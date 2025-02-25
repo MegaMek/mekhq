@@ -45,8 +45,8 @@ public class PersonnelMarketDylan extends PersonnelMarketRandom {
 
         ArrayList<Long> mtf = new ArrayList<>();
         long mostTypes = PersonnelMarket.getUnitMainForceTypes(c);
-        if ((mostTypes & Entity.ETYPE_MECH) != 0) {
-            mtf.add(Entity.ETYPE_MECH);
+        if ((mostTypes & Entity.ETYPE_MEK) != 0) {
+            mtf.add(Entity.ETYPE_MEK);
         } else if ((mostTypes & Entity.ETYPE_TANK) != 0) {
             mtf.add(Entity.ETYPE_TANK);
         } else if ((mostTypes & Entity.ETYPE_AEROSPACEFIGHTER) != 0) {
@@ -55,8 +55,8 @@ public class PersonnelMarketDylan extends PersonnelMarketRandom {
             mtf.add(Entity.ETYPE_BATTLEARMOR);
         } else if ((mostTypes & Entity.ETYPE_INFANTRY) != 0) {
             mtf.add(Entity.ETYPE_INFANTRY);
-        } else if ((mostTypes & Entity.ETYPE_PROTOMECH) != 0) {
-            mtf.add(Entity.ETYPE_PROTOMECH);
+        } else if ((mostTypes & Entity.ETYPE_PROTOMEK) != 0) {
+            mtf.add(Entity.ETYPE_PROTOMEK);
         } else if ((mostTypes & Entity.ETYPE_CONV_FIGHTER) != 0) {
             mtf.add(Entity.ETYPE_CONV_FIGHTER);
         } else if ((mostTypes & Entity.ETYPE_SMALL_CRAFT) != 0) {
@@ -64,7 +64,7 @@ public class PersonnelMarketDylan extends PersonnelMarketRandom {
         } else if ((mostTypes & Entity.ETYPE_DROPSHIP) != 0) {
             mtf.add(Entity.ETYPE_DROPSHIP);
         } else {
-            mtf.add(Entity.ETYPE_MECH);
+            mtf.add(Entity.ETYPE_MEK);
         }
 
         final PersonnelRole[] personnelRoles = PersonnelRole.values();
@@ -74,8 +74,8 @@ public class PersonnelMarketDylan extends PersonnelMarketRandom {
         for (int i = 0; i < q; i++) {
             long choice = mtf.get(Compute.randomInt(Math.max(mtf.size() - 1, 1)));
             if (Compute.randomInt(99) < weight) {
-                if (choice == Entity.ETYPE_MECH) {
-                    p = c.newPerson(PersonnelRole.MECHWARRIOR);
+                if (choice == Entity.ETYPE_MEK) {
+                    p = c.newPerson(PersonnelRole.MEKWARRIOR);
                 } else if (choice == Entity.ETYPE_TANK) {
                     p = c.newPerson((Compute.d6() < 3) ? PersonnelRole.GROUND_VEHICLE_DRIVER
                             : PersonnelRole.VEHICLE_GUNNER);
@@ -85,8 +85,8 @@ public class PersonnelMarketDylan extends PersonnelMarketRandom {
                     p = c.newPerson(PersonnelRole.BATTLE_ARMOUR);
                 } else if (choice == Entity.ETYPE_INFANTRY) {
                     p = c.newPerson(PersonnelRole.SOLDIER);
-                } else if (choice == Entity.ETYPE_PROTOMECH) {
-                    p = c.newPerson(PersonnelRole.PROTOMECH_PILOT);
+                } else if (choice == Entity.ETYPE_PROTOMEK) {
+                    p = c.newPerson(PersonnelRole.PROTOMEK_PILOT);
                 } else if (choice == Entity.ETYPE_CONV_FIGHTER) {
                     p = c.newPerson(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
                 } else if (choice == Entity.ETYPE_SMALL_CRAFT) {

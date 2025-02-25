@@ -21,10 +21,11 @@
 package mekhq.campaign.unit;
 
 import megamek.Version;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.common.force.Force;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import org.apache.logging.log4j.LogManager;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -37,9 +38,12 @@ import java.util.UUID;
  * This class is used to store information about a particular unit that is
  * lost when a unit is mothballed, so that it may be restored to as close to
  * its prior state as possible when the unit is reactivated.
+ *
  * @author NickAragua
  */
 public class MothballInfo {
+    private static final MMLogger logger = MMLogger.create(MothballInfo.class);
+
     private Person tech;
     private int forceID;
     private List<Person> drivers;
@@ -52,13 +56,23 @@ public class MothballInfo {
      * Parameterless constructor, used for deserialization.
      */
     private MothballInfo() {
+        forceID = Force.NO_FORCE;
         drivers = new ArrayList<>();
         gunners = new ArrayList<>();
         vesselCrew = new ArrayList<>();
     }
 
     /**
+     * Who was the original tech of this vessel?
+     * @return The original tech
+     */
+    public Person getTech() {
+        return tech;
+    }
+
+    /**
      * Creates a set of mothball info for a given unit
+     *
      * @param unit The unit to work with
      */
     public MothballInfo(Unit unit) {
@@ -73,7 +87,8 @@ public class MothballInfo {
 
     /**
      * Restore a unit's pilot, assigned tech and force, to the best of our ability
-     * @param unit The unit to restore
+     *
+     * @param unit     The unit to restore
      * @param campaign The campaign in which this is happening
      */
     public void restorePreMothballInfo(Unit unit, Campaign campaign) {
@@ -88,7 +103,8 @@ public class MothballInfo {
         }
 
         for (Person gunner : gunners) {
-            // add the gunner if they exist, aren't dead/retired/etc and aren't already assigned to some
+            // add the gunner if they exist, aren't dead/retired/etc and aren't already
+            // assigned to some
             // other unit. Caveat: single-person units have the same driver and gunner.
             if (gunner.getStatus().isActive() &&
                     ((gunner.getUnit() == null) || (gunner.getUnit() == unit))) {
@@ -123,9 +139,7 @@ public class MothballInfo {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techId", tech.getId());
         }
 
-        if (forceID > 0) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceID", forceID);
-        }
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceID", forceID);
 
         for (Person driver : drivers) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "driverId", driver.getId());
@@ -151,6 +165,7 @@ public class MothballInfo {
 
     /**
      * Deserializer method implemented in standard MekHQ pattern.
+     *
      * @return Instance of MothballInfo
      */
     public static MothballInfo generateInstanceFromXML(Node wn, Version version) {
@@ -179,7 +194,7 @@ public class MothballInfo {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
 
         return retVal;
@@ -199,8 +214,8 @@ public class MothballInfo {
             UUID id = tech.getId();
             tech = campaign.getPerson(id);
             if (tech == null) {
-                LogManager.getLogger().error(
-                    String.format("Mothball info references missing tech %s", id));
+                logger.error(
+                        String.format("Mothball info references missing tech %s", id));
             }
         }
         for (int ii = drivers.size() - 1; ii >= 0; --ii) {
@@ -208,9 +223,9 @@ public class MothballInfo {
             if (driver instanceof MothballInfoPersonRef) {
                 drivers.set(ii, campaign.getPerson(driver.getId()));
                 if (drivers.get(ii) == null) {
-                    LogManager.getLogger().error(
-                        String.format("Mothball info references missing driver %s",
-                            driver.getId()));
+                    logger.error(
+                            String.format("Mothball info references missing driver %s",
+                                    driver.getId()));
                     drivers.remove(ii);
                 }
             }
@@ -220,9 +235,9 @@ public class MothballInfo {
             if (gunner instanceof MothballInfoPersonRef) {
                 gunners.set(ii, campaign.getPerson(gunner.getId()));
                 if (gunners.get(ii) == null) {
-                    LogManager.getLogger().error(
-                        String.format("Mothball info references missing gunner %s",
-                            gunner.getId()));
+                    logger.error(
+                            String.format("Mothball info references missing gunner %s",
+                                    gunner.getId()));
                     gunners.remove(ii);
                 }
             }
@@ -232,9 +247,9 @@ public class MothballInfo {
             if (crew instanceof MothballInfoPersonRef) {
                 vesselCrew.set(ii, campaign.getPerson(crew.getId()));
                 if (vesselCrew.get(ii) == null) {
-                    LogManager.getLogger().error(
-                        String.format("Mothball info references missing vessel crew %s",
-                            crew.getId()));
+                    logger.error(
+                            String.format("Mothball info references missing vessel crew %s",
+                                    crew.getId()));
                     vesselCrew.remove(ii);
                 }
             }
@@ -243,8 +258,8 @@ public class MothballInfo {
             UUID id = navigator.getId();
             navigator = campaign.getPerson(id);
             if (navigator == null) {
-                LogManager.getLogger().error(
-                    String.format("Mothball info references missing navigator %s", id));
+                logger.error(
+                        String.format("Mothball info references missing navigator %s", id));
             }
         }
     }

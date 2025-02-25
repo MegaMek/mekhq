@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2011-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,73 +18,56 @@
  */
 package mekhq.campaign.universe;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlTransient;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.KeyDeserializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import megamek.common.EquipmentType;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.common.preference.PreferenceManager;
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.Utilities;
-import org.apache.logging.log4j.LogManager;
+import mekhq.campaign.universe.enums.HiringHallLevel;
+import mekhq.campaign.universe.enums.HPGRating;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 
 import java.io.*;
-import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
- * This will eventually replace the Planets object as our source of system/planetary information
- * using the new XML format that places planets within systems
+ * This will eventually replace the Planets object as our source of
+ * system/planetary information using the new XML format that places planets
+ * within systems
+ *
  * @author Taharqa
  */
 
 public class Systems {
+    private static final MMLogger logger = MMLogger.create(Systems.class);
+
     private static Systems systems;
 
-    // Marshaller / unmarshaller instances
-    private static Marshaller marshaller;
-    private static Unmarshaller unmarshaller;
-    static {
-        try {
-            JAXBContext context = JAXBContext.newInstance(LocalSystemList.class, Planet.class);
-            marshaller = context.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            unmarshaller = context.createUnmarshaller();
-            // For debugging only!
-            // unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
-        } catch (JAXBException e) {
-            LogManager.getLogger().error("", e);
-        }
-    }
-
-    private static Marshaller planetMarshaller;
-    private static Unmarshaller planetUnmarshaller;
-    static {
-        try {
-            //creating the JAXB context
-            JAXBContext jContext = JAXBContext.newInstance(Planet.class);
-            planetMarshaller = jContext.createMarshaller();
-            planetMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-            planetMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            planetUnmarshaller = jContext.createUnmarshaller();
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
-        }
-    }
+    private final int HPG_RADIUS_A_STATION = 50;
+    private final int HPG_RADIUS_B_STATION = 30;
 
     public static Systems getInstance() {
         if (systems == null) {
             systems = new Systems();
         }
+
         return systems;
     }
 
@@ -110,6 +93,7 @@ public class Systems {
         if (!systemGrid.containsKey(x)) {
             return null;
         }
+
         return systemGrid.get(x).get(y);
     }
 
@@ -118,15 +102,18 @@ public class Systems {
         if (null == name) {
             return null;
         }
+
         name = name.toLowerCase(Locale.ROOT);
         for (PlanetarySystem system : systemList.values()) {
             if (null != system) {
                 String systemName = system.getName(when);
+
                 if ((null != systemName) && systemName.toLowerCase(Locale.ROOT).equals(name)) {
                     return system;
                 }
             }
         }
+
         return null;
     }
 
@@ -148,20 +135,22 @@ public class Systems {
     }
 
     public PlanetarySystem getSystemById(String id) {
-        return( null != id ? systemList.get(id) : null);
+        return (null != id ? systemList.get(id) : null);
     }
 
     /**
-     * Get a list of planetary systems within a certain jump radius (30ly per jump) that
+     * Get a list of planetary systems within a certain jump radius (30ly per jump)
+     * that
      * you can shop on, sorted by number of jumps and in system transit time
+     *
      * @param system - current <code>PlanetarySystem</code>
-     * @param jumps - number of jumps out to look as an integer
+     * @param jumps  - number of jumps out to look as an integer
      * @return a list of planets where you can go shopping
      */
     public List<PlanetarySystem> getShoppingSystems(final PlanetarySystem system, int jumps, LocalDate when) {
-        List<PlanetarySystem> shoppingSystems = getNearbySystems(system, jumps*30);
+        List<PlanetarySystem> shoppingSystems = getNearbySystems(system, jumps * 30);
 
-        //remove dead planets
+        // remove dead planets
         Iterator<PlanetarySystem> iter = shoppingSystems.iterator();
         while (iter.hasNext()) {
             PlanetarySystem s = iter.next();
@@ -171,7 +160,7 @@ public class Systems {
         }
 
         shoppingSystems.sort((p1, p2) -> {
-            //sort first on number of jumps required
+            // sort first on number of jumps required
             int jump1 = (int) Math.ceil(p1.getDistanceTo(system) / 30.0);
             int jump2 = (int) Math.ceil(p2.getDistanceTo(system) / 30.0);
             int sComp = Integer.compare(jump1, jump2);
@@ -180,7 +169,7 @@ public class Systems {
                 return sComp;
             }
 
-            //if number of jumps the same then sort on in system transit time
+            // if number of jumps the same then sort on in system transit time
             return Double.compare(p1.getTimeToJumpPoint(1.0), p2.getTimeToJumpPoint(1.0));
         });
 
@@ -207,26 +196,33 @@ public class Systems {
         return news;
     }
 
-    /** Clean up the local HPG network cache */
-    public void recalcHPGNetwork() {
-        hpgNetworkCacheDate = null;
-    }
-
-    public Collection<Systems.HPGLink> getHPGNetwork(LocalDate when) {
+    public Collection<HPGLink> getHPGNetwork(LocalDate when) {
         if ((null != when) && when.equals(hpgNetworkCacheDate)) {
             return hpgNetworkCache;
         }
 
         Set<HPGLink> result = new HashSet<>();
         for (PlanetarySystem system : systemList.values()) {
-            Integer hpg = system.getHPG(when);
-            if ((null != hpg) && (hpg == EquipmentType.RATING_A)) {
-                Collection<PlanetarySystem> neighbors = getNearbySystems(system, 50);
-                for (PlanetarySystem neighbor : neighbors) {
-                    hpg = neighbor.getHPG(when);
-                    if (null != hpg) {
-                        HPGLink link = new HPGLink(system, neighbor, hpg);
-                        result.add(link);
+            HPGRating hpg = system.getHPG(when);
+            if (hpg != null) {
+                int distance = 0;
+                if (hpg == HPGRating.A) {
+                    distance = HPG_RADIUS_A_STATION;
+                }
+
+                if (hpg == HPGRating.B) {
+                    distance = HPG_RADIUS_B_STATION;
+                }
+
+                Collection<PlanetarySystem> neighbors = getNearbySystems(system, distance);
+
+                if (distance > 0) {
+                    for (PlanetarySystem neighbor : neighbors) {
+                        hpg = neighbor.getHPG(when);
+                        if (null != hpg) {
+                            HPGLink link = new HPGLink(system, neighbor, hpg);
+                            result.add(link);
+                        }
                     }
                 }
             }
@@ -239,23 +235,32 @@ public class Systems {
     // Data loading methods
 
     /**
-     * Loads the default Systems data.
+     * Loads the default planetary system data. This includes all *.yml files in
+     * data/universe/planetary_systems and subfolders. It also loads a player's
+     * custom planets in their custom user directory, if it exists.
      *
      * @throws DOMException
      * @throws IOException
-     * @throws FileNotFoundException
-     * @throws ParseException
      */
-    public static Systems loadDefault()
-            throws DOMException, FileNotFoundException, IOException, ParseException {
-        LogManager.getLogger().info("Starting load of system data from XML...");
+    public static Systems loadDefault() throws DOMException, IOException {
+        logger.info("Starting load of system data from XML...");
         long currentTime = System.currentTimeMillis();
 
-        Systems systems = load("data/universe/planetary_systems", "data/universe/systems.xml");
+        Systems systems = new Systems();
 
-        LogManager.getLogger().info(String.format(Locale.ROOT, "Loaded a total of %d systems in %.3fs.",
+        // load default systems
+        systems.load(MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH);
+
+        // load user directory systems
+        String userDir = PreferenceManager.getClientPreferences().getUserDir();
+        systems.load(new File(userDir, MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH).toString());
+
+        // a bit of post loading clean up
+        systems.cleanupSystems();
+
+        // logging
+        logger.info(String.format(Locale.ROOT, "Loaded a total of %d systems in %.3fs.",
                 systems.systemList.size(), (System.currentTimeMillis() - currentTime) / 1000.0));
-
         systems.logVeryCloseSystems();
 
         return systems;
@@ -264,80 +269,123 @@ public class Systems {
     /**
      * Loads Systems data from files.
      *
-     * @param planetsPath The path to the folder containing planetary XML files.
-     * @param defaultFilePath The path to the file with default systems data.
+     * @param planetsPath     The path to the folder containing planetary XML files.
      *
      * @throws DOMException
      * @throws IOException
-     * @throws FileNotFoundException
-     * @throws ParseException
      */
-    public static Systems load(String planetsPath, String defaultFilePath)
-            throws DOMException, IOException, ParseException, FileNotFoundException {
-        Systems systems = new Systems();
+    public void load(String planetsPath) throws DOMException, IOException {
+        // set up mapper
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        // add custom deserializer for any complex objects that need to be read from Strings, etc.
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(SocioIndustrialData.class, new SocioIndustrialData.SocioIndustrialDataDeserializer());
+        module.addDeserializer(StarType.class, new StarType.StarTypeDeserializer());
+        module.addDeserializer(SourceableValue.class, new SourceableValue.SourceableValueDeserializer());
+        mapper.registerModule(module);
+        // this will allow the mapper to deserialize LocalDate objects
+        mapper.registerModule(new JavaTimeModule());
 
-        // Step 1: Read the default file
-        try (FileInputStream fis = new FileInputStream(defaultFilePath)) {
-            systems.updateSystems(fis);
-        }
-
-        // Step 2: Load all the xml files within the planets subdirectory, if it exists
-        Utilities.parseXMLFiles(planetsPath, systems::updateSystems);
-
-        // Step 3: Cleanup any systems that have issues
-        systems.cleanupSystems();
-
-        return systems;
+        // Now we can Load all the yml files in the planetsPath and subdirectories
+        parsePlanetarySystemFiles(planetsPath, mapper);
     }
 
-    private void updateSystems(FileInputStream source) {
-        // JAXB unmarshaller closes the stream it doesn't own. Bad JAXB. BAD.
-        try (InputStream is = new FilterInputStream(source) {
-                @Override
-                public void close() {  }
-            }) {
-            // Reset the file stream
-            source.getChannel().position(0);
-
-            LocalSystemList systems = unmarshaller.unmarshal(
-                    MHQXMLUtility.createSafeXmlSource(is), LocalSystemList.class).getValue();
-
-            // Run through the list again, this time creating and updating systems as we go
-            for (PlanetarySystem system : systems.list) {
-                PlanetarySystem oldSystem = systemList.get(system.getId());
-                if (null == oldSystem) {
-                    systemList.put(system.getId(), system);
-                } else {
-                    // Update with new data
-                    oldSystem.copyDataFrom(system);
-                    system = oldSystem;
-                }
-            }
-
-            // Process system deletions
-            for (String systemId : systems.toDelete) {
-                if (null != systemId) {
-                    systemList.remove(systemId);
-                }
-            }
-        } catch (JAXBException e) {
-            LogManager.getLogger().error("", e);
-        } catch (IOException e) {
-            LogManager.getLogger().error("", e);
+    /**
+     * loop through all files in the directory and subdirectories and load any
+     * *.yml files found.
+     * @param dirName the name of the directory from which to load files
+     * @param mapper the Jackson mapper used to load the data from yaml
+     */
+    private void parsePlanetarySystemFiles(String dirName, ObjectMapper mapper) {
+        if ((null == dirName)) {
+            throw new NullPointerException();
         }
+
+        File dir = new File(dirName);
+        if (dir.isDirectory()) {
+            File[] files = dir.listFiles((dir1, name) -> name.toLowerCase(Locale.ROOT).endsWith(".yml"));
+            if ((null != files) && (files.length > 0)) {
+                // Case-insensitive sorting. Yes, even on Windows. Deal with it.
+                Arrays.sort(files, Comparator.comparing(File::getPath));
+                // Try parsing and updating the main list, one by one
+                for (File file : files) {
+                    if (file.isFile()) {
+                        try (FileInputStream fis = new FileInputStream(file)) {
+                            loadPlanetarySystem(fis, mapper);
+                        } catch (Exception ex) {
+                            // Ignore this file then
+                            logger.error(
+                                String.format("Exception trying to parse %s - ignoring.", file.getPath()),
+                                ex);
+                        }
+                    }
+                }
+            }
+
+            File[] zipFiles = dir.listFiles((dir1, name) -> name.toLowerCase(Locale.ROOT).endsWith(".zip"));
+            for (File zipFile : zipFiles) {
+                try (ZipFile zip = new ZipFile(zipFile.getPath())) {
+                    Enumeration<? extends ZipEntry> entries = zip.entries();
+                    while (entries.hasMoreElements()) {
+                        ZipEntry entry = entries.nextElement();
+                        // Check if entry is a directory
+                        if (!entry.isDirectory() && entry.getName().toLowerCase(Locale.ROOT).endsWith(".yml")) {
+                            try (InputStream inputStream = zip.getInputStream(entry)) {
+                                loadPlanetarySystem(inputStream, mapper);
+                            } catch (Exception ex) {
+                                // Ignore this file then
+                                logger.error(
+                                    String.format("Exception trying to parse zip  entry %s - ignoring.", entry.getName()),
+                                    ex);
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    logger.error(
+                        String.format("Exception trying to read the zip file %s -ignoring.", zipFile.getName()),
+                        ex);
+                }
+            }
+
+            // Get subdirectories too
+            File[] dirs = dir.listFiles();
+            if (null != dirs && dirs.length > 0) {
+                Arrays.sort(dirs, Comparator.comparing(File::getPath));
+                for (File subDirectory : dirs) {
+                    if (subDirectory.isDirectory()) {
+                        parsePlanetarySystemFiles(subDirectory.getPath(), mapper);
+                    }
+                }
+            }
+        }
+    }
+
+    private void loadPlanetarySystem(InputStream source, ObjectMapper mapper) throws IOException {
+
+        PlanetarySystem system = mapper.readValue(source, PlanetarySystem.class);
+        systemList.put(system.getId(), system);
+
     }
 
     private void cleanupSystems() {
         List<PlanetarySystem> toRemove = new ArrayList<>();
         for (PlanetarySystem system : systemList.values()) {
             if ((null == system.getX()) || (null == system.getY())) {
-                LogManager.getLogger().error(String.format("System \"%s\" is missing coordinates", system.getId()));
+                logger.error(String.format("System \"%s\" is missing coordinates", system.getId()));
                 toRemove.add(system);
                 continue;
             }
-            //make sure the primary slot is not larger than the number of planets
+
+            if(null == system.getStar()) {
+                logger.error(String.format("System \"%s\" is missing a star", system.getId()));
+                toRemove.add(system);
+                continue;
+            }
+
+            // make sure the primary slot is not larger than the number of planets
             if (system.getPrimaryPlanetPosition() > system.getPlanets().size()) {
-                LogManager.getLogger().error(String.format("System \"%s\" has a primary slot greater than the number of planets", system.getId()));
+                logger.error(String
+                        .format("System \"%s\" has a primary slot greater than the number of planets", system.getId()));
                 toRemove.add(system);
                 continue;
             }
@@ -359,7 +407,7 @@ public class Systems {
             if (veryCloseSystems.size() > 1) {
                 for (PlanetarySystem closeSystem : veryCloseSystems) {
                     if (!system.getId().equals(closeSystem.getId())) {
-                        LogManager.getLogger().warn(String.format(Locale.ROOT,
+                        logger.warn(String.format(Locale.ROOT,
                                 "Extremely close systems detected. Data error? %s <-> %s: %.3f ly",
                                 system.getId(), closeSystem.getId(), system.getDistanceTo(closeSystem)));
                     }
@@ -368,42 +416,17 @@ public class Systems {
         }
     }
 
-    @XmlRootElement(name="systems")
-    private static final class LocalSystemList {
-        @XmlElement(name="system")
-        public List<PlanetarySystem> list;
-
-        @XmlTransient
-        public List<String> toDelete;
-
-        @SuppressWarnings("unused")
-        private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
-            toDelete = new ArrayList<>();
-            if (null == list) {
-                list = new ArrayList<>();
-            } else {
-                // Fill in the "toDelete" list
-                List<PlanetarySystem> filteredList = new ArrayList<>(list.size());
-                for (PlanetarySystem system : list) {
-                    if ((null != system.delete) && system.delete && (null != system.getId())) {
-                        toDelete.add(system.getId());
-                    } else {
-                        filteredList.add(system);
-                    }
-                }
-                list = filteredList;
-            }
-        }
-    }
-
     /** A data class representing a HPG link between two planets */
     public static final class HPGLink {
-        /** In case of HPG-A to HPG-B networks, <code>primary</code> holds the HPG-A node. Else the order doesn't matter. */
+        /**
+         * In case of HPG-A to HPG-B networks, <code>primary</code> holds the HPG-A
+         * node. Else the order doesn't matter.
+         */
         public final PlanetarySystem primary;
         public final PlanetarySystem secondary;
-        public final int rating;
+        public final HPGRating rating;
 
-        public HPGLink(PlanetarySystem primary, PlanetarySystem secondary, int rating) {
+        public HPGLink(PlanetarySystem primary, PlanetarySystem secondary, HPGRating rating) {
             this.primary = primary;
             this.secondary = secondary;
             this.rating = rating;
@@ -424,17 +447,20 @@ public class Systems {
             }
             final HPGLink other = (HPGLink) obj;
             return Objects.equals(primary, other.primary) && Objects.equals(secondary, other.secondary)
-                && (rating == other.rating);
+                    && (rating == other.rating);
         }
     }
 
-    public void visitNearbySystems(final double centerX, final double centerY, final int distance, Consumer<PlanetarySystem> visitor) {
+    public void visitNearbySystems(final double centerX, final double centerY, final int distance,
+            Consumer<PlanetarySystem> visitor) {
         int gridRadius = (int) Math.ceil(distance / 30.0);
         int gridX = (int) (centerX / 30.0);
         int gridY = (int) (centerY / 30.0);
+
         for (int x = gridX - gridRadius; x <= gridX + gridRadius; x++) {
             for (int y = gridY - gridRadius; y <= gridY + gridRadius; y++) {
                 Set<PlanetarySystem> grid = getSystemGrid(x, y);
+
                 if (null != grid) {
                     for (PlanetarySystem p : grid) {
                         if (p.getDistanceTo(centerX, centerY) <= distance) {
@@ -446,143 +472,8 @@ public class Systems {
         }
     }
 
-    public void visitNearbySystems(final PlanetarySystem system, final int distance, Consumer<PlanetarySystem> visitor) {
+    public void visitNearbySystems(final PlanetarySystem system, final int distance,
+            Consumer<PlanetarySystem> visitor) {
         visitNearbySystems(system.getX(), system.getY(), distance, visitor);
-    }
-
-    /**
-     * Write out a planetary event to XML
-     * @param out - the <code>Writer</code>
-     * @param event - the <code>PlanetaryEvent</code> to write
-     */
-    public void writePlanetaryEvent(Writer out, Planet.PlanetaryEvent event) {
-        try {
-            planetMarshaller.marshal(event, out);
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
-        }
-    }
-
-    /**
-     * Write out planetary system-wide event to XML
-     * @param out - the <code>Writer</code>
-     * @param event - the <code>PlanetarySystemEvent</code> to write
-     */
-    public void writePlanetarySystemEvent(Writer out, PlanetarySystem.PlanetarySystemEvent event) {
-        try {
-            marshaller.marshal(event, out);
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
-        }
-    }
-
-    /**
-     * This is a legacy function to read custom planetary events from before the switch
-     * to PlanetarySystems
-     * @param node - xml node
-     * @return PlanetaryEvent class from Planet
-     */
-    public Planet.PlanetaryEvent readPlanetaryEvent(Node node) {
-        try {
-            return (Planet.PlanetaryEvent) planetUnmarshaller.unmarshal(node);
-        } catch (JAXBException e) {
-            LogManager.getLogger().error("", e);
-        }
-        return null;
-    }
-
-    /**
-     * This function will read in system wide events from XML and apply them. It is designed
-     * for allowind custom events
-     * @param node - xml node
-     * @return PlanetaryEvent class from Planet
-     */
-    public PlanetarySystem.PlanetarySystemEvent readPlanetarySystemEvent(Node node) {
-        try {
-            return (PlanetarySystem.PlanetarySystemEvent) unmarshaller.unmarshal(node);
-        } catch (JAXBException e) {
-            LogManager.getLogger().error("", e);
-        }
-        return null;
-    }
-
-    /** @return <code>true</code> if the planet was known and got updated, <code>false</code> otherwise */
-    /*public boolean updatePlanetaryEvents(String id, Collection<Planet.PlanetaryEvent> events) {
-        return updatePlanetaryEvents(id, events, false);
-    }*/
-
-    /**
-     * This is a legacy function for updating planetary events before PlanetarySystem. it will
-     * assume that the planet's events to be updated is the primary planet
-     * @param id
-     * @param events
-     * @param replace
-     * @return
-     */
-    public boolean updatePlanetaryEvents(String id, Collection<Planet.PlanetaryEvent> events, boolean replace) {
-        //assume the primary planet
-        PlanetarySystem system = getSystemById(id);
-        if (null == system) {
-            return false;
-        }
-        int pos = system.getPrimaryPlanetPosition();
-        if (pos == 0) {
-            return false;
-        }
-        return(updatePlanetaryEvents(id, events, replace, pos));
-    }
-
-    /** @return <code>true</code> if the planet was known and got updated, <code>false</code> otherwise */
-    public boolean updatePlanetaryEvents(String id, Collection<Planet.PlanetaryEvent> events, boolean replace, int position) {
-        PlanetarySystem system = getSystemById(id);
-        if ((null == system) || (position < 1)) {
-            return false;
-        }
-        if (null != events) {
-            for (Planet.PlanetaryEvent event : events) {
-                if (null != event.date) {
-                    Planet.PlanetaryEvent planetaryEvent = system.getOrCreateEvent(event.date, position);
-                    if (null == planetaryEvent) {
-                        continue;
-                    }
-                    if (replace) {
-                        planetaryEvent.replaceDataFrom(event);
-                    } else {
-                        planetaryEvent.copyDataFrom(event);
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
-     * updates system wide events from a collection of events
-     * @param id - system id
-     * @param events - collection of PlanetarySystemEvents
-     * @param replace - should we replace existing events
-     * @return <code>true</code> if the system was known and got updated, <code>false</code> otherwise
-     */
-    public boolean updatePlanetarySystemEvents(String id, Collection<PlanetarySystem.PlanetarySystemEvent> events, boolean replace) {
-        PlanetarySystem system = getSystemById(id);
-        if (null == system) {
-            return false;
-        }
-        if (null != events) {
-            for (PlanetarySystem.PlanetarySystemEvent event : events) {
-                if (null != event.date) {
-                    PlanetarySystem.PlanetarySystemEvent systemEvent = system.getOrCreateEvent(event.date);
-                    if (null == systemEvent) {
-                        continue;
-                    }
-                    if (replace) {
-                        systemEvent.replaceDataFrom(event);
-                    } else {
-                        systemEvent.copyDataFrom(event);
-                    }
-                }
-            }
-        }
-        return true;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,9 +25,9 @@ import megamek.common.event.MMEvent;
  * The event handlers cannot modify these options.
  */
 public class MHQOptionsChangedEvent extends MMEvent {
-    //region Constructors
+    // region Constructors
     public MHQOptionsChangedEvent() {
         super();
     }
-    //endregion Constructors
+    // endregion Constructors
 }

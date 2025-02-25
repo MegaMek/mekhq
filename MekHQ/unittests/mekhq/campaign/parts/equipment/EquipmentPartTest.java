@@ -41,7 +41,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -219,25 +218,25 @@ public class EquipmentPartTest {
         // Just because we're MiscType doesn't mean we're omnipoddable ...
         assertFalse(equipmentPart.isOmniPoddable());
 
-        // ... we need to be Mech Equipment ...
+        // ... we need to be Mek Equipment ...
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
-            return MiscType.F_MECH_EQUIPMENT.equals(flag);
-        }).when(miscType).hasFlag(any());
+            EquipmentFlag flag = inv.getArgument(0);
+            return MiscType.F_MEK_EQUIPMENT.equals(flag);
+        }).when(miscType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // ... or Tank Equipment ...
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
+            EquipmentFlag flag = inv.getArgument(0);
             return MiscType.F_TANK_EQUIPMENT.equals(flag);
-        }).when(miscType).hasFlag(any());
+        }).when(miscType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // ... or Aero Equipment ...
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
+            EquipmentFlag flag = inv.getArgument(0);
             return MiscType.F_FIGHTER_EQUIPMENT.equals(flag);
-        }).when(miscType).hasFlag(any());
+        }).when(miscType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // WeaponType
@@ -248,32 +247,32 @@ public class EquipmentPartTest {
         // Just because we're WeaponType doesn't mean we're omnipoddable ...
         assertFalse(equipmentPart.isOmniPoddable());
 
-        // ... we need to be Mech Equipment ...
+        // ... we need to be Mek Equipment ...
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
-            return WeaponType.F_MECH_WEAPON.equals(flag);
-        }).when(weaponType).hasFlag(any());
+            EquipmentFlag flag = inv.getArgument(0);
+            return WeaponType.F_MEK_WEAPON.equals(flag);
+        }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // ... or Tank Equipment ...
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
+            EquipmentFlag flag = inv.getArgument(0);
             return WeaponType.F_TANK_WEAPON.equals(flag);
-        }).when(weaponType).hasFlag(any());
+        }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // ... or Fighter Equipment ...
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
+            EquipmentFlag flag = inv.getArgument(0);
             return WeaponType.F_AERO_WEAPON.equals(flag);
-        }).when(weaponType).hasFlag(any());
+        }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // ... but not Capital scale.
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
+            EquipmentFlag flag = inv.getArgument(0);
             return WeaponType.F_AERO_WEAPON.equals(flag);
-        }).when(weaponType).hasFlag(any());
+        }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         when(weaponType.isCapital()).thenReturn(true);
         assertFalse(equipmentPart.isOmniPoddable());
     }
@@ -325,7 +324,7 @@ public class EquipmentPartTest {
 
         // Put a mount behind the equipment on the unit
         Mounted mounted = mock(Mounted.class);
-        int location = Mech.LOC_RT;
+        int location = Mek.LOC_RT;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
@@ -360,8 +359,8 @@ public class EquipmentPartTest {
 
         // Put a mount behind the equipment on the unit
         Mounted mounted = mock(Mounted.class);
-        String locationName = "Mech Right Torso";
-        int location = Mech.LOC_RT;
+        String locationName = "Mek Right Torso";
+        int location = Mek.LOC_RT;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
         doReturn(locationName).when(entity).getLocationName(eq(location));
@@ -387,7 +386,7 @@ public class EquipmentPartTest {
         doReturn(1.0).when(type).getTonnage(any(), anyDouble());
 
         int equipmentNum = 42;
-        String locationName = "Mech Right Torso";
+        String locationName = "Mek Right Torso";
 
         EquipmentPart equipmentPart = new EquipmentPart(75, type, equipmentNum, size, false, mockCampaign);
 
@@ -402,7 +401,7 @@ public class EquipmentPartTest {
 
         // Put a mount behind the equipment on the unit
         Mounted mounted = mock(Mounted.class);
-        int location = Mech.LOC_RT;
+        int location = Mek.LOC_RT;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
@@ -416,7 +415,7 @@ public class EquipmentPartTest {
         assertFalse(equipmentPart.isInLocation(locationName));
 
         // Split the mount and have the second location be the one we want
-        when(mounted.getLocation()).thenReturn(Mech.LOC_RLEG);
+        when(mounted.getLocation()).thenReturn(Mek.LOC_RLEG);
         when(mounted.isSplit()).thenReturn(true);
         when(mounted.getSecondLocation()).thenReturn(location);
 
@@ -730,7 +729,7 @@ public class EquipmentPartTest {
 
         // Mount equipment at the index
         Mounted mounted = mock(Mounted.class);
-        int location = Mech.LOC_LARM;
+        int location = Mek.LOC_LARM;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
@@ -744,7 +743,7 @@ public class EquipmentPartTest {
 
         // Swap over to the secondary location
         doReturn(false).when(unit).hasBadHipOrShoulder(eq(location));
-        int secondLocation = Mech.LOC_LT;
+        int secondLocation = Mek.LOC_LT;
         when(mounted.getSecondLocation()).thenReturn(secondLocation);
         when(mounted.isSplit()).thenReturn(true);
         doReturn(true).when(unit).hasBadHipOrShoulder(eq(secondLocation));
@@ -789,8 +788,8 @@ public class EquipmentPartTest {
 
         // Mount equipment at the index
         Mounted mounted = mock(Mounted.class);
-        String locationName = "Mech Left Torso";
-        int location = Mech.LOC_LT;
+        String locationName = "Mek Left Torso";
+        int location = Mek.LOC_LT;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
         doReturn(locationName).when(entity).getLocationName(eq(location));
@@ -812,8 +811,8 @@ public class EquipmentPartTest {
         //      See: https://github.com/MegaMek/mekhq/issues/2387
         assertNull(equipmentPart.checkFixable());
 
-        String secondaryLocationName = "Mech Left Arm";
-        int secondaryLocation = Mech.LOC_LARM;
+        String secondaryLocationName = "Mek Left Arm";
+        int secondaryLocation = Mek.LOC_LARM;
         when(mounted.getSecondLocation()).thenReturn(secondaryLocation);
         when(mounted.isSplit()).thenReturn(true);
         doReturn(secondaryLocationName).when(entity).getLocationName(secondaryLocation);
@@ -1007,7 +1006,7 @@ public class EquipmentPartTest {
         int equipmentNum = 42;
         Mounted mounted = mock(Mounted.class);
         when(mounted.isMissing()).thenReturn(false);
-        int location = Mech.LOC_LLEG;
+        int location = Mek.LOC_LLEG;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
         doReturn(1).when(entity).getDamagedCriticals(anyInt(), anyInt(), anyInt()); // Setup damage everywhere else
@@ -1029,7 +1028,7 @@ public class EquipmentPartTest {
 
         // If the part is split it should also take those hits into account
         when(mounted.isSplit()).thenReturn(true);
-        int secondLocation = Mech.LOC_LT;
+        int secondLocation = Mek.LOC_LT;
         when(mounted.getSecondLocation()).thenReturn(secondLocation);
         doReturn(0).when(entity).getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(secondLocation));
 
@@ -1057,7 +1056,7 @@ public class EquipmentPartTest {
         int equipmentNum = 42;
         Mounted mounted = mock(Mounted.class);
         when(mounted.isMissing()).thenReturn(false);
-        int location = Mech.LOC_LLEG;
+        int location = Mek.LOC_LLEG;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
         doReturn(0).when(entity).getDamagedCriticals(anyInt(), anyInt(), anyInt()); // Setup damage everywhere else
@@ -1073,7 +1072,7 @@ public class EquipmentPartTest {
 
         // If the part is split it should also take those hits into account
         when(mounted.isSplit()).thenReturn(true);
-        int secondLocation = Mech.LOC_LT;
+        int secondLocation = Mek.LOC_LT;
         when(mounted.getSecondLocation()).thenReturn(secondLocation);
         doReturn(2).when(entity).getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(secondLocation));
 
@@ -1117,7 +1116,7 @@ public class EquipmentPartTest {
         int equipmentNum = 42;
         Mounted mounted = mock(Mounted.class);
         when(mounted.isMissing()).thenReturn(false);
-        int location = Mech.LOC_LLEG;
+        int location = Mek.LOC_LLEG;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
         doReturn(0).when(entity).getDamagedCriticals(anyInt(), anyInt(), anyInt()); // Setup damage everywhere else
@@ -1151,7 +1150,7 @@ public class EquipmentPartTest {
 
             // Split the mount and bust the second location ...
             when(mounted.isSplit()).thenReturn(true);
-            int secondLocation = Mech.LOC_LT;
+            int secondLocation = Mek.LOC_LT;
             when(mounted.getSecondLocation()).thenReturn(secondLocation);
             doReturn(1).when(entity).getDamagedCriticals(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(secondLocation));
 
@@ -1207,7 +1206,7 @@ public class EquipmentPartTest {
         int equipmentNum = 42;
         Mounted mounted = mock(Mounted.class);
         when(mounted.isMissing()).thenReturn(true);
-        int location = Mech.LOC_LLEG;
+        int location = Mek.LOC_LLEG;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
@@ -1394,7 +1393,7 @@ public class EquipmentPartTest {
 
         // Put the variable cost part back on a unit
         Mounted mounted = mock(Mounted.class);
-        int location = Mech.LOC_CT;
+        int location = Mek.LOC_CT;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
         doReturn(cost * 10.0).when(type).getCost(eq(entity), anyBoolean(), eq(location), eq(size));

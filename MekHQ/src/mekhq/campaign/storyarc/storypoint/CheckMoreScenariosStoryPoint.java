@@ -34,11 +34,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.Mission;
+import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
- * A story point that checks whether a given mission has more active scenarios. This will typically be used
- * in cases where players are given all scenarios at once and GM does not know which they will complete last.
+ * A story point that checks whether a given mission has more active scenarios.
+ * This will typically be used
+ * in cases where players are given all scenarios at once and GM does not know
+ * which they will complete last.
  */
 public class CheckMoreScenariosStoryPoint extends StoryPoint {
+    private static final MMLogger logger = MMLogger.create(CheckMoreScenariosStoryPoint.class);
 
     /** id of the mission to check **/
     private UUID missionStoryPointId;
@@ -98,7 +111,7 @@ public class CheckMoreScenariosStoryPoint extends StoryPoint {
                     missionStoryPointId = UUID.fromString(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

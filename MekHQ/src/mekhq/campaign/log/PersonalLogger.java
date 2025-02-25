@@ -33,16 +33,25 @@ import java.util.ResourceBundle;
  * @author Miguel Azevedo
  */
 public class PersonalLogger {
-    private static final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.LogEntries",
+    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.LogEntries",
             MekHQ.getMHQOptions().getLocale());
 
     public static void spouseKia(Person spouse, Person person, LocalDate date) {
         String message = resources.getString("spouseKia.text");
         spouse.addLogEntry(new PersonalLogEntry(date, MessageFormat.format(message, person.getFullName())));
     }
+    public static void RelativeHasDied(Person person, Person relative, String relation, LocalDate date) {
+        String message = resources.getString("relativeHasDied.text");
+        person.addLogEntry(new PersonalLogEntry(date, MessageFormat.format(message, relation, relative.getFullName())));
+    }
 
     public static void divorcedFrom(Person person, Person spouse, LocalDate date) {
         String message = resources.getString("divorcedFrom.text");
+        person.addLogEntry(new PersonalLogEntry(date, MessageFormat.format(message, spouse.getFullName())));
+    }
+
+    public static void widowedBy(Person person, Person spouse, LocalDate date) {
+        String message = resources.getString("widowedBy.text");
         person.addLogEntry(new PersonalLogEntry(date, MessageFormat.format(message, spouse.getFullName())));
     }
 
@@ -97,7 +106,7 @@ public class PersonalLogger {
         String message = MessageFormat.format(resources.getString("spouseConceived.text"), spouseName);
 
         if (sizeString != null) {
-            message += " " + sizeString;
+            message += ' ' + sizeString;
         }
 
         person.addLogEntry(new PersonalLogEntry(date, message));

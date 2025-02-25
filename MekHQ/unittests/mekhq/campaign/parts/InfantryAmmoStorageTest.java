@@ -23,7 +23,6 @@ import megamek.common.AmmoType;
 import megamek.common.EquipmentTypeLookup;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.equipment.InfantryAmmoBin;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
@@ -108,7 +107,8 @@ public class InfantryAmmoStorageTest {
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
         Campaign mockCampaign = mock(Campaign.class);
-        InfantryAmmoStorage ammoStorage = new InfantryAmmoStorage(0, ammoType, 7 * ammoType.getShots(), weaponType, mockCampaign);
+        InfantryAmmoStorage ammoStorage = new InfantryAmmoStorage(0, ammoType, 7 * ammoType.getShots(), weaponType,
+                mockCampaign);
         ammoStorage.setId(25);
 
         // Write the AmmoStorage XML

@@ -23,13 +23,12 @@ package mekhq.gui.dialog;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialTerm;
-import mekhq.campaign.rating.IUnitRating;
-import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -42,12 +41,15 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
  * @author Taharqa
  */
 public class NewLoanDialog extends JDialog implements ActionListener, ChangeListener {
+    private static final MMLogger logger = MMLogger.create(NewLoanDialog.class);
+
     private NumberFormatter numberFormatter;
     private JFrame frame;
     private Loan loan;
@@ -99,8 +101,8 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
         this.frame = frame;
         this.campaign = campaign;
         this.numberFormatter = new NumberFormatter(NumberFormat.getInstance());
-        IUnitRating unitRating = campaign.getUnitRating();
-        rating = unitRating.getModifier();
+
+        rating = campaign.getAtBUnitRatingMod();
         loan = Loan.getBaseLoan(rating, this.campaign.getLocalDate());
         maxCollateralValue = this.campaign.getFinances().getMaxCollateral(this.campaign);
         initComponents();
@@ -386,7 +388,7 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -548,7 +550,7 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
             lblTotalPayment.setText(loan.determineRemainingValue().toAmountAndSymbolString());
             lblCollateralAmount.setText(loan.determineCollateralAmount().toAmountAndSymbolString());
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
     }
 
@@ -621,11 +623,11 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
     @Override
     public void stateChanged(ChangeEvent e) {
         if (campaign.getCampaignOptions().isUseLoanLimits()) {
-            if (e.getSource() == sldInterest) {
+            if (Objects.equals(e.getSource(), sldInterest)) {
                 sldCollateral.removeChangeListener(this);
                 sldCollateral.setValue(Loan.recalculateCollateralFromInterest(rating, sldInterest.getValue()));
                 sldCollateral.addChangeListener(this);
-            } else if (e.getSource() == sldCollateral) {
+            } else if (Objects.equals(e.getSource(), sldCollateral)) {
                 sldInterest.removeChangeListener(this);
                 sldInterest.setValue(Loan.recalculateInterestFromCollateral(rating, sldCollateral.getValue()));
                 sldInterest.addChangeListener(this);

@@ -25,6 +25,7 @@ import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -123,4 +124,27 @@ public interface IPartWork extends IWork {
             return part.getRepairPartType();
         }
     }
+
+
+    /**
+     * Sticker price is the value of the part according to the rulebooks
+     * @return the part's sticker price
+     */
+    public abstract Money getStickerPrice();
+
+    /**
+     * This is the value of the part that may be affected by characteristics and campaign options
+     * @return the part's actual value
+     */
+    public abstract Money getActualValue();
+
+    /**
+     * This is the value of the part that may be affected by characteristics and campaign options
+     * but not affected by part damage
+     * @return the part's actual value if it wasn't damaged
+     */
+    public abstract Money getUndamagedValue();
+
+
+    public abstract boolean isPriceAdjustedForAmount();
 }

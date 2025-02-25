@@ -18,30 +18,30 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.ResourceBundle;
 
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+
 public enum FormerSpouseReason {
-    //region Enum Declarations
+    // region Enum Declarations
     WIDOWED("FormerSpouseReason.WIDOWED.text"),
     DIVORCE("FormerSpouseReason.DIVORCE.text");
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     FormerSpouseReason(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isWidowed() {
         return this == WIDOWED;
     }
@@ -49,9 +49,9 @@ public enum FormerSpouseReason {
     public boolean isDivorce() {
         return this == DIVORCE;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     public static FormerSpouseReason parseFromString(final String text) {
         try {
             return valueOf(text);
@@ -72,10 +72,11 @@ public enum FormerSpouseReason {
 
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into a FormerSpouseReason. Returning WIDOWED.");
+        MMLogger.create(FormerSpouseReason.class)
+                .error("Unable to parse " + text + " into a FormerSpouseReason. Returning WIDOWED.");
         return WIDOWED;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

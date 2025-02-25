@@ -20,10 +20,18 @@
  */
 package mekhq.campaign.storyarc.storytrigger;
 
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.util.UUID;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.Version;
 import mekhq.gui.panels.storytriggerpanels.FakeStoryTriggerPanel;
 import mekhq.gui.panels.storytriggerpanels.StoryTriggerPanel;
 import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -37,11 +45,13 @@ import javax.swing.*;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.UUID;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * A StoryTrigger that can change various characteristics of a Person
  */
 public class ChangePersonStoryTrigger extends StoryTrigger {
+    private static final MMLogger logger = MMLogger.create(ChangePersonStoryTrigger.class);
 
     /**
      * The id of the Person in the campaign
@@ -54,7 +64,8 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
     private PersonnelStatus status;
 
     /**
-     * Boolean for whether Persons switched to inactive status also take any unit they are assigned to with them
+     * Boolean for whether Persons switched to inactive status also take any unit
+     * they are assigned to with them
      */
     boolean takeUnit = false;
 
@@ -83,7 +94,8 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
     private String bloodname;
 
     /**
-     * A boolean indicator for whether the bloodname variable is a key to variable in the Story Arc
+     * A boolean indicator for whether the bloodname variable is a key to variable
+     * in the Story Arc
      */
     private boolean assignKeyBloodname = false;
 
@@ -176,7 +188,7 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
                     takeUnit = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("addHits")) {
                     addHits = Integer.parseInt(wn2.getTextContent().trim());
-                }  else if (wn2.getNodeName().equalsIgnoreCase("deathStatusHits")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("deathStatusHits")) {
                     deathStatusHits = PersonnelStatus.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("healHits")) {
                     healHits = Integer.parseInt(wn2.getTextContent().trim());
@@ -188,7 +200,7 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
                     assignKeyBloodname = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

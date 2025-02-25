@@ -2,7 +2,7 @@
  * Faction.java
  *
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2009-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2009-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -22,10 +22,11 @@
 package mekhq.campaign.universe;
 
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import org.apache.logging.log4j.LogManager;
+import mekhq.campaign.universe.enums.HonorRating;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -34,12 +35,20 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
+import java.util.Map.Entry;
+
+import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.universe.enums.HonorRating.LIBERAL;
+import static mekhq.campaign.universe.enums.HonorRating.OPPORTUNISTIC;
+import static mekhq.campaign.universe.enums.HonorRating.STRICT;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Faction {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(Faction.class);
+
+    // region Variable Declarations
     public static final String DEFAULT_CODE = "???";
 
     private String shortName;
@@ -60,9 +69,9 @@ public class Faction {
     private Set<Tag> tags;
     private int start; // Start year (inclusive)
     private int end; // End year (inclusive)
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public Faction() {
         this(DEFAULT_CODE, "Unknown");
     }
@@ -82,14 +91,14 @@ public class Faction {
         start = 0;
         end = 9999;
     }
-    //endregion Constructors
+    // endregion Constructors
 
     public String getShortName() {
         return shortName;
     }
 
     public String getFullName(int year) {
-        Map.Entry<Integer,String> change = nameChanges.floorEntry(year);
+        Entry<Integer, String> change = nameChanges.floorEntry(year);
         if (null == change) {
             return fullName;
         } else {
@@ -118,7 +127,7 @@ public class Faction {
     }
 
     public String getStartingPlanet(final LocalDate date) {
-        final Map.Entry<LocalDate, String> change = planetChanges.floorEntry(date);
+        final Entry<LocalDate, String> change = planetChanges.floorEntry(date);
         return (change == null) ? startingPlanet : change.getValue();
     }
 
@@ -127,32 +136,38 @@ public class Faction {
             return 0;
         } else {
             if (year < 2570) {
-                //Era: Age of War
+                // Era: Age of War
                 return eraMods[0];
             } else if (year < 2598) {
-                //Era: RW
+                // Era: RW
                 return eraMods[1];
             } else if (year < 2785) {
-                //Era: Star League
+                // Era: Star League
                 return eraMods[2];
             } else if (year < 2828) {
-                //Era: 1st SW
+                // Era: 1st SW
                 return eraMods[3];
             } else if (year < 2864) {
-                //Era: 2nd SW
+                // Era: 2nd SW
                 return eraMods[4];
             } else if (year < 3028) {
-                //Era: 3rd SW
+                // Era: 3rd SW
                 return eraMods[5];
             } else if (year < 3050) {
-                //Era: 4th SW
+                // Era: 4th SW
                 return eraMods[6];
             } else if (year < 3067) {
-                //Era: Clan Invasion
+                // Era: Clan Invasion
                 return eraMods[7];
-            } else {
-                //Era: Jihad
+            } else if (year < 3086) {
+                // Era: Jihad
                 return eraMods[8];
+            } else if (year < 3151) {
+                // Era: Dark Age
+                return eraMods[9];
+            } else {
+                // Era: ilClan
+                return eraMods[10];
             }
         }
     }
@@ -217,7 +232,7 @@ public class Faction {
         this.layeredForceIconLogoFilename = layeredForceIconLogoFilename;
     }
 
-    //region Checks
+    // region Checks
     public boolean isPlayable() {
         return is(Tag.PLAYABLE);
     }
@@ -236,6 +251,11 @@ public class Faction {
 
     public boolean isRebelOrPirate() {
         return isRebel() || isPirate();
+    }
+
+    public boolean isGovernment() {
+        return !isClan() && (isComStar() || isISMajorOrSuperPower() || isMinorPower()
+            || isPlanetaryGovt() || isIndependent());
     }
 
     public boolean isComStar() {
@@ -274,7 +294,7 @@ public class Faction {
         return "IND".equals(getShortName());
     }
 
-    //region Power Checks
+    // region Power Checks
     public boolean isSuperPower() {
         return is(Tag.SUPER);
     }
@@ -298,8 +318,44 @@ public class Faction {
     public boolean isSmall() {
         return is(Tag.SMALL);
     }
-    //endregion Power Checks
-    //endregion Checks
+
+    public boolean isNoble() {
+        return is(Tag.NOBLE);
+    }
+
+    public boolean isPlanetaryGovt() {
+        return is(Tag.PLANETARY_GOVERNMENT);
+    }
+
+    public boolean isCorporation() {
+        return is(Tag.CORPORATION);
+    }
+
+    public boolean isInactive() {
+        return is(Tag.INACTIVE);
+    }
+
+    public boolean isChaos() {
+        return is(Tag.CHAOS);
+    }
+
+    public boolean isStingy() {
+        return is(Tag.STINGY);
+    }
+
+    public boolean isGenerous() {
+        return is(Tag.GENEROUS);
+    }
+
+    public boolean isControlling() {
+        return is(Tag.CONTROLLING);
+    }
+
+    public boolean isLenient() {
+        return is(Tag.LENIENT);
+    }
+    // endregion Power Checks
+    // endregion Checks
 
     public static Faction getFactionFromXML(Node wn) throws DOMException {
         Faction retVal = new Faction();
@@ -326,9 +382,10 @@ public class Faction {
                             MHQXMLUtility.parseDate(wn2.getAttributes().getNamedItem("year").getTextContent().trim()),
                             wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eraMods")) {
-                    retVal.eraMods = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
                     String[] values = wn2.getTextContent().split(",", -2);
-                    for (int i = 0; i < values.length; i++) {
+                    int eraModCount = values.length;
+                    retVal.eraMods = new int[eraModCount];
+                    for (int i = 0; i < eraModCount; i++) {
                         retVal.eraMods[i] = Integer.parseInt(values[i]);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("nameGenerator")) {
@@ -360,12 +417,8 @@ public class Faction {
                     retVal.end = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
-        }
-
-        if ((retVal.eraMods != null) && (retVal.eraMods.length < 9)) {
-            LogManager.getLogger().warn(retVal.fullName + " faction did not have a long enough eraMods vector");
         }
 
         return retVal;
@@ -394,8 +447,7 @@ public class Faction {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Faction) {
-            final Faction other = (Faction) obj;
+        if (obj instanceof Faction other) {
             return (null != shortName) && (shortName.equals(other.shortName));
         }
         return false;
@@ -410,20 +462,30 @@ public class Faction {
         MERC,
         /** Major trading company */
         TRADER,
-        /** Super Power: the Terran Hegemony, the First Star League, and the Federated Commonwealth. (CamOps p12) */
+        /**
+         * Super Power: the Terran Hegemony, the First Star League, and the Federated
+         * Commonwealth. (CamOps p12)
+         */
         SUPER,
         /**
-         * Major Power: e.g. Inner Sphere Great Houses, Republic of the Sphere, Terran Alliance,
+         * Major Power: e.g. Inner Sphere Great Houses, Republic of the Sphere, Terran
+         * Alliance,
          * Second Star League, Inner Sphere Clans. (CamOps p12)
          */
         MAJOR,
-        /** Faction is limited to a single star system, or potentially just a part of a planet (CamOps p12) */
+        /**
+         * Faction is limited to a single star system, or potentially just a part of a
+         * planet (CamOps p12)
+         */
         MINOR,
         /** Independent world or Small State (CamOps p12) */
         SMALL,
         /** Faction is rebelling against the superior ("parent") faction */
         REBEL,
-        /** Faction isn't overtly acting on the political/military scale; think ComStar before clan invasion */
+        /**
+         * Faction isn't overtly acting on the political/military scale; think ComStar
+         * before clan invasion
+         */
         INACTIVE,
         /** Faction represents empty space */
         ABANDONED,
@@ -436,6 +498,60 @@ public class Faction {
         /** Faction code is not intended to be for players */
         SPECIAL,
         /** Faction is meant to be played */
-        PLAYABLE
+        PLAYABLE,
+        /** Faction is an independent noble (Camops p. 39) */
+        NOBLE,
+        /** Faction is an independent planetary government (Camops p. 39) */
+        PLANETARY_GOVERNMENT,
+        /** Faction is an independent corporation (Camops p. 39) */
+        CORPORATION,
+        /** Faction is stingy and tends to pay less for contracts (Camops p. 42) */
+        STINGY,
+        /** Faction is generous and tends to pay more for contracts (Camops p. 42) */
+        GENEROUS,
+        /** Faction is controlling with mercenary command rights (Camops p. 42) */
+        CONTROLLING,
+        /** Faction is lenient with mercenary command rights (Camops p. 42) */
+        LENIENT
+    }
+
+    /**
+     * Calculates the honor rating for a given Clan.
+     *
+     * @param campaign    the ongoing campaign
+     * @return the honor rating as an {@link HonorRating} enum
+     */
+    public HonorRating getHonorRating(Campaign campaign) {
+        // Our research showed the post-Invasion shift in Clan doctrine to occur between 3053 and 3055
+        boolean isPostInvasion = campaign.getLocalDate().getYear() >= 3053 + randomInt(2);
+
+        // This is based on the table found on page 274 of Total Warfare
+        // Any Clan not mentioned on that table is assumed to be Strict → Opportunistic
+        return switch (shortName) {
+            case "CCC", "CHH", "CIH", "CNC", "CSR" -> OPPORTUNISTIC;
+            case "CCO", "CGS", "CSV" -> STRICT;
+            case "CGB", "CWIE" -> {
+                if (isPostInvasion) {
+                    yield LIBERAL;
+                } else {
+                    yield STRICT;
+                }
+            }
+            case "CDS" -> LIBERAL;
+            case "CW" -> {
+                if (isPostInvasion) {
+                    yield LIBERAL;
+                } else {
+                    yield OPPORTUNISTIC;
+                }
+            }
+            default -> {
+                if (isPostInvasion) {
+                    yield OPPORTUNISTIC;
+                } else {
+                    yield STRICT;
+                }
+            }
+        };
     }
 }

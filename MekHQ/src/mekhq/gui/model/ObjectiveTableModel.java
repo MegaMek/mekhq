@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
  *
- * This file is part of MegaMek.
+ * This file is part of MekHQ.
  *
  * MegaMek is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,32 +18,34 @@
  */
 package mekhq.gui.model;
 
+import java.awt.Component;
+import java.util.List;
+
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+
 import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveAmountType;
 import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import java.awt.*;
-import java.util.List;
-
 /**
  * TableModel for displaying information about a scenario objective
  */
 public class ObjectiveTableModel extends AbstractTableModel {
-    //region Variable Declarations
+    // region Variable Declarations
     protected String[] columnNames;
     protected List<ScenarioObjective> data;
 
-    public final static int COL_CRITERION      = 0;
-    public final static int COL_AMOUNT         = 1;
-    public final static int COL_TIME           = 2;
+    public final static int COL_CRITERION = 0;
+    public final static int COL_AMOUNT = 1;
+    public final static int COL_TIME = 2;
     public final static int COL_SUCCESS_EFFECT = 3;
     public final static int COL_FAILURE_EFFECT = 4;
-    public final static int N_COL              = 5;
-    //endregion Variable Declarations
+    public final static int N_COL = 5;
+    // endregion Variable Declarations
 
     public ObjectiveTableModel(List<ScenarioObjective> entries) {
         data = entries;
@@ -95,16 +97,17 @@ public class ObjectiveTableModel extends AbstractTableModel {
             case COL_CRITERION:
                 return objective.getObjectiveCriterion().toString();
             case COL_AMOUNT:
-                return objective.getAmountType().equals(ObjectiveAmountType.Percentage) ?
-                        objective.getPercentage() + "%" : objective.getAmount() + " units";
+                return objective.getAmountType().equals(ObjectiveAmountType.Percentage)
+                        ? objective.getPercentage() + "%"
+                        : objective.getAmount() + " units";
             case COL_TIME:
-                if(objective.getTimeLimitType().equals(TimeLimitType.None)) {
+                if (objective.getTimeLimitType().equals(TimeLimitType.None)) {
                     return "None";
                 }
                 String timeDirection = objective.isTimeLimitAtMost() ? "At most " : "At least ";
-                return objective.getTimeLimitType().equals(TimeLimitType.Fixed) ?
-                        timeDirection + objective.getTimeLimit() + " turns" :
-                        timeDirection + '(' + objective.getTimeLimitScaleFactor() + "x unit count) turns";
+                return objective.getTimeLimitType().equals(TimeLimitType.Fixed)
+                        ? timeDirection + objective.getTimeLimit() + " turns"
+                        : timeDirection + '(' + objective.getTimeLimitScaleFactor() + "x unit count) turns";
             case COL_SUCCESS_EFFECT:
                 return objective.getSuccessEffects().size() + " Effect(s)";
             case COL_FAILURE_EFFECT:
@@ -143,11 +146,11 @@ public class ObjectiveTableModel extends AbstractTableModel {
 
         switch (col) {
             case COL_CRITERION:
-                return "<html>" + String.join("<br>", objective.getAssociatedForceNames()) +"</html>";
+                return "<html>" + String.join("<br>", objective.getAssociatedForceNames()) + "</html>";
             case COL_SUCCESS_EFFECT:
                 sb = new StringBuilder();
                 sb.append("<html>");
-                for(ObjectiveEffect effect : objective.getSuccessEffects()) {
+                for (ObjectiveEffect effect : objective.getSuccessEffects()) {
                     sb.append(effect.toString()).append("<br>");
                 }
                 sb.append("</html>");
@@ -155,7 +158,7 @@ public class ObjectiveTableModel extends AbstractTableModel {
             case COL_FAILURE_EFFECT:
                 sb = new StringBuilder();
                 sb.append("<html>");
-                for(ObjectiveEffect effect : objective.getFailureEffects()) {
+                for (ObjectiveEffect effect : objective.getFailureEffects()) {
                     sb.append(effect.toString()).append("<br>");
                 }
                 sb.append("</html>");
@@ -165,7 +168,7 @@ public class ObjectiveTableModel extends AbstractTableModel {
         }
     }
 
-    //fill table with values
+    // fill table with values
     public void setData(List<ScenarioObjective> objectives) {
         data = objectives;
         fireTableDataChanged();
@@ -178,8 +181,8 @@ public class ObjectiveTableModel extends AbstractTableModel {
     public class Renderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                                                       boolean isSelected, boolean hasFocus,
-                                                       int row, int column) {
+                boolean isSelected, boolean hasFocus,
+                int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setOpaque(true);
             int actualCol = table.convertColumnIndexToModel(column);

@@ -59,6 +59,7 @@ public class MissingKFFieldInitiator extends MissingPart {
         this.coreType = coreType;
         this.docks = docks;
         this.name = "K-F Field Initiator";
+        this.unitTonnageMatters = true;
     }
 
     @Override

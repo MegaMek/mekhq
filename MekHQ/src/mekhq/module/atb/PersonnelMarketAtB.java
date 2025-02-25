@@ -50,18 +50,18 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
             int roll = Compute.d6(2);
             if (roll == 2) {
                 switch (Compute.randomInt(4)) {
-                case 0:
-                    p = c.newPerson(PersonnelRole.ADMINISTRATOR_COMMAND);
-                    break;
-                case 1:
-                    p = c.newPerson(PersonnelRole.ADMINISTRATOR_HR);
-                    break;
-                case 2:
-                    p = c.newPerson(PersonnelRole.ADMINISTRATOR_LOGISTICS);
-                    break;
-                case 3:
-                    p = c.newPerson(PersonnelRole.ADMINISTRATOR_TRANSPORT);
-                    break;
+                    case 0:
+                        p = c.newPerson(PersonnelRole.ADMINISTRATOR_COMMAND);
+                        break;
+                    case 1:
+                        p = c.newPerson(PersonnelRole.ADMINISTRATOR_HR);
+                        break;
+                    case 2:
+                        p = c.newPerson(PersonnelRole.ADMINISTRATOR_LOGISTICS);
+                        break;
+                    case 3:
+                        p = c.newPerson(PersonnelRole.ADMINISTRATOR_TRANSPORT);
+                        break;
                 }
             } else if (roll == 3 || roll == 11) {
                 int r = Compute.d6();
@@ -70,16 +70,16 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 } else if (r < 4) {
                     p = c.newPerson(PersonnelRole.MECHANIC);
                 } else if (r == 4 && c.getCampaignOptions().isUseAero()) {
-                    p = c.newPerson(PersonnelRole.AERO_TECH);
+                    p = c.newPerson(PersonnelRole.AERO_TEK);
                 } else {
-                    p = c.newPerson(PersonnelRole.MECH_TECH);
+                    p = c.newPerson(PersonnelRole.MEK_TECH);
                 }
             } else if (roll == 4 || roll == 10) {
-                p = c.newPerson(PersonnelRole.MECHWARRIOR);
+                p = c.newPerson(PersonnelRole.MEKWARRIOR);
             } else if (roll == 5 && c.getCampaignOptions().isUseAero()) {
                 p = c.newPerson(PersonnelRole.AEROSPACE_PILOT);
             } else if (roll == 5 && c.getFaction().isClan()) {
-                p = c.newPerson(PersonnelRole.MECHWARRIOR);
+                p = c.newPerson(PersonnelRole.MEKWARRIOR);
             } else if (roll == 5) {
                 int r = Compute.d6(2);
                 if (r == 2) {
@@ -106,8 +106,10 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 retVal.add(p);
 
                 if (p.getPrimaryRole().isGroundVehicleDriver()) {
-                    /* Replace driver with 1-6 crew with equal
-                     * chances of being drivers or gunners */
+                    /*
+                     * Replace driver with 1-6 crew with equal
+                     * chances of being drivers or gunners
+                     */
                     retVal.remove(p);
                     for (int i = 0; i < Compute.d6(); i++) {
                         retVal.add(c.newPerson((Compute.d6() < 4) ? PersonnelRole.GROUND_VEHICLE_DRIVER
@@ -116,7 +118,8 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 }
 
                 Person adminHR = c.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_ADMIN);
-                int adminHRExp = (adminHR == null) ? SkillType.EXP_ULTRA_GREEN : adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+                int adminHRExp = (adminHR == null) ? SkillType.EXP_ULTRA_GREEN
+                        : adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
                 int gunneryMod = 0;
                 int pilotingMod = 0;
                 switch (adminHRExp) {
@@ -147,9 +150,9 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 }
 
                 switch (p.getPrimaryRole()) {
-                    case MECHWARRIOR:
-                        adjustSkill(p, SkillType.S_GUN_MECH, gunneryMod);
-                        adjustSkill(p, SkillType.S_PILOT_MECH, pilotingMod);
+                    case MEKWARRIOR:
+                        adjustSkill(p, SkillType.S_GUN_MEK, gunneryMod);
+                        adjustSkill(p, SkillType.S_PILOT_MEK, pilotingMod);
                         break;
                     case GROUND_VEHICLE_DRIVER:
                         adjustSkill(p, SkillType.S_PILOT_GVEE, pilotingMod);
@@ -167,16 +170,16 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                         adjustSkill(p, SkillType.S_GUN_AERO, gunneryMod);
                         adjustSkill(p, SkillType.S_PILOT_AERO, pilotingMod);
                         break;
-                    case PROTOMECH_PILOT:
+                    case PROTOMEK_PILOT:
                         adjustSkill(p, SkillType.S_GUN_PROTO, gunneryMod);
                         break;
                     case BATTLE_ARMOUR:
                         adjustSkill(p, SkillType.S_GUN_BA, gunneryMod);
-                        adjustSkill(p, SkillType.S_ANTI_MECH, pilotingMod);
+                        adjustSkill(p, SkillType.S_ANTI_MEK, pilotingMod);
                         break;
                     case SOLDIER:
                         adjustSkill(p, SkillType.S_SMALL_ARMS, gunneryMod);
-                        adjustSkill(p, SkillType.S_ANTI_MECH, pilotingMod);
+                        adjustSkill(p, SkillType.S_ANTI_MEK, pilotingMod);
                         break;
                     default:
                         break;
@@ -197,11 +200,12 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
 
     /**
      * Adjust a recruit's skill based on HR admin skill
+     *
      * @param p         The recruit
      * @param skillName The name of the skill to adjust
      * @param mod       The amount to adjust the skill
      */
-    public void adjustSkill (Person p, String skillName, int mod) {
+    public void adjustSkill(Person p, String skillName, int mod) {
         if (p.getSkill(skillName) == null) {
             return;
         }

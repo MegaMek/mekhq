@@ -20,31 +20,41 @@
  */
 package mekhq.campaign.storyarc.storypoint;
 
-import megamek.Version;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.storyarc.StoryPoint;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.time.LocalDate;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
- * StoryPoint to check whether a certain date has been reached. The {@link mekhq.campaign.storyarc.StoryArc StoryArc} will
- * check for StoryPoints of this class whenever a new day is reached and if the date matches, this StoryPoint will start
+ * StoryPoint to check whether a certain date has been reached. The
+ * {@link mekhq.campaign.storyarc.StoryArc StoryArc} will
+ * check for StoryPoints of this class whenever a new day is reached and if the
+ * date matches, this StoryPoint will start
  * and complete.
- * <p>if the exact date cannot be known ahead of time, date can be left null initially and a
- * {@link mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger SetDateStoryTrigger} can be used by another story
+ * <p>
+ * if the exact date cannot be known ahead of time, date can be left null
+ * initially and a
+ * {@link mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger
+ * SetDateStoryTrigger} can be used by another story
  * point to assign a date some specified number of days in the future.
  */
 public class CheckDateReachedStoryPoint extends StoryPoint {
+    private static final MMLogger logger = MMLogger.create(CheckDateReachedStoryPoint.class);
 
     /**
-     * The date to be checked. If null, this StoryPoint will be ignored when checking a new day. Date can be
-     * set later with {@link mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger SetDateStoryTrigger}.
+     * The date to be checked. If null, this StoryPoint will be ignored when
+     * checking a new day. Date can be
+     * set later with
+     * {@link mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger
+     * SetDateStoryTrigger}.
      */
     private LocalDate date;
 
@@ -95,7 +105,7 @@ public class CheckDateReachedStoryPoint extends StoryPoint {
                     date = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

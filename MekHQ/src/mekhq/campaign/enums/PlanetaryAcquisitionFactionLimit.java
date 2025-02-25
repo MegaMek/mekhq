@@ -18,32 +18,32 @@
  */
 package mekhq.campaign.enums;
 
-import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.ResourceBundle;
 
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+
 public enum PlanetaryAcquisitionFactionLimit {
-    //region Enum Declarations
+    // region Enum Declarations
     ALL("PlanetaryAcquisitionFactionLimit.ALL.text"),
     NEUTRAL("PlanetaryAcquisitionFactionLimit.NEUTRAL.text"),
     ALLIED("PlanetaryAcquisitionFactionLimit.ALLIED.text"),
     SELF("PlanetaryAcquisitionFactionLimit.SELF.text");
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     PlanetaryAcquisitionFactionLimit(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isAll() {
         return this == ALL;
     }
@@ -71,9 +71,9 @@ public enum PlanetaryAcquisitionFactionLimit {
     public boolean generateOnAlliedPlanets() {
         return generateOnNeutralPlanets() || isAllied();
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     public static PlanetaryAcquisitionFactionLimit parseFromString(final String text) {
         try {
             return valueOf(text);
@@ -97,10 +97,11 @@ public enum PlanetaryAcquisitionFactionLimit {
 
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into a PlanetaryAcquisitionFactionLimit. Returning NEUTRAL.");
+        MMLogger.create(PlanetaryAcquisitionFactionLimit.class)
+                .error("Unable to parse " + text + " into a PlanetaryAcquisitionFactionLimit. Returning NEUTRAL.");
         return NEUTRAL;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

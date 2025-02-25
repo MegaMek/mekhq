@@ -39,7 +39,7 @@ public class TransportReport extends AbstractReport {
     public String getTransportDetails() {
         HangarStatistics stats = getCampaign().getHangarStatistics();
 
-        int noMech = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_MECH) - stats.getOccupiedBays(Entity.ETYPE_MECH), 0);
+        int noMek = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_MEK) - stats.getOccupiedBays(Entity.ETYPE_MEK), 0);
         int noDS = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP) - stats.getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
         int noSC = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) - stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
         @SuppressWarnings("unused") // FIXME: What type of bays do ConvFighters use?
@@ -51,7 +51,7 @@ public class TransportReport extends AbstractReport {
         int noinf = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - stats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
         int noBA = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) - stats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
         @SuppressWarnings("unused") // FIXME: This should be used somewhere...
-        int noProto = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH) - stats.getOccupiedBays(Entity.ETYPE_PROTOMECH),
+        int noProto = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK) - stats.getOccupiedBays(Entity.ETYPE_PROTOMEK),
                 0);
         int freehv = Math.max(stats.getTotalHeavyVehicleBays() - stats.getOccupiedBays(Entity.ETYPE_TANK), 0);
         int freeinf = Math.max(stats.getTotalInfantryBays() - stats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
@@ -85,9 +85,9 @@ public class TransportReport extends AbstractReport {
 
         final StringBuilder sb = new StringBuilder("Transports\n\n");
 
-        // Lets do Mechs first.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Mech Bays (Occupied):",
-                stats.getTotalMechBays(), stats.getOccupiedBays(Entity.ETYPE_MECH), "Mechs Not Transported:", noMech));
+        // Lets do Meks first.
+        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Mek Bays (Occupied):",
+                stats.getTotalMekBays(), stats.getOccupiedBays(Entity.ETYPE_MEK), "Meks Not Transported:", noMek));
 
         // Lets do ASF next.
         sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d%s\n", "ASF Bays (Occupied):",
@@ -143,9 +143,9 @@ public class TransportReport extends AbstractReport {
                     "ASF Not Transported:", newNoASF));
         }
 
-        // Lets do ProtoMechs next.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "ProtoMech Bays (Occupied):",
-                stats.getTotalProtomechBays(), stats.getOccupiedBays(Entity.ETYPE_PROTOMECH), "ProtoMechs Not Transported:", noSC));
+        // Lets do ProtoMeks next.
+        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "ProtoMek Bays (Occupied):",
+                stats.getTotalProtomekBays(), stats.getOccupiedBays(Entity.ETYPE_PROTOMEK), "ProtoMeks Not Transported:", noSC));
 
         sb.append("\n\n");
 

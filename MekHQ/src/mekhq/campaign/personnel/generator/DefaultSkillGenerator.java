@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -26,7 +26,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DefaultSkillGenerator extends AbstractSkillGenerator {
@@ -61,8 +61,13 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         // roll small arms skill
         if (!person.getSkills().hasSkill(SkillType.S_SMALL_ARMS)) {
             int sarmsLvl = Utilities.generateExpLevel(
-                    (primaryRole.isSupport() || secondaryRole.isSupport(true))
+                    (primaryRole.isSupport(true) || secondaryRole.isSupport(true))
                             ? rskillPrefs.getSupportSmallArmsBonus() : rskillPrefs.getCombatSmallArmsBonus());
+
+            if (primaryRole.isCivilian()) {
+                sarmsLvl = 0;
+            }
+
             if (sarmsLvl > SkillType.EXP_ULTRA_GREEN) {
                 addSkill(person, SkillType.S_SMALL_ARMS, sarmsLvl, rskillPrefs.randomizeSkill(), bonus);
             }
@@ -78,19 +83,28 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         // roll artillery skill
         if (campaign.getCampaignOptions().isUseArtillery()
-                && (primaryRole.isMechWarrior() || primaryRole.isVehicleGunner() || primaryRole.isSoldier())
+                && (primaryRole.isMekWarrior() || primaryRole.isVehicleGunner() || primaryRole.isSoldier())
                 && Utilities.rollProbability(rskillPrefs.getArtilleryProb())) {
             generateArtillerySkill(person, bonus);
         }
 
+        // roll Negotiation skill
+        if (campaign.getCampaignOptions().isAdminsHaveNegotiation()
+                && (primaryRole.isAdministrator())) {
+            addSkill(person, SkillType.S_NEG, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
+        }
+
+        // roll Scrounge skill
+        if (campaign.getCampaignOptions().isAdminsHaveScrounge()
+                && (primaryRole.isAdministrator())) {
+            addSkill(person, SkillType.S_SCROUNGE, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
+        }
+
         // roll random secondary skill
         if (Utilities.rollProbability(rskillPrefs.getSecondSkillProb())) {
-            final List<String> possibleSkills = new ArrayList<>();
-            for (String stype : SkillType.skillList) {
-                if (!person.getSkills().hasSkill(stype)) {
-                    possibleSkills.add(stype);
-                }
-            }
+            final List<String> possibleSkills = Arrays.stream(SkillType.skillList)
+                    .filter(stype -> !person.getSkills().hasSkill(stype))
+                    .toList();
             String selSkill = possibleSkills.get(Compute.randomInt(possibleSkills.size()));
             int secondLvl = Utilities.generateExpLevel(rskillPrefs.getSecondSkillBonus());
             addSkill(person, selSkill, secondLvl, rskillPrefs.randomizeSkill(), bonus);

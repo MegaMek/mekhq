@@ -2,7 +2,7 @@
 <scenarioModifierManifest>
 	<modifiers>
 		<modifier>
-			FacilityAlliedDefend.xml 
+			FacilityAlliedDefend.xml
 		</modifier>
 		<modifier>
 			FacilityAlliedEvac.xml

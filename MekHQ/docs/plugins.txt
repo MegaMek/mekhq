@@ -46,7 +46,7 @@ of module objects. The container object must implement Java's Iterable interface
 this with native array or list structure, but others require creating an instance of a Java container class.
 The script manager uses the filename extension to locate the correct script engine for the plugin, so
 plugin files should use a standard extension.
- 
+
 III. Installing plugins
 
 A plugin is installed by putting it in the plugins directory of the MekHQ installation. The plugins directory
@@ -79,7 +79,7 @@ to be as follows:
 |---+ domain/
     |---+ mekhqplugins
         |--- MarketTest.class
-        
+
 The mekhq.module.api.PersonnelMarketMethod file should contain a single line: my.domain.mekhqplugins.MarketTest
 
 /** MarketTest.java listing **/
@@ -154,7 +154,7 @@ var testMarket = new PersonnelMarketMethod() {
 	getModuleName: function() {
 		return "Market Test - JavaScript";
 	},
-	
+
     generatePersonnelForDay: function(c) {
         var retVal = new java.util.ArrayList();
         var num = Compute.d6(2) - 2
@@ -166,7 +166,7 @@ var testMarket = new PersonnelMarketMethod() {
 		}
         return retVal;
     },
-    
+
     removePersonnelForDay: function(c, current) {
         if (current.isEmpty()) {
             return current;
@@ -182,9 +182,9 @@ var testMarket = new PersonnelMarketMethod() {
         }
         return toRemove;
     }
-	
+
 }
-    
+
 function getPlugins() {
     var list = new java.util.ArrayList();
     list.add(testMarket);
@@ -216,7 +216,7 @@ def getPlugins():
 class TestMarket (PersonnelMarketMethod):
     def getModuleName(self):
         return "Market Test - Python"
-        
+
     def generatePersonnelForDay(self, c):
         retVal = ArrayList()
         num = Compute.d6(2)
@@ -226,7 +226,7 @@ class TestMarket (PersonnelMarketMethod):
             p.setId(UUID.randomUUID())
             retVal.add(p)
         return retVal
-        
+
     def removePersonnelForDay(self, c, current):
         if current.isEmpty():
             return current
@@ -270,11 +270,11 @@ end
 
 class TestMarket
     include mekhq.module.api.PersonnelMarketMethod
-    
+
     def getModuleName()
         return "Market Test - Ruby"
     end
-    
+
     def generatePersonnelForDay(c)
         retVal = ArrayList.new()
         num = megamek.common.Compute.d6(2) - 2
@@ -286,7 +286,7 @@ class TestMarket
         end
         return retVal
     end
-    
+
     def removePersonnelForDay(c, current)
         if current.isEmpty()
             return current

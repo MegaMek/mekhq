@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2017-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,6 +21,7 @@ package mekhq.gui.dialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.StringUtility;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
@@ -30,11 +31,11 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.RepairTab;
+import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.PartsAcquisitionService.PartCountInfo;
-import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -46,6 +47,8 @@ import java.util.Map;
  * @author Kipsta
  */
 public class AcquisitionsDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(AcquisitionsDialog.class);
+
     private CampaignGUI campaignGUI;
     private Map<String, AcquisitionPanel> partPanelMap = new HashMap<>();
 
@@ -53,13 +56,9 @@ public class AcquisitionsDialog extends JDialog {
     private JLabel lblSummary;
     private JButton btnSummary;
 
-    private int numBonusParts = 0;
-
     public AcquisitionsDialog(JFrame parent, boolean modal, CampaignGUI campaignGUI) {
         super(parent, modal);
         this.campaignGUI = campaignGUI;
-
-        calculateBonusParts();
 
         initComponents();
 
@@ -103,7 +102,7 @@ public class AcquisitionsDialog extends JDialog {
 
         pnlSummary.firePropertyChange("counts", -1, 0);
 
-        JScrollPane scrollMain = new JScrollPane(pnlMain);
+        JScrollPane scrollMain = new JScrollPaneWithSpeed(pnlMain);
         scrollMain.setPreferredSize(new Dimension(700, 500));
 
         content.add(scrollMain, BorderLayout.CENTER);
@@ -154,12 +153,7 @@ public class AcquisitionsDialog extends JDialog {
             }
         });
         btnSummary.addPropertyChangeListener("missingCount", evt -> {
-            boolean visible = false;
-
-            if ((PartsAcquisitionService.getMissingCount() > 0)
-                    && (PartsAcquisitionService.getMissingCount() > PartsAcquisitionService.getUnavailableCount())) {
-                visible = true;
-            }
+            boolean visible = (PartsAcquisitionService.getMissingCount() > 0) && (PartsAcquisitionService.getMissingCount() > PartsAcquisitionService.getUnavailableCount());
 
             btnSummary.setVisible(visible);
         });
@@ -176,7 +170,7 @@ public class AcquisitionsDialog extends JDialog {
 
     private String generateSummaryText() {
         StringBuilder sbText = new StringBuilder();
-        sbText.append("<html><font size='3'>");
+        sbText.append("<html><font>");
 
         sbText.append("Required: ");
         sbText.append(PartsAcquisitionService.getRequiredCount());
@@ -184,7 +178,7 @@ public class AcquisitionsDialog extends JDialog {
         if (PartsAcquisitionService.getMissingCount() > 0) {
             sbText.append(", ");
 
-            sbText.append("<font color='red'>");
+            sbText.append("<font color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>");
             sbText.append("missing: ");
             sbText.append(PartsAcquisitionService.getMissingCount());
 
@@ -228,17 +222,7 @@ public class AcquisitionsDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
-        }
-    }
-
-    private void calculateBonusParts() {
-        numBonusParts = campaignGUI.getCampaign().totalBonusParts();
-
-        if (partPanelMap != null) {
-            for (AcquisitionPanel pnl : partPanelMap.values()) {
-                pnl.refresh();
-            }
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -251,7 +235,6 @@ public class AcquisitionsDialog extends JDialog {
         private PartCountInfo partCountInfo = new PartCountInfo();
 
         private JButton btnOrderAll;
-        private JButton btnUseBonus;
         private JButton btnDepod;
         private JLabel lblText;
 
@@ -277,18 +260,6 @@ public class AcquisitionsDialog extends JDialog {
             }
         }
 
-        private void useBonusPart() {
-            if (targetWork instanceof AmmoBin) {
-                targetWork = ((AmmoBin) targetWork).getAcquisitionWork();
-            }
-
-            campaignGUI.getCampaign().spendBonusPart(targetWork);
-
-            refresh();
-
-            calculateBonusParts();
-        }
-
         private void refresh() {
             pnlSummary.firePropertyChange("counts", -1, 0);
 
@@ -311,15 +282,12 @@ public class AcquisitionsDialog extends JDialog {
                 }
 
                 btnDepod.setVisible(partCountInfo.getOmniPodCount() != 0);
-
-                btnUseBonus.setText(String.format("Use Bonus Part (%s)", numBonusParts));
-                btnUseBonus.setVisible(numBonusParts > 0);
             }
         }
 
         private String generateText() {
             StringBuilder sbText = new StringBuilder();
-            sbText.append("<html><font size='3'>");
+            sbText.append("<html><font>");
 
             sbText.append("<b>");
             sbText.append(targetWork.getAcquisitionDisplayName());
@@ -332,7 +300,8 @@ public class AcquisitionsDialog extends JDialog {
                 if (partCountInfo.getMissingCount() > 0) {
                     sbText.append(", ");
 
-                    sbText.append("<font color='red'>");
+                    sbText.append("<font color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                            .append("'>");
                     sbText.append("missing: ");
                     sbText.append(partCountInfo.getMissingCount());
                     sbText.append("</font>");
@@ -343,7 +312,7 @@ public class AcquisitionsDialog extends JDialog {
                 String countModifier = partCountInfo.getCountModifier();
 
                 if (!StringUtility.isNullOrBlank(countModifier)) {
-                    countModifier = " " + countModifier;
+                    countModifier = ' ' + countModifier;
                 }
 
                 String inventoryInfo = "Inventory: " + partCountInfo.getInTransitCount() + countModifier
@@ -363,14 +332,16 @@ public class AcquisitionsDialog extends JDialog {
 
                 if (partCountInfo.getMissingCount() > 1) {
                     price = "Missing item price: " +
-                            partCountInfo.getStickerPrice().multipliedBy(partCountInfo.getMissingCount()).toAmountAndSymbolString();
+                            partCountInfo.getStickerPrice().multipliedBy(partCountInfo.getMissingCount())
+                                    .toAmountAndSymbolString();
 
                     sbText.append(price);
                     sbText.append("<br/>");
                 }
 
                 if (!partCountInfo.isCanBeAcquired()) {
-                    sbText.append("<br/><br/><font color='red' size='4'>");
+                    sbText.append("<br/><br/><font color='")
+                            .append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("' size='4'>");
                     sbText.append(partCountInfo.getFailedMessage());
                     sbText.append("</font>");
                 }
@@ -437,7 +408,7 @@ public class AcquisitionsDialog extends JDialog {
 
             JPanel pnlUnits = new JPanel();
             pnlUnits.setLayout(new GridBagLayout());
-            pnlUnits.setBorder(BorderFactory.createTitledBorder("Units requiring this part (" + unitMap.size() + ")"));
+            pnlUnits.setBorder(BorderFactory.createTitledBorder("Units requiring this part (" + unitMap.size() + ')'));
 
             GridBagConstraints cUnits = new GridBagConstraints();
             cUnits.gridx = 0;
@@ -479,42 +450,44 @@ public class AcquisitionsDialog extends JDialog {
             gbcActions.insets = new Insets(10, 0, 5, 0);
             gbcActions.fill = GridBagConstraints.NONE;
             gbcActions.anchor = GridBagConstraints.NORTHEAST;
-
-            btnUseBonus = new JButton(String.format("Use Bonus Part (%s)", numBonusParts));
-            btnUseBonus.setToolTipText("Use a bonus part to acquire this item");
-            btnUseBonus.setName("btnUseBonus");
-            btnUseBonus.setVisible(numBonusParts > 0);
-            btnUseBonus.addActionListener(ev -> useBonusPart());
-            actionButtons.add(btnUseBonus, gbcActions);
+            JButton btnOrderOne;
+            JButton btnOrderInBulk;
+            if (partCountInfo.isCanBeAcquired()) {
+                btnOrderOne = new JButton("Order One");
+                btnOrderInBulk = new JButton("Order in Bulk");
+            } else {
+                btnOrderOne = new JButton("Order One (TN: Impossible)");
+                btnOrderInBulk = new JButton("Order in Bulk (TN: Impossible)");
+            }
+            btnOrderOne.setToolTipText("Order one item");
+            btnOrderOne.setName("btnOrderOne");
+            btnOrderOne.addActionListener(ev -> {
+                campaignGUI.getCampaign().getShoppingList().addShoppingItem(part.getAcquisitionWork(),
+                        1, campaignGUI.getCampaign());
+                refresh();
+            });
+            actionButtons.add(btnOrderOne, gbcActions);
             gbcActions.gridy++;
 
-            if (partCountInfo.isCanBeAcquired()) {
-                JButton btnOrderOne = new JButton("Order One");
-                btnOrderOne.setToolTipText("Order one item");
-                btnOrderOne.setName("btnOrderOne");
-                btnOrderOne.addActionListener(ev -> {
-                    campaignGUI.getCampaign().getShoppingList().addShoppingItem(part.getAcquisitionWork(),
-                            1, campaignGUI.getCampaign());
+            btnOrderInBulk.setToolTipText("Order item in bulk");
+            btnOrderInBulk.setName("btnOrderInBulk");
+            btnOrderInBulk.addActionListener(ev -> {
+                int quantity = 1;
+                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(),
+                        true, "How Many " + part.getName() + '?', quantity,
+                        1, CampaignGUI.MAX_QUANTITY_SPINNER);
+                pcd.setVisible(true);
+                quantity = pcd.getValue();
+                if (quantity > 0) {
+                    campaignGUI.getCampaign().getShoppingList()
+                            .addShoppingItem(part.getAcquisitionWork(), quantity, campaignGUI.getCampaign());
                     refresh();
-                });
-                actionButtons.add(btnOrderOne, gbcActions);
-                gbcActions.gridy++;
-            }
+                }
+            });
+            actionButtons.add(btnOrderInBulk, gbcActions);
+            gbcActions.gridy++;
 
-            if (!partCountInfo.isCanBeAcquired()) {
-                JButton btnOrderOne = new JButton("Order One (TN: Impossible)");
-                btnOrderOne.setToolTipText("Order one item");
-                btnOrderOne.setName("btnOrderOne");
-                btnOrderOne.addActionListener(ev -> {
-                    campaignGUI.getCampaign().getShoppingList().addShoppingItem(part.getAcquisitionWork(),
-                            1, campaignGUI.getCampaign());
-                    refresh();
-                });
-                actionButtons.add(btnOrderOne, gbcActions);
-                gbcActions.gridy++;
-            }
-
-            btnOrderAll = new JButton("Order All (" + partCountInfo.getMissingCount() + ")");
+            btnOrderAll = new JButton("Order All (" + partCountInfo.getMissingCount() + ')');
             btnOrderAll.setToolTipText("Order all missing");
             btnOrderAll.setName("btnOrderAll");
             btnOrderAll.setVisible(partCountInfo.getMissingCount() > 1);

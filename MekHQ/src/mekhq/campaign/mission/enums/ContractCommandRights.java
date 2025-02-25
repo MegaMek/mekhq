@@ -18,26 +18,30 @@
  */
 package mekhq.campaign.mission.enums;
 
-import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.ResourceBundle;
 
-public enum ContractCommandRights {
-    //region Enum Declarations
-    INTEGRATED("ContractCommandRights.INTEGRATED.text", "ContractCommandRights.INTEGRATED.toolTipText", "ContractCommandRights.INTEGRATED.stratConText"),
-    HOUSE("ContractCommandRights.HOUSE.text", "ContractCommandRights.HOUSE.toolTipText", "ContractCommandRights.HOUSE.stratConText"),
-    LIAISON("ContractCommandRights.LIAISON.text", "ContractCommandRights.LIAISON.toolTipText", "ContractCommandRights.LIAISON.stratConText"),
-    INDEPENDENT("ContractCommandRights.INDEPENDENT.text", "ContractCommandRights.INDEPENDENT.toolTipText", "ContractCommandRights.INDEPENDENT.stratConText");
-    //endregion Enum Declarations
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 
-    //region Variable Declarations
+public enum ContractCommandRights {
+    // region Enum Declarations
+    INTEGRATED("ContractCommandRights.INTEGRATED.text", "ContractCommandRights.INTEGRATED.toolTipText",
+            "ContractCommandRights.INTEGRATED.stratConText"),
+    HOUSE("ContractCommandRights.HOUSE.text", "ContractCommandRights.HOUSE.toolTipText",
+            "ContractCommandRights.HOUSE.stratConText"),
+    LIAISON("ContractCommandRights.LIAISON.text", "ContractCommandRights.LIAISON.toolTipText",
+            "ContractCommandRights.LIAISON.stratConText"),
+    INDEPENDENT("ContractCommandRights.INDEPENDENT.text", "ContractCommandRights.INDEPENDENT.toolTipText",
+            "ContractCommandRights.INDEPENDENT.stratConText");
+    // endregion Enum Declarations
+
+    // region Variable Declarations
     private final String name;
     private final String toolTipText;
     private final String stratConText;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     ContractCommandRights(final String name, final String toolTipText, final String stratConText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
                 MekHQ.getMHQOptions().getLocale());
@@ -45,9 +49,9 @@ public enum ContractCommandRights {
         this.toolTipText = resources.getString(toolTipText);
         this.stratConText = resources.getString(stratConText);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public String getToolTipText() {
         return toolTipText;
     }
@@ -55,9 +59,9 @@ public enum ContractCommandRights {
     public String getStratConText() {
         return stratConText;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isIntegrated() {
         return this == INTEGRATED;
     }
@@ -73,9 +77,9 @@ public enum ContractCommandRights {
     public boolean isIndependent() {
         return this == INDEPENDENT;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     /**
      * @param text containing the ContractCommandRights
      * @return the saved ContractCommandRights
@@ -104,10 +108,11 @@ public enum ContractCommandRights {
 
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into a ContractCommandRights. Returning HOUSE.");
+        MMLogger.create(ContractCommandRights.class)
+                .error("Unable to parse " + text + " into a ContractCommandRights. Returning HOUSE.");
         return HOUSE;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

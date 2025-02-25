@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2017-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,15 +18,34 @@
  */
 package mekhq.gui;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.ResourceBundle;
+import java.util.UUID;
+
+import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.GUIPreferences;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.event.Subscribe;
-import mekhq.MekHQ;
+import megamek.common.preference.IPreferenceChangeListener;
+import megamek.logging.MMLogger;
 import mekhq.MHQOptionsChangedEvent;
+import mekhq.MekHQ;
 import mekhq.campaign.event.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
@@ -35,23 +54,16 @@ import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.PersonViewPanel;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.ResourceBundle;
-import java.util.UUID;
 
 /**
  * Tab for interacting with all personnel
  */
 public final class PersonnelTab extends CampaignGuiTab {
-    public static final int PERSONNEL_VIEW_WIDTH = 500;
+    private static final MMLogger logger = MMLogger.create(PersonnelTab.class);
+
+    public static final int PERSONNEL_VIEW_WIDTH = 490;
 
     private JSplitPane splitPersonnel;
     private JTable personnelTable;
@@ -63,13 +75,16 @@ public final class PersonnelTab extends CampaignGuiTab {
     private PersonnelTableModel personModel;
     private TableRowSorter<PersonnelTableModel> personnelSorter;
 
-    //region Constructors
+    private final IPreferenceChangeListener scalingChangeListener = e -> changePersonnelView();
+
+    // region Constructors
     public PersonnelTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
         setUserPreferences();
+        GUIPreferences.getInstance().addPreferenceChangeListener(scalingChangeListener);
     }
-    //endregion Constructors
+    // endregion Constructors
 
     @Override
     public MHQTabType tabType() {
@@ -85,11 +100,10 @@ public final class PersonnelTab extends CampaignGuiTab {
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
                 MekHQ.getMHQOptions().getLocale());
-        GridBagConstraints gridBagConstraints;
 
         setLayout(new GridBagLayout());
 
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
@@ -102,8 +116,8 @@ public final class PersonnelTab extends CampaignGuiTab {
         choicePerson.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                    final int index, final boolean isSelected,
+                    final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PersonnelFilter) {
                     list.setToolTipText(((PersonnelFilter) value).getToolTipText());
@@ -137,8 +151,8 @@ public final class PersonnelTab extends CampaignGuiTab {
         choicePersonView.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                    final int index, final boolean isSelected,
+                    final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PersonnelTabView) {
                     list.setToolTipText(((PersonnelTabView) value).getToolTipText());
@@ -181,15 +195,13 @@ public final class PersonnelTab extends CampaignGuiTab {
         personnelTable.setColumnModel(personColumnModel);
         personnelTable.createDefaultColumnsFromModel();
         personnelSorter = new TableRowSorter<>(personModel);
-        final ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
+        final ArrayList<SortKey> sortKeys = new ArrayList<>();
         for (final PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {
             final Comparator<?> comparator = column.getComparator(getCampaign());
-            if (comparator != null) {
-                personnelSorter.setComparator(column.ordinal(), comparator);
-            }
+            personnelSorter.setComparator(column.ordinal(), comparator);
             final SortOrder sortOrder = column.getDefaultSortOrder();
             if (sortOrder != null) {
-                sortKeys.add(new RowSorter.SortKey(column.ordinal(), sortOrder));
+                sortKeys.add(new SortKey(column.ordinal(), sortOrder));
             }
         }
         personnelSorter.setSortKeys(sortKeys);
@@ -199,13 +211,13 @@ public final class PersonnelTab extends CampaignGuiTab {
         changePersonnelView();
         personnelTable.getSelectionModel().addListSelectionListener(ev -> refreshPersonnelView());
 
-        scrollPersonnelView = new JScrollPane();
+        scrollPersonnelView = new JScrollPaneWithSpeed();
         scrollPersonnelView.setMinimumSize(new Dimension(PERSONNEL_VIEW_WIDTH, 600));
         scrollPersonnelView.setPreferredSize(new Dimension(PERSONNEL_VIEW_WIDTH, 600));
         scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPersonnelView.setViewportView(null);
 
-        JScrollPane scrollPersonnelTable = new JScrollPane(personnelTable);
+        JScrollPane scrollPersonnelTable = new JScrollPaneWithSpeed(personnelTable);
         splitPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPersonnelTable,
                 scrollPersonnelView);
         splitPersonnel.setOneTouchExpandable(true);
@@ -222,6 +234,12 @@ public final class PersonnelTab extends CampaignGuiTab {
         PersonnelTableMouseAdapter.connect(getCampaignGui(), personnelTable, personModel, splitPersonnel);
 
         filterPersonnel();
+    }
+
+    @Override
+    public void disposeTab() {
+        super.disposeTab();
+        GUIPreferences.getInstance().removePreferenceChangeListener(scalingChangeListener);
     }
 
     private DefaultComboBoxModel<PersonnelFilter> createPersonGroupModel() {
@@ -250,7 +268,7 @@ public final class PersonnelTab extends CampaignGuiTab {
             personnelTable.setName("personnelTable");
             preferences.manage(new JTablePreference(personnelTable));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -276,20 +294,23 @@ public final class PersonnelTab extends CampaignGuiTab {
 
     public void filterPersonnel() {
         final PersonnelFilter filter = (choicePerson.getSelectedItem() == null)
-                ? PersonnelFilter.ACTIVE : choicePerson.getSelectedItem();
+                ? PersonnelFilter.ACTIVE
+                : choicePerson.getSelectedItem();
         personnelSorter.setRowFilter(new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
-                return filter.getFilteredInformation(entry.getModel().getPerson(entry.getIdentifier()), getCampaignGui().getCampaign().getLocalDate());
+                return filter.getFilteredInformation(entry.getModel().getPerson(entry.getIdentifier()),
+                        getCampaignGui().getCampaign().getLocalDate());
             }
         });
     }
 
     private void changePersonnelView() {
         final PersonnelTabView view = (choicePersonView.getSelectedItem() == null)
-                ? PersonnelTabView.GENERAL : choicePersonView.getSelectedItem();
+                ? PersonnelTabView.GENERAL
+                : choicePersonView.getSelectedItem();
         final XTableColumnModel columnModel = (XTableColumnModel) getPersonnelTable().getColumnModel();
-        getPersonnelTable().setRowHeight(15);
+        getPersonnelTable().setRowHeight(UIUtil.scaleForGUI(15));
 
         // set the renderer
         for (final PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {

@@ -25,7 +25,7 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 public class ExactMatchStep extends UnscrambleStep {
     @Override
     public void visit(final EquipmentProposal proposal, final EquipmentPart part) {
-        final Mounted mount = proposal.getEquipment(part.getEquipmentNum());
+        final Mounted<?> mount = proposal.getEquipment(part.getEquipmentNum());
         if ((mount != null) && part.getType().equals(mount.getType())) {
             proposal.proposeMapping(part, part.getEquipmentNum());
         }
@@ -33,7 +33,7 @@ public class ExactMatchStep extends UnscrambleStep {
 
     @Override
     public void visit(final EquipmentProposal proposal, final MissingEquipmentPart part) {
-        final Mounted mount = proposal.getEquipment(part.getEquipmentNum());
+        final Mounted<?> mount = proposal.getEquipment(part.getEquipmentNum());
         if ((mount != null) && part.getType().equals(mount.getType())) {
             proposal.proposeMapping(part, part.getEquipmentNum());
         }

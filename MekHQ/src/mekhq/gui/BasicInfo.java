@@ -68,11 +68,11 @@ public class BasicInfo extends JPanel {
     }
 
     public void setText(String s, String color) {
-        lblImage.setText("<html><font size='2' color='" + color + "'>" + s + "</font></html>");
+        lblImage.setText("<html><font color='" + color + "'>" + s + "</font></html>");
     }
 
     public void setText(String s) {
-        lblImage.setText("<html><font size='2'>" + s + "</font></html>");
+        lblImage.setText("<html>" + s + "</html>");
     }
 
     public void setHtmlText(String s) {

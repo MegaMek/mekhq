@@ -13,7 +13,7 @@
 		<arrivalTurn>0</arrivalTurn>
 		<canReinforceLinked>false</canReinforceLinked>
 		<contributesToBV>false</contributesToBV>
-		<contributesToMapSize>false</contributesToMapSize>
+		<contributesToMapSize>true</contributesToMapSize>
 		<contributesToUnitCount>false</contributesToUnitCount>
 		<deploymentZones>
 			<deploymentZone>10</deploymentZone>
@@ -28,7 +28,7 @@
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>50</retreatThreshold>
 		<objectiveLinkedForces>
-			<objectiveLinkedForce>Base Turrets</objectiveLinkedForce>
+			<objectiveLinkedForce>Base Defenses</objectiveLinkedForce>
 		</objectiveLinkedForces>
 		<syncDeploymentType>None</syncDeploymentType>
 	</forceDefinition>

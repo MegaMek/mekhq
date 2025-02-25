@@ -22,10 +22,10 @@
 package mekhq.campaign.finances;
 
 import megamek.common.Compute;
+import megamek.logging.MMLogger;
 import mekhq.campaign.finances.enums.FinancialTerm;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -35,10 +35,13 @@ import java.util.Objects;
 
 /**
  * TODO : Update loan baseline based on latest Campaign Operations Rules
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Loan {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(Loan.class);
+
+    // region Variable Declarations
     private String institution;
     private String referenceNumber;
     private Money principal;
@@ -50,27 +53,27 @@ public class Loan {
     private Money paymentAmount;
     private LocalDate nextPayment;
     private boolean overdue;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     private Loan() {
         // don't do anything, this is for loading
     }
 
     public Loan(final int principal, final int rate, final int years,
-                final FinancialTerm financialTerm, final int collateral, final LocalDate today) {
+            final FinancialTerm financialTerm, final int collateral, final LocalDate today) {
         this(Money.of(principal), rate, years, financialTerm, collateral, today);
     }
 
     public Loan(final Money principal, final int rate, final int years,
-                final FinancialTerm financialTerm, final int collateral, final LocalDate today) {
+            final FinancialTerm financialTerm, final int collateral, final LocalDate today) {
         this(FinancialInstitutions.randomFinancialInstitution(today).toString(), randomReferenceNumber(),
                 principal, rate, years, financialTerm, collateral, today);
     }
 
     public Loan(final String institution, final String referenceNumber, final Money principal,
-                final int rate, final int years, final FinancialTerm financialTerm,
-                final int collateral, final LocalDate today) {
+            final int rate, final int years, final FinancialTerm financialTerm,
+            final int collateral, final LocalDate today) {
         setInstitution(institution);
         setReferenceNumber(referenceNumber);
         setPrincipal(principal);
@@ -83,9 +86,9 @@ public class Loan {
 
         calculateAmortization();
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public String getInstitution() {
         return institution;
     }
@@ -173,9 +176,9 @@ public class Loan {
     public void setOverdue(final boolean overdue) {
         this.overdue = overdue;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
-    //region Determination Methods
+    // region Determination Methods
     public Money determineCollateralAmount() {
         return getPrincipal().multipliedBy(getCollateral()).dividedBy(100);
     }
@@ -184,7 +187,7 @@ public class Loan {
         return getPaymentAmount()
                 .multipliedBy(getRemainingPayments());
     }
-    //endregion Determination Methods
+    // endregion Determination Methods
 
     public void calculateAmortization() {
         // figure out actual rate from APR
@@ -193,9 +196,13 @@ public class Loan {
         final double periodicRate = (getRate() / 100.0) / paymentsPerYear;
 
         setRemainingPayments(numberOfPayments);
-        setPaymentAmount(getPrincipal()
+        if (periodicRate > 0) {
+            setPaymentAmount(getPrincipal()
                 .multipliedBy(periodicRate * Math.pow(1 + periodicRate, numberOfPayments))
                 .dividedBy(Math.pow(1 + periodicRate, numberOfPayments) - 1));
+        } else {
+            setPaymentAmount(getPrincipal().dividedBy(numberOfPayments));
+        }
     }
 
     public void paidLoan() {
@@ -319,7 +326,7 @@ public class Loan {
         return stringBuilder.toString();
     }
 
-    //region File I/O
+    // region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "loan");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "institution", getInstitution());
@@ -364,22 +371,14 @@ public class Loan {
                     loan.setNextPayment(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("overdue")) {
                     loan.setOverdue(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("payAmount")) { // Legacy - 0.49.3 Removal
-                    loan.setPaymentAmount(Money.fromXmlString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("refNumber")) { // Legacy - 0.49.3 Removal
-                    loan.setReferenceNumber(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("schedule")) { // Legacy - 0.49.3 Removal
-                    loan.setFinancialTerm(FinancialTerm.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("nPayments")) { // Legacy - 0.49.3 Removal
-                    loan.setRemainingPayments(Integer.parseInt(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
         return loan;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {
@@ -392,8 +391,7 @@ public class Loan {
             return false;
         } else if (this == other) {
             return true;
-        } else if (other instanceof Loan) {
-            final Loan loan = (Loan) other;
+        } else if (other instanceof Loan loan) {
             return getInstitution().equals(loan.getInstitution())
                     && getReferenceNumber().equals(loan.getReferenceNumber())
                     && getPrincipal().equals(loan.getPrincipal())

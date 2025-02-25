@@ -345,4 +345,13 @@ public class PartTest {
         assertTrue(part.getChildParts().isEmpty());
         verify(childPart0, times(1)).setParentPart(eq(null));
     }
+
+    @Test
+    public void testTransportBayPartNameNoEntity() {
+        Campaign mockCampaign = mock(Campaign.class);
+        int size = 1000;
+        TransportBayPart tbp = new TransportBayPart(size, 1, size, mockCampaign);
+        // Should return default name, _not_ throw NPE here
+        assertNotNull(tbp.getName());
+    }
 }

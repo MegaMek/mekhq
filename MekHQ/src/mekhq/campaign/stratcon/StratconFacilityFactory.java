@@ -13,20 +13,28 @@
 */
 package mekhq.campaign.stratcon;
 
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
-import org.apache.logging.log4j.LogManager;
-
-import java.nio.file.Paths;
-import java.util.*;
 
 /**
- * This class handles functionality related to loading and stratcon facility definitions.
+ * This class handles functionality related to loading and stratcon facility
+ * definitions.
+ * 
  * @author NickAragua
  */
 public class StratconFacilityFactory {
+    private static final MMLogger logger = MMLogger.create(StratconFacilityFactory.class);
+
     // loaded facility definitions
 
     // map of filename -> facility definition, for specific facility retrieval
@@ -55,10 +63,12 @@ public class StratconFacilityFactory {
         stratconFacilityMap.clear();
 
         // load dynamic scenarios
-        StratconFacilityManifest facilityManifest = StratconFacilityManifest.deserialize(MHQConstants.STRATCON_FACILITY_MANIFEST);
+        StratconFacilityManifest facilityManifest = StratconFacilityManifest
+                .deserialize(MHQConstants.STRATCON_FACILITY_MANIFEST);
 
         // load user-specified scenario list
-        StratconFacilityManifest userManifest = StratconFacilityManifest.deserialize(MHQConstants.STRATCON_USER_FACILITY_MANIFEST);
+        StratconFacilityManifest userManifest = StratconFacilityManifest
+                .deserialize(MHQConstants.STRATCON_USER_FACILITY_MANIFEST);
 
         if (facilityManifest != null) {
             loadFacilitiesFromManifest(facilityManifest);
@@ -71,6 +81,7 @@ public class StratconFacilityFactory {
 
     /**
      * Helper function that loads scenario templates from the given manifest.
+     * 
      * @param manifest The manifest to process
      */
     private static void loadFacilitiesFromManifest(StratconFacilityManifest manifest) {
@@ -95,21 +106,23 @@ public class StratconFacilityFactory {
                     }
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(String.format("Error loading file: %s", filePath), e);
+                logger.error(String.format("Error loading file: %s", filePath), e);
             }
         }
     }
 
     /**
      * Gets a specific facility given an "ID" (the file name).
-     * This method does not clone the facility and should not be used to put one on the board
+     * This method does not clone the facility and should not be used to put one on
+     * the board
      */
     public static StratconFacility getFacilityByName(String name) {
         return stratconFacilityMap.get(name);
     }
 
     /**
-     * Gets a clone of a specific facility given the "ID" (file name), null if it doesn't exist.
+     * Gets a clone of a specific facility given the "ID" (file name), null if it
+     * doesn't exist.
      */
     @Nullable
     public static StratconFacility getFacilityCloneByName(String name) {

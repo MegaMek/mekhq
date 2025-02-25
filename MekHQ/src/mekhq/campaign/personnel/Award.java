@@ -23,6 +23,7 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import mekhq.MekHQ;
+import mekhq.campaign.CampaignOptions;
 import mekhq.utilities.MHQXMLUtility;
 
 import java.io.PrintWriter;
@@ -38,10 +39,13 @@ import java.util.List;
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class Award implements Comparable<Award> {
     @XmlElement(name = "name")
-    private String name;
+    private String name = "ERROR: NO NAME";
 
     @XmlElement(name = "description")
-    private String description;
+    private String description = "";
+
+    @XmlElement(name = "group")
+    private String group = "";
 
     @XmlElement(name = "medal")
     private List<String> medals;
@@ -58,6 +62,18 @@ public class Award implements Comparable<Award> {
     @XmlElement(name = "edge")
     private int edge = 0;
 
+    @XmlElement(name = "qty")
+    private int qty = 0;
+
+    @XmlElement(name = "item")
+    private String item = "";
+
+    @XmlElement(name = "size")
+    private String size = "";
+
+    @XmlElement(name = "range")
+    private String range = "";
+
     @XmlElement(name = "stackable")
     private boolean stackable = false;
 
@@ -71,16 +87,21 @@ public class Award implements Comparable<Award> {
 
     }
 
-    public Award(String name, String set,  String description, List<String> medals, List<String> ribbons,
-                 List<String> miscs, int xp, int edge, boolean stackable, int id) {
+    public Award(String name, String set,  String description, String group, List<String> medals, List<String> ribbons,
+                 List<String> miscs, int xp, int edge, boolean stackable, int qty, String item, String size, String range, int id) {
         this.name = name;
         this.set = set;
         this.description = description;
+        this.group = group;
         this.medals = medals;
         this.ribbons = ribbons;
         this.miscs = miscs;
         this.xp = xp;
         this.edge = edge;
+        this.qty = qty;
+        this.item = item;
+        this.size = size;
+        this.range = range;
         this.stackable = stackable;
         dates = new ArrayList<>();
         this.id = id;
@@ -125,10 +146,42 @@ public class Award implements Comparable<Award> {
         return description;
     }
 
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(final String group) {
+        this.group = group;
+    }
+
+    /**
+     * Returns the xml element 'qty'
+     * Use getQuantity() if looking for the number of times an award has been issued to an individual
+     */
+    public int getQty() {
+        return qty;
+    }
+
+    public String getItem() {
+        return item;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public String getRange() {
+        return range;
+    }
+
+    public Boolean isStackable() {
+        return stackable;
+    }
+
     /**
      * Gets the file name of an award given i times.
      * @param i times given the award
-     * @param fileNames list containing all of the file names
+     * @param fileNames list containing all the file names
      * @return the file name
      */
     private String getFileName(int i, List<String> fileNames) {
@@ -188,8 +241,8 @@ public class Award implements Comparable<Award> {
      * @return award with new date
      */
     public Award createCopy() {
-        return new Award(this.name, this.set, this.description, this.medals, this.ribbons, this.miscs,
-                this.xp, this.edge, this.stackable, this.id);
+        return new Award(this.name, this.set, this.description, this.group, this.medals, this.ribbons, this.miscs,
+                this.xp, this.edge, this.stackable, this.qty, this.item, this.size, this.range, this.id);
     }
 
     /**
@@ -284,26 +337,56 @@ public class Award implements Comparable<Award> {
     }
 
     /**
-     * @return the number of times this award has been awarded to the person.
+     * @return the number of times this award has been awarded.
      */
     public int getQuantity() {
         return dates.size();
     }
 
     /**
-     * @return an html formatted string to be used as tooltip.
+     * @return the tooltip for an award.
+     *
+     * @param campaignOptions the campaign options to determine the tooltip content
      */
-    public String getTooltip() {
-        StringBuilder string = new StringBuilder();
-        string.append("<html>").append(getName()).append("<br>").append(getDescription())
+    public String getTooltip(CampaignOptions campaignOptions, Person person) {
+        boolean awardXP = (campaignOptions.getAwardBonusStyle().isBoth()) || (campaignOptions.getAwardBonusStyle().isXP());
+        boolean awardEdge = (campaignOptions.getAwardBonusStyle().isBoth()) || (campaignOptions.getAwardBonusStyle().isEdge());
+
+        int issueCount = person.getAwardController().getNumberOfAwards(this);
+
+        StringBuilder tooltip = new StringBuilder();
+        tooltip.append("<html>").append(getName()).append("<br>").append(getDescription())
                 .append("<br>").append("<br>");
-        for (String date : getFormattedDates()) {
-            string.append("(").append(date).append(")").append("<br>");
+
+        if ((awardXP) && (xp > 0)) {
+            tooltip.append("XP: +").append(xp);
+
+            if (issueCount > 1) {
+                tooltip.append(" (+").append(xp * issueCount).append(')');
+            }
+
+            tooltip.append("<br>");
         }
 
-        string.append("</html>");
+        if ((awardEdge) && (edge > 0)) {
+            tooltip.append("Edge: +").append(edge);
 
-        return string.toString();
+            if (issueCount > 1) {
+                tooltip.append(" (+").append(edge * issueCount).append(')');
+            }
+
+            tooltip.append("<br>");
+        }
+
+        tooltip.append("<br>");
+
+        for (String date : getFormattedDates()) {
+            tooltip.append('(').append(date).append(')').append("<br>");
+        }
+
+        tooltip.append("</html>");
+
+        return tooltip.toString();
     }
 
     /**

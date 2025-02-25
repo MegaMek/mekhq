@@ -1,9 +1,26 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 
 import megamek.common.CriticalSlot;
@@ -11,7 +28,9 @@ import megamek.common.Entity;
 import megamek.common.QuadVee;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 
 /**
  * Conversion gear for QuadVees
@@ -47,13 +66,13 @@ public class QuadVeeGear extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if (null != unit) {
             hits = unit.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
-                        QuadVee.SYSTEM_CONVERSION_GEAR);
+                    QuadVee.SYSTEM_CONVERSION_GEAR);
         }
     }
 
     @Override
     public int getBaseTime() {
-        // Using value for 'Mech "weapons and other equipment"
+        // Using value for 'Mek "weapons and other equipment"
         if (isSalvaging()) {
             return 120;
         }
@@ -156,10 +175,14 @@ public class QuadVeeGear extends Part {
     @Override
     public Money getStickerPrice() {
         /*
-         * The cost for conversion equipment is calculated as 10% of the total cost of weapons/equipment
-         * and structure. This is unworkable for the conversion gear sticker price, since this
-         * would make the cost of the conversion gear in OmniQuadVees vary with the configuration.
-         * We will use a general 10,000 * part tonnage and assume the remainder is part of the
+         * The cost for conversion equipment is calculated as 10% of the total cost of
+         * weapons/equipment
+         * and structure. This is unworkable for the conversion gear sticker price,
+         * since this
+         * would make the cost of the conversion gear in OmniQuadVees vary with the
+         * configuration.
+         * We will use a general 10,000 * part tonnage and assume the remainder is part
+         * of the
          * turret mechanism that is only destroyed if the center torso is destroyed.
          */
         return Money.of(getTonnage() * 10000);

@@ -20,22 +20,25 @@
  */
 package mekhq.campaign.storyarc.storypoint;
 
-import megamek.Version;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.storyarc.StoryPoint;
-import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.time.LocalDate;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
- * A StoryPoint that waits until a certain number of days pass before completing.
+ * A StoryPoint that waits until a certain number of days pass before
+ * completing.
  */
 public class WaitStoryPoint extends StoryPoint {
+    private static final MMLogger logger = MMLogger.create(WaitStoryPoint.class);
 
     String title;
     int days;
@@ -53,7 +56,7 @@ public class WaitStoryPoint extends StoryPoint {
 
     @Override
     protected String getResult() {
-        //this one has no variation
+        // this one has no variation
         return "";
     }
 
@@ -100,7 +103,7 @@ public class WaitStoryPoint extends StoryPoint {
                     days = Integer.parseInt(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

@@ -18,16 +18,18 @@
  */
 package mekhq.campaign.mission.atb.scenario;
 
-import java.util.ArrayList;
-
 import megamek.common.Compute;
 import megamek.common.Entity;
+import megamek.common.EntityWeightClass;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
+
+import java.util.ArrayList;
 
 @AtBScenarioEnabled
 public class StandUpBuiltInScenario extends AtBScenario {
@@ -64,7 +66,10 @@ public class StandUpBuiltInScenario extends AtBScenario {
             addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
-        addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
+        CombatTeam combatTeam = getCombatTeamById(campaign);
+        int weightClass = combatTeam != null ? combatTeam.getWeightClass(campaign) : EntityWeightClass.WEIGHT_LIGHT;
+
+        addEnemyForce(enemyEntities, weightClass, campaign);
         addBotForce(getEnemyBotForce(getContract(campaign), getEnemyHome(), getEnemyHome(), enemyEntities), campaign);
     }
 

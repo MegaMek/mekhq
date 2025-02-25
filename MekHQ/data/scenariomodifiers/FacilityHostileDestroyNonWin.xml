@@ -1,29 +1,29 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>This facility will be destroyed if all turret buildings are destroyed.</additionalBriefingText>
-	<benefitsPlayer>false</benefitsPlayer>
-	<eventTiming>PreForceGeneration</eventTiming>
-	<modifierName>Destroy</modifierName>
-	<objectives>
+    <additionalBriefingText>This facility will be destroyed if 75% of turrets are destroyed.</additionalBriefingText>
+    <benefitsPlayer>false</benefitsPlayer>
+    <eventTiming>PreForceGeneration</eventTiming>
+    <modifierName>Destroy</modifierName>
+    <objectives>
         <objective>
             <associatedForceNames>
-                <associatedForceName>Base Turrets</associatedForceName>
+                <associatedForceName>Base Defenses</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
-		<successEffect>
-			<effectType>FacilityRemoved</effectType>
-			<effectScaling>Fixed</effectScaling>
-			<howMuch>1</howMuch>
-		</successEffect>
+                <successEffect>
+                    <effectType>FacilityRemoved</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
             </successEffects>
-            <additionalDetails/>
-            <description>Destroy or cripple all of the following force(s) and unit(s) to render the facility inoperative:</description>
+            <additionalDetails />
+            <description>Destroy or cripple 75% of the following unit(s) to render the facility inoperative:</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
-            <percentage>100</percentage>
+            <percentage>75</percentage>
             <timeLimit>0</timeLimit>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
         </objective>
-        </objectives>
+    </objectives>
 </AtBScenarioModifier>

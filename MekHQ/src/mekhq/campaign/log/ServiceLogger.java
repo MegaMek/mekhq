@@ -18,25 +18,28 @@
  */
 package mekhq.campaign.log;
 
+import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.util.ResourceBundle;
+
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import org.apache.logging.log4j.LogManager;
-
-import java.text.MessageFormat;
-import java.time.LocalDate;
-import java.util.ResourceBundle;
 
 /**
  * This class is responsible to control the logging of Service Log Entries.
+ *
  * @author Miguel Azevedo
  */
 public class ServiceLogger {
-    private static final transient ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
+    private static final MMLogger logger = MMLogger.create(ServiceLogger.class);
+
+    private static final ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
             MekHQ.getMHQOptions().getLocale());
 
     public static void retireDueToWounds(Person person, LocalDate date) {
@@ -82,8 +85,49 @@ public class ServiceLogger {
     }
 
     public static void changedStatus(final Person person, final LocalDate date,
-                                     final PersonnelStatus status) {
+            final PersonnelStatus status) {
         person.addLogEntry(new ServiceLogEntry(date, status.getLogText()));
+    }
+
+    public static void eduEnrolled(Person person, LocalDate date, String institution, String course) {
+        person.addLogEntry(new ServiceLogEntry(date,
+                MessageFormat.format(logEntriesResourceMap.getString("eduEnrolled.text"), institution, course)));
+    }
+
+    public static void eduReEnrolled(Person person, LocalDate date, String institution, String course) {
+        person.addLogEntry(new ServiceLogEntry(date,
+                MessageFormat.format(logEntriesResourceMap.getString("eduReEnrolled.text"), institution, course)));
+    }
+
+    public static void eduGraduated(Person person, LocalDate date, String institution, String course) {
+        person.addLogEntry(new ServiceLogEntry(date,
+                MessageFormat.format(logEntriesResourceMap.getString("eduGraduated.text"), institution, course)));
+    }
+
+    public static void eduGraduatedPlus(Person person, LocalDate date, String graduationType, String institution,
+            String course) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(
+                logEntriesResourceMap.getString("eduGraduatedPlus.text"), graduationType, institution, course)));
+    }
+
+    public static void eduGraduatedMasters(Person person, LocalDate date, String institution, String course) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat
+                .format(logEntriesResourceMap.getString("eduGraduatedMasters.text"), institution, course)));
+    }
+
+    public static void eduGraduatedDoctorate(Person person, LocalDate date, String institution, String course) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat
+                .format(logEntriesResourceMap.getString("eduGraduatedDoctorate.text"), institution, course)));
+    }
+
+    public static void eduFailed(Person person, LocalDate date, String institution, String course) {
+        person.addLogEntry(new ServiceLogEntry(date,
+                MessageFormat.format(logEntriesResourceMap.getString("eduFailed.text"), institution, course)));
+    }
+
+    public static void eduFailedApplication(Person person, LocalDate date, String institution) {
+        person.addLogEntry(new ServiceLogEntry(date,
+                MessageFormat.format(logEntriesResourceMap.getString("eduFailedApplication.text"), institution)));
     }
 
     public static void recoveredMia(Person person, LocalDate date) {
@@ -98,8 +142,16 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("returnedFromLeave.text")));
     }
 
+    public static void returnedFromEducation(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("returnedFromEducation.text")));
+    }
+
     public static void returnedFromAWOL(Person person, LocalDate date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("returnedFromAWOL.text")));
+    }
+
+    public static void returnedFromMissing(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("returnedFromMissing.text")));
     }
 
     public static void resurrected(Person person, LocalDate date) {
@@ -114,6 +166,26 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("retired.text")));
     }
 
+    public static void resigned(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("resigned.text")));
+    }
+
+    public static void deserted(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("deserted.text")));
+    }
+
+    public static void defected(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("defected.text")));
+    }
+
+    public static void sacked(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("sacked.text")));
+    }
+
+    public static void left(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("left.text")));
+    }
+
     public static void promotedTo(Person person, LocalDate date) {
         String message = logEntriesResourceMap.getString("promotedTo.text");
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, person.getRankName())));
@@ -125,9 +197,16 @@ public class ServiceLogger {
     }
 
     public static void participatedInScenarioDuringMission(Person person, LocalDate date,
-                                                           String scenarioName, String missionName) {
+            String scenarioName, String missionName) {
         String message = logEntriesResourceMap.getString("participatedInScenarioDuringMission.text");
         person.addScenarioLogEntry(new ServiceLogEntry(date,
+                MessageFormat.format(message, scenarioName, missionName)));
+    }
+
+    public static void capturedInScenarioDuringMission(Person person, LocalDate date,
+            String scenarioName, String missionName) {
+        String message = logEntriesResourceMap.getString("capturedInScenarioDuringMission.text");
+        person.addLogEntry(new ServiceLogEntry(date,
                 MessageFormat.format(message, scenarioName, missionName)));
     }
 
@@ -165,15 +244,16 @@ public class ServiceLogger {
         if (force != null) {
             String message = logEntriesResourceMap.getString("addToTOEForce.text");
             person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
-                    campaign.getCampaignOptions().isUseExtendedTOEForceName() ? force.getFullName() : force.getName())));
+                    campaign.getCampaignOptions().isUseExtendedTOEForceName() ? force.getFullName()
+                            : force.getName())));
         }
     }
 
     public static void reassignedTOEForce(final Campaign campaign, final Person person,
-                                          final LocalDate date, final @Nullable Force oldForce,
-                                          final @Nullable Force newForce) {
+            final LocalDate date, final @Nullable Force oldForce,
+            final @Nullable Force newForce) {
         if ((oldForce == null) && (newForce == null)) {
-            LogManager.getLogger().error(String.format("Cannot reassign %s on %s because both specified forces are null",
+            logger.error(String.format("Cannot reassign %s on %s because both specified forces are null",
                     person.getFullTitle(), date));
             return;
         }
@@ -181,8 +261,10 @@ public class ServiceLogger {
         if ((oldForce != null) && (newForce != null)) {
             String message = logEntriesResourceMap.getString("reassignedTOEForce.text");
             person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
-                    campaign.getCampaignOptions().isUseExtendedTOEForceName() ? oldForce.getFullName() : oldForce.getName(),
-                    campaign.getCampaignOptions().isUseExtendedTOEForceName() ? newForce.getFullName() : newForce.getName())));
+                    campaign.getCampaignOptions().isUseExtendedTOEForceName() ? oldForce.getFullName()
+                            : oldForce.getName(),
+                    campaign.getCampaignOptions().isUseExtendedTOEForceName() ? newForce.getFullName()
+                            : newForce.getName())));
         } else if (oldForce == null) {
             addedToTOEForce(campaign, person, date, newForce);
         } else {
@@ -194,7 +276,19 @@ public class ServiceLogger {
         if (force != null) {
             String message = logEntriesResourceMap.getString("removedFromTOEForce.text");
             person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
-                    campaign.getCampaignOptions().isUseExtendedTOEForceName() ? force.getFullName() : force.getName())));
+                    campaign.getCampaignOptions().isUseExtendedTOEForceName() ? force.getFullName()
+                            : force.getName())));
         }
+    }
+
+    /**
+     * Adds a log entry to the specified {@link Person} when they become orphaned by
+     * the death of both parents.
+     *
+     * @param person The person who is becoming orphaned.
+     * @param date   The date on which the person is becoming orphaned.
+     */
+    public static void orphaned(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("orphaned.text")));
     }
 }

@@ -20,20 +20,23 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.EquipmentType;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.enums.PartRepairType;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
+import megamek.common.EquipmentType;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class InfantryWeaponPart extends EquipmentPart {
+    private static final MMLogger logger = MMLogger.create(InfantryWeaponPart.class);
+
     private boolean primary;
 
     public InfantryWeaponPart() {
@@ -47,7 +50,8 @@ public class InfantryWeaponPart extends EquipmentPart {
 
     @Override
     public InfantryWeaponPart clone() {
-        InfantryWeaponPart clone = new InfantryWeaponPart(getUnitTonnage(), getType(), getEquipmentNum(), campaign, primary);
+        InfantryWeaponPart clone = new InfantryWeaponPart(getUnitTonnage(), getType(), getEquipmentNum(), campaign,
+                primary);
         clone.copyBaseData(this);
         return clone;
     }
@@ -85,7 +89,7 @@ public class InfantryWeaponPart extends EquipmentPart {
                     primary = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
         restore();

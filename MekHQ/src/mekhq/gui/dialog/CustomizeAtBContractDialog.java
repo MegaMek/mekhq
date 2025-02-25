@@ -27,6 +27,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -40,7 +41,6 @@ import mekhq.gui.FactionComboBox;
 import mekhq.gui.utilities.JMoneyTextField;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
-import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,10 +49,14 @@ import java.awt.event.ActionListener;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+
 /**
  * @author Neoancient
  */
 public class CustomizeAtBContractDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(CustomizeAtBContractDialog.class);
+
     private JFrame frame;
     private AtBContract contract;
     private Campaign campaign;
@@ -119,12 +123,12 @@ public class CustomizeAtBContractDialog extends JDialog {
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.X_AXIS));
         JPanel leftPanel = new JPanel(new GridBagLayout());
         leftPanel.setBorder(BorderFactory.createCompoundBorder(
-                 BorderFactory.createTitledBorder("Contract Details"),
-                 BorderFactory.createEmptyBorder(5,5,5,5)));
+                BorderFactory.createTitledBorder("Contract Details"),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         JPanel rightPanel = new JPanel(new GridBagLayout());
         rightPanel.setBorder(BorderFactory.createCompoundBorder(
-                 BorderFactory.createTitledBorder("Bot Settings"),
-                 BorderFactory.createEmptyBorder(5,5,5,5)));
+                BorderFactory.createTitledBorder("Bot Settings"),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         JPanel buttonPanel = new JPanel();
         mainPanel.add(leftPanel);
         mainPanel.add(rightPanel);
@@ -149,8 +153,8 @@ public class CustomizeAtBContractDialog extends JDialog {
         comboContractType.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                    final int index, final boolean isSelected,
+                    final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof AtBContractType) {
                     list.setToolTipText(((AtBContractType) value).getToolTipText());
@@ -165,7 +169,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         txtDesc = new MarkdownEditorPanel("Contract Description");
         JLabel lblPlanetName = new JLabel();
         // TODO : Switch me to use IUnitRating
-        String[] ratingNames = {"F", "D", "C", "B", "A"};
+        String[] ratingNames = { "F", "D", "C", "B", "A" };
         final DefaultComboBoxModel<SkillLevel> allySkillModel = new DefaultComboBoxModel<>();
         allySkillModel.addAll(SkillLevel.getGeneratableValues());
         comboAllySkill = new MMComboBox<>("comboAllySkill", allySkillModel);
@@ -186,13 +190,13 @@ public class CustomizeAtBContractDialog extends JDialog {
         JLabel lblEnemyRating = new JLabel();
         JLabel lblRequiredLances = new JLabel();
 
-        int requiredLances = contract.getRequiredLances() > 0 ? contract.getRequiredLances() : 1;
+        int requiredLances = contract.getRequiredCombatTeams() > 0 ? contract.getRequiredCombatTeams() : 1;
 
         spnRequiredLances = new JSpinner(new SpinnerNumberModel(requiredLances, 1, null, 1));
         JLabel lblEnemyMorale = new JLabel();
         spnContractScoreArbitraryModifier = new JSpinner(
                 new SpinnerNumberModel(contract.getContractScoreArbitraryModifier(),
-                        null,null,1));
+                        null, null, 1));
         JLabel lblContractScoreArbitraryModifier = new JLabel();
 
         txtBasePay = new JMoneyTextField();
@@ -203,11 +207,11 @@ public class CustomizeAtBContractDialog extends JDialog {
         comboContractType.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                    final int index, final boolean isSelected,
+                    final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof AtBMoraleLevel) {
-                    list.setToolTipText(((AtBMoraleLevel) value).getToolTipText());
+                    list.setToolTipText(wordWrap(((AtBMoraleLevel) value).getToolTipText()));
                 }
                 return this;
             }
@@ -427,7 +431,6 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(txtBasePay, gbc);
 
-
         txtDesc.setText(contract.getDescription());
         txtDesc.setPreferredSize(new Dimension(400, 200));
         txtDesc.setMinimumSize(new Dimension(400, 200));
@@ -538,7 +541,7 @@ public class CustomizeAtBContractDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -571,7 +574,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         contract.setAllyQuality(cbAllyQuality.getSelectedIndex());
         contract.setEnemySkill(comboEnemySkill.getSelectedItem());
         contract.setEnemyQuality(cbEnemyQuality.getSelectedIndex());
-        contract.setRequiredLances((Integer) spnRequiredLances.getValue());
+        contract.setRequiredCombatTeams((Integer) spnRequiredLances.getValue());
         contract.setMoraleLevel(comboEnemyMorale.getSelectedItem());
         contract.setContractScoreArbitraryModifier((Integer) spnContractScoreArbitraryModifier.getValue());
         contract.setBaseAmount(txtBasePay.getMoney());
@@ -589,7 +592,8 @@ public class CustomizeAtBContractDialog extends JDialog {
             contract.setSystemId(canonSystem.getId());
         } else {
             contract.setSystemId(null);
-            contract.setLegacyPlanetName(suggestPlanet.getText());
+            contract.setLegacyPlanetName(suggestPlanet.getText());// Is this method actual Legacy or just related to
+                                                                  // history of planet
         }
 
         contract.setDesc(txtDesc.getText());

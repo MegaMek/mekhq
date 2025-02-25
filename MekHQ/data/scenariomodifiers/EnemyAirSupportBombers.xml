@@ -9,7 +9,7 @@
 		<arrivalTurn>-3</arrivalTurn>
 		<canReinforceLinked>true</canReinforceLinked>
 		<contributesToBV>false</contributesToBV>
-		<contributesToMapSize>false</contributesToMapSize>
+		<contributesToMapSize>true</contributesToMapSize>
 		<contributesToUnitCount>false</contributesToUnitCount>
 		<deploymentZones>
 			<deploymentZone>1</deploymentZone>
@@ -26,16 +26,19 @@
 		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>Opfor Aircraft</forceName>
+		<forceName>Aircraft</forceName>
 		<generationMethod>3</generationMethod>
 		<generationOrder>5</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<objectiveLinkedForces>
-                    <objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
-                </objectiveLinkedForces>
+			<objectiveLinkedForce>OpFor</objectiveLinkedForce>
+		</objectiveLinkedForces>
 		<retreatThreshold>50</retreatThreshold>
 		<startingAltitude>5</startingAltitude>
 		<syncDeploymentType>None</syncDeploymentType>
 		<syncedForceName />
+        <roleChoices>
+            <forceRole>BOMBER</forceRole>
+        </roleChoices>
 	</forceDefinition>
 </AtBScenarioModifier>

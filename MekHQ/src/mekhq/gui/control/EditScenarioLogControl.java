@@ -24,6 +24,7 @@ import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.dialog.AddOrEditScenarioEntryDialog;
 import mekhq.gui.model.LogTableModel;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -96,7 +97,7 @@ public class EditScenarioLogControl extends JPanel {
         logsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         logsTable.getSelectionModel().addListSelectionListener(this::logTableValueChanged);
 
-        scrollLogsTable = new JScrollPane();
+        scrollLogsTable = new JScrollPaneWithSpeed();
         scrollLogsTable.setName(resourceMap.getString("scrollLogsTable.name"));
         scrollLogsTable.setViewportView(logsTable);
         this.add(scrollLogsTable, BorderLayout.CENTER);

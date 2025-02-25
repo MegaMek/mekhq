@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2017-2024 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,6 +18,7 @@
  */
 package mekhq.gui;
 
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.TargetRoll;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
@@ -30,6 +31,7 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.DocTableModel;
 import mekhq.gui.model.PatientTableModel;
 import mekhq.gui.sorter.PersonTitleSorter;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import java.awt.*;
@@ -79,11 +81,11 @@ public final class InfirmaryTab extends CampaignGuiTab {
 
         doctorsModel = new DocTableModel(getCampaign());
         docTable = new JTable(doctorsModel);
-        docTable.setRowHeight(60);
+        docTable.setRowHeight(UIUtil.scaleForGUI(60));
         docTable.getColumnModel().getColumn(0).setCellRenderer(doctorsModel.getRenderer());
         docTable.getSelectionModel().addListSelectionListener(ev -> docTableValueChanged());
         docTable.setOpaque(false);
-        JScrollPane scrollDocTable = new JScrollPane(docTable);
+        JScrollPane scrollDocTable = new JScrollPaneWithSpeed(docTable);
         scrollDocTable.setMinimumSize(new Dimension(300, 300));
         scrollDocTable.setPreferredSize(new Dimension(300, 300));
         scrollDocTable.setOpaque(false);
@@ -124,7 +126,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         listAssignedPatient.setVisibleRowCount(-1);
         listAssignedPatient.getSelectionModel().addListSelectionListener(ev -> updateAssignDoctorEnabled());
         listAssignedPatient.setOpaque(false);
-        JScrollPane scrollAssignedPatient = new JScrollPane(listAssignedPatient);
+        JScrollPane scrollAssignedPatient = new JScrollPaneWithSpeed(listAssignedPatient);
         scrollAssignedPatient.setMinimumSize(new Dimension(300, 360));
         scrollAssignedPatient.setPreferredSize(new Dimension(300, 360));
         scrollAssignedPatient.setOpaque(false);
@@ -136,7 +138,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         listUnassignedPatient.setVisibleRowCount(-1);
         listUnassignedPatient.getSelectionModel().addListSelectionListener(ev -> updateAssignDoctorEnabled());
         listUnassignedPatient.setOpaque(false);
-        JScrollPane scrollUnassignedPatient = new JScrollPane(listUnassignedPatient);
+        JScrollPane scrollUnassignedPatient = new JScrollPaneWithSpeed(listUnassignedPatient);
         scrollUnassignedPatient.setMinimumSize(new Dimension(300, 200));
         scrollUnassignedPatient.setPreferredSize(new Dimension(300, 300));
         scrollUnassignedPatient.setOpaque(false);
@@ -228,7 +230,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         return patients;
     }
 
-    protected ArrayList<Person> getSelectedUnassignedPatients() {
+    private ArrayList<Person> getSelectedUnassignedPatients() {
         ArrayList<Person> patients = new ArrayList<>();
         int[] indices = listUnassignedPatient.getSelectedIndices();
         if (unassignedPatientModel.getSize() == 0) {
@@ -270,7 +272,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
                 if ((null != p)
                         && (p.needsFixing()
                                 || (getCampaign().getCampaignOptions().isUseAdvancedMedical() && p.needsAMFixing()))
-                        && (getCampaign().getPatientsFor(doctor) < 25)
+                        && (getCampaign().getPatientsFor(doctor) < getCampaign().getCampaignOptions().getMaximumPatients())
                         && (getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
                     p.setDoctorId(doctor.getId(), getCampaign().getCampaignOptions().getHealingWaitingPeriod());
                     MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, p));
@@ -283,7 +285,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
                 if ((null != p)
                         && (p.needsFixing()
                                 || (getCampaign().getCampaignOptions().isUseAdvancedMedical() && p.needsAMFixing()))
-                        && (getCampaign().getPatientsFor(doctor) < 25)
+                        && (getCampaign().getPatientsFor(doctor) < getCampaign().getCampaignOptions().getMaximumPatients())
                         && (getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
                     p.setDoctorId(doctor.getId(), getCampaign().getCampaignOptions().getHealingWaitingPeriod());
                     MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, p));

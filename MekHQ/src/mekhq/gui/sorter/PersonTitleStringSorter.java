@@ -18,30 +18,32 @@
  */
 package mekhq.gui.sorter;
 
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.Campaign;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.Comparator;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+
 public class PersonTitleStringSorter implements Comparator<String> {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(PersonTitleStringSorter.class);
+
+    // region Variable Declarations
     private final Campaign campaign;
     private final Pattern pattern = Pattern.compile("id=\"([^\"]+)\"");
     private final PersonTitleSorter personTitleSorter;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public PersonTitleStringSorter(final Campaign campaign) {
         this.campaign = campaign;
         this.personTitleSorter = new PersonTitleSorter();
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public Campaign getCampaign() {
         return campaign;
     }
@@ -53,11 +55,12 @@ public class PersonTitleStringSorter implements Comparator<String> {
     public PersonTitleSorter getPersonTitleSorter() {
         return personTitleSorter;
     }
-    //endregion Getters
+    // endregion Getters
 
     @Override
     public int compare(final @Nullable String s0, final @Nullable String s1) {
-        // First we need to compare for null or "-" values, as those are used for absent values
+        // First we need to compare for null or "-" values, as those are used for absent
+        // values
         // on the front-end
         if ((s0 == null) && (s1 == null)) {
             return 0;
@@ -85,7 +88,7 @@ public class PersonTitleStringSorter implements Comparator<String> {
             return getPersonTitleSorter().compare(getCampaign().getPerson(UUID.fromString(id0)),
                     getCampaign().getPerson(UUID.fromString(id1)));
         } catch (Exception e) {
-            LogManager.getLogger().error(String.format("s0: %s, s1: %s", s0, s1), e);
+            logger.error(String.format("s0: %s, s1: %s", s0, s1), e);
             return 0;
         }
     }

@@ -30,7 +30,7 @@ import org.w3c.dom.Node;
 import megamek.common.Compute;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
-import megamek.common.Mech;
+import megamek.common.Mek;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
@@ -46,7 +46,8 @@ public class MekSensor extends Part {
 
     public MekSensor(int tonnage, Campaign c) {
         super(tonnage, c);
-        this.name = "Mech Sensors";
+        this.name = "Mek Sensors";
+        this.unitTonnageMatters = true;
     }
 
     @Override
@@ -95,7 +96,7 @@ public class MekSensor extends Part {
     public void fix() {
         super.fix();
         if (null != unit) {
-            unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);
+            unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_SENSORS);
         }
     }
 
@@ -107,7 +108,7 @@ public class MekSensor extends Part {
     @Override
     public void remove(boolean salvage) {
         if (null != unit) {
-            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);
+            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_SENSORS);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
@@ -130,9 +131,9 @@ public class MekSensor extends Part {
             int priorHits = hits;
             Entity entity = unit.getEntity();
             for (int i = 0; i < entity.locations(); i++) {
-                if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i) > 0) {
-                    if (!unit.isSystemMissing(Mech.SYSTEM_SENSORS, i)) {
-                        hits = entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i);
+                if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_SENSORS, i) > 0) {
+                    if (!unit.isSystemMissing(Mek.SYSTEM_SENSORS, i)) {
+                        hits = entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_SENSORS, i);
                         break;
                     } else {
                         remove(false);
@@ -178,9 +179,9 @@ public class MekSensor extends Part {
     public void updateConditionFromPart() {
         if (null != unit) {
             if (hits == 0) {
-                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_SENSORS);
             } else {
-                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, hits);
+                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_SENSORS, hits);
             }
         }
     }
@@ -194,7 +195,7 @@ public class MekSensor extends Part {
             return null;
         }
         for (int i = 0; i < unit.getEntity().locations(); i++) {
-            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i) > 0) {
+            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_SENSORS, i) > 0) {
                 if (unit.isLocationBreached(i)) {
                     return unit.getEntity().getLocationName(i) + " is breached.";
                 }
@@ -213,26 +214,12 @@ public class MekSensor extends Part {
             return false;
         }
         for (int i = 0; i < unit.getEntity().locations(); i++) {
-            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i) > 0
+            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_SENSORS, i) > 0
                     && unit.isLocationDestroyed(i)) {
                 return true;
             }
         }
         return false;
-    }
-
-    @Override
-    public String getDetails() {
-        return getDetails(true);
-    }
-
-    @Override
-    public String getDetails(boolean includeRepairDetails) {
-        String details = super.getDetails(includeRepairDetails);
-        if (!details.isEmpty()) {
-            details += ", ";
-        }
-        return  details + getUnitTonnage() + " tons";
     }
 
     @Override
@@ -242,7 +229,7 @@ public class MekSensor extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MECH);
+        return skillType.equals(SkillType.S_TECH_MEK);
     }
 
     @Override
@@ -263,14 +250,14 @@ public class MekSensor extends Part {
 
     @Override
     public boolean isInLocation(String loc) {
-        if (null == unit || null == unit.getEntity() || !(unit.getEntity() instanceof Mech)) {
+        if (null == unit || null == unit.getEntity() || !(unit.getEntity() instanceof Mek)) {
             return false;
         }
-        if (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_HEAD) {
+        if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_HEAD) {
             return true;
         }
-        if (((Mech) unit.getEntity()).getCockpitType() == Mech.COCKPIT_TORSO_MOUNTED) {
-            if (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
+        if (((Mek) unit.getEntity()).getCockpitType() == Mek.COCKPIT_TORSO_MOUNTED) {
+            if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_CT) {
                 return true;
             }
         }

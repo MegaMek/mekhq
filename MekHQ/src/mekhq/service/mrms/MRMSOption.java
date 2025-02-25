@@ -18,20 +18,23 @@
  */
 package mekhq.service.mrms;
 
-import megamek.Version;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.personnel.SkillType;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.utilities.MHQXMLUtility;
+
 public class MRMSOption {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(MRMSOption.class);
+
+    // region Variable Declarations
     private PartRepairType type;
     private boolean active;
     private int skillMin;
@@ -40,11 +43,11 @@ public class MRMSOption {
     private int bthMax;
 
     private static final int DEFAULT_BTH = 4;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public MRMSOption(PartRepairType type) {
-        this (type, false, SkillType.EXP_ULTRA_GREEN, SkillType.EXP_ELITE, DEFAULT_BTH, DEFAULT_BTH);
+        this(type, false, SkillType.EXP_ULTRA_GREEN, SkillType.EXP_ELITE, DEFAULT_BTH, DEFAULT_BTH);
     }
 
     public MRMSOption(PartRepairType type, boolean active, int skillMin, int skillMax, int bthMin, int bthMax) {
@@ -55,9 +58,9 @@ public class MRMSOption {
         this.bthMin = bthMin;
         this.bthMax = bthMax;
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public PartRepairType getType() {
         return type;
     }
@@ -105,9 +108,9 @@ public class MRMSOption {
     public void setBthMax(int bthMax) {
         this.bthMax = bthMax;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
-    //region File I/O
+    // region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "mrmsOption");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", getType().name());
@@ -142,12 +145,12 @@ public class MRMSOption {
 
                 if ((mrmsOption.getType() == PartRepairType.UNKNOWN_LOCATION)
                         || !partRepairTypes.contains(mrmsOption.getType())) {
-                    LogManager.getLogger().error("Attempted to load MRMSOption with illegal type id of " + mrmsOption.getType());
+                    logger.error("Attempted to load MRMSOption with illegal type id of " + mrmsOption.getType());
                 } else {
                     mrmsOptions.add(mrmsOption);
                 }
             } catch (Exception ex) {
-                LogManager.getLogger().error("Failed to parse MRMSOption from XML", ex);
+                logger.error("Failed to parse MRMSOption from XML", ex);
             }
         }
 
@@ -180,11 +183,11 @@ public class MRMSOption {
                     mrmsOption.setBthMax(Integer.parseInt(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
 
         return mrmsOption;
     }
-    //endregion File I/O
+    // endregion File I/O
 }

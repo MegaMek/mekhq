@@ -23,6 +23,7 @@ package mekhq.campaign.rating;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.personnel.Person;
 
@@ -37,12 +38,12 @@ public interface IUnitRating {
     public static final BigDecimal ONE_HUNDRED = new BigDecimal(100);
 
     // TODO : Add an array for each level of this, then use it across MekHQ instead of a bunch of random lists
-    public static final int DRAGOON_F = 0;
-    public static final int DRAGOON_D = 1;
-    public static final int DRAGOON_C = 2;
-    public static final int DRAGOON_B = 3;
-    public static final int DRAGOON_A = 4;
-    public static final int DRAGOON_ASTAR = 5;
+    public static final int DRAGOON_F = ForceDescriptor.RATING_0;
+    public static final int DRAGOON_D = ForceDescriptor.RATING_1;
+    public static final int DRAGOON_C = ForceDescriptor.RATING_2;
+    public static final int DRAGOON_B = ForceDescriptor.RATING_3;
+    public static final int DRAGOON_A = ForceDescriptor.RATING_4;
+    public static final int DRAGOON_ASTAR = ForceDescriptor.RATING_5;
 
     void reInitialize();
 

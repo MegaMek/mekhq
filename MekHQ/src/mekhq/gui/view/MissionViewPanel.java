@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2009-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,8 +24,9 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 import javax.swing.*;
@@ -33,6 +34,9 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ResourceBundle;
+
+import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
@@ -47,6 +51,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
     /* Basic Mission Parameters */
     private JLabel lblStatus;
+    private JPanel lblChallenge;
     private JLabel lblLocation;
     private JLabel txtLocation;
     private JLabel lblType;
@@ -87,6 +92,8 @@ public class MissionViewPanel extends JScrollablePanel {
     private JLabel txtScore;
     private JLabel lblSharePct;
     private JLabel txtSharePct;
+    private JLabel lblCargoRequirement;
+    private JLabel txtCargoRequirement;
 
     protected JTable scenarioTable;
 
@@ -123,7 +130,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
 
-        JScrollPane scrollScenarioTable = new JScrollPane(scenarioTable);
+        JScrollPane scrollScenarioTable = new JScrollPaneWithSpeed(scenarioTable);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -514,7 +521,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
             String lead = "<html><font>";
             if (currentSalvagePct > maxSalvagePct) {
-                lead = "<html><font color='red'>";
+                lead = "<html><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>";
             }
             lblSalvagePct2.setText(lead + currentSalvagePct + "%</font> <span>(max " + maxSalvagePct + "%)</span></html>");
         }
@@ -558,6 +565,7 @@ public class MissionViewPanel extends JScrollablePanel {
         // TODO : Switch me to use IUnitRating
         String[] ratingNames = {"F", "D", "C", "B", "A"};
         lblStatus = new JLabel();
+        lblChallenge = new JPanel();
         lblLocation = new JLabel();
         txtLocation = new JLabel();
         lblEmployer = new JLabel();
@@ -584,6 +592,8 @@ public class MissionViewPanel extends JScrollablePanel {
         txtMorale = new JLabel();
         lblSharePct = new JLabel();
         txtSharePct = new JLabel();
+        lblCargoRequirement = new JLabel();
+        txtCargoRequirement = new JLabel();
         lblScore = new JLabel();
         txtScore = new JLabel();
 
@@ -606,6 +616,17 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblStatus, gridBagConstraints);
 
+        lblChallenge = contract.getContractDifficultySkulls(campaign);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblChallenge, gridBagConstraints);
 
         lblLocation.setName("lblLocation");
         lblLocation.setText(resourceMap.getString("lblLocation.text"));
@@ -667,7 +688,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(lblEnemy, gridBagConstraints);
 
         txtEnemy.setName("txtEnemy");
-        txtEnemy.setText(contract.getEnemyName(campaign.getGameYear()));
+        txtEnemy.setText(contract.getEnemyBotName());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -918,7 +939,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         lblMorale.setName("lblMorale");
         lblMorale.setText(resourceMap.getString("lblMorale.text"));
-        lblMorale.setToolTipText(contract.getMoraleLevel().getToolTipText());
+        lblMorale.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -927,8 +948,14 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(lblMorale, gridBagConstraints);
 
         txtMorale.setName("txtMorale");
-        txtMorale.setText(contract.getMoraleLevel().toString());
-        txtMorale.setToolTipText(contract.getMoraleLevel().getToolTipText());
+
+        if (contract.getContractType().isGarrisonDuty() && contract.getMoraleLevel().isRouted()) {
+            txtMorale.setText(resourceMap.getString("txtGarrisonMoraleRouted.text"));
+            txtMorale.setToolTipText(wordWrap(resourceMap.getString("txtGarrisonMoraleRouted.tooltip")));
+        } else {
+            txtMorale.setText(contract.getMoraleLevel().toString());
+            txtMorale.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
+        }
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -941,6 +968,7 @@ public class MissionViewPanel extends JScrollablePanel {
         if (campaign.getCampaignOptions().isUseShareSystem()) {
             lblSharePct.setName("lblSharePct");
             lblSharePct.setText(resourceMap.getString("lblSharePct.text"));
+            lblSharePct.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
@@ -949,7 +977,8 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(lblSharePct, gridBagConstraints);
 
             txtSharePct.setName("txtSharePct");
-            txtSharePct.setText(contract.getSharesPct() + "%");
+            txtSharePct.setText(contract.getSharesPercent() + "%");
+            txtSharePct.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y++;
@@ -958,6 +987,28 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtSharePct, gridBagConstraints);
+        }
+
+        if (campaign.getCampaignOptions().isUseStratCon()) {
+            lblCargoRequirement.setName("lblCargoRequirement");
+            lblCargoRequirement.setText(resourceMap.getString("lblCargoRequirement.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblCargoRequirement, gridBagConstraints);
+
+            txtCargoRequirement.setName("txtCargoRequirement");
+            txtCargoRequirement.setText(estimateCargoRequirements(campaign, contract) + "t+");
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(txtCargoRequirement, gridBagConstraints);
         }
 
         // for StratCon, contract score is irrelevant and only leads to confusion, so we

@@ -18,31 +18,40 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.util.weightedMaps.WeightedIntMap;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.Map;
 import java.util.ResourceBundle;
 
-public enum SplittingSurnameStyle {
-    //region Enum Declarations
-    ORIGIN_CHANGES_SURNAME("SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.text", "SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.toolTipText", "SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.dropDownText"),
-    SPOUSE_CHANGES_SURNAME("SplittingSurnameStyle.SPOUSE_CHANGES_SURNAME.text", "SplittingSurnameStyle.SPOUSE_CHANGES_SURNAME.toolTipText", "SplittingSurnameStyle.SPOUSE_CHANGES_SURNAME.dropDownText"),
-    BOTH_CHANGE_SURNAME("SplittingSurnameStyle.BOTH_CHANGE_SURNAME.text", "SplittingSurnameStyle.BOTH_CHANGE_SURNAME.toolTipText", "SplittingSurnameStyle.BOTH_CHANGE_SURNAME.dropDownText"),
-    BOTH_KEEP_SURNAME("SplittingSurnameStyle.BOTH_KEEP_SURNAME.text", "SplittingSurnameStyle.BOTH_KEEP_SURNAME.toolTipText", "SplittingSurnameStyle.BOTH_KEEP_SURNAME.dropDownText"),
-    WEIGHTED("SplittingSurnameStyle.WEIGHTED.text", "SplittingSurnameStyle.WEIGHTED.toolTipText", "SplittingSurnameStyle.WEIGHTED.dropDownText");
-    //endregion Enum Declarations
+import megamek.common.util.weightedMaps.WeightedIntMap;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
 
-    //region Variable Declarations
+public enum SplittingSurnameStyle {
+    // region Enum Declarations
+    ORIGIN_CHANGES_SURNAME("SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.text",
+            "SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.toolTipText",
+            "SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME.dropDownText"),
+    SPOUSE_CHANGES_SURNAME("SplittingSurnameStyle.SPOUSE_CHANGES_SURNAME.text",
+            "SplittingSurnameStyle.SPOUSE_CHANGES_SURNAME.toolTipText",
+            "SplittingSurnameStyle.SPOUSE_CHANGES_SURNAME.dropDownText"),
+    BOTH_CHANGE_SURNAME("SplittingSurnameStyle.BOTH_CHANGE_SURNAME.text",
+            "SplittingSurnameStyle.BOTH_CHANGE_SURNAME.toolTipText",
+            "SplittingSurnameStyle.BOTH_CHANGE_SURNAME.dropDownText"),
+    BOTH_KEEP_SURNAME("SplittingSurnameStyle.BOTH_KEEP_SURNAME.text",
+            "SplittingSurnameStyle.BOTH_KEEP_SURNAME.toolTipText",
+            "SplittingSurnameStyle.BOTH_KEEP_SURNAME.dropDownText"),
+    WEIGHTED("SplittingSurnameStyle.WEIGHTED.text", "SplittingSurnameStyle.WEIGHTED.toolTipText",
+            "SplittingSurnameStyle.WEIGHTED.dropDownText");
+    // endregion Enum Declarations
+
+    // region Variable Declarations
     private final String name;
     private final String toolTipText;
     private final String dropDownText;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     SplittingSurnameStyle(final String name, final String toolTipText, final String dropDownText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
@@ -50,9 +59,9 @@ public enum SplittingSurnameStyle {
         this.toolTipText = resources.getString(toolTipText);
         this.dropDownText = resources.getString(dropDownText);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public String getToolTipText() {
         return toolTipText;
     }
@@ -60,9 +69,9 @@ public enum SplittingSurnameStyle {
     public String getDropDownText() {
         return dropDownText;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isOriginChangesSurname() {
         return this == ORIGIN_CHANGES_SURNAME;
     }
@@ -82,13 +91,14 @@ public enum SplittingSurnameStyle {
     public boolean isWeighted() {
         return this == WEIGHTED;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
     /**
      * This applies the surname changes that occur during a divorce
+     * 
      * @param campaign the campaign to use in processing
-     * @param origin the origin person
-     * @param spouse the origin person's former spouse
+     * @param origin   the origin person
+     * @param spouse   the origin person's former spouse
      */
     public void apply(final Campaign campaign, final Person origin, final Person spouse) {
         final SplittingSurnameStyle surnameStyle = isWeighted()
@@ -119,8 +129,10 @@ public enum SplittingSurnameStyle {
                 break;
             case WEIGHTED:
             default:
-                LogManager.getLogger().error(String.format("Splitting Surname Style %s is not defined, and cannot be used for \"%s\" and \"%s\"",
-                        surnameStyle.name(), origin.getFullName(), spouse.getFullName()));
+                MMLogger.create(SplittingSurnameStyle.class)
+                        .error(String.format(
+                                "Splitting Surname Style %s is not defined, and cannot be used for \"%s\" and \"%s\"",
+                                surnameStyle.name(), origin.getFullName(), spouse.getFullName()));
                 break;
         }
     }

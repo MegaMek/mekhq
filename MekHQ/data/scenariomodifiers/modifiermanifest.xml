@@ -20,7 +20,7 @@
 			EnemyTankReinforcements.xml
 		</modifier>
 		<modifier>
-			EnemyMechReinforcements.xml
+			EnemyMekReinforcements.xml
 		</modifier>
 		<modifier>
 			EnemyArty.xml
@@ -55,19 +55,21 @@
 		<modifier>
 			BadEvent.xml
 		</modifier>
-		<!--modifier> 
-			Need ability to allow player to specifically deploy dropships
+		<!--modifier>
+			Need ability to allow player to specifically deploy DropShips
 			HotDrop.xml
 		</modifier-->
 		<modifier>
 			EnemyHotDrop.xml
 		</modifier>
-		<modifier>
-			EnemyDropship.xml
-		</modifier>
-		<modifier>
-			GroundedEnemyDropship.xml
-		</modifier>
+		<!--modifier>
+		    Removed by popular demand
+			EnemyDropShip.xml
+		</modifier-->
+		<!--modifier>
+		    Removed by popular demand
+			GroundedEnemyDropShip.xml
+		</modifier!-->
 		<modifier>
 			GoodIntel.xml
 		</modifier>
@@ -131,11 +133,11 @@
 			AlliedTurrets.xml
 		</modifier>
 		<modifier>
-			AlliedMechReinforcements.xml
+			AlliedMekReinforcements.xml
 		</modifier>
 		<!--modifier>
 			Need campaign state
-			Need way to change rat for opfor
+			Need way to change rat for OpFor
 			AlliedTreachery.xml
 		</modifier-->
 		<modifier>
@@ -149,12 +151,9 @@
 			OffworldOperation.xml
 		</modifier-->
 		<modifier>
-			SearchAndRescue.xml
-		</modifier>
-		<modifier>
 			GoodEvent.xml
 		</modifier>
-		<modifier>		
+		<modifier>
 			SuperiorEquipment.xml
 		</modifier>
 		<modifier>
@@ -162,108 +161,112 @@
 		</modifier>
 		<modifier>
 			ArmednArmored.xml
-		</modifier>	
-		<modifier>
-			EnemyOfficerMech.xml
 		</modifier>
 		<modifier>
-			EnemyCommanderMech.xml
+			EnemyOfficerMek.xml
 		</modifier>
-		<modifier>		
+		<modifier>
+			EnemyCommanderMek.xml
+		</modifier>
+		<modifier>
 			EnemyAirPatrol.xml
 		</modifier>
 		<modifier>
-			EnemyMechPatrol.xml
+			EnemyMekPatrol.xml
 		</modifier>
-		<modifier>
-			EnemyAceMechARC2R.xml
-		</modifier>
-		<modifier>
-			EnemyAceMechAWS8Q.xml
-		</modifier>
-		<modifier>
-			EnemyAceMechFS9M.xml
-		</modifier>
-		<modifier>
-			EnemyAceMechGHR5N.xml
-		</modifier>
-		<modifier>
-			EnemyAceMechHGN733P.xml
-		</modifier>
-		<modifier>
-			EnemyAceMechMAD3D.xml
-		</modifier>
-		<modifier>
-			EnemyAceMechPXH1D.xml
-		</modifier>
+		<!--modifier>
+		These have been disabled as they are not era agnostic
+			EnemyAceMekARC2R.xml
+		</modifier-->
+		<!--modifier>
+			EnemyAceMekAWS8Q.xml
+		</modifier-->
+		<!--modifier>
+			EnemyAceMekFS9M.xml
+		</modifier-->
+		<!--modifier>
+			EnemyAceMekGHR5N.xml
+		</modifier-->
+		<!--modifier>
+			EnemyAceMekHGN733P.xml
+		</modifier-->
+		<!--modifier>
+			EnemyAceMekMAD3D.xml
+		</modifier-->
+		<!--modifier>
+			EnemyAceMekPXH1D.xml
+		</modifier-->
 		<modifier>
 			EnemyAirCav.xml
 		</modifier>
 		<modifier>
 			EnemyAirMobileInf.xml
-		</modifier>	
-		<modifier>
+		</modifier>
+		<!--modifier>
+		These have been disabled as they are not era agnostic
 			EnemyMercFireSupport.xml
-		</modifier>	
-		<modifier>
+		</modifier-->
+		<!--modifier>
 			EnemyMercBrawl.xml
-		</modifier>
-		<modifier>
+		</modifier-->
+		<!--modifier>
 			EnemyMercSkirmish.xml
-		</modifier>			
-		<modifier>
+		</modifier-->
+		<!--modifier>
 			EnemyMercScouts.xml
-		</modifier>	
-		<modifier>
+		</modifier-->
+		<!--modifier>
 			AlliedCavLance.xml
-		</modifier>	
+		</modifier-->
+		<!--modifier>
+            These have been disabled as they are not era agnostic
+			AlliedMekAceCRD.xml
+		</modifier-->
+		<!--modifier>
+			AlliedMekAceGLT.xml
+		</modifier-->
+		<!--modifier>
+			AlliedMekAceGOL.xml
+		</modifier-->
+		<!--modifier>
+			AlliedMekAceOTT.xml
+		</modifier-->
+		<!--modifier>
+			AlliedMekAceTBT.xml
+		</modifier-->
 		<modifier>
-			AlliedMechAceCRD.xml
-		</modifier>			
-		<modifier>
-			AlliedMechAceGLT.xml
-		</modifier>	
-		<modifier>
-			AlliedMechAceGOL.xml
-		</modifier>	
-		<modifier>
-			AlliedMechAceOTT.xml
+			AlliedOfficerMek.xml
 		</modifier>
-		<modifier>
-			AlliedMechAceTBT.xml
-		</modifier>	
-		<modifier>
-			AlliedOfficerMech.xml
-		</modifier>	
 		<modifier>
 			EnemyMercHopInfantry.xml
-		</modifier>	
+		</modifier>
 		<modifier>
 			EnemyMercSkyInfantry.xml
-		</modifier>	
+		</modifier>
 		<modifier>
 			AlliedHorseCav.xml
 		</modifier>
 		<modifier>
-			AlliedASFAce01.xml
-		</modifier>	
-		<modifier>
 			EnemyFieldArtyCrack.xml
-		</modifier>	
+		</modifier>
 		<modifier>
 			EnemyFieldArtyOffboard.xml
-		</modifier>	
-		<modifier>
-			EnemyASFAce01.xml
-		</modifier>	
-		<modifier>
-			EnemyASFAce02.xml
 		</modifier>
+        <!--modifier>
+            These have been disabled as they are not era agnostic
+            AlliedASFAce01.xml
+        </modifier-->
+		<!--modifier>
+			EnemyASFAce01.xml
+		</modifier-->
+		<!--modifier>
+			EnemyASFAce02.xml
+		</modifier-->
 
-		
+
 		<!-- Fixed scenario modifiers suitable for specific scenario types go here -->
 		<modifier>
-			AlliedMechGarrison.xml
+			AlliedMekGarrison.xml
 		</modifier>
 		<modifier>
 			AlliedTankGarrison.xml
@@ -275,7 +278,7 @@
 			AlliedArtyGarrison.xml
 		</modifier>
 		<modifier>
-			EnemyMechGarrison.xml
+			EnemyMekGarrison.xml
 		</modifier>
 		<modifier>
 			EnemyTankGarrison.xml
@@ -314,7 +317,7 @@
 		</modifier>
 
 		<modifier>
-			FacilityAlliedDefend.xml 
+			FacilityAlliedDefend.xml
 		</modifier>
 		<modifier>
 			FacilityAlliedEvac.xml

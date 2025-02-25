@@ -18,29 +18,63 @@
  */
 package mekhq.campaign.universe;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+
 public enum Atmosphere {
     NONE("None"),
-    TAINTEDPOISON("Tainted (Poisonous)"), TAINTEDCAUSTIC("Tainted (Caustic)"), TAINTEDFLAME("Tainted (Flammable)"),
-    TOXICPOISON("Toxic (Poisonous)"), TOXICCAUSTIC("Toxic (Caustic)"), TOXICFLAME("Toxic (Flammable)"),
+    TAINTEDPOISON("Tainted (Poisonous)"),
+    TAINTEDCAUSTIC("Tainted (Caustic)"),
+    TAINTEDFLAME("Tainted (Flammable)"),
+    TOXICPOISON("Toxic (Poisonous)"),
+    TOXICCAUSTIC("Toxic (Caustic)"),
+    TOXICFLAME("Toxic (Flammable)"),
     BREATHABLE("Breathable");
-
-    // For old life form data
-    public static Atmosphere parseAtmosphere(String val) {
-        switch (val.toLowerCase()) {
-            case "tainted (poisonous)": return TAINTEDPOISON;
-            case "tainted (caustic)": return TAINTEDCAUSTIC;
-            case "tainted (flammable)": return TAINTEDFLAME;
-            case "toxic (poisonous)": return TOXICPOISON;
-            case "toxic (caustic)": return TOXICCAUSTIC;
-            case "toxic (flammable)": return TOXICFLAME;
-            case "breathable": return BREATHABLE;
-            default: return NONE;
-        }
-    }
 
     public final String name;
 
-    private Atmosphere(String name) {
+    Atmosphere(String name) {
         this.name = name;
+    }
+
+    public boolean isNone() {
+        return this == NONE;
+    }
+
+    public boolean isTaintedPoison() {
+        return this == TAINTEDPOISON;
+    }
+
+    public boolean isTaintedCaustic() {
+        return this == TAINTEDCAUSTIC;
+    }
+
+    public boolean isTaintedFlame() {
+        return this == TAINTEDFLAME;
+    }
+
+    public boolean isToxicPoison() {
+        return this == TOXICPOISON;
+    }
+
+    public boolean isToxicCaustic() {
+        return this == TOXICCAUSTIC;
+    }
+
+    public boolean isToxicFlame() {
+        return this == TOXICFLAME;
+    }
+
+    public boolean isBreathable() {
+        return this == BREATHABLE;
+    }
+
+    public boolean isTainted() {
+        return isTaintedPoison() || isTaintedCaustic() || isTaintedFlame();
+    }
+
+    public boolean isToxic() {
+        return isToxicPoison() || isToxicCaustic() || isToxicFlame();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,7 +21,7 @@ package mekhq.campaign.personnel.enums;
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
-import mekhq.campaign.personnel.divorce.PercentageRandomDivorce;
+import mekhq.campaign.personnel.divorce.RandomDivorce;
 import org.junit.jupiter.api.Test;
 
 import java.util.ResourceBundle;
@@ -44,10 +44,10 @@ public class RandomDivorceMethodTest {
     //region Getters
     @Test
     public void testGetToolTipText() {
-        assertEquals(resources.getString("RandomDivorceMethod.NONE.toolTipText"),
-                RandomDivorceMethod.NONE.getToolTipText());
-        assertEquals(resources.getString("RandomDivorceMethod.PERCENTAGE.toolTipText"),
-                RandomDivorceMethod.PERCENTAGE.getToolTipText());
+        String expected = resources.getString("RandomDivorceMethod.NONE.toolTipText").replaceAll("\\s", "");
+        String actual = RandomDivorceMethod.NONE.getToolTipText().trim().replaceAll("\\s", "");
+
+        assertEquals(expected, actual);
     }
     //endregion Getters
 
@@ -64,12 +64,12 @@ public class RandomDivorceMethodTest {
     }
 
     @Test
-    public void testIsPercentage() {
+    public void testIsDiceRoll() {
         for (final RandomDivorceMethod randomDivorceMethod : methods) {
-            if (randomDivorceMethod == RandomDivorceMethod.PERCENTAGE) {
-                assertTrue(randomDivorceMethod.isPercentage());
+            if (randomDivorceMethod == RandomDivorceMethod.DICE_ROLL) {
+                assertTrue(randomDivorceMethod.isDiceRoll());
             } else {
-                assertFalse(randomDivorceMethod.isPercentage());
+                assertFalse(randomDivorceMethod.isDiceRoll());
             }
         }
     }
@@ -84,18 +84,17 @@ public class RandomDivorceMethodTest {
         when(mockOptions.isUseRandomSameSexDivorce()).thenReturn(false);
         when(mockOptions.isUseRandomClanPersonnelDivorce()).thenReturn(false);
         when(mockOptions.isUseRandomPrisonerDivorce()).thenReturn(false);
-        when(mockOptions.getPercentageRandomDivorceOppositeSexChance()).thenReturn(0.5);
-        when(mockOptions.getPercentageRandomDivorceSameSexChance()).thenReturn(0.5);
+        when(mockOptions.getRandomDivorceDiceSize()).thenReturn(5);
 
         assertInstanceOf(DisabledRandomDivorce.class, RandomDivorceMethod.NONE.getMethod(mockOptions));
-        assertInstanceOf(PercentageRandomDivorce.class, RandomDivorceMethod.PERCENTAGE.getMethod(mockOptions));
+        assertInstanceOf(RandomDivorce.class, RandomDivorceMethod.DICE_ROLL.getMethod(mockOptions));
     }
 
     @Test
     public void testToStringOverride() {
         assertEquals(resources.getString("RandomDivorceMethod.NONE.text"),
                 RandomDivorceMethod.NONE.toString());
-        assertEquals(resources.getString("RandomDivorceMethod.PERCENTAGE.text"),
-                RandomDivorceMethod.PERCENTAGE.toString());
+        assertEquals(resources.getString("RandomDivorceMethod.DICE_ROLL.text"),
+                RandomDivorceMethod.DICE_ROLL.toString());
     }
 }

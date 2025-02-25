@@ -1,7 +1,7 @@
 /*
  * SocioIndustrialData.java
  *
- * Copyright (C) 2011-2016 MegaMek team
+ * Copyright (C) 2011-2025 MegaMek team
  * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
  * This file is part of MekHQ.
@@ -21,10 +21,29 @@
  */
 package mekhq.campaign.universe;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
 public class SocioIndustrialData {
+
+    private final static Map<String, Integer> stringToEquipmentTypeMap = new HashMap<String, Integer>() {{
+        put("A", EquipmentType.RATING_A);
+        put("B", EquipmentType.RATING_B);
+        put("C", EquipmentType.RATING_C);
+        put("D", EquipmentType.RATING_D);
+        put("F", EquipmentType.RATING_F);
+        put("X", EquipmentType.RATING_X);
+    }};
+
+    private final static String SEPARATOR = "-";
+
     public static final SocioIndustrialData NONE = new SocioIndustrialData();
     static {
         NONE.tech = EquipmentType.RATING_X;
@@ -61,13 +80,13 @@ public class SocioIndustrialData {
         return ITechnology.getRatingName(tech)
                 + "-" + ITechnology.getRatingName(industry)
                 + "-" + ITechnology.getRatingName(rawMaterials)
-                + "-    " + ITechnology.getRatingName(output)
+                + "-" + ITechnology.getRatingName(output)
                 + "-" + ITechnology.getRatingName(agriculture);
          }
 
     /** @return the USILR rating as a HTML description */
     public String getHTMLDescription() {
-        // TODO: Internationalization
+        // TODO: MHQInternationalization
         // TODO: Some way to encode "advanced" ultra-tech worlds (rating "AA" for technological sophistication)
         // TODO: Some way to encode "regressed" worlds
         // Note that rating "E" isn't used in official USILR codes, but we add them for completeness
@@ -161,10 +180,10 @@ public class SocioIndustrialData {
                 sb.append("C: Limited industrial output<br>"); // Bad for Ferengi
                 break;
             case EquipmentType.RATING_D:
-                sb.append("D: Negligable industrial output<br>");
+                sb.append("D: Negligible industrial output<br>");
                 break;
             case EquipmentType.RATING_E:
-                sb.append("E: Negligable industrial output<br>");
+                sb.append("E: Negligible industrial output<br>");
                 break;
             case EquipmentType.RATING_F:
                 sb.append("F: None<br>"); // Good for Ferengi
@@ -200,4 +219,52 @@ public class SocioIndustrialData {
 
         return sb.append("</html>").toString();
     }
+
+    /**
+     * This class is used to deserialize the SICs codes (e.g. "D-C-B-A-D") from a String into
+     * a SocioIndustrialData object.
+     */
+    public static class SocioIndustrialDataDeserializer extends StdDeserializer<SocioIndustrialData> {
+
+        public SocioIndustrialDataDeserializer() {
+            this(null);
+        }
+
+        public SocioIndustrialDataDeserializer(final Class<?> vc) {
+            super(vc);
+        }
+
+        private int convertRatingToCode(String rating) {
+            Integer result = stringToEquipmentTypeMap.get(rating.toUpperCase(Locale.ROOT));
+            return (null != result) ? result : EquipmentType.RATING_C;
+        }
+        @Override
+        public SocioIndustrialData deserialize(final JsonParser jsonParser, final DeserializationContext context) {
+            try {
+                String[] socio = jsonParser.getText().split(SEPARATOR);
+                SocioIndustrialData result = new SocioIndustrialData();
+                if (socio.length >= 5) {
+                    result.tech = convertRatingToCode(socio[0]);
+                    if (result.tech == EquipmentType.RATING_C) {
+                        // Could be ADV or R too
+                        String techRating = socio[0].toUpperCase(Locale.ROOT);
+                        if (techRating.equals("ADV")) {
+                            result.tech = -1;
+                        } else if (techRating.equals("R")) {
+                            result.tech = EquipmentType.RATING_X;
+                        }
+                    }
+                    result.industry = convertRatingToCode(socio[1]);
+                    result.rawMaterials = convertRatingToCode(socio[2]);
+                    result.output = convertRatingToCode(socio[3]);
+                    result.agriculture = convertRatingToCode(socio[4]);
+                }
+                return result;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+    }
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,21 +20,27 @@ package mekhq.gui.dialog;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
 import megamek.common.Crew;
 import megamek.common.EquipmentType;
+import megamek.common.TechConstants;
 import megamek.common.enums.Gender;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.Option;
 import megamek.common.options.OptionsConstants;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.randomEvents.PersonalityController;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.*;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
@@ -44,10 +50,10 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.control.EditKillLogControl;
-import mekhq.gui.control.EditScenarioLogControl;
 import mekhq.gui.control.EditPersonnelLogControl;
+import mekhq.gui.control.EditScenarioLogControl;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownEditorPanel;
-import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -56,26 +62,28 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This dialog is used to both hire new pilots and to edit existing ones
- * @author  Jay Lawson (jaylawson39 at yahoo.com)
+ *
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class CustomizePersonDialog extends JDialog implements DialogOptionListener {
-    //region Variable declarations
+    private static final MMLogger logger = MMLogger.create(CustomizePersonDialog.class);
+
+    // region Variable declarations
     private Person person;
     private List<DialogOptionComponent> optionComps = new ArrayList<>();
-    private Map<String, JSpinner> skillLvls = new Hashtable<>();
-    private Map<String, JSpinner> skillBonus = new Hashtable<>();
-    private Map<String, JLabel> skillValues = new Hashtable<>();
-    private Map<String, JCheckBox> skillChks = new Hashtable<>();
+    private final Map<String, JSpinner> skillLvls = new Hashtable<>();
+    private final Map<String, JSpinner> skillBonus = new Hashtable<>();
+    private final Map<String, JLabel> skillValues = new Hashtable<>();
+    private final Map<String, JCheckBox> skillChks = new Hashtable<>();
     private PersonnelOptions options;
     private LocalDate birthdate;
     private LocalDate recruitment;
     private LocalDate lastRankChangeDate;
     private LocalDate retirement;
-    private JFrame frame;
+    private final JFrame frame;
 
     private JButton btnDate;
     private JButton btnServiceDate;
@@ -86,6 +94,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private AbstractMHQScrollablePanel skillsPanel;
     private AbstractMHQScrollablePanel optionsPanel;
     private JTextField textToughness;
+    private JTextField textFatigue;
+    private JComboBox<EducationLevel> textEducationLevel;
+    private JTextField textLoyalty;
     private JTextField textPreNominal;
     private JTextField textGivenName;
     private JTextField textSurname;
@@ -108,11 +119,20 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private JCheckBox chkFounder;
     private JComboBox<Unit> choiceOriginalUnit;
 
-    private Campaign campaign;
+    // random personality
+    private MMComboBox<Aggression> comboAggression;
+    private MMComboBox<Ambition> comboAmbition;
+    private MMComboBox<Greed> comboGreed;
+    private MMComboBox<Social> comboSocial;
+    private MMComboBox<PersonalityQuirk> comboPersonalityQuirk;
+    private MMComboBox<Intelligence> comboIntelligence;
 
-    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog",
+    private final Campaign campaign;
+
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
+            "mekhq.resources.CustomizePersonDialog",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable declarations
+    // endregion Variable declarations
 
     /** Creates new form CustomizePilotDialog */
     public CustomizePersonDialog(JFrame parent, boolean modal, Person person, Campaign campaign) {
@@ -125,8 +145,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         setUserPreferences();
     }
 
-    private void initializePilotAndOptions () {
-        birthdate = person.getBirthday();
+    private void initializePilotAndOptions() {
+        birthdate = person.getDateOfBirth();
         if (person.getRecruitment() != null) {
             recruitment = person.getRecruitment();
         }
@@ -146,6 +166,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     private void initComponents() {
         GridBagConstraints gridBagConstraints;
+        setMinimumSize(new Dimension(1100, 500));
 
         JPanel panDemog = new JPanel(new GridBagLayout());
         JTabbedPane tabStats = new JTabbedPane();
@@ -160,9 +181,15 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         textNickname = new JTextField();
         textBloodname = new JTextField();
         textToughness = new JTextField();
+        JLabel lblFatigue = new JLabel();
+        textFatigue = new JTextField();
+        JLabel lblLoyalty = new JLabel();
+        textLoyalty = new JTextField();
         JLabel lblToughness = new JLabel();
-        JScrollPane scrOptions = new JScrollPane();
-        JScrollPane scrSkills = new JScrollPane();
+        textEducationLevel = new JComboBox<>();
+        JLabel lblEducationLevel = new JLabel();
+        JScrollPane scrOptions = new JScrollPaneWithSpeed();
+        JScrollPane scrSkills = new JScrollPaneWithSpeed();
         JPanel panButtons = new JPanel();
         JButton btnOk = new JButton();
 
@@ -292,7 +319,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
             JButton btnRandomCallsign = new JButton(resourceMap.getString("btnRandomCallsign.text"));
             btnRandomCallsign.setName("btnRandomCallsign");
-            btnRandomCallsign.addActionListener(e -> textNickname.setText(RandomCallsignGenerator.getInstance().generate()));
+            btnRandomCallsign
+                    .addActionListener(e -> textNickname.setText(RandomCallsignGenerator.getInstance().generate()));
             gridBagConstraints.gridx = 2;
             panDemog.add(btnRandomCallsign, gridBagConstraints);
         }
@@ -308,14 +336,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
         panDemog.add(lblGender, gridBagConstraints);
 
-        DefaultComboBoxModel<Gender> genderModel = new DefaultComboBoxModel<>();
-        for (Gender gender : Gender.getExternalOptions()) {
-            genderModel.addElement(gender);
-        }
-        choiceGender = new JComboBox<>(genderModel);
+        choiceGender = new JComboBox<>(Gender.values());
         choiceGender.setName("choiceGender");
-        choiceGender.setSelectedItem(person.getGender().isExternal() ? person.getGender()
-                : person.getGender().getExternalVariant());
+        choiceGender.setSelectedItem(person.getGender());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
@@ -339,13 +362,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         choiceFaction.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list,
-                                                          final Object value,
-                                                          final int index,
-                                                          final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                    final Object value,
+                    final int index,
+                    final boolean isSelected,
+                    final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Faction) {
-                    Faction faction = (Faction) value;
+                if (value instanceof Faction faction) {
                     setText(String.format("%s [%s]",
                             faction.getFullName(campaign.getGameYear()),
                             faction.getShortName()));
@@ -395,14 +417,13 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         choiceSystem.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list,
-                                                          final Object value,
-                                                          final int index,
-                                                          final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                    final Object value,
+                    final int index,
+                    final boolean isSelected,
+                    final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected,
                         cellHasFocus);
-                if (value instanceof PlanetarySystem) {
-                    PlanetarySystem system = (PlanetarySystem) value;
+                if (value instanceof PlanetarySystem system) {
                     setText(system.getName(campaign.getLocalDate()));
                 }
 
@@ -455,14 +476,13 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         choicePlanet.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list,
-                                                          final Object value,
-                                                          final int index,
-                                                          final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                    final Object value,
+                    final int index,
+                    final boolean isSelected,
+                    final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected,
                         cellHasFocus);
-                if (value instanceof Planet) {
-                    Planet planet = (Planet) value;
+                if (value instanceof Planet planet) {
                     setText(planet.getName(campaign.getLocalDate()));
                 }
 
@@ -596,7 +616,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             y++;
         }
 
-        if (campaign.getCampaignOptions().isUseRetirementDateTracking() && (retirement != null)) {
+        if (retirement != null) {
             JLabel lblRetirement = new JLabel(resourceMap.getString("lblRetirement.text"));
             lblRetirement.setName("lblRetirement");
             gridBagConstraints = new GridBagConstraints();
@@ -637,6 +657,81 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             panDemog.add(textToughness, gridBagConstraints);
+
+            y++;
+        }
+
+        lblFatigue.setText(resourceMap.getString("lblFatigue.text"));
+        lblFatigue.setName("lblFatigue");
+
+        textFatigue.setText(Integer.toString(person.getFatigue()));
+        textFatigue.setName("textFatigue");
+
+        if (campaign.getCampaignOptions().isUseFatigue()) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(lblFatigue, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            panDemog.add(textFatigue, gridBagConstraints);
+
+            y++;
+        }
+
+        lblEducationLevel.setText(resourceMap.getString("lblEducationLevel.text"));
+        lblEducationLevel.setName("lblEducationLevel");
+
+        for (EducationLevel level : EducationLevel.values()) {
+            textEducationLevel.addItem(level);
+        }
+        textEducationLevel.setSelectedItem(person.getEduHighestEducation());
+        textEducationLevel.setName("textEducationLevel");
+
+        if (campaign.getCampaignOptions().isUseEducationModule()) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(lblEducationLevel, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            panDemog.add(textEducationLevel, gridBagConstraints);
+
+            y++;
+        }
+
+        lblLoyalty.setText(resourceMap.getString("lblLoyalty.text"));
+        lblLoyalty.setName("lblLoyalty");
+
+        textLoyalty.setText(Integer.toString(person.getLoyalty()));
+        textLoyalty.setName("textLoyalty");
+
+        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
+                && (!campaign.getCampaignOptions().isUseHideLoyalty())) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(lblLoyalty, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            panDemog.add(textLoyalty, gridBagConstraints);
+
+            y++;
         }
 
         JLabel lblUnit = new JLabel();
@@ -668,8 +763,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         choiceOriginalUnit.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list,
-                                                          Object value, int index, boolean isSelected,
-                                                          boolean cellHasFocus) {
+                    Object value, int index, boolean isSelected,
+                    boolean cellHasFocus) {
                 if (null == value) {
                     setText("None");
                 } else {
@@ -686,19 +781,19 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             choiceOriginalUnit.setSelectedItem(campaign.getUnit(person.getOriginalUnitId()));
         }
         choiceOriginalUnit.addActionListener(ev -> {
-            if (null == choiceOriginalUnit.getSelectedItem()) {
-                choiceUnitWeight.setSelectedIndex(0);
-                choiceUnitTech.setSelectedIndex(0);
-            } else {
+            try {
                 Unit unit = (Unit) choiceOriginalUnit.getSelectedItem();
                 choiceUnitWeight.setSelectedIndex(unit.getEntity().getWeightClass());
                 if (unit.getEntity().isClan()) {
                     choiceUnitTech.setSelectedIndex(2);
-                } else if (unit.getEntity().getTechLevel() > megamek.common.TechConstants.T_INTRO_BOXSET) {
+                } else if (unit.getEntity().getTechLevel() > TechConstants.T_INTRO_BOXSET) {
                     choiceUnitTech.setSelectedIndex(1);
                 } else {
                     choiceUnitTech.setSelectedIndex(0);
                 }
+            } catch (Exception e) {
+                choiceUnitWeight.setSelectedIndex(person.getOriginalUnitWeight());
+                choiceUnitTech.setSelectedIndex(person.getOriginalUnitTech());
             }
         });
 
@@ -750,6 +845,131 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         y++;
 
+        // region random personality
+        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+            JLabel labelAggression = new JLabel();
+            labelAggression.setText("Aggression:");
+            labelAggression.setName("labelAggression");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(labelAggression, gridBagConstraints);
+
+            comboAggression = new MMComboBox<>("comboAggression", Aggression.values());
+            comboAggression.setSelectedItem(person.getAggression());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(comboAggression, gridBagConstraints);
+
+            JLabel labelAmbition = new JLabel();
+            labelAmbition.setText("Ambition:");
+            labelAmbition.setName("labelAmbition");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(labelAmbition, gridBagConstraints);
+
+            comboAmbition = new MMComboBox<>("comboAmbition", Ambition.values());
+            comboAmbition.setSelectedItem(person.getAmbition());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(comboAmbition, gridBagConstraints);
+
+            JLabel labelGreed = new JLabel();
+            labelGreed.setText("Greed:");
+            labelGreed.setName("labelGreed");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(labelGreed, gridBagConstraints);
+
+            comboGreed = new MMComboBox<>("comboGreed", Greed.values());
+            comboGreed.setSelectedItem(person.getGreed());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(comboGreed, gridBagConstraints);
+
+            JLabel labelSocial = new JLabel();
+            labelSocial.setText("Social:");
+            labelSocial.setName("labelSocial");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(labelSocial, gridBagConstraints);
+
+            comboSocial = new MMComboBox<>("comboSocial", Social.values());
+            comboSocial.setSelectedItem(person.getSocial());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(comboSocial, gridBagConstraints);
+
+            JLabel labelPersonalityQuirk = new JLabel();
+            labelPersonalityQuirk.setText("Quirk:");
+            labelPersonalityQuirk.setName("labelPersonalityQuirk");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(labelPersonalityQuirk, gridBagConstraints);
+
+            comboPersonalityQuirk = new MMComboBox<>("comboPersonalityQuirk", PersonalityQuirk.values());
+            comboPersonalityQuirk.setSelectedItem(person.getPersonalityQuirk());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(comboPersonalityQuirk, gridBagConstraints);
+
+            JLabel labelIntelligence = new JLabel();
+            labelIntelligence.setText("Intelligence:");
+            labelIntelligence.setName("labelIntelligence");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(labelIntelligence, gridBagConstraints);
+
+            comboIntelligence = new MMComboBox<>("comboIntelligence", Intelligence.values());
+            comboIntelligence.setSelectedItem(person.getIntelligence());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(comboIntelligence, gridBagConstraints);
+        }
+
+        y++;
+
         txtBio = new MarkdownEditorPanel("Biography");
         txtBio.setText(person.getBiography());
         gridBagConstraints = new GridBagConstraints();
@@ -789,9 +1009,11 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 || campaign.getCampaignOptions().isUseImplants()) {
             tabStats.addTab(resourceMap.getString("scrOptions.TabConstraints.tabTitle"), scrOptions);
         }
-        tabStats.add(resourceMap.getString("panLog.TabConstraints.tabTitle"), new EditPersonnelLogControl(frame, campaign, person));
+        tabStats.add(resourceMap.getString("panLog.TabConstraints.tabTitle"),
+                new EditPersonnelLogControl(frame, campaign, person));
         tabStats.add(resourceMap.getString("panScenarios.title"), new EditScenarioLogControl(frame, campaign, person));
-        tabStats.add(resourceMap.getString("panKills.TabConstraints.tabTitle"), new EditKillLogControl(frame, campaign, person));
+        tabStats.add(resourceMap.getString("panKills.TabConstraints.tabTitle"),
+                new EditKillLogControl(frame, campaign, person));
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -838,7 +1060,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -846,7 +1068,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         int year = campaign.getGameYear();
         List<Faction> orderedFactions = Factions.getInstance().getFactions().stream()
                 .sorted((a, b) -> a.getFullName(year).compareToIgnoreCase(b.getFullName(year)))
-                .collect(Collectors.toList());
+                .toList();
 
         DefaultComboBoxModel<Faction> factionsModel = new DefaultComboBoxModel<>();
         for (Faction faction : orderedFactions) {
@@ -864,7 +1086,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 int endYear = person.getRecruitment() != null
                         ? Math.min(person.getRecruitment().getYear(), year)
                         : year;
-                if (faction.validBetween(person.getBirthday().getYear(), endYear)) {
+                if (faction.validBetween(person.getDateOfBirth().getYear(), endYear)) {
                     factionsModel.addElement(faction);
                 }
             }
@@ -878,7 +1100,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
                 .sorted(Comparator.comparing(a -> a.getName(campaign.getLocalDate())))
-                .collect(Collectors.toList());
+                .toList();
         for (PlanetarySystem system : orderedSystems) {
             model.addElement(system);
         }
@@ -889,9 +1111,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         DefaultComboBoxModel<PlanetarySystem> model = new DefaultComboBoxModel<>();
 
         List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
-                .filter(a -> a.getFactionSet(person.getBirthday()).contains(faction))
-                .sorted(Comparator.comparing(a -> a.getName(person.getBirthday())))
-                .collect(Collectors.toList());
+                .filter(a -> a.getFactionSet(person.getDateOfBirth()).contains(faction))
+                .sorted(Comparator.comparing(a -> a.getName(person.getDateOfBirth())))
+                .toList();
         for (PlanetarySystem system : orderedSystems) {
             model.addElement(system);
         }
@@ -922,7 +1144,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         choicePlanet.setSelectedItem(selectedPlanet);
     }
 
-    private void updatePlanetsComboBoxModel(DefaultComboBoxModel<Planet> planetsModel, PlanetarySystem planetarySystem) {
+    private void updatePlanetsComboBoxModel(DefaultComboBoxModel<Planet> planetsModel,
+            PlanetarySystem planetarySystem) {
         planetsModel.removeAllElements();
         if (planetarySystem != null) {
             planetsModel.addElement(planetarySystem.getPrimaryPlanet());
@@ -944,19 +1167,20 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         person.setSurname(textSurname.getText());
         person.setPostNominal(textPostNominal.getText());
         person.setCallsign(textNickname.getText());
-        person.setBloodname(textBloodname.getText().equals(resourceMap.getString("textBloodname.error"))
-                ? "" : textBloodname.getText());
+        person.setBloodname(textBloodname.getText().equals(resourceMap.getString("textBloodname.error")) ? ""
+                : textBloodname.getText());
         person.setBiography(txtBio.getText());
+
         if (choiceGender.getSelectedItem() != null) {
-            person.setGender(person.getGender().isInternal()
-                    ? ((Gender) choiceGender.getSelectedItem()).getInternalVariant()
-                    : (Gender) choiceGender.getSelectedItem());
+            person.setGender((Gender) choiceGender.getSelectedItem());
         }
-        person.setBirthday(birthdate);
+
+        person.setDateOfBirth(birthdate);
         person.setRecruitment(recruitment);
         person.setLastRankChangeDate(lastRankChangeDate);
         person.setRetirement(retirement);
         person.setOriginFaction((Faction) choiceFaction.getSelectedItem());
+
         if (choiceSystem.getSelectedItem() != null && choicePlanet.getSelectedItem() != null) {
             person.setOriginPlanet((Planet) choicePlanet.getSelectedItem());
         } else {
@@ -964,16 +1188,52 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         }
         person.setPhenotype((Phenotype) choicePhenotype.getSelectedItem());
         person.setClanPersonnel(chkClan.isSelected());
-        try {
-            person.setToughness(Integer.parseInt(textToughness.getText()));
-        } catch (NumberFormatException ignored) { }
+
+        if (campaign.getCampaignOptions().isUseToughness()) {
+            try {
+                person.setToughness(Integer.parseInt(textToughness.getText()));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        if (campaign.getCampaignOptions().isUseEducationModule()) {
+            person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
+        }
+
+        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            try {
+                person.setLoyalty(Integer.parseInt(textLoyalty.getText()));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        if (campaign.getCampaignOptions().isUseFatigue()) {
+            try {
+                person.setFatigue(Integer.parseInt(textFatigue.getText()));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
         if (null == choiceOriginalUnit.getSelectedItem()) {
+            person.setOriginalUnit(null);
             person.setOriginalUnitWeight(choiceUnitWeight.getSelectedIndex());
             person.setOriginalUnitTech(choiceUnitTech.getSelectedIndex());
         } else {
-            person.setOriginalUnitId(((Unit) choiceOriginalUnit.getSelectedItem()).getId());
+            person.setOriginalUnit((Unit) choiceOriginalUnit.getSelectedItem());
         }
+
         person.setFounder(chkFounder.isSelected());
+
+        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+            person.setAggression(comboAggression.getSelectedItem());
+            person.setAmbition(comboAmbition.getSelectedItem());
+            person.setGreed(comboGreed.getSelectedItem());
+            person.setSocial(comboSocial.getSelectedItem());
+            person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
+            person.setIntelligence(comboIntelligence.getSelectedItem());
+            PersonalityController.writeDescription(person);
+        }
+
         setSkills();
         setOptions();
         setVisible(false);
@@ -994,7 +1254,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         Faction faction = campaign.getFaction().isClan() ? campaign.getFaction()
                 : (Faction) choiceFaction.getSelectedItem();
         faction = ((faction != null) && faction.isClan()) ? faction : person.getOriginFaction();
-        Bloodname bloodname = Bloodname.randomBloodname(faction.getShortName(), selectedPhenotype, campaign.getGameYear());
+        Bloodname bloodname = Bloodname.randomBloodname(faction.getShortName(), selectedPhenotype,
+                campaign.getGameYear());
         textBloodname.setText((bloodname != null) ? bloodname.getName() : resourceMap.getString("textBloodname.error"));
     }
 
@@ -1097,13 +1358,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             }
         }
         IOption option;
-        for (final Object newVar : optionComps) {
-            DialogOptionComponent comp = (DialogOptionComponent) newVar;
-            option = comp.getOption();
-            if ((comp.getValue().equals("None"))) {
+        for (final DialogOptionComponent newVar : optionComps) {
+            option = newVar.getOption();
+            if ((newVar.getValue().equals("None"))) {
                 person.getOptions().getOption(option.getName()).setValue("None");
             } else {
-                person.getOptions().getOption(option.getName()).setValue(comp.getValue());
+                person.getOptions().getOption(option.getName()).setValue(newVar.getValue());
             }
         }
     }
@@ -1122,7 +1382,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         c.ipadx = 0;
         c.ipady = 0;
 
-        for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements(); ) {
+        for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
             IOptionGroup group = i.nextElement();
 
             if (group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES)
@@ -1200,7 +1460,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             optionComp.setSelected(option.stringValue());
         } else if (OptionsConstants.MISC_HUMAN_TRO.equals(option.getName())) {
             optionComp.addValue(Crew.HUMANTRO_NONE);
-            optionComp.addValue(Crew.HUMANTRO_MECH);
+            optionComp.addValue(Crew.HUMANTRO_MEK);
             optionComp.addValue(Crew.HUMANTRO_AERO);
             optionComp.addValue(Crew.HUMANTRO_VEE);
             optionComp.addValue(Crew.HUMANTRO_BA);
@@ -1222,14 +1482,13 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     private void setOptions() {
         IOption option;
-        for (final Object newVar : optionComps) {
-            DialogOptionComponent comp = (DialogOptionComponent) newVar;
-            option = comp.getOption();
-            if ((comp.getValue().equals("None"))) {
+        for (final DialogOptionComponent newVar : optionComps) {
+            option = newVar.getOption();
+            if ((newVar.getValue().equals("None"))) {
                 person.getOptions().getOption(option.getName()).setValue("None");
             } else {
                 person.getOptions().getOption(option.getName())
-                        .setValue(comp.getValue());
+                        .setValue(newVar.getValue());
             }
         }
     }
@@ -1304,16 +1563,16 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     private void backgroundChanged() {
         final Phenotype newPhenotype = (Phenotype) choicePhenotype.getSelectedItem();
-        if (chkClan.isSelected() || newPhenotype.isNone()) {
+        if ((chkClan.isSelected()) || (Objects.requireNonNull(newPhenotype).isNone())) {
             if ((newPhenotype != null) && (newPhenotype != selectedPhenotype)) {
                 switch (selectedPhenotype) {
-                    case MECHWARRIOR:
-                        decreasePhenotypeBonus(SkillType.S_GUN_MECH);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_MECH);
+                    case MEKWARRIOR:
+                        decreasePhenotypeBonus(SkillType.S_GUN_MEK);
+                        decreasePhenotypeBonus(SkillType.S_PILOT_MEK);
                         break;
                     case ELEMENTAL:
                         decreasePhenotypeBonus(SkillType.S_GUN_BA);
-                        decreasePhenotypeBonus(SkillType.S_ANTI_MECH);
+                        decreasePhenotypeBonus(SkillType.S_ANTI_MEK);
                         break;
                     case AEROSPACE:
                         decreasePhenotypeBonus(SkillType.S_GUN_AERO);
@@ -1327,7 +1586,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                         decreasePhenotypeBonus(SkillType.S_PILOT_NVEE);
                         decreasePhenotypeBonus(SkillType.S_PILOT_VTOL);
                         break;
-                    case PROTOMECH:
+                    case PROTOMEK:
                         decreasePhenotypeBonus(SkillType.S_GUN_PROTO);
                         break;
                     case NAVAL:
@@ -1341,13 +1600,13 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 }
 
                 switch (newPhenotype) {
-                    case MECHWARRIOR:
-                        increasePhenotypeBonus(SkillType.S_GUN_MECH);
-                        increasePhenotypeBonus(SkillType.S_PILOT_MECH);
+                    case MEKWARRIOR:
+                        increasePhenotypeBonus(SkillType.S_GUN_MEK);
+                        increasePhenotypeBonus(SkillType.S_PILOT_MEK);
                         break;
                     case ELEMENTAL:
                         increasePhenotypeBonus(SkillType.S_GUN_BA);
-                        increasePhenotypeBonus(SkillType.S_ANTI_MECH);
+                        increasePhenotypeBonus(SkillType.S_ANTI_MEK);
                         break;
                     case AEROSPACE:
                         increasePhenotypeBonus(SkillType.S_GUN_AERO);
@@ -1361,7 +1620,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                         increasePhenotypeBonus(SkillType.S_PILOT_NVEE);
                         increasePhenotypeBonus(SkillType.S_PILOT_VTOL);
                         break;
-                    case PROTOMECH:
+                    case PROTOMEK:
                         increasePhenotypeBonus(SkillType.S_GUN_PROTO);
                         break;
                     case NAVAL:

@@ -18,26 +18,27 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import mekhq.MekHQ;
-import org.junit.jupiter.api.Test;
-
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class FormerSpouseReasonTest {
-    //region Variable Declarations
+import java.util.ResourceBundle;
+
+import org.junit.jupiter.api.Test;
+
+import mekhq.MekHQ;
+
+class FormerSpouseReasonTest {
+    // region Variable Declarations
     private static final FormerSpouseReason[] reasons = FormerSpouseReason.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     @Test
-    public void testIsWidowed() {
+    void testIsWidowed() {
         for (final FormerSpouseReason formerSpouseReason : reasons) {
             if (formerSpouseReason == FormerSpouseReason.WIDOWED) {
                 assertTrue(formerSpouseReason.isWidowed());
@@ -48,7 +49,7 @@ public class FormerSpouseReasonTest {
     }
 
     @Test
-    public void testIsDivorce() {
+    void testIsDivorce() {
         for (final FormerSpouseReason formerSpouseReason : reasons) {
             if (formerSpouseReason == FormerSpouseReason.DIVORCE) {
                 assertTrue(formerSpouseReason.isDivorce());
@@ -57,27 +58,23 @@ public class FormerSpouseReasonTest {
             }
         }
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     @Test
-    public void testParseFromString() {
+    void testParseFromString() {
         // Normal Parsing
         assertEquals(FormerSpouseReason.DIVORCE, FormerSpouseReason.parseFromString("DIVORCE"));
         assertEquals(FormerSpouseReason.WIDOWED, FormerSpouseReason.parseFromString("WIDOWED"));
-
-        // Legacy Parsing
-        assertEquals(FormerSpouseReason.WIDOWED, FormerSpouseReason.parseFromString("0"));
-        assertEquals(FormerSpouseReason.DIVORCE, FormerSpouseReason.parseFromString("1"));
 
         // Error Case
         assertEquals(FormerSpouseReason.WIDOWED, FormerSpouseReason.parseFromString("2"));
         assertEquals(FormerSpouseReason.WIDOWED, FormerSpouseReason.parseFromString("blah"));
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Test
-    public void testToStringOverride() {
+    void testToStringOverride() {
         assertEquals(resources.getString("FormerSpouseReason.DIVORCE.text"), FormerSpouseReason.DIVORCE.toString());
         assertEquals(resources.getString("FormerSpouseReason.WIDOWED.text"), FormerSpouseReason.WIDOWED.toString());
     }

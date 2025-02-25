@@ -88,7 +88,7 @@ public class PersonnelFilterStyleTest {
     public void testGetFilters() {
         try (MockedStatic<PersonnelFilter> personnelFilter = Mockito.mockStatic(PersonnelFilter.class)) {
             final List<PersonnelFilter> individualRolesStandardPersonnelFilters = new ArrayList<>();
-            individualRolesStandardPersonnelFilters.add(PersonnelFilter.MECHWARRIOR);
+            individualRolesStandardPersonnelFilters.add(PersonnelFilter.MEKWARRIOR);
             personnelFilter.when(PersonnelFilter::getIndividualRolesStandardPersonnelFilters).thenReturn(individualRolesStandardPersonnelFilters);
             assertEquals(individualRolesStandardPersonnelFilters, PersonnelFilterStyle.INDIVIDUAL_ROLE.getFilters(true));
 

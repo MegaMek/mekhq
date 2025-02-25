@@ -59,7 +59,7 @@ public abstract class AbstractPlanetSelector {
      * @param campaign The {@link Campaign} to use when selecting a planet.
      * @return A {@link Planet} or {@code null}.
      */
-    public abstract @Nullable Planet selectPlanet(final Campaign campaign);
+    public abstract @Nullable Planet selectPlanet(Campaign campaign);
 
     /**
      * Select a {@link Planet} for a {@link Campaign} and optional {@link} Faction.
@@ -67,7 +67,7 @@ public abstract class AbstractPlanetSelector {
      * @param faction An optional {@link Faction} to use when selecting a planet.
      * @return A {@link Planet} or {@code null}.
      */
-    public abstract @Nullable Planet selectPlanet(final Campaign campaign, final @Nullable Faction faction);
+    public abstract @Nullable Planet selectPlanet(Campaign campaign, @Nullable Faction faction);
 
     /**
      * Clears any cache associated with planet selection.

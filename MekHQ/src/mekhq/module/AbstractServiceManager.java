@@ -18,12 +18,18 @@
  */
 package mekhq.module;
 
-import megamek.common.annotations.Nullable;
-import mekhq.module.api.MekHQModule;
-import org.apache.logging.log4j.LogManager;
-
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.stream.Collectors;
+
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.module.api.MekHQModule;
 
 /**
  * Common functionality for MekHQ module service managers.
@@ -31,6 +37,7 @@ import java.util.stream.Collectors;
  * @author Neoancient
  */
 abstract public class AbstractServiceManager<T extends MekHQModule> {
+    private static final MMLogger logger = MMLogger.create(AbstractServiceManager.class);
 
     private final ServiceLoader<T> loader;
     private final Map<String, T> services;
@@ -44,14 +51,14 @@ abstract public class AbstractServiceManager<T extends MekHQModule> {
 
     private void loadServices() {
         try {
-            for (Iterator<T> iter = loader.iterator(); iter.hasNext(); ) {
+            for (Iterator<T> iter = loader.iterator(); iter.hasNext();) {
                 final T service = iter.next();
-                LogManager.getLogger().debug("Found service " + service.getModuleName());
+                logger.debug("Found service " + service.getModuleName());
 
                 services.put(service.getModuleName(), service);
             }
         } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
     }
 
@@ -66,8 +73,11 @@ abstract public class AbstractServiceManager<T extends MekHQModule> {
 
     /**
      * Retrieves a specific instance of the service
-     * @param key The name of the method, returned by the service's getMethodName method.
-     * @return    The service associated with the key, or null if there is no such service.
+     * 
+     * @param key The name of the method, returned by the service's getMethodName
+     *            method.
+     * @return The service associated with the key, or null if there is no such
+     *         service.
      */
     public @Nullable T getService(String key) {
         return services.get(key);

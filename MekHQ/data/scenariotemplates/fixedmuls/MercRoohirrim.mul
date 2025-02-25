@@ -1,69 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<unit version="0.49.16-SNAPSHOT" >
+<unit version="0.49.16-SNAPSHOT">
 
-		<entity chassis="Beast Infantry (Kangaroo)" model="(Auto-Rifle)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="d7c077d6-6936-40ee-b550-2130e6dc9f4c">
-			<pilot size="1" name="Theoden Ofrohan" nick="" gender="MALE" gunnery="3" piloting="3" externalId="633f0492-efde-4204-af73-9a1382a55cac" ejected="false" advantages="tactical_genius"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="1"/>
-		</entity>
+	<entity chassis="Beast Infantry (Kangaroo)" model="(Auto-Rifle)" type="Leg" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="d7c077d6-6936-40ee-b550-2130e6dc9f4c">
+		<pilot size="1" name="Theoden Ofrohan" nick="" gender="MALE" gunnery="3" piloting="3"
+			externalId="633f0492-efde-4204-af73-9a1382a55cac" ejected="false" advantages="tactical_genius" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="1" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Kangaroo)" model="(Auto-Rifle)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="fe8f0c4e-e132-44b1-bd22-b87d72520f61">
-			<pilot size="1" name="Fareed Ngare" nick="" gender="MALE" gunnery="4" piloting="4" externalId="5009f0ac-b0b2-41d5-8864-5fe336109bf4" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="2"/>
-		</entity>
+	<entity chassis="Beast Infantry (Kangaroo)" model="(Auto-Rifle)" type="Leg" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="fe8f0c4e-e132-44b1-bd22-b87d72520f61">
+		<pilot size="1" name="Fareed Ngare" nick="" gender="MALE" gunnery="4" piloting="4"
+			externalId="5009f0ac-b0b2-41d5-8864-5fe336109bf4" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="2" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Kangaroo)" model="(Auto-Rifle)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="8dbf49ac-6faf-446a-9804-77f90752827a">
-			<pilot size="1" name="Eomer Eomundson" nick="" gender="MALE" gunnery="3" piloting="3" externalId="ea418959-61f9-4688-a2c5-a8dd6ab72245" ejected="false" advantages="foot_cav"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="3"/>
-		</entity>
+	<entity chassis="Beast Infantry (Kangaroo)" model="(Auto-Rifle)" type="Leg" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="8dbf49ac-6faf-446a-9804-77f90752827a">
+		<pilot size="1" name="Eomer Eomundson" nick="" gender="MALE" gunnery="3" piloting="3"
+			externalId="ea418959-61f9-4688-a2c5-a8dd6ab72245" ejected="false" advantages="foot_cav" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="3" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Kangaroo)" model="(Laser Rifle)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="8bab39f7-349b-4850-8579-1cc626b6ba7e">
-			<pilot size="1" name="Alcine Palminteri" nick="" gender="FEMALE" gunnery="3" piloting="5" externalId="5a074ac8-bebb-4759-964c-69f00ab85fbc" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="4"/>
-		</entity>
+	<entity chassis="Beast Infantry (Kangaroo)" model="(Laser Rifle)" type="Leg" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="8bab39f7-349b-4850-8579-1cc626b6ba7e">
+		<pilot size="1" name="Alcine Palminteri" nick="" gender="FEMALE" gunnery="3" piloting="5"
+			externalId="5a074ac8-bebb-4759-964c-69f00ab85fbc" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="4" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Kangaroo)" model="(Auto-Rifle)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="e118ab81-94b8-4c99-99a9-1884379a79ed">
-			<pilot size="1" name="Inis Stapler" nick="" gender="FEMALE" gunnery="4" piloting="6" externalId="af771b99-ea67-4f00-8753-54205889284e" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="5"/>
-		</entity>
+	<entity chassis="Beast Infantry (Kangaroo)" model="(Auto-Rifle)" type="Leg" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="e118ab81-94b8-4c99-99a9-1884379a79ed">
+		<pilot size="1" name="Inis Stapler" nick="" gender="FEMALE" gunnery="4" piloting="6"
+			externalId="af771b99-ea67-4f00-8753-54205889284e" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="5" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Kangaroo)" model="(Laser Rifle)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="e7d9fce9-3815-46f9-8166-d47083405dee">
-			<pilot size="1" name="Afei Dolezal" nick="" gender="FEMALE" gunnery="4" piloting="6" externalId="2d85530a-417c-4465-9c6f-8d5f2a65ad54" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="9"/>
-		</entity>
+	<entity chassis="Beast Infantry (Kangaroo)" model="(Laser Rifle)" type="Leg" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="e7d9fce9-3815-46f9-8166-d47083405dee">
+		<pilot size="1" name="Afei Dolezal" nick="" gender="FEMALE" gunnery="4" piloting="6"
+			externalId="2d85530a-417c-4465-9c6f-8d5f2a65ad54" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="9" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Kangaroo)" model="(Laser Rifle)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="68f62a31-312b-47c3-b590-fe2cfd7f9644">
-			<pilot size="1" name="Dean Marrero" nick="" gender="MALE" gunnery="3" piloting="6" externalId="6d6f2c09-2b76-4458-98cf-6c82afea11a8" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="10"/>
-		</entity>
+	<entity chassis="Beast Infantry (Kangaroo)" model="(Laser Rifle)" type="Leg" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="68f62a31-312b-47c3-b590-fe2cfd7f9644">
+		<pilot size="1" name="Dean Marrero" nick="" gender="MALE" gunnery="3" piloting="6"
+			externalId="6d6f2c09-2b76-4458-98cf-6c82afea11a8" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="10" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Kangaroo)" model="(Laser Rifle)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="af219f9b-ed5b-4462-916e-0be88572a0e6">
-			<pilot size="1" name="Eowyn Andmerry" nick="" gender="FEMALE" gunnery="3" piloting="5" externalId="c2e8b301-733e-4718-b426-acc21a0d7bb5" ejected="false" advantages="urban_guerrilla"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="11"/>
-		</entity>
+	<entity chassis="Beast Infantry (Kangaroo)" model="(Laser Rifle)" type="Leg" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="af219f9b-ed5b-4462-916e-0be88572a0e6">
+		<pilot size="1" name="Eowyn Andmerry" nick="" gender="FEMALE" gunnery="3" piloting="5"
+			externalId="c2e8b301-733e-4718-b426-acc21a0d7bb5" ejected="false" advantages="urban_guerrilla" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="11" />
+	</entity>
 
 </unit>

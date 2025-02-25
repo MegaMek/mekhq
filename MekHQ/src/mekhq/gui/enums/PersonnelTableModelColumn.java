@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,6 +18,7 @@
  */
 package mekhq.gui.enums;
 
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
@@ -33,9 +34,11 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.*;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.sorter.*;
+import mekhq.utilities.ReportingUtilities;
 
 import javax.swing.*;
 import java.util.Comparator;
@@ -43,7 +46,7 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public enum PersonnelTableModelColumn {
-    //region Enum Declarations
+    // region Enum Declarations
     PERSON("PersonnelTableModelColumn.PERSON.text"),
     RANK("PersonnelTableModelColumn.RANK.text"),
     FIRST_NAME("PersonnelTableModelColumn.FIRST_NAME.text"),
@@ -105,26 +108,35 @@ public enum PersonnelTableModelColumn {
     TRYING_TO_CONCEIVE("PersonnelTableModelColumn.TRYING_TO_CONCEIVE.text"),
     IMMORTAL("PersonnelTableModelColumn.IMMORTAL.text"),
     TOUGHNESS("PersonnelTableModelColumn.TOUGHNESS.text"),
+    FATIGUE("PersonnelTableModelColumn.FATIGUE.text"),
     EDGE("PersonnelTableModelColumn.EDGE.text"),
     SPA_COUNT("PersonnelTableModelColumn.SPA_COUNT.text"),
     IMPLANT_COUNT("PersonnelTableModelColumn.IMPLANT_COUNT.text"),
-    PORTRAIT_PATH("PersonnelTableModelColumn.PORTRAIT_PATH.text");
-    //endregion Enum Declarations
+    LOYALTY("PersonnelTableModelColumn.LOYALTY.text"),
+    EDUCATION("PersonnelTableModelColumn.EDUCATION.text"),
+    AGGRESSION("PersonnelTableModelColumn.AGGRESSION.text"),
+    AMBITION("PersonnelTableModelColumn.AMBITION.text"),
+    GREED("PersonnelTableModelColumn.GREED.text"),
+    SOCIAL("PersonnelTableModelColumn.SOCIAL.text"),
+    INTELLIGENCE("PersonnelTableModelColumn.INTELLIGENCE.text");
 
-    //region Variable Declarations
+    // endregion Enum Declarations
+
+    // region Variable Declarations
     private final String name;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     PersonnelTableModelColumn(final String name) {
         this.name = resources.getString(name);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
+
     public boolean isPerson() {
         return this == PERSON;
     }
@@ -268,6 +280,7 @@ public enum PersonnelTableModelColumn {
     public boolean isTechBA() {
         return this == TECH_BA;
     }
+
     public boolean isTechVessel() {
         return this == TECH_VESSEL;
     }
@@ -368,6 +381,10 @@ public enum PersonnelTableModelColumn {
         return this == TOUGHNESS;
     }
 
+    public boolean isFatigue() {
+        return this == FATIGUE;
+    }
+
     public boolean isEdge() {
         return this == EDGE;
     }
@@ -380,14 +397,44 @@ public enum PersonnelTableModelColumn {
         return this == IMPLANT_COUNT;
     }
 
-    public boolean isPortraitPath() {
-        return this == PORTRAIT_PATH;
+    public boolean isLoyalty() {
+        return this == LOYALTY;
     }
-    //endregion Boolean Comparison Methods
+
+    public boolean isEducation() {
+        return this == EDUCATION;
+    }
+
+    public boolean isAggression() {
+        return this == AGGRESSION;
+    }
+
+    public boolean isAmbition() {
+        return this == AMBITION;
+    }
+
+    public boolean isGreed() {
+        return this == GREED;
+    }
+
+    public boolean isSocial() {
+        return this == SOCIAL;
+    }
+
+    public boolean isIntelligence() {
+        return this == INTELLIGENCE;
+    }
+
+    public boolean isPersonality() {
+        return isAggression() || isAmbition() || isGreed() || isSocial() || isIntelligence();
+    }
+    // endregion Boolean Comparison Methods
 
     public String getCellValue(final Campaign campaign, final PersonnelMarket personnelMarket,
-                               final Person person, final boolean loadAssignmentFromMarket,
-                               final boolean groupByUnit) {
+            final Person person, final boolean loadAssignmentFromMarket,
+            final boolean groupByUnit) {
+        String sign;
+
         switch (this) {
             case PERSON:
                 return "";
@@ -408,7 +455,8 @@ public enum PersonnelTableModelColumn {
                 } else if (!groupByUnit) {
                     return surname;
                 } else {
-                    // If we're grouping by unit, determine the number of persons under their command.
+                    // If we're grouping by unit, determine the number of persons under their
+                    // command.
                     final Unit unit = person.getUnit();
 
                     // If the personnel does not have a unit, return their name
@@ -417,14 +465,14 @@ public enum PersonnelTableModelColumn {
                     }
 
                     // The crew size is the number of personnel under their charge, excluding
-                    // themselves of course
+                    // themselves, of course
                     final int crewSize = unit.getCrew().size() - 1;
                     if (crewSize <= 0) {
                         // If there is only one crew member, just return their name
                         return surname;
                     }
 
-                    return surname + " (+" + crewSize+ resources.getString(unit.usesSoldiers()
+                    return surname + " (+" + crewSize + resources.getString(unit.usesSoldiers()
                             ? "PersonnelTableModelColumn.SURNAME.Soldiers.text"
                             : "PersonnelTableModelColumn.SURNAME.Crew.text");
                 }
@@ -437,13 +485,14 @@ public enum PersonnelTableModelColumn {
                 return person.getCallsign();
             case AGE:
             case BIRTHDAY:
-                return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getBirthday());
+                return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getDateOfBirth());
             case PERSONNEL_STATUS:
                 return person.getStatus().toString();
             case GENDER:
                 return GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());
             case SKILL_LEVEL:
-                return person.getSkillLevel(campaign, false).toString();
+                return "<html>" + SkillType.getColoredExperienceLevelName(
+                    person.getSkillLevel(campaign, false)) + "</html>";
             case PERSONNEL_ROLE:
                 return person.getRoleDesc();
             case UNIT_ASSIGNMENT: {
@@ -478,13 +527,21 @@ public enum PersonnelTableModelColumn {
 
                     // Check for tech units
                     if (!person.getTechUnits().isEmpty()) {
+                        Unit refitUnit = person.getTechUnits().stream()
+                            .filter(u -> u.isRefitting() && u.getRefit().getTech() == person)
+                            .findFirst().orElse(null);
+                        String refitString = null != refitUnit ? 
+                                "<b>Refitting</b> " + refitUnit.getName() : "";
                         if (person.getTechUnits().size() == 1) {
                             unit = person.getTechUnits().get(0);
                             if (unit != null) {
-                                return unit.getName() + " (" + person.getMaintenanceTimeUsing() + "m)";
+                                return "<html>" + ReportingUtilities.separateIf(refitString, ", ", 
+                                        unit.getName() + " (" + person.getMaintenanceTimeUsing() + "m)") + "</html>";
                             }
                         } else {
-                            return "" + person.getTechUnits().size() + " units (" + person.getMaintenanceTimeUsing() + "m)";
+                            return "<html>" + ReportingUtilities.separateIf(refitString, ", ", 
+                                    person.getTechUnits().size() + " units (" + person.getMaintenanceTimeUsing() + "m)")
+                                    + "</html>";
                         }
                     }
                 }
@@ -500,58 +557,58 @@ public enum PersonnelTableModelColumn {
                 return ((unit == null) || !unit.isDeployed()) ? "-"
                         : campaign.getScenario(unit.getScenarioId()).getName();
             case MEK:
-                return (person.hasSkill(SkillType.S_GUN_MECH)
-                                ? Integer.toString(person.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue())
-                                : "-")
-                        + "/"
-                        + (person.hasSkill(SkillType.S_PILOT_MECH)
-                                ? Integer.toString(person.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue())
+                return (person.hasSkill(SkillType.S_GUN_MEK)
+                        ? Integer.toString(person.getSkill(SkillType.S_GUN_MEK).getFinalSkillValue())
+                        : "-")
+                        + '/'
+                        + (person.hasSkill(SkillType.S_PILOT_MEK)
+                                ? Integer.toString(person.getSkill(SkillType.S_PILOT_MEK).getFinalSkillValue())
                                 : "-");
             case GROUND_VEHICLE:
                 return (person.hasSkill(SkillType.S_GUN_VEE)
-                                ? Integer.toString(person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue())
-                                : "-")
-                        + "/"
+                        ? Integer.toString(person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue())
+                        : "-")
+                        + '/'
                         + (person.hasSkill(SkillType.S_PILOT_GVEE)
                                 ? Integer.toString(person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue())
                                 : "-");
             case NAVAL_VEHICLE:
                 return (person.hasSkill(SkillType.S_GUN_VEE)
-                                ? Integer.toString(person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue())
-                                : "-")
-                        + "/"
+                        ? Integer.toString(person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue())
+                        : "-")
+                        + '/'
                         + (person.hasSkill(SkillType.S_PILOT_NVEE)
                                 ? Integer.toString(person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue())
                                 : "-");
             case VTOL:
                 return (person.hasSkill(SkillType.S_GUN_VEE)
-                                ? Integer.toString(person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue())
-                                : "-")
-                        + "/"
+                        ? Integer.toString(person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue())
+                        : "-")
+                        + '/'
                         + (person.hasSkill(SkillType.S_PILOT_VTOL)
                                 ? Integer.toString(person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue())
                                 : "-");
             case AEROSPACE:
                 return (person.hasSkill(SkillType.S_GUN_AERO)
-                                ? Integer.toString(person.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue())
-                                : "-")
-                        + "/"
+                        ? Integer.toString(person.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue())
+                        : "-")
+                        + '/'
                         + (person.hasSkill(SkillType.S_PILOT_AERO)
                                 ? Integer.toString(person.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue())
                                 : "-");
             case CONVENTIONAL_AIRCRAFT:
                 return (person.hasSkill(SkillType.S_GUN_JET)
-                                ? Integer.toString(person.getSkill(SkillType.S_GUN_JET).getFinalSkillValue())
-                                : "-")
-                        + "/"
+                        ? Integer.toString(person.getSkill(SkillType.S_GUN_JET).getFinalSkillValue())
+                        : "-")
+                        + '/'
                         + (person.hasSkill(SkillType.S_PILOT_JET)
                                 ? Integer.toString(person.getSkill(SkillType.S_PILOT_JET).getFinalSkillValue())
                                 : "-");
             case VESSEL:
                 return (person.hasSkill(SkillType.S_GUN_SPACE)
-                                ? Integer.toString(person.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue())
-                                : "-")
-                        + "/"
+                        ? Integer.toString(person.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue())
+                        : "-")
+                        + '/'
                         + (person.hasSkill(SkillType.S_PILOT_SPACE)
                                 ? Integer.toString(person.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue())
                                 : "-");
@@ -560,8 +617,8 @@ public enum PersonnelTableModelColumn {
                         ? Integer.toString(person.getSkill(SkillType.S_GUN_BA).getFinalSkillValue())
                         : "-";
             case ANTI_MEK:
-                return person.hasSkill(SkillType.S_ANTI_MECH)
-                        ? Integer.toString(person.getSkill(SkillType.S_ANTI_MECH).getFinalSkillValue())
+                return person.hasSkill(SkillType.S_ANTI_MEK)
+                        ? Integer.toString(person.getSkill(SkillType.S_ANTI_MEK).getFinalSkillValue())
                         : "-";
             case SMALL_ARMS:
                 return person.hasSkill(SkillType.S_SMALL_ARMS)
@@ -584,8 +641,8 @@ public enum PersonnelTableModelColumn {
                         ? Integer.toString(person.getSkill(SkillType.S_LEADER).getFinalSkillValue())
                         : "-";
             case TECH_MEK:
-                return person.hasSkill(SkillType.S_TECH_MECH)
-                        ? Integer.toString(person.getSkill(SkillType.S_TECH_MECH).getFinalSkillValue())
+                return person.hasSkill(SkillType.S_TECH_MEK)
+                        ? Integer.toString(person.getSkill(SkillType.S_TECH_MEK).getFinalSkillValue())
                         : "-";
             case TECH_AERO:
                 return person.hasSkill(SkillType.S_TECH_AERO)
@@ -620,7 +677,11 @@ public enum PersonnelTableModelColumn {
                         ? Integer.toString(person.getSkill(SkillType.S_SCROUNGE).getFinalSkillValue())
                         : "-";
             case INJURIES:
-                return Integer.toString(person.getHits());
+                if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
+                    return Integer.toString(person.getInjuries().size());
+                } else {
+                    return Integer.toString(person.getHits());
+                }
             case KILLS:
                 return Integer.toString(campaign.getKillsFor(person.getId()).size());
             case SALARY:
@@ -649,39 +710,71 @@ public enum PersonnelTableModelColumn {
             case CLAN_PERSONNEL:
                 return resources.getString(person.isClanPersonnel() ? "Yes.text" : "No.text");
             case MARRIAGEABLE:
-                return resources.getString(person.getGenealogy().hasSpouse() ? "NA.text" : (person.isMarriageable() ? "Yes.text" : "No.text"));
+                return resources.getString(person.getGenealogy().hasSpouse() ? "NA.text"
+                        : (person.isMarriageable() ? "Yes.text" : "No.text"));
             case DIVORCEABLE:
-                return resources.getString(person.getGenealogy().hasSpouse() ? (person.isDivorceable() ? "Yes.text" : "No.text") : "NA.text");
+                return resources
+                        .getString(person.getGenealogy().hasSpouse() ? (person.isDivorceable() ? "Yes.text" : "No.text")
+                                : "NA.text");
             case TRYING_TO_CONCEIVE:
-                return resources.getString(person.getGender().isFemale() ? (person.isTryingToConceive() ? "Yes.text" : "No.text") : "NA.text");
+                return resources.getString(
+                        person.getGender().isFemale() ? (person.isTryingToConceive() ? "Yes.text" : "No.text")
+                                : "NA.text");
             case IMMORTAL:
-                return resources.getString(person.getStatus().isDead() ? "NA.text" : (person.isImmortal() ? "Yes.text" : "No.text"));
+                return resources.getString(
+                        person.getStatus().isDead() ? "NA.text" : (person.isImmortal() ? "Yes.text" : "No.text"));
             case TOUGHNESS:
                 return Integer.toString(person.getToughness());
+            case FATIGUE:
+                return Integer.toString(person.getEffectiveFatigue(campaign));
             case EDGE:
                 return Integer.toString(person.getEdge());
             case SPA_COUNT:
                 return Integer.toString(person.countOptions(PersonnelOptions.LVL3_ADVANTAGES));
             case IMPLANT_COUNT:
                 return Integer.toString(person.countOptions(PersonnelOptions.MD_ADVANTAGES));
-            case PORTRAIT_PATH:
-                return person.getPortrait().toString();
+            case LOYALTY:
+                return String.valueOf(person.getLoyalty());
+            case EDUCATION:
+                return person.getEduHighestEducation().toString();
+            case AGGRESSION:
+                Aggression aggression = person.getAggression();
+                sign = aggression.isTraitPositive() ? "+" : "-";
+
+                return aggression + " (" + (aggression.isTraitMajor() ? sign + sign : sign) + ')';
+            case AMBITION:
+                Ambition ambition = person.getAmbition();
+                sign = ambition.isTraitPositive() ? "+" : "-";
+
+                return  ambition + " (" + (ambition.isTraitMajor() ? sign + sign : sign) + ')';
+            case GREED:
+                Greed greed = person.getGreed();
+                sign = greed.isTraitPositive() ? "+" : "-";
+
+                return greed + " (" + (greed.isTraitMajor() ? sign + sign : sign) + ')';
+            case SOCIAL:
+                Social social = person.getSocial();
+                sign = social.isTraitPositive() ? "+" : "-";
+
+                return social + " (" + (social.isTraitMajor() ? sign + sign : sign) + ')';
+            case INTELLIGENCE:
+                Intelligence intelligence = person.getIntelligence();
+
+                return String.valueOf(intelligence.ordinal());
             default:
                 return "UNIMPLEMENTED";
         }
     }
 
     public @Nullable String getDisplayText(final Campaign campaign, final Person person) {
-        switch (this) {
-            case AGE:
-                return Integer.toString(person.getAge(campaign.getLocalDate()));
-            default:
-                return null;
+        if (this == PersonnelTableModelColumn.AGE) {
+            return Integer.toString(person.getAge(campaign.getLocalDate()));
         }
+        return null;
     }
 
     public @Nullable String getToolTipText(final Person person,
-                                           final boolean loadAssignmentFromMarket) {
+            final boolean loadAssignmentFromMarket) {
         switch (this) {
             case PERSONNEL_STATUS:
                 return person.getStatus().getToolTipText();
@@ -704,323 +797,137 @@ public enum PersonnelTableModelColumn {
     }
 
     public int getWidth() {
-        switch (this) {
-            case PERSON:
-            case UNIT_ASSIGNMENT:
-                return 125;
-            case RANK:
-            case FIRST_NAME:
-            case GIVEN_NAME:
-            case DEPLOYED:
-                return 70;
-            case LAST_NAME:
-            case SURNAME:
-            case BLOODNAME:
-            case CALLSIGN:
-            case SKILL_LEVEL:
-            case SALARY:
-                return 50;
-            case PERSONNEL_ROLE:
-            case FORCE:
-                return 100;
-            default:
-                return 20;
-        }
+        return switch (this) {
+            case PERSON, UNIT_ASSIGNMENT -> 125;
+            case RANK, FIRST_NAME, GIVEN_NAME, DEPLOYED -> 70;
+            case LAST_NAME, SURNAME, BLOODNAME, CALLSIGN, SKILL_LEVEL, SALARY -> 50;
+            case PERSONNEL_ROLE, FORCE -> 100;
+            default -> 20;
+        };
     }
 
     public int getAlignment() {
-        switch (this) {
-            case PERSON:
-            case RANK:
-            case FIRST_NAME:
-            case LAST_NAME:
-            case PRE_NOMINAL:
-            case GIVEN_NAME:
-            case SURNAME:
-            case BLOODNAME:
-            case POST_NOMINAL:
-            case CALLSIGN:
-            case GENDER:
-            case SKILL_LEVEL:
-            case PERSONNEL_ROLE:
-            case UNIT_ASSIGNMENT:
-            case FORCE:
-            case DEPLOYED:
-                return SwingConstants.LEFT;
-            case SALARY:
-                return SwingConstants.RIGHT;
-            default:
-                return SwingConstants.CENTER;
-        }
+        return switch (this) {
+            case PERSON, RANK, FIRST_NAME, LAST_NAME, PRE_NOMINAL, GIVEN_NAME, SURNAME, BLOODNAME, POST_NOMINAL,
+                    CALLSIGN, GENDER,
+                    SKILL_LEVEL, PERSONNEL_ROLE, UNIT_ASSIGNMENT, FORCE, DEPLOYED ->
+                SwingConstants.LEFT;
+            case SALARY -> SwingConstants.RIGHT;
+            default -> SwingConstants.CENTER;
+        };
     }
 
     public boolean isVisible(final Campaign campaign, final PersonnelTabView view,
-                             final JTable table) {
-        switch (view) {
-            case GRAPHIC: {
-                table.setRowHeight(80);
-                switch (this) {
-                    case PERSON:
-                    case UNIT_ASSIGNMENT:
-                    case FORCE:
-                        return true;
-                    default:
-                        return false;
-                }
+            final JTable table) {
+        return switch (view) {
+            case GRAPHIC -> {
+                table.setRowHeight(UIUtil.scaleForGUI(60));
+                yield switch (this) {
+                    case PERSON, UNIT_ASSIGNMENT, FORCE -> true;
+                    default -> false;
+                };
             }
-            case GENERAL: {
-                switch (this) {
-                    case RANK:
-                    case FIRST_NAME:
-                    case LAST_NAME:
-                    case SKILL_LEVEL:
-                    case PERSONNEL_ROLE:
-                    case UNIT_ASSIGNMENT:
-                    case FORCE:
-                    case DEPLOYED:
-                    case INJURIES:
-                    case XP:
-                        return true;
-                    case SALARY:
-                        return campaign.getCampaignOptions().isPayForSalaries();
-                    default:
-                        return false;
-                }
-            }
-            case PILOT_GUNNERY_SKILLS: {
-                switch (this) {
-                    case RANK:
-                    case FIRST_NAME:
-                    case LAST_NAME:
-                    case PERSONNEL_ROLE:
-                    case MEK:
-                    case GROUND_VEHICLE:
-                    case NAVAL_VEHICLE:
-                    case VTOL:
-                    case AEROSPACE:
-                    case CONVENTIONAL_AIRCRAFT:
-                    case VESSEL:
-                    case ARTILLERY:
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-            case INFANTRY_SKILLS: {
-                switch (this) {
-                    case RANK:
-                    case FIRST_NAME:
-                    case LAST_NAME:
-                    case PERSONNEL_ROLE:
-                    case BATTLE_ARMOUR:
-                    case SMALL_ARMS:
-                    case ANTI_MEK:
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-            case TACTICAL_SKILLS: {
-                switch (this) {
-                    case RANK:
-                    case FIRST_NAME:
-                    case LAST_NAME:
-                    case PERSONNEL_ROLE:
-                    case TACTICS:
-                    case STRATEGY:
-                    case LEADERSHIP:
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-            case TECHNICAL_SKILLS: {
-                switch (this) {
-                    case RANK:
-                    case FIRST_NAME:
-                    case LAST_NAME:
-                    case PERSONNEL_ROLE:
-                    case TECH_MEK:
-                    case TECH_AERO:
-                    case TECH_MECHANIC:
-                    case TECH_BA:
-                    case TECH_VESSEL:
-                    case MEDICAL:
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-            case ADMINISTRATIVE_SKILLS: {
-                switch (this) {
-                    case RANK:
-                    case FIRST_NAME:
-                    case LAST_NAME:
-                    case PERSONNEL_ROLE:
-                    case ADMINISTRATION:
-                    case NEGOTIATION:
-                    case SCROUNGE:
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-            case BIOGRAPHICAL: {
-                switch (this) {
-                    case RANK:
-                    case FIRST_NAME:
-                    case LAST_NAME:
-                    case AGE:
-                    case PERSONNEL_STATUS:
-                    case PERSONNEL_ROLE:
-                    case FOUNDER:
-                        return true;
-                    case ORIGIN_FACTION:
-                    case ORIGIN_PLANET:
-                        return campaign.getCampaignOptions().isShowOriginFaction();
-                    default:
-                        return false;
-                }
-            }
-            case FLUFF: {
-                switch (this) {
-                    case RANK:
-                    case PRE_NOMINAL:
-                    case GIVEN_NAME:
-                    case SURNAME:
-                    case BLOODNAME:
-                    case POST_NOMINAL:
-                    case CALLSIGN:
-                    case GENDER:
-                    case PERSONNEL_ROLE:
-                    case KILLS:
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-            case DATES: {
-                switch (this) {
-                    case RANK:
-                    case FIRST_NAME:
-                    case LAST_NAME:
-                    case BIRTHDAY:
-                    case DEATH_DATE:
-                        return true;
-                    case RECRUITMENT_DATE:
-                        return campaign.getCampaignOptions().isUseTimeInService();
-                    case LAST_RANK_CHANGE_DATE:
-                        return campaign.getCampaignOptions().isUseTimeInRank();
-                    case DUE_DATE:
-                        return campaign.getCampaignOptions().isUseManualProcreation()
-                                || !campaign.getCampaignOptions().getRandomProcreationMethod().isNone();
-                    case RETIREMENT_DATE:
-                        return campaign.getCampaignOptions().isUseRetirementDateTracking();
-                    default:
-                        return false;
-                }
-            }
-            case FLAGS: {
-                switch (this) {
-                    case RANK:
-                    case FIRST_NAME:
-                    case LAST_NAME:
-                    case COMMANDER:
-                    case FOUNDER:
-                    case CLAN_PERSONNEL:
-                    case MARRIAGEABLE:
-                    case DIVORCEABLE:
-                    case TRYING_TO_CONCEIVE:
-                    case IMMORTAL:
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-            case OTHER: {
-                switch (this) {
-                    case RANK:
-                    case FIRST_NAME:
-                    case LAST_NAME:
-                    case TOUGHNESS:
-                    case EDGE:
-                    case SPA_COUNT:
-                    case IMPLANT_COUNT:
-                    case PORTRAIT_PATH:
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-            default: {
-                return false;
-            }
-        }
+            case GENERAL -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME, SKILL_LEVEL, PERSONNEL_ROLE, UNIT_ASSIGNMENT, FORCE, DEPLOYED,
+                        INJURIES, XP ->
+                    true;
+                case SALARY -> campaign.getCampaignOptions().isPayForSalaries();
+                default -> false;
+            };
+            case PILOT_GUNNERY_SKILLS -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, MEK, GROUND_VEHICLE, NAVAL_VEHICLE, VTOL, AEROSPACE,
+                        CONVENTIONAL_AIRCRAFT, VESSEL, ARTILLERY ->
+                    true;
+                default -> false;
+            };
+            case INFANTRY_SKILLS -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, BATTLE_ARMOUR, SMALL_ARMS, ANTI_MEK -> true;
+                default -> false;
+            };
+            case TACTICAL_SKILLS -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, TACTICS, STRATEGY, LEADERSHIP -> true;
+                default -> false;
+            };
+            case TECHNICAL_SKILLS -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, TECH_MEK, TECH_AERO, TECH_MECHANIC, TECH_BA,
+                        TECH_VESSEL, MEDICAL ->
+                    true;
+                default -> false;
+            };
+            case ADMINISTRATIVE_SKILLS -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, ADMINISTRATION, NEGOTIATION, SCROUNGE -> true;
+                default -> false;
+            };
+            case BIOGRAPHICAL -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME, AGE, PERSONNEL_STATUS, PERSONNEL_ROLE, EDUCATION -> true;
+                case ORIGIN_FACTION, ORIGIN_PLANET -> campaign.getCampaignOptions().isShowOriginFaction();
+                default -> false;
+            };
+            case FLUFF -> switch (this) {
+                case RANK, PRE_NOMINAL, GIVEN_NAME, SURNAME, BLOODNAME, POST_NOMINAL, CALLSIGN, GENDER, PERSONNEL_ROLE,
+                        KILLS ->
+                    true;
+                default -> false;
+            };
+            case DATES -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME, BIRTHDAY, DEATH_DATE, RETIREMENT_DATE -> true;
+                case RECRUITMENT_DATE -> campaign.getCampaignOptions().isUseTimeInService();
+                case LAST_RANK_CHANGE_DATE -> campaign.getCampaignOptions().isUseTimeInRank();
+                case DUE_DATE ->
+                    campaign.getCampaignOptions().isUseManualProcreation()
+                            || !campaign.getCampaignOptions().getRandomProcreationMethod().isNone();
+                default -> false;
+            };
+            case FLAGS -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME, COMMANDER, FOUNDER, CLAN_PERSONNEL, MARRIAGEABLE, DIVORCEABLE,
+                        TRYING_TO_CONCEIVE,
+                        IMMORTAL ->
+                    true;
+                default -> false;
+            };
+            case PERSONALITY -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME -> true;
+                case AGGRESSION, AMBITION, GREED, SOCIAL, INTELLIGENCE ->
+                    campaign.getCampaignOptions().isUseRandomPersonalities();
+                default -> false;
+            };
+            case OTHER -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME -> true;
+                case TOUGHNESS -> campaign.getCampaignOptions().isUseToughness();
+                case FATIGUE -> campaign.getCampaignOptions().isUseFatigue();
+                case EDGE -> campaign.getCampaignOptions().isUseEdge();
+                case SPA_COUNT -> campaign.getCampaignOptions().isUseAbilities();
+                case IMPLANT_COUNT -> campaign.getCampaignOptions().isUseImplants();
+                case LOYALTY -> campaign.getCampaignOptions().isUseLoyaltyModifiers()
+                        && !campaign.getCampaignOptions().isUseHideLoyalty();
+                default -> false;
+            };
+        };
     }
 
     public Comparator<?> getComparator(final Campaign campaign) {
-        switch (this) {
-            case RANK:
-                return new PersonRankStringSorter(campaign);
-            case AGE:
-            case BIRTHDAY:
-            case RECRUITMENT_DATE:
-            case LAST_RANK_CHANGE_DATE:
-            case DUE_DATE:
-            case RETIREMENT_DATE:
-            case DEATH_DATE:
-                return new DateStringComparator();
-            case SKILL_LEVEL:
-                return new LevelSorter();
-            case MEK:
-            case GROUND_VEHICLE:
-            case NAVAL_VEHICLE:
-            case VTOL:
-            case AEROSPACE:
-            case CONVENTIONAL_AIRCRAFT:
-            case VESSEL:
-            case BATTLE_ARMOUR:
-            case SMALL_ARMS:
-            case ANTI_MEK:
-            case ARTILLERY:
-            case TACTICS:
-            case STRATEGY:
-            case LEADERSHIP:
-            case TECH_MEK:
-            case TECH_AERO:
-            case TECH_MECHANIC:
-            case TECH_BA:
-            case TECH_VESSEL:
-            case MEDICAL:
-            case ADMINISTRATION:
-            case NEGOTIATION:
-            case SCROUNGE:
-                return new BonusSorter();
-            case INJURIES:
-            case KILLS:
-            case XP:
-            case TOUGHNESS:
-            case EDGE:
-            case SPA_COUNT:
-            case IMPLANT_COUNT:
-                return new IntegerStringSorter();
-            case SALARY:
-                return new FormattedNumberSorter();
-            default:
-                return new NaturalOrderComparator();
-        }
+        return switch (this) {
+            case RANK -> new PersonRankStringSorter(campaign);
+            case AGE, BIRTHDAY, RECRUITMENT_DATE, LAST_RANK_CHANGE_DATE, DUE_DATE, RETIREMENT_DATE, DEATH_DATE ->
+                new DateStringComparator();
+            case SKILL_LEVEL -> new LevelSorter();
+            case MEK, GROUND_VEHICLE, NAVAL_VEHICLE, VTOL, AEROSPACE, CONVENTIONAL_AIRCRAFT, VESSEL, BATTLE_ARMOUR,
+                    SMALL_ARMS, ANTI_MEK,
+                    ARTILLERY, TACTICS, STRATEGY, LEADERSHIP, TECH_MEK, TECH_AERO, TECH_MECHANIC, TECH_BA, TECH_VESSEL,
+                    MEDICAL,
+                    ADMINISTRATION, NEGOTIATION, SCROUNGE ->
+                new BonusSorter();
+            case INJURIES, KILLS, XP, TOUGHNESS, EDGE, SPA_COUNT, IMPLANT_COUNT, LOYALTY, INTELLIGENCE -> new IntegerStringSorter();
+            case SALARY -> new FormattedNumberSorter();
+            default -> new NaturalOrderComparator();
+        };
     }
 
     public @Nullable SortOrder getDefaultSortOrder() {
-        switch (this) {
-            case RANK:
-            case FIRST_NAME:
-            case LAST_NAME:
-            case SKILL_LEVEL:
-                return SortOrder.DESCENDING;
-            default:
-                return null;
-        }
+        return switch (this) {
+            case RANK, FIRST_NAME, LAST_NAME, SKILL_LEVEL -> SortOrder.DESCENDING;
+            default -> null;
+        };
     }
 
     @Override

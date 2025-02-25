@@ -27,6 +27,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import java.awt.*;
@@ -87,7 +88,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         gbc.gridwidth = 1;
         gbc.gridy++;
 
-        JScrollPane itemListPane = new JScrollPane();
+        JScrollPane itemListPane = new JScrollPaneWithSpeed();
         if (individualUnits) {
             itemListPane.setViewportView(unitList);
             refreshUnitList();
@@ -98,7 +99,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         getContentPane().add(itemListPane, gbc);
         gbc.gridx++;
 
-        JScrollPane templateListPane = new JScrollPane();
+        JScrollPane templateListPane = new JScrollPaneWithSpeed();
         templateListPane.setViewportView(templateList);
         itemListPane.setPreferredSize(
                 new Dimension((int) itemListPane.getPreferredSize().getWidth() + (int) templateListPane.getPreferredSize().getWidth(),
@@ -191,7 +192,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         currentScenario.addUnit(unit.getId(), templateList.getSelectedValue().getForceName());
         unit.setScenarioId(currentScenario.getId());
         MekHQ.triggerEvent(new DeploymentChangedEvent(unit, currentScenario));
-        if (unit.hasTransportedUnits()) {
+        if (unit.hasShipTransportedUnits()) {
             // Prompt the player to also deploy any units transported by this one
             deployTransportedUnitsDialog(unit);
         }
@@ -208,7 +209,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         // all this stuff apparently needs to happen when assigning a force to a scenario
         campaignGUI.undeployForce(force);
         force.clearScenarioIds(campaignGUI.getCampaign(), true);
-        force.setScenarioId(currentScenario.getId());
+        force.setScenarioId(currentScenario.getId(),campaignGUI.getCampaign());
         currentScenario.addForce(forceID, templateList.getSelectedValue().getForceName());
         for (UUID uid : force.getAllUnits(true)) {
             Unit u = campaignGUI.getCampaign().getUnit(uid);
@@ -216,7 +217,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
                 u.setScenarioId(currentScenario.getId());
                 // If your force includes transports with units assigned,
                 // prompt the player to also deploy any units transported by this one
-                if (u.hasTransportedUnits()) {
+                if (u.hasShipTransportedUnits()) {
                     deployTransportedUnitsDialog(u);
                 }
             }
@@ -241,13 +242,13 @@ public class ForceTemplateAssignmentDialog extends JDialog {
     }
 
     private void deployTransportedUnits(final Unit unit) {
-        for (final Unit cargo : unit.getTransportedUnits()) {
+        for (final Unit cargo : unit.getShipTransportedUnits()) {
             currentScenario.removeUnit(cargo.getId());
             currentScenario.addUnit(cargo.getId(), templateList.getSelectedValue().getForceName());
             cargo.setScenarioId(currentScenario.getId());
             MekHQ.triggerEvent(new DeploymentChangedEvent(cargo, currentScenario));
 
-            if (cargo.hasTransportedUnits()) {
+            if (cargo.hasShipTransportedUnits()) {
                 deployTransportedUnits(cargo);
             }
         }

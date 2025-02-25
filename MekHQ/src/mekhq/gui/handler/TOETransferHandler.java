@@ -18,12 +18,12 @@
  */
 package mekhq.gui.handler;
 
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
-import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.tree.TreePath;
@@ -36,7 +36,9 @@ import java.util.StringTokenizer;
 import java.util.UUID;
 
 public class TOETransferHandler extends TransferHandler {
-    private CampaignGUI gui;
+    private static final MMLogger logger = MMLogger.create(TOETransferHandler.class);
+
+    private final CampaignGUI gui;
 
     public TOETransferHandler(CampaignGUI gui) {
         super();
@@ -127,9 +129,9 @@ public class TOETransferHandler extends TransferHandler {
                 force = gui.getCampaign().getForce(Integer.parseInt(id));
             }
         } catch (UnsupportedFlavorException ufe) {
-            LogManager.getLogger().error("UnsupportedFlavor: " + ufe.getMessage());
+            logger.error("UnsupportedFlavor: " + ufe.getMessage());
         } catch (IOException ioe) {
-            LogManager.getLogger().error("I/O error: " + ioe.getMessage());
+            logger.error("I/O error: " + ioe.getMessage());
         }
 
         if ((force != null) && (superForce != null) && force.isAncestorOf(superForce)) {
@@ -140,7 +142,7 @@ public class TOETransferHandler extends TransferHandler {
     }
 
     @Override
-    public boolean importData(TransferHandler.TransferSupport support) {
+    public boolean importData(TransferSupport support) {
         if (!canImport(support)) {
             return false;
         }
@@ -154,14 +156,20 @@ public class TOETransferHandler extends TransferHandler {
             String id = st.nextToken();
             if (type.equals("UNIT")) {
                 unit = gui.getCampaign().getUnit(UUID.fromString(id));
+                if (unit == null || unit.isDeployed()) {
+                    return false;
+                }
             }
             if (type.equals("FORCE")) {
                 force = gui.getCampaign().getForce(Integer.parseInt(id));
+                if (force == null || force.isDeployed()) {
+                    return false;
+                }
             }
         } catch (UnsupportedFlavorException ufe) {
-            LogManager.getLogger().error("UnsupportedFlavor: " + ufe.getMessage());
+            logger.error("UnsupportedFlavor: " + ufe.getMessage());
         } catch (IOException ioe) {
-            LogManager.getLogger().error("I/O error: " + ioe.getMessage());
+            logger.error("I/O error: " + ioe.getMessage());
         }
 
         // Get drop location info.

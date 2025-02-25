@@ -20,28 +20,36 @@
  */
 package mekhq.campaign.storyarc.storypoint;
 
-import megamek.Version;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.storyarc.StoryPoint;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
- * This StoryPoint is started and completed whenever the status of a Person with a certain UUID is in a certain state.
- * Most typically this would be used to end the game if the main character is killed.
- * <p>This class differs from {@link CheckPersonStatusStoryPoint CheckPersonStatusStoryPoint} in that it is activated by
- * the listener in StoryArc rather than being called explicitly in a chain of StoryPoints.</p>
+ * This StoryPoint is started and completed whenever the status of a Person with
+ * a certain UUID is in a certain state.
+ * Most typically this would be used to end the game if the main character is
+ * killed.
+ * <p>
+ * This class differs from {@link CheckPersonStatusStoryPoint
+ * CheckPersonStatusStoryPoint} in that it is activated by
+ * the listener in StoryArc rather than being called explicitly in a chain of
+ * StoryPoints.
+ * </p>
  */
 public class PersonStatusStoryPoint extends StoryPoint {
+    private static final MMLogger logger = MMLogger.create(PersonStatusStoryPoint.class);
 
     /**
      * ID of the person being checked
@@ -104,12 +112,12 @@ public class PersonStatusStoryPoint extends StoryPoint {
                     personId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("statusCondition")) {
                     PersonnelStatus status = PersonnelStatus.parseFromString(wn2.getTextContent().trim());
-                    if(null != status) {
+                    if (null != status) {
                         statusConditions.add(status);
                     }
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

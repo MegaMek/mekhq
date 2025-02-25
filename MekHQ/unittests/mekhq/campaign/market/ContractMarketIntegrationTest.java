@@ -22,6 +22,7 @@ import megamek.common.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
@@ -84,7 +85,7 @@ public class ContractMarketIntegrationTest {
 
     @Test
     public void addAtBContractMercsTest() {
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         // Simulate clicking GM Add on the contract market three times
         for (int ii = 0; ii < REASONABLE_GENERATION_ATTEMPTS; ii++) {
@@ -96,7 +97,7 @@ public class ContractMarketIntegrationTest {
 
     @Test
     public void generateContractOffersMercsTest() {
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         // Simulate three months of contract generation ...
         boolean foundContract = false;
@@ -114,7 +115,7 @@ public class ContractMarketIntegrationTest {
     public void addAtBContractMercRetainerTest() {
         campaign.setRetainerEmployerCode("LA");
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         // Simulate clicking GM Add on the contract market three times
         for (int ii = 0; ii < 3; ii++) {
@@ -128,7 +129,7 @@ public class ContractMarketIntegrationTest {
     public void generateContractOffersMercRetainerTest() {
         campaign.setRetainerEmployerCode("CS");
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         // Simulate three months of contract generation ...
         boolean foundContract = false;
@@ -158,7 +159,7 @@ public class ContractMarketIntegrationTest {
         when(existing.getCommandRights()).thenReturn(ContractCommandRights.INDEPENDENT);
         campaign.importMission(existing);
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         SecureRandom realRng = new SecureRandom();
         MMRandom rng = mock(MMRandom.class);
@@ -205,7 +206,7 @@ public class ContractMarketIntegrationTest {
     public void addAtBContractHouseTest() {
         campaign.setFactionCode("DC");
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         // Simulate clicking GM Add on the contract market three times
         for (int ii = 0; ii < 3; ii++) {
@@ -219,7 +220,7 @@ public class ContractMarketIntegrationTest {
     public void generateContractOffersHouseTest() {
         campaign.setFactionCode("FS");
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         // Simulate three months of contract generation ...
         boolean foundContract = false;
@@ -234,11 +235,11 @@ public class ContractMarketIntegrationTest {
     }
 
     private void fillHangar(Campaign campaign) {
-        // Add 12 mechs in 3 forces
+        // Add 12 meks in 3 forces
         for (int jj = 0; jj < 3; ++jj) {
             Force force = new Force("Force " + jj);
             for (int ii = 0; ii < 4; ++ii) {
-                Unit unit = createMech(campaign);
+                Unit unit = createMek(campaign);
                 force.addUnit(unit.getId());
 
                 campaign.getHangar().addUnit(unit);
@@ -248,8 +249,8 @@ public class ContractMarketIntegrationTest {
         }
     }
 
-    private Unit createMech(Campaign campaign) {
-        Mech entity = mock(Mech.class);
+    private Unit createMek(Campaign campaign) {
+        Mek entity = mock(Mek.class);
         when(entity.getCrew()).thenReturn(new Crew(CrewType.SINGLE));
         when(entity.getTransportBays()).thenReturn(new Vector<>());
         Unit unit = new Unit(entity, campaign);
@@ -261,7 +262,7 @@ public class ContractMarketIntegrationTest {
     private Person createPilot() {
         Person person = mock(Person.class);
         when(person.getId()).thenReturn(UUID.randomUUID());
-        when(person.getPrimaryRole()).thenReturn(PersonnelRole.MECHWARRIOR);
+        when(person.getPrimaryRole()).thenReturn(PersonnelRole.MEKWARRIOR);
         when(person.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         return person;

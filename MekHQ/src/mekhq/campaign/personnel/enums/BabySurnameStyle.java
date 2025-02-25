@@ -18,51 +18,57 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.annotations.Nullable;
-import megamek.common.enums.Gender;
-import mekhq.MekHQ;
-import mekhq.campaign.personnel.Person;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.ResourceBundle;
 
+import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.personnel.Person;
+
 public enum BabySurnameStyle {
-    //region Enum Declaration
+    // region Enum Declaration
     FATHERS("BabySurnameStyle.FATHERS.text", "BabySurnameStyle.FATHERS.toolTipText"),
     MOTHERS("BabySurnameStyle.MOTHERS.text", "BabySurnameStyle.MOTHERS.toolTipText"),
     MOTHERS_FATHERS("BabySurnameStyle.MOTHERS_FATHERS.text", "BabySurnameStyle.MOTHERS_FATHERS.toolTipText"),
-    MOTHERS_HYPHEN_FATHERS("BabySurnameStyle.MOTHERS_HYPHEN_FATHERS.text", "BabySurnameStyle.MOTHERS_HYPHEN_FATHERS.toolTipText"),
+    MOTHERS_HYPHEN_FATHERS("BabySurnameStyle.MOTHERS_HYPHEN_FATHERS.text",
+            "BabySurnameStyle.MOTHERS_HYPHEN_FATHERS.toolTipText"),
     FATHERS_MOTHERS("BabySurnameStyle.FATHERS_MOTHERS.text", "BabySurnameStyle.FATHERS_MOTHERS.toolTipText"),
-    FATHERS_HYPHEN_MOTHERS("BabySurnameStyle.FATHERS_HYPHEN_MOTHERS.text", "BabySurnameStyle.FATHERS_HYPHEN_MOTHERS.toolTipText"),
+    FATHERS_HYPHEN_MOTHERS("BabySurnameStyle.FATHERS_HYPHEN_MOTHERS.text",
+            "BabySurnameStyle.FATHERS_HYPHEN_MOTHERS.toolTipText"),
     WELSH_PATRONYMICS("BabySurnameStyle.WELSH_PATRONYMICS.text", "BabySurnameStyle.WELSH_PATRONYMICS.toolTipText"),
     WELSH_MATRONYMICS("BabySurnameStyle.WELSH_MATRONYMICS.text", "BabySurnameStyle.WELSH_MATRONYMICS.toolTipText"),
-    ICELANDIC_PATRONYMICS("BabySurnameStyle.ICELANDIC_PATRONYMICS.text", "BabySurnameStyle.ICELANDIC_PATRONYMICS.toolTipText"),
-    ICELANDIC_MATRONYMICS("BabySurnameStyle.ICELANDIC_MATRONYMICS.text", "BabySurnameStyle.ICELANDIC_MATRONYMICS.toolTipText"),
-    ICELANDIC_COMBINATION_NYMICS("BabySurnameStyle.ICELANDIC_COMBINATION_NYMICS.text", "BabySurnameStyle.ICELANDIC_COMBINATION_NYMICS.toolTipText"),
-    RUSSIAN_PATRONYMICS("BabySurnameStyle.RUSSIAN_PATRONYMICS.text", "BabySurnameStyle.RUSSIAN_PATRONYMICS.toolTipText");
-    //endregion Enum Declaration
+    ICELANDIC_PATRONYMICS("BabySurnameStyle.ICELANDIC_PATRONYMICS.text",
+            "BabySurnameStyle.ICELANDIC_PATRONYMICS.toolTipText"),
+    ICELANDIC_MATRONYMICS("BabySurnameStyle.ICELANDIC_MATRONYMICS.text",
+            "BabySurnameStyle.ICELANDIC_MATRONYMICS.toolTipText"),
+    ICELANDIC_COMBINATION_NYMICS("BabySurnameStyle.ICELANDIC_COMBINATION_NYMICS.text",
+            "BabySurnameStyle.ICELANDIC_COMBINATION_NYMICS.toolTipText"),
+    RUSSIAN_PATRONYMICS("BabySurnameStyle.RUSSIAN_PATRONYMICS.text",
+            "BabySurnameStyle.RUSSIAN_PATRONYMICS.toolTipText");
+    // endregion Enum Declaration
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String toolTipText;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     BabySurnameStyle(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public String getToolTipText() {
         return toolTipText;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isFathers() {
         return this == FATHERS;
     }
@@ -110,10 +116,10 @@ public enum BabySurnameStyle {
     public boolean isRussianPatronymics() {
         return this == RUSSIAN_PATRONYMICS;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
     public String generateBabySurname(final Person mother, final @Nullable Person father,
-                                      final Gender babyGender) {
+            final Gender babyGender) {
         final boolean hasFather = father != null;
         switch (this) {
             case WELSH_PATRONYMICS:
@@ -164,8 +170,10 @@ public enum BabySurnameStyle {
     }
 
     /**
-     * This creates a Welsh-style Surname based on the supplied given name and the gender of the baby
-     * @param givenName the given name to create the surname from
+     * This creates a Welsh-style Surname based on the supplied given name and the
+     * gender of the baby
+     * 
+     * @param givenName  the given name to create the surname from
      * @param babyGender the baby's gender
      * @return The Welsh-style surname
      */
@@ -198,8 +206,10 @@ public enum BabySurnameStyle {
     }
 
     /**
-     * This creates an Icelandic-style surname based on the supplied given name and the gender of the baby
-     * @param givenName the given name to create the surname from
+     * This creates an Icelandic-style surname based on the supplied given name and
+     * the gender of the baby
+     * 
+     * @param givenName  the given name to create the surname from
      * @param babyGender the baby's gender
      * @return The Icelandic-style surname
      */
@@ -215,8 +225,10 @@ public enum BabySurnameStyle {
     }
 
     /**
-     * This creates an Russian-style surname based on the supplied given name and the gender of the baby
-     * @param givenName the given name to create the surname from
+     * This creates an Russian-style surname based on the supplied given name and
+     * the gender of the baby
+     * 
+     * @param givenName  the given name to create the surname from
      * @param babyGender the baby's gender
      * @return The Russian-style surname
      */
@@ -239,7 +251,7 @@ public enum BabySurnameStyle {
         }
     }
 
-    //region File I/O
+    // region File I/O
     /**
      * @param text containing the BabySurnameStyle
      * @return the saved BabySurnameStyle
@@ -275,10 +287,11 @@ public enum BabySurnameStyle {
 
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into a BabySurnameStyle. Returning MOTHERS.");
+        MMLogger.create(BabySurnameStyle.class)
+                .error("Unable to parse " + text + " into a BabySurnameStyle. Returning MOTHERS.");
         return MOTHERS;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

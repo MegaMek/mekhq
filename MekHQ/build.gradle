@@ -1,12 +1,19 @@
-import edu.sc.seis.launch4j.tasks.Launch4jLibraryTask
-
 import java.time.LocalDateTime
 
 plugins {
     id 'application'
-    id 'maven-publish'
-    id 'edu.sc.seis.launch4j' version '2.5.4'
+    id 'checkstyle'
+    id 'com.palantir.git-version' version '3.1.0'
+    id 'edu.sc.seis.launch4j' version '3.0.6'
+    id "io.sentry.jvm.gradle" version "5.1.0"
     id 'jacoco'
+    id 'java'
+    id 'org.ec4j.editorconfig' version '0.1.0'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 sourceSets {
@@ -28,45 +35,15 @@ sourceSets {
     }
 }
 
-dependencies {
-    implementation "org.megamek:megamek${mmBranchTag}:${version}"
-    implementation ("org.megamek:megameklab${mmlBranchTag}:${version}") {
-        // We may want to specify different branches for MM and MML, so we need to exclude the
-        // transitive MM dependency
-        exclude group: 'org.megamek', module: "megameklab${mmlBranchTag}"
-        // We don't need the python and javascript engine taking up space
-        exclude group: 'org.python', module: 'jython'
-        exclude group: 'org.mozilla', module: 'rhino'
-        // Eclipse IDE Multiple Dependency errors. 
-        exclude group: 'xml-apis'
-    }
-
-    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
-    implementation 'javax.vecmath:vecmath:1.5.2'
-    implementation 'joda-time:joda-time:2.12.5'
-    implementation 'org.apache.commons:commons-csv:1.10.0'
-    implementation 'org.apache.commons:commons-math3:3.6.1'
-    implementation 'org.apache.commons:commons-text:1.10.0'
-    implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
-    implementation 'org.commonmark:commonmark:0.21.0'
-    implementation 'org.jfree:jfreechart:1.5.4'
-    implementation 'org.joda:joda-money:1.0.3'
-
-    runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.2'
-    // Required for mml printing scaled vector graphics (SVG) - Eclipse IDE Compatability.
-    runtimeOnly 'xml-apis:xml-apis-ext:1.3.04'
-    
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
-    testImplementation 'org.mockito:mockito-core:5.2.0'
-    testImplementation 'org.mockito:mockito-junit-jupiter:5.2.0'
-}
-
-mainClassName = 'mekhq.MekHQ'
-
 ext {
-    mmJvmOptions = ['-Xmx2048m', '--add-opens', 'java.base/java.util=ALL-UNNAMED', '--add-opens', 'java.base/java.util.concurrent=ALL-UNNAMED']
-    mmlJvmOptions = ['-Xmx1024m']
-    mhqJvmOptions = ['-Xmx2048m', '--add-opens', 'java.base/java.util=ALL-UNNAMED', '--add-opens', 'java.base/java.util.concurrent=ALL-UNNAMED']
+    mhqJvmOptions = [
+        '-Xmx4096m',
+        '--add-opens',
+        'java.base/java.util=ALL-UNNAMED',
+        '--add-opens',
+        'java.base/java.util.concurrent=ALL-UNNAMED',
+        '-Dsun.awt.disablegrab=true'
+    ]
     campaigns = 'campaigns'
     data = 'data'
     docs = 'docs'
@@ -75,99 +52,79 @@ ext {
     mmconf = 'mmconf'
     plugins = 'plugins'
     userdata = 'userdata'
-    distributionDir = "${buildDir}/distributions"
     fileStagingDir = "${buildDir}/files"
-    mmRepoDir = "${buildDir}/repo/megamek"
-    mmlRepoDir = "${buildDir}/repo/megameklab"
-    mhqRepoDir = "${buildDir}/repo/mekhq"
-    mavenPublishDir = "${buildDir}/mavenrepo"
     scriptsDir = "${projectDir}/scripts"
     scriptTemplate = "${scriptsDir}/startScriptTemplate.txt"
+
+    // Allows setting a dependency on a different MM branch.
+    mmBranch = 'master'
+    mmBranchTag = mmBranch.equals('master') ? '' : '-' + mmBranch
+    mmlBranch = 'master'
+    mmlBranchTag = mmlBranch.equals('master') ? '' : '-' + mmlBranch
+
+    mmDir = "${rootDir}/../megamek"
+    mmlDir = "${rootDir}/../megameklab"
+}
+
+dependencies {
+    implementation "org.megamek:megamek${mmBranchTag}:${version}"
+    implementation ("org.megamek:megameklab${mmlBranchTag}:${version}") {
+        // We may want to specify different branches for MM and MML, so we need to exclude the transitive MM dependency
+        exclude group: 'org.megamek', module: "megamek${mmBranchTag}:${version}"
+
+        // We don't need the python and javascript engine taking up space
+        exclude group: 'org.python', module: 'jython'
+        exclude group: 'org.mozilla', module: 'rhino'
+
+        // Eclipse IDE Multiple Dependency errors.
+        exclude group: 'xml-apis'
+    }
+
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.2'
+    implementation 'javax.vecmath:vecmath:1.5.2'
+    implementation 'joda-time:joda-time:2.12.7'
+    implementation 'org.apache.commons:commons-csv:1.11.0'
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+    implementation 'org.apache.commons:commons-text:1.12.0'
+    implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
+    implementation 'org.commonmark:commonmark:0.22.0'
+    implementation 'org.jfree:jfreechart:1.5.5'
+    implementation 'org.joda:joda-money:1.0.4'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.18.2'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
+
+    runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.5'
+    // Required for mml printing scaled vector graphics (SVG) - Eclipse IDE Compatability.
+    runtimeOnly 'xml-apis:xml-apis-ext:1.3.04'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.3'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.3'
+    testImplementation 'org.mockito:mockito-core:5.12.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.12.0'
+}
+
+application {
+    mainClass = 'mekhq.MekHQ'
+}
+
+checkstyle {
+    toolVersion '10.18.1'
+    configFile file("config/checkstyle/checkstyle.xml")
+    ignoreFailures false
 }
 
 run {
     jvmArgs = mhqJvmOptions
 }
 
-task compileMM (type: GradleBuild) {
-    description = 'Compiles the MM directory for packaging in a Jar'
-
-    buildName = "mhq-compile-mm"
-    dir = "${mmDir}"
-    tasks = [ 'compileTestJava' ]
-}
-
-task mmJar (type: Jar, dependsOn: compileMM) {
-    description = 'Builds a MegaMek jar from the current source'
-
-    archiveFileName = "MegaMek.jar"
-    from "${mmDir}/megamek/build/classes/java/main"
-    from "${mmDir}/megamek/build/resources/main"
-    manifest {
-        attributes "Main-Class" : 'megamek.MegaMek'
-        attributes "Class-Path" : project.sourceSets.main.runtimeClasspath.files
-                .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
-                .collect { "${lib}/${it.name}" }.join(' ')
-        attributes "Add-Opens" : 'java.base/java.util java.base/java.util.concurrent'
-        attributes "Build-Date" : LocalDateTime.now()
-    }
-    ext.jarLocation = "${buildDir}/libs/${archiveFileName.get()}"
-    inputs.dir "${mmDir}/megamek/build/classes/java/main"
-    inputs.dir "${mmDir}/megamek/build/resources/main"
-    outputs.file jarLocation
-}
-
-task mmJarLibDir (type: Jar, dependsOn: compileMM) {
-    description = 'Builds a MegaMek jar from the current source, with dependencies on the classpath in the same directory'
-
-    archiveFileName = "MegaMek.jar"
-    from "${mmDir}/megamek/build/classes/java/main"
-    from "${mmDir}/megamek/build/resources/main"
-    manifest {
-        attributes "Main-Class" : 'megamek.MegaMek'
-        attributes "Class-Path" : project.sourceSets.main.runtimeClasspath.files
-                .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
-                .collect { it.name }.join(' ')
-        attributes "Add-Opens" : 'java.base/java.util java.base/java.util.concurrent'
-        attributes "Build-Date" : LocalDateTime.now()
-    }
-    ext.jarLocation = "${buildDir}/libs/${archiveFileName.get()}"
-    inputs.dir "${mmDir}/build/classes/java/main"
-    inputs.dir "${mmDir}/build/resources/main"
-    outputs.file jarLocation
-}
-
-task compileMML (type: GradleBuild) {
-    description = 'Compiles the MML directory for packaging in a Jar'
-
-    buildName = "mhq-compile-mml"
-    dir = "${mmlDir}"
-    tasks = [ 'compileTestJava' ]
-}
-
-task mmlJar (type: Jar, dependsOn: compileMML) {
-    archiveFileName = "MegaMekLab.jar"
-    from "${mmlDir}/megameklab/build/classes/java/main"
-    from "${mmlDir}/megameklab/build/resources/main"
-    manifest {
-        attributes "Main-Class" : 'megameklab.MegaMekLab'
-        attributes "Class-Path" : "${mmJar.archiveFileName.get()} " + (project.sourceSets.main.runtimeClasspath.files
-            .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
-            .collect { "${lib}/${it.name}" }.join(' '))
-        attributes "Add-Opens" : 'java.base/java.util java.base/java.util.concurrent'
-        attributes "Build-Date" : LocalDateTime.now()
-    }
-    ext.jarLocation = "${buildDir}/libs/${archiveFileName.get()}"
-    inputs.dir "${mmlDir}/megameklab/build/classes/java/main"
-    inputs.dir "${mmlDir}/megameklab/build/resources/main"
-    outputs.file jarLocation
-}
-
 jar {
     archiveFileName = "MekHQ.jar"
+
     manifest {
-        attributes "Main-Class" : mainClassName
-        attributes "Class-Path" : "${mmJar.archiveFileName.get()} ${mmlJar.archiveFileName.get()} " + (project.sourceSets.main.runtimeClasspath.files
+        attributes "Main-Class" : application.mainClass
+        attributes "Class-Path" : "MegaMek.jar MegaMekLab.jar " + (project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
             .collect { "${lib}/${it.name}" }.join(' '))
         attributes "Add-Opens" : 'java.base/java.util java.base/java.util.concurrent'
@@ -175,8 +132,22 @@ jar {
     }
 }
 
+task generateDynamicFiles() {
+    doLast {
+        new File("${projectDir}/docs/mhq-revision.txt").text = versionDetails().gitHashFull
+        new File("${projectDir}/MekHQ.l4j.ini").text = """# Launch4j runtime config
+# you can add arguments here that will be processed by the JVM at runtime
+${project.ext.mhqJvmOptions.join('\n')}
+"""
+    }
+}
+
 task stageFiles(type: Copy) {
     description = 'Stages files that are to be copied into the distribution.'
+
+    dependsOn generateDynamicFiles
+    dependsOn gradle.includedBuild('megamek').task(':megamek:generateDynamicFiles')
+    dependsOn gradle.includedBuild('megameklab').task(':megameklab:generateDynamicFiles')
 
     from projectDir
     include "${campaigns}/"
@@ -206,16 +177,19 @@ task stageFiles(type: Copy) {
     include "${userdata}/data/universe/"
     include 'license.txt'
     include 'SubmitBug.html'
+    include "sentry.properties"
+    include "*.ini"
+
+    // User Config Files
+    exclude "${mmconf}/clientsettings.xml"
+    exclude "${mmconf}/gameoptions.xml"
+    exclude "${mmconf}/megameklab.properties"
+    exclude "${mmconf}/megameklab.properties.bak"
+    exclude "${mmconf}/mhq.preferences"
+    exclude "${mmconf}/mm.preferences"
+    exclude "${mmconf}/mml.preferences"
 
     into fileStagingDir
-
-    inputs.dir "${campaigns}"
-    inputs.dir "${data}"
-    inputs.dir "${docs}"
-    inputs.dir "${mmconf}"
-    inputs.dir "${project.ext.plugins}"
-    inputs.files 'license.txt', 'SubmitBug.html'
-    outputs.dir fileStagingDir
 
     doLast {
         mkdir "${fileStagingDir}/${log}"
@@ -225,283 +199,160 @@ task stageFiles(type: Copy) {
 
 task createStartScripts (type: CreateStartScripts) {
     description = 'Create shell script for generic distribution.'
-    applicationName = 'mhq'
-    mainClass = project.mainClassName
+
+    applicationName = 'MekHQ'
+    mainClass = application.mainClass
     outputDir = startScripts.outputDir
     classpath = jar.outputs.files + files(project.sourceSets.main.runtimeClasspath.files)
             .filter { it.name.endsWith(".jar") }
     defaultJvmOpts = project.ext.mhqJvmOptions
-    // The default template assumes the start script is in a subdirectory and always
-    // sets APP_HOME to the parent directory of the one containing the script.
-    // So we provide a modified template.
-    unixStartScriptGenerator.template = resources.text.fromFile(scriptTemplate)
-    doLast {
-        // The start script assumes all the files on the classpath will be in the lib directory.
-        unixScript.text = unixScript.text.replace('lib/MekHQ', 'MekHQ')
-        windowsScript.text = windowsScript.text.replace('lib\\MekHQ', 'MekHQ')
-        // The Windows script just has a single line that needs to be changed to put the script in the root,
-        // so we'll do a simple replace
-        windowsScript.text = windowsScript.text.replace('set APP_HOME=%DIRNAME%..', '')
-    }
 }
 
 distributions {
-    // Creates tasks which package distribution with MM jar and startup script in root directory
-    unix {
-       distributionBaseName = 'mekhq'
+    main {
+        distributionBaseName = 'MekHQ'
         contents {
+            // MegaMek Includes
             from ("${mmDir}/megamek/build/files")
             from ("${mmDir}/megamek/build/scripts") {
-                include 'mm*'
-                rename 'mm(.*)', 'mm-startup$1'
+                into "bin"
             }
-            from ("${mmDir}/megamek/${docs}/history.txt") {
+            from ("${mmDir}/megamek/scripts") {
+                include "shell.sh"
+                rename "shell.sh", "MegaMek.sh"
+            }
+            from ("${mmDir}/megamek/docs") {
                 rename 'history.txt', 'mm-history.txt'
                 into 'docs'
             }
-            from ("${mmDir}/megamek/${mmconf}/log4j2.xml") {
+            from ("${mmDir}/megamek/mmconf/log4j2.xml") {
                 exclude 'log4j2.xml'
+            }
+            from ("${mmDir}/megamek/build/launch4j/lib") {
+                into "${lib}"
+            }
+            from ("${mmDir}/megamek/build/launch4j") {
+                include '*.exe'
+            }
+            from ("${mmDir}/megamek/build/libs/MegaMek.jar") {
+                into "${lib}"
+            }
+            from ("${mmDir}/megamek/build/libs/MegaMek.jar")
+            from ("${mmDir}/megamek/") {
+                include '*.ini'
+            }
+
+            // MegaMekLab Includes
+            from ("${mmlDir}/megameklab/build/files") {
+                exclude 'data/mekfiles'
+            }
+            from ("${mmlDir}/megameklab/build/launch4j/lib") {
+                into "${lib}"
             }
             from ("${mmlDir}/megameklab/build/files/${data}/images") {
                 into "${data}/images"
             }
             from ("${mmlDir}/megameklab/build/scripts") {
-                include 'mml*'
-                rename 'mml(.*)', 'mml-startup$1'
+                into "bin"
             }
-            from ("${mmlDir}/megameklab/${docs}/history.txt") {
+            from ("${mmlDir}/megameklab/scripts") {
+                include "shell.sh"
+                rename "shell.sh", "MegaMekLab.sh"
+            }
+            from ("${mmlDir}/megameklab/docs") {
                 rename 'history.txt', 'mml-history.txt'
                 into "${docs}"
             }
-            from ("${mmlDir}/megameklab/${mmconf}/log4j2.xml") {
+            from ("${mmlDir}/megameklab/mmconf/log4j2.xml") {
                 exclude 'log4j2.xml'
             }
-            from ("docs/history.txt") {
-                rename 'history.txt', 'mhq-history.txt'
-                into 'docs'
+            from ("${mmlDir}/megameklab/build/launch4j") {
+                include '*.exe'
             }
-            from (fileStagingDir) {
-                exclude 'history.txt'
-            }
-            from (createStartScripts) {
-                include 'mhq*'
-                rename 'mhq(.*)', 'mhq-startup$1'
-            }
-            from (project.sourceSets.main.runtimeClasspath.files
-                    .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
+            from ("${mmlDir}/megameklab/build/libs/MegaMekLab.jar") {
                 into "${lib}"
             }
-            from (mmJar)
-            from (mmlJar)
-            from (jar)
-            duplicatesStrategy = 'exclude'
-        }
-    }
-    // Creates tasks which package distribution with MM jar wrapped in Windows executable
-    windows {
-        distributionBaseName = 'mekhq-windows'
-        contents {
-            from ("${mmDir}/megamek/build/files")
-            from ("${mmDir}/megamek/docs/history.txt") {
-                rename 'history.txt', 'mm-history.txt'
-                into 'docs'
+            from ("${mmlDir}/megameklab/build/libs/MegaMekLab.jar")
+            from ("${mmlDir}/megameklab/") {
+                include '*.ini'
             }
-            from ("${mmDir}/megamek/${mmconf}/log4j2.xml") {
-                exclude 'log4j2.xml'
-            }
-            from ("${mmlDir}/megameklab/build/files/${data}/images") {
-                into "${data}/images"
-            }
-            from ("${mmlDir}/megameklab/${docs}/history.txt") {
-                rename 'history.txt', 'mml-history.txt'
-                into "${docs}"
-            }
-            from ("${mmlDir}/megameklab/${mmconf}/log4j2.xml") {
-                exclude 'log4j2.xml'
-            }
+
+            // MekHQ Includes
             from ("docs/history.txt") {
                 rename 'history.txt', 'mhq-history.txt'
                 into 'docs'
             }
             from (fileStagingDir) {
                 exclude 'history.txt'
+            }
+            from ("${projectDir}/scripts") {
+                include 'shell.sh'
+                rename 'shell.sh', 'MekHQ.sh'
             }
             from ("${buildDir}/launch4j") {
                 include '*.exe'
-                include '*.ini'
             }
+
             from (project.sourceSets.main.runtimeClasspath.files
                     .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
                 into "${lib}"
             }
-            from (mmJar) {
+            from(jar) {
                 into "${lib}"
             }
-            from (mmlJar) {
-                into "${lib}"
-            }
+            from(jar)
+
             duplicatesStrategy = 'exclude'
         }
     }
 }
 
-createExe {
-    description = 'Create Windows executable that wraps MekHQ jar'
-    mainClassName = project.mainClassName
-    jar = "${project.tasks.getByName("jar").archiveFile.get()}"
-    icon = "${projectDir}/${data}/images/misc/mekhq.ico"
+launch4j {
+    description = 'Create Windows executable for MekHQ'
+    mainClassName = application.mainClass
+    icon = "${projectDir}/data/images/misc/mekhq.ico"
+    outfile = "MekHQ.exe"
+    jarTask = project.tasks.jar
+    windowTitle = 'MekHQ'
     internalName = 'MekHQ'
-    classpath = ["lib/${mmJar.archiveFileName.get()}", "lib/${mmlJar.archiveFileName.get()}"] + project.sourceSets.main.runtimeClasspath.files
-            .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
-            .collect { "${lib}/${it.name}" }
-    def iniFile = outfile.replace('.exe', '.l4j.ini')
-    outputs.file "${buildDir}/launch4j/${outfile}"
-    outputs.file "${buildDir}/launch4j/${iniFile}"
-    doLast {
-        new File("${buildDir}/${outputDir}/${iniFile}").text = """# Launch4j runtime config
-# you can add arguments here that will be processed by the JVM at runtime
-${project.ext.mhqJvmOptions.join('\n')}
-"""
-    }
-}
-
-task createMMExe (type: Launch4jLibraryTask, dependsOn: mmJar) {
-    description = 'Create Windows executable stub for MM jar'
-    outfile = 'MegaMek.exe'
-    mainClassName = 'megamek.MegaMek'
-    jar = "lib/${mmJar.archiveFileName.get()}"
-    classpath = project.sourceSets.main.runtimeClasspath.files
-            .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
-            .collect { "${lib}/${it.name}" }
-    icon = "${mmDir}/megamek/${data}/images/misc/megamek.ico"
-    internalName = 'MegaMek'
+    downloadUrl = 'https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium-(Eclipse-Temurin-Open-Source-Java)'
+    supportUrl = 'https://megamek.org'
+    copyright = '2024 MegaMek Development Team.'
+    trademarks = 'MechWarrior, BattleMech, `Mech and Aerotech - The The Topps Company, Inc. Catalyst Game Labs - InMediaRes Productions, LLC.'
+    companyName = "MegaMek Development Team"
+    jreMinVersion = '17'
     dontWrapJar = true
-    def iniFile = outfile.replace('.exe', '.l4j.ini')
-    outputs.file "${buildDir}/launch4j/${outfile}"
-    outputs.file "${buildDir}/launch4j/${iniFile}"
-    doLast {
-        new File("${buildDir}/${outputDir}/${iniFile}").text = """# Launch4j runtime config
-# you can add arguments here that will be processed by the JVM at runtime
-${project.ext.mmJvmOptions.join('\n')}
-"""
-    }
+    messagesJreVersionError = 'We require a Java Runtime of version 17 or higher installed. https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium-(Eclipse-Temurin-Open-Source-Java)'
+    messagesJreNotFoundError = 'Go here for instructions on installing the correct version of Java: https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium-(Eclipse-Temurin-Open-Source-Java)'
 }
 
-task createMMLExe (type: Launch4jLibraryTask, dependsOn: mmlJar) {
-    description = 'Create Windows executable stub for MML jar'
-    outfile = 'MegaMekLab.exe'
-    mainClassName = 'megameklab.MegaMekLab'
-    jar = "lib/${mmlJar.archiveFileName.get()}"
-    classpath = ["lib/${mmJar.archiveFileName.get()}"] + project.sourceSets.main.runtimeClasspath.files
-            .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
-            .collect { "${lib}/${it.name}" }
-    icon = "${mmlDir}/megameklab/${data}/images/misc/megameklab.ico"
-    internalName = 'MegaMekLab'
-    dontWrapJar = true
-    def iniFile = outfile.replace('.exe', '.l4j.ini')
-    outputs.file "${buildDir}/launch4j/${outfile}"
-    outputs.file "${buildDir}/launch4j/${iniFile}"
-    doLast {
-        new File("${buildDir}/${outputDir}/${iniFile}").text = """# Launch4j runtime config
-# you can add arguments here that will be processed by the JVM at runtime
-${project.ext.mmlJvmOptions.join('\n')}
-"""
-    }
-}
-
-task stageMM (type: GradleBuild) {
-    description = 'Prepares files from the MegaMek project'
-    group = 'distribution'
-
-    buildName = "mhq-stage-mm"
-    dir = "${mmDir}"
-    tasks = [ 'stageFiles', 'createStartScripts' ]
-}
-
-task stageMML (type: GradleBuild) {
-    description = 'Prepares files from the MegaMekLab project'
-    group = 'distribution'
-
-    buildName = "mhq-stage-mml"
-    dir = "${mmlDir}"
-    tasks = [ 'stageFiles', 'createStartScripts' ]
-}
-
-windowsDistZip {
-    description = 'Creates Windows distribution packaged as a zip archive'
+tasks.register("packagePrepWork") {
+    description = 'General Catch All for all distributions'
     dependsOn stageFiles
-    dependsOn stageMM
-    dependsOn stageMML
-    dependsOn createExe
-    dependsOn createMMExe
-    dependsOn createMMLExe
-}
-
-unixDistTar {
-    description = 'Creates *nix distribution packaged as a tar ball'
-    dependsOn stageFiles
-    dependsOn stageMM
-    dependsOn stageMML
     dependsOn startScripts
+    dependsOn createStartScripts
+    dependsOn createAllExecutables
+    dependsOn gradle.includedBuild('megamek').task(':megamek:stageFiles')
+    dependsOn gradle.includedBuild('megameklab').task(':megameklab:stageFiles')
+    dependsOn gradle.includedBuild('megamek').task(':megamek:startScripts')
+    dependsOn gradle.includedBuild('megameklab').task(':megameklab:startScripts')
+    dependsOn gradle.includedBuild('megamek').task(':megamek:createStartScripts')
+    dependsOn gradle.includedBuild('megameklab').task(':megameklab:createStartScripts')
+    dependsOn gradle.includedBuild('megamek').task(':megamek:createAllExecutables')
+    dependsOn gradle.includedBuild('megameklab').task(':megameklab:createAllExecutables')
+}
+
+distTar {
+    description = 'Creates *nix distribution packaged as a tar ball'
+    dependsOn packagePrepWork
     archiveExtension = 'tar.gz'
     compression = Compression.GZIP
 }
 
-// The repository can only be cloned into an empty directory so we need to delete anything left over
-// from a previous build
-task deleteMMRepoDir (type: Delete) {
-    delete = "${mmRepoDir}"
-}
-
-task deleteMMLRepoDir (type: Delete) {
-    delete = "${mmlRepoDir}"
-}
-
-task deleteMHQRepoDir (type: Delete) {
-    delete = "${mhqRepoDir}"
-}
-
-task cloneMMRepo (type: Exec, dependsOn: deleteMMRepoDir) {
-    description = 'Clones the MegaMek repository to ensure we are working with a clean directory tree'
-    group = 'distribution'
-    commandLine "git"
-    args "clone", "--branch", mmBranch, "--single-branch", mmGitRoot, "${mmRepoDir}"
-}
-
-task cloneMMLRepo (type: Exec, dependsOn: deleteMMLRepoDir) {
-    description = 'Clones the MegaMekLab repository to ensure we are working with a clean directory tree'
-    group = 'distribution'
-    commandLine "git"
-    args "clone", "--branch", mmlBranch, "--single-branch", mmlGitRoot, "${mmlRepoDir}"
-}
-
-task cloneMHQRepo (type: Exec, dependsOn: deleteMHQRepoDir) {
-    description = 'Clones the MekHQ repository to ensure we are working with a clean directory tree'
-    group = 'distribution'
-    commandLine "git"
-    args "clone", "--branch", mhqBranch, "--single-branch", mhqGitRoot, "${mhqRepoDir}"
-}
-
-task sourceZip (type: Zip) {
-    description 'Creates a zip archive of the source'
-    group = 'distribution'
-    from (rootDir) {
-        exclude "**/build/**"
-        exclude "**/.*"
-    }
-    archiveFileName = "mekhq-${archiveVersion}-source.zip"
-    destinationDirectory = file(distributionDir)
-}
-
-task sourceTar (type: Tar) {
-    description 'Creates a compressed tar archive of the source'
-    from (rootDir) {
-        exclude "**/build/**"
-        exclude "**/.*"
-    }
-    archiveFileName = "mekhq-${archiveVersion}-source.tar.gz"
-    compression = Compression.GZIP
-    destinationDirectory = file(distributionDir)
+distZip {
+    description = 'Creates *nix distribution packaged as a tar ball'
+    enabled = false
+    dependsOn packagePrepWork
 }
 
 // The distribution plugin adds the distro packages to the assemble task, which causes the build task
@@ -514,123 +365,33 @@ task assemble(overwrite: true) {
 task assembleDist(overwrite: true) {
     description = 'Build unix, Windows, and source packages'
     group = 'distribution'
-    dependsOn stageMM
-    dependsOn stageMML
+    dependsOn stageFiles
     dependsOn test
-    dependsOn unixDistTar
-    dependsOn windowsDistZip
+    dependsOn distTar
 }
 
-task buildFromRepo (type: GradleBuild) {
-    description = 'Assembles the distribution packages in the clean repository copy'
-    group = 'distribution'
-    dependsOn cloneMMRepo
-    dependsOn cloneMMLRepo
-    dependsOn cloneMHQRepo
+tasks.register("buildAllPackages", Copy) {
+    dependsOn gradle.includedBuild('megamek').task(':megamek:assembleDist')
+    dependsOn gradle.includedBuild('megameklab').task(':megameklab:assembleDist')
+    dependsOn assembleDist
+    group = "distribution"
 
-    buildName = "mhq-build-repo"
-    dir = "${mhqRepoDir}"
-    tasks = [ 'assembleDist' ]
-}
-
-task release (type: Copy) {
-    description = 'Builds the release packages from the repository and copies them into the project build directory'
-    group = 'distribution'
-    dependsOn buildFromRepo
-
-    from "${mhqRepoDir}/MekHQ/build/distributions"
-    into "${distributionDir}"
-}
-
-task buildMM (type: GradleBuild, dependsOn: cloneMMRepo) {
-    description = 'Prepares files from the MegaMek project'
-    group = 'distribution'
-
-    buildName = "mhq-build-mm"
-    dir = "${mmRepoDir}"
-    tasks = [ 'assembleDist' ]
-}
-
-task buildMML (type: GradleBuild, dependsOn: cloneMMLRepo) {
-    description = 'Prepares files from the MegaMekLab project'
-    group = 'distribution'
-
-    buildName = "mhq-build-mml"
-    dir = "${mmlRepoDir}"
-    tasks = [ 'assembleDist' ]
-}
-
-task buildAllFromRepo (type: GradleBuild) {
-    description = 'Assembles the distribution packages in the clean repository copy'
-    group = 'distribution'
-    dependsOn cloneMMRepo
-    dependsOn cloneMMLRepo
-    dependsOn cloneMHQRepo
-    dependsOn buildMM
-    dependsOn buildMML
-
-    buildName = "mhq-build-all-repo"
-    dir = "${mhqRepoDir}"
-    tasks = [ 'unixDistTar', 'windowsDistZip' ]
-}
-
-task releaseAll (type: Copy) {
-    description = 'Builds the release packages for all the projects and copies them into the project build directory'
-    group = 'distribution'
-    dependsOn buildAllFromRepo
-
-    from "${mmRepoDir}/megamek/build/distributions"
-    from "${mmlRepoDir}/megameklab/build/distributions"
-    from "${mhqRepoDir}/MekHQ/build/distributions"
-    into "${distributionDir}"
-}
-
-task sourcesJar(type: Jar) {
-    description = 'Creates a source archive for publication to a maven repository'
-    from sourceSets.main.allJava
-    archiveClassifier = 'sources'
-}
-
-task javadocJar(type: Jar) {
-    description = 'Creates a documentation archive for publication to a maven repository'
-    from javadoc
-    archiveClassifier = 'javadoc'
-}
-
-publishing {
-    publications {
-        publishMMLibrary(MavenPublication) {
-            artifactId = "mekhq${mmBranchTag}"
-            from components.java
-            artifact sourcesJar
-//            artifact javadocJar
-
-            pom {
-                name = "MekHQ"
-                description = "MekHQ"
-                url = "https://megamek.org"
-                licenses {
-                    license {
-                        name = "GNU General Public License, version 3"
-                        url = "https://www.gnu.org/licenses/gpl-3.0.en.html"
-                    }
-                }
-            }
-        }
+    into layout.buildDirectory.dir("distributions")
+    from("${mmDir}/megamek/build/distributions") {
+        include "*.tar.gz"
     }
-
-    repositories {
-        maven {
-            url uri(mavenPublishDir)
-        }
+    from("${mmlDir}/megameklab/build/distributions") {
+        include "*.tar.gz"
     }
 }
 
-task cleanPublishingDir (type: Delete) {
-    delete = mavenPublishDir
+tasks.register("cleanAll") {
+    description = "Cleans all build projects to ensure a clean salte"
+    group = "build"
+    dependsOn gradle.includedBuild('megamek').task(':megamek:clean')
+    dependsOn gradle.includedBuild('megameklab').task(':megameklab:clean')
+    dependsOn clean
 }
-
-publishPublishMMLibraryPublicationToMavenRepository.dependsOn cleanPublishingDir
 
 test {
     useJUnitPlatform()
@@ -643,6 +404,15 @@ jacocoTestReport {
     dependsOn test
     reports {
         xml.required = true
+        html.required = true
+    }
+}
+
+tasks.withType(Checkstyle) {
+    minHeapSize = "200m"
+    maxHeapSize = "1g"
+    reports {
+        xml.required = false
         html.required = true
     }
 }

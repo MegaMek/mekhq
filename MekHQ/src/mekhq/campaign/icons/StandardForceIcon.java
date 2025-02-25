@@ -18,27 +18,32 @@
  */
 package mekhq.campaign.icons;
 
-import megamek.common.annotations.Nullable;
-import megamek.common.icons.AbstractIcon;
-import mekhq.MHQStaticDirectoryManager;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-
-import java.awt.*;
+import java.awt.Image;
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+
+import megamek.common.annotations.Nullable;
+import megamek.common.icons.AbstractIcon;
+import megamek.logging.MMLogger;
+import mekhq.MHQStaticDirectoryManager;
+
 /**
- * StandardForceIcon is an implementation of AbstractIcon that contains and displays a
+ * StandardForceIcon is an implementation of AbstractIcon that contains and
+ * displays a
  * StandardForceIcon from the Force Icon Directory.
+ * 
  * @see AbstractIcon
  */
 public class StandardForceIcon extends AbstractIcon {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(StandardForceIcon.class);
+
+    // region Variable Declarations
     public static final String DEFAULT_FORCE_ICON_FILENAME = "empty.png";
     public static final String XML_TAG = "standardForceIcon";
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public StandardForceIcon() {
         this(ROOT_CATEGORY, DEFAULT_FORCE_ICON_FILENAME);
     }
@@ -46,14 +51,14 @@ public class StandardForceIcon extends AbstractIcon {
     public StandardForceIcon(final @Nullable String category, final @Nullable String filename) {
         super(category, filename);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Boolean Methods
+    // region Boolean Methods
     @Override
     public boolean hasDefaultFilename() {
         return super.hasDefaultFilename() || DEFAULT_FORCE_ICON_FILENAME.equals(getFilename());
     }
-    //endregion Boolean Methods
+    // endregion Boolean Methods
 
     @Override
     public @Nullable Image getBaseImage() {
@@ -74,13 +79,13 @@ public class StandardForceIcon extends AbstractIcon {
                         DEFAULT_FORCE_ICON_FILENAME);
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
 
         return forceIcon;
     }
 
-    //region File I/O
+    // region File I/O
     @Override
     public void writeToXML(final PrintWriter pw, final int indent) {
         writeToXML(pw, indent, XML_TAG);
@@ -91,12 +96,12 @@ public class StandardForceIcon extends AbstractIcon {
         try {
             icon.parseNodes(wn.getChildNodes());
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return new StandardForceIcon();
         }
         return icon;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public StandardForceIcon clone() {

@@ -1,6 +1,800 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.49.20-SNAPSHOT
+0.50.04-SNAPSHOT
++ PR #5852: RAW CamOps Delivery Times
++ PR #5853: Remove Legacy AtB's Campaign Parts Availability System
++ PR #5868: Updated Several Scenario Effects to use SupplyCache over SupportPointUpdate
++ Fix #5695: Refactored Personnel Cleanup and Random Dependent Removal
++ PR #5873: Added Force Type Enumeration
++ PR #5892: Refactored Resupply Messaging to use Internalization
++ PR #5905: Refactored Currency to No Longer Always Display as C-Bills
++ PR #5907: Implemented Clarion Note & Gray Monday
++ PR #5920: MegaMekLab Issue 1703: Allow bays to be added to aerospace fighters
++ PR #5955: Implemented Death Rework
++ PR #5959: Updated rankSystems version to 0.50.04-SNAPSHOT
++ PR #5962: Converted Honor Rating into an Enum
++ PR #5963: Refactored PrisonerStatus Enum and Reorganized Related Code
++ PR #5964: Use ModifiedConstantSkillGenerator for Skill Generation
++ PR #5965: Added "Intercept the Escapees" Scenario Template
++ PR #5966: Added 'None' Generation Method to ScenarioForceTemplate
++ Fix #5845: In Stratcon scenario wizard, leadership units consider transport assignments
++ PR #5982: Cap splashscreen button width
++ Fix #5980: Improved commander updating logic
++ PR #5985: Fixed backwards "last compatible version" check
++ PR #5988: Feat: refactor flags to use EquipmentFlag instead
++ Fix #5987: local bots property empty on non-atb games #5989
++ Fix #5922: Fixed Off-by-One Error in Mass Training Dialog
++ PR #5993: Adjusted Gray Monday Employer Dialog to Trigger on the Correct Day
++ PR #5999: Fixed Clan Ghost Bear Greeting Keys
++ Fix #5979: Force players to use commit when deploying forces
++ PR #6001: Added Glossary Functionality to MHQDialogImmersive with Clickable Hyperlink Support
++ PR #6004: Refactored Support Point Modification Method Name
++ PR #6005: Refactored Fatigue Modification Method Name
++ PR #6006: Added Shortcut Method to Check if a Unit is Battle Armor
++ Fix #6009: Improve Stratcon deployment logic to ensure units aren't deployed twice
++ PR #6012: Fixed Multiple Resupply Bugs
++ PR #6020: Manage Scenario will now use manage scenario and not manage forces
++ PR #6019: Change xml recording of hiring halls
++ Fix #5996: Typo in cargo, fixes bolding, addresses issue #5996
++ Fix #5784: Better handling for missing parts when replacing parts via "Pod Space"
++ PR #6014: Refactored Active Personnel Retrieval Logic
++ PR #6013: Refactored Random Dependents Removal-Addition into a Seperate Class
++ PR #6028: Cache finances balance
++ PR #6029: Linked scenario unit selection
++ PR #6031: Convert planetary system data to yaml + general planetary system overhaul
+
+0.50.03 (2025-02-02 2030 UTC)
++ PR #5568: Spare parts rules reference adjustment
++ PR #5559: Refactored Combat Team Handling in Scenarios for Better null Safety
++ Fix #5572: don't attempt to sum NaN tonnage equipment
++ PR #5577: Leadership Units & Support Point Scarcity Hot Fixes
++ PR #5582: Updated Rank Systems Version in ranks.xml
++ Fix #5188, #5410: Corrected GUI Theme Retrieval to Use selectedTheme
++ PR #5585: Replaced Placeholder Challenge Skulls with Final
++ Fix #5584: Fixed NPE in ScenarioTableModel
++ Fix #5590: Fixed Incorrect Cargo Sizes for Resupplies
++ PR #5595: Fixed Abandoned Convoys; Updated Abandoned Convoy Dialog
++ PR #5597: Added Better Tooltips for Force Roles
++ PR #5598: Updated Resupply & Contract Automation Dialogs; Fixed Multiple Resupply Bugs
++ PR #5599: Improved Loot Good Event Language
++ PR #5600: Added Clarification to Reinforcement Dialog
++ Fix MM #5547: spelling, fixes issue 
++ PR #5602: Adjusted AtB Bonus Events
++ Fix MM ##5138: fixes capitalization of names
++ PR #5606: fix moons listed for Tantara
++ PR #5610: Corrected StratCon Menu Actions for Scenario and Force Management
++ PR #5611: Corrected Default Theme to Empty String
++ Fix #3352: add additional sortable columns to the contract table
++ PR #5614: Fixed Cargo Capacity Calculation with New Container Pattern
++ PR #5617: Restrict Distance Label to AtB Contracts Only
++ PR #5619: Refactored PostScenarioDialogHandler to use Generic Scenario
++ PR #5620: Autologistics Reporting fixes
++ PR #5624: Updated Frontline Deployment Instructions
++ Fix #5612: Add defensive check on cancel button
++ PR #5625: Updated StratCon Data Center to Increase Scan Range Instead of Sector Reveal
++ Fix #5604: Save refit config from MHQ MekLab tab
++ Fix #5328: Adjust acquisition modifiers for support vehicles
++ Fix #4876: Add sortable columns in the finance tab
++ PR #5644: Fixed Value Display in Resupplies
++ Fix #5646: Spelling Mistakes
++ PR #5650: Address potential int and double issue from SpotBugs
++ PR #5651: Don't use floats in for loops
++ PR #5652: Adds synchronization to getForces since setForces is synchronized
++ PR #5653: Keep odd number checks using modulus
++ Fix #5604: Save refit config from MHQ MekLab tab
++ PR #5618: Enable Auto-Resolve Button Conditionally for Scenarios
++ PR #5616: Adds some helpful tooltips for contracts
++ PR #5682: Refactored Crew Assignment Event Handling
++ PR #5684: Added Report for Returning StratCon Forces
++ PR #5690: Added Potential Difficulty Spikes to Garrison-Type Contracts
++ PR #5692: Removed Undeploy Option (again); Added Reset Scenario Deployment Option
++ PR #5693: Removed SP Cost for GM Reinforcement Attempts in StratCon
++ PR #5698: Fixed Multiple StratCon Bugs
++ PR #5700: Refactored Scenario Reporting for Legacy AtB and StratCon Differentiation
++ PR #5701: Corrected Weight Class Initialization of Artillery Units
++ Fix #5688: Fixed Typo in Payment Overages Message
++ Fix #5628: Fixed Personality Loading
++ Fix #5612: Fixed Unit Name Reset
++ Fix #5705: Refactored Personnel Market Generation & Fixed Capital/Hiring Hall Checks
++ PR #5707: Corrected Available Force Check
++ PR #5708: Added a Soft Cap to Support Point Generation
++ Fix #5570: Fixed Maternity Leave Date Handling
++ PR #5699: Moved ACAR Module to MegaMek
++ PR #5709: Added MHQDialogImmersive for Immersive Dialog Functionality that Immersively Improves Immersion
++ Fix #3752: Added Handling for Unsupported Unit Types
++ Fix #5717: Removed End of Contract and Manual Resupplies; Fixed Smuggler Prices; Added Remove SP Button
++ PR #5735: Fix: compilation error due to a function being set as static but acessing instance data
++ PR #5781: Feat/ACAR formations reintroduced
++ Fix #5739: Updated 'Clear Units' Button to Correctly Handle StratCon Scenarios
++ Fix #5740,#5580: Fixed Role Eligibility Checks and Ensured Proper Role Assignment
++ Fix #5746: Added Clan and Inner Sphere Resupply Restrictions
++ Fix #5766, #5769: Refactored Education Tag-Along Logic
++ PR #5771: Removed EnemyDropShip and GroundedEnemyDropShip Modifiers
++ Fix #5770: Added null Protection to OutstandingScenariosNagLogic for Outstanding Scenario Nags
++ Fix #5765: Log Prohibited Unit Skips in Resupplies & Prevent Invalid Part Additions
++ Fix #5760: Fixed Combat Team Status Logic for Convoy and Support Force
++ PR #5783: Update Sector Display in Briefing Room to Show Full Grid Reference
++ Fix #5779: Adjust Bounds Calculation in getUnoccupiedAdjacentCoords
++ Fix #5714: Fixed Maternity Leave... yet again
++ Fix #5716: Fixed Force Commander Handling and Improve XML Persistence
++ Fix #5727: Fixed Routed Contracts Resulting in Truncated Payouts
++ Fix #5726: Fix Support Point Acquisition Visual Bug
++ Fix #5736: Preventing Negative Personnel Income
++ PR #5754: Corrected Birthday Generation for Personnel
++ Fix #5753: Added 'null' Protection to AtBDynamicScenarioFactory
++ Fix #5751: Added Exception Handling for Out-of_Bounds Tab Index Selection
++ PR #5731: Remove all the damage applier classes because they currently reside on MegaMek
++ Fix #5713, #5737 Updated & Fixed Required Combat Team Calculations;
+             Reworked Combat Team Requirement Contract Pay Modifiers; Added Contract Difficulty Modifier
++ PR #4963: Implemented Campaign Options IIC - Full rework of all MekHQ options
++ Fix #3650, #4006, #4712, #5593: Added Ability to Link Units in MekHQ
++ PR #5757: Warnings on Campaign Load
++ PR #5790: Removed Legacy AtB Scenarios from StratCon Campaigns
++ PR #5791: Updated Contract Role Requirements
++ Fix #5777: QuadMeks (and QuadVees) that use Gunner & Pilot can be crewed
++ PR #5795: Replaced a Number of Placeholder Flavor Text & Fixed Encoding Error
++ PR #5796: Fixed Incorrect Condition for VTOL Unit Check
++ PR #5797: Refactored Portrait Mass Assignment Controls to Use Buttons
++ Fix #5750: Added Contract Breach CVP Penalties to StratCon Contracts
++ Fix #6416: Ghostbusting - Reset isDestroyed for entities when returning to MekHQ
++ Fix #5591: Improved Vocational (Idle) Experience Gain; Expanded Immersive Dialog Functionality 
++ Fix #5745: Added null Protection to Loot Saving
++ Fix #5761: Fixed Incorrect Pass/Fail Logic in Initial Education Evaluation
++ Fix #5801: Added Enemy Morale Spike to Justify Contract Extension Clause
++ Fix #5800: Corrected Scenario info Visibility Logic in StratconPanel
++ PR #5806: Refactored BV Display Logic in StratconScenario.java
++ PR #5813: Replaced ':' with '@' in internal AI Bot Name
++ Fix #5724: Fix astech time calculations for units that do not require maintenance 
++ Fix #5818: Fixed assigning/unassigning transports from TOE at the Force level & infantry compartments use the correct weight for infantry squads
++ Fix #3701: Corrected preset picker display on Linux
++ Fix #5810: Fixed peacetime operating cost settings
++ Fix #5826: Fixed Scenario Info Display for Uncloaked Scenarios
++ PR #5830: Convoy Message Copy Editing
++ Fix #5831: Added null Protection for Units Involved in Automated Mothballing
++ PR #5832: Corrected MHQDialogImmersive Constructor Usage
++ PR #5835: Implemented Granular autoLogistics Settings
++ Fix #5836: Combat Force commanders should be updated when a Force's Commander is updated
++ PR #5839: Refactored HPG Network Logic and Improved Visualization Clarity
++ Fix #5840: Refactored Loot Preview to Use JEditorPane not JTextArea
++ Fix #5841: Corrected isUseAtB to account for useStratCon
++ Fix #5844: Units can only be assigned a transport that is in the TOE
++ PR #5847: Added Methods for Star Radius Estimation and Spectral Type Parsing
++ PR #5848: Fixed Parsing of routedPayout to Handle Non-Numeric Characters
++ PR #5850: Rebranded Idle XP into Vocational XP
++ Fix #5718: Added GM Option to Assign Random SPAs
++ Fix #5817: Fixed Force Updates after Removal in TOEMouseAdapter
++ Fix #5822: Updated Premade Presets for 50.03
++ Fix #5828: Restored Missing Kill Credits for DropShips and Turrets
++ PR #5854: Refactored Preset Dialog Chooser to Include Description
++ Fix #5857, #5862: Fixed Incorrect Tooltips in Campaign Options IIC
++ Fix #5860: Fixed Loading & Saving of Some Campaign Options
++ PR #5864: Remove Unnecessary Edge Trigger Logging
++ PR #5866: Temporarily Removed CamOps Contract Market
++ PR #5812: adding new GUI for Princess ACAR
++ PR #5870: Adjusted Randomness of Turning Points and Highlighted Them in Briefing Room
++ PR #5875: Rolled Back Window Size Setting
++ PR #5878: Fixed Mothball Info Saving & Loading Bug
++ PR #5879: Added Jackson Dependencies for YAML Processing in MekHQ
++ Fix #5799: Differentiating between IS & Clan DHS & unbreaking commas in Parts in use
++ Fix #5811: Fixed Multiple Follow-up Contract Bugs
++ Fix #5823: Added Weight Bypass Based on Role
++ Fix #5882: Fixed Clan Bidding
++ Fix #5883: Corrected Edge Cost Calculations
++ Fix #5884: Refactored Age Checks; Updated Unit Tests for Procreation and Marriage
++ Fix #5885: Corrected Morale Logic and Contract Type Checks
++ Fix #5886: Added Movement Filter to Entity Generation Logic
++ PR #5889: Replaced Internal Dissension Events in StratCon
++ PR #5891: Added 1,247 New Callsigns
++ PR #5893: Immersively Updated the Immersive Dialog to Be More Immersive
++ PR #5894: Added missing minimaps for MekHQ
++ PR #5900: Fixed Negative Contract Base Pay
++ PR #5874: Feature: minimap themes
++ PR #5908: Restored Missing Column Labels for Planetary Acquisition
++ Fix #5910: Added Fallback for AtB Bonus Unit Creation
++ PR #5912: Implemented NewsDialog for Immersive News Display
++ PR #5915: Update scenario panel facility objective text
++ PR #5925: Fixed Unit Role configuration in Resupply Scenario Templates
++ Fix #5934: Fixed Contract Multiplier Again
++ PR #5941: Corrected Weight Class Parameter Setting Logic
++ PR #5942: Renamed 'Fixed BV' to 'BV' in BotForce Scenario Details
++ Fix #5921: Fixed Used Parts Multiplier Labels to Ignore Quality Reversal in Finances Tab
++ Fix #5917: Added Soldier Requirements Handling in UnitTableModel
++ PR #5930: Format Part Names as Italicized when Brand New
++ PR #5933: Fixed Overwriting of 'Brand New' Part State
++ Fix #5685: More control settings for autoLogistics
++ PR #5931: Refactored Part Handling in Resupply Module
++ Fix #5932: Added check for injuries that are not permanent before going on leave
++ PR #5946: Implemented Linked Scenarios for Interceptions
++ Fix #5951: Fixed Cargo Capacity Calculation in For Cargo Items in Body
+
+0.50.02 (2024-12-30 2130 UTC)
++ Fix #846, #5185: Fix BattleArmor customization/refit overweight check.
++ PR #5206: Re-enabled CamOps Contract Market Method
++ PR #5207: Re-enabled Confirm Preset Option for New Campaign Preset Picker
++ Fix #5203: Handled Exception when Fetching Force by ID in StratconPanel
++ Fix #5202, #5226: Increase Time Limit Scale Factors in Scenario Templates
++ Fix #5197: Reduced Force Multiplier for Pirate Scenarios #5211
++ Fix #5196: Fix Spouse Dependency Check in Divorce Logic
++ Fix #5190: Enhanced Mothballing in ContractAutomation
++ Fix #5184: Corrected Unit Site Comparison Logic
++ Fix #5182: Refactored getCurrentPrisoners to use getActivePersonnel
++ Fix #4652, #5194, #5193, #5205: Reputation Error Corrections & Report Reformatting
++ Fix #5204: Enhanced INVALID Formation Level Checking
++ Fix #5220: Lowered Capture Percentage Requirement to 25%
++ PR #5223: Adjusted Command Rights Scenario Modifiers
++ Fix #5219: Updated Force Generation for Irregular Scenarios
++ PR #5225: Removed Legacy AtB Guaranteed SPAs
++ PR #5227: Renamed "Add Funds" to "Add Transaction" for Clarity
++ PR #5228: Added Monthly StratCon Support Points Generation #5228
++ Fix #5181: Generate required lances for manual AtB contracts for StratCon init
++ PR #5234: Refined Turnover Prompt Dialog Text
++ PR #5173: Rename TroopSpace to InfantryCompartment
++ PR #5210: Update Rank Systems to Version 0.50.02-SNAPSHOT
++ Fix #5239: Simulated Relationship Behavior Fixes
++ Fix #5235: Fixed Typo and Added null check in RetirementDefectionTracker
++ PR #5243: Updated MekHQ Morale & StratCon Scenario Spawn Methods
++ PR #5155: CombatMath: Make princess take the reins so you can play a game of spreadsheets!
++ Fix #5238: Added Better Handling for Negative Skill Levels
++ PR #5247: [FG3] Updated Aircraft Force Generation, Unit Culling, and Added ProtoMeks
++ Fix #5236: Stop My Mechwarrior Won't Stop Having Babies
++ Fix #4849: Replaced Cubicles Persist after Saving & Loading
++ Fix #4529: adds null check before accessing skill property
++ PR #5253: Allows to select a previous engineer or new crew member to activate large vessels
++ Fix #4163: This allows the left thruster to be a missing part
++ Fix #4085: MegaMek fails to load Dropship sent from MekHQ
++ Fix #4600: Add Persistent Initiative Bonus to campaign
++ Fix #5169: Added temp Astechs and Medics to Personnel Report; Support Personnel Salaries now match the Finances tab.
++ PR #5250: Renamed 'Lances' to 'Strategic Formations', Expanded Functionality
++ Fix #4600: Added initiativeMaxBonus to Campaign
++ PR #5263: Refactored Strategic Formation Weight Categories
++ Fix #5262: Refactored Scenario Force Building Logic.
++ PR #5266: Refactored Morale Calculations and Logging
++ PR #5268: Refactored Strategic Formations
++ Fix #5149: Better error message for null values in contract fields
++ Fix #5060: BriefingTab Fix
++ Fix #4733: Implemented Advanced StratCon Reinforcements
++ PR #5274: Improved Logging for Force Generation Process.
++ Fix #5114: Campaign now uses pickRandomCamouflage when initialized
++ PR #5280: Centralized Formation Size Logic & Adjusted Contract Required Lance Count
++ PR #5281: Refactored Leadership Unit Selection Logic
++ PR #5283: Adjusted Support Points Negotiation Logic
++ Fix #5285: Fixed SVArmor Price Calculation
++ Fix #5288: Added Recalculation of Scenario Objectives when Assigning Forces
++ Fix #5122 & #5084: Adjusted TO&E Menu Option Availability
++ Fix #5195: Made completion/finished by day calculation unambiguous
++ Fix #5256: Refactored MekHQ Unit's Gunners to be Set to ensure gunners are unique
++ PR #5294: Fixed Typo in 'Fourth Succession War' Naming
++ PR #5296: Simplified Modifier Briefing Text in AtBScenarioModifier
++ PR #5297: Enhanced Formatting in StratCon Scenario Information
++ Fix #5301: Fixed Theatre of War Faction Checks
++ Fix #5302: Improved Unit Substitution
++ Fix #5311: Fixed Marriage Announcements Not Appearing in Daily Activity Log
++ Fix #5318: Corrected Calculation of Age Difference When Marrying Personnel
++ Fix #5333: Show Hired personnel's name change
++ Fix #5323: Removed VIP Capture Scenarios, Added Role Templates, Fixed Objectives
++ Fix #5324: Refactored Cargo Capacity Calculations and Reporting
++ PR #5340: Renamed Strategic Formations to Combat Teams
++ PR #5351: Refactored Required Lances Calculation Logic
++ Fix #5348: Refactored Objective Time Scaling to Handle Edge Cases
++ Fix #5350: Corrected Briefing Room Unit Editing Menu Condition
++ Fix #5345: Reassigned StratCon Force Assignment Picker as Modal
++ PR #5357: Fixed Multiple-Nag Bug by Refactoring in-app New Campaign Handling (Possible fix for #4767)
++ PR #5359: Simplified Splash Screen Button Text
++ PR #5361: Refactored StratCon Tab Layout and Improved UI Design
++ PR #5362: Refactored StratCon Scenario Deployment to Support Scout Role Behavior
++ Fix #5322: Fixed Incorrect Color Usage for Quality Decline Messages
++ PR #5368: Env var mm.profile=dev makes log print on console
++ Fix #5322: Fixed Incorrect Color Usage for Quality Decline Messages
++ Fix #5330: Refactored Combat Team Validation Logic, Loosened Combat Team Requirements
++ PR #5358: Disabled Startup Screen Buttons during Actions
++ PR #5363: Added Requirement for Training Lances to be Deployed to a StratCon Track
++ PR #5364: Renamed 'Unassigned' Combat Team Role to 'In Reserve'
++ PR #5365: Refactored Logic for Retrieving Deployable Combat Forces
++ Fix #5380: Removed Monthly & Mission Accomplished XP Awards from Children & Dependents
++ PR #5382: Establishment of a Requested Stock % feature, and automating weekly checks to keep spare parts in stock
++ Fix #5383: Fixed save bug
++ PR #5389: Abstract Combat Auto Resolve
++ Fix #5304: Fixed Force Commanders Changing on Load
++ Fix #5390: Adjusted Dependent Addition & Removal Logic
++ Fix #5391: Refactored StratconScenarioWizard to use a Scroll Pane
++ Fix #5392: Updated StratCon Deployment Mechanics
++ PR #5393: Fixed Experience Rating Parsing to Handle Invalid Character
++ Fix #5394: Corrected Scenario Briefings by Removing Explicit Turn Limits
++ PR #5397: Prevent Reserved Formations from Being Deployed to StratCon
++ PR #5399: Capped Negotiated StratCon Support Points at Sector Count
++ PR #5400: Removed Contract Breach References in Scenario and Loan Events
++ PR #5401: Set Default Maintenance Multiplier for Salvaged Units
++ PR #5403: Disabled Commit Forces Button when No Forces Selected
++ PR #5158: Implemented Resupply Module
++ PR #5407: Updated Name of I18n Class
++ PR #5411: Updated Damage Application in ACAR
++ PR #5415: Fixed Resolve Unit Test to Only Run when Asked
++ Fix #2800: Fixed Force Deployment Order Bug
++ Fix #4430: Fixed NPE in Caused by Deployment Attempt in Integrated Command
++ Fix #5299: Added Missing Tile Images to Stratcon Biome Manifest
++ Fix #5317: Set Minimum Target Skill Level in Mass Training Dialog to 1
++ Fix #5344: Improved StratCon Force Picker & Renamed LayeredForceIconOperationalStatus to OperationalStatus
++ Fix #5369: Fixed Divorce Logic
++ Fix #5408: Fixed Passenger Capacity Calculation in CamOps Reputation
++ Fix #5409: Refactored StratCon Campaign Management Dialog
++ PR #5416: Fixed Incorrect Ordering in Personnel Status Change Switch
++ PR #5417: Refactored Personnel Handling on New Day
++ PR #5423: Updated TO&E to Use "Support" Term instead of "Non-Combat"
++ PR #5425: Added Notification for Users Attempting to Manually Deploy on Integrated Commands
++ PR #5427: Fixed Unit Check in Combat Team Status Evaluation
++ PR #5428: Added Combat Teams & Support Forces Documentation
++ PR #5429: Archived Outdated Against the Bot Documentation
++ PR #5435: Halved Duration of Recon Scenarios
++ PR #5436: Adjusted Scenario Modifiers BV & Unit Count Contribution
++ PR #5437: Added Further Edge Case Handling for Turn Limit Scenario Objectives
++ PR #5438: fix: quick bandaid for gun emplacements in ACAR
++ PR #5443: Updated Naming of AtBLanceRole Class, Added Auxiliaries Combat Role
++ PR #5444: Removed Remaining Instance of Undeploy Functionality when StratCon is Enabled
++ PR #5446: Updated Convoy Scenarios to Exclude BV and Unit Count Contribution for Convoy Units
++ PR #5447: Refactored Conventional Fighter Handling in StratCon
++ Fix #5449: Fixed Force Removal Bug in TO&E, Fixed Convoy-Support Force Option Bug #5449
++ Fix #5450: Fixed Combat Team Eligibility Check by Rolling Back Use of getAllUnits()
++ Fix #5439: ACAR mode selection
++ PR #5460: Refined Deploy/Undeploy Menu Behavior for GM Permissions
++ Fix #5442: Improved Reinforcement Transparency and User Control
++ Fix #5465: Corrected Date of Resupply Interception Scenarios & Added Clarity to Scenario Names
++ Fix #3639, #4036: Fixed Monthly Facility Support Point Gains & Added Functionality to Allied Industrial Facilities
++ PR #5472: Renamed Supply Depots to Space Ports, Buffed Support Point Gain
++ PR #5473: Renamed Fight, Defense, and Scouting Combat Role Names
++ PR #5475: Fixed Resupply Smuggler Dialog Formatting
++ PR #5476: Added Missing Anti-Mek Skill to Battle Armor Basic Training In-Unit Education Curriculum
++ Fix #5491: Fixed Transportation Capacity and Requirement Calculations
++ Fix #5478: Refactored Loot Description for Clarity
++ PR #5493: Added Name for Resupply Loot
++ PR #5494: Fixed Marshalling and Unmarshalling of stratConScenarioType
++ PR #5495, #5496: Updated Documentation for Personnel Modules, Unit Markets, Force Documentation
++ Fix #5453: Refactored Resupply Logic and Streamlined Cargo Calculations
++ PR #5456: Added Motive System Exclusion in Resupply Eligibility
++ PR #5458: Clarified Speaker Names in Resupply Dialogs
++ PR #5459: Added Notification for Dispatched Convoys During Resupplies
++ Fix #5461: Fixed Legacy AtB Battle Chance Spinner Array Indexing Bug
++ Fix #5464: Adjusted Force Multipliers in Emergency Convoy Defense - VTOL Scenario Template
++ PR #5489: Fixed NPE when Searching for Primary Force in StratCon Scenario Generation
++ PR #5477: Rewrote & Reworked Training Combat Role
++ Fix #5506: Updated Force Refresh Logic in TOEMouseAdapter
++ Fix #5512: Added Compatibility Handlers for Legacy Save File Support
++ Fix #5500: Update contract scenarios to replace VIP Capture objectives
++ PR #5504: Fixed Duplicated autoAwards Trigger in New Day
++ PR #5501: Updated Resupply Mechanics, Added Documentation
++ Fix #5480: AutoLogistics requesting incorrect parts when variants of the same part exist in some cases
++ Fix #5479: AutoLogistics orders reset values
++ PR #5509: ACAR Improvements- Damage delivery more granular, fixed error with morale never checking
++ PR #5528: Updated Space Scenario OpFor Deployment & Arrival
++ PR #5526: Renamed 'requiredScenario' to 'turningPoint' in StratCon
++ PR #5525: Refactored Support Point Negotiation into a Dedicated Class; Fixed Initial Support Point Pool Bug
++ Fix #5515: Added "Refused Engagement" ScenarioStatus
++ Fix #5517: Refactored Personnel Filtering Logic for Field Kitchens...Again
++ Fix #5519: Fixed Recon Scenario Spawn; Fixed Bugs Related to Role Name Changes
++ Fix #5529: Fixed Training Logic to Handle Empty Skill Lists
++ PR #5532: ACAR Documentation
++ PR #5522: Implemented Nag Dialog Visual & Code Improvements
++ PR #5514: Added Travel Description Report to Transit Automation
++ Fix #5221: Adjusted Required Scenario Distribution to More Evenly Award CVP;
+             Reduced Scenario Sizes for House & Integrated Commands
++ PR #5540: Refactored Pilot Starting Age Calculation
++ PR #5541: Further Adjustments to Starting Ages
++ PR #5536: Corrected Auxiliary Deployment Restrictions
++ PR #5537: Corrected Reinforcement Interception Map Type
++ Fix #5534: Fixed Typo in Resupply Roleplay Event
++ Fix #5535: Adjusted Force Role Weighting in DropShip Defense Scenario Templates
++ PR #5545: Temporarily Disabled Non-Launch Ready Options
++ Fix #5498: Corrected Loading & Unloading of Prior Failed Entrance Exams
++ Fix #5543: Refactored ScenarioType Parsing Logic
++ Fix #5542: Remove User Preferences Handling from BatchXPDialog
++ PR #5551: Refactored Initial Education Logic
++ PR #5557: Refactored Ally and Enemy Rating Calculations for Contracts
++ Fix #5556: Refactored Combat Roles for Clarity
++ PR #5560: Fixed Support Point Negotiation Report
++ PR #5561: Added Missing in-House Bootcamps for NCOs, Warrant Officers, and Officers
++ PR #5562: Fixed Entrance Exam Logic and Added Tooltip Display
++ PR #5563: Log jvm parameters
++ PR #5565: Refactored StratCon Reinforcement Dialog & Added GM Reinforcement Option
++ PR #5566: Refactored Nag Dialog Checks to Improve Performance
++ Fix #5667: Reworked Morale Logic
++ PR #5670: Refactored Font Color Handling for Cargo Report
++ Fix #5662: Restore Default Font Color when Leadership Selection Valid
++ Fix #5661: Removed Hardcoded Primary Ally Modifier Chances
++ Fix #5648: Expanded and Fixed Cargo Capacity Logic
++ PR #5674: Expand Special Unit Generation in AtB Unit Market
++ Fix #5668, #5640: Multiple Resupply Bug Fixes
++ PR #5676: Corrected Transportation Unit Type Check
++ Fix #5663: Addresses where the financeTable is empty
++ Fix #5664: Expanded Contract Automation Functionality to Manually Created AtB Contracts
++ Fix #5728: fixed error with resolver test 
+
+0.50.01 (2024-11-10 1800 UTC)
++ PR #4810: Respecting Trademarks (Mech to Mek)
++ Fix #4417, #4764, #4774: Updated Campaign Presets & Addressed Relevant Name Change Issues
++ PR #4655: Refactored Random Company Name Generator to Use CSV
++ PR #4691: Revised CamOps Reputation Derived AtB Modifier, Renamed getUnitRatingMod Method
++ PR #4693: Refactored Personality Characteristic Display in Personnel Table
++ PR #4699: Refactor Initial Education Level Assignment
++ PR #4719: Adjusted Target BV Percentage Logic for BVScaled OpFor Generation
++ PR #4720: Replaced TaharqaSkillGenerator with StratConSkillGenerator in Force Generation Calculations
++ PR #4722: Refactored Difficulty Multiplier Calculation
++ FIX #4535: Improved limits on generating infantry for APCs
++ FIX #4649: Removed Ability to Assign AeroSpace Pilots to Conventional Aircraft
++ FIX #4744: Fixed Formatting Issues in EducationController
++ FIX #4763: Added Army Group Formation Level
++ PR #4777: Include more information about available personnel in Camops Personnel Market Refresh Report
++ FIX #4783: Fixed Hidden Loyalty Calculation in RetirementDefectionTracker
++ FIX #4784: Refactored Personnel Filtering and Added Last Mission Date Check
++ FIX #4787: Updated Prisoner Defection Base TN
++ PR #4792: Sell Parts from Parts in Use Dialog
++ FIX #4765: Fix error in camlann system faction ownership
++ FIX #4789: Remove untreated personnel nag for prisoner-defectors and add unit tests
++ FIX #4790: Fix Mission XP Reward Setting
++ FIX #4803, #4802: Corrected Experience Rating Calculation in Reputation
++ PR #4830: Corrected terminology in Academy XMLs
++ PR #4831: Fix typos in identifiers for MEKWARRIOR and AtBUnitRatingMod
++ PR #4751: Fixed Typo in Mission.properties
++ FIX #4841: Added Post-Name Change Compatibility Handlers to Academy.java, Removed Redundant Setter Methods
++ PR #4843: Added Post-Name Change Compatibility Handlers, Added JavaDocs to Phenotype.java
++ PR #4846: Restored Missing Portrait Folders
++ PR #4847: Added Post-Name Change Compatibility Handlers to SkillType.java
++ FIX #4833: Added Post-Name Change Compatibility Handlers, Added JavaDocs to PersonnelRole.java
++ Fix #4882: Filter out inactive factions when determining capitals for personnel market generation
++ PR #4848: Added Tooltip for Crew Requirements in Hangar Tab Display
++ Fix #4834: Refactored Nag Dialogs, Split UnableToAffordExpensesNagDialog into Two Dialogs, Added Unit Tests
++ PR #4521: Relationship & Childhood Overhaul
++ PR #4888: Added 'Part Quality Report' Dialog
++ PR #4884: Refactored GM Person Editing to Handle Multiple Selections
++ Fix #4748: Refactored Award Drawing Methods
++ Fix #4745: Added Mission Check for 'prisonerofwar' Award Eligibility
++ Fix #4701: Updated StratCon Status Message for Inactive Contracts
++ Fix #4870: Enhanced Random-Death Reporting
++ PR #4865: Implemented Force Generation 3, Including Clan Bidding & Batchall System
++ Fix #4785: Added the Tracking of Hits Obtained Prior to the Completion of a Scenario
++ Fix #4779: Added Adult Apprenticeship and Updated Tuition Fees
++ Fix #4771 & #4781: Fixed ConcurrentModificationException in Personnel Removal Process
++ Fix #4736: Regenerate Personality Descriptions for NPCs
++ Fix #4721: Removed Automatic Conversion of CVP into SP when Reinforcing in StratCon
++ Fix #4782: Removed TN Modifier for IS Techs working on Clan Tech, Removed Clan Tech Knowledge SPA and Effects
++ PR #4463: Decoupled Dependents from AtB, Reworked Dependents, Reworked New Personnel Ages, Added Documentation
++ PR #4644: Initial work on CamOps RAW Contract Market
++ PR #4859: Reworked AtB Morale, Rebranding it as MekHQ Morale
++ PR #4885: Added Ability to Define Skill Levels When Using GM Hire Minimum Complement
++ PR #4886: Fixed Birthday Anniversary Events, Added Employment Anniversary Events
++ PR #4887: Refactored Enemy Name Retrieval and Added Automatic Camouflage Assignment
++ PR #4889: Enhanced Academy Application Failure Report
++ FIX #4890: Change Logger Level from Error to Warn for SPA Loader
++ PR #4894: Multiple Post-Merge Corrections
++ PR #4904: Reduced Idle XP in Campaign Presets
++ Fix #4776: Added Default Maintenance Time Campaign Setting #4905 Fix
++ Fix #4897: Generate contract modifiers when adding contracts individually
++ Fix #4805: Fixed Two Instances of NPE Related to the TO&E #4907 Fix
++ Fix #4807: Added Display for Original Unit to Person View Panel #4908 Fix
++ Fix #4835: Added Clarification to Maintenance Cycle Campaign Setting #4909 fix
++ Fix #4839 && #4488: Loosened Skill Requirements for Vehicle Crewmember Role #4910 fix
++ Fix #4911: Simplified Tech Personnel Checks
++ Fix #4851: Added Several <50.01 Compatibility Handlers to CamOps Reputation Report #4913 Fix
++ Fix #4852: Restored Award Unmarshalling Method Call #4914 Fix
++ Fix #4891: Added <50.01 Compatibility BayType Handlers #4915 Fix
++ Fix #4892: Added <50.01 Compatibility Handler for VeeStabiliser Parts #4916 Fix
++ Fix #4902: Added <50.01 Compatibility Handler for Removed Clan Tech Knowledge SPA
++ Fix #4896: Fixed Random-Camouflage Path Handling for Alternate Directory Format
++ PR #4903: Implement dynamic hiring halls
++ FIX #4845: Refactored DropShip Salvage Handling
++ PR #4924: Refactored Batchall Logic and Enhanced Bidding Report
++ FIX #4952: Fix AtBMonthlyContractMarket payment multiplier
++ PR #4961: Remove hiring halls from clan worlds
++ PR #4928: Reworked Scenarios and Scenario Modifiers, Tied Civilian Units to Campaign Era
++ Fix #4930: Fixed Academy XML to Avoid Odd Formating
++ Fix #4898 && #4917 && #4920: Added Further Portrait <50.01 Compatibility Handlers
++ Fix #4921: Edited Display of Advantage Tooltips in Person View
++ Fix #4938: Added <50.01 Compatibility Handlers to SkillPerquisite.java
++ Fix #4900: Fixed Personnel Filter Role Checks to For Vehicle and Vessel Crews
++ Fix #4829: Add Sorter for Maintenance Column in Hangar Tab
++ Fix #4826: Fixed Multiple Award Set Logic in autoAwards
++ Fix #4662: Added Era Buttons to Date Chooser and Modernized GUI
++ PR #4943: Added Contract Difficulty Estimate, Including GUI Support
++ FIX #4918: Updated OpFor Skill Generator and Added Skilled Level Parser
++ FIX #4929: Prevent Battle Armor allocation in TORNADO_F4 wind scenarios
++ PR #4931: Reworked AtB Bonus Rolls, Fixed Bug in Bulk Hire
++ PR #4981: Implemented Campaign Options IIC Preset Picker #4981
++ PR #4984: Refactored Daily Personnel Processing Logic.
++ PR #4989: Adaptation to MM #6068 Replace Manual GUI scaling with FlatLaf Scaling
++ PR #5002: Correct issues with fixed map generation #5002
++ PR #4992: Add Customization Option to Refit Dialog
++ PR #5030: Replaced autoAwards Award Ceremony Placeholder Image
++ PR #4967: CamOps Contract Market - Contract Generation
++ PR #5017: Display Advanced Medical Injuries in UI
++ PR #5024: Add option to show unit images in TO&E
++ PR #5025: Pin/sticky force view tab on TO&E panel
++ PR #5031: Fixed Refitting Units with Blank Model Name
++ PR #5033, #5049: GUI Scaling fixes
++ PR #5034: New row highlights for Personnel Table: Gone, Absent, Fatigued
++ FIX #5028: Random Camo Allocation Fixes
++ PR #5036: Corrected Scenario Modifiers for HouseOfficer units
++ PR #5052: Convert the Part Quality concept into an enum
++ PR #5053: Colorise Skill Levels
++ PR #5054: Implement CamOps Contract Negotiation
++ PR #5055: Parts In Use - Filter Mothballed and Spare Part Quality
++ PR #5064: Bug fix and improvements for calculateContractDifficulty()
++ Fix #5061: Fixed TurretLock Part not saving
++ Fix #4725: Added duplicate kill checking for multi-crewed units
++ Fix #5058: Fixed `isMilitary` and `isPrepSchool` flags; corrected typo
++ Fix #4973: Fixed `isMilitary` and `isPrepSchool` flags; corrected typo
++ Fix #5065: Showed actual amount of armor on order in repair info
++ PR #5066: Parts improvements - minor refactoring and better information
++ PR #5067: Changed "Clear All Items" to "Remove Selected Items" on CC Tab list
++ Fix #5059: Added "No Eligible Personnel" dialog to turnover & retention checks
++ PR #5069: Implemented hiring hall overrides
++ Fix #5045: Added TotalGenericBattleValue tag to MUL export
++ Fix #5037: Fixed hire minimum complement commands
++ Fix #4725: Added duplicate kill checking for multi-crewed units
++ PR #5073: Refactored contract difficulty display and added tooltips
++ PR #5074: Updated primary allies scenario modifiers
++ Fix #5003: Fixed wrapping of personality description
++ Fix #4999: Updated fatigue column of personnel table to use effective fatigue value
++ Fix #4998: Fixed new day reporting
++ Fix #4991: Re-added compatibility handlers for SPA skill prerequisites
++ Fix #5019: ForceRenderer - Bolded unit commanders
++ Fix #5083: StratCon vs normal deployment status of units
++ PR #5085: Improved Force Gen unit substitution
++ Fix #5079: Refined PartQualityReportDialog layout handling and exclusions
++ Fix #4995: Fixed SPA tooltip HTML wrapping in PersonViewPanel
++ Fix #5020: Fixed SPA tooltip HTML wrapping in PersonViewPanel
++ PR #5088: Added 100+ new quirks, refactored personality traits & quirk classes
++ Fix #4988: Added empty jump path check to UnableToAffordJumpNagDialog
++ Fix #4987: Fixed camouflage directory assignment for null faction codes
++ PR #5091: Added minimum number of tracks (1) to StratCon initialization
++ PR #5092: Fixed objective criteria for intercept engagement
++ Fix #4980: Fixed outsourcing of babies
++ Fix #4972: Corrected parameter order in simulated relationship history reports
++ PR #5097: Simplified reputation display
++ PR #5098, #5113: More FG3 scenario adjustments
++ PR #5099: Added award bonuses to award ceremony dialog
++ Fix #5100: PartsStore - Fixed equipment parts and OmniPods (fixes hatchets and maces at least)
++ Fix #4955: Prevented dropout and some graduation events occurring for very young children
++ Fix #5102: Fixed portrait folder names
++ Fix #5023: Fixed Divide by Zero Error in Loans Dialog
++ Fix #4975: Prevent Early Clan Units in Non-Clan Campaigns
++ PR #5103: Globally fix slow mouse wheeling issues, with scaling
++ PR #5104: Fixed Preset Picker Date Issues
++ Fix #4980: Fixed Outsourcing of Babies
++ PR #5105: ResolveScenarioWizardDialog - Some UX Improvements
++ PR #5106: ResolveScenarioWizardDialog - Ransom All Button
++ PR #5107: Updated Interstellar Map View Defaults & Optimized 'ISW' view
++ Fix #5109: Corrected DropShip Scenario Modifier Generation Method
++ PR #5111: Better multi-day repair and refit reports.
++ PR #5112: TechTabelModel - Show Daily Available Time for Techs
++ Fix #5118 && #5117: FG3 Scenario Improvements
++ PR #5121: Label OmniUnits as Omni in the MekHQ UI
++ Fix #5119 && #5108 && #4297 Fixed Position of NewDayEvent Trigger in processNewDay
++ PR #5126: Rebalanced Random Unit Quality
++ Fix #5131: Fixed Faction Conflict Checks for Reeducation Camps
++ PR #5137: Stopped Scenarios Pulling Units from the Hangar
++ Fix #5139: Refactored Field Kitchen Personnel Count Logic
++ PR #5141: Handled StratCon Scenario Placement Failure when All Coordinates Occupied
++ PR #5142: Added New StratCon Scenario Generation Utility Method
++ PR #5143: Fix Track Calculation in StratconContractInitializer
++ PR #5144: [FG3] Adjusted Generation Method in Some Scenarios
++ PR #5145: [FG3] Refactored Difficulty Multiplier Application
++ PR #5146: Adjusted Scenario Loot Box Behavior
++ PR #5147: Refactored JScrollPaneWithSpeed Constructor
++ PR #5148: ResolveScenarioWizardDialog - Rebuild as a tabbed dialog, improve UI
++ PR #5151: Fixed Line Breaks in StratCon Facility Descriptions
++ PR #5152: Update odds add lightning storm and adjust others
++ PR #5154: Renamed Tracks and AtB Campaign State in StratCon
++ PR #5156: Refactor Supply Depot SP Modifiers to be Monthly
++ PR #5157: Fixed StratCon Reinforcement Deployment Check
++ PR #5159: CampaignGUI Tab reordering
++ PR #5161: Changed wording in "Potential Capture Style"
++ PR #5163: Added Force BV Multiplier Logging & Adjusted Calculation in AtBDynamicScenarioFactory
++ FIX #5160, #5162: Updated Infantry Generation Method and Trainee Settings
++ PR #5168: StratCon will No Longer Display GBV when Using FG3
++ PR #5172: Added Contract Automation
++ PR #5174: Updated Faction Loading Log Format
++ PR #5175: Temporarily Disabled Preset Confirm in New Campaign Dialog
++ PR #5176: Temporarily Removed CAM_OPS from Contract Market Method ComboBox
++ PR #5179: Fix Perm. Injury showing as Injury on Personnel tabel
++ PR #5180: Show refitting techs and fix refit countdown
+
+
+0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
++ PR #4332: CI Updates for windows build and normalizing
++ PR #4344: Update Payout Calculation for KIA Personnel
++ PR #4345: Updated fatigue display logic in PersonViewPanel
++ PR #4346: Refactored management skill calculation in RetirementDefectionTracker
++ PR #4348: Sentry Additions
++ PR #4355: Spelling, typos, grammar, etc
++ PR #4356: Move munition config out of MHQ, use MM autoconfig code
++ FIX #4326, #4325: Corrected Admin Negotiation Experience Level Campaign Setting & Experience Level Calculations
++ PR #4378: Update autoconfig calls to explicitly set ground/space state from scenario data, not game or map info
++ RFE #4316: Updated Scenario Modifier Tooltips in CampaignOptionsDialog Properties
++ RFE #4317: Added Education Level to Biographical Filter of Personnel Table
++ RFE #4319: Added Education Level to Company Generator
++ FIX #4329: Added Option to Include Non-Combatants in Field Kitchen Capacity Calculations
++ FIX #4357: Reworked Monthly XP in Education Module
++ RFE #4359: Added Ability to Manually Drop Personnel out of Active Education
++ RFE #4361: Updated & Corrected Prestigious Academy Information and Added Three New Types of Local Academy
++ FIX #4384: Refactored Faction Restriction Checks in Academy Class
++ PR #4385: Updated Logic for Identifying Pregnant Combatants
++ PR #4390: Added Quarterly Turnover Frequency Option
++ PR #4391: Added Campaign Option to Automate Retention Bonus Payments Based on a Threshold
++ PR #4391: Added Campaign Option to Automate Retention Bonus Payments Based on a Threshold
++ PR #4396: Changed some wording around to help avoid confusion about StratCon
++ FIX #4352: Null pointer exception advancing the day when custom academies are missing
++ PR #4375: Updated Documentation for Education Module
++ PR #4377: Expanded Manual Assignment of Personnel Statuses to Include PoW, On Leave, and AWOL Statuses
++ PR #4382: Added In-Unit Education to Education Module
++ PR #4388: Replaced CargoCapacityNagDialog functionality
++ PR #4392: Removed Personnel With Impossible-to-Fail TN from Turnover Table
++ PR #4393: Added the Automatic Release of the Commander Flag upon Commander Departure or Death, and Loyalty Reset upon Sudden Leadership Change
++ PR #4394: Updated Prisoner Defection Calculation to Optionally Include Loyalty
++ PR #4395: Added Execution and Jettison Options for Prisoners
++ PR #4398: Added the Ability to Ransom Friendly PoWs
++ PR #4400: Implemented the Capture of Missing Friendly Personnel During Scenario Resolution
++ PR #4402: Added a Dialog for Zero Award-Eligible Personnel
++ PR #4404: Added Automatic Running of autoAwards on 1st of Month & After Company Generator Runs
++ PR #4405: Corrected Missing Fatigue Option Check During Scenario Resolution & for StratCon Actions
++ PR #4407: Added Scenario Awards to Post-Scenario autoAward Checks
++ PR #4409: Refactored Kill Count and Personnel Filtering Methods
++ PR #4418: Added SuperStucco's Basic Force Generator Role Functionality to Scenario Random Unit Generation
++ PR #4411: Education tool tip no longer references "weeks" to avoid confusion
++ PR #4414: Detailed medical system properly marked as unofficial
++ PR #4419: Multiple typo fixes in news and "canned" campaigns
++ PR #4413: Decoupled Prisoner Capture & Defection from AtB, Updated Mechanics, & Added Supporting Documentation
++ PR #4415: Refactored Award Tier Count Calculation in PersonViewPanel
++ PR #4416: Refactored Skill Improvement Logic in EducationController
++ PR #4422: Expanded autoAwards Coverage to Include 'Prisoner of War'
++ PR #4423: Fixed additional typos and spelling errors
++ FIX #4425: Right-clicking on any person in Personnel tab causes NPE error
++ PR #4426: Updated static faction references with appropriate isX() call
++ FIX #4429: Added Null protection when generating forces from fixed scenarios like Base Defense
++ FIX #4434: Added processNewYearChecks Skip for Homeschool Academies
++ FIX #4335: paid recruitment doesnt turn off
++ FIX #4456: Added Nag for Inability to Afford Next Jump
++ FIX #4437: Null pointer exception while removing an asset
++ PR #4439: Added Missing Status Log Messages & Stored Turnover Information Across New Day Events
++ PR #4440: Updated Divorce and Death Handling
++ PR #4441: Implemented Incremental Loyalty Changes
++ PR #4446: Added Random Personality Functionality
++ FIX #4447: All non-KIA enemy personnel default marked as captured
++ FIX #4448: Custom award set not displaying medals
++ PR #4452: Improved Education Module Messaging
++ PR #4455: Added Re-Enrollment Functionality to Education System
++ PR #4457: Removed Paid Retirement Color Options
++ PR #4459: Added 'Unable to Afford Expenses' Nag Dialog
++ PR #4462: Automated Unit Site Location Change when Entering Transit and Arrival States
++ PR #4464: Minor Education Module Data Fixes
++ PR #4465: Updated Salvage Terminology
++ PR #4469: Added Prisoner Ransom & Free Prompts to Mission Completion
++ PR #4466: Added Option to Grant Random Toughness when Using Toughness
++ PR #4468: Implemented Monthly Personnel Data Cleanup
++ PR #4472: Expanded Random Personalities to Include Intelligence, Incorporated Character Intelligence into Education Module
++ FIX #4474: Infantry personalty description is too wide
++ PR #4476: Removed Loyalty Change Event for Executing Prisoners
++ PR #4477: Marked 'FM: Mercenaries (rev)' Unit Rating Method as Deprecated
++ FIX #4481: Significant amount of company mysteriously vanished
++ FIX #4386: Personnel Report Counting Injured Prisoners as Support Personnel
++ PR #4490: Fixed Missing Site Location Change Code & Turnover Information Storage
++ PR #4491: Corrected Qualification Start Years
++ PR #4492: Added Promotion-Based autoAwards Processing
++ PR #4494: Improved Award Tooltips with XP & Edge Benefits
++ PR #4501: Added Hospital Beds to Facility Report, Added Maximum Patients Per Doctor Campaign Option
++ FIX #4270: Top Level of TO&E Displaying Incorrect Commanding Officer
++ PR #4507: Removed Vestigial 'Uneventful' Graduation Event
++ PR #4508: Added autoAwards Support for the Final Three Awards from the Standard Set
++ PR #4509: Removed Turnover Target Number Method Configuration
++ PR #4510: Updated Turnover & Retention Module.pdf
++ PR #4489: Refactored Personality Characteristic Generation Logic
++ PR #4493: Added Ability to Tell autoAwards to Ignore Individual Custom Award Sets
++ PR #4497: Updated Prisoner Resolution Messages
++ PR #4498: Added AToW Mission Completion XP Awards, Added Global XP Cost Multiplier Option
++ PR #4523: Prevented Automated Removal of Genealogically Relevant Characters
++ PR #4524: Update Loyalty Change Reporting with Color-Coded Messages
++ PR #4526: Education Module Data Fixes
++ PR #4527: Improved Color Formatting for Education Events
++ PR #4528: Refactored Fatigue Messages to Support Colored Span Tags
++ PR #4534: Added the Automation and Tracking of Formation Levels within The TO&E Pane
++ PR #4536: Added Force and Unit Type to Kill Tracking
++ PR #4538: Fixed Support Score Calculation
++ PR #4500: Corrected Masters and Doctorate Graduation Checks
++ FIX #4532, #4546: Fixed NPE in Mass Enroll Filters
++ PR #4553: Added "Buy in Bulk" Button to Parts Acquisition in Repair Bay
++ PR #4566: Updated era modifiers to reflect CamOps
++ FIX #4566: AutoAward misinterprets TOE for formation kills
++ FIX #1795, #2552, #4473: Adjusted Sale Value for Infantry and Battle Armor Units
++ PR #4499: Replaced Legacy Presets, Took StratCon Out of Alpha & Into Beta
++ FIX #4522: Education: Children born to parents at school should stay with the parent until they return
++ FIX #4544: Corrected Errors in Post-Grad & Doctorate Graduation Handler
++ FIX #4550: "Use StratCon Rules" appears twice on that Campaign Options tab
++ FIX #4557: Education - Re-enroll options shows 'nothing more to learn' on drop-outs from military academies
++ PR #4558: Added DropShip Bounty Settings
++ PR #4560: Updated Assertiveness and Removed Toughness Biography Entries
++ PR #4563: Added Education Module Handler for Injured Personnel
++ PR #4569: Added Unit Market Rarity Setting to Campaign Options, Updated Unit Markets.pdf
++ PR #4570: Separated Handling of Prisoners & Prisoner-Defectors in Resolve Mission Dialogs
++ PR #4571: Renamed Game Options to MegaMek Options to Improve Clarity
++ PR #4573: Fixed Formation Level Calculations
++ PR #4574: Updated Repair Site Names to Match CamOps
++ PR #4576: Fixed Prisoner of War Award Categorization
++ PR #4577: Fixed Index Out-of-Bounds Error During eraMods Parsing
++ PR #4578: Updated Awards Module.pdf
++ PR #4580: Refactored Infantry Sell Value Calculation to Include Unit Quality Multipliers
++ PR #4582: Corrected New Presets, Added Missing Updated SPA Costs
++ PR #4583: Fixed Injury Fatigue Checkbox
++ FIX #4537: Updated Repair Tab Experience Level Requirement Text & Adjusted Font Sizes
++ FIX #4579: Infinite Loop when Bulk-Hiring at Impossible Skill Level
++ PR #4587: Fixed Missing String Format Key in Fatigue Messages
++ PR #4591: Added CamOps Planetary Condition Modifiers to Maintenance Checks
++ PR #4595: Fixed Null Check for Education Tag Alongs
++ PR #4596: Added Personality Characteristics and Loyalty to Personnel Tab
++ PR #4597: Updated Person View and Personnel Tab to Better Support Differing Screen Sizes
++ PR #4609: Integrated Academy Information into Interstellar Map Tab
++ FIX #3920: Fixed Shares Payouts for Early Contract End, Refactored Shares Percentage Fetching to Further Detach System from AtB
++ FIX #4615: Added Missing Maintenance Planetary Modifier Text
++ FIX #4605: Overhauled CamOps Unit Reputation Calculations and Report
++ FIX #4618: Added Sale Buttons to Parts in Use Dialog
++ FIX #4637: Fixed Text Placeholders in CamOpsReputation.properties
++ FIX #4636: Renamed StratOps Personnel Market to Campaign Ops to Reflect Rulebook Reorganization
++ FIX #4611: Minor Preset Updates
++ PR #4614: Updated BA Qualification Start Years
++ PR #4616: Added Intelligence-based XP Cost Multiplier
++ PR #4617: Added Support for Handling Medical Discharge
++ FIX #4619: Restored adminXPPeriod Option Parsing
++ PR #4620: Fix hyperlink issue in payment text
++ PR #4621: Improved Edge Trigger Unmarshalling
++ FIX #4624: Refactored Years of Service Calculation for autoAwards Time Awards
++ FIX #4625: Removed Loyalty Change Notifications for Campaigns with Loyalty Disabled
++ PR #4631: Added Entrance Exams for Prestigious Academies, Updated Education Module Documentation
++ PR #4633: Refactored Force Commander Logic & TOE Information Display
++ PR #4634: Refactored Unit getCommander() Method
++ PR #4638: Adjusted Objectives Pane to Use Client Theme Colors and Added Normal Play Usage
++ PR #4639: Fixed Grammar in Personality Characteristic Descriptions
++ PR #4641: Implement negotiation for salvage terms
++ FIX #4645: Fixed Weekly Reputation Recalculations
++ FIX #4643: Fixed Copy-Paste Error in End Mission Prisoner Nag
++ PR #4648: Refactored AutoAwardsController and Fixed Scenario Awards Support
++ PR #4650: Removed unused import of LogManager and corrected the import path for Intelligence
++ PR #4640: Implemented Random Mercenary Company Name Generator
++ FIX #4654: Added Checks for Scenarios with Null Start Dates within Objectives Panel
++ FIX #4651: Fixed Support Rating Administration Requirements Calculations
++ FIX #4656: Fixed Intelligence XP Cost Calculations and Minor Logic Issues
++ FIX #4660: Added missing angle bracket in Independent Command Rights tooltip text
++ FIX #4663: Reverted change to find parts by name when selling from parts in use
++ FIX #4664: Added clearance of enemy name, when changing enemy code
++ FIX #4666: Added Check for Null Crew When Determining Force Leader
++ PR #4673: Added Conditional Check Before Showing 0 Personnel Eligible autoAwards Dialog
++ PR #4674: Fixed NPE in CamOps Mission Date Calculation
++ PR #4677: Update CamOps Personnel Market to Properly Not Generate Personnel on a roll of 7
++ PR #4678: Fixed Incorrect Variable in Education Failed Application Report
++ PR #4679: Refactored DropShip Bonus Calculation Logic
++ Fix #4608: Relocate some methods and remove bad Part casting
++ PR #4684: Refactored Personality Generation and Education Level Assignment
++ PR #4685: Fixed NPE in AutoAwardsController
++ PR #4688: Temporarily hide sell buttons from parts in use dialog (work in progress not ready for release)
++ PR #4610: Added Faction Event Changes from Shattered Fortress
++ PR #4686: Adjusted CamOps Personnel Market to Refresh Daily
++ PR #4692: Updated Map Colors to Match Official Colors Where Known
++ PR #4696: Add current edge total to the tech information
++ PR #4705: Remove unnecessary faction era modifier warning
++ PR #4716: Updated Campaign Presets
++ PR #4718: Added StratCon Introduction Promo on Campaign Start
++ FIX #3769: Fixed Skill Level Retrieval Method in AtBDynamicScenario
++ FIX #4709: Fixed Maintenance Interval Calculations
++ PR #4715: Updated Default Repair Sites
++ FIX #4622: Set Minimum Size for CustomizePersonDialog UI elemen
++ FIX #4713: Fixed Recursive Node Reader in Force.java
++ FIX #4728: Safety getBay, add unit test, turn down logging in one location
++ FIX #4729: Simplified NullPointerException Message in DataLoadingDialog
++ FIX #4738: Fixed NPE in getEligibleCommanders
++ FIX #4742: Fixed Unmarshalling of daysSinceMaintenance
++ PR #4758: MHQ side of fix for MHQ 4755: NPE when opfor has no faction code
++ FIX #4697: Refactor salary editing logic and prevent NPE
++ PR #4690: Corrected Experience Generation Logic and Refined Campaign Options GUI
++ PR #5052: Convert the Part Quality concept into an enum
++ PR #5053: Colorise Skill Levels
++ PR #5054: Implement CamOps Contract Negotiation
+
+0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update
 + PR #2997: Story Arcs Basic Architecture
 + FIX #4017: Space and Low Atmosphere not saved to xml, when started game after load the correct board type was to megamek
@@ -15,7 +809,149 @@ MEKHQ VERSION HISTORY:
 + PR #4026: Refactor ChoiceStoryPoint and NarrativeStoryPoint with underlying abstract DialogStoryPoint class
 + PR #3980: Improved CamOps Unit Rating Handling Within Clamp
 + Fix #3931: Add new Scenario features to CustomizeScenarioDialog
++ PR #4041: Updated isChild()
++ Fix #4080: Updated Tooltips for the Marriageable & Trying to Conceive Flags
++ Fix #4083: Added Customizable Log Display Settings to Campaign Options
++ Fix #4088: MM code adaptation for boards validation
++ PR #4087: Reintegrate Pay Multiplier into Salary Calculation
++ PR #4095: Restored ranks.xml
++ PR #4094: MegaMek code adaptation
++ PR #4008: Added the Automatic Tracking of Award Eligibility and Additional Award Enhancements
+            Very Important to read the documentation on this feature (See Docs folder)
++ PR #4106: Use tabs in customize scenario dialog
++ PR #4105: Updated Post-Scenario Logging for Prisoners
++ PR #4104: Fixed Post-Scenario Tracking System's Handling of Multiple Personnel in autoAwards
++ PR #4102: Fixed Award Tier Count Calculations in PersonViewPanel
++ PR #4093: Added Negotiation and Scrounge Skill Settings for Administrator Personnel
++ PR #4054: Added Life Paths Campaign Options Tab, Added Education Module
+            Very Important to read the documentation on this feature (See Docs folder)
++ PR #4114: Additional Education Module Bug Fixes
++ PR #4115: Fixed Award Image Display in Person View
++ PR #4116: Added ability to Pass CamOps Fatigue to MegaMek
++ PR #4117: Even More Education Module Bug Fixes
++ PR #4118: Added autoAwards Support for the Education Module
++ PR #4119: Added Reeducation Camps to Education Module, Replaced Placeholder Academy Descriptions
++ PR #4129: Correcting a bunch of spelling errors and typos
++ PR #4101: Replaced Retirement System with Turnover and Retention Module
+            Very Important to read the documentation on this feature (See Docs folder)
++ PR #4124: Fixed Award Eligibility Tracker Issuing Double Scenario Kill Awards... again
++ PR #4125: Fixed Friendly Personnel Missing Post-Scenario Scenario Credit
++ PR #4127: Fixed Clan Creche Graduation in Education Module
++ PR #4136: Updated Scenario Modifiers to More Consistently Contribute to Map Size
++ PR #4137: Tied StratCon Force Generation BV Allowance to AtB Difficulty Option
++ PR #4140: Added Dedicated Awards Panel to Personnel Tab of Campaign Options
++ PR #4141: Fixed Used Parts Value Multipliers Incorrectly Resetting to 0
++ PR #4142: Added No Commander Nag Dialog
++ PR #4143: Adjusted Founder Turnover Modifier & Updated Documentation for Turnover and Retention Module
++ PR #4144: Changed "Operational Victory Points" to "Scenario Victory Points"
++ PR #4145: Reversed Order of Personnel Logs, Renamed 'Personnel Log' to 'Personal Log'
++ PR #4146: Added Ability to Change Original Unit Assignment via Personnel Table
++ PR #4147: Set Default Edge Usage States to True
++ PR #4150: Added Unit Quality Parameter to addNewUnit Method and Related Tests
++ PR #4151: Updated Vehicle Gunner's Experience Level Calculation to Optionally Include Artillery Skill
++ PR #4153: Added Font Color Options to MHQ Options for Negative, Positive, and Warning Events
++ PR #4126: Added Ability to Manually Edit Education Level to Edit Person View & Fixed Minor Bugs
++ PR #4133: Implemented Basic Tax System, Profits Calculations, and Minor Financial Term Changes
++ PR #4134: Updated Menu Labels and Tooltips for Better Clarity and Grammar
++ PR #4135: Added Birthday Announcement Options
++ PR #4138: Added Scenario Modifier Options to Campaign Options
++ PR #4139: Added Second Chance Caste to the Education Module for Warrior Caste Washouts
++ PR #4149: Added Automatic Bonus Parts Exchange at Contract End, Added Bonus Parts Display to Mission Stats Panel
++ PR #4152: Updated Parts Acquisition Dialog in Repair Tab
++ PR #4156: Replaced Uses of Font Color 'Red' with New MekHQ Font Color Option Call
++ PR #4157: Replaced Uses of Font Color 'Green' and 'Orange' with New MekHQ Font Color Option Calls
++ PR #4162: Updated Tooltip Text for Contract Command Rights to Include Clearer Game Mechanics
++ PR #4165: Added GM Hire & Fixed Skill Level Options to Bulk Hire Dialog
++ PR #4166: Added Campaign Option to Disable Salary Increases from Secondary Roles
++ PR #4167: Fixed Missing Personal Log Messages for Resign, Desert, and Defect
++ PR #4168: Updated Turnover Frequency Logic in Turnover and Retention Module
++ PR #4169: Streamlined Management Modifier Calculations in Turnover and Retention Module
++ PR #4175: Removed Flavor Text from Breach of Contract Departure in Turnover and Retention Module
++ PR #4176: Turnover Target Number Revision & Updated Documentation
++ PR #4177: Fix NPE Resulting from Null Recruitment Date
++ PR #4158: Added Campaign Option to Randomize New Unit Quality
++ PR #4172: Implemented More Education Module Bug Fixes
++ PR #4174: Fixed Payout of 0 c-bills Causing Soft Lock in Turnover and Retention Module
++ PR #4178: Updated Family Modifier Logic, a Warring Faction Modifier, in Turnover and Retention Module
++ PR #4183: Fixed Multi-Person Original Unit Assignments in Personnel Market & Interactions with Turnover and Retention Module
++ PR #4173: Added Multiple Turnover and Retention Module Improvements
++ Fix #4182: Added Nag to Alert Users at Contract End fix
++ PR #4187: Restored Missing Code for Scenario Modifier Options & Campaign Option Layout Tweaks
++ PR #4188: Added Campaign Start Date Logging to Campaign
++ Fix #4203: Fixed Monthly Unit Market Incorrectly Filtering Out Vehicles
++ PR #4205: Fixed bug in Company Generator, add word Dragoon in front of Dragoon rating.
++ PR #4202: Added Parsing for "campaignStartDate" on Campaign Load
++ PR #4201: Fixed Intersected Conditions in CustomizePersonDialog.java
++ PR #4199: Updated PersonnelTableMouseAdapter to Support Enrolling Multiple Personnel
++ PR #4197: Updated Default Support Personnel Counts in Company Generator
++ Fix #2085: Added Variable Unit Quality to Unit Markets and Updated Unit Market Logic
++ Fix #2405: Added Variable Unit Quality to Salvaged Units
++ PR #4208: Added Numerous Improvements to the Turnover and Retention Module
++ Fix #4210: Rolled Back 'overrideBv' XML Tag, Fixing Non-Random Scenario Modifier Forces Incorrectly Generating Random Mechs
++ PR #4215: Fixed Handling of autoAwards Post-Scenario Kill Tracking
++ PR #4216: Converted Shares Payouts to Use Profits Not Net-Worth
++ PR #4217: Temporarily Removed Clan Support from Education Module, Refactored Remaining Code
++ PR #4218: Added Campaign Option to Control CamOps Unit Rating Within Clamp
++ Fix #4057: Could not find a mech summary
++ PR #4237: Added Prestigious Academies (A-A)
++ Fix #4235: Fixed Invalid Parsing of Early Childhood when Loading Personnel
++ PR #4242: Added Prestigious Academies D-F
++ PR #4246: Added Prestigious Academies G-J
++ PR #4248: Fixed Missing Qualification from James McKenna University
++ PR #4224: Corrected Condition for Enabling Prestigious Academies
++ PR #4225: Adjusted Condition for Setting campaignStartDate
++ PR #4226: Updated StratCon Font Colors to use New Font Color MekHQ Options
++ PR #4227: Updated Unit Market Descriptions & Refactored Unit Market Prices
++ PR #4229: Updated Child Education Level Handling & Academy Name Generation
++ PR #4230: Updated Fatigue Display Calculations in PersonViewPanel
++ PR #4231: Added Nag for Invalid Faction & Updated Missing Federation Commonwealth Start/End Date
++ PR #4232: Updated Loyalty Handling for Reeducation Camps
++ PR #4233: Fixed and Enhanced FactionHunterAwards Processing
++ PR #4234: Fixed Total Bonus Incorrectly Applying Repeated Division in Turnover Dialog
++ PR #4251: Adjusted Step Size for Fixed Map Chance AtB Option
++ PR #4252: Added 'getCurrentPrisoners' Method, Fixed Cargo Capacity Nag Dialog
++ PR #4253: Added Option to Restrict AtB Personnel Market to Hiring Halls Only
++ PR #4254: Updated Contract End Dialog Message
++ PR #4255: Relabeled Ally & Enemy Rating in AtB Contract Market to Improve Clarity
++ PR #4256: Fixed 'Advanced Infantry Graduate' Qualifications in Prestigious Academies Missing Start Date
++ PR #4257: Adjusted Curriculum XP to Use a Fixed Value Instead of Dynamic
++ Fix #3974: Add facility description capability to StratCon
++ PR #4261: Fixed Campus Name in Education Module
++ PR #4262: Separated Officer and Enlisted Curriculums, Corrected Local Academy Data
++ PR #4263: Inverted Management Skill Modifier in RetirementDefectionTracker
++ PR #4264: Updated Education Tooltip Properties to Better Handle Mass Enroll
++ PR #4267: Replaced Non-Universal ASCII Arrow with Braces in Turnover Dialog
++ PR #4271: Corrected Scenario BV Allowance Calculations for Scenario Modifiers
++ PR #4272: Updated Turnover & Retention Documentation
++ PR #4273: Corrected Dialog Option for Invalid Faction Nag
++ PR #4275: Fixed Original Unit Value Being Deducted from Payout Sum When Personnel Resign/Retire
++ FIX #4277: enable new network creation for units not in a network
++ FIX #4279: Added Check for 'dead' Status in Various Personnel Filters
++ PR #4282: Fixed Graduation Event Failing to Correctly Trigger autoAwards
++ PR #4285: Fixed Commanders Incorrectly Displaying 0 Loyalty
++ PR #4286: Numerous Corrections to the Prestigious Academies
++ PR #4287: Added More Education Module Fixes
++ PR #4274: Added 'Override Requirements' Campaign Option for Education Module
++ PR #4291: Added Clan Adoption (Abtakha)
++ PR #4292: Switched Loyalty Rating from Static to Dynamic
++ PR #4294: Added Prestigious Academies K-M
++ PR #4295: Added Prestigious Academies N-P
++ PR #4301: Add handling for new save-time exception added by fixes to MML 1537
++ PR #4281: Added Population Check to Education Module
++ PR #4299: Extended 'Hiring Halls Only' Personnel Market Option to Capital Planets
++ PR #4300: Revised Tuition and Faction discount Calculations
++ PR #4302: Added Prestigious Academies R-T
++ PR #4304: Added Prestigious Academies U-W
++ PR #4306: Fixed & Optimized Total Profits Calculation & Removed Tax Exemptions
++ PR #4307: Fixed Faction Discount to Tuition, Fixed autoAwards Triggering when Personnel Fail to Graduate
++ PR #4308: Fixed Administrative Capacity Displaying while Turnover is Disabled
++ PR #4309: Updated Education Module Documentation, Restored Reeducation Camp Dropout Functionality
++ PR #4164: More detailed auto-selection of bombs
++ PR #4312: Young wolves art update
++ PR #4313: Updated Campaign Options Settings to Disable New Components by Default
 
+0.49.19.1 (2024-05-14 1800 UTC)
++ Milestone Release. Backported fixes.
 
 0.49.19 (2024-04-19 2030 UTC)
 + Bug #3958: No selling units in scenario resolution if campaign disallows selling
@@ -276,7 +1212,7 @@ MEKHQ VERSION HISTORY:
 + Issue #3097: Adding Medical Dialog Handwriting Font Selection Option
 + PR #3137: Fixing the final two LGTM issues
 + PR #3113: AbstractIcon: MekHQ's Preferences Now Write to MekHQ's File
-+ PR #3123: Company Generator: Adding MechWarrior Callsign Generation Option
++ PR #3123: Company Generator: Adding MekWarrior Callsign Generation Option
 + Issue #3132: Adding Entity Generation Null Protection for Officer Duel Scenario
 + PR #3105: Base Components: CompleteMissionDialog Rewrite
 + Issue #2877: Part XML File I/O using MHQXMLUtility
@@ -429,7 +1365,7 @@ MEKHQ VERSION HISTORY:
 + Issue #2825: Individual Camouflage Bulk Assignment from Same Original Camouflage
 + Issue #2521: Star League Caches No Longer Generate in Pre-Spaceflight, Early Spaceflight, and Age of War Eras
 + Issue #2838: Turrets now generate with the proper faction and thus names
-+ Issue #2841: Properly hide the MechWarriors grouping when using individual role filters
++ Issue #2841: Properly hide the MekWarriors grouping when using individual role filters
 + Issue #2747: Fixing StratCon Scenario Template Path Capitalization
 + PR #2847: Preventing Null Force Template Addition
 + PR #2849, 2846: Addressed multiple errors resulting in failure to generate aerospace scenarios
@@ -566,7 +1502,7 @@ MEKHQ VERSION HISTORY:
 
 0.49.1 (2021-05-23 1630 UTC)
 + Data: Fixing Aerospace Tech Portrait Folder Names
-+ PR #2571: Fixing MechWarrior Salary
++ PR #2571: Fixing MekWarrior Salary
 + Issue #2569: Adding userdata to the build script
 + Issue #2574: Fixing Experience Tab Custom Skill Costs Formatting Type
 + PR #2584: MekHQ Options: New Day: Auto-hiring Pool Options
@@ -677,7 +1613,7 @@ MEKHQ VERSION HISTORY:
 + Issue #2317: Ensure Person::idleMonths defaults to 0
 + PR #2324: Restrict removing, salvaging, or scrapping certain locations with avionics and landing gear on LAMs
 + Issues #2325 #2328: Do not throw NPE on missing equipment when unscrambling equipment numbers
-+ PR #2330: Fix capitalization of MechWarrior portrait folder
++ PR #2330: Fix capitalization of MekWarrior portrait folder
 + Issue #2332: Delete refit file if unable to read it back when saving
 + PR #2294: Add contract market tests and add setters for static singletons (e.g. Systems and RandomFactionGenerator)
 + Issues #1727 and #2318: Colour Camouflage and Camouflage Selector Standardization
@@ -1226,7 +2162,7 @@ v0.45.2 (2018-11-18 0200 UTC)
 + PR #971: Feature allowing grouping personnel by their unit on the Personnel tab
 + Issue #865: Changing Award Date Does Not Update Award Tooltip
 + Issue #973: No contracts are offered at the start of an AtB campaign.
-+ Issue #949: MechWarrior KO'ed at beginning of battle
++ Issue #949: MekWarrior KO'ed at beginning of battle
 + Issue #981: Fixed bug where refits overcharged for armor or would perform excess moves
 
 v0.45.1 (2018-09-03 2300 UTC)
@@ -1435,7 +2371,7 @@ v0.43.6 (2017-12-22 10:00 UTC)
 
 v0.43.5 (2017-12-17 11:00 UTC)
 + Issue #490: NPE with campaign.universe.RandomFactionGenerator.addBorderEnemy
-+ Issue #494: Regenerate LAM Pilot selects from the MechWarrior pool.
++ Issue #494: Regenerate LAM Pilot selects from the MekWarrior pool.
 + Issue #488: Select bombs throws "index out of bounds" errors in particular campaign file
 + Feature #280: Role folders now supported for random portrait assignment
 + PR #440: Track & report time in service
@@ -1792,7 +2728,7 @@ v0.3.20 (2015-10-12 00:11 UTC)
 + Bug [#845]: [ATB] Employer offers follow up contract, but follow up contract has incorrect employer
 + Bug [#860]: [ATB] Special missions still generating gravity even if "use planetary conditions" is turned off
 + Bug [#861]: [ATB] 100 ton ASF being classified as "Medium" in the unit market
-+ Bug [#858]: Personnel market : MechWarrior's unit is a tank
++ Bug [#858]: Personnel market : MekWarrior's unit is a tank
 + Bug [#864]: [ATB] Uses Highest Strategy not "Deployed" Strategy
 + Bug [#870]: JumpShips getting assigned to battles in AtB
 + Updated MegaMek.jar to 0.41.10
@@ -1818,7 +2754,7 @@ v0.3.19 (2014-09-14 01:25 UTC)
 + Bug [#571]: Experience Error With Late Deployment
 + sort personnel and prisoners in ResolveScenarioWizard by unit name
 + Bug: when no mul file is loaded, pilot resolution is skipped
-+ Bug [#928]: Picked up MechWarriors are not shown in Post Battle Resolution
++ Bug [#928]: Picked up MekWarriors are not shown in Post Battle Resolution
 + Bug [#657]: Units incorrectly listed as escaped at end of the battle
 + Bug [#945]: Personnel tab, Fluff Information view - cannot sort by kills
 + Bug [#930]: Name of Tab different between MHQ and MML
@@ -1967,7 +2903,7 @@ v0.3.14 (2015-05-31 18:15 UTC)
 + Patch [patches:#49]: Refit: Tech Time Management
 + Patch [patches:#45]: Marriage bugfix - Can marry the dead
 + Patch [patches:#43]: Higher-precision quality averaging
-+ Bug [#140]: MechWarrior Quality Bug
++ Bug [#140]: MekWarrior Quality Bug
 + Patch [patches:#42]: Show required lances for AtB contracts in market
 + Patch [patches:#41]: Don't auto-deploy when force under repair
 + Bug [#804]: [ATB] Scheduled repair tasks automatically fail if the mech is auto deployed to a pending battle
@@ -2584,7 +3520,7 @@ v0.3.4 (2014-04-26)
 + Bug: Custom rank systems not working correctly on reload
 + Bug [#467]: Structural Integrity showing in Warehouse
 + Bug [#130]: Daedalus with damaged leg remain crippled after repair
-+ Bug [#471]: Captured MechWarriors, Escaped Salvages??
++ Bug [#471]: Captured MekWarriors, Escaped Salvages??
 + Bug [#426]: Aerospace fighters showing "undamaged" after combat; ferro-aluminum armor missing
     To fix this bug I dumped the MekHQ versions of undamaged, light damage, heavy damage, and crippled
     and instead pulled them in from Entity & it's subclasses to let them handle all the work
@@ -2721,7 +3657,7 @@ v0.3.1 (2013-09-5)
 + Changed how the Individual Camo option is displayed.
 + Bug 369: Removing / Paying Off Loans
 + Added more bank names for the loan randomization
-+ Removed arbitrary secondary role limitation - Many of my techs are also (albeit poor ones) MechWarriors.
++ Removed arbitrary secondary role limitation - Many of my techs are also (albeit poor ones) MekWarriors.
 + Make Male/Female portrait folders so they can be embedded inside other folders.
     Also allow folders that just end in Male or Female (ie ralgith_Female)
 + Added four Canon banks to the array for randomizing the bank name for Loans
@@ -3451,7 +4387,7 @@ v0.1.10 (2011-12-05)
 + Bug 3380632: Mechs with Destroyed Head never Usable
 + Bug 3430515: Cannot Load Campaign
 + Bug 3403476: Using Ampersand In Scenario/Mission Description Causes Issue
-+ Bug 3401092: Loading a save with "MechWarrior" units crashes MekHQ
++ Bug 3401092: Loading a save with "MekWarrior" units crashes MekHQ
 + Bug 3398514: JumpShips inoperable
 + Bug 3371755: Medic Count
 + Bug 3369530: Infantry
@@ -4217,7 +5153,7 @@ v0.1.1 (2009-09-29)
 + wounded personnel will heal on their own in 15 cycles
 + make MekHQ compilable in Eclipse
 + native-looking menus for Mac OSX
-+ Bug 2854866: MechWarrior with 1 hit unable to be healed by medic team
++ Bug 2854866: MekWarrior with 1 hit unable to be healed by medic team
 + double-click for view of pilot personnel
 + updated mechfiles
 + GM mode options

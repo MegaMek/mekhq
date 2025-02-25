@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>One of your employer's ASF Aces is close and is moving to support.  Watch and learn.</additionalBriefingText>
+	<additionalBriefingText>One of your employer's ASF Aces is close and is moving to support. Watch and learn.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
@@ -12,11 +12,11 @@
 		<allowedUnitType>-2</allowedUnitType>
 		<arrivalTurn>2</arrivalTurn>
 		<canReinforceLinked>false</canReinforceLinked>
-		<contributesToBV>true</contributesToBV>
+		<contributesToBV>false</contributesToBV>
 		<contributesToMapSize>true</contributesToMapSize>
-		<contributesToUnitCount>true</contributesToUnitCount>
+		<contributesToUnitCount>false</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
-		<deploymentZones/>
+		<deploymentZones />
 		<destinationZone>5</destinationZone>
 		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>1</forceAlignment>
@@ -24,7 +24,7 @@
 		<fixedUnitCount>4</fixedUnitCount>
 		<forceName>Allied ASF Ace</forceName>
 		<generationMethod>5</generationMethod>
-			<fixedMul>AlliedASFAceHvy.mul</fixedMul>	
+		<fixedMul>AlliedASFAceHvy.mul</fixedMul>
 		<generationOrder>1</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>0</retreatThreshold>

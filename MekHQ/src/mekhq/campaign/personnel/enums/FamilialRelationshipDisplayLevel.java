@@ -18,32 +18,32 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.ResourceBundle;
 
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+
 public enum FamilialRelationshipDisplayLevel {
-    //region Enum Declarations
+    // region Enum Declarations
     SPOUSE("FamilialRelationshipDisplayLevel.SPOUSE.text"),
     PARENTS_CHILDREN_SIBLINGS("FamilialRelationshipDisplayLevel.PARENTS_CHILDREN_SIBLINGS.text"),
     GRANDPARENTS_GRANDCHILDREN("FamilialRelationshipDisplayLevel.GRANDPARENTS_GRANDCHILDREN.text"),
     AUNTS_UNCLES_COUSINS("FamilialRelationshipDisplayLevel.AUNTS_UNCLES_COUSINS.text");
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     FamilialRelationshipDisplayLevel(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Boolean Comparisons
+    // region Boolean Comparisons
     public boolean isSpouse() {
         return this == SPOUSE;
     }
@@ -67,9 +67,9 @@ public enum FamilialRelationshipDisplayLevel {
     public boolean displayGrandparentsGrandchildren() {
         return isGrandparentsGrandchildren() || isAuntsUnclesCousins();
     }
-    //endregion Boolean Comparisons
+    // endregion Boolean Comparisons
 
-    //region File I/O
+    // region File I/O
     public static FamilialRelationshipDisplayLevel parseFromString(final String text) {
         try {
             return valueOf(text);
@@ -92,10 +92,11 @@ public enum FamilialRelationshipDisplayLevel {
 
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into a FamilialRelationshipDisplayLevel. Returning PARENTS_CHILDREN_SIBLINGS.");
+        MMLogger.create(FamilialRelationshipDisplayLevel.class).error("Unable to parse " + text
+                + " into a FamilialRelationshipDisplayLevel. Returning PARENTS_CHILDREN_SIBLINGS.");
         return PARENTS_CHILDREN_SIBLINGS;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

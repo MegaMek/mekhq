@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,11 +20,19 @@ package mekhq.gui;
 
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
-import megamek.common.MechSummaryCache;
+import megamek.common.MekSummaryCache;
 import megamek.common.event.Subscribe;
-import mekhq.MekHQ;
 import mekhq.MHQOptionsChangedEvent;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.CampaignSummary;
 import mekhq.campaign.event.*;
+import mekhq.campaign.finances.FinancialReport;
+import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.rating.CamOpsReputation.ReputationController;
+import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
@@ -37,17 +45,20 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TargetSorter;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.service.enums.MRMSMode;
 import mekhq.service.mrms.MRMSService;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * Collates important information about the campaign and displays it, along with some actionable buttons
@@ -61,15 +72,18 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JLabel lblRating;
     private JLabel lblExperience;
     private JLabel lblPersonnel;
+    private JLabel lblMorale;
+    private JLabel lblAdminstrativeCapacity;
     private JLabel lblMissionSuccess;
     private JLabel lblComposition;
     private JLabel lblRepairStatus;
     private JLabel lblTransportCapacity;
     private JLabel lblCargoSummary;
+    private JLabel lblFacilityCapacities;
 
     // objectives panel
     private JPanel panObjectives;
-    java.awt.List listObjectives;
+    JList<String> listObjectives;
 
     // daily report
     private DailyReportLogPanel panLog;
@@ -93,7 +107,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JPanel panIcon;
     private JLabel lblIcon;
 
-    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
             MekHQ.getMHQOptions().getLocale());
 
     /**
@@ -202,6 +216,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblRating, gridBagConstraints);
+
         JLabel lblExperienceHead = new JLabel(resourceMap.getString("lblExperience.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -210,7 +225,19 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblExperienceHead, gridBagConstraints);
-        lblExperience = new JLabel(getCampaign().getUnitRating().getAverageExperience().toString());
+
+        lblExperience = new JLabel();
+        if (getCampaign().getCampaignOptions().getUnitRatingMethod().isFMMR()) {
+            lblExperience.setText(getCampaign().getUnitRating().getAverageExperience().toString());
+        } else {
+            // This seems to be overwritten completely and immediately by refresh
+            StringBuilder experienceString = new StringBuilder(64);
+            experienceString.append("<html><b>")
+                .append(mekhq.campaign.personnel.SkillType.getColoredExperienceLevelName(getCampaign().getReputation().getAverageSkillLevel()))
+                .append("</b></html>");
+            lblExperience.setText(experienceString.toString());
+        }
+
         lblExperienceHead.setLabelFor(lblExperience);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
@@ -243,6 +270,22 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblPersonnel, gridBagConstraints);
+
+        if ((getCampaign().getCampaignOptions().isUseRandomRetirement()) && (getCampaign().getCampaignOptions().isUseAdministrativeStrain())) {
+            JLabel lblAdministrativeCapacityHead = new JLabel(resourceMap.getString("lblAdministrativeCapacity.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(1, 5, 1, 5);
+            panInfo.add(lblAdministrativeCapacityHead, gridBagConstraints);
+            lblAdminstrativeCapacity = new JLabel(getCampaign().getCampaignSummary().getAdministrativeCapacityReport(getCampaign()));
+            lblAdministrativeCapacityHead.setLabelFor(lblAdminstrativeCapacity);
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.weightx = 1.0;
+            panInfo.add(lblAdminstrativeCapacity, gridBagConstraints);
+        }
 
         JLabel lblCompositionHead = new JLabel(resourceMap.getString("lblComposition.text"));
         gridBagConstraints = new GridBagConstraints();
@@ -292,15 +335,31 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridy = y++;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(1, 5, 5, 5);
+        gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblCargoSummaryHead, gridBagConstraints);
-        lblCargoSummary = new JLabel(getCampaign().getCampaignSummary().getCargoCapacityReport());
+        lblCargoSummary = new JLabel(getCampaign().getCampaignSummary().getCargoCapacityReport().toString());
         lblCargoSummaryHead.setLabelFor(lblCargoSummary);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblCargoSummary, gridBagConstraints);
 
-        panInfo.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panInfo.title")));
+        if ((getCampaignOptions().isUseFatigue()) || (getCampaignOptions().isUseAdvancedMedical())) {
+            JLabel lblFacilityCapacitiesHead = new JLabel(resourceMap.getString("lblFacilityCapacities.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(1, 5, 1, 5);
+            panInfo.add(lblFacilityCapacitiesHead, gridBagConstraints);
+            lblFacilityCapacities = new JLabel(getCampaign().getCampaignSummary().getFacilityReport());
+            lblFacilityCapacitiesHead.setLabelFor(lblFacilityCapacities);
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.weightx = 1.0;
+            panInfo.add(lblFacilityCapacities, gridBagConstraints);
+        }
+
+        panInfo.setBorder(BorderFactory.createTitledBorder(getCampaign().getName()));
     }
 
     /**
@@ -310,11 +369,13 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private void initObjectivesPanel() {
         panObjectives = new JPanel(new BorderLayout());
         panObjectives.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panObjectives.title")));
-        listObjectives = new java.awt.List();
-        for (String objective : getCampaign().getCurrentObjectives()) {
-            listObjectives.add(objective);
-        }
-        panObjectives.add(listObjectives, BorderLayout.CENTER);
+
+        listObjectives = new JList<>();
+
+        listObjectives.setModel(new DefaultListModel<>());
+        refreshObjectives();
+
+        panObjectives.add(new JScrollPaneWithSpeed(listObjectives), BorderLayout.CENTER);
     }
 
     /**
@@ -428,7 +489,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             }
         });
 
-        JScrollPane scrollProcurement = new JScrollPane(procurementTable);
+        JScrollPane scrollProcurement = new JScrollPaneWithSpeed(procurementTable);
         panProcurement = new JPanel(new GridBagLayout());
         panProcurement.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panProcurement.title")));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -477,8 +538,12 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         btnUnitRating = new JButton(resourceMap.getString("btnUnitRating.text"));
         btnUnitRating.setVisible(getCampaign().getCampaignOptions().getUnitRatingMethod().isEnabled());
-        btnUnitRating.addActionListener(evt -> new UnitRatingReportDialog(getCampaignGui().getFrame(),
-                getCampaign()).setVisible(true));
+
+        if (getCampaign().getCampaignOptions().getUnitRatingMethod().isFMMR()) {
+            btnUnitRating.addActionListener(evt -> new UnitRatingReportDialog(getCampaignGui().getFrame(), getCampaign()).setVisible(true));
+        } else {
+            btnUnitRating.addActionListener(evt -> new ReputationReportDialog(getCampaignGui().getFrame(), getCampaign()).setVisible(true));
+        }
         panReports.add(btnUnitRating);
 
         panReports.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panReports.title")));
@@ -504,23 +569,131 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * refresh the basic info panel with campaign information
      */
     private void refreshBasicInfo() {
-        getCampaign().getUnitRating().reInitialize();
-        getCampaign().getCampaignSummary().updateInformation();
-        lblRating.setText(getCampaign().getUnitRatingText());
-        lblPersonnel.setText(getCampaign().getCampaignSummary().getPersonnelReport());
-        lblMissionSuccess.setText(getCampaign().getCampaignSummary().getMissionSuccessReport());
-        lblExperience.setText(getCampaign().getUnitRating().getAverageExperience().toString());
-        lblComposition.setText(getCampaign().getCampaignSummary().getForceCompositionReport());
-        lblCargoSummary.setText(getCampaign().getCampaignSummary().getCargoCapacityReport());
-        lblRepairStatus.setText(getCampaign().getCampaignSummary().getForceRepairReport());
-        lblTransportCapacity.setText(getCampaign().getCampaignSummary().getTransportCapacity());
+        final Campaign campaign = getCampaign();
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final UnitRatingMethod unitRatingMethod = campaignOptions.getUnitRatingMethod();
+        final CampaignSummary campaignSummary = campaign.getCampaignSummary();
+
+        if (panInfo.getBorder() instanceof TitledBorder titledBorder) {
+            titledBorder.setTitle(getCampaign().getName());
+            panInfo.repaint();
+        }
+
+        if (unitRatingMethod.isFMMR()) {
+            campaign.getUnitRating().reInitialize();
+            lblExperience.setText(campaign.getUnitRating().getAverageExperience().toString());
+        } else if (unitRatingMethod.isCampaignOperations()) {
+            if (campaign.getReputation() == null) {
+                ReputationController reputationController = new ReputationController();
+                reputationController.initializeReputation(campaign);
+                campaign.setReputation(reputationController);
+            }
+
+            StringBuilder experienceString = new StringBuilder(64);
+            experienceString.append("<html><b>")
+                .append(mekhq.campaign.personnel.SkillType.getColoredExperienceLevelName(campaign.getReputation().getAverageSkillLevel()))
+                .append("</b></html>");
+            lblExperience.setText(experienceString.toString());
+        }
+
+        campaignSummary.updateInformation();
+        lblRating.setText(campaign.getUnitRatingText());
+        lblPersonnel.setText(campaignSummary.getPersonnelReport());
+        lblMissionSuccess.setText(campaignSummary.getMissionSuccessReport());
+        lblComposition.setText(campaignSummary.getForceCompositionReport());
+        lblCargoSummary.setText(campaignSummary.getCargoCapacityReport().toString());
+        lblRepairStatus.setText(campaignSummary.getForceRepairReport());
+        lblTransportCapacity.setText(campaignSummary.getTransportCapacity());
+
+        if (campaignOptions.isUseAdministrativeStrain()) {
+            try {
+                lblAdminstrativeCapacity.setText(campaignSummary.getAdministrativeCapacityReport(campaign));
+            } catch (Exception ignored) {}
+        }
+
+        if (campaignOptions.isUseFatigue()) {
+            try {
+                lblFacilityCapacities.setText(campaignSummary.getFacilityReport());
+            } catch (Exception ignored) {}
+        }
     }
 
     private void refreshObjectives() {
-        listObjectives.removeAll();
-        for (String objective : getCampaign().getCurrentObjectives()) {
-            listObjectives.add(objective);
+        // Define the DefaultListModel
+        DefaultListModel<String> model = new DefaultListModel<>();
+
+        // Add items to the model
+        if (getCampaign().getStoryArc() != null) {
+            for (String objective : getCampaign().getCurrentObjectives()) {
+                model.addElement(objective);
+            }
+        } else {
+            for (String report : getAbridgedFinancialReport()) {
+                model.addElement(String.format(report));
+            }
+
+            for (Mission mission : getCampaign().getActiveMissions(false)) {
+                List<Scenario> scenarios = mission.getScenarios();
+
+                scenarios.sort(Comparator.comparing(Scenario::getDate, Comparator.nullsFirst(Comparator.naturalOrder())));
+                Collections.reverse(scenarios);
+
+                if (!scenarios.isEmpty()) {
+                    model.addElement(String.format("<html><b>" + mission.getName() + "</b></html>"));
+
+                    for (Scenario scenario : scenarios) {
+
+                        if (scenario.getStatus().isCurrent()) {
+                            // StratCon facility contacts that haven't yet been discovered are stored as scenarios with null start dates
+                            if (scenario.getDate() != null) {
+                                model.addElement(String.format("<html><b>" + scenario.getName() + ":</b> "
+                                        + "<font color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
+                                        + ChronoUnit.DAYS.between(getCampaign().getLocalDate(), scenario.getDate())) + " days</font</html>");
+                            }
+                        } else {
+                            if (scenario.getStatus().isOverallVictory()) {
+                                model.addElement(String.format("<html><b>" + scenario.getName() + ":</b> "
+                                        + "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                                        + scenario.getStatus().toString()
+                                        + "</font></html>"));
+                            } else {
+                                model.addElement(String.format("<html><b>" + scenario.getName() + ":</b> "
+                                        + "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                                        + scenario.getStatus().toString()
+                                        + "</font></html>"));
+                            }
+                        }
+                    }
+                }
+            }
         }
+
+        // Set the model to the list
+        listObjectives.setModel(model);
+    }
+
+
+    /**
+     * @return a {@code List<String>} containing the abridged financial report entries.
+     */
+    public List<String> getAbridgedFinancialReport() {
+        List<String> reportString = new ArrayList<>();
+
+        FinancialReport report = FinancialReport.calculate(getCampaign());
+
+        String formatted = "%ss";
+
+        reportString.add("<html><b>Net Worth:</b> "
+                + String.format(formatted, report.getNetWorth().toAmountAndSymbolString())
+                + "</html>");
+
+        reportString.add("<html><b>Monthly Profit:</b> "
+                + String.format(formatted, report.getMonthlyIncome().minus(report.getMonthlyExpenses()).toAmountAndSymbolString())
+                + "</html>");
+
+        reportString.add("<html><br></html>");
+
+        return reportString;
     }
 
     /**
@@ -556,7 +729,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             new UnitMarketDialog(getFrame(), getCampaign()).showDialog();
         } else {
             UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(getFrame());
-            if (!MechSummaryCache.getInstance().isInitialized()) {
+            if (!MekSummaryCache.getInstance().isInitialized()) {
                 unitLoadingDialog.setVisible(true);
             }
             AbstractUnitSelectorDialog usd = new MekHQUnitSelectorDialog(getFrame(), unitLoadingDialog,

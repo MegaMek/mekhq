@@ -18,12 +18,6 @@
  */
 package mekhq.module;
 
-import mekhq.module.api.MekHQModule;
-import org.apache.logging.log4j.LogManager;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
 import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
@@ -31,14 +25,25 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
+
+import megamek.logging.MMLogger;
+import mekhq.module.api.MekHQModule;
+
 /**
- * Manages plugins requiring interpretation by a scripting engine. As scripts are encountered while
- * parsing the plugins directory they are converted to instances of the MekHQModule interface for
+ * Manages plugins requiring interpretation by a scripting engine. As scripts
+ * are encountered while
+ * parsing the plugins directory they are converted to instances of the
+ * MekHQModule interface for
  * use by the various specific module managers.
  *
  * @author Neoancient
  */
 public class ScriptPluginManager {
+    private static final MMLogger logger = MMLogger.create(ScriptPluginManager.class);
+
     private static ScriptPluginManager instance;
 
     private final List<MekHQModule> modules;
@@ -75,7 +80,7 @@ public class ScriptPluginManager {
     private void addModule(File script, String extension) {
         ScriptEngine engine = scriptEngineManager.getEngineByExtension(extension);
         if (null == engine) {
-            LogManager.getLogger().warn("Could not find script engine for extension " + extension);
+            logger.warn("Could not find script engine for extension " + extension);
             return;
         }
         try (Reader fileReader = new FileReader(script)) {
@@ -87,7 +92,7 @@ public class ScriptPluginManager {
                 }
             }
         } catch (Exception e) {
-            LogManager.getLogger().error("While parsing script " + script.getName(), e);
+            logger.error("While parsing script " + script.getName(), e);
         }
     }
 
@@ -95,10 +100,10 @@ public class ScriptPluginManager {
     private static void listEngines() {
         ScriptEngineManager mgr = new ScriptEngineManager(PluginManager.getInstance().getClassLoader());
         for (ScriptEngineFactory engine : mgr.getEngineFactories()) {
-            LogManager.getLogger().info("Engine: " + engine.getEngineName());
-            LogManager.getLogger().info("\tVersion: " + engine.getEngineVersion());
-            LogManager.getLogger().info("\tAlias: " + engine.getNames());
-            LogManager.getLogger().info("\tLanguage name: " + engine.getLanguageName() + "\n");
+            logger.info("Engine: " + engine.getEngineName());
+            logger.info("\tVersion: " + engine.getEngineVersion());
+            logger.info("\tAlias: " + engine.getNames());
+            logger.info("\tLanguage name: " + engine.getLanguageName() + "\n");
         }
     }
 }

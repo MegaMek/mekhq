@@ -18,39 +18,45 @@
  */
 package mekhq.campaign.stratcon;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.List;
+
+import javax.xml.transform.Source;
+
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-
-import javax.xml.transform.Source;
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.List;
 
 /**
  * A manifest containing IDs and file names of stratcon facility definitions
+ * 
  * @author NickAragua
  */
 @XmlRootElement(name = "facilityManifest")
 public class StratconFacilityManifest {
+    private static final MMLogger logger = MMLogger.create(StratconFacilityManifest.class);
+
     @XmlElementWrapper(name = "facilityFileNames")
     @XmlElement(name = "facilityFileName")
     public List<String> facilityFileNames;
 
     /**
-     * Attempt to deserialize an instance of a StratconFacilityManifest from the passed-in file path
+     * Attempt to deserialize an instance of a StratconFacilityManifest from the
+     * passed-in file path
+     * 
      * @return Possibly an instance of a StratconFacilityManifest
      */
     public static StratconFacilityManifest deserialize(String fileName) {
         StratconFacilityManifest resultingManifest = null;
         File inputFile = new File(fileName);
         if (!inputFile.exists()) {
-            LogManager.getLogger().warn(String.format("Specified file %s does not exist", fileName));
+            logger.warn(String.format("Specified file %s does not exist", fileName));
             return null;
         }
 
@@ -59,11 +65,12 @@ public class StratconFacilityManifest {
             Unmarshaller um = context.createUnmarshaller();
             try (FileInputStream fileStream = new FileInputStream(inputFile)) {
                 Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
-                JAXBElement<StratconFacilityManifest> manifestElement = um.unmarshal(inputSource, StratconFacilityManifest.class);
+                JAXBElement<StratconFacilityManifest> manifestElement = um.unmarshal(inputSource,
+                        StratconFacilityManifest.class);
                 resultingManifest = manifestElement.getValue();
             }
         } catch (Exception e) {
-            LogManager.getLogger().error("Error Deserializing Facility Manifest", e);
+            logger.error("Error Deserializing Facility Manifest", e);
         }
 
         return resultingManifest;

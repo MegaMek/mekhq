@@ -20,26 +20,29 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+import java.util.StringJoiner;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Compute;
 import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.StringJoiner;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author MKerensky
  */
 public class LFBattery extends Part {
+    private static final MMLogger logger = MMLogger.create(LFBattery.class);
+
     // Not specified in IO - use SO p158
     public static final TechAdvancement TA_LF_BATTERY = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2519, 2529, 2600).setPrototypeFactions(F_TH)
@@ -102,7 +105,7 @@ public class LFBattery extends Part {
     public int getBaseTime() {
         int time;
         if (isSalvaging()) {
-            //SO KF Drive times, p184-5
+            // SO KF Drive times, p184-5
             time = 28800;
         } else {
             time = 4800;
@@ -112,7 +115,7 @@ public class LFBattery extends Part {
 
     @Override
     public int getDifficulty() {
-        //SO Difficulty Mods
+        // SO Difficulty Mods
         if (isSalvaging()) {
             return 2;
         }
@@ -122,7 +125,7 @@ public class LFBattery extends Part {
     @Override
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-                ((Jumpship) unit.getEntity()).setLFBatteryHit(needsFixing());
+            ((Jumpship) unit.getEntity()).setLFBatteryHit(needsFixing());
         }
     }
 
@@ -132,8 +135,9 @@ public class LFBattery extends Part {
         if (null != unit && unit.getEntity() instanceof Jumpship) {
             Jumpship js = ((Jumpship) unit.getEntity());
             js.setLFBatteryHit(false);
-            //Also repair your KF Drive integrity - +1 point if you have other components to fix
-            //Otherwise, fix it all.
+            // Also repair your KF Drive integrity - +1 point if you have other components
+            // to fix
+            // Otherwise, fix it all.
             if (js.isKFDriveDamaged()) {
                 js.setKFIntegrity(Math.min((js.getKFIntegrity() + 1), js.getOKFIntegrity()));
             } else {
@@ -150,9 +154,11 @@ public class LFBattery extends Part {
                 js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - 1));
                 js.setLFBatteryHit(true);
             }
-            //All the BT lore says you can't jump while carrying around another KF Drive, therefore
-            //you can't salvage and keep this in the warehouse, just remove/scrap and replace it
-            //See SO p130 for reference
+            // All the BT lore says you can't jump while carrying around another KF Drive,
+            // therefore
+            // you can't salvage and keep this in the warehouse, just remove/scrap and
+            // replace it
+            // See SO p130 for reference
             campaign.getWarehouse().removePart(this);
             unit.removePart(this);
             Part missing = getMissingPart();
@@ -184,7 +190,7 @@ public class LFBattery extends Part {
 
     @Override
     public Money getStickerPrice() {
-        //No cost per SO p158 - multiplies other components instead
+        // No cost per SO p158 - multiplies other components instead
         return Money.zero();
     }
 
@@ -221,7 +227,7 @@ public class LFBattery extends Part {
                     docks = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }
@@ -239,7 +245,7 @@ public class LFBattery extends Part {
             joiner.add(details);
         }
         joiner.add(getUnitTonnage() + " tons")
-              .add(getDocks() + " collars");
+                .add(getDocks() + " collars");
         return joiner.toString();
     }
 

@@ -19,6 +19,7 @@
 package mekhq.gui.utilities;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -65,7 +66,7 @@ public class MarkdownEditorPanel extends JPanel {
         editor.setEditable(true);
         editor.setLineWrap(true);
         editor.setWrapStyleWord(true);
-        scrollEditor = new JScrollPane(editor);
+        scrollEditor = new JScrollPaneWithSpeed(editor);
         scrollEditor.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
         //set up buttons
@@ -133,7 +134,7 @@ public class MarkdownEditorPanel extends JPanel {
         viewer = new JTextPane();
         viewer.setEditable(false);
         viewer.setContentType("text/html");
-        scrollViewer = new JScrollPane(viewer);
+        scrollViewer = new JScrollPaneWithSpeed(viewer);
         scrollViewer.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         tabPane.add("Preview", scrollViewer);
 

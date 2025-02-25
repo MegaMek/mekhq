@@ -18,22 +18,28 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
-import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
 import java.awt.GridLayout;
 import java.util.ResourceBundle;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.WindowConstants;
+
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 
 /**
  * @author natit
  * @since Jan 6, 2010, 10:46:02 PM
  */
 public class MissionTypeDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(MissionTypeDialog.class);
 
     private boolean contract;
+    private boolean mission;
 
     public MissionTypeDialog(final JFrame frame, final boolean modal) {
         super(frame, modal);
@@ -49,13 +55,13 @@ public class MissionTypeDialog extends JDialog {
         setName("Form");
         setTitle(resourceMap.getString("Form.title"));
 
-        getContentPane().setLayout(new GridLayout(2,1));
+        getContentPane().setLayout(new GridLayout(2, 1));
 
         JButton btnMission = new JButton(resourceMap.getString("btnMission.text"));
         btnMission.setToolTipText(resourceMap.getString("btnMission.tooltip"));
         btnMission.setName("btnMission");
         btnMission.addActionListener(evt -> {
-            contract = false;
+            mission = true;
             setVisible(false);
         });
         getContentPane().add(btnMission);
@@ -80,11 +86,15 @@ public class MissionTypeDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
     public boolean isContract() {
         return contract;
+    }
+    
+    public boolean isMission() {
+        return mission;
     }
 }

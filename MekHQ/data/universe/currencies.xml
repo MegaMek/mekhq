@@ -4,7 +4,8 @@ currencies.xml
 written by Vicente Cartas Espinel
 
 This file contains the different currencies used in MekHQ. Keep in mind that the currency codes are
-used by the factions.xml file and by CurrencyManager.java, so if you remove or change a currency here,
+used by the factions.xml file and by CurrencyManager.java, so if you remove or change a currency
+here,
 you will need to do changes on those files.
 
 Here is a description of what goes in each currency tag

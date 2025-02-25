@@ -22,10 +22,14 @@ import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.GUIPreferences;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Entity;
 import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
+import megamek.common.preference.IPreferenceChangeListener;
 import megamek.common.util.sorter.NaturalOrderComparator;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.*;
 import mekhq.campaign.unit.Unit;
@@ -34,8 +38,8 @@ import mekhq.gui.adapter.UnitTableMouseAdapter;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.sorter.*;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.UnitViewPanel;
-import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
@@ -51,6 +55,8 @@ import java.util.UUID;
  * Displays a table of all units in the force.
  */
 public final class HangarTab extends CampaignGuiTab {
+    private static final MMLogger logger = MMLogger.create(HangarTab.class);
+
     public static final int UNIT_VIEW_WIDTH = 600;
 
     // unit views
@@ -69,16 +75,19 @@ public final class HangarTab extends CampaignGuiTab {
     private UnitTableModel unitModel;
     private TableRowSorter<UnitTableModel> unitSorter;
 
-    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+    private final IPreferenceChangeListener scalingChangeListener = e -> changeUnitView();
+
+    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
             MekHQ.getMHQOptions().getLocale());
 
-    //region Constructors
+    // region Constructors
     public HangarTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
         setUserPreferences();
+        GUIPreferences.getInstance().addPreferenceChangeListener(scalingChangeListener);
     }
-    //endregion Constructors
+    // endregion Constructors
 
     @Override
     public MHQTabType tabType() {
@@ -160,6 +169,7 @@ public final class HangarTab extends CampaignGuiTab {
         unitSorter.setComparator(UnitTableModel.COL_STATUS, new UnitStatusSorter());
         unitSorter.setComparator(UnitTableModel.COL_PILOT, new PersonTitleStringSorter(getCampaign()));
         unitSorter.setComparator(UnitTableModel.COL_TECH_CRW, new PersonTitleStringSorter(getCampaign()));
+        unitSorter.setComparator(UnitTableModel.COL_MAINTAIN, new FormattedNumberSorter());
         unitTable.setRowSorter(unitSorter);
         List<SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new SortKey(UnitTableModel.COL_TYPE, SortOrder.DESCENDING));
@@ -178,9 +188,9 @@ public final class HangarTab extends CampaignGuiTab {
         changeUnitView();
         unitTable.getSelectionModel().addListSelectionListener(ev -> refreshUnitView());
 
-        JScrollPane scrollUnitTable = new JScrollPane(unitTable);
+        JScrollPane scrollUnitTable = new JScrollPaneWithSpeed(unitTable);
 
-        scrollUnitView = new JScrollPane();
+        scrollUnitView = new JScrollPaneWithSpeed();
         scrollUnitView.setMinimumSize(new Dimension(UNIT_VIEW_WIDTH, 600));
         scrollUnitView.setPreferredSize(new Dimension(UNIT_VIEW_WIDTH, 600));
         scrollUnitView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -215,7 +225,7 @@ public final class HangarTab extends CampaignGuiTab {
             unitTable.setName("unitTable");
             preferences.manage(new JTablePreference(unitTable));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -252,11 +262,14 @@ public final class HangarTab extends CampaignGuiTab {
                         type = en.getUnitType();
                     }
                     return type == nGroup;
-                } else if (resourceMap.getString("choiceUnit.ActiveUnits.filter").equals(choiceUnit.getSelectedItem())) {
+                } else if (resourceMap.getString("choiceUnit.ActiveUnits.filter")
+                        .equals(choiceUnit.getSelectedItem())) {
                     return !unit.isMothballed();
-                } else if (resourceMap.getString("choiceUnit.MothballedUnits.filter").equals(choiceUnit.getSelectedItem())) {
+                } else if (resourceMap.getString("choiceUnit.MothballedUnits.filter")
+                        .equals(choiceUnit.getSelectedItem())) {
                     return unit.isMothballed();
-                } else if (resourceMap.getString("choiceUnit.UnmaintainedUnits.filter").equals(choiceUnit.getSelectedItem())) {
+                } else if (resourceMap.getString("choiceUnit.UnmaintainedUnits.filter")
+                        .equals(choiceUnit.getSelectedItem())) {
                     return unit.isUnmaintained();
                 } else {
                     return false;
@@ -285,7 +298,7 @@ public final class HangarTab extends CampaignGuiTab {
     public void changeUnitView() {
         int view = choiceUnitView.getSelectedIndex();
         XTableColumnModel columnModel = (XTableColumnModel) unitTable.getColumnModel();
-        unitTable.setRowHeight(15);
+        unitTable.setRowHeight(UIUtil.scaleForGUI(15));
 
         // set the renderer
         TableColumn column;
@@ -305,7 +318,7 @@ public final class HangarTab extends CampaignGuiTab {
         }
 
         if (view == UV_GRAPHIC) {
-            unitTable.setRowHeight(80);
+            unitTable.setRowHeight(UIUtil.scaleForGUI(60));
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WCLASS), true);
@@ -369,7 +382,8 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE), false);
-            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), getCampaign().getCampaignOptions().isUseQuirks());
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS),
+                    getCampaign().getCampaignOptions().isUseQuirks());
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS), false);
         } else if (view == UV_STATUS) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), true);
@@ -386,7 +400,8 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_FORCE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), false);
-            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN), getCampaign().getCampaignOptions().isPayForMaintain());
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN),
+                    getCampaign().getCampaignOptions().isPayForMaintain());
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), true);
@@ -394,6 +409,12 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS), false);
         }
+    }
+
+    @Override
+    public void disposeTab() {
+        super.disposeTab();
+        GUIPreferences.getInstance().removePreferenceChangeListener(scalingChangeListener);
     }
 
     public void focusOnUnit(UUID id) {

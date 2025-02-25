@@ -3,6 +3,6 @@
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PreForceGeneration</eventTiming>
 	<eventRecipient>Opposing</eventRecipient>
-    <qualityAdjustment>1</qualityAdjustment>
-    <bvBudgetAdditiveMultiplier>-1</bvBudgetAdditiveMultiplier>
+	<qualityAdjustment>1</qualityAdjustment>
+	<bvBudgetAdditiveMultiplier>-1</bvBudgetAdditiveMultiplier>
 </AtBScenarioModifier>

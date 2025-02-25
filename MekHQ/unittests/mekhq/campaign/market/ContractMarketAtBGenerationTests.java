@@ -22,6 +22,7 @@ import mekhq.campaign.*;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
@@ -59,9 +60,13 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
+
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
@@ -146,7 +151,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        assertNotNull(new ContractMarket().addAtBContract(campaign));
+        assertNotNull(new AtbMonthlyContractMarket().addAtBContract(campaign));
     }
 
     @ParameterizedTest
@@ -157,9 +162,13 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
+
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
@@ -244,7 +253,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -258,9 +267,13 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
+
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
@@ -345,7 +358,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -359,9 +372,13 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
+
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
@@ -447,7 +464,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -460,9 +477,13 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
+
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
@@ -507,6 +528,10 @@ public class ContractMarketAtBGenerationTests {
         Faction rebels = mock(Faction.class);
         doReturn(rebels).when(factions).getFaction(eq("REB"));
 
+        Faction mercenary = mock(Faction.class);
+	when(mercenary.isMercenary()).thenReturn(true);
+        doReturn(mercenary).when(factions).getFaction(eq("MERC"));
+
         Systems systems = mock(Systems.class);
         Systems.setInstance(systems);
 
@@ -548,7 +573,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -562,19 +587,29 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
+
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
+
+	// Make a fake "MERC" employer for getFaction purposes in the rfg
+        Faction employerFaction = mock(Faction.class);
+        when(employerFaction.isMercenary()).thenReturn(true);
+
+        doReturn(employerFaction).when(factions).getFaction(eq("MERC"));
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
         // Return "MERC" every time
         when(rfg.getEmployer()).thenReturn("MERC");
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNull(contract);
@@ -587,9 +622,13 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
+
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
@@ -675,7 +714,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -688,9 +727,13 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
+
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
@@ -768,7 +811,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(false).when(hints).isNeutral(eq(enemyFaction));
         when(rfg.getFactionHints()).thenReturn(hints);
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNull(contract);
@@ -781,9 +824,13 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
+
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
@@ -869,7 +916,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(null).doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -882,9 +929,13 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
+
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
@@ -964,7 +1015,7 @@ public class ContractMarketAtBGenerationTests {
         // Fail to find a jump path
         doReturn(null).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNull(contract);
@@ -978,9 +1029,13 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(employer);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
+
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
@@ -1064,7 +1119,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -1079,9 +1134,13 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(employer);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
+
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
@@ -1165,7 +1224,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -1180,9 +1239,13 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(employer);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
+
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
@@ -1266,7 +1329,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -1281,9 +1344,13 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(employer);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
+
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(true);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
@@ -1367,7 +1434,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -1381,9 +1448,14 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn(employer);
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
+
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(false);
+        when(campaignFaction.getShortName()).thenReturn(employer);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
@@ -1467,7 +1539,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -1481,9 +1553,14 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn(employer);
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
+
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(false);
+        when(campaignFaction.getShortName()).thenReturn(employer);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
@@ -1567,7 +1644,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -1581,9 +1658,14 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn(employer);
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
+
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(false);
+        when(campaignFaction.getShortName()).thenReturn(employer);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
@@ -1667,7 +1749,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -1681,9 +1763,14 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn(employer);
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
+
+        Faction campaignFaction = mock(Faction.class);
+        when(campaignFaction.isMercenary()).thenReturn(false);
+        when(campaignFaction.getShortName()).thenReturn(employer);
+        when(campaign.getFaction()).thenReturn(campaignFaction);
 
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.isVariableContractLength()).thenReturn(false);
@@ -1767,7 +1854,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);

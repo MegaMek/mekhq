@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,7 +21,7 @@ package mekhq.campaign.personnel.divorce;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -53,29 +53,6 @@ public class AbstractDivorceTest {
     public void beforeEach() {
         lenient().when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
     }
-
-    //region Getters/Setters
-    @Disabled // FIXME : Windchild : Test Missing
-    @Test
-    public void testGettersAndSetters() {
-/*
-        when(mockCampaignOptions.isUseClanPersonnelDivorce()).thenReturn(false);
-        when(mockCampaignOptions.isUsePrisonerDivorce()).thenReturn(false);
-        when(mockCampaignOptions.isUseRandomSameSexDivorce()).thenReturn(false);
-        when(mockCampaignOptions.isUseRandomClanPersonnelDivorce()).thenReturn(false);
-        when(mockCampaignOptions.isUseRandomPrisonerDivorce()).thenReturn(false);
-
-        final AbstractDivorce disabledDivorce = new DisabledRandomDivorce(mockCampaignOptions);
-
-        assertEquals(RandomDivorceMethod.NONE, disabledDivorce.getMethod());
-        assertFalse(disabledDivorce.isUseClanPersonnelDivorce());
-        assertFalse(disabledDivorce.isUsePrisonerDivorce());
-        assertFalse(disabledDivorce.isUseRandomSameSexDivorce());
-        assertFalse(disabledDivorce.isUseRandomClanPersonnelDivorce());
-        assertFalse(disabledDivorce.isUseRandomPrisonerDivorce());
-*/
-    }
-    //endregion Getters/Setters
 
     @Disabled // FIXME : Windchild : Test Missing
     @Test
@@ -125,7 +102,7 @@ public class AbstractDivorceTest {
     //region New Day
     @Disabled // FIXME : Windchild : Test Missing
     @Test
-    public void testProcessNewDay() {
+    public void testProcessNewWeek() {
 
     }
     //endregion New Day

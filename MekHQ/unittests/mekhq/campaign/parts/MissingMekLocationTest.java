@@ -19,8 +19,8 @@
 package mekhq.campaign.parts;
 
 import megamek.common.CriticalSlot;
-import megamek.common.LandAirMech;
-import megamek.common.Mech;
+import megamek.common.LandAirMek;
+import megamek.common.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
@@ -37,12 +37,12 @@ public class MissingMekLocationTest {
     public void missingLAMTorsoRepairableOnlyWithMissingAvionicsAndLandingGear() {
         Campaign mockCampaign = mock(Campaign.class);
         Unit unit = mock(Unit.class);
-        LandAirMech entity = mock(LandAirMech.class);
+        LandAirMek entity = mock(LandAirMek.class);
         when(unit.getEntity()).thenReturn(entity);
         when(entity.getWeight()).thenReturn(30.0);
         doCallRealMethod().when(entity).getLocationName(any());
 
-        int location = Mech.LOC_RT;
+        int location = Mek.LOC_RT;
         MissingMekLocation missing = new MissingMekLocation(location, 30, 0, false, false, false, mockCampaign);
         missing.setUnit(unit);
 
@@ -51,12 +51,12 @@ public class MissingMekLocationTest {
         CriticalSlot mockLandingGear = mock(CriticalSlot.class);
         when(mockLandingGear.isEverHittable()).thenReturn(true);
         when(mockLandingGear.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);
-        when(mockLandingGear.getIndex()).thenReturn(LandAirMech.LAM_LANDING_GEAR);
+        when(mockLandingGear.getIndex()).thenReturn(LandAirMek.LAM_LANDING_GEAR);
         doReturn(mockLandingGear).when(entity).getCritical(eq(location), eq(0));
         CriticalSlot mockAvionics = mock(CriticalSlot.class);
         when(mockAvionics.isEverHittable()).thenReturn(true);
         when(mockAvionics.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);
-        when(mockAvionics.getIndex()).thenReturn(LandAirMech.LAM_AVIONICS);
+        when(mockAvionics.getIndex()).thenReturn(LandAirMek.LAM_AVIONICS);
         doReturn(mockAvionics).when(entity).getCritical(eq(location), eq(1));
 
         // No missing parts
@@ -112,12 +112,12 @@ public class MissingMekLocationTest {
     public void missingLAMHeadRepairableOnlyWithMissingAvionics() {
         Campaign mockCampaign = mock(Campaign.class);
         Unit unit = mock(Unit.class);
-        LandAirMech entity = mock(LandAirMech.class);
+        LandAirMek entity = mock(LandAirMek.class);
         when(unit.getEntity()).thenReturn(entity);
         when(entity.getWeight()).thenReturn(30.0);
         doCallRealMethod().when(entity).getLocationName(any());
 
-        int location = Mech.LOC_HEAD;
+        int location = Mek.LOC_HEAD;
         MissingMekLocation missing = new MissingMekLocation(location, 30, 0, false, false, false, mockCampaign);
         missing.setUnit(unit);
 
@@ -126,7 +126,7 @@ public class MissingMekLocationTest {
         CriticalSlot mockAvionics = mock(CriticalSlot.class);
         when(mockAvionics.isEverHittable()).thenReturn(true);
         when(mockAvionics.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);
-        when(mockAvionics.getIndex()).thenReturn(LandAirMech.LAM_AVIONICS);
+        when(mockAvionics.getIndex()).thenReturn(LandAirMek.LAM_AVIONICS);
         doReturn(mockAvionics).when(entity).getCritical(eq(location), eq(0));
 
         // No missing parts

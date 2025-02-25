@@ -20,28 +20,31 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Entity;
 import megamek.common.IArmorState;
 import megamek.common.Tank;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingTurret extends MissingPart {
+    private static final MMLogger logger = MMLogger.create(MissingTurret.class);
+
     double weight;
 
     public MissingTurret() {
-        this(0,0, null);
+        this(0, 0, null);
     }
 
     public MissingTurret(int tonnage, double weight, Campaign c) {
@@ -79,7 +82,7 @@ public class MissingTurret extends MissingPart {
                     weight = Double.parseDouble(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }
@@ -87,7 +90,8 @@ public class MissingTurret extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof Turret
-            && (((TankLocation) part).getLoc() == Tank.LOC_TURRET || ((TankLocation) part).getLoc() == Tank.LOC_TURRET_2);
+                && (((TankLocation) part).getLoc() == Tank.LOC_TURRET
+                        || ((TankLocation) part).getLoc() == Tank.LOC_TURRET_2);
     }
 
     @Override
@@ -97,7 +101,7 @@ public class MissingTurret extends MissingPart {
 
     @Override
     public Part getNewPart() {
-        //TODO: how to get second turret location?
+        // TODO: how to get second turret location?
         return new Turret(Tank.LOC_TURRET, getUnitTonnage(), weight, campaign);
     }
 

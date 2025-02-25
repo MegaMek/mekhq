@@ -20,18 +20,6 @@
  */
 package mekhq.campaign.storyarc;
 
-import megamek.common.annotations.Nullable;
-import megamek.common.util.sorter.NaturalOrderComparator;
-import mekhq.MHQConstants;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.storyarc.enums.StoryLoadingType;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
@@ -39,20 +27,41 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.annotations.Nullable;
+import megamek.common.util.sorter.NaturalOrderComparator;
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.storyarc.enums.StoryLoadingType;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
- * This class just reads in a few fields from a Story Arc XML object. it is used to produce the story arc
- * selection dialog without having to load the full story arcs which depend on the Campaign object.
+ * This class just reads in a few fields from a Story Arc XML object. it is used
+ * to produce the story arc
+ * selection dialog without having to load the full story arcs which depend on
+ * the Campaign object.
  */
 public class StoryArcStub {
+    private static final MMLogger logger = MMLogger.create(StoryArcStub.class);
 
     private String title;
     private String details;
     private String description;
 
-    /** Can this story arc be added to existing campaign or does it need to start fresh? **/
+    /**
+     * Can this story arc be added to existing campaign or does it need to start
+     * fresh?
+     **/
     private StoryLoadingType storyLoadingType;
 
-    /** directory path to the initial campaign data for this StoryArc - can be null **/
+    /**
+     * directory path to the initial campaign data for this StoryArc - can be null
+     **/
     private String initCampaignPath;
 
     /** directory path to this story arc **/
@@ -95,11 +104,11 @@ public class StoryArcStub {
     }
 
     private void setInitCampaignPath(String s) {
-        this.initCampaignPath =s;
+        this.initCampaignPath = s;
     }
 
     public File getInitCampaignFile() {
-        if(null == initCampaignPath) {
+        if (null == initCampaignPath) {
             return null;
         }
         return new File(initCampaignPath);
@@ -112,7 +121,6 @@ public class StoryArcStub {
     public String getDirectoryPath() {
         return directoryPath;
     }
-
 
     public static @Nullable StoryArcStub parseFromXML(final NodeList nl, Campaign c) {
         final StoryArcStub storyArcStub = new StoryArcStub();
@@ -142,7 +150,7 @@ public class StoryArcStub {
                 }
             }
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            logger.error(e);
             return null;
         }
         return storyArcStub;
@@ -153,7 +161,7 @@ public class StoryArcStub {
         try (InputStream is = new FileInputStream(file)) {
             xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            logger.error(e);
             return null;
         }
 
@@ -177,12 +185,12 @@ public class StoryArcStub {
     }
 
     private static List<StoryArcStub> loadStoryArcStubsFromDirectory(final @Nullable File directory,
-                                                                     boolean startNew) {
+            boolean startNew) {
         if ((directory == null) || !directory.exists() || !directory.isDirectory()) {
             return new ArrayList<>();
         }
 
-        //get all the story arc directory names
+        // get all the story arc directory names
         String[] arcDirectories = directory.list(new FilenameFilter() {
             @Override
             public boolean accept(File current, String name) {
@@ -192,19 +200,22 @@ public class StoryArcStub {
 
         final List<StoryArcStub> storyArcStubs = new ArrayList<>();
         for (String arcDirectoryName : arcDirectories) {
-            //find the expected items within this story arc directory
-            final File storyArcFile = new File(directory.getPath() + '/' +  arcDirectoryName + '/' + MHQConstants.STORY_ARC_FILE);
+            // find the expected items within this story arc directory
+            final File storyArcFile = new File(
+                    directory.getPath() + '/' + arcDirectoryName + '/' + MHQConstants.STORY_ARC_FILE);
             if (!storyArcFile.exists()) {
                 continue;
             }
             final StoryArcStub storyArcStub = parseFromFile(storyArcFile);
-            final File initCampaignFile = new File(directory.getPath() + '/' +  arcDirectoryName + '/' + MHQConstants.STORY_ARC_CAMPAIGN_FILE);
+            final File initCampaignFile = new File(
+                    directory.getPath() + '/' + arcDirectoryName + '/' + MHQConstants.STORY_ARC_CAMPAIGN_FILE);
             if (storyArcStub != null) {
-                storyArcStub.setDirectoryPath(directory.getPath() + '/' +  arcDirectoryName);
+                storyArcStub.setDirectoryPath(directory.getPath() + '/' + arcDirectoryName);
                 if (initCampaignFile.exists()) {
                     storyArcStub.setInitCampaignPath(initCampaignFile.getPath());
                 }
-                if (startNew ? storyArcStub.getStoryLoadingType().canStartNew() : storyArcStub.getStoryLoadingType().canLoadExisting()) {
+                if (startNew ? storyArcStub.getStoryLoadingType().canStartNew()
+                        : storyArcStub.getStoryLoadingType().canLoadExisting()) {
                     storyArcStubs.add(storyArcStub);
                 }
             }

@@ -57,7 +57,7 @@ public class TransportBayPart extends Part {
     }
 
     public Bay getBay() {
-        if (null != unit) {
+        if (null != unit && null != unit.getEntity()) {
             return unit.getEntity().getBayById(bayNumber);
         }
         return null;

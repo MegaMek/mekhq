@@ -2,7 +2,7 @@
  * PlanetarySystem.java
  *
  * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2011-2022 - The MegaMek team. All Rights Reserved.
+ * Copyright (c) 2011-2025 - The MegaMek team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,105 +21,63 @@
  */
 package mekhq.campaign.universe;
 
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.*;
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.util.StdConverter;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
-import mekhq.adapter.BooleanValueAdapter;
-import mekhq.adapter.DateAdapter;
-import mekhq.adapter.SpectralClassAdapter;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.education.Academy;
+import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
-
-import java.time.LocalDate;
-import java.util.*;
+import mekhq.campaign.universe.enums.HPGRating;
+import mekhq.campaign.universe.enums.HiringHallLevel;
 
 /**
- * This is a PlanetarySystem object which will contain information
+ * This is a PlanetarySystem object that will contain information
  * about the system as well as an ArrayList of the Planet objects
  * that make up the system
  *
  * @author Taharqa
  */
-@XmlRootElement(name = "system")
-@XmlAccessorType(value = XmlAccessType.FIELD)
+@JsonIgnoreProperties(ignoreUnknown=true)
+@JsonDeserialize(converter= PlanetarySystem.PlanetarySystemPostLoader.class)
 public class PlanetarySystem {
-    // Star classification data and methods
-    public static final int SPECTRAL_O = 0;
-    public static final int SPECTRAL_B = 1;
-    public static final int SPECTRAL_A = 2;
-    public static final int SPECTRAL_F = 3;
-    public static final int SPECTRAL_G = 4;
-    public static final int SPECTRAL_K = 5;
-    public static final int SPECTRAL_M = 6;
-    public static final int SPECTRAL_L = 7;
-    public static final int SPECTRAL_T = 8;
-    public static final int SPECTRAL_Y = 9;
-    // Spectral class "D" (white dwarfs) are determined by their luminosity "VII" - the number is here for sorting
-    public static final int SPECTRAL_D = 99;
-    // "Q" - not a proper star (neutron stars QN, pulsars QP, black holes QB, ...)
-    public static final int SPECTRAL_Q = 100;
-    // TODO: Wolf-Rayet stars ("W"), carbon stars ("C"), S-type stars ("S"),
-
-    public static final String LUM_0           = "0";
-    public static final String LUM_IA          = "Ia";
-    public static final String LUM_IAB         = "Iab";
-    public static final String LUM_IB          = "Ib";
-    // Generic class, consisting of Ia, Iab and Ib
-    public static final String LUM_I           = "I";
-    public static final String LUM_II_EVOLVED  = "I/II";
-    public static final String LUM_II          = "II";
-    public static final String LUM_III_EVOLVED = "II/III";
-    public static final String LUM_III         = "III";
-    public static final String LUM_IV_EVOLVED  = "III/IV";
-    public static final String LUM_IV          = "IV";
-    public static final String LUM_V_EVOLVED   = "IV/V";
-    public static final String LUM_V           = "V";
-    // typically used as a prefix "sd", not as a suffix
-    public static final String LUM_VI          = "VI";
-    // typically used as a prefix "esd", not as a suffix
-    public static final String LUM_VI_PLUS     = "VI+";
-    // always used as class designation "D", never as a suffix
-    public static final String LUM_VII         = "VII";
-
-    @XmlElement(name = "xcood")
+    @JsonProperty("xcood")
     private Double x;
-    @XmlElement(name = "ycood")
+    @JsonProperty("ycood")
     private Double y;
 
     // Base data
-    @SuppressWarnings("unused")
-    private UUID uniqueIdentifier;
+    @JsonProperty("id")
     private String id;
     private String name;
 
-    //Star data (to be factored out)
-    private String spectralType;
-    @XmlJavaTypeAdapter(SpectralClassAdapter.class)
-    private Integer spectralClass;
-    private Double subtype;
-    private String luminosity;
-
-    @XmlJavaTypeAdapter(BooleanValueAdapter.class)
-    private Boolean nadirCharge;
-    @XmlJavaTypeAdapter(BooleanValueAdapter.class)
-    private Boolean zenithCharge;
+    // Star data (to be factored out)
+    @JsonProperty("spectralType")
+    private SourceableValue<StarType> star;
 
     // tree map of planets sorted by system position
-    @XmlTransient
     private TreeMap<Integer, Planet> planets;
 
     // for reading in because lists are easier
-    @XmlElement(name = "planet")
+    @JsonProperty("planet")
     private List<Planet> planetList;
 
     // the location of the primary planet for this system
+    @JsonProperty("primarySlot")
     private int primarySlot;
-
-    /** Marker for "please delete this system" */
-    @XmlJavaTypeAdapter(BooleanValueAdapter.class)
-    public Boolean delete;
 
     /**
      * a hash to keep track of dynamic planet changes
@@ -128,11 +86,10 @@ public class PlanetarySystem {
      * <p>
      * Package-private so that Planets can access it
      */
-    @XmlTransient
     TreeMap<LocalDate, PlanetarySystemEvent> events;
 
     // For export and import only (lists are easier than maps) */
-    @XmlElement(name = "event")
+    @JsonProperty("event")
     private List<PlanetarySystemEvent> eventList;
 
     public PlanetarySystem() {
@@ -156,15 +113,15 @@ public class PlanetarySystem {
     }
 
     public String getName(LocalDate when) {
-        if (primarySlot < 1) {
-            // if no primary slot, then just return the id
-            if (null != id) {
-                return id;
-            }
+        // if no primary slot, then just return the id
+        if (primarySlot < 1 && null != id) {
+            return id;
         }
+
         if (null != getPrimaryPlanet()) {
             return getPrimaryPlanet().getName(when);
         }
+
         return "Unknown";
     }
 
@@ -204,7 +161,7 @@ public class PlanetarySystem {
         return pop;
     }
 
-    /** highest socio-industrial ratings among all planets in system for the map **/
+    /** highest socio-industrial ratings among all planets in-system for the map **/
     public SocioIndustrialData getSocioIndustrial(LocalDate when) {
         int tech = EquipmentType.RATING_X;
         int industry = EquipmentType.RATING_X;
@@ -236,14 +193,30 @@ public class PlanetarySystem {
     }
 
     /** @return the highest HPG rating among planets **/
-    public Integer getHPG(LocalDate when) {
-        int rating = EquipmentType.RATING_X;
+    public HPGRating getHPG(LocalDate when) {
+        HPGRating rating = HPGRating.X;
         for (Planet planet : planets.values()) {
-            if ((null != planet.getHPG(when)) && (planet.getHPG(when) < rating)) {
+            if ((null != planet.getHPG(when)) && (planet.getHPG(when).compareTo(rating) > 0)) {
                 rating = planet.getHPG(when);
             }
         }
         return rating;
+    }
+
+    /** @return the highest Hiring Hall rating among planets **/
+    public HiringHallLevel getHiringHallLevel(LocalDate when) {
+        HiringHallLevel level = HiringHallLevel.NONE;
+        for (Planet planet : planets.values()) {
+            if ((null != planet.getHiringHallLevel(when)) && (planet.getHiringHallLevel(when).compareTo(level) > 0)) {
+                level = planet.getHiringHallLevel(when);
+            }
+        }
+        return level;
+    }
+
+    /** @return true if a hiring hall is present in the system **/
+    public boolean isHiringHall(LocalDate when) {
+        return !getHiringHallLevel(when).isNone();
     }
 
     /**
@@ -262,18 +235,27 @@ public class PlanetarySystem {
     }
 
     /**
-     * @return the distance to another system in light years (0 if both are in the same system)
+     * @return the distance to another system in light years (0 if both are in the
+     *         same system)
      */
     public double getDistanceTo(PlanetarySystem anotherSystem) {
         return Math.sqrt(Math.pow(x - anotherSystem.x, 2) + Math.pow(y - anotherSystem.y, 2));
     }
 
     public Boolean isNadirCharge(LocalDate when) {
-        return getEventData(when, nadirCharge, e -> e.nadirCharge);
+        return (null == getSourcedNadirCharge(when) ? false : getSourcedNadirCharge(when).getValue());
+    }
+
+    public SourceableValue<Boolean> getSourcedNadirCharge(LocalDate when) {
+        return getEventData(when, null, e -> e.nadirCharge);
     }
 
     public boolean isZenithCharge(LocalDate when) {
-        return getEventData(when, zenithCharge, e -> e.zenithCharge);
+        return (null == getSourcedZenithCharge(when) ? false : getSourcedZenithCharge(when).getValue());
+    }
+
+    public SourceableValue<Boolean> getSourcedZenithCharge(LocalDate when) {
+        return getEventData(when, null, e -> e.zenithCharge);
     }
 
     public int getNumberRechargeStations(LocalDate when) {
@@ -294,7 +276,10 @@ public class PlanetarySystem {
         }
     }
 
-    /** Recharge time in hours (assuming the usage of the fastest charging method available) */
+    /**
+     * Recharge time in hours (assuming the usage of the fastest charging method
+     * available)
+     */
     public double getRechargeTime(LocalDate when) {
         if (isZenithCharge(when) || isNadirCharge(when)) {
             // The 176 value comes from pg. 87-88 and 138 of StratOps
@@ -304,13 +289,12 @@ public class PlanetarySystem {
         }
     }
 
-    /** Recharge time in hours using solar radiation alone (at jump point and 100% efficiency) */
+    /**
+     * Recharge time in hours using solar radiation alone (at jump point and 100%
+     * efficiency)
+     */
     public double getSolarRechargeTime() {
-        if ((null == spectralClass) || (null == subtype)) {
-            // 176 is the average recharge time across all spectral classes and subtypes
-            return 176;
-        }
-        return StarUtil.getSolarRechargeTime(spectralClass, subtype);
+        return getStar().getSolarRechargeTime();
     }
 
     public String getRechargeTimeText(LocalDate when) {
@@ -323,83 +307,48 @@ public class PlanetarySystem {
     }
 
     public double getStarDistanceToJumpPoint() {
-        if ((null == spectralClass) || (null == subtype)) {
+        if (null == star) {
             // 40 is close to the midpoint value across all star types
             return StarUtil.getDistanceToJumpPoint(40);
         }
-        return StarUtil.getDistanceToJumpPoint(spectralClass, subtype);
+        return getStar().getDistanceToJumpPoint();
     }
 
     /**
-     * @return the average travel time from low orbit to the jump point at 1g, in Terran days for a given planetary position
+     * @return the average travel time from low orbit to the jump point at 1g, in
+     *         Terran days for a given planetary position
      */
     public double getTimeToJumpPoint(double acceleration) {
         return getTimeToJumpPoint(acceleration, getPrimaryPlanetPosition());
     }
 
     /**
-     * @return the average travel time from low orbit to the jump point at 1g, in Terran days for a given planetary position
+     * @return the average travel time from low orbit to the jump point at 1g, in
+     *         Terran days for a given planetary position
      */
     public double getTimeToJumpPoint(double acceleration, int sysPos) {
         return planets.get(sysPos).getTimeToJumpPoint(acceleration);
     }
 
-    public String getSpectralType() {
-        return spectralType;
+    public StarType getStar() {
+        return getSourcedStar().getValue();
+    }
+
+    public SourceableValue<StarType> getSourcedStar() {
+        return star;
     }
 
     /**
-     * @return normalized spectral type, for display
-     */
-    public String getSpectralTypeNormalized() {
-        return null != spectralType ? StarUtil.getSpectralType(spectralClass, subtype, luminosity) : "?";
-    }
-
-    public String getSpectralTypeText() {
-        if ((null == spectralType) || spectralType.isEmpty()) {
-            return "unknown";
-        }
-        if (spectralType.startsWith("Q")) {
-            switch (spectralType) {
-                case "QB":
-                    return "black hole";
-                case "QN":
-                    return "neutron star";
-                case "QP":
-                    return "pulsar";
-                default:
-                    return "unknown";
-            }
-        }
-        return spectralType;
-    }
-
-    public Integer getSpectralClass() {
-        return spectralClass;
-    }
-
-    public void setSpectralClass(Integer spectralClass) {
-        this.spectralClass = spectralClass;
-    }
-
-    public Double getSubtype() {
-        return subtype;
-    }
-
-    public void setSubtype(double subtype) {
-        this.subtype = subtype;
-    }
-
-    /**
-     * @return the planet object identified by the primary slot. If no primary slot is given then
-     * this function will return the first planet
+     * @return the planet object identified by the primary slot.
+     *         If no primary slot is given, then this function will return the first
+     *         planet
      */
     public Planet getPrimaryPlanet() {
         return planets.get(getPrimaryPlanetPosition());
     }
 
     public int getPrimaryPlanetPosition() {
-        // if no primary slot (uninhabited system) just return first planet
+        // if no primary slot (i.e., an uninhabited system) then return the first planet
         return Math.max(primarySlot, 1);
     }
 
@@ -424,24 +373,8 @@ public class PlanetarySystem {
         return planets.values();
     }
 
-
     public String getIcon() {
-        switch (getSpectralClass()) {
-            case SPECTRAL_B:
-                return "B_" + luminosity;
-            case SPECTRAL_A:
-                return  "A_" + luminosity;
-            case SPECTRAL_F:
-                return "F_" + luminosity;
-            case SPECTRAL_G:
-                return "G_" + luminosity;
-            case SPECTRAL_K:
-                return "K_" + luminosity;
-            case SPECTRAL_M:
-                return "M_" + luminosity;
-            default:
-                return "default";
-        }
+        return getStar().getIcon();
     }
 
     @Override
@@ -458,31 +391,7 @@ public class PlanetarySystem {
 
     @Override
     public int hashCode() {
-       return Objects.hash(id);
-    }
-
-    public PlanetarySystemEvent getOrCreateEvent(LocalDate when) {
-        if (null == when) {
-            return null;
-        }
-        if (null == events) {
-            events = new TreeMap<>();
-        }
-        PlanetarySystemEvent event = events.get(when);
-        if (null == event) {
-            event = new PlanetarySystemEvent();
-            event.date = when;
-            events.put(when, event);
-        }
-        return event;
-    }
-
-    public PlanetaryEvent getOrCreateEvent(LocalDate when, int position) {
-        Planet p = getPlanet(position);
-        if (null == p) {
-            return null;
-        }
-        return p.getOrCreateEvent(when);
+        return Objects.hash(id);
     }
 
     public PlanetarySystemEvent getEvent(LocalDate when) {
@@ -513,147 +422,124 @@ public class PlanetarySystem {
         return new ArrayList<>(events.values());
     }
 
-    /** Includes a parser for spectral type strings */
-    protected void setSpectralType(String type) {
-        SpectralDefinition scDef = StarUtil.parseSpectralType(type);
-
-        if (null == scDef) {
-            return;
-        }
-
-        spectralType = scDef.spectralType;
-        spectralClass = scDef.spectralClass;
-        subtype = scDef.subtype;
-        luminosity = scDef.luminosity;
-    }
-
-    // JAXB marshalling support
-    @SuppressWarnings({ "unused" })
-    private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
-        if (null == id) {
-            id = name;
-        }
-
-        // Spectral classification: use spectralType if available, else the separate values
-        if (null != spectralType) {
-            setSpectralType(spectralType);
-        }
-        nadirCharge = ObjectUtility.nonNull(nadirCharge, Boolean.FALSE);
-        zenithCharge = ObjectUtility.nonNull(zenithCharge, Boolean.FALSE);
-
-        // fill up planets
-        planets = new TreeMap<>();
-        if (null != planetList) {
-            for (Planet p : planetList) {
-                p.setParentSystem(this);
-                if (!planets.containsKey(p.getSystemPosition())) {
-                    planets.put(p.getSystemPosition(), p);
-                }
-            }
-            planetList.clear();
-        }
-        planetList = null;
-        // Fill up events
-        events = new TreeMap<>();
-        if (null != eventList) {
-            for (PlanetarySystemEvent event : eventList) {
-                if ((null != event) && (null != event.date)) {
-                    events.put(event.date, event);
-                }
-            }
-            eventList.clear();
-        }
-        eventList = null;
-    }
-
-    @SuppressWarnings("unused")
-    private boolean beforeMarshal(Marshaller marshaller) {
-        // Fill up our event list from the internal data type
-        eventList = new ArrayList<>(events.values());
-        // same for planet list
-        planetList = new ArrayList<>(planets.values());
-        return true;
-    }
-
-    public void copyDataFrom(PlanetarySystem other) {
-        if (null != other) {
-            // We don't change the ID
-            name = ObjectUtility.nonNull(other.name, name);
-            x = ObjectUtility.nonNull(other.x, x);
-            y = ObjectUtility.nonNull(other.y, y);
-            nadirCharge = ObjectUtility.nonNull(other.nadirCharge, nadirCharge);
-            zenithCharge = ObjectUtility.nonNull(other.zenithCharge, zenithCharge);
-            // TODO : some other changes should be possible
-            // TODO : Merge (not replace!) events
-            if (null != other.events) {
-                for (PlanetarySystemEvent event : other.getEvents()) {
-                    if ((null != event) && (null != event.date)) {
-                        PlanetarySystemEvent myEvent = getOrCreateEvent(event.date);
-                        myEvent.copyDataFrom(event);
-                    }
-                }
-            }
-            // check for planet level changes
-            if (null != other.planets) {
-                for (Planet p : other.planets.values()) {
-                    int pos = p.getSystemPosition();
-                    if (planets.containsKey(pos)) {
-                        planets.get(pos).copyDataFrom(p);
-                    } else {
-                        planets.put(pos, p);
-                    }
-                }
-            }
-        }
-    }
-
-    /** Data class to hold parsed spectral definitions */
-    public static final class SpectralDefinition {
-        public String spectralType;
-        public int spectralClass;
-        public double subtype;
-        public String luminosity;
-
-        public SpectralDefinition(String spectralType, int spectralClass, double subtype, String luminosity) {
-            this.spectralType = Objects.requireNonNull(spectralType);
-            this.spectralClass = spectralClass;
-            this.subtype = subtype;
-            this.luminosity = Objects.requireNonNull(luminosity);
-        }
-    }
-
- // @FunctionalInterface in Java 8, or just use Function<PlanetaryEvent, T>
     private interface EventGetter<T> {
         T get(PlanetarySystemEvent e);
     }
 
     /** A class representing some event, possibly changing planetary information */
-    @XmlRootElement(name="event")
     public static final class PlanetarySystemEvent {
-        @XmlJavaTypeAdapter(DateAdapter.class)
+
+        @JsonProperty("date")
         public LocalDate date;
-        public Boolean nadirCharge;
-        public Boolean zenithCharge;
+        @JsonProperty("nadirCharge")
+        public SourceableValue<Boolean> nadirCharge;
+        @JsonProperty("zenithCharge")
+        public SourceableValue<Boolean> zenithCharge;
         // Events marked as "custom" are saved to scenario files and loaded from there
         public transient boolean custom = false;
-
-        public void copyDataFrom(PlanetarySystemEvent other) {
-            nadirCharge = ObjectUtility.nonNull(other.nadirCharge, nadirCharge);
-            zenithCharge = ObjectUtility.nonNull(other.zenithCharge, zenithCharge);
-            custom = (other.custom || custom);
-        }
-
-        public void replaceDataFrom(PlanetarySystemEvent other) {
-            nadirCharge = other.nadirCharge;
-            zenithCharge = other.zenithCharge;
-            custom = (other.custom || custom);
-        }
 
         /**
          * @return <code>true</code> if the event doesn't contain any change
          */
         public boolean isEmpty() {
             return (null == nadirCharge) && (null == zenithCharge);
+        }
+    }
+
+    /**
+     * Retrieves a list of filtered academies based on the given campaign.
+     *
+     * @param campaign The campaign for filtering the academies.
+     * @return A list of filtered academies based on the campaign.
+     */
+    public List<Academy> getFilteredAcademies(Campaign campaign) {
+        final LocalDate currentDate = campaign.getLocalDate();
+        AcademyFactory academyFactory = AcademyFactory.getInstance();
+
+        List<String> excludedSets = List.of("Local Academies", "Unit Education");
+
+        return academyFactory.getAllSetNames().stream()
+                .filter(setName -> !excludedSets.contains(setName) // Excluding certain setNames
+                        && (!setName.equalsIgnoreCase("Prestigious Academies")
+                                || campaign.getCampaignOptions().isEnablePrestigiousAcademies())) // Additional
+                                                                                                  // condition for
+                                                                                                  // "Prestigious
+                                                                                                  // Academies"
+                .flatMap(setName -> getFilteredAcademiesForSet(currentDate, setName).stream())
+                .toList();
+    }
+
+    /**
+     * Retrieves a list of filtered academies for a given set and current date.
+     *
+     * @param currentDate The current date to filter the academies.
+     * @param setName     The set name to filter the academies.
+     * @return A list of filtered academies for the given set and current date.
+     */
+    private List<Academy> getFilteredAcademiesForSet(LocalDate currentDate, String setName) {
+        return AcademyFactory.getInstance().getAllAcademiesForSet(setName).stream()
+                .filter(academy -> academy.getLocationSystems().contains(this.getId())
+                        && !academy.isLocal()
+                        && !academy.isHomeSchool()
+                        && !academy.getName().contains("(Officer)")
+                        && currentDate.getYear() >= academy.getConstructionYear()
+                        && currentDate.getYear() < academy.getClosureYear()
+                        && currentDate.getYear() < academy.getDestructionYear())
+                .sorted()
+                .toList();
+    }
+
+    /**
+     * Retrieves a string representation of the prestigious academies available in
+     * the system.
+     *
+     * @return A string representation of the prestigious academies in the system.
+     */
+    public String getAcademiesForSystem(List<Academy> filteredAcademies) {
+        StringBuilder academyString = new StringBuilder();
+
+        for (Academy academy : filteredAcademies) { // there are not enough entries to justify a Stream
+            academyString.append("<b>").append(academy.getName()).append("</b><br>")
+                .append(academy.getDescription()).append("<br><br>");
+        }
+
+        return academyString.toString();
+    }
+
+    /** This class allows for some additional code on a planetary system after it is loaded by Jackson **/
+    public static class PlanetarySystemPostLoader extends StdConverter<PlanetarySystem, PlanetarySystem> {
+
+        @Override
+        public PlanetarySystem convert(PlanetarySystem planetarySystem) {
+            if (null == planetarySystem.id) {
+                planetarySystem.id = planetarySystem.name;
+            }
+
+            // fill up planets
+            planetarySystem.planets = new TreeMap<>();
+            if (null != planetarySystem.planetList) {
+                for (Planet planet : planetarySystem.planetList) {
+                    planet.setParentSystem(planetarySystem);
+                    if (!planetarySystem.planets.containsKey(planet.getSystemPosition())) {
+                        planetarySystem.planets.put(planet.getSystemPosition(), planet);
+                    }
+                }
+                planetarySystem.planetList.clear();
+            }
+            planetarySystem.planetList = null;
+            // Fill up events
+            planetarySystem.events = new TreeMap<>();
+            if (null != planetarySystem.eventList) {
+                for (PlanetarySystemEvent systemEvent : planetarySystem.eventList) {
+                    if ((null != systemEvent) && (null != systemEvent.date)) {
+                        planetarySystem.events.put(systemEvent.date, systemEvent);
+                    }
+                }
+                planetarySystem.eventList.clear();
+            }
+            planetarySystem.eventList = null;
+
+            return planetarySystem;
         }
     }
 }

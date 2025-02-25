@@ -18,24 +18,6 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.client.generator.RandomNameGenerator;
-import megamek.common.enums.Gender;
-import megamek.common.util.weightedMaps.WeightedIntMap;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.Person;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,9 +27,28 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import megamek.client.generator.RandomNameGenerator;
+import megamek.common.enums.Gender;
+import megamek.common.util.weightedMaps.WeightedIntMap;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.Person;
+
 @ExtendWith(value = MockitoExtension.class)
-public class MergingSurnameStyleTest {
-    //region Variable Declarations
+class MergingSurnameStyleTest {
+    // region Variable Declarations
     private static final MergingSurnameStyle[] styles = MergingSurnameStyle.values();
 
     @Mock
@@ -58,16 +59,16 @@ public class MergingSurnameStyleTest {
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         lenient().when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
     }
 
-    //region Getters
+    // region Getters
     @Test
-    public void testGetToolTipText() {
+    void testGetToolTipText() {
         assertEquals(resources.getString("MergingSurnameStyle.YOURS.toolTipText"),
                 MergingSurnameStyle.YOURS.getToolTipText());
         assertEquals(resources.getString("MergingSurnameStyle.WEIGHTED.toolTipText"),
@@ -75,17 +76,17 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testGetDropDownText() {
+    void testGetDropDownText() {
         assertEquals(resources.getString("MergingSurnameStyle.BOTH_HYPHEN_YOURS.dropDownText"),
                 MergingSurnameStyle.BOTH_HYPHEN_YOURS.getDropDownText());
         assertEquals(resources.getString("MergingSurnameStyle.BOTH_HYPHEN_SPOUSE.dropDownText"),
                 MergingSurnameStyle.BOTH_HYPHEN_SPOUSE.getDropDownText());
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     @Test
-    public void testIsNoChange() {
+    void testIsNoChange() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
             if (mergingSurnameStyle == MergingSurnameStyle.NO_CHANGE) {
                 assertTrue(mergingSurnameStyle.isNoChange());
@@ -96,7 +97,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testIsYours() {
+    void testIsYours() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
             if (mergingSurnameStyle == MergingSurnameStyle.YOURS) {
                 assertTrue(mergingSurnameStyle.isYours());
@@ -107,7 +108,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testIsSpouse() {
+    void testIsSpouse() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
             if (mergingSurnameStyle == MergingSurnameStyle.SPOUSE) {
                 assertTrue(mergingSurnameStyle.isSpouse());
@@ -118,7 +119,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testIsSpaceYours() {
+    void testIsSpaceYours() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
             if (mergingSurnameStyle == MergingSurnameStyle.SPACE_YOURS) {
                 assertTrue(mergingSurnameStyle.isSpaceYours());
@@ -129,7 +130,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testIsBothSpaceYours() {
+    void testIsBothSpaceYours() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
             if (mergingSurnameStyle == MergingSurnameStyle.BOTH_SPACE_YOURS) {
                 assertTrue(mergingSurnameStyle.isBothSpaceYours());
@@ -140,7 +141,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testIsHyphenYours() {
+    void testIsHyphenYours() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
             if (mergingSurnameStyle == MergingSurnameStyle.HYPHEN_YOURS) {
                 assertTrue(mergingSurnameStyle.isHyphenYours());
@@ -151,7 +152,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testIsBothHyphenYours() {
+    void testIsBothHyphenYours() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
             if (mergingSurnameStyle == MergingSurnameStyle.BOTH_HYPHEN_YOURS) {
                 assertTrue(mergingSurnameStyle.isBothHyphenYours());
@@ -162,7 +163,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testIsSpaceSpouse() {
+    void testIsSpaceSpouse() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
             if (mergingSurnameStyle == MergingSurnameStyle.SPACE_SPOUSE) {
                 assertTrue(mergingSurnameStyle.isSpaceSpouse());
@@ -173,7 +174,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testIsBothSpaceSpouse() {
+    void testIsBothSpaceSpouse() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
             if (mergingSurnameStyle == MergingSurnameStyle.BOTH_SPACE_SPOUSE) {
                 assertTrue(mergingSurnameStyle.isBothSpaceSpouse());
@@ -184,7 +185,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testIsHyphenSpouse() {
+    void testIsHyphenSpouse() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
             if (mergingSurnameStyle == MergingSurnameStyle.HYPHEN_SPOUSE) {
                 assertTrue(mergingSurnameStyle.isHyphenSpouse());
@@ -195,7 +196,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testIsBothHyphenSpouse() {
+    void testIsBothHyphenSpouse() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
             if (mergingSurnameStyle == MergingSurnameStyle.BOTH_HYPHEN_SPOUSE) {
                 assertTrue(mergingSurnameStyle.isBothHyphenSpouse());
@@ -206,7 +207,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testIsMale() {
+    void testIsMale() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
             if (mergingSurnameStyle == MergingSurnameStyle.MALE) {
                 assertTrue(mergingSurnameStyle.isMale());
@@ -217,7 +218,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testIsFemale() {
+    void testIsFemale() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
             if (mergingSurnameStyle == MergingSurnameStyle.FEMALE) {
                 assertTrue(mergingSurnameStyle.isFemale());
@@ -228,7 +229,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testIsWeighted() {
+    void testIsWeighted() {
         for (final MergingSurnameStyle mergingSurnameStyle : styles) {
             if (mergingSurnameStyle == MergingSurnameStyle.WEIGHTED) {
                 assertTrue(mergingSurnameStyle.isWeighted());
@@ -237,10 +238,10 @@ public class MergingSurnameStyleTest {
             }
         }
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
     @Test
-    public void testApplyNoChange() {
+    void testApplyNoChange() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
 
         final Person origin = new Person(mockCampaign);
@@ -254,7 +255,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testApplyYours() {
+    void testApplyYours() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(true);
 
         final Person origin = new Person(mockCampaign);
@@ -268,7 +269,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testApplySpouse() {
+    void testApplySpouse() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(true);
 
         final Person origin = new Person(mockCampaign);
@@ -282,7 +283,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testApplySpaceYours() {
+    void testApplySpaceYours() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
 
         final Person origin = new Person(mockCampaign);
@@ -308,7 +309,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testApplyBothSpaceYours() {
+    void testApplyBothSpaceYours() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
 
         final Person origin = new Person(mockCampaign);
@@ -340,7 +341,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testApplyHyphenYours() {
+    void testApplyHyphenYours() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
 
         final Person origin = new Person(mockCampaign);
@@ -366,7 +367,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testApplyBothHyphenYours() {
+    void testApplyBothHyphenYours() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
 
         final Person origin = new Person(mockCampaign);
@@ -398,7 +399,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testApplySpaceSpouse() {
+    void testApplySpaceSpouse() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
 
         final Person origin = new Person(mockCampaign);
@@ -424,7 +425,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testApplyBothSpaceSpouse() {
+    void testApplyBothSpaceSpouse() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
 
         final Person origin = new Person(mockCampaign);
@@ -456,7 +457,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testApplyHyphenSpouse() {
+    void testApplyHyphenSpouse() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
 
         final Person origin = new Person(mockCampaign);
@@ -482,7 +483,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testApplyBothHyphenSpouse() {
+    void testApplyBothHyphenSpouse() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
 
         final Person origin = new Person(mockCampaign);
@@ -514,7 +515,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testApplyMale() {
+    void testApplyMale() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
 
         final Person origin = new Person(mockCampaign);
@@ -539,7 +540,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testApplyFemale() {
+    void testApplyFemale() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
 
         final Person origin = new Person(mockCampaign);
@@ -564,7 +565,7 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testApplyWeighted() {
+    void testApplyWeighted() {
         when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
 
         final WeightedIntMap<MergingSurnameStyle> weightMap = new WeightedIntMap<>();
@@ -582,34 +583,29 @@ public class MergingSurnameStyleTest {
     }
 
     @Test
-    public void testCreateWeightedSurnameMap() {
+    void testCreateWeightedSurnameMap() {
         final Map<MergingSurnameStyle, Integer> weights = new HashMap<>();
         for (final MergingSurnameStyle style : styles) {
             weights.put(style, 1);
         }
-        assertFalse(MergingSurnameStyle.WEIGHTED.createWeightedSurnameMap(weights).containsValue(MergingSurnameStyle.WEIGHTED));
+        assertFalse(MergingSurnameStyle.WEIGHTED.createWeightedSurnameMap(weights)
+                .containsValue(MergingSurnameStyle.WEIGHTED));
     }
 
-    //region File I/O
+    // region File I/O
     @Test
-    public void testParseFromString() {
+    void testParseFromString() {
         // Normal Parsing
         assertEquals(MergingSurnameStyle.NO_CHANGE, MergingSurnameStyle.parseFromString("NO_CHANGE"));
         assertEquals(MergingSurnameStyle.BOTH_SPACE_SPOUSE, MergingSurnameStyle.parseFromString("BOTH_SPACE_SPOUSE"));
 
-        // Legacy Parsing - Enum Renames
-        assertEquals(MergingSurnameStyle.HYPHEN_YOURS, MergingSurnameStyle.parseFromString("HYP_YOURS"));
-        assertEquals(MergingSurnameStyle.BOTH_HYPHEN_YOURS, MergingSurnameStyle.parseFromString("BOTH_HYP_YOURS"));
-        assertEquals(MergingSurnameStyle.HYPHEN_SPOUSE, MergingSurnameStyle.parseFromString("HYP_SPOUSE"));
-        assertEquals(MergingSurnameStyle.BOTH_HYPHEN_SPOUSE, MergingSurnameStyle.parseFromString("BOTH_HYP_SPOUSE"));
-
         // Error Case
         assertEquals(MergingSurnameStyle.FEMALE, MergingSurnameStyle.parseFromString("blah"));
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Test
-    public void testToStringOverride() {
+    void testToStringOverride() {
         assertEquals(resources.getString("MergingSurnameStyle.BOTH_SPACE_SPOUSE.text"),
                 MergingSurnameStyle.BOTH_SPACE_SPOUSE.toString());
         assertEquals(resources.getString("MergingSurnameStyle.WEIGHTED.text"),

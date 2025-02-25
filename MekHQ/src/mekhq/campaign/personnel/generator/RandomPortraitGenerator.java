@@ -20,14 +20,16 @@ package mekhq.campaign.personnel.generator;
 
 import megamek.common.Compute;
 import megamek.common.icons.Portrait;
+import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.personnel.Person;
-import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
 import java.util.*;
 
 public class RandomPortraitGenerator {
+    private static final MMLogger logger = MMLogger.create(RandomPortraitGenerator.class);
+
     private RandomPortraitGenerator() {
 
     }
@@ -35,8 +37,9 @@ public class RandomPortraitGenerator {
     /**
      * This generates a unique Portrait based on the supplied {@link Person}
      *
-     * @param personnel a list of all personnel, from which existing portraits are determined
-     * @param p the {@link Person} to generate a unique portrait for
+     * @param personnel a list of all personnel, from which existing portraits are
+     *                  determined
+     * @param p         the {@link Person} to generate a unique portrait for
      * @return the generated portrait
      */
     public static Portrait generate(Collection<Person> personnel, Person p) {
@@ -44,7 +47,7 @@ public class RandomPortraitGenerator {
         // duplicates
         Set<String> existingPortraits = new HashSet<>();
         for (Person existingPerson : personnel) {
-            existingPortraits.add(existingPerson.getPortrait().getCategory() + ":"
+            existingPortraits.add(existingPerson.getPortrait().getCategory() + ':'
                     + existingPerson.getPortrait().getFilename());
         }
 
@@ -64,6 +67,8 @@ public class RandomPortraitGenerator {
                 searchCat_RoleGroup = "Admin";
             } else if (p.getPrimaryRole().isVesselCrew()) {
                 searchCat_RoleGroup = "Vessel Crew";
+            } else if (p.getPrimaryRole().isVehicleCrewMember()) {
+                searchCat_RoleGroup = "Vehicle Crew";
             } else if (p.getPrimaryRole().isTech()) {
                 searchCat_RoleGroup = "Tech";
             } else if (p.getPrimaryRole().isMedicalStaff()) {
@@ -91,11 +96,11 @@ public class RandomPortraitGenerator {
             if (temp.length == 2) {
                 return new Portrait(temp[0], temp[1]);
             } else {
-                LogManager.getLogger().error("Failed to generate portrait for " + p.getFullTitle() + ". "
+                logger.error("Failed to generate portrait for " + p.getFullTitle() + ". "
                         + chosenPortrait + " does not split into an array of length 2.");
             }
         } else {
-            LogManager.getLogger().warn("Failed to generate portrait for " + p.getFullTitle()
+            logger.warn("Failed to generate portrait for " + p.getFullTitle()
                     + ". No possible portraits found.");
         }
 
@@ -103,15 +108,17 @@ public class RandomPortraitGenerator {
     }
 
     /**
-     * This is a helper method that determines what possible unassigned portraits can be generated
+     * This is a helper method that determines what possible unassigned portraits
+     * can be generated
      * based on the supplied subdirectory
      *
-     * @param existingPortraits the list of existing portraits that have already been assigned
-     * @param subdirectory the subdirectory to search
+     * @param existingPortraits the list of existing portraits that have already
+     *                          been assigned
+     * @param subdirectory      the subdirectory to search
      * @return a list of all possible unassigned random portraits
      */
     private static List<String> getPossibleRandomPortraits(final Set<String> existingPortraits,
-                                                           final File subdirectory) {
+            final File subdirectory) {
         if (MHQStaticDirectoryManager.getPortraits() == null) {
             return new ArrayList<>();
         }
@@ -124,7 +131,7 @@ public class RandomPortraitGenerator {
 
             final Iterator<String> names = MHQStaticDirectoryManager.getPortraits().getItemNames(category);
             while (names.hasNext()) {
-                final String location = category + ":" + names.next();
+                final String location = category + ':' + names.next();
                 if (existingPortraits.contains(location)) {
                     continue;
                 }

@@ -21,7 +21,7 @@ package mekhq.campaign;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
-import megamek.common.Mech;
+import megamek.common.Mek;
 import mekhq.EventSpy;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartNewEvent;
@@ -1003,7 +1003,7 @@ public class WarehouseTest {
     private Unit createMockUnit() {
         Unit mockUnit = mock(Unit.class);
         when(mockUnit.getId()).thenReturn(UUID.randomUUID());
-        Mech mockEntity = mock(Mech.class);
+        Mek mockEntity = mock(Mek.class);
         when(mockEntity.getWeight()).thenReturn(0.0); // CAW: match spare parts without unit tonnage.
         when(mockUnit.getEntity()).thenReturn(mockEntity);
 

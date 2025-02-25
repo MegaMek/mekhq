@@ -23,9 +23,11 @@ import mekhq.MekHQ;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.JumpPathViewPanel;
 import mekhq.gui.view.PlanetViewPanel;
@@ -34,6 +36,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
@@ -44,7 +47,6 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     private JPanel panMapView;
     private InterstellarMapPanel panMap;
     private PlanetarySystemMapPanel panSystem;
-    private JSplitPane splitMap;
     private JScrollPane scrollPlanetView;
     JSuggestField suggestPlanet;
 
@@ -127,7 +129,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
         //the actual map
         panMap = new InterstellarMapPanel(getCampaign(), getCampaignGui());
-        // lets go ahead and zoom in on the current location
+        // let's go ahead and zoom in on the current location
         panMap.setSelectedSystem(getCampaign().getLocation().getCurrentSystem());
         panMapView.add(panMap, BorderLayout.CENTER);
 
@@ -135,12 +137,12 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         mapView.setMinimumSize(new Dimension(600,600));
         mapView.setView(panMapView);
 
-        scrollPlanetView = new JScrollPane();
+        scrollPlanetView = new JScrollPaneWithSpeed();
         scrollPlanetView.setMinimumSize(new Dimension(400, 600));
         scrollPlanetView.setPreferredSize(new Dimension(400, 600));
         scrollPlanetView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPlanetView.setViewportView(null);
-        splitMap = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, mapView, scrollPlanetView);
+        JSplitPane splitMap = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, mapView, scrollPlanetView);
         splitMap.setOneTouchExpandable(true);
         splitMap.setResizeWeight(1.0);
         splitMap.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshPlanetView());
@@ -177,47 +179,44 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         if (panMap.getJumpPath().isEmpty()) {
             return;
         }
+
         getCampaign().getLocation().setJumpPath(panMap.getJumpPath());
+
         refreshPlanetView();
         getCampaignGui().refreshLocation();
+
         panMap.setJumpPath(new JumpPath());
         panMap.repaint();
+
+        getCampaign().getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
     }
 
-    protected void refreshSystemView() {
+    private void refreshSystemView() {
         JumpPath path = panMap.getJumpPath();
         if (null != path && !path.isEmpty()) {
             scrollPlanetView.setViewportView(new JumpPathViewPanel(path, getCampaign()));
-            SwingUtilities.invokeLater(() -> {
-                scrollPlanetView.getVerticalScrollBar().setValue(0);
-            });
+            SwingUtilities.invokeLater(() -> scrollPlanetView.getVerticalScrollBar().setValue(0));
             return;
         }
         PlanetarySystem system = panMap.getSelectedSystem();
         if (null != system) {
             scrollPlanetView.setViewportView(new PlanetViewPanel(system, getCampaign()));
-            SwingUtilities.invokeLater(() -> {
-                scrollPlanetView.getVerticalScrollBar().setValue(0);
-            });
+            SwingUtilities.invokeLater(() -> scrollPlanetView.getVerticalScrollBar().setValue(0));
         }
     }
 
-    protected void refreshPlanetView() {
+    private void refreshPlanetView() {
         JumpPath path = panMap.getJumpPath();
         if (null != path && !path.isEmpty()) {
             scrollPlanetView.setViewportView(new JumpPathViewPanel(path, getCampaign()));
-            SwingUtilities.invokeLater(() -> {
-                scrollPlanetView.getVerticalScrollBar().setValue(0);
-            });
+            SwingUtilities.invokeLater(() -> scrollPlanetView.getVerticalScrollBar().setValue(0));
             return;
         }
         int pos = panSystem.getSelectedPlanetPosition();
         PlanetarySystem system = panMap.getSelectedSystem();
         if (null != system) {
             scrollPlanetView.setViewportView(new PlanetViewPanel(system, getCampaign(), pos));
-            SwingUtilities.invokeLater(() -> {
-                scrollPlanetView.getVerticalScrollBar().setValue(0);
-            });
+            SwingUtilities.invokeLater(() -> scrollPlanetView.getVerticalScrollBar().setValue(0));
         }
     }
 
@@ -264,9 +263,9 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == panMap) {
+        if (Objects.equals(e.getSource(), panMap)) {
             refreshSystemView();
-        } else if (e.getSource() == panSystem) {
+        } else if (Objects.equals(e.getSource(), panSystem)) {
             refreshPlanetView();
         }
     }

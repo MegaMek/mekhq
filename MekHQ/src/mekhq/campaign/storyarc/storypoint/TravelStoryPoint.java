@@ -20,47 +20,52 @@
  */
 package mekhq.campaign.storyarc.storypoint;
 
+import java.io.PrintWriter;
+import java.text.ParseException;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.Version;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.text.ParseException;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
- * This StoryPoint begins transit to some destination on the map. It completes when the campaign arrives at this
+ * This StoryPoint begins transit to some destination on the map. It completes
+ * when the campaign arrives at this
  * destination.
  */
 public class TravelStoryPoint extends StoryPoint {
+    private static final MMLogger logger = MMLogger.create(TravelStoryPoint.class);
 
-    //region Variable Declarations
+    // region Variable Declarations
     /** The id of the planetary system that is the destination */
     private String destinationId;
 
     /**
      * Should travel automatically begin to this system when the story point starts?
-     * For the time being, this will be yes. Once we implement a graphical display of story objectives
-     * then we can give creators the option of letting players arrange travel themselves
-     * */
+     * For the time being, this will be yes. Once we implement a graphical display
+     * of story objectives
+     * then we can give creators the option of letting players arrange travel
+     * themselves
+     */
     private boolean autoStart;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public TravelStoryPoint() {
         super();
         autoStart = true;
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region getter/setters
+    // region getter/setters
     @Override
     public String getTitle() {
         PlanetarySystem system = getDestination();
@@ -71,13 +76,15 @@ public class TravelStoryPoint extends StoryPoint {
         return "Unknown planetary system";
     }
 
-    public String getDestinationId() { return destinationId; }
+    public String getDestinationId() {
+        return destinationId;
+    }
 
     @Override
     protected String getResult() {
         return null;
     }
-    //endregion getter/setters
+    // endregion getter/setters
 
     @Override
     public String getObjective() {
@@ -88,22 +95,21 @@ public class TravelStoryPoint extends StoryPoint {
         return Systems.getInstance().getSystemById(destinationId);
     }
 
-
     @Override
     public void start() {
         super.start();
         if (null == getDestination()) {
-            //if we don't have a valid destination, then complete the story point
+            // if we don't have a valid destination, then complete the story point
             complete();
-        }
-        else if(autoStart) {
+        } else if (autoStart) {
             CurrentLocation location = getStoryArc().getCampaign().getLocation();
-            JumpPath path = getStoryArc().getCampaign().calculateJumpPath(location.getCurrentSystem(), getDestination());
+            JumpPath path = getStoryArc().getCampaign().calculateJumpPath(location.getCurrentSystem(),
+                    getDestination());
             getStoryArc().getCampaign().getLocation().setJumpPath(path);
         }
     }
 
-    //region File I/O
+    // region File I/O
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
@@ -121,14 +127,14 @@ public class TravelStoryPoint extends StoryPoint {
 
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("destinationId")) {
-                    destinationId =wn2.getTextContent().trim();
+                    destinationId = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("autoStart")) {
                     autoStart = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }
-    //endregion File I/O
+    // endregion File I/O
 }

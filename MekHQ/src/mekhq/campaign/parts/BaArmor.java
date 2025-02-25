@@ -31,7 +31,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class BaArmor extends Armor implements IAcquisitionWork {
+public class BaArmor extends Armor {
     public static boolean canBeClan(int type) {
         return type == EquipmentType.T_ARMOR_BA_STANDARD || type == EquipmentType.T_ARMOR_BA_STEALTH_BASIC
                 || type == EquipmentType.T_ARMOR_BA_STEALTH_IMP || type == EquipmentType.T_ARMOR_BA_STEALTH
@@ -41,7 +41,6 @@ public class BaArmor extends Armor implements IAcquisitionWork {
     public static boolean canBeIs(int type) {
         return type != EquipmentType.T_ARMOR_BA_FIRE_RESIST;
     }
-
 
     public static double getPointsPerTon(int t, boolean isClan) {
         return 1.0 / ArmorType.of(t, isClan).getWeightPerPoint();
@@ -139,7 +138,7 @@ public class BaArmor extends Armor implements IAcquisitionWork {
 
     @Override
     public double getArmorWeight(int points) {
-        return points * 50/1000.0;
+        return points * 50 / 1000.0;
     }
 
     @Override
@@ -155,18 +154,17 @@ public class BaArmor extends Armor implements IAcquisitionWork {
     @Override
     public int getAmountAvailable() {
         BaArmor a = (BaArmor) campaign.getWarehouse().findSparePart(part -> (part instanceof BaArmor)
-            && part.isPresent()
-            && !part.isReservedForRefit()
-            && isClanTechBase() == part.isClanTechBase()
-            && ((BaArmor) part).getType() == getType());
+                && part.isPresent()
+                && !part.isReservedForRefit()
+                && isClanTechBase() == part.isClanTechBase()
+                && ((BaArmor) part).getType() == getType());
 
         return a != null ? a.getAmount() : 0;
     }
 
     @Override
     public void changeAmountAvailable(int amount) {
-        BaArmor a = (BaArmor) campaign.getWarehouse().findSparePart(part ->
-                isSamePartType(part) && part.isPresent());
+        BaArmor a = (BaArmor) campaign.getWarehouse().findSparePart(part -> isSamePartType(part) && part.isPresent());
 
         if (null != a) {
             a.setAmount(a.getAmount() + amount);
@@ -174,7 +172,8 @@ public class BaArmor extends Armor implements IAcquisitionWork {
                 campaign.getWarehouse().removePart(a);
             }
         } else if (amount > 0) {
-            campaign.getQuartermaster().addPart(new BaArmor(getUnitTonnage(), amount, type, -1, isClanTechBase(), campaign), 0);
+            campaign.getQuartermaster()
+                    .addPart(new BaArmor(getUnitTonnage(), amount, type, -1, isClanTechBase(), campaign), 0);
         }
     }
 }

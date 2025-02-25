@@ -18,27 +18,28 @@
  */
 package mekhq.campaign.parts.enums;
 
-import mekhq.MekHQ;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PartRepairTypeTest {
-    //region Variable Declarations
+import java.util.List;
+import java.util.ResourceBundle;
+
+import org.junit.jupiter.api.Test;
+
+import mekhq.MekHQ;
+
+class PartRepairTypeTest {
+    // region Variable Declarations
     private static final PartRepairType[] types = PartRepairType.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Getters
+    // region Getters
     @Test
-    public void testIsValidForMRMS() {
+    void testIsValidForMRMS() {
         for (final PartRepairType partRepairType : types) {
             switch (partRepairType) {
                 case HEAT_SINK:
@@ -53,11 +54,11 @@ public class PartRepairTypeTest {
             }
         }
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     @Test
-    public void testIsArmour() {
+    void testIsArmour() {
         for (final PartRepairType partRepairType : types) {
             if (partRepairType == PartRepairType.ARMOUR) {
                 assertTrue(partRepairType.isArmour());
@@ -68,7 +69,7 @@ public class PartRepairTypeTest {
     }
 
     @Test
-    public void testIsAmmunition() {
+    void testIsAmmunition() {
         for (final PartRepairType partRepairType : types) {
             if (partRepairType == PartRepairType.AMMUNITION) {
                 assertTrue(partRepairType.isAmmunition());
@@ -79,7 +80,7 @@ public class PartRepairTypeTest {
     }
 
     @Test
-    public void testIsWeapon() {
+    void testIsWeapon() {
         for (final PartRepairType partRepairType : types) {
             if (partRepairType == PartRepairType.WEAPON) {
                 assertTrue(partRepairType.isWeapon());
@@ -90,7 +91,7 @@ public class PartRepairTypeTest {
     }
 
     @Test
-    public void testIsGeneralLocation() {
+    void testIsGeneralLocation() {
         for (final PartRepairType partRepairType : types) {
             if (partRepairType == PartRepairType.GENERAL_LOCATION) {
                 assertTrue(partRepairType.isGeneralLocation());
@@ -101,7 +102,7 @@ public class PartRepairTypeTest {
     }
 
     @Test
-    public void testIsEngine() {
+    void testIsEngine() {
         for (final PartRepairType partRepairType : types) {
             if (partRepairType == PartRepairType.ENGINE) {
                 assertTrue(partRepairType.isEngine());
@@ -112,7 +113,7 @@ public class PartRepairTypeTest {
     }
 
     @Test
-    public void testIsGyro() {
+    void testIsGyro() {
         for (final PartRepairType partRepairType : types) {
             if (partRepairType == PartRepairType.GYRO) {
                 assertTrue(partRepairType.isGyro());
@@ -123,7 +124,7 @@ public class PartRepairTypeTest {
     }
 
     @Test
-    public void testIsActuator() {
+    void testIsActuator() {
         for (final PartRepairType partRepairType : types) {
             if (partRepairType == PartRepairType.ACTUATOR) {
                 assertTrue(partRepairType.isActuator());
@@ -134,7 +135,7 @@ public class PartRepairTypeTest {
     }
 
     @Test
-    public void testIsElectronics() {
+    void testIsElectronics() {
         for (final PartRepairType partRepairType : types) {
             if (partRepairType == PartRepairType.ELECTRONICS) {
                 assertTrue(partRepairType.isElectronics());
@@ -145,7 +146,7 @@ public class PartRepairTypeTest {
     }
 
     @Test
-    public void testIsGeneral() {
+    void testIsGeneral() {
         for (final PartRepairType partRepairType : types) {
             if (partRepairType == PartRepairType.GENERAL) {
                 assertTrue(partRepairType.isGeneral());
@@ -156,7 +157,7 @@ public class PartRepairTypeTest {
     }
 
     @Test
-    public void testIsHeatSink() {
+    void testIsHeatSink() {
         for (final PartRepairType partRepairType : types) {
             if (partRepairType == PartRepairType.HEAT_SINK) {
                 assertTrue(partRepairType.isHeatSink());
@@ -167,7 +168,7 @@ public class PartRepairTypeTest {
     }
 
     @Test
-    public void testIsMekLocation() {
+    void testIsMekLocation() {
         for (final PartRepairType partRepairType : types) {
             if (partRepairType == PartRepairType.MEK_LOCATION) {
                 assertTrue(partRepairType.isMekLocation());
@@ -178,7 +179,7 @@ public class PartRepairTypeTest {
     }
 
     @Test
-    public void testIsPhysicalWeapon() {
+    void testIsPhysicalWeapon() {
         for (final PartRepairType partRepairType : types) {
             if (partRepairType == PartRepairType.PHYSICAL_WEAPON) {
                 assertTrue(partRepairType.isPhysicalWeapon());
@@ -189,7 +190,7 @@ public class PartRepairTypeTest {
     }
 
     @Test
-    public void testIsPodSpace() {
+    void testIsPodSpace() {
         for (final PartRepairType partRepairType : types) {
             if (partRepairType == PartRepairType.POD_SPACE) {
                 assertTrue(partRepairType.isPodSpace());
@@ -200,7 +201,7 @@ public class PartRepairTypeTest {
     }
 
     @Test
-    public void testIsUnknownLocation() {
+    void testIsUnknownLocation() {
         for (final PartRepairType partRepairType : types) {
             if (partRepairType == PartRepairType.UNKNOWN_LOCATION) {
                 assertTrue(partRepairType.isUnknownLocation());
@@ -209,9 +210,10 @@ public class PartRepairTypeTest {
             }
         }
     }
-    //endregion Boolean Comparison Methods
+
+    // endregion Boolean Comparison Methods
     @Test
-    public void testGetMRMSValidTypes() {
+    void testGetMRMSValidTypes() {
         final List<PartRepairType> mrmsValidTypes = PartRepairType.getMRMSValidTypes();
         for (final PartRepairType partRepairType : types) {
             switch (partRepairType) {
@@ -228,38 +230,21 @@ public class PartRepairTypeTest {
         }
     }
 
-    //region File I/O
+    // region File I/O
     @Test
-    public void testParseFromString() {
+    void testParseFromString() {
         // Normal Parsing
         assertEquals(PartRepairType.WEAPON, PartRepairType.parseFromString("WEAPON"));
         assertEquals(PartRepairType.GENERAL, PartRepairType.parseFromString("GENERAL"));
-
-        // Legacy Parsing - Enum Renames
-        assertEquals(PartRepairType.ARMOUR, PartRepairType.parseFromString("ARMOR"));
-        assertEquals(PartRepairType.AMMUNITION, PartRepairType.parseFromString("AMMO"));
-        assertEquals(PartRepairType.ARMOUR, PartRepairType.parseFromString("0"));
-        assertEquals(PartRepairType.AMMUNITION, PartRepairType.parseFromString("1"));
-        assertEquals(PartRepairType.WEAPON, PartRepairType.parseFromString("2"));
-        assertEquals(PartRepairType.GENERAL_LOCATION, PartRepairType.parseFromString("3"));
-        assertEquals(PartRepairType.ENGINE, PartRepairType.parseFromString("4"));
-        assertEquals(PartRepairType.GYRO, PartRepairType.parseFromString("5"));
-        assertEquals(PartRepairType.ACTUATOR, PartRepairType.parseFromString("6"));
-        assertEquals(PartRepairType.ELECTRONICS, PartRepairType.parseFromString("7"));
-        assertEquals(PartRepairType.GENERAL, PartRepairType.parseFromString("8"));
-        assertEquals(PartRepairType.HEAT_SINK, PartRepairType.parseFromString("9"));
-        assertEquals(PartRepairType.MEK_LOCATION, PartRepairType.parseFromString("10"));
-        assertEquals(PartRepairType.PHYSICAL_WEAPON, PartRepairType.parseFromString("11"));
-        assertEquals(PartRepairType.POD_SPACE, PartRepairType.parseFromString("12"));
 
         // Error Case
         assertEquals(PartRepairType.GENERAL_LOCATION, PartRepairType.parseFromString("13"));
         assertEquals(PartRepairType.GENERAL_LOCATION, PartRepairType.parseFromString("blah"));
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Test
-    public void testToStringOverride() {
+    void testToStringOverride() {
         assertEquals(resources.getString("PartRepairType.ARMOUR.text"),
                 PartRepairType.ARMOUR.toString());
         assertEquals(resources.getString("PartRepairType.AMMUNITION.text"),

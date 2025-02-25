@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -23,9 +23,9 @@ import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
+import mekhq.utilities.MHQXMLUtility;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -107,6 +107,13 @@ public class StratconTrackState {
         this.height = height;
     }
 
+    /**
+     * @return The size of the track derived by multiplying width and height.
+     */
+    public int getSize() {
+        return width * height;
+    }
+
     @XmlElementWrapper(name = "trackFacilities")
     @XmlElement(name = "facility")
     public Map<StratconCoords, StratconFacility> getFacilities() {
@@ -159,7 +166,7 @@ public class StratconTrackState {
             removeScenario(getBackingScenariosMap().get(campaignScenarioID));
         }
     }
-    
+
     /**
      * Removes a StratconScenario from this track.
      */
@@ -169,7 +176,7 @@ public class StratconTrackState {
         Map<StratconCoords, StratconStrategicObjective> objectives = getObjectivesByCoords();
         if (objectives.containsKey(scenario.getCoords())) {
             StrategicObjectiveType objectiveType = objectives.get(scenario.getCoords()).getObjectiveType();
-            
+
             switch (objectiveType) {
                 case RequiredScenarioVictory:
                 case SpecificScenarioVictory:
@@ -265,6 +272,19 @@ public class StratconTrackState {
      * Handles the unassignment of a force from this track.
      */
     public void unassignForce(int forceID) {
+        if (assignedForceCoords.containsKey(forceID)) {
+            assignedCoordForces.get(assignedForceCoords.get(forceID)).remove(forceID);
+            assignedForceCoords.remove(forceID);
+            assignedForceReturnDates.remove(forceID);
+            removeStickyForce(forceID);
+            getAssignedForceReturnDatesForStorage().remove(forceID);
+        }
+    }
+
+    /**
+     * Handles the unassignment of a force from this track.
+     */
+    public void unassignUnit(int forceID) {
         if (assignedForceCoords.containsKey(forceID)) {
             assignedCoordForces.get(assignedForceCoords.get(forceID)).remove(forceID);
             assignedForceCoords.remove(forceID);
@@ -432,6 +452,26 @@ public class StratconTrackState {
      */
     public boolean hasActiveTrackReveal() {
         return getFacilities().values().stream().anyMatch(StratconFacility::getRevealTrack);
+    }
+
+    /**
+     * Determines the number of facilities on this track that actively reveal the track.
+     *
+     * <p>This method iterates through all facilities associated with the track and counts
+     * how many of them have the ability to reveal the track, as determined by the facility's
+     * {@link StratconFacility#getIncreaseScanRange()} method.</p>
+     *
+     * @return an integer representing the total number of facilities on this track
+     *         that are actively revealing it.
+     */
+    public int getScanRangeIncrease() {
+        int scanRange = 0;
+        for (StratconFacility facility : getFacilities().values()) {
+            if (facility.getIncreaseScanRange()) {
+                scanRange++;
+            }
+        }
+        return scanRange;
     }
 
     /**

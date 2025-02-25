@@ -28,6 +28,7 @@ import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -45,7 +46,7 @@ public class Quartermaster {
         PlanetSpecificFailure,
         Success
     }
-    
+
     private final Campaign campaign;
 
     /**
@@ -102,7 +103,6 @@ public class Quartermaster {
         }
 
         part.setDaysToArrival(Math.max(transitDays, 0));
-        part.setBrandNew(false);
 
         // be careful in using this next line
         part.postProcessCampaignAddition();
@@ -466,17 +466,26 @@ public class Quartermaster {
     public boolean buyUnit(Entity en, int days) {
         Objects.requireNonNull(en);
 
+        PartQuality quality = PartQuality.QUALITY_D;
+
+        if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+            quality = Unit.getRandomUnitQuality(0);
+        }
+
         if (getCampaignOptions().isPayForUnits()) {
             Money cost = new Unit(en, getCampaign()).getBuyCost();
             if (getCampaign().getFinances().debit(TransactionType.UNIT_PURCHASE, getCampaign().getLocalDate(),
                     cost, "Purchased " + en.getShortName())) {
-                getCampaign().addNewUnit(en, false, days);
+
+                getCampaign().addNewUnit(en, false, days, quality);
+
                 return true;
             } else {
                 return false;
             }
         } else {
-            getCampaign().addNewUnit(en, false, days);
+
+            getCampaign().addNewUnit(en, false, days, quality);
             return true;
         }
     }

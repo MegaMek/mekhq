@@ -13,7 +13,7 @@
 		<arrivalTurn>-3</arrivalTurn>
 		<canReinforceLinked>true</canReinforceLinked>
 		<contributesToBV>false</contributesToBV>
-		<contributesToMapSize>false</contributesToMapSize>
+		<contributesToMapSize>true</contributesToMapSize>
 		<contributesToUnitCount>false</contributesToUnitCount>
 		<deploymentZones>
 			<deploymentZone>1</deploymentZone>
@@ -30,14 +30,14 @@
 		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>Opfor Ground Reinforcements</forceName>
+		<forceName>Ground Reinforcements</forceName>
 		<generationMethod>1</generationMethod>
 		<generationOrder>5</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>0</retreatThreshold>
 		<objectiveLinkedForces>
-                    <objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
-                </objectiveLinkedForces>
+			<objectiveLinkedForce>OpFor</objectiveLinkedForce>
+		</objectiveLinkedForces>
 		<syncDeploymentType>None</syncDeploymentType>
 		<syncedForceName />
 	</forceDefinition>

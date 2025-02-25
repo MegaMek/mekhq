@@ -2,8 +2,12 @@
 <!--
 Each Institution consists of the following fields:
 Name: The display name for the financial institution.
-foundationDate: The date the institution was founded. This is an optional field, and if absent allows the institution to generate on all dates before their shutter date. If both this and the shutter date are absent this institution can generate on any year.
-shutterDate: The date the institution shuttered its doors. This is an optional field, and if absent allows the institution to generate on all dates after their foundation date. If both this and the foundation date are absent this institution can generate on any year.
+foundationDate: The date the institution was founded. This is an optional field, and if absent
+allows the institution to generate on all dates before their shutter date. If both this and the
+shutter date are absent this institution can generate on any year.
+shutterDate: The date the institution shuttered its doors. This is an optional field, and if absent
+allows the institution to generate on all dates after their foundation date. If both this and the
+foundation date are absent this institution can generate on any year.
 -->
 <financialInstitutions>
     <institution>

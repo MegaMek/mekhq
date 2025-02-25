@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<unit version="0.49.13-SNAPSHOT" >
+<unit version="0.49.13-SNAPSHOT">
 
-		<entity chassis="Grasshopper" model="GHR-5N" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="5c4bc4fd-da43-4637-bb04-eb749c331239">
-			<pilot size="1" name="Tomokazu Yamada" nick="Cherry" gender="MALE" gunnery="2" piloting="3" externalId="b24705fd-9eec-484c-8d14-ac5ca970710d" ejected="false" advantages="hopping_jack::melee_specialist" edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
-			<Game id="2"/>
-		</entity>
+	<entity chassis="Grasshopper" model="GHR-5N" type="Biped" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="5c4bc4fd-da43-4637-bb04-eb749c331239">
+		<pilot size="1" name="Tomokazu Yamada" nick="Cherry" gender="MALE" gunnery="2" piloting="3"
+			externalId="b24705fd-9eec-484c-8d14-ac5ca970710d" ejected="false"
+			advantages="hopping_jack::melee_specialist"
+			edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails"
+			autoeject="true" />
+		<Game id="2" />
+	</entity>
 
 </unit>

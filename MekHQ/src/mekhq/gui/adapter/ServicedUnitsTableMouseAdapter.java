@@ -78,7 +78,7 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
                 if (!unit.isDeployed()) {
                     String sel = command.split(":")[1];
                     int selected = Integer.parseInt(sel);
-                    if ((selected > -1) && (selected < Unit.SITE_N)) {
+                    if ((selected > -1) && (selected < Unit.SITE_UNKNOWN)) {
                         unit.setSite(selected);
                         MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
                     }
@@ -135,13 +135,12 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
                     .convertRowIndexToModel(rows[i]));
         }
         JMenuItem menuItem;
-        JMenu menu;
         JCheckBoxMenuItem cbMenuItem;
         // **lets fill the pop up menu**//
         // change the location
-        menu = new JMenu("Change site");
+        JMenu menu = new JMenu("Change site");
         int i;
-        for (i = 0; i < Unit.SITE_N; i++) {
+        for (i = 0; i < Unit.SITE_UNKNOWN; i++) {
             cbMenuItem = new JCheckBoxMenuItem(Unit.getSiteName(i));
             if (StaticChecks.areAllSameSite(units) && unit.getSite() == i) {
                 cbMenuItem.setSelected(true);

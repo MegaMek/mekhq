@@ -15,7 +15,7 @@ The expected format is as follows:
 Top row contains three empty "cells", followed by a list of all the years in which faction change events can occur for planets.
 Each row thereafter contains the following cells:
 System Name
-X coordinate 
+X coordinate
 Y coordinate (with Terra as the "origin")
 faction codes for each of the years defined in the top row. An empty value in one of these cells is treated as "undiscovered".
 

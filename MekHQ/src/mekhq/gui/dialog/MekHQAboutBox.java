@@ -21,20 +21,30 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
-import mekhq.MHQConstants;
-import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Cursor;
+import java.awt.Desktop;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URI;
 import java.util.ResourceBundle;
 
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.WindowConstants;
+
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
+import mekhq.MekHQ;
+
 public class MekHQAboutBox extends JDialog {
+    private static final MMLogger logger = MMLogger.create(MekHQAboutBox.class);
+
     public MekHQAboutBox(JFrame parent) {
         super(parent);
         initComponents();
@@ -119,7 +129,8 @@ public class MekHQAboutBox extends JDialog {
         getContentPane().add(homepageLabel, gridBagConstraints);
 
         // use a JButton but make it look more like a regular link
-        appHomepage.setText("<html><font color='#0000EE'>" + mekhqProperties.getString("Application.homepage") + "</font></html>");
+        appHomepage.setText(
+                "<html><font color='#0000EE'>" + mekhqProperties.getString("Application.homepage") + "</font></html>");
         appHomepage.setName("appHomepageLabel");
         appHomepage.setOpaque(false);
         appHomepage.setToolTipText(mekhqProperties.getString("Application.homepage"));
@@ -149,13 +160,13 @@ public class MekHQAboutBox extends JDialog {
         gridBagConstraints.weighty = 1.0;
 
         // add some space at the bottom so the description text is easier to read
-        gridBagConstraints.insets = new Insets(15,15,15,15);
+        gridBagConstraints.insets = new Insets(15, 15, 15, 15);
 
         appDescLabel.setName("appDescLabel");
 
         getContentPane().add(appDescLabel, gridBagConstraints);
 
-        setSize(200,200);
+        setSize(200, 200);
 
         pack();
     }
@@ -166,7 +177,7 @@ public class MekHQAboutBox extends JDialog {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekHQAboutBox.class);
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 }

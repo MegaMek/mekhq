@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -82,106 +82,138 @@ public class UnitTableModel extends DataTableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch (column) {
-            case COL_NAME:
-                return "Name";
-            case COL_TYPE:
-                return "Type";
-            case COL_WCLASS:
-                return "Class";
-            case COL_TECH:
-                return "Tech";
-            case COL_WEIGHT:
-                return "Weight";
-            case COL_COST:
-                return "Value";
-            case COL_STATUS:
-                return "Status";
-            case COL_CONDITION:
-                return "Condition";
-            case COL_CREW_STATE:
-                return "Crew State";
-            case COL_QUALITY:
-                return "Quality";
-            case COL_PILOT:
-                return "Assigned to";
-            case COL_FORCE:
-                return "Force";
-            case COL_CREW:
-                return "Crew";
-            case COL_TECH_CRW:
-                return "Tech Crew";
-            case COL_MAINTAIN:
-                return "Maintenance Costs";
-            case COL_BV:
-                return "BV";
-            case COL_REPAIR:
-                return "# Repairs";
-            case COL_PARTS:
-                return "# Parts";
-            case COL_SITE:
-                return "Site";
-            case COL_QUIRKS:
-                return "Quirks";
-            case COL_RSTATUS:
-                return "Mode";
-            default:
-                return "?";
-        }
+        return switch (column) {
+            case COL_NAME -> "Name";
+            case COL_TYPE -> "Type";
+            case COL_WCLASS -> "Class";
+            case COL_TECH -> "Tech";
+            case COL_WEIGHT -> "Weight";
+            case COL_COST -> "Value";
+            case COL_STATUS -> "Status";
+            case COL_CONDITION -> "Condition";
+            case COL_CREW_STATE -> "Crew State";
+            case COL_QUALITY -> "Quality";
+            case COL_PILOT -> "Assigned to";
+            case COL_FORCE -> "Force";
+            case COL_CREW -> "Crew";
+            case COL_TECH_CRW -> "Tech Crew";
+            case COL_MAINTAIN -> "Maintenance";
+            case COL_BV -> "BV";
+            case COL_REPAIR -> "# Repairs";
+            case COL_PARTS -> "# Parts";
+            case COL_SITE -> "Site";
+            case COL_QUIRKS -> "Quirks";
+            case COL_RSTATUS -> "Mode";
+            default -> "?";
+        };
     }
 
     public int getColumnWidth(final int columnId) {
-        switch (columnId) {
-            case COL_NAME:
-            case COL_TECH:
-            case COL_PILOT:
-            case COL_FORCE:
-            case COL_TECH_CRW:
-                return 150;
-            case COL_TYPE:
-            case COL_WCLASS:
-            case COL_SITE:
-                return 50;
-            case COL_COST:
-            case COL_STATUS:
-            case COL_RSTATUS:
-                return 40;
-            default:
-                return 20;
-        }
+        return switch (columnId) {
+            case COL_NAME, COL_TECH, COL_PILOT, COL_FORCE, COL_TECH_CRW -> 150;
+            case COL_TYPE, COL_WCLASS, COL_SITE -> 50;
+            case COL_COST, COL_STATUS, COL_RSTATUS, COL_CREW -> 40;
+            case COL_PARTS -> 10;
+            default -> 20;
+        };
     }
 
     public int getAlignment(int col) {
-        switch (col) {
-            case COL_WEIGHT:
-            case COL_COST:
-            case COL_MAINTAIN:
-            case COL_BV:
-            case COL_REPAIR:
-            case COL_PARTS:
-                return SwingConstants.RIGHT;
-            case COL_QUALITY:
-            case COL_CREW:
-            case COL_QUIRKS:
-            case COL_RSTATUS:
-                return SwingConstants.CENTER;
-            default:
-                return SwingConstants.LEFT;
-        }
+        return switch (col) {
+            case COL_WEIGHT, COL_COST, COL_MAINTAIN, COL_BV, COL_REPAIR, COL_PARTS -> SwingConstants.RIGHT;
+            case COL_QUALITY, COL_CREW, COL_QUIRKS, COL_RSTATUS -> SwingConstants.CENTER;
+            default -> SwingConstants.LEFT;
+        };
     }
 
-    public @Nullable String getTooltip(int row, int col) {
-        Unit u = getUnit(row);
-        switch (col) {
-            case COL_STATUS:
-                return u.isRefitting() ? u.getRefit().getDesc() : null;
-            case COL_CREW_STATE:
-                return u.getCrewState().getToolTipText();
-            case COL_QUIRKS:
-                return u.getQuirksList();
-            default:
-                return null;
+    /**
+     * Returns the tooltip for the specified row and column.
+     *
+     * @param rowIndex    the index of the row
+     * @param columnIndex the index of the column
+     * @return the tooltip for the specified row and column, or {@code null} if no tooltip is available
+     */
+    public @Nullable String getTooltip(int rowIndex, int columnIndex) {
+        Unit unit = getUnit(rowIndex);
+
+        if (unit == null) {
+            return null;
         }
+
+        return switch (columnIndex) {
+            case COL_STATUS -> unit.isRefitting() ? unit.getRefit().getDesc() : null;
+            case COL_CREW_STATE -> unit.getCrewState().getToolTipText();
+            case COL_CREW -> getCrewTooltip(unit);
+            case COL_QUIRKS -> unit.getQuirksList();
+            default -> null;
+        };
+    }
+
+    /**
+     * Returns the tooltip for the crew status of a given unit.
+     *
+     * @param unit the unit for which to get the crew tooltip
+     * @return the crew tooltip as an HTML string
+     */
+    static String getCrewTooltip(Unit unit) {
+        int gunnersNeeded = unit.getTotalGunnerNeeds();
+        int gunnersAssigned = unit.getGunners().size();
+
+        int driversNeeded = unit.getTotalDriverNeeds();
+        int driversAssigned = unit.getDrivers().size();
+
+        Entity entity = unit.getEntity();
+        int soldiersNeeded = entity instanceof Infantry ? gunnersNeeded : 0;
+        int soldiersAssigned = entity instanceof Infantry ? gunnersAssigned : 0;
+
+        int navigatorsNeeded = entity instanceof Jumpship && !(entity instanceof SpaceStation) ? 1 : 0;
+        int navigatorsAssigned = unit.getNavigator() == null ? 0 : 1;
+
+        int crewNeeded = unit.getTotalCrewNeeds();
+        int crewAssigned = unit.getCrew().size() - (gunnersAssigned + driversAssigned + navigatorsAssigned);
+
+        StringBuilder report = new StringBuilder("<html>");
+
+
+        if (driversNeeded > 0 && soldiersNeeded == 0) {
+            appendReport(report, "Drivers", driversAssigned, driversNeeded);
+        }
+
+        if (gunnersNeeded > 0 && soldiersNeeded == 0) {
+            report.append("<br>");
+            appendReport(report, "Gunners", gunnersAssigned, gunnersNeeded);
+        }
+
+        if (soldiersNeeded > 0) {
+            report.append("<br>");
+            appendReport(report, "Soldiers", soldiersAssigned, soldiersNeeded);
+        }
+
+        if (crewNeeded > 0) {
+            report.append("<br>");
+            appendReport(report, "Crew", crewAssigned, crewNeeded);
+        }
+
+        if (navigatorsNeeded > 0) {
+            report.append("<br>");
+            appendReport(report, "Navigator", navigatorsAssigned, navigatorsNeeded);
+        }
+
+        report.append("</html>");
+
+        return report.toString();
+    }
+
+    /**
+     * Appends a crew report line to the provided StringBuilder.
+     *
+     * @param report the {@link StringBuilder} to append to
+     * @param title the title of the crew role (e.g., "Driver", "Gunner")
+     * @param assigned the number of crew members assigned to the role
+     * @param needed the number of crew members needed for the role
+     */
+    private static void appendReport(StringBuilder report, String title, int assigned, int needed) {
+        report.append(String.format("<b>%s: </b>%d/%d", title, assigned, needed));
     }
 
     @Override
@@ -204,59 +236,39 @@ public class UnitTableModel extends DataTableModel {
             return "";
         }
 
-        Unit u = getUnit(row);
-        Entity e = u.getEntity();
-        if (e == null) {
+        Unit unit = getUnit(row);
+        Entity entity = unit.getEntity();
+        if (entity == null) {
             return "?";
         }
 
-        switch (col) {
-            case COL_NAME:
-                return u.getName();
-            case COL_TYPE:
-                return UnitType.getTypeDisplayableName(e.getUnitType());
-            case COL_WCLASS:
-                return e.getWeightClassName();
-            case COL_TECH:
-                return TechConstants.getLevelDisplayableName(e.getTechLevel());
-            case COL_WEIGHT:
-                return e.getWeight();
-            case COL_COST:
-                return u.getSellValue().toAmountAndSymbolString();
-            case COL_STATUS:
-                return u.getStatus();
-            case COL_CONDITION:
-                return u.getCondition();
-            case COL_CREW_STATE:
-                return u.getCrewState();
-            case COL_QUALITY:
-                return u.getQualityName();
-            case COL_PILOT:
-                return (u.getCommander() != null) ? u.getCommander().getHTMLTitle() : "-";
-            case COL_FORCE:
-                Force force = u.getCampaign().getForce(u.getForceId());
-                return (force != null) ? force.getFullName() : "-";
-            case COL_CREW:
-                return u.getActiveCrew().size() + "/" + u.getFullCrewSize();
-            case COL_TECH_CRW:
-                return (u.getTech() != null) ? u.getTech().getHTMLTitle() : "-";
-            case COL_MAINTAIN:
-                return u.getMaintenanceCost().toAmountAndSymbolString();
-            case COL_BV:
-                return e.calculateBattleValue(true, u.getEntity().getCrew() == null);
-            case COL_REPAIR:
-                return u.getPartsNeedingFixing().size();
-            case COL_PARTS:
-                return u.getPartsNeeded().size();
-            case COL_SITE:
-                return Unit.getSiteName(u.getSite());
-            case COL_QUIRKS:
-                return e.countQuirks();
-            case COL_RSTATUS:
-                return u.isSalvage() ? "Salvage" : "Repair";
-            default:
-                return "?";
-        }
+        return switch (col) {
+            case COL_NAME -> unit.getName();
+            case COL_TYPE -> unit.getTypeDisplayableNameWithOmni();
+            case COL_WCLASS -> entity.getWeightClassName();
+            case COL_TECH -> TechConstants.getLevelDisplayableName(entity.getTechLevel());
+            case COL_WEIGHT -> entity.getWeight();
+            case COL_COST -> unit.getSellValue().toAmountAndSymbolString();
+            case COL_STATUS -> unit.getStatus();
+            case COL_CONDITION -> unit.getCondition();
+            case COL_CREW_STATE -> unit.getCrewState();
+            case COL_QUALITY -> unit.getQualityName();
+            case COL_PILOT -> (unit.getCommander() != null) ? unit.getCommander().getHTMLTitle() : "-";
+            case COL_FORCE -> {
+                Force force = unit.getCampaign().getForce(unit.getForceId());
+                yield (force != null) ? force.getFullName() : "-";
+            }
+            case COL_CREW -> unit.getActiveCrew().size() + "/" + unit.getFullCrewSize();
+            case COL_TECH_CRW -> (unit.getTech() != null) ? unit.getTech().getHTMLTitle() : "-";
+            case COL_MAINTAIN -> unit.getMaintenanceCost().toAmountAndSymbolString();
+            case COL_BV -> entity.calculateBattleValue(true, unit.getEntity().getCrew() == null);
+            case COL_REPAIR -> unit.getPartsNeedingFixing().size();
+            case COL_PARTS -> unit.getPartsNeeded().size();
+            case COL_SITE -> Unit.getSiteName(unit.getSite());
+            case COL_QUIRKS -> entity.countQuirks();
+            case COL_RSTATUS -> unit.isSalvage() ? "Strip" : "Repair";
+            default -> "?";
+        };
     }
 
     public Campaign getCampaign() {
@@ -264,7 +276,7 @@ public class UnitTableModel extends DataTableModel {
     }
 
     public TableCellRenderer getRenderer(boolean graphic) {
-        return (graphic) ? new UnitTableModel.VisualRenderer() : new UnitTableModel.Renderer();
+        return (graphic) ? new VisualRenderer() : new Renderer();
     }
 
     public class Renderer extends DefaultTableCellRenderer {

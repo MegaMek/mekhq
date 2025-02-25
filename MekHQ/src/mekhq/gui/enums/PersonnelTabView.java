@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2023 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,6 +35,7 @@ public enum PersonnelTabView {
     FLUFF("PersonnelTabView.FLUFF.text", "PersonnelTabView.FLUFF.toolTipText"),
     DATES("PersonnelTabView.DATES.text", "PersonnelTabView.DATES.toolTipText"),
     FLAGS("PersonnelTabView.FLAGS.text", "PersonnelTabView.FLAGS.toolTipText"),
+    PERSONALITY("PersonnelTabView.PERSONALITY.text", "PersonnelTabView.PERSONALITY.toolTipText"),
     OTHER("PersonnelTabView.OTHER.text", "PersonnelTabView.OTHER.toolTipText");
     //endregion Enum Declarations
 
@@ -101,6 +102,10 @@ public enum PersonnelTabView {
 
     public boolean isFlags() {
         return this == FLAGS;
+    }
+
+    public boolean isPersonality() {
+        return this == PERSONALITY;
     }
 
     public boolean isOther() {

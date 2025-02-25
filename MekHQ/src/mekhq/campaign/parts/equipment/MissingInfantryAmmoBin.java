@@ -19,29 +19,31 @@
 
 package mekhq.campaign.parts.equipment;
 
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
 import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * Ammo bin missing from a small support vehicle
  */
 public class MissingInfantryAmmoBin extends MissingAmmoBin {
+    private static final MMLogger logger = MMLogger.create(MissingInfantryAmmoBin.class);
+
     private InfantryWeapon weaponType;
 
     // Used in deserialization
-    @SuppressWarnings("unused")
     public MissingInfantryAmmoBin() {
         this(0, null, 0, null, 0, false, null);
     }
@@ -49,13 +51,13 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
     /**
      * Construct a new placeholder for a missing infantry ammo bin
      *
-     * @param tonnage     The weight of the unit it's installed on
-     * @param ammoType    The type of ammo
-     * @param equipNum    The equipment index on the unit
-     * @param weaponType  The weapon this ammo is for
-     * @param clips       The number of clips of ammo
-     * @param omniPodded  Whether the weapon is pod-mounted on an omnivehicle
-     * @param c           The campaign instance
+     * @param tonnage    The weight of the unit it's installed on
+     * @param ammoType   The type of ammo
+     * @param equipNum   The equipment index on the unit
+     * @param weaponType The weapon this ammo is for
+     * @param clips      The number of clips of ammo
+     * @param omniPodded Whether the weapon is pod-mounted on an omnivehicle
+     * @param c          The campaign instance
      */
     public MissingInfantryAmmoBin(int tonnage, @Nullable AmmoType ammoType, int equipNum,
             @Nullable InfantryWeapon weaponType, int clips, boolean omniPodded, @Nullable Campaign c) {
@@ -73,7 +75,7 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
         if (getWeaponType() != null) {
             name = getWeaponType().getName() + " Ammo Bin";
         } else {
-            LogManager.getLogger().error("MissingInfantryAmmoBin does not have a weapon type!");
+            logger.error("MissingInfantryAmmoBin does not have a weapon type!");
         }
     }
 
@@ -101,7 +103,7 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
     @Override
     public int getLocation() {
         if (unit != null) {
-            Mounted m = unit.getEntity().getEquipment(equipmentNum);
+            Mounted<?> m = unit.getEntity().getEquipment(equipmentNum);
             while (m.getLinkedBy() != null) {
                 m = m.getLinkedBy();
             }

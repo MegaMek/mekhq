@@ -1,105 +1,135 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<unit version="0.49.15-SNAPSHOT" >
+<unit version="0.49.15-SNAPSHOT">
 
-		<entity chassis="Warrior Attack Helicopter" model="H-7C" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" elevation="1" externalId="ce890ad4-160f-4e2b-b59d-72a68d7ce9b0" quirks="vtol_rotor">
-			<pilot size="2" name="Ghaidaa Abdul-Samad" nick="" gender="FEMALE" gunnery="3" piloting="5" externalId="eb856571-3ce2-4f5d-a030-3ff00321aa95" ejected="false"/>
-      <motive damage="0" penalty="0"/>
-      Tanks have special needs, so don't delete any ammo slots.
-      The first slot in a location is at index="1".
-			<location index="0"> Body
-				<slot index="1" type="IS Ammo LRM-10" shots="12"/>
-				<slot index="2" type="IS Ammo LRM-10" shots="12"/>
-				<slot index="3" type="IS Ammo SRM-4" shots="25"/>
-			</location>
-			<Game id="1"/>
-		</entity>
+	<entity chassis="Warrior Attack Helicopter" model="H-7C" type="VTOL" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" elevation="1"
+		externalId="ce890ad4-160f-4e2b-b59d-72a68d7ce9b0" quirks="vtol_rotor">
+		<pilot size="2" name="Ghaidaa Abdul-Samad" nick="" gender="FEMALE" gunnery="3" piloting="5"
+			externalId="eb856571-3ce2-4f5d-a030-3ff00321aa95" ejected="false" />
+      <motive damage="0"
+			penalty="0" /> Tanks have special needs, so don't delete any ammo slots. The first slot in a
+		location is at index="1". <location index="0"> Body <slot index="1" type="IS Ammo LRM-10"
+				shots="12" />
+				<slot index="2" type="IS Ammo LRM-10" shots="12" />
+				<slot index="3"
+				type="IS Ammo SRM-4" shots="25" />
+		</location>
+			<Game id="1" />
+	</entity>
 
-		<entity chassis="Warrior Attack Helicopter" model="H-7C" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" elevation="1" externalId="6cf04ea3-fa28-41a7-8f05-7bb62fd02f0f" quirks="vtol_rotor">
-			<pilot size="2" name="Bill Killgore" nick="" gender="MALE" gunnery="3" piloting="4" externalId="a5e2f8c0-b38f-4057-a65e-50b53727fd43" ejected="false" advantages="weapon_specialist LRM 10" edge="edge 2::edge_when_tac::edge_when_ko"/>
-      <motive damage="0" penalty="0"/>
-      Tanks have special needs, so don't delete any ammo slots.
-      The first slot in a location is at index="1".
-			<location index="0"> Body
-				<slot index="1" type="IS Ammo LRM-10" shots="12"/>
-				<slot index="2" type="IS Ammo LRM-10" shots="12"/>
-				<slot index="3" type="IS Ammo SRM-4" shots="25"/>
-			</location>
-			<Game id="2"/>
-		</entity>
+	<entity chassis="Warrior Attack Helicopter" model="H-7C" type="VTOL" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" elevation="1"
+		externalId="6cf04ea3-fa28-41a7-8f05-7bb62fd02f0f" quirks="vtol_rotor">
+		<pilot size="2" name="Bill Killgore" nick="" gender="MALE" gunnery="3" piloting="4"
+			externalId="a5e2f8c0-b38f-4057-a65e-50b53727fd43" ejected="false"
+			advantages="weapon_specialist LRM 10" edge="edge 2::edge_when_tac::edge_when_ko" />
+      <motive
+			damage="0" penalty="0" /> Tanks have special needs, so don't delete any ammo slots. The first
+		slot in a location is at index="1". <location index="0"> Body <slot index="1"
+				type="IS Ammo LRM-10" shots="12" />
+				<slot index="2" type="IS Ammo LRM-10" shots="12" />
+				<slot
+				index="3" type="IS Ammo SRM-4" shots="25" />
+		</location>
+			<Game id="2" />
+	</entity>
 
-		<entity chassis="Warrior Attack Helicopter" model="H-7" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" elevation="1" externalId="f65ef5c6-560b-4d15-990a-79009c814951" quirks="vtol_rotor">
-			<pilot size="2" name="Shih-k'ai Dai" nick="" gender="MALE" gunnery="3" piloting="4" externalId="3e53a0cc-c970-4b5c-a858-5b9c15423fb7" ejected="false" advantages="weapon_specialist SRM 4"/>
-      <motive damage="0" penalty="0"/>
-      Tanks have special needs, so don't delete any ammo slots.
-      The first slot in a location is at index="1".
-			<location index="0"> Body
-				<slot index="1" type="IS Ammo SRM-4" shots="25"/>
-				<slot index="2" type="IS Ammo AC/2" shots="45"/>
-			</location>
-			<Game id="5"/>
-		</entity>
+	<entity chassis="Warrior Attack Helicopter" model="H-7" type="VTOL" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" elevation="1"
+		externalId="f65ef5c6-560b-4d15-990a-79009c814951" quirks="vtol_rotor">
+		<pilot size="2" name="Shih-k'ai Dai" nick="" gender="MALE" gunnery="3" piloting="4"
+			externalId="3e53a0cc-c970-4b5c-a858-5b9c15423fb7" ejected="false"
+			advantages="weapon_specialist SRM 4" />
+      <motive damage="0" penalty="0" /> Tanks have special
+		needs, so don't delete any ammo slots. The first slot in a location is at index="1". <location
+			index="0"> Body <slot index="1" type="IS Ammo SRM-4" shots="25" />
+				<slot index="2"
+				type="IS Ammo AC/2" shots="45" />
+		</location>
+			<Game id="5" />
+	</entity>
 
-		<entity chassis="Warrior Attack Helicopter" model="H-7C" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" elevation="1" externalId="6c7a07e6-83f6-4487-b7c8-c62589e2b030" quirks="vtol_rotor">
-			<pilot size="2" name="Georgia Stewart" nick="" gender="FEMALE" gunnery="3" piloting="4" externalId="62b10236-8ce0-4029-bbb5-b160be3412a5" ejected="false"/>
-      <motive damage="0" penalty="0"/>
-      Tanks have special needs, so don't delete any ammo slots.
-      The first slot in a location is at index="1".
-			<location index="0"> Body
-				<slot index="1" type="IS Ammo LRM-10" shots="12"/>
-				<slot index="2" type="IS Ammo LRM-10" shots="12"/>
-				<slot index="3" type="IS Ammo SRM-4" shots="25"/>
-			</location>
-			<Game id="6"/>
-		</entity>
+	<entity chassis="Warrior Attack Helicopter" model="H-7C" type="VTOL" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" elevation="1"
+		externalId="6c7a07e6-83f6-4487-b7c8-c62589e2b030" quirks="vtol_rotor">
+		<pilot size="2" name="Georgia Stewart" nick="" gender="FEMALE" gunnery="3" piloting="4"
+			externalId="62b10236-8ce0-4029-bbb5-b160be3412a5" ejected="false" />
+      <motive damage="0"
+			penalty="0" /> Tanks have special needs, so don't delete any ammo slots. The first slot in a
+		location is at index="1". <location index="0"> Body <slot index="1" type="IS Ammo LRM-10"
+				shots="12" />
+				<slot index="2" type="IS Ammo LRM-10" shots="12" />
+				<slot index="3"
+				type="IS Ammo SRM-4" shots="25" />
+		</location>
+			<Game id="6" />
+	</entity>
 
-		<entity chassis="Warrior Attack Helicopter" model="H-7C" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" elevation="1" externalId="2386d443-b642-4654-8163-15e19b36e30c" quirks="vtol_rotor">
-			<pilot size="2" name="Muzaina bin Shafiq" nick="" gender="FEMALE" gunnery="4" piloting="5" externalId="a25bfd21-de53-48ca-ab31-f00ed54e2c05" ejected="false"/>
-      <motive damage="0" penalty="0"/>
-      Tanks have special needs, so don't delete any ammo slots.
-      The first slot in a location is at index="1".
-			<location index="0"> Body
-				<slot index="1" type="IS Ammo LRM-10" shots="12"/>
-				<slot index="2" type="IS Ammo LRM-10" shots="12"/>
-				<slot index="3" type="IS Ammo SRM-4" shots="25"/>
-			</location>
-			<Game id="7"/>
-		</entity>
+	<entity chassis="Warrior Attack Helicopter" model="H-7C" type="VTOL" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" elevation="1"
+		externalId="2386d443-b642-4654-8163-15e19b36e30c" quirks="vtol_rotor">
+		<pilot size="2" name="Muzaina bin Shafiq" nick="" gender="FEMALE" gunnery="4" piloting="5"
+			externalId="a25bfd21-de53-48ca-ab31-f00ed54e2c05" ejected="false" />
+      <motive damage="0"
+			penalty="0" /> Tanks have special needs, so don't delete any ammo slots. The first slot in a
+		location is at index="1". <location index="0"> Body <slot index="1" type="IS Ammo LRM-10"
+				shots="12" />
+				<slot index="2" type="IS Ammo LRM-10" shots="12" />
+				<slot index="3"
+				type="IS Ammo SRM-4" shots="25" />
+		</location>
+			<Game id="7" />
+	</entity>
 
-		<entity chassis="Warrior Attack Helicopter" model="H-7" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" elevation="1" externalId="52696843-239f-4fd3-b747-692f4b0750e7" quirks="vtol_rotor">
-			<pilot size="2" name="Gita Rajani" nick="" gender="MALE" gunnery="4" piloting="5" externalId="b7ed065c-fff7-4c08-b09b-e8a0eafc093c" ejected="false"/>
-      <motive damage="0" penalty="0"/>
-      Tanks have special needs, so don't delete any ammo slots.
-      The first slot in a location is at index="1".
-			<location index="0"> Body
-				<slot index="1" type="IS Ammo SRM-4" shots="25"/>
-				<slot index="2" type="IS Ammo AC/2" shots="45"/>
-			</location>
-			<Game id="8"/>
-		</entity>
+	<entity chassis="Warrior Attack Helicopter" model="H-7" type="VTOL" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" elevation="1"
+		externalId="52696843-239f-4fd3-b747-692f4b0750e7" quirks="vtol_rotor">
+		<pilot size="2" name="Gita Rajani" nick="" gender="MALE" gunnery="4" piloting="5"
+			externalId="b7ed065c-fff7-4c08-b09b-e8a0eafc093c" ejected="false" />
+      <motive damage="0"
+			penalty="0" /> Tanks have special needs, so don't delete any ammo slots. The first slot in a
+		location is at index="1". <location index="0"> Body <slot index="1" type="IS Ammo SRM-4"
+				shots="25" />
+				<slot index="2" type="IS Ammo AC/2" shots="45" />
+		</location>
+			<Game id="8" />
+	</entity>
 
-		<entity chassis="Warrior Attack Helicopter" model="H-7" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" elevation="1" externalId="77de301e-278a-4d6d-a72a-7d60fb927460" quirks="vtol_rotor">
-			<pilot size="2" name="Chi-ju Hui" nick="" gender="MALE" gunnery="4" piloting="5" externalId="66d15535-0fd9-4840-af9f-bfdbc874cc09" ejected="false"/>
-      <motive damage="0" penalty="0"/>
-      Tanks have special needs, so don't delete any ammo slots.
-      The first slot in a location is at index="1".
-			<location index="0"> Body
-				<slot index="1" type="IS Ammo SRM-4" shots="25"/>
-				<slot index="2" type="IS Ammo AC/2" shots="45"/>
-			</location>
-			<Game id="9"/>
-		</entity>
+	<entity chassis="Warrior Attack Helicopter" model="H-7" type="VTOL" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" elevation="1"
+		externalId="77de301e-278a-4d6d-a72a-7d60fb927460" quirks="vtol_rotor">
+		<pilot size="2" name="Chi-ju Hui" nick="" gender="MALE" gunnery="4" piloting="5"
+			externalId="66d15535-0fd9-4840-af9f-bfdbc874cc09" ejected="false" />
+      <motive damage="0"
+			penalty="0" /> Tanks have special needs, so don't delete any ammo slots. The first slot in a
+		location is at index="1". <location index="0"> Body <slot index="1" type="IS Ammo SRM-4"
+				shots="25" />
+				<slot index="2" type="IS Ammo AC/2" shots="45" />
+		</location>
+			<Game id="9" />
+	</entity>
 
-		<entity chassis="Warrior Attack Helicopter" model="H-7" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" elevation="1" externalId="5b8cadda-6b73-4e7b-b569-3e632dd40503" quirks="vtol_rotor">
-			<pilot size="2" name="Andrea Malines" nick="" gender="FEMALE" gunnery="4" piloting="5" externalId="233aa284-4d08-4356-8cd2-4900c22de7d1" ejected="false"/>
-      <motive damage="0" penalty="0"/>
-      Tanks have special needs, so don't delete any ammo slots.
-      The first slot in a location is at index="1".
-			<location index="0"> Body
-				<slot index="1" type="IS Ammo SRM-4" shots="25"/>
-				<slot index="2" type="IS Ammo AC/2" shots="45"/>
-			</location>
-			<Game id="10"/>
-		</entity>
+	<entity chassis="Warrior Attack Helicopter" model="H-7" type="VTOL" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" elevation="1"
+		externalId="5b8cadda-6b73-4e7b-b569-3e632dd40503" quirks="vtol_rotor">
+		<pilot size="2" name="Andrea Malines" nick="" gender="FEMALE" gunnery="4" piloting="5"
+			externalId="233aa284-4d08-4356-8cd2-4900c22de7d1" ejected="false" />
+      <motive damage="0"
+			penalty="0" /> Tanks have special needs, so don't delete any ammo slots. The first slot in a
+		location is at index="1". <location index="0"> Body <slot index="1" type="IS Ammo SRM-4"
+				shots="25" />
+				<slot index="2" type="IS Ammo AC/2" shots="45" />
+		</location>
+			<Game id="10" />
+	</entity>
 
 </unit>

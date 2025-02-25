@@ -20,6 +20,7 @@ package mekhq.gui.dialog;
 
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 import javax.swing.*;
@@ -60,7 +61,7 @@ public class StoryNarrativeDialog extends StoryDialog {
         String text = StoryArc.replaceTokens(((NarrativeStoryPoint) getStoryPoint()).getNarrative(), getStoryPoint().getCampaign());
         txtDesc.setText(MarkdownRenderer.getRenderedHtml(text));
         txtDesc.setCaretPosition(0);
-        JScrollPane scrollPane = new JScrollPane(txtDesc);
+        JScrollPane scrollPane = new JScrollPaneWithSpeed(txtDesc);
         mainPanel.add(scrollPane, gbc);
 
         return mainPanel;

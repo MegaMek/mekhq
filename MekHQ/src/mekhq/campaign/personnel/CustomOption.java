@@ -18,27 +18,31 @@
  */
 package mekhq.campaign.personnel;
 
-import megamek.common.options.IOption;
-import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import javax.xml.parsers.DocumentBuilder;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.parsers.DocumentBuilder;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.options.IOption;
+import megamek.logging.MMLogger;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
- * Parses custom SPA file and passes data to the PersonnelOption constructor so the custom
+ * Parses custom SPA file and passes data to the PersonnelOption constructor so
+ * the custom
  * abilities are included.
  *
  * @author Neoancient
  */
 public class CustomOption {
+    private static final MMLogger logger = MMLogger.create(CustomOption.class);
 
     private static List<CustomOption> customAbilities = null;
 
@@ -94,7 +98,7 @@ public class CustomOption {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return;
         }
 
@@ -102,7 +106,7 @@ public class CustomOption {
         NodeList nl = spaEle.getChildNodes();
 
         // Get rid of empty text nodes and adjacent text nodes...
-        // Stupid weird parsing of XML.  At least this cleans it up.
+        // Stupid weird parsing of XML. At least this cleans it up.
         spaEle.normalize();
 
         // Okay, lets iterate through the children, eh?
@@ -135,7 +139,7 @@ public class CustomOption {
     public static CustomOption generateInstanceFromXML(Node wn) {
         String key = wn.getAttributes().getNamedItem("name").getTextContent();
         if (null == key) {
-            LogManager.getLogger().error("Custom ability does not have a 'name' attribute.");
+            logger.error("Custom ability does not have a 'name' attribute.");
             return null;
         }
 
@@ -169,7 +173,7 @@ public class CustomOption {
                     break;
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("Error parsing custom ability " + retVal.name, ex);
+            logger.error("Error parsing custom ability " + retVal.name, ex);
         }
 
         return retVal;

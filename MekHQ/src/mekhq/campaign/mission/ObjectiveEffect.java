@@ -51,13 +51,13 @@ public class ObjectiveEffect {
      */
     public enum ObjectiveEffectType {
         /*
-         *  contributes a "Operational Victory Point" towards the scenario's victory/defeat state
+         *  contributes a "Scenario Victory Point" towards the scenario's victory/defeat state
          */
-        ScenarioVictory("+%d Operational VP", true),
+        ScenarioVictory("+%d Scenario VP", true),
         /*
-         *  contributes a "negative Operational Victory Point/s" towards the scenario's victory/defeat state
+         *  contributes a "negative Scenario Victory Point/s" towards the scenario's victory/defeat state
          */
-        ScenarioDefeat("-%d Operational VP", true),
+        ScenarioDefeat("-%d Scenario VP", true),
         /*
          *  changes the contract score
          */
@@ -66,6 +66,10 @@ public class ObjectiveEffect {
          *
          */
         SupportPointUpdate("%d Support Points", true),
+        /* changes the size of supply cache
+         *
+         */
+        SupplyCache("%d Looted Supplies", true),
         /*
          *  changes the contract morale up or down
          */
@@ -90,17 +94,17 @@ public class ObjectiveEffect {
         /*
          * In StratCon, relevant if scenario is about a facility, said facility remains in play.
          */
-        FacilityRemains("Facility Remains Intact", false),
+        FacilityRemains("Facility remains with current controller", false),
 
         /*
          * In StratCon, relevant if scenario is about a facility, said facility is removed from play.
          */
-        FacilityRemoved("Facility Destroyed", false),
+        FacilityRemoved("Facility destroyed and removed from area of operations", false),
 
         /*
          * In StratCon, relevant if scenario is about a facility, said facility changes ownership.
          */
-        FacilityCaptured("Facility Captured", false);
+        FacilityCaptured("Facility captured and changes controller", false);
 
         private final String descriptiveText;
         private boolean magnitudeIsRelevant;

@@ -20,15 +20,10 @@ package mekhq.gui.panels;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryArc;
-import mekhq.campaign.storyarc.StoryArcStub;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 import javax.swing.*;
-import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 import java.awt.*;
 
 public class StoryChoicePanel extends AbstractMHQPanel {
@@ -43,28 +38,32 @@ public class StoryChoicePanel extends AbstractMHQPanel {
 
     @Override
     protected void initialize() {
-        setLayout(new GridLayout(0,1));
+        setLayout(new GridLayout(0, 1));
         lblChoice = new JLabel();
-        //txtChoice.setEditable(false);
-        //txtChoice.setContentType("text/html");
+        // txtChoice.setEditable(false);
+        // txtChoice.setContentType("text/html");
         lblChoice.setText("");
         add(lblChoice);
     }
 
     protected void updateChoice(String choice, boolean isSelected, Campaign c, Color fg, Color bg) {
-        // this gets a little complicated because we have to dynamically set the height of the panel based on
-        // how long the text is, but that text may or not be bolded. So we calculate the height as if it was
+        // this gets a little complicated because we have to dynamically set the height
+        // of the panel based on
+        // how long the text is, but that text may or not be bolded. So we calculate the
+        // height as if it was
         // bolded and then switch for unselected cases.
         // the div business sets a fixed width on the label and forces it to wrap.
-        lblChoice.setText("<html><div style=\"width:280px;\">" + MarkdownRenderer.getRenderedHtml(StoryArc.replaceTokens("**" + choice + "**", c)) + "</div></html>");
+        lblChoice.setText("<html><div style=\"width:280px;\">"
+                + MarkdownRenderer.getRenderedHtml(StoryArc.replaceTokens("**" + choice + "**", c)) + "</div></html>");
         setBackground(bg);
         lblChoice.setForeground(fg);
         int height = lblChoice.getPreferredSize().height;
-        if(!isSelected) {
-            lblChoice.setText("<html><div style=\"width:280px;\">" + MarkdownRenderer.getRenderedHtml(StoryArc.replaceTokens(choice, c)) + "</div></html>");
+        if (!isSelected) {
+            lblChoice.setText("<html><div style=\"width:280px;\">"
+                    + MarkdownRenderer.getRenderedHtml(StoryArc.replaceTokens(choice, c)) + "</div></html>");
         }
-        setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
-        setMinimumSize(new Dimension(400, height+10));
-        setPreferredSize(new Dimension(400, height+10));
+        setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 0));
+        setMinimumSize(new Dimension(400, height + 10));
+        setPreferredSize(new Dimension(400, height + 10));
     }
 }

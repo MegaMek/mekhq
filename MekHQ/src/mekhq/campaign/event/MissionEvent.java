@@ -29,7 +29,7 @@ import mekhq.campaign.mission.Mission;
  * Abstract base class for events involving missions or contracts.
  *
  */
-abstract public class MissionEvent extends MMEvent {
+public abstract class MissionEvent extends MMEvent {
 
     private final Mission mission;
 

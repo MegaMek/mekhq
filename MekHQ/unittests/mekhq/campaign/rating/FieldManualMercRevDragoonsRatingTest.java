@@ -20,6 +20,25 @@
  */
 package mekhq.campaign.rating;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import megamek.common.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -30,18 +49,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.*;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
@@ -57,8 +64,8 @@ public class FieldManualMercRevDragoonsRatingTest {
     private Skill mockDoctorSkillRegular;
     private Skill mockDoctorSkillGreen;
     private Skill mockMedicSkill;
-    private Skill mockMechTechSkillVeteran;
-    private Skill mockMechTechSkillRegular;
+    private Skill mockMekTechSkillVeteran;
+    private Skill mockMekTechSkillRegular;
     private Skill mockAstechSkill;
 
     @BeforeEach
@@ -76,8 +83,8 @@ public class FieldManualMercRevDragoonsRatingTest {
         mockDoctorSkillRegular = mock(Skill.class);
         mockDoctorSkillGreen = mock(Skill.class);
         mockMedicSkill = mock(Skill.class);
-        mockMechTechSkillVeteran = mock(Skill.class);
-        mockMechTechSkillRegular = mock(Skill.class);
+        mockMekTechSkillVeteran = mock(Skill.class);
+        mockMekTechSkillRegular = mock(Skill.class);
         mockAstechSkill = mock(Skill.class);
 
         // Set up the doctor.
@@ -94,16 +101,16 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockDoctor.getRankNumeric()).thenReturn(5);
 
         // Set up the tech.
-        when(mockMechTechSkillVeteran.getExperienceLevel()).thenReturn(SkillType.EXP_VETERAN);
-        when(mockMechTechSkillRegular.getExperienceLevel()).thenReturn(SkillType.EXP_REGULAR);
-        when(mockTech.getPrimaryRole()).thenReturn(PersonnelRole.MECH_TECH);
+        when(mockMekTechSkillVeteran.getExperienceLevel()).thenReturn(SkillType.EXP_VETERAN);
+        when(mockMekTechSkillRegular.getExperienceLevel()).thenReturn(SkillType.EXP_REGULAR);
+        when(mockTech.getPrimaryRole()).thenReturn(PersonnelRole.MEK_TECH);
         when(mockTech.isTech()).thenReturn(true);
-        when(mockTech.getPrimaryRole()).thenReturn(PersonnelRole.MECH_TECH);
+        when(mockTech.getPrimaryRole()).thenReturn(PersonnelRole.MEK_TECH);
         when(mockTech.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockTech).getStatus();
         when(mockTech.isDeployed()).thenReturn(false);
-        when(mockTech.getSkill(eq(SkillType.S_TECH_MECH))).thenReturn(mockMechTechSkillVeteran);
-        when(mockTech.hasSkill(eq(SkillType.S_TECH_MECH))).thenReturn(true);
+        when(mockTech.getSkill(eq(SkillType.S_TECH_MEK))).thenReturn(mockMekTechSkillVeteran);
+        when(mockTech.hasSkill(eq(SkillType.S_TECH_MEK))).thenReturn(true);
         when(mockTech.getRankNumeric()).thenReturn(4);
 
         when(mockMedicSkill.getExperienceLevel()).thenReturn(SkillType.EXP_REGULAR);
@@ -131,7 +138,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         FieldManualMercRevDragoonsRating spyRating = spy(new FieldManualMercRevDragoonsRating(mockCampaign));
 
         Unit mockWasp = mock(Unit.class);
-        Entity mockWaspE = mock(BipedMech.class);
+        Entity mockWaspE = mock(BipedMek.class);
         doReturn(EntityMovementMode.BIPED).when(mockWaspE).getMovementMode();
         doReturn(mockWaspE).when(mockWasp).getEntity();
         doReturn(TechConstants.T_INTRO_BOXSET).when(mockWaspE).getTechLevel();
@@ -145,7 +152,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(waspCrew).when(mockWaspE).getCrew();
 
         Unit mockStinger = mock(Unit.class);
-        Entity mockStingerE = mock(BipedMech.class);
+        Entity mockStingerE = mock(BipedMek.class);
         doReturn(EntityMovementMode.BIPED).when(mockStingerE).getMovementMode();
         doReturn(TechConstants.T_INTRO_BOXSET).when(mockStingerE).getTechLevel();
         doReturn(20.0).when(mockStingerE).getWeight();
@@ -162,7 +169,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(true).when(mockGriffin).isMothballed();
 
         Unit mockThunderbolt = mock(Unit.class);
-        Entity mockThunderboltE = mock(BipedMech.class);
+        Entity mockThunderboltE = mock(BipedMek.class);
         doReturn(EntityMovementMode.BIPED).when(mockThunderboltE).getMovementMode();
         doReturn(TechConstants.T_IS_TW_NON_BOX).when(mockThunderboltE).getTechLevel();
         doReturn(65.0).when(mockThunderboltE).getWeight();
@@ -273,7 +280,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(4).when(unionCrew).getGunnery();
         doReturn(5).when(unionCrew).getPiloting();
         Vector<Bay> bays = new Vector<>(2);
-        bays.add(new MechBay(12, 1, 1));
+        bays.add(new MekBay(12, 1, 1));
         bays.add(new ASFBay(2, 1, 2));
         doReturn(bays).when(mockUnionE).getTransportBays();
 
@@ -324,18 +331,18 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockCampaign.getMedicPool()).thenReturn(4);
         assertEquals(expectedHours, testFieldManuMercRevDragoonsRating.getMedicalSupportAvailable());
 
-        // Add a mechwarrior who doubles as a back-up medic of Green skill.  This should add another 15 hours.
+        // Add a mekwarrior who doubles as a back-up medic of Green skill.  This should add another 15 hours.
         testFieldManuMercRevDragoonsRating = new FieldManualMercRevDragoonsRating(mockCampaign);
-        Person mockMechwarrior = mock(Person.class);
-        when(mockMechwarrior.getPrimaryRole()).thenReturn(PersonnelRole.MECHWARRIOR);
-        when(mockMechwarrior.getSecondaryRole()).thenReturn(PersonnelRole.DOCTOR);
-        when(mockMechwarrior.isDoctor()).thenReturn(true);
-        doReturn(PersonnelStatus.ACTIVE).when(mockMechwarrior).getStatus();
-        when(mockMechwarrior.isDeployed()).thenReturn(false);
-        when(mockMechwarrior.getSkill(eq(SkillType.S_DOCTOR))).thenReturn(mockDoctorSkillGreen);
-        when(mockMechwarrior.hasSkill(eq(SkillType.S_DOCTOR))).thenReturn(true);
-        mockPersonnelList.add(mockMechwarrior);
-        mockActivePersonnelList.add(mockMechwarrior);
+        Person mockMekwarrior = mock(Person.class);
+        when(mockMekwarrior.getPrimaryRole()).thenReturn(PersonnelRole.MEKWARRIOR);
+        when(mockMekwarrior.getSecondaryRole()).thenReturn(PersonnelRole.DOCTOR);
+        when(mockMekwarrior.isDoctor()).thenReturn(true);
+        doReturn(PersonnelStatus.ACTIVE).when(mockMekwarrior).getStatus();
+        when(mockMekwarrior.isDeployed()).thenReturn(false);
+        when(mockMekwarrior.getSkill(eq(SkillType.S_DOCTOR))).thenReturn(mockDoctorSkillGreen);
+        when(mockMekwarrior.hasSkill(eq(SkillType.S_DOCTOR))).thenReturn(true);
+        mockPersonnelList.add(mockMekwarrior);
+        mockActivePersonnelList.add(mockMekwarrior);
         expectedHours += 15;
         testFieldManuMercRevDragoonsRating.updateAvailableSupport();
         assertEquals(expectedHours, testFieldManuMercRevDragoonsRating.getMedicalSupportAvailable());
@@ -359,7 +366,7 @@ public class FieldManualMercRevDragoonsRatingTest {
     @Test
     public void testGetTechSupportAvailable() {
 
-        // Test having 1 veteran mech tech with 6 temp astechs.
+        // Test having 1 veteran mek tech with 6 temp astechs.
         // Expected available support should be:
         // Regular Tech = 45 hours.
         // + 6 Astechs = 20 * 4 = 120 hours.
@@ -371,18 +378,18 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockCampaign.getAstechPool()).thenReturn(6);
         assertEquals(expectedHours, testFieldManuMercRevDragoonsRating.getTechSupportHours());
 
-        // Add a mechwarrior who doubles as a back-up tech of Regular skill.  This should add another 20 hours.
+        // Add a mekwarrior who doubles as a back-up tech of Regular skill.  This should add another 20 hours.
         testFieldManuMercRevDragoonsRating = new FieldManualMercRevDragoonsRating(mockCampaign);
-        Person mockMechwarrior = mock(Person.class);
-        when(mockMechwarrior.getPrimaryRole()).thenReturn(PersonnelRole.MECHWARRIOR);
-        when(mockMechwarrior.getSecondaryRole()).thenReturn(PersonnelRole.MECH_TECH);
-        when(mockMechwarrior.isTech()).thenReturn(true);
-        doReturn(PersonnelStatus.ACTIVE).when(mockMechwarrior).getStatus();
-        when(mockMechwarrior.isDeployed()).thenReturn(false);
-        when(mockMechwarrior.getSkill(eq(SkillType.S_TECH_MECH))).thenReturn(mockMechTechSkillRegular);
-        when(mockMechwarrior.hasSkill(eq(SkillType.S_TECH_MECH))).thenReturn(true);
-        mockPersonnelList.add(mockMechwarrior);
-        mockActivePersonnelList.add(mockMechwarrior);
+        Person mockMekwarrior = mock(Person.class);
+        when(mockMekwarrior.getPrimaryRole()).thenReturn(PersonnelRole.MEKWARRIOR);
+        when(mockMekwarrior.getSecondaryRole()).thenReturn(PersonnelRole.MEK_TECH);
+        when(mockMekwarrior.isTech()).thenReturn(true);
+        doReturn(PersonnelStatus.ACTIVE).when(mockMekwarrior).getStatus();
+        when(mockMekwarrior.isDeployed()).thenReturn(false);
+        when(mockMekwarrior.getSkill(eq(SkillType.S_TECH_MEK))).thenReturn(mockMekTechSkillRegular);
+        when(mockMekwarrior.hasSkill(eq(SkillType.S_TECH_MEK))).thenReturn(true);
+        mockPersonnelList.add(mockMekwarrior);
+        mockActivePersonnelList.add(mockMekwarrior);
         expectedHours += 20;
         testFieldManuMercRevDragoonsRating.updateAvailableSupport();
         assertEquals(expectedHours, testFieldManuMercRevDragoonsRating.getTechSupportHours());
@@ -459,10 +466,10 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(4).when(testRating).getLightVeeCount();
         String expected = "Transportation      -10\n" +
                           "    DropShip Capacity:       0%\n" +
-                          "        #BattleMech Bays:             0 needed /   0 available\n" +
+                          "        #BattleMek Bays:              0 needed /   0 available\n" +
                           "        #Fighter Bays:                0 needed /   0 available (plus 0 excess Small Craft)\n" +
                           "        #Small Craft Bays:            0 needed /   0 available\n" +
-                          "        #ProtoMech Bays:              0 needed /   0 available\n" +
+                          "        #ProtoMek Bays:               0 needed /   0 available\n" +
                           "        #Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
                           "        #Heavy Vehicle Bays:          4 needed /   0 available (plus 0 excess Super Heavy)\n" +
                           "        #Light Vehicle Bays:          4 needed /   0 available (plus 0 excess Heavy and 0 excess Super Heavy)\n" +
@@ -478,10 +485,10 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(8).when(testRating).getHeavyVeeBayCount();
         expected = "Transportation        0\n" +
                    "    DropShip Capacity:      100%\n" +
-                   "        #BattleMech Bays:             0 needed /   0 available\n" +
+                   "        #BattleMek Bays:              0 needed /   0 available\n" +
                    "        #Fighter Bays:                0 needed /   0 available (plus 0 excess Small Craft)\n" +
                    "        #Small Craft Bays:            0 needed /   0 available\n" +
-                   "        #ProtoMech Bays:              0 needed /   0 available\n" +
+                   "        #ProtoMek Bays:               0 needed /   0 available\n" +
                    "        #Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
                    "        #Heavy Vehicle Bays:          4 needed /   8 available (plus 0 excess Super Heavy)\n" +
                    "        #Light Vehicle Bays:          4 needed /   0 available (plus 4 excess Heavy and 0 excess Super Heavy)\n" +

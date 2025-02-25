@@ -535,7 +535,9 @@ Rank:
 	<rankSystem>
 		<code>AFFC</code>
 		<name>Armed Forces of the Federated Commonwealth</name>
-		<description>This is the rank system used by the Armed Forces of the Federated Commonwealth, created during the merge of the Lyran Commonwealth Armed Forces and the Armed Forces of the Federated Suns.</description>
+		<description>This is the rank system used by the Armed Forces of the Federated Commonwealth,
+			created during the merge of the Lyran Commonwealth Armed Forces and the Armed Forces of the
+			Federated Suns.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH,--ADMIN</rankNames>
 			<officer>false</officer>
@@ -1835,7 +1837,8 @@ Rank:
 	<rankSystem>
 		<code>CCWH</code>
 		<name>Capellan Confederation Warrior House</name>
-		<description>This is the rank system used by the warrior houses within the Capellan Confederation.</description>
+		<description>This is the rank system used by the warrior houses within the Capellan
+			Confederation.</description>
 		<rank>
 			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW,--TECH,--TECH,--ADMIN</rankNames>
 			<officer>false</officer>
@@ -3051,8 +3054,8 @@ Rank:
 		</rank> <!-- O3 -->
 		<rank>
 			<rankNames>Demi-Precentor:25,-,-,-,-,-,-,-,-</rankNames>
-            <officer>true</officer>
-            <payMultiplier>2.0</payMultiplier>
+			<officer>true</officer>
+			<payMultiplier>2.0</payMultiplier>
 		</rank> <!-- O4 -->
 		<rank>
 			<rankNames>-,-,-,-,-,-,-,-,-</rankNames>

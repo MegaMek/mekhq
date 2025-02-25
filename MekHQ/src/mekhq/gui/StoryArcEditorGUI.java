@@ -130,7 +130,7 @@ public class StoryArcEditorGUI extends JPanel {
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent evt) {
-                getApplication().exit();
+                getApplication().exit(false);
             }
         });
 

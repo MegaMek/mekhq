@@ -203,7 +203,7 @@
 		<clanVehicles>false</clanVehicles>
 		<doubleVehicles>true</doubleVehicles>
 		<adjustPlayerVehicles>false</adjustPlayerVehicles>
-		<opforLanceTypeMechs>1</opforLanceTypeMechs>
+		<opforLanceTypeMeks>1</opforLanceTypeMeks>
 		<opforLanceTypeMixed>2</opforLanceTypeMixed>
 		<opforLanceTypeVehicles>3</opforLanceTypeVehicles>
 		<opforUsesVTOLs>true</opforUsesVTOLs>
@@ -221,7 +221,7 @@
 		<trackUnitFatigue>false</trackUnitFatigue>
 		<mercSizeLimited>false</mercSizeLimited>
 		<trackOriginalUnit>false</trackOriginalUnit>
-		<regionalMechVariations>false</regionalMechVariations>
+		<regionalMekVariations>false</regionalMekVariations>
 		<attachedPlayerCamouflage>true</attachedPlayerCamouflage>
 		<playerControlsAttachedUnits>false</playerControlsAttachedUnits>
 		<searchRadius>800</searchRadius>
@@ -333,23 +333,28 @@
 		<planetTechAcquisitionBonus>-1,0,1,2,4,8</planetTechAcquisitionBonus>
 		<planetIndustryAcquisitionBonus>0,0,0,0,0,0</planetIndustryAcquisitionBonus>
 		<planetOutputAcquisitionBonus>-1,0,1,2,4,8</planetOutputAcquisitionBonus>
-		<salaryTypeBase>0 CSB,1500 CSB,1500 CSB,900 CSB,900 CSB,900 CSB,900 CSB,960 CSB,750 CSB,960 CSB,900 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500 CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB,0 CSB,0 CSB</salaryTypeBase>
+		<salaryTypeBase>0 CSB,1500 CSB,1500 CSB,900 CSB,900 CSB,900 CSB,900 CSB,960 CSB,750 CSB,960
+			CSB,900 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500
+			CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB,0 CSB,0 CSB</salaryTypeBase>
 		<salaryXpMultiplier>0.6,0.6,1.0,1.6,3.2</salaryXpMultiplier>
-		<usePortraitForType>false,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false</usePortraitForType>
+		<usePortraitForType>
+			false,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false</usePortraitForType>
 		<useAtBUnitMarket>false</useAtBUnitMarket>
 		<rats>Xotl,Total Warfare</rats>
 	</campaignOptions>
 	<units>
 		<unit id="16dcf501-0713-44cd-9ab8-506ae8132bc4" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Cougar" model="A" type="Biped" commander="false" externalId="16dcf501-0713-44cd-9ab8-506ae8132bc4">
-      The first slot in a location is at index="1".
-				<location index="4"> Right Arm
-					<slot index="7" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6"/>
-					<slot index="8" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6"/>
+			<entity chassis="Cougar" model="A" type="Biped" commander="false"
+				externalId="16dcf501-0713-44cd-9ab8-506ae8132bc4"> The first slot in a location is at
+				index="1". <location index="4"> Right Arm <slot index="7"
+						type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6" />
+					<slot index="8"
+						type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6" />
 				</location>
-				<location index="5"> Left Arm
-					<slot index="7" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6"/>
-					<slot index="8" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6"/>
+				<location
+					index="5"> Left Arm <slot index="7" type="Clan Ammo LRM-20 (Clan) Artemis-capable"
+						shots="6" />
+					<slot index="8" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6" />
 				</location>
 			</entity>
 			<driverId>76a13d8f-bb29-470d-9077-8c4cb0ae5dcd</driverId>
@@ -357,10 +362,10 @@
 			<forceId>3</forceId>
 		</unit>
 		<unit id="59fa4c14-67fe-4156-9036-12d15c980258" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Vixen (Incubus)" model="(Standard)" type="Biped" commander="false" externalId="59fa4c14-67fe-4156-9036-12d15c980258">
-      The first slot in a location is at index="1".
-				<location index="1"> Center Torso
-					<slot index="11" type="Clan Machine Gun Ammo - Half" shots="100"/>
+			<entity chassis="Vixen (Incubus)" model="(Standard)" type="Biped" commander="false"
+				externalId="59fa4c14-67fe-4156-9036-12d15c980258"> The first slot in a location is at
+				index="1". <location index="1"> Center Torso <slot index="11"
+						type="Clan Machine Gun Ammo - Half" shots="100" />
 				</location>
 			</entity>
 			<driverId>590dcabe-e9d9-43ec-8e24-0c3651f1a28c</driverId>
@@ -368,17 +373,18 @@
 			<forceId>2</forceId>
 		</unit>
 		<unit id="51097474-8627-4694-a6a3-a26ac7004a99" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Nova Cat" model="A" type="Biped" commander="false" externalId="51097474-8627-4694-a6a3-a26ac7004a99">
+			<entity chassis="Nova Cat" model="A" type="Biped" commander="false"
+				externalId="51097474-8627-4694-a6a3-a26ac7004a99">
 			</entity>
 			<driverId>a78026c1-b3f6-4674-bbe6-99d44cd734e0</driverId>
 			<gunnerId>a78026c1-b3f6-4674-bbe6-99d44cd734e0</gunnerId>
 			<forceId>2</forceId>
 		</unit>
 		<unit id="debc1f9e-e3f6-4fa7-ba5f-d8468fda03f6" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Grendel (Mongrel)" model="Prime" type="Biped" commander="false" externalId="debc1f9e-e3f6-4fa7-ba5f-d8468fda03f6">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="8" type="Clan Streak SRM 6 Ammo" shots="15"/>
+			<entity chassis="Grendel (Mongrel)" model="Prime" type="Biped" commander="false"
+				externalId="debc1f9e-e3f6-4fa7-ba5f-d8468fda03f6"> The first slot in a location is at
+				index="1". <location index="2"> Right Torso <slot index="8" type="Clan Streak SRM 6 Ammo"
+						shots="15" />
 				</location>
 			</entity>
 			<driverId>7cda45c3-54d0-4486-8aaf-42b8baefd02e</driverId>
@@ -386,13 +392,13 @@
 			<forceId>2</forceId>
 		</unit>
 		<unit id="27f78700-2c26-485e-8ca8-2150bbd84912" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Hellion" model="Prime" type="Biped" commander="false" externalId="27f78700-2c26-485e-8ca8-2150bbd84912">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="6" type="Clan Ammo LRM-10" shots="12"/>
+			<entity chassis="Hellion" model="Prime" type="Biped" commander="false"
+				externalId="27f78700-2c26-485e-8ca8-2150bbd84912"> The first slot in a location is at
+				index="1". <location index="2"> Right Torso <slot index="6" type="Clan Ammo LRM-10"
+						shots="12" />
 				</location>
-				<location index="3"> Left Torso
-					<slot index="5" type="Clan Streak SRM 2 Ammo" shots="50"/>
+				<location index="3"> Left Torso <slot index="5"
+						type="Clan Streak SRM 2 Ammo" shots="50" />
 				</location>
 			</entity>
 			<driverId>cc01ee96-49ea-4e0e-a992-d6cc25bbda1e</driverId>
@@ -400,15 +406,16 @@
 			<forceId>2</forceId>
 		</unit>
 		<unit id="672e726e-2c55-4773-9017-85527cf9a679" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Kodiak" model="(Standard)" type="Biped" commander="false" externalId="672e726e-2c55-4773-9017-85527cf9a679">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="11" type="Clan Ultra AC/20 Ammo" shots="5"/>
-					<slot index="12" type="Clan Ultra AC/20 Ammo" shots="5"/>
+			<entity chassis="Kodiak" model="(Standard)" type="Biped" commander="false"
+				externalId="672e726e-2c55-4773-9017-85527cf9a679"> The first slot in a location is at
+				index="1". <location index="2"> Right Torso <slot index="11" type="Clan Ultra AC/20 Ammo"
+						shots="5" />
+					<slot index="12" type="Clan Ultra AC/20 Ammo" shots="5" />
 				</location>
-				<location index="3"> Left Torso
-					<slot index="11" type="Clan Streak SRM 6 Ammo" shots="15"/>
-					<slot index="12" type="Clan Streak SRM 6 Ammo" shots="15"/>
+				<location
+					index="3"> Left Torso <slot index="11" type="Clan Streak SRM 6 Ammo" shots="15" />
+					<slot
+						index="12" type="Clan Streak SRM 6 Ammo" shots="15" />
 				</location>
 			</entity>
 			<driverId>61b23021-990f-4f58-9a90-4ea15f59d6c4</driverId>
@@ -416,10 +423,9 @@
 			<forceId>3</forceId>
 		</unit>
 		<unit id="5e10fd69-20f4-4335-ae97-ebd688cc33cb" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Fenris (Ice Ferret)" model="H" type="Biped" commander="false" externalId="5e10fd69-20f4-4335-ae97-ebd688cc33cb">
-      The first slot in a location is at index="1".
-				<location index="5"> Left Arm
-					<slot index="7" type="Clan Ammo SRM-6" shots="15"/>
+			<entity chassis="Fenris (Ice Ferret)" model="H" type="Biped" commander="false"
+				externalId="5e10fd69-20f4-4335-ae97-ebd688cc33cb"> The first slot in a location is at
+				index="1". <location index="5"> Left Arm <slot index="7" type="Clan Ammo SRM-6" shots="15" />
 				</location>
 			</entity>
 			<driverId>44e0d05e-33ee-40c4-afc8-bdea0fa2bd82</driverId>
@@ -427,16 +433,18 @@
 			<forceId>2</forceId>
 		</unit>
 		<unit id="10a48169-4ce8-48a9-abae-9dc65c6b095c" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Shadow Cat" model="C" type="Biped" commander="false" externalId="10a48169-4ce8-48a9-abae-9dc65c6b095c">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="5" type="ISNarc Pods" shots="6"/>
-					<slot index="6" type="ISNarc Pods" shots="6"/>
+			<entity chassis="Shadow Cat" model="C" type="Biped" commander="false"
+				externalId="10a48169-4ce8-48a9-abae-9dc65c6b095c"> The first slot in a location is at
+				index="1". <location index="2"> Right Torso <slot index="5" type="ISNarc Pods" shots="6" />
+					<slot
+						index="6" type="ISNarc Pods" shots="6" />
 				</location>
-				<location index="3"> Left Torso
-					<slot index="5" type="Clan Ammo ATM-6" shots="10"/>
-					<slot index="6" type="Clan Ammo ATM-6 ER" shots="10"/>
-					<slot index="7" type="Clan Ammo ATM-6 HE" shots="10"/>
+				<location index="3"> Left
+				Torso <slot index="5" type="Clan Ammo ATM-6" shots="10" />
+					<slot index="6"
+						type="Clan Ammo ATM-6 ER" shots="10" />
+					<slot index="7" type="Clan Ammo ATM-6 HE"
+						shots="10" />
 				</location>
 			</entity>
 			<driverId>e4459752-4dd8-43da-b3f9-447df3ec737f</driverId>
@@ -444,14 +452,14 @@
 			<forceId>3</forceId>
 		</unit>
 		<unit id="18c0e478-71ec-4101-936e-4036e6679aa5" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Jenner IIC" model="(Standard)" type="Biped" commander="false" externalId="18c0e478-71ec-4101-936e-4036e6679aa5">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="4" type="Clan Streak SRM 4 Ammo" shots="25"/>
-					<slot index="5" type="Clan Ammo SRM-6" shots="15"/>
+			<entity chassis="Jenner IIC" model="(Standard)" type="Biped" commander="false"
+				externalId="18c0e478-71ec-4101-936e-4036e6679aa5"> The first slot in a location is at
+				index="1". <location index="2"> Right Torso <slot index="4" type="Clan Streak SRM 4 Ammo"
+						shots="25" />
+					<slot index="5" type="Clan Ammo SRM-6" shots="15" />
 				</location>
-				<location index="3"> Left Torso
-					<slot index="4" type="Clan Ammo SRM-6" shots="15"/>
+				<location
+					index="3"> Left Torso <slot index="4" type="Clan Ammo SRM-6" shots="15" />
 				</location>
 			</entity>
 			<driverId>6a465a01-6306-47a7-bf77-be95b7860434</driverId>
@@ -459,15 +467,17 @@
 			<forceId>3</forceId>
 		</unit>
 		<unit id="cdcddcc1-62e1-4e24-b3f3-640b3a24f50f" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Mad Cat (Timber Wolf)" model="H" type="Biped" commander="false" externalId="cdcddcc1-62e1-4e24-b3f3-640b3a24f50f">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="8" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6"/>
-					<slot index="9" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6"/>
+			<entity chassis="Mad Cat (Timber Wolf)" model="H" type="Biped" commander="false"
+				externalId="cdcddcc1-62e1-4e24-b3f3-640b3a24f50f"> The first slot in a location is at
+				index="1". <location index="2"> Right Torso <slot index="8"
+						type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6" />
+					<slot index="9"
+						type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6" />
 				</location>
-				<location index="3"> Left Torso
-					<slot index="8" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6"/>
-					<slot index="9" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6"/>
+				<location
+					index="3"> Left Torso <slot index="8" type="Clan Ammo LRM-20 (Clan) Artemis-capable"
+						shots="6" />
+					<slot index="9" type="Clan Ammo LRM-20 (Clan) Artemis-capable" shots="6" />
 				</location>
 			</entity>
 			<driverId>c78411a2-1375-46e1-a11f-db0dfc825810</driverId>
@@ -483,24 +493,48 @@
 			<primaryRole>1</primaryRole>
 			<faction>CJF</faction>
 			<clan>true</clan>
-			<phenotype>MECHWARRIOR</phenotype>
-			<biography>Although he stands barely one hundred and eighty centimeters high, MechWarriors Hayes is a talented martial artist who prefers to fight his challenges unaugmented, where he can take advantage
-of his opponentsâ€™ near-certain dismissal of his small stature. His falconers indulged him his passion for unarmed combat butalso made certain they trained him as a skilled MechWarrior, and Hayes has not disappointed them. His choice of a highly-mobile
-Incubus for a â€™Mech is another small joke between Hayes and the world; the Incubus is one of the tallest-appearing â€™Mechs on the battlefield because of its slender stature and high mobility. Fewpeople expect to see the shape of a man like Hayes emerge from
-its cockpit.
+			<phenotype>MEKWARRIOR</phenotype>
+			<biography>Although he stands barely one hundred and eighty centimeters high, MekWarriors
+				Hayes is a talented martial artist who prefers to fight his challenges unaugmented, where he
+				can take advantage
+				of his opponentsâ' near-certain dismissal of his small stature. His falconers indulged him
+				his passion for unarmed combat butalso made certain they trained him as a skilled
+				MekWarrior, and Hayes has not disappointed them. His choice of a highly-mobile
+				Incubus for a 'Mek is another small joke between Hayes and the world; the Incubus is one of
+				the tallest-appearing 'Meks on the battlefield because of its slender stature and high
+				mobility. Fewpeople expect to see the shape of a man like Hayes emerge from
+				its cockpit.
 
-Hayes was assigned to the First Falcon Striker as part of Binary Bravo after serving with the Fourth Falcon Dragoons on Morges. During that action, his Star was cut off from the rest of the Trinary and had to evade a stronger Lyran force to rejoin. Hayes was the
-last MechWarrior to return from the Morges wastelands, but he had claimed two heavier Lyran â€™Mechs before coming in. He used the Incubusâ€™ powerful large pulse laser and superior mobility to
-keep the medium â€™Mechs at range, wearing them down. When Star Captain Ingried was reviewing codexes he immediately requested Hayes and his second-line BattleMech for his Binary based on that action. Hayesâ€™ placement in the Alpha Beak is a
-reflection of both Ingriedâ€™s high regard for the warrior and for Star Commander Nicola von Jankmonâ€™s disdain for his light, secondline BattleMech. 
+				Hayes was assigned to the First Falcon Striker as part of Binary Bravo after serving with
+				the Fourth Falcon Dragoons on Morges. During that action, his Star was cut off from the rest
+				of the Trinary and had to evade a stronger Lyran force to rejoin. Hayes was the
+				last MekWarrior to return from the Morges wastelands, but he had claimed two heavier Lyran
+				'Meks before coming in. He used the Incubusâ' powerful large pulse laser and superior
+				mobility to
+				keep the medium 'Meks at range, wearing them down. When Star Captain Ingried was reviewing
+				codexes he immediately requested Hayes and his second-line BattleMek for his Binary based on
+				that action. Hayesâ' placement in the Alpha Beak is a
+				reflection of both Ingriedâ's high regard for the warrior and for Star Commander Nicola von
+				Jankmonâ's disdain for his light, secondline BattleMek.
 
-For his part Hayes is pleased to be a in a frontline Cluster and serving beneath an officer who recognizes and accepts unorthodox tactics. Although he is Jade Falcon to the core, and prefers the rituals of zellbrigen wherever possible, Hayes also believes it is his opponentsâ€™ responsibility to return the same
-honorable treatment in kind. On Morges, the way that the two Lyran â€™Mechs ganged up on his lighter, solitary â€™Mech told him they were warriors without honor, and he treated them that way. Star Captain Ingried, who agrees with this point of view
-entirely, encourages the MechWarrior to keep his enemies underestimating himâ€”and by extension, the entire Star.
+				For his part Hayes is pleased to be a in a frontline Cluster and serving beneath an officer
+				who recognizes and accepts unorthodox tactics. Although he is Jade Falcon to the core, and
+				prefers the rituals of zellbrigen wherever possible, Hayes also believes it is his
+				opponentsâ' responsibility to return the same
+				honorable treatment in kind. On Morges, the way that the two Lyran 'Meks ganged up on his
+				lighter, solitary 'Mek told him they were warriors without honor, and he treated them that
+				way. Star Captain Ingried, who agrees with this point of view
+				entirely, encourages the MekWarrior to keep his enemies underestimating himâ€”and by
+				extension, the entire Star.
 
-Hayes was offered an OmniMech when he transferred to the First Falcon Striker Cluster, but he retained the Incubus heâ€™s piloted since his Trial of Position on Ironhold. On Morges this decision served him well in skirmishes with the Twenty-fifth Arcturan
-Guardsâ€™ infantry regiments, where he was able to use the Incubusâ€™ anti-infantry machine guns to keep sappers away from his â€™Mech and those of his Starmates. He is a crack shot with the â€™Mechâ€™s
-large pulse laser, but his accuracy suffers when he switches to the paired ER medium lasersâ€”Hayes appears unable to switch quickly between the two different firing modes.</biography>
+				Hayes was offered an OmniMek when he transferred to the First Falcon Striker Cluster, but he
+				retained the Incubus heâ's piloted since his Trial of Position on Ironhold. On Morges this
+				decision served him well in skirmishes with the Twenty-fifth Arcturan
+				Guardsâ' infantry regiments, where he was able to use the Incubusâ' anti-infantry machine
+				guns to keep sappers away from his 'Mek and those of his Starmates. He is a crack shot with
+				the 'Mekâ's
+				large pulse laser, but his accuracy suffers when he switches to the paired ER medium
+				lasersâ€”Hayes appears unable to switch quickly between the two different firing modes.</biography>
 			<portraitCategory>Pursing Peregrines/</portraitCategory>
 			<portraitFile>Hayes.jpg</portraitFile>
 			<xp>0</xp>
@@ -536,17 +570,21 @@ large pulse laser, but his accuracy suffers when he switches to the paired ER me
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<personnelLog>
-				<logEntry><date>3071-05-14</date><desc>Promoted to Warrior</desc><type>SERVICE</type></logEntry>
+				<logEntry>
+					<date>3071-05-14</date>
+					<desc>Promoted to Warrior</desc>
+					<type>SERVICE</type>
+				</logEntry>
 			</personnelLog>
 		</person>
 		<person id="44e0d05e-33ee-40c4-afc8-bdea0fa2bd82" type="mekhq.campaign.personnel.Person">
@@ -556,22 +594,44 @@ large pulse laser, but his accuracy suffers when he switches to the paired ER me
 			<primaryRole>1</primaryRole>
 			<faction>CJF</faction>
 			<clan>true</clan>
-			<phenotype>MECHWARRIOR</phenotype>
-			<biography>MechWarrior Allen is a solidly competent, if uninspiring, Jade Falcon MechWarrior. Most people mistake him for a simpleton when first they meet, but that is simply because Allen is a very taciturn man. He never speaks when a gesture will do, but his
-courtesy is beyond reproach inside the Binary and Cluster. The only time Allen appears to show any animus is in combat, when he wields his Ice Ferret with a skill and speed that shocks those who havenâ€™t seen it before. Few of his falconers expected Allen
-to even survive his Trial of Position, much less pass it, but he surprised them by defeating one of his opponents and then ending the Trial. When pressed why he didnâ€™t keep fighting, Allen replied â€œto do more would be wasteful; the objective was a warriorâ€™s rank.â€� MechWarrior Quintero of Bravo Beak calls Allen
-â€œShrugâ€� behind his back.
+			<phenotype>MEKWARRIOR</phenotype>
+			<biography>MekWarrior Allen is a solidly competent, if uninspiring, Jade Falcon MekWarrior.
+				Most people mistake him for a simpleton when first they meet, but that is simply because
+				Allen is a very taciturn man. He never speaks when a gesture will do, but his
+				courtesy is beyond reproach inside the Binary and Cluster. The only time Allen appears to
+				show any animus is in combat, when he wields his Ice Ferret with a skill and speed that
+				shocks those who havenâ't seen it before. Few of his falconers expected Allen
+				to even survive his Trial of Position, much less pass it, but he surprised them by defeating
+				one of his opponents and then ending the Trial. When pressed why he didnâ't keep fighting,
+				Allen replied â€œto do more would be wasteful; the objective was a warriorâ's rank.â€�
+				MekWarrior Quintero of Bravo Beak calls Allen
+				â€œShrugâ€� behind his back.
 
-When not in combat Allen fills his time with exercise and reading. His physique is distinctive without being outrageousâ€”he prefers toning workouts to bulk muscle, and will spend any free time he has out hiking around his Starâ€™s base. He is an accomplished
-outdoorsman and climber, but his superiors are often loathe to allow him the freedom to wander into the wilderness alone for weeks at a timeâ€”Jade Falcon warriors are supposed to be always ready for combat. By some quirk or skill, though, Allen has never
-failed to return in time for a deployment. On Deia, for example, he walked back into the Starâ€™s bivouac literally ten minutes before the alarm was sounded for a raid by the Knights of St. Cameron.
+				When not in combat Allen fills his time with exercise and reading. His physique is
+				distinctive without being outrageousâ€”he prefers toning workouts to bulk muscle, and will
+				spend any free time he has out hiking around his Starâ's base. He is an accomplished
+				outdoorsman and climber, but his superiors are often loathe to allow him the freedom to
+				wander into the wilderness alone for weeks at a timeâ€”Jade Falcon warriors are supposed to
+				be always ready for combat. By some quirk or skill, though, Allen has never
+				failed to return in time for a deployment. On Deia, for example, he walked back into the
+				Starâ's bivouac literally ten minutes before the alarm was sounded for a raid by the Knights
+				of St. Cameron.
 
-Although he piloted an Alpha-configuration Ice Ferret on Deia, for the Great X campaign Allen has reconfigured his machine to the H-configuration, which carries an ER large laser and a pair of
-powerful (if inaccurate) heavy medium lasers. The heavy mediums offer him serious firepower, and the large laser possesses a farther-reaching range envelope than even an ER PPC. Allen has been testing the configuration in the DropShipâ€™s simulators
-against common Lyran Alliance BattleMech designs. Using the Ice Ferretâ€™s speed, he has been racing in to deliver crushing attacks against heavier â€™Mechsâ€™ flanks and lighter rear armor before using that same speed to escape return fire. He has been having some
-success, although his lack of accuracy with the attached six-tube short-range missile system is causing him some frustration. In an unorthodox move for him, he has been consulting MechWarrior
-Hayes, who uses similar tactics with his lighter (and even faster) Incubus. Hayes has offered him some pointers, but the missile launcher remains a problem.
-</biography>
+				Although he piloted an Alpha-configuration Ice Ferret on Deia, for the Great X campaign
+				Allen has reconfigured his machine to the H-configuration, which carries an ER large laser
+				and a pair of
+				powerful (if inaccurate) heavy medium lasers. The heavy mediums offer him serious firepower,
+				and the large laser possesses a farther-reaching range envelope than even an ER PPC. Allen
+				has been testing the configuration in the DropShipâ's simulators
+				against common Lyran Alliance BattleMek designs. Using the Ice Ferretâ's speed, he has been
+				racing in to deliver crushing attacks against heavier 'Meksâ' flanks and lighter rear armor
+				before using that same speed to escape return fire. He has been having some
+				success, although his lack of accuracy with the attached six-tube short-range missile system
+				is causing him some frustration. In an unorthodox move for him, he has been consulting
+				MekWarrior
+				Hayes, who uses similar tactics with his lighter (and even faster) Incubus. Hayes has
+				offered him some pointers, but the missile launcher remains a problem.
+			</biography>
 			<portraitCategory>Pursing Peregrines/</portraitCategory>
 			<portraitFile>Allen.jpg</portraitFile>
 			<xp>0</xp>
@@ -607,17 +667,21 @@ Hayes, who uses similar tactics with his lighter (and even faster) Incubus. Haye
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<personnelLog>
-				<logEntry><date>3071-05-14</date><desc>Promoted to Warrior</desc><type>SERVICE</type></logEntry>
+				<logEntry>
+					<date>3071-05-14</date>
+					<desc>Promoted to Warrior</desc>
+					<type>SERVICE</type>
+				</logEntry>
 			</personnelLog>
 		</person>
 		<person id="c78411a2-1375-46e1-a11f-db0dfc825810" type="mekhq.campaign.personnel.Person">
@@ -627,18 +691,41 @@ Hayes, who uses similar tactics with his lighter (and even faster) Incubus. Haye
 			<primaryRole>1</primaryRole>
 			<faction>CJF</faction>
 			<clan>true</clan>
-			<phenotype>MECHWARRIOR</phenotype>
-			<biography>MechWarrior Linders is, much like Alpha Beakâ€™s MechWarrior Allen, a simple warrior with few aspirations. Unlike Allen, though, Linders is not a quiet man. He is much the opposite, in factâ€”so much so that his Starmates will leave the room if they hear him
-getting started on one of his stories. In combat the Star has two frequencies; the Star channel Linders knows about and the other, quieter one he does not. The only reason he hasnâ€™t been dismissed from Star Commander von Jankmonâ€™s Star is his skill in his Timber
-Wolf. Linders makes a fine courser for Nicolaâ€™s Kodiak, and she uses him in that role. Many enemies who would run from a Timber Wolf are surprised to find an assault-class Kodiak waiting to challenge them, while Linders turns away to find his own opponents.
+			<phenotype>MEKWARRIOR</phenotype>
+			<biography>MekWarrior Linders is, much like Alpha Beakâ's MekWarrior Allen, a simple warrior
+				with few aspirations. Unlike Allen, though, Linders is not a quiet man. He is much the
+				opposite, in factâ€”so much so that his Starmates will leave the room if they hear him
+				getting started on one of his stories. In combat the Star has two frequencies; the Star
+				channel Linders knows about and the other, quieter one he does not. The only reason he
+				hasnâ't been dismissed from Star Commander von Jankmonâ's Star is his skill in his Timber
+				Wolf. Linders makes a fine courser for Nicolaâ's Kodiak, and she uses him in that role. Many
+				enemies who would run from a Timber Wolf are surprised to find an assault-class Kodiak
+				waiting to challenge them, while Linders turns away to find his own opponents.
 
-The fighting with the Second Wolf Legion on Deia produced a change in Linders, one that he has not entirely sorted out. During those battles he was challenged by a Wolf-in-Exile Linebacker pilot, and the two of them fought a running battle that lasted more than twenty hours. Cut off from their respective Stars, the Linebacker retreated steadily, using his â€™Mechâ€™s greater speed to keep out of range of Lindersâ€™ heavy large lasers. Linders, despite running out of long-range missile ammunition after only three hours, refused to break off. Few of his comrades would have suspected that he could carry a mission that far, but in the end the Linebacker mistakenly retreated into an arroyo whose opposite end had been collapsed by earlier fighting. Linders was able to corner the lighter
-machine and destroy it, but the Wolf-in-Exile warrior was killed in the destruction of his â€™Mech rather than taken bondsman. Linders returned to the Star bivouac and didnâ€™t speak for two entire days. His Starmates tried to draw him out, even going to so far as to call
-a medic, before he seemed to emerge from his funk. He has never spoken of that time, nor explained what was so trying. He will not, in fact, speak of Deia at all.
+				The fighting with the Second Wolf Legion on Deia produced a change in Linders, one that he
+				has not entirely sorted out. During those battles he was challenged by a Wolf-in-Exile
+				Linebacker pilot, and the two of them fought a running battle that lasted more than twenty
+				hours. Cut off from their respective Stars, the Linebacker retreated steadily, using his
+				'Mekâ's greater speed to keep out of range of Lindersâ' heavy large lasers. Linders, despite
+				running out of long-range missile ammunition after only three hours, refused to break off.
+				Few of his comrades would have suspected that he could carry a mission that far, but in the
+				end the Linebacker mistakenly retreated into an arroyo whose opposite end had been collapsed
+				by earlier fighting. Linders was able to corner the lighter
+				machine and destroy it, but the Wolf-in-Exile warrior was killed in the destruction of his
+				'Mek rather than taken bondsman. Linders returned to the Star bivouac and didnâ't speak for
+				two entire days. His Starmates tried to draw him out, even going to so far as to call
+				a medic, before he seemed to emerge from his funk. He has never spoken of that time, nor
+				explained what was so trying. He will not, in fact, speak of Deia at all.
 
-Many younger Falcon warriors deride Linders for piloting an OmniMech that more commonly associated with the Wolf Clan than the Jade Falcons, suggesting he trade the heavy OmniMech for a Black Lanner or a Turkina. Linders ignores these warriors, or answers them with a Trial of Grievance. He has successfully
-defended his honor in three Trials since arriving in the Inner Sphere, twice defeating warriors in OmniMechs that mass more than his Timber Wolf. He rarely reconfigures his â€™Mech out of the H configuration, preferring the heavy lasers to other weapons, even
-ER PPCs. Through diligent effort he has managed to overcome the worst of the heavy lasersâ€™ inherent inaccuracy, though in the stress of battle he does sometimes miss.</biography>
+				Many younger Falcon warriors deride Linders for piloting an OmniMek that more commonly
+				associated with the Wolf Clan than the Jade Falcons, suggesting he trade the heavy OmniMek
+				for a Black Lanner or a Turkina. Linders ignores these warriors, or answers them with a
+				Trial of Grievance. He has successfully
+				defended his honor in three Trials since arriving in the Inner Sphere, twice defeating
+				warriors in OmniMeks that mass more than his Timber Wolf. He rarely reconfigures his 'Mek
+				out of the H configuration, preferring the heavy lasers to other weapons, even
+				ER PPCs. Through diligent effort he has managed to overcome the worst of the heavy lasersâ'
+				inherent inaccuracy, though in the stress of battle he does sometimes miss.</biography>
 			<portraitCategory>Pursing Peregrines/</portraitCategory>
 			<portraitFile>Linders.jpg</portraitFile>
 			<xp>0</xp>
@@ -674,17 +761,21 @@ ER PPCs. Through diligent effort he has managed to overcome the worst of the hea
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>4</level>
 				<bonus>1</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>4</level>
 				<bonus>1</bonus>
 			</skill>
 			<personnelLog>
-				<logEntry><date>3071-05-14</date><desc>Promoted to Warrior</desc><type>SERVICE</type></logEntry>
+				<logEntry>
+					<date>3071-05-14</date>
+					<desc>Promoted to Warrior</desc>
+					<type>SERVICE</type>
+				</logEntry>
 			</personnelLog>
 		</person>
 		<person id="6a465a01-6306-47a7-bf77-be95b7860434" type="mekhq.campaign.personnel.Person">
@@ -694,18 +785,39 @@ ER PPCs. Through diligent effort he has managed to overcome the worst of the hea
 			<primaryRole>1</primaryRole>
 			<faction>CJF</faction>
 			<clan>true</clan>
-			<phenotype>MECHWARRIOR</phenotype>
-			<biography>Edward has led a solid, if uninspiring, career as a Jade Falcon MechWarrior. He is one of those warriors who does their job without flair, which has kept him from ever rising higher than Star Commanderâ€™s rank. The pinnacle of his career was the Jade Falcon offensive that reached Coventry, when he served beneath Star Colonel Arimas Malthus. Since that time heâ€™s been
-fighting the inertia of a Clan warrior whoâ€™s unable to distinguish himself, hoping to find some way to earn back his ascendancy. His assignment to Binary Bravo is the first light heâ€™s seen in a long timeâ€”both because he believes Star Captain Ingried will bring him opportunities for glory and because he has the living,
-breathing example of Callen Malthus to see what future to avoid.
+			<phenotype>MEKWARRIOR</phenotype>
+			<biography>Edward has led a solid, if uninspiring, career as a Jade Falcon MekWarrior. He is
+				one of those warriors who does their job without flair, which has kept him from ever rising
+				higher than Star Commanderâ's rank. The pinnacle of his career was the Jade Falcon offensive
+				that reached Coventry, when he served beneath Star Colonel Arimas Malthus. Since that time
+				heâ's been
+				fighting the inertia of a Clan warrior whoâ's unable to distinguish himself, hoping to find
+				some way to earn back his ascendancy. His assignment to Binary Bravo is the first light
+				heâ's seen in a long timeâ€”both because he believes Star Captain Ingried will bring him
+				opportunities for glory and because he has the living,
+				breathing example of Callen Malthus to see what future to avoid.
 
-Although he would barely be entering early middle age in the Inner Sphere, Edward is already feeling the effects of his age amongst his youthful Clan comrades. He is waging a personal war against entropy with a brutal physical exercise program thatâ€™s
-built him so much muscle mass that his friends tease him about trying to become an Elemental. Whenever he is not engaged in Star duties or combat Edward is in the fitness center, building muscle mass or training. Although he excels at none he is trained in several forms of unarmed combat, including working with a
-Spheroid savate master on Morges for a short time. He uses his muscle and his varied skills to good effect in Trials of Grievance; his age means that he is the frequent target of such Trials issued by younger warriors fresh from their Trials of Position. To a
-nineteen-year-old, nearly-thirty is nearly-dead. Edward may not have succeeded in his path to promotion, but he remains a fit and experienced warriorâ€”he doesnâ€™t lose many of those Trials.
+				Although he would barely be entering early middle age in the Inner Sphere, Edward is already
+				feeling the effects of his age amongst his youthful Clan comrades. He is waging a personal
+				war against entropy with a brutal physical exercise program thatâ's
+				built him so much muscle mass that his friends tease him about trying to become an
+				Elemental. Whenever he is not engaged in Star duties or combat Edward is in the fitness
+				center, building muscle mass or training. Although he excels at none he is trained in
+				several forms of unarmed combat, including working with a
+				Spheroid savate master on Morges for a short time. He uses his muscle and his varied skills
+				to good effect in Trials of Grievance; his age means that he is the frequent target of such
+				Trials issued by younger warriors fresh from their Trials of Position. To a
+				nineteen-year-old, nearly-thirty is nearly-dead. Edward may not have succeeded in his path
+				to promotion, but he remains a fit and experienced warriorâ€”he doesnâ't lose many of those
+				Trials.
 
-Just prior to the lift from Deia Edward was defeated in a Trial of Possession for his â€™Mech. Until then he had piloted a sixty-ton Mad Dog, but the successful challenge of MechWarrior Lilith of the Fourth Falcon Dragoons left him with her Jenner IIC. Edward
-despises the light, fixed-configuration second-line â€™Mech and its entirely-missile armament. In the simulators on the transit to Great X he has been attempting to better his accuracy with the Jennerâ€™s paired short-range missile launchers, but he is used to the Mad Dogâ€™s pulse lasers. The yelling from his simulator pod could be heard three decks away.</biography>
+				Just prior to the lift from Deia Edward was defeated in a Trial of Possession for his 'Mek.
+				Until then he had piloted a sixty-ton Mad Dog, but the successful challenge of MekWarrior
+				Lilith of the Fourth Falcon Dragoons left him with her Jenner IIC. Edward
+				despises the light, fixed-configuration second-line 'Mek and its entirely-missile armament.
+				In the simulators on the transit to Great X he has been attempting to better his accuracy
+				with the Jennerâ's paired short-range missile launchers, but he is used to the Mad Dogâ's
+				pulse lasers. The yelling from his simulator pod could be heard three decks away.</biography>
 			<portraitCategory>Pursing Peregrines/</portraitCategory>
 			<portraitFile>Edward.jpg</portraitFile>
 			<xp>0</xp>
@@ -741,17 +853,21 @@ despises the light, fixed-configuration second-line â€™Mech and its entirel
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>3</level>
 				<bonus>1</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>3</level>
 				<bonus>1</bonus>
 			</skill>
 			<personnelLog>
-				<logEntry><date>3071-05-14</date><desc>Promoted to Warrior</desc><type>SERVICE</type></logEntry>
+				<logEntry>
+					<date>3071-05-14</date>
+					<desc>Promoted to Warrior</desc>
+					<type>SERVICE</type>
+				</logEntry>
 			</personnelLog>
 		</person>
 		<person id="7cda45c3-54d0-4486-8aaf-42b8baefd02e" type="mekhq.campaign.personnel.Person">
@@ -761,17 +877,43 @@ despises the light, fixed-configuration second-line â€™Mech and its entirel
 			<primaryRole>1</primaryRole>
 			<faction>CJF</faction>
 			<clan>true</clan>
-			<phenotype>MECHWARRIOR</phenotype>
-			<biography>Denise is the only freeborn MechWarrior in the Binary, and few of the trueborn Jade Falcon warriors let her forget it. Although she is only nineteen years old, she has already fought in more Trials of Greivance than any other warrior in the Binary except Callen Malthus. Her victories in all of these Trials except oneâ€”a foolish unaugmented challenge against MechWarrior Hayes that put her in the DropShipâ€™s sickbay for three daysâ€”prove her qualifications to serve in the frontline Binary, but she still resents the unthinking discrimination against freeborns.
+			<phenotype>MEKWARRIOR</phenotype>
+			<biography>Denise is the only freeborn MekWarrior in the Binary, and few of the trueborn Jade
+				Falcon warriors let her forget it. Although she is only nineteen years old, she has already
+				fought in more Trials of Greivance than any other warrior in the Binary except Callen
+				Malthus. Her victories in all of these Trials except oneâ€”a foolish unaugmented challenge
+				against MekWarrior Hayes that put her in the DropShipâ's sickbay for three daysâ€”prove her
+				qualifications to serve in the frontline Binary, but she still resents the unthinking
+				discrimination against freeborns.
 
-To an outside observer Deniseâ€™s skills are amazing; she tested into the warrior caste at seventeen, rather than entering a childhood sibko earlier. The fact that she can compete with trueborn Jade Falcon warriors, whoâ€™ve been trained since birth for the warriorâ€™s life, reveals incredible innate talent for BattleMech piloting. Her position in the First Falcon Striker is a test of sortsâ€”only the desperate losses on Morges forced the Star Colonel to approve the transfer from the Gyrfalcon Solahma, and Star Captain Ingried was the only officer willing to accept her into his command. Ingried doesnâ€™t care about how Denise was bornâ€”he only cares about how she fights.
+				To an outside observer Deniseâ's skills are amazing; she tested into the warrior caste at
+				seventeen, rather than entering a childhood sibko earlier. The fact that she can compete
+				with trueborn Jade Falcon warriors, whoâ've been trained since birth for the warriorâ's
+				life, reveals incredible innate talent for BattleMek piloting. Her position in the First
+				Falcon Striker is a test of sortsâ€”only the desperate losses on Morges forced the Star
+				Colonel to approve the transfer from the Gyrfalcon Solahma, and Star Captain Ingried was the
+				only officer willing to accept her into his command. Ingried doesnâ't care about how Denise
+				was bornâ€”he only cares about how she fights.
 
-Denise is hot-tempered and rash. Her tactics in combatâ€” unarmed or BattleMechâ€”reveal a woman whose idea of finesse is to not shout before she attacks. Against Inner Sphere opponents this tactic may actually be of some worth, since many Lyran â€˜Mech jocks are used to seeing Jade Falcons stop and announce their challenges. She has little regard for tactics or teamworkâ€”a trait she shares with many trueborn Jade Falconsâ€”but prefers to prove herself or fail strictly on her own merits. This attitude is not surprising for a freeborn Jade Falcon warrior; an Inner Sphere observer would say she is trying to â€œ...out-trueborn the trueborns...â€œ by being the most individualistic warrior she can. Ingried has already given up trying to reign her in, instead using
-her as a shock trooper to break up enemy formations.
+				Denise is hot-tempered and rash. Her tactics in combatâ€” unarmed or BattleMekâ€”reveal a
+				woman whose idea of finesse is to not shout before she attacks. Against Inner Sphere
+				opponents this tactic may actually be of some worth, since many Lyran 'Mek jocks are used to
+				seeing Jade Falcons stop and announce their challenges. She has little regard for tactics or
+				teamwork trait she shares with many trueborn Jade Falcons but prefers to prove herself or
+				fail strictly on her own merits. This attitude is not surprising for a freeborn Jade Falcon
+				warrior; an Inner Sphere observer would say she is trying to â€œ...out-trueborn the
+				trueborns...â€œ by being the most individualistic warrior she can. Ingried has already given
+				up trying to reign her in, instead using
+				her as a shock trooper to break up enemy formations.
 
-The Grendel OmniMech Denise pilots is a machine captured from the now-defunct Smoke Jaguars. She successfully defeated a trueborn Star Commander for the â€™Mech, fighting in a Locust IIC. Her opponent attempted to hold her at long range and snipe her
-to death with his large laser, but Denise used the natural obstacles in the Circle of Equals to close the range and quickly disable the Grendel with a flurry of missiles. The Star Commander did not survive the Trial, and Denise arrived in the First Falcon Striker a
-freeborn warrior with an OmniMech in her control. She eschews the other configurations, preferring to keep the Grendel in the primary.</biography>
+				The Grendel OmniMek Denise pilots is a machine captured from the now-defunct Smoke Jaguars.
+				She successfully defeated a trueborn Star Commander for the 'Mek, fighting in a Locust IIC.
+				Her opponent attempted to hold her at long range and snipe her
+				to death with his large laser, but Denise used the natural obstacles in the Circle of Equals
+				to close the range and quickly disable the Grendel with a flurry of missiles. The Star
+				Commander did not survive the Trial, and Denise arrived in the First Falcon Striker a
+				freeborn warrior with an OmniMek in her control. She eschews the other configurations,
+				preferring to keep the Grendel in the primary.</biography>
 			<portraitCategory>Pursing Peregrines/</portraitCategory>
 			<portraitFile>Denise.jpg</portraitFile>
 			<xp>0</xp>
@@ -808,17 +950,21 @@ freeborn warrior with an OmniMech in her control. She eschews the other configur
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<personnelLog>
-				<logEntry><date>3071-05-14</date><desc>Promoted to Warrior</desc><type>SERVICE</type></logEntry>
+				<logEntry>
+					<date>3071-05-14</date>
+					<desc>Promoted to Warrior</desc>
+					<type>SERVICE</type>
+				</logEntry>
 			</personnelLog>
 		</person>
 		<person id="61b23021-990f-4f58-9a90-4ea15f59d6c4" type="mekhq.campaign.personnel.Person">
@@ -828,19 +974,45 @@ freeborn warrior with an OmniMech in her control. She eschews the other configur
 			<primaryRole>1</primaryRole>
 			<faction>CJF</faction>
 			<clan>true</clan>
-			<phenotype>MECHWARRIOR</phenotype>
-			<biography>Nicola von Jankmonâ€™s first taste of combat in the Inner Sphere was on Coventry against the Tenth Skye Rangers, and she earned her Bloodname the following year. One of the rare von Jankmons who doesnâ€™t serve as an aerospace pilot or a WarShip officer,Nicola has proceeded through her career with something of a chip on her shoulder, as if she believes the rest of her Bloodhouse is looking down its noses at her because she fights on the ground. Whether or not they do deride her for her position, her attitude more than ensures they deride her nonetheless. 
+			<phenotype>MEKWARRIOR</phenotype>
+			<biography>Nicola von Jankmonâ's first taste of combat in the Inner Sphere was on Coventry
+				against the Tenth Skye Rangers, and she earned her Bloodname the following year. One of the
+				rare von Jankmons who doesnâ't serve as an aerospace pilot or a WarShip officer,Nicola has
+				proceeded through her career with something of a chip on her shoulder, as if she believes
+				the rest of her Bloodhouse is looking down its noses at her because she fights on the
+				ground. Whether or not they do deride her for her position, her attitude more than ensures
+				they deride her nonetheless.
 
-That attitude has kept Nicola from advancing. She has twice successfully tested to Star Captainâ€™s rank but been defeated in Trials of Position for the Trinary command each time, forcing her back to Star Commanderâ€™s rank. The elevation of Star Captain
-Ingriedâ€”a warrior without even a Bloodnameâ€”over her when Binary Bravo was formed infuriated her, but Ingriedâ€™s handy defeat of her when she challenged him to a Trial of Position made the point plainly to the battle-oriented Falcons. Her command of her Star has become by-the-book and downright bloodthirsty. On
-Deia her Star defeated more than a company of the Knights of St. Cameron before being driven back by the Second Wolf Legion.
+				That attitude has kept Nicola from advancing. She has twice successfully tested to Star
+				Captainâ's rank but been defeated in Trials of Position for the Trinary command each time,
+				forcing her back to Star Commanderâ's rank. The elevation of Star Captain
+				Ingriedâ€”a warrior without even a Bloodnameâ€”over her when Binary Bravo was formed
+				infuriated her, but Ingriedâ's handy defeat of her when she challenged him to a Trial of
+				Position made the point plainly to the battle-oriented Falcons. Her command of her Star has
+				become by-the-book and downright bloodthirsty. On
+				Deia her Star defeated more than a company of the Knights of St. Cameron before being driven
+				back by the Second Wolf Legion.
 
-The knowledge that the Knights remain on Great X has filled Nicola with a vengeful fury. Her Star has spent the entire in-system transit in the simulators, acclimating themselves to the various landscapes and prominent terrain features of the terrain around Spot, the capital city. It was the Second Wolf Legionâ€™s command of the terrain that allowed them to sneak up on Bravo Beak and push them back on Deiaâ€”Nicola will not be manipulated again.
+				The knowledge that the Knights remain on Great X has filled Nicola with a vengeful fury. Her
+				Star has spent the entire in-system transit in the simulators, acclimating themselves to the
+				various landscapes and prominent terrain features of the terrain around Spot, the capital
+				city. It was the Second Wolf Legionâ's command of the terrain that allowed them to sneak up
+				on Bravo Beak and push them back on Deiaâ€”Nicola will not be manipulated again.
 
-Several of her Starmates are concerned about the coming battles; during the in-system simulations Nicola fought with a fearless abandon that has many of the younger Falcons wondering if she is trying to make sure she dies in combat before she can be assigned to a solahma Cluster. Although she is only twenty-nine,
-her subordinates are nearly a decade her junior in the ageconscious Clan touman. Although she does fear the arrival of her thirtieth birthday, her drive and near-suicidal tactics are more derived from her burning hatred of the Knights of St. Cameron and the Inner Sphere in general.
+				Several of her Starmates are concerned about the coming battles; during the in-system
+				simulations Nicola fought with a fearless abandon that has many of the younger Falcons
+				wondering if she is trying to make sure she dies in combat before she can be assigned to a
+				solahma Cluster. Although she is only twenty-nine,
+				her subordinates are nearly a decade her junior in the ageconscious Clan touman. Although
+				she does fear the arrival of her thirtieth birthday, her drive and near-suicidal tactics are
+				more derived from her burning hatred of the Knights of St. Cameron and the Inner Sphere in
+				general.
 
-The Kodiak Nicola pilots was taken as isorla from Clan Wolf in a Trial of Possession in 3069. The Wolf warrior, himself an abtakha from Clan Ghost Bear, nearly succeeded in defeating Nicola in her Executioner, and she claimed his â€™Mech as her own when the Executioner was scrapped after the battle. Although she occasionally rails against the fixed configuration, the Kodiakâ€™s sheer firepower serves her temper well.</biography>
+				The Kodiak Nicola pilots was taken as isorla from Clan Wolf in a Trial of Possession in
+				3069. The Wolf warrior, himself an abtakha from Clan Ghost Bear, nearly succeeded in
+				defeating Nicola in her Executioner, and she claimed his 'Mek as her own when the
+				Executioner was scrapped after the battle. Although she occasionally rails against the fixed
+				configuration, the Kodiakâ's sheer firepower serves her temper well.</biography>
 			<portraitCategory>Pursing Peregrines/</portraitCategory>
 			<portraitFile>Nicola Von Jankmon.jpg</portraitFile>
 			<xp>0</xp>
@@ -851,7 +1023,7 @@ The Kodiak Nicola pilots was taken as isorla from Clan Wolf in a Trial of Posses
 			<status>ACTIVE</status>
 			<birthday>3042-01-24</birthday>
 			<skill>
-				<type>Tech/Mech</type>
+				<type>Tech/Mek</type>
 				<level>1</level>
 				<bonus>0</bonus>
 			</skill>
@@ -891,12 +1063,12 @@ The Kodiak Nicola pilots was taken as isorla from Clan Wolf in a Trial of Posses
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
@@ -909,22 +1081,48 @@ The Kodiak Nicola pilots was taken as isorla from Clan Wolf in a Trial of Posses
 			<secondaryRole>22</secondaryRole>
 			<faction>CJF</faction>
 			<clan>true</clan>
-			<phenotype>MECHWARRIOR</phenotype>
-			<biography>One of the ristars born to a sibko hatched just as the Clans were departing for Operation REVIVAL, Ingried grew up hearing the falconers telling the grand tales of Crusader glory in the Inner Sphere. His every class was built around the Falconâ€™s eventual rise as ilClan and their lordship over the new Star League. Like every impressionable child might, Ingried believed his tutorsâ€”which meant his world was turned upside down when the Star League Defense Force arrived in Clan space and demanded their Great Refusal, and the defeat of the Clans shook him to his core. He began to question some of the things his falconers told him andmake his own decisions about the right of things.
+			<phenotype>MEKWARRIOR</phenotype>
+			<biography>One of the ristars born to a sibko hatched just as the Clans were departing for
+				Operation REVIVAL, Ingried grew up hearing the falconers telling the grand tales of Crusader
+				glory in the Inner Sphere. His every class was built around the Falconâ's eventual rise as
+				ilClan and their lordship over the new Star League. Like every impressionable child might,
+				Ingried believed his tutorsâ€”which meant his world was turned upside down when the Star
+				League Defense Force arrived in Clan space and demanded their Great Refusal, and the defeat
+				of the Clans shook him to his core. He began to question some of the things his falconers
+				told him andmake his own decisions about the right of things.
 
-Whatever his mental proclivities he was also one of the most deadly MechWarriors to emerge from the sibkos. He earned the rank of Star Captain in his Trial of Position, even after his Trialmate forced the Trial into a melee with a stray shot. His posting to Delta
-Galaxyâ€™s Eyrie Cluster put him on the front lines of the Falconsâ€™ interregnum between the 3064 incursion and their leap across the border again soon after the Jihad broke out. He distinguished himself in 3066 by capturing the Nova Cat he still pilots from a
-Ghost Bear warrior in a Trial of Possession, which brought him to Galaxy Commander Uvin Buhallinâ€™s attention. When Buhallin was injured and thought killed on Morges, new Galaxy Commander
-Lee Newclay transferred the young warrior to the First Falcon Striker and built a new Binary around him.
+				Whatever his mental proclivities he was also one of the most deadly MekWarriors to emerge
+				from the sibkos. He earned the rank of Star Captain in his Trial of Position, even after his
+				Trialmate forced the Trial into a melee with a stray shot. His posting to Delta
+				Galaxyâ's Eyrie Cluster put him on the front lines of the Falconsâ' interregnum between the
+				3064 incursion and their leap across the border again soon after the Jihad broke out. He
+				distinguished himself in 3066 by capturing the Nova Cat he still pilots from a
+				Ghost Bear warrior in a Trial of Possession, which brought him to Galaxy Commander Uvin
+				Buhallinâ's attention. When Buhallin was injured and thought killed on Morges, new Galaxy
+				Commander
+				Lee Newclay transferred the young warrior to the First Falcon Striker and built a new Binary
+				around him.
 
-As Binary commander Ingried has to deal with considerable dissatisfaction from his MechWarriors. Star Commander Nicola von Jankmon has already challenged him once for the Binary command, and despite her defeat his command of her still
-rankles the older woman. Several of the younger Falcon warriors who should follow him happily are instead drawn to the older, Bloodnamed warriors like von Jankmon and Callen Malthus, who do nothing but fill their heads with drivel about how â€œun-Jade
-Falconâ€� many of Ingriedâ€™s attitudes are. So long as the resentment doesnâ€™t interfere with discipline Ingried will do nothing; after all, his is rather un-Jade Falcon. The performance of his Binary will be
-the ultimate arbiter of his methods, and he intends the Binary to shine, unruly warriors or not.
+				As Binary commander Ingried has to deal with considerable dissatisfaction from his
+				MekWarriors. Star Commander Nicola von Jankmon has already challenged him once for the
+				Binary command, and despite her defeat his command of her still
+				rankles the older woman. Several of the younger Falcon warriors who should follow him
+				happily are instead drawn to the older, Bloodnamed warriors like von Jankmon and Callen
+				Malthus, who do nothing but fill their heads with drivel about how â€œun-Jade
+				Falconâ€� many of Ingriedâ's attitudes are. So long as the resentment doesnâ't interfere
+				with discipline Ingried will do nothing; after all, his is rather un-Jade Falcon. The
+				performance of his Binary will be
+				the ultimate arbiter of his methods, and he intends the Binary to shine, unruly warriors or
+				not.
 
-Ingriedâ€™s Nova Cat is a rare machine in the Jade Falcons, and a maligned one. He claimed it as isorla despite the Jade Falconsâ€™ opinions of the Abjured Nova Cats as traitors to the Clans. It is a
-powerful OmniMech and one well-suited to his style of combat, and he cares little for its provenance. He prefers the Alpha configuration for its unerring accuracy andâ€”surprisingly for such a laser-heavy machineâ€”complete control over its heat burden.
-He has defended himself in two Trials by disabling his opponentâ€™s â€™Mechs before they can even enter range to get a shot off.</biography>
+				Ingriedâ's Nova Cat is a rare machine in the Jade Falcons, and a maligned one. He claimed it
+				as isorla despite the Jade Falconsâ' opinions of the Abjured Nova Cats as traitors to the
+				Clans. It is a
+				powerful OmniMek and one well-suited to his style of combat, and he cares little for its
+				provenance. He prefers the Alpha configuration for its unerring accuracy andâ€”surprisingly
+				for such a laser-heavy machineâ€”complete control over its heat burden.
+				He has defended himself in two Trials by disabling his opponentâ's 'Meks before they can
+				even enter range to get a shot off.</biography>
 			<portraitCategory>Pursing Peregrines/</portraitCategory>
 			<portraitFile>Ingried.jpg</portraitFile>
 			<xp>0</xp>
@@ -935,7 +1133,7 @@ He has defended himself in two Trials by disabling his opponentâ€™s â€�
 			<status>ACTIVE</status>
 			<birthday>3048-06-17</birthday>
 			<skill>
-				<type>Tech/Mech</type>
+				<type>Tech/Mek</type>
 				<level>1</level>
 				<bonus>0</bonus>
 			</skill>
@@ -970,12 +1168,12 @@ He has defended himself in two Trials by disabling his opponentâ€™s â€�
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>5</level>
 				<bonus>1</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>4</level>
 				<bonus>1</bonus>
 			</skill>
@@ -987,21 +1185,42 @@ He has defended himself in two Trials by disabling his opponentâ€™s â€�
 			<primaryRole>1</primaryRole>
 			<faction>CJF</faction>
 			<clan>true</clan>
-			<phenotype>MECHWARRIOR</phenotype>
-			<biography>Callen Malthus is the oldest warrior in Binary Bravo by many years. Nearly fortyâ€”and fighting assignment to a solahma Cluster tooth and nailâ€”he is a canny and experienced warrior who doesnâ€™t suffer the company of his younger Starmates very well. It took him nearly all the capital and favors he could muster to get assigned to the Inner Sphere even as a MechWarrior, and he doesnâ€™t intend to waste the opportunity.
+			<phenotype>MEKWARRIOR</phenotype>
+			<biography>Callen Malthus is the oldest warrior in Binary Bravo by many years. Nearly
+				fortyâ€”and fighting assignment to a solahma Cluster tooth and nailâ€”he is a canny and
+				experienced warrior who doesnâ't suffer the company of his younger Starmates very well. It
+				took him nearly all the capital and favors he could muster to get assigned to the Inner
+				Sphere even as a MekWarrior, and he doesnâ't intend to waste the opportunity.
 
-Callen Malthus passed his Trial of Position with the rank of Star Commander, a feat that should have put him on the ristar track, but his assignment to the Homeworld garrisons rather than into one of the frontline Clusters during Operation REVIVAL stymied
-his chances for advancement. He was preparing to challenge a warrior in the 305th Assault Cluster for his Trinary command when the disaster on Twycross stained the entire Malthus Bloodhouse. The demotion of Timur Malthus from saKhan soon after sealed his
-fate, and his capture of the Malthus Bloodname in 3054 seemed almost anticlimactic. By the time Marthe Pryde assumed the Khanship Callen was resigned to his fate, and it was only the need to provide some experience to the young Clusters being blooded
-on Coventry that finally brought him forward to the Occupation Zone.
+				Callen Malthus passed his Trial of Position with the rank of Star Commander, a feat that
+				should have put him on the ristar track, but his assignment to the Homeworld garrisons
+				rather than into one of the frontline Clusters during Operation REVIVAL stymied
+				his chances for advancement. He was preparing to challenge a warrior in the 305th Assault
+				Cluster for his Trinary command when the disaster on Twycross stained the entire Malthus
+				Bloodhouse. The demotion of Timur Malthus from saKhan soon after sealed his
+				fate, and his capture of the Malthus Bloodname in 3054 seemed almost anticlimactic. By the
+				time Marthe Pryde assumed the Khanship Callen was resigned to his fate, and it was only the
+				need to provide some experience to the young Clusters being blooded
+				on Coventry that finally brought him forward to the Occupation Zone.
 
-Once in the Inner Sphere Callenâ€™s influence remained as wan as previous. Despite his Bloodname he was unable to capture a higher rank than Star Commander, and his transfer to the Eighth
-Falcon Talon and reduction in rank was a thinly-veiled preview of his eventual assignment to a solahma Cluster. In the Eighth Callen directed all of his energies to proving himself the equal of any
-younger warrior. Although he was unable to test to a higher rank, he defeated every Trial thrust at him by the younger warriors of his Cluster, eventually earning a transfer to the First Falcon Striker in
-the aftermath of Morges and Deia as Galaxy Commander Newclay struggled to rebuild his Galaxyâ€™s flagship Cluster.
+				Once in the Inner Sphere Callenâ's influence remained as wan as previous. Despite his
+				Bloodname he was unable to capture a higher rank than Star Commander, and his transfer to
+				the Eighth
+				Falcon Talon and reduction in rank was a thinly-veiled preview of his eventual assignment to
+				a solahma Cluster. In the Eighth Callen directed all of his energies to proving himself the
+				equal of any
+				younger warrior. Although he was unable to test to a higher rank, he defeated every Trial
+				thrust at him by the younger warriors of his Cluster, eventually earning a transfer to the
+				First Falcon Striker in
+				the aftermath of Morges and Deia as Galaxy Commander Newclay struggled to rebuild his
+				Galaxyâ's flagship Cluster.
 
-Callenâ€™s Hellion is a prize taken as isorla after defeating an Ice Hellion warrior in a Trial of Grievance in the Homeworlds just prior to his reassignment to Coventry. The Ice Hellion had insulted Callenâ€™s age and accepted Callenâ€™s Trial. Compounding the insult
-of his defeat by such an â€œold man,â€� Callen used a decrepit secondline Commando IIC to defeat him and claimed the â€™Mech as his prize. It has served him well in the Inner Sphere, where few if any of his enemies have encountered the â€™Mech before.</biography>
+				Callenâ's Hellion is a prize taken as isorla after defeating an Ice Hellion warrior in a
+				Trial of Grievance in the Homeworlds just prior to his reassignment to Coventry. The Ice
+				Hellion had insulted Callenâ's age and accepted Callenâ's Trial. Compounding the insult
+				of his defeat by such an â€œold man,â€� Callen used a decrepit secondline Commando IIC to
+				defeat him and claimed the 'Mek as his prize. It has served him well in the Inner Sphere,
+				where few if any of his enemies have encountered the 'Mek before.</biography>
 			<portraitCategory>Pursing Peregrines/</portraitCategory>
 			<portraitFile>Callen Malthus.jpg</portraitFile>
 			<xp>0</xp>
@@ -1042,17 +1261,21 @@ of his defeat by such an â€œold man,â€� Callen used a decrepit secondli
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<personnelLog>
-				<logEntry><date>3071-05-14</date><desc>Promoted to Warrior</desc><type>SERVICE</type></logEntry>
+				<logEntry>
+					<date>3071-05-14</date>
+					<desc>Promoted to Warrior</desc>
+					<type>SERVICE</type>
+				</logEntry>
 			</personnelLog>
 		</person>
 		<person id="e4459752-4dd8-43da-b3f9-447df3ec737f" type="mekhq.campaign.personnel.Person">
@@ -1062,19 +1285,44 @@ of his defeat by such an â€œold man,â€� Callen used a decrepit secondli
 			<primaryRole>1</primaryRole>
 			<faction>CJF</faction>
 			<clan>true</clan>
-			<phenotype>MECHWARRIOR</phenotype>
-			<biography>Quintero is an ambitious man. He dreams of one day becoming Khan of the Jade Falcons, if not ilKhan of the ilClan when his forces retake Terra. Fortunately for his superiors, he does notâ€” yetâ€”possess the cunning necessary to match his plans. He was
-a mediocre student, one whose falconers did not expect him to pass his Trial of Position. His success in that Trial, although only with MechWarriorâ€™s rank, proved to himself that he was capable of far more than heâ€™d been told, which set him on the path he
-now walks. He is an irascible, impatient man who aches for greater rank than he now possesses. He is constantly needling Star Commander Nicola von Jankmon, constantly probing for weaknesses that he can exploit. The two have very nearly come to
-Trials of Grievance already, and triumphing in such a Trial is only one part of Quinteroâ€™s plan.
+			<phenotype>MEKWARRIOR</phenotype>
+			<biography>Quintero is an ambitious man. He dreams of one day becoming Khan of the Jade
+				Falcons, if not ilKhan of the ilClan when his forces retake Terra. Fortunately for his
+				superiors, he does notâ€” yetâ€”possess the cunning necessary to match his plans. He was
+				a mediocre student, one whose falconers did not expect him to pass his Trial of Position.
+				His success in that Trial, although only with MekWarriorâ's rank, proved to himself that he
+				was capable of far more than heâ'd been told, which set him on the path he
+				now walks. He is an irascible, impatient man who aches for greater rank than he now
+				possesses. He is constantly needling Star Commander Nicola von Jankmon, constantly probing
+				for weaknesses that he can exploit. The two have very nearly come to
+				Trials of Grievance already, and triumphing in such a Trial is only one part of Quinteroâ's
+				plan.
 
-As part of a Star Quintero is an outlier. His personality does not lend itself to making close friends, as he is far too fond of finding faults and exploiting them in others than he is of building camaraderie. Most of his Starmates disdain him, except for his commander, who actively hates him. Quintero acknowledges this but does nothing to change itâ€”to his mind, the others will
-come around when he proves himself a more capable warrior and commander than anyone else. In the combat-oriented society of the Clans, he may be rightâ€”assuming he does, in fact, develop
-the skills he already believes he has. His only real comrade in Bravo Beak is MechWarrior Edward, who is too newly-assigned to have grasped the realities of Quinteroâ€™s â€œfriendship.â€� The older warrior doesnâ€™t recognize Quinteroâ€™s advances as the semi-insults they
-are, but he may soon if Quinteroâ€™s past habits continue. No doubt Edward will find himself the butt of a humiliating joke or some other insult, but Quintero may overreach, considering Edwardâ€™s proven skill in Trials of Grievance.
+				As part of a Star Quintero is an outlier. His personality does not lend itself to making
+				close friends, as he is far too fond of finding faults and exploiting them in others than he
+				is of building camaraderie. Most of his Starmates disdain him, except for his commander, who
+				actively hates him. Quintero acknowledges this but does nothing to change itâ€”to his mind,
+				the others will
+				come around when he proves himself a more capable warrior and commander than anyone else. In
+				the combat-oriented society of the Clans, he may be rightâ€”assuming he does, in fact,
+				develop
+				the skills he already believes he has. His only real comrade in Bravo Beak is MekWarrior
+				Edward, who is too newly-assigned to have grasped the realities of Quinteroâ's
+				â€œfriendship.â€� The older warrior doesnâ't recognize Quinteroâ's advances as the
+				semi-insults they
+				are, but he may soon if Quinteroâ's past habits continue. No doubt Edward will find himself
+				the butt of a humiliating joke or some other insult, but Quintero may overreach, considering
+				Edwardâ's proven skill in Trials of Grievance.
 
-Quinteroâ€™s Shadow Cat is usually configured in the uncommon C configuration, which mounts advanced tactical missile launchers and jump jets rather than the common Gauss rifle. Quintero prefers to fight a more mobile campaign than many Jade Falcon warriors, using his missiles and mobility to harass his opponents
-into making a mistake. These tactics work well for him in the open field, where he can use his â€™Mechâ€™s speed to keep away from heavier opponents, but offer less success in heavily forested or urban environments. Quintero uses his jump jets only for obstacle avoidance, and his gunnery suffers more than most MechWarriors when he tries to combine firing with jumping.</biography>
+				Quinteroâ's Shadow Cat is usually configured in the uncommon C configuration, which mounts
+				advanced tactical missile launchers and jump jets rather than the common Gauss rifle.
+				Quintero prefers to fight a more mobile campaign than many Jade Falcon warriors, using his
+				missiles and mobility to harass his opponents
+				into making a mistake. These tactics work well for him in the open field, where he can use
+				his 'Mekâ's speed to keep away from heavier opponents, but offer less success in heavily
+				forested or urban environments. Quintero uses his jump jets only for obstacle avoidance, and
+				his gunnery suffers more than most MekWarriors when he tries to combine firing with
+				jumping.</biography>
 			<portraitCategory>Pursing Peregrines/</portraitCategory>
 			<portraitFile>Quintero.jpg</portraitFile>
 			<xp>0</xp>
@@ -1110,17 +1358,21 @@ into making a mistake. These tactics work well for him in the open field, where 
 				<bonus>1</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>3</level>
 				<bonus>1</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>3</level>
 				<bonus>1</bonus>
 			</skill>
 			<personnelLog>
-				<logEntry><date>3071-05-14</date><desc>Promoted to Warrior</desc><type>SERVICE</type></logEntry>
+				<logEntry>
+					<date>3071-05-14</date>
+					<desc>Promoted to Warrior</desc>
+					<type>SERVICE</type>
+				</logEntry>
 			</personnelLog>
 		</person>
 		<person id="76a13d8f-bb29-470d-9077-8c4cb0ae5dcd" type="mekhq.campaign.personnel.Person">
@@ -1130,18 +1382,43 @@ into making a mistake. These tactics work well for him in the open field, where 
 			<primaryRole>1</primaryRole>
 			<faction>CJF</faction>
 			<clan>true</clan>
-			<phenotype>MECHWARRIOR</phenotype>
-			<biography>Binary Bravo is MechWarrior Michaelaâ€™s first posting. She successfully won her Trial of Position in mid-3069 and barely reached the Inner Sphere in time to be assigned to the First Falcon Striker Cluster. Her youth and inexperience placed her in the newly-formed Binary, but Star Captain Ingried was immediately impressed with her skills and is pleased to have her. Her Star Commander is not so enamored, but no one can deny that Michaela is a prodigy on the battlefield. Her talent for â€™Mech piloting has already marked her as a likely ristar in the Clan.
+			<phenotype>MEKWARRIOR</phenotype>
+			<biography>Binary Bravo is MekWarrior Michaelaâ's first posting. She successfully won her
+				Trial of Position in mid-3069 and barely reached the Inner Sphere in time to be assigned to
+				the First Falcon Striker Cluster. Her youth and inexperience placed her in the newly-formed
+				Binary, but Star Captain Ingried was immediately impressed with her skills and is pleased to
+				have her. Her Star Commander is not so enamored, but no one can deny that Michaela is a
+				prodigy on the battlefield. Her talent for 'Mek piloting has already marked her as a likely
+				ristar in the Clan.
 
-Were it not for her partnerâ€™s initiation of a melee in her Trial of Position, most of her Starmates agree she would have achieved at least Star Commanderâ€™s rank, if not Star Captain. The fact that her Trial opponents were freed from zellbrigen made it impossible for her to defeat more than one of them before her â€™Mech was
-disabled, but her one victory was enough to secure her place in the warrior caste. Her first act after her Trial of Position was to challenge her partner in the Trial to a Trial of Grievance for his actions in the battle. She won the challenge, crippling the other
-warrior and forcing his dismissal into the scientist caste. She has not told this story to her Starmates, but the Jade Falcon rumor mill has no doubt informed them. Michaela is not a woman to cross.
+				Were it not for her partnerâ's initiation of a melee in her Trial of Position, most of her
+				Starmates agree she would have achieved at least Star Commanderâ's rank, if not Star
+				Captain. The fact that her Trial opponents were freed from zellbrigen made it impossible for
+				her to defeat more than one of them before her 'Mek was
+				disabled, but her one victory was enough to secure her place in the warrior caste. Her first
+				act after her Trial of Position was to challenge her partner in the Trial to a Trial of
+				Grievance for his actions in the battle. She won the challenge, crippling the other
+				warrior and forcing his dismissal into the scientist caste. She has not told this story to
+				her Starmates, but the Jade Falcon rumor mill has no doubt informed them. Michaela is not a
+				woman to cross.
 
-Her short time in the Inner Sphere has already given Michaela something most Clan warriors lack: a sense of vanity. Like most Clansmen she hadnâ€™t given a great deal of thought to her physical beauty as a child and adolescent, but she is uncommonly beautiful
-by Inner Sphere standards and has been noticed by many younger Inner Sphere-born youths. At first she dismissed the attention, but lately has come to embrace it. Her Starmates mock her for the attention she gives to her appearance, but she ignores them. She enjoys the attention of those her Clan has conquered, and the realization that her looks can give her some measure of control over the opposite sex has offered her one more weapon to add to her arsenal.
+				Her short time in the Inner Sphere has already given Michaela something most Clan warriors
+				lack: a sense of vanity. Like most Clansmen she hadnâ't given a great deal of thought to her
+				physical beauty as a child and adolescent, but she is uncommonly beautiful
+				by Inner Sphere standards and has been noticed by many younger Inner Sphere-born youths. At
+				first she dismissed the attention, but lately has come to embrace it. Her Starmates mock her
+				for the attention she gives to her appearance, but she ignores them. She enjoys the
+				attention of those her Clan has conquered, and the realization that her looks can give her
+				some measure of control over the opposite sex has offered her one more weapon to add to her
+				arsenal.
 
-Her Cougar is configured in the Alpha configuration, which is a support â€™Mech built around two large long-range missile launchers. This means she is often assigned near MechWarrior Quintero, who also prefers missiles on his OmniMech, but the two warriors do not cooperate. They are both far too ambitious
-for that. Michaela has been practicing steadily in the simulator to improve her long-range gunnery with her missiles, in anticipation of facing heavier Lyran â€˜Mechs that far outmass her Cougar.</biography>
+				Her Cougar is configured in the Alpha configuration, which is a support 'Mek built around
+				two large long-range missile launchers. This means she is often assigned near MekWarrior
+				Quintero, who also prefers missiles on his OmniMek, but the two warriors do not cooperate.
+				They are both far too ambitious
+				for that. Michaela has been practicing steadily in the simulator to improve her long-range
+				gunnery with her missiles, in anticipation of facing heavier Lyran 'Meks that far outmass
+				her Cougar.</biography>
 			<portraitCategory>Pursing Peregrines/</portraitCategory>
 			<portraitFile>Michaela.jpg</portraitFile>
 			<xp>0</xp>
@@ -1177,19 +1454,31 @@ for that. Michaela has been practicing steadily in the simulator to improve her 
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<personnelLog>
-				<logEntry><date>3071-05-14</date><desc>Promoted to Warrior</desc><type>SERVICE</type></logEntry>
-				<logEntry><date>3071-05-14</date><desc>Removed from Cougar A</desc><type>SERVICE</type></logEntry>
-				<logEntry><date>3071-05-14</date><desc>Assigned to Cougar A</desc><type>SERVICE</type></logEntry>
+				<logEntry>
+					<date>3071-05-14</date>
+					<desc>Promoted to Warrior</desc>
+					<type>SERVICE</type>
+				</logEntry>
+				<logEntry>
+					<date>3071-05-14</date>
+					<desc>Removed from Cougar A</desc>
+					<type>SERVICE</type>
+				</logEntry>
+				<logEntry>
+					<date>3071-05-14</date>
+					<desc>Assigned to Cougar A</desc>
+					<type>SERVICE</type>
+				</logEntry>
 			</personnelLog>
 		</person>
 	</personnel>
@@ -1199,22 +1488,31 @@ for that. Michaela has been practicing steadily in the simulator to improve her 
 			<type>Disrupt Lyran Operations</type>
 			<systemId>Unknown System</systemId>
 			<status>0</status>
-			<desc>The fighting on Bastion in 3071 was characterized by maneuver and short, sharp clashes between the Lyran Alliance regulars and the Jade Falcon Clansmen. Star Captain Ingriedâ€™s Binary is tasked with disrupting LAAF operations enough to force the garrison in Spot to detach more forces to stop them, thereby opening a weakness in the defenses around the city.
-</desc>
+			<desc>The fighting on Bastion in 3071 was characterized by maneuver and short, sharp clashes
+				between the Lyran Alliance regulars and the Jade Falcon Clansmen. Star Captain Ingriedâ's
+				Binary is tasked with disrupting LAAF operations enough to force the garrison in Spot to
+				detach more forces to stop them, thereby opening a weakness in the defenses around the city.
+			</desc>
 			<id>1</id>
 			<scenarios>
 				<scenario id="1" type="mekhq.campaign.mission.Scenario">
 					<name>Setting the Tone</name>
-					<desc>There had better be something to shoot up ahead, else I will challenge the fledgling myself and we will get ourselves back to the war at Spot. How this whelp won this command over me I will never understandâ€”Fortune, the fickle bitch, must favor him.
+					<desc>There had better be something to shoot up ahead, else I will challenge the fledgling
+						myself and we will get ourselves back to the war at Spot. How this whelp won this
+						command over me I will never understandâ€”Fortune, the fickle bitch, must favor him.
 
-She certainly does not favor me. A von Jankmon, stuck in a BattleMech. A von Jankmon, stuck on this backwater continent where the locals send their old people to die. A dust house. Empty.
+						She certainly does not favor me. A von Jankmon, stuck in a BattleMek. A von Jankmon,
+						stuck on this backwater continent where the locals send their old people to die. A dust
+						house. Empty.
 
-The scanner says there may be BattleMechs in this next depot.
+						The scanner says there may be BattleMeks in this next depot.
 
-It had better not be a ruse. Quintero has been watching me; I can see his ambition growing. If we do not get into combat soon he will challenge for my Star command. And while I will beat him, I will need his aim and his â€™Mech when we return to Spot. By the
-Founder, I hate this duty.
+						It had better not be a ruse. Quintero has been watching me; I can see his ambition
+						growing. If we do not get into combat soon he will challenge for my Star command. And
+						while I will beat him, I will need his aim and his 'Mek when we return to Spot. By the
+						Founder, I hate this duty.
 
-â€”personal log of Star Commander Nicola von Jankmon, dictated 14 May 3071</desc>
+						â€”personal log of Star Commander Nicola von Jankmon, dictated 14 May 3071</desc>
 					<report></report>
 					<status>0</status>
 					<id>1</id>
@@ -1225,15 +1523,18 @@ Founder, I hate this duty.
 	<forces>
 		<force id="0" type="mekhq.campaign.force.Force">
 			<name>Binary Bravo</name>
-			<desc>This is Binary Bravo, 1st Falcon Strikers as set up at the start of the campaign for the Starter Book: Fist and Falcon.
+			<desc>This is Binary Bravo, 1st Falcon Strikers as set up at the start of the campaign for the
+				Starter Book: Fist and Falcon.
 
-Anyone that wants to use these will need to add the additional support personal and define the rules as they want them.
+				Anyone that wants to use these will need to add the additional support personal and define
+				the rules as they want them.
 
-In addition this starter book included Character sheets so those have been added to the Personnel.
+				In addition this starter book included Character sheets so those have been added to the
+				Personnel.
 
-Enjoy.
+				Enjoy.
 
-Conversion by Hammer</desc>
+				Conversion by Hammer</desc>
 			<combatForce>true</combatForce>
 			<iconCategory>Units/</iconCategory>
 			<iconFileName>JadeFalconDelta.gif</iconFileName>
@@ -1243,30 +1544,30 @@ Conversion by Hammer</desc>
 					<name>Alpha Beak</name>
 					<desc></desc>
 					<combatForce>true</combatForce>
-					<iconCategory>Mech/</iconCategory>
-					<iconFileName>momnimech.png</iconFileName>
+					<iconCategory>Mek/</iconCategory>
+					<iconFileName>momnimek.png</iconFileName>
 					<scenarioId>-1</scenarioId>
 					<units>
-						<unit id="51097474-8627-4694-a6a3-a26ac7004a99"/>
-						<unit id="59fa4c14-67fe-4156-9036-12d15c980258"/>
-						<unit id="debc1f9e-e3f6-4fa7-ba5f-d8468fda03f6"/>
-						<unit id="5e10fd69-20f4-4335-ae97-ebd688cc33cb"/>
-						<unit id="27f78700-2c26-485e-8ca8-2150bbd84912"/>
+						<unit id="51097474-8627-4694-a6a3-a26ac7004a99" />
+						<unit id="59fa4c14-67fe-4156-9036-12d15c980258" />
+						<unit id="debc1f9e-e3f6-4fa7-ba5f-d8468fda03f6" />
+						<unit id="5e10fd69-20f4-4335-ae97-ebd688cc33cb" />
+						<unit id="27f78700-2c26-485e-8ca8-2150bbd84912" />
 					</units>
 				</force>
 				<force id="3" type="mekhq.campaign.force.Force">
 					<name>Bravo Beak</name>
 					<desc></desc>
 					<combatForce>true</combatForce>
-					<iconCategory>Mech/</iconCategory>
-					<iconFileName>momnimech.png</iconFileName>
+					<iconCategory>Mek/</iconCategory>
+					<iconFileName>momnimek.png</iconFileName>
 					<scenarioId>-1</scenarioId>
 					<units>
-						<unit id="672e726e-2c55-4773-9017-85527cf9a679"/>
-						<unit id="cdcddcc1-62e1-4e24-b3f3-640b3a24f50f"/>
-						<unit id="10a48169-4ce8-48a9-abae-9dc65c6b095c"/>
-						<unit id="18c0e478-71ec-4101-936e-4036e6679aa5"/>
-						<unit id="16dcf501-0713-44cd-9ab8-506ae8132bc4"/>
+						<unit id="672e726e-2c55-4773-9017-85527cf9a679" />
+						<unit id="cdcddcc1-62e1-4e24-b3f3-640b3a24f50f" />
+						<unit id="10a48169-4ce8-48a9-abae-9dc65c6b095c" />
+						<unit id="18c0e478-71ec-4101-936e-4036e6679aa5" />
+						<unit id="16dcf501-0713-44cd-9ab8-506ae8132bc4" />
 					</units>
 				</force>
 			</subforces>
@@ -1287,7 +1588,7 @@ Conversion by Hammer</desc>
 	</kills>
 	<skillTypes>
 		<skillType>
-			<name>Piloting/Mech</name>
+			<name>Piloting/Mek</name>
 			<target>8</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -1297,7 +1598,7 @@ Conversion by Hammer</desc>
 			<costs>8,4,4,4,4,4,4,4,4,-1,-1</costs>
 		</skillType>
 		<skillType>
-			<name>Gunnery/Mech</name>
+			<name>Gunnery/Mek</name>
 			<target>7</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -1427,7 +1728,7 @@ Conversion by Hammer</desc>
 			<costs>16,8,8,8,8,8,8,8,-1,-1,-1</costs>
 		</skillType>
 		<skillType>
-			<name>Gunnery/Protomech</name>
+			<name>Gunnery/Protomek</name>
 			<target>7</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -1447,7 +1748,7 @@ Conversion by Hammer</desc>
 			<costs>8,4,4,4,4,4,4,4,4,-1,-1</costs>
 		</skillType>
 		<skillType>
-			<name>Anti-Mech</name>
+			<name>Anti-Mek</name>
 			<target>8</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -1457,7 +1758,7 @@ Conversion by Hammer</desc>
 			<costs>12,6,6,6,6,6,6,6,6,-1,-1</costs>
 		</skillType>
 		<skillType>
-			<name>Tech/Mech</name>
+			<name>Tech/Mek</name>
 			<target>10</target>
 			<countUp>false</countUp>
 			<greenLvl>1</greenLvl>
@@ -1634,7 +1935,7 @@ Conversion by Hammer</desc>
 			<displayName>Sandblaster (AToW)</displayName>
 			<lookupName>sandblaster</lookupName>
 			<desc>A pilot with this ability gets a +4, +3, or +2 to the cluster table
-at short, medium, or long/extended range, respectively, but only with a specialized weapon.</desc>
+				at short, medium, or long/extended range, respectively, but only with a specialized weapon.</desc>
 			<xpCost>6</xpCost>
 			<weight>3</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1646,8 +1947,8 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 			<displayName>Tactical Genius (aToW)</displayName>
 			<lookupName>tactical_genius</lookupName>
 			<desc>A pilot who has a Tactical Genius may reroll their initiative once per turn.
- The second roll must be accepted.
-Note: Only one Tactical Genius may be utilized per team.</desc>
+				The second roll must be accepted.
+				Note: Only one Tactical Genius may be utilized per team.</desc>
 			<xpCost>8</xpCost>
 			<weight>1</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1659,9 +1960,9 @@ Note: Only one Tactical Genius may be utilized per team.</desc>
 			<displayName>Dodge (MaxTech)</displayName>
 			<lookupName>dodge_maneuver</lookupName>
 			<desc>Enables the unit to make a dodge maneuver instead of a physical attack.
-This maneuver adds +2 to the BTH to physical attacks against the unit.
-NOTE: The dodge maneuver is declared during the weapons phase.
-Note: This ability is only used for BattleMechs.</desc>
+				This maneuver adds +2 to the BTH to physical attacks against the unit.
+				NOTE: The dodge maneuver is declared during the weapons phase.
+				Note: This ability is only used for BattleMeks.</desc>
 			<xpCost>2</xpCost>
 			<weight>1</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1683,7 +1984,8 @@ Note: This ability is only used for BattleMechs.</desc>
 		<ability>
 			<displayName>Weapon Specialist (aToW)</displayName>
 			<lookupName>weapon_specialist</lookupName>
-			<desc>A pilot who specializes in a particular weapon receives a -2 to hit modifier on all attacks with that weapon.</desc>
+			<desc>A pilot who specializes in a particular weapon receives a -2 to hit modifier on all
+				attacks with that weapon.</desc>
 			<xpCost>12</xpCost>
 			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1716,7 +2018,8 @@ Note: This ability is only used for BattleMechs.</desc>
 		<ability>
 			<displayName>Weathered (Unofficial)</displayName>
 			<lookupName>weathered</lookupName>
-			<desc>A pilot with this ability does not suffer the initial -1 to hit due to weather conditions.</desc>
+			<desc>A pilot with this ability does not suffer the initial -1 to hit due to weather
+				conditions.</desc>
 			<xpCost>6</xpCost>
 			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1739,7 +2042,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<displayName>Sensor Geek (Unofficial)</displayName>
 			<lookupName>sensor_geek</lookupName>
 			<desc>A pilot with this ability gets a -2 bonus on sensor checks.
- Note that this is really only a bonus, if inclusive sensor ranges are in use.</desc>
+				Note that this is really only a bonus, if inclusive sensor ranges are in use.</desc>
 			<xpCost>3</xpCost>
 			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1762,9 +2065,10 @@ Note: This ability is only used for BattleMechs.</desc>
 			<displayName>Maneuvering Ace (aToW)</displayName>
 			<lookupName>maneuvering_ace</lookupName>
 			<desc>Enables the unit to move laterally like a Quad.
-Quads can move laterally for 1 less MP.
-Aerospace units can perform maneuvers for 1 less thrust point.
-Units also receive a -1 BTH to rolls against skidding, sideslipping, and going out of control.</desc>
+				Quads can move laterally for 1 less MP.
+				Aerospace units can perform maneuvers for 1 less thrust point.
+				Units also receive a -1 BTH to rolls against skidding, sideslipping, and going out of
+				control.</desc>
 			<xpCost>4</xpCost>
 			<weight>3</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1797,8 +2101,9 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 		<ability>
 			<displayName>Melee Specialist (aToW)</displayName>
 			<lookupName>melee_specialist</lookupName>
-			<desc>Enables the unit to do 1 additional point of damage with physical attacks and applies a -1 to-hit modifier to physical attacks.
-Note: This ability is only used for BattleMechs.</desc>
+			<desc>Enables the unit to do 1 additional point of damage with physical attacks and applies a
+				-1 to-hit modifier to physical attacks.
+				Note: This ability is only used for BattleMeks.</desc>
 			<xpCost>4</xpCost>
 			<weight>3</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1809,8 +2114,9 @@ Note: This ability is only used for BattleMechs.</desc>
 		<ability>
 			<displayName>Gunnery Specialization (aToW)</displayName>
 			<lookupName>specialist</lookupName>
-			<desc>A pilot who specializes in a type of weapon receives a -1 to-hit modifier when using weapons of that type and a
- +1 to-hit modifier when using other types of weapons.</desc>
+			<desc>A pilot who specializes in a type of weapon receives a -1 to-hit modifier when using
+				weapons of that type and a
+				+1 to-hit modifier when using other types of weapons.</desc>
 			<xpCost>6</xpCost>
 			<weight>4</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1822,10 +2128,10 @@ Note: This ability is only used for BattleMechs.</desc>
 			<displayName>Pain Resistance (MaxTech)</displayName>
 			<lookupName>pain_resistance</lookupName>
 			<desc>When making consciousness rolls,
-1 is added to all rolls.
-Also,
-damage received from ammo explosions is reduced to 1.
-Note: This ability is only used for BattleMechs.</desc>
+				1 is added to all rolls.
+				Also,
+				damage received from ammo explosions is reduced to 1.
+				Note: This ability is only used for BattleMeks.</desc>
 			<xpCost>4</xpCost>
 			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
@@ -2225,7 +2531,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="21" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>21</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2240,7 +2546,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="22" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>22</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2255,7 +2561,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="23" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>23</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2270,7 +2576,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="24" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>24</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2285,7 +2591,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="25" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>25</id>
 			<name>ER Large Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2300,7 +2606,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="26" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>26</id>
 			<name>ER Large Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2315,7 +2621,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="27" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>27</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2330,7 +2636,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="31" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>31</id>
 			<name>ER Large Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2345,7 +2651,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="32" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>32</id>
 			<name>ER Large Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2360,7 +2666,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="37" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>37</id>
 			<name>Jump Jet</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2375,7 +2681,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="38" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>38</id>
 			<name>Jump Jet</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2390,7 +2696,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="41" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>41</id>
 			<name>Jump Jet</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2405,7 +2711,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="42" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>42</id>
 			<name>Jump Jet</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2420,7 +2726,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="43" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>43</id>
 			<name>Targeting Computer</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -3487,7 +3793,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="124" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>124</id>
 			<name>ER Medium Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -3502,7 +3808,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="126" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>126</id>
 			<name>ER Large Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -3517,7 +3823,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="128" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>128</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -3532,7 +3838,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="130" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>130</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -3547,7 +3853,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="132" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>132</id>
 			<name>Streak SRM 6</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -4081,7 +4387,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="173" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>173</id>
 			<name>Heavy Medium Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -4096,7 +4402,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="174" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>174</id>
 			<name>Heavy Medium Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -4111,7 +4417,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="175" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>175</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -4655,7 +4961,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="217" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>217</id>
 			<name>Streak SRM 2</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>30</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -4670,7 +4976,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="218" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>218</id>
 			<name>Streak SRM 2</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>30</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -4713,7 +5019,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="221" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>221</id>
 			<name>LRM 10</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>30</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -4728,7 +5034,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="222" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>222</id>
 			<name>Streak SRM 2</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>30</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -5903,7 +6209,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="321" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>321</id>
 			<name>LRM 20</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>75</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -5918,7 +6224,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="322" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>322</id>
 			<name>Artemis IV FCS</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>75</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -5961,7 +6267,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="325" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>325</id>
 			<name>LRM 20</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>75</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -5976,7 +6282,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="326" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>326</id>
 			<name>Artemis IV FCS</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>75</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -6019,7 +6325,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="329" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>329</id>
 			<name>ER Small Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>75</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -6581,7 +6887,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="378" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>378</id>
 			<name>Narc</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -7370,7 +7676,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="491" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>491</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -7385,7 +7691,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="492" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>492</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -7400,7 +7706,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="493" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>493</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -7415,7 +7721,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="494" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>494</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -7444,7 +7750,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="496" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>496</id>
 			<name>ER Small Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -7501,7 +7807,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="500" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>500</id>
 			<name>ER Medium Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -7544,7 +7850,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="503" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>503</id>
 			<name>ER Medium Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>30</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -7559,7 +7865,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="504" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>504</id>
 			<name>ER Medium Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>30</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -7672,7 +7978,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="517" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>517</id>
 			<name>ER Large Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -7687,7 +7993,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="518" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>518</id>
 			<name>SRM 6</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -7744,7 +8050,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="522" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>522</id>
 			<name>ATM 6</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -7773,7 +8079,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="524" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>524</id>
 			<name>ER Medium Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -7872,7 +8178,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="531" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>531</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>75</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -7887,7 +8193,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="532" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>532</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>75</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -7902,7 +8208,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="533" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>533</id>
 			<name>Heavy Large Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>75</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -7945,7 +8251,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="536" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>536</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -7960,7 +8266,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="537" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>537</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -7975,7 +8281,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="538" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>538</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -7990,7 +8296,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="539" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>539</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8047,7 +8353,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="543" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>543</id>
 			<name>ER Medium Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8062,7 +8368,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="544" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>544</id>
 			<name>ER Medium Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>30</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8077,7 +8383,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="545" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>545</id>
 			<name>ER Medium Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>30</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8148,7 +8454,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="553" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>553</id>
 			<name>ATM 6</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8177,7 +8483,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="555" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>555</id>
 			<name>ER Medium Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8262,7 +8568,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="561" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>561</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>75</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8277,7 +8583,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="562" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>562</id>
 			<name>Heavy Large Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>75</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8292,7 +8598,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="563" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>563</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8321,7 +8627,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="565" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>565</id>
 			<name>ER Medium Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8678,7 +8984,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="586" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>586</id>
 			<name>ER Medium Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>35</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8693,7 +8999,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="587" type="mekhq.campaign.parts.equipment.AmmoBin">
 			<id>587</id>
 			<name>LRM 20 (Clan) Artemis-capable Ammo Bin</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>35</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8708,7 +9014,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="588" type="mekhq.campaign.parts.equipment.AmmoBin">
 			<id>588</id>
 			<name>LRM 20 (Clan) Artemis-capable Ammo Bin</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>35</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8737,7 +9043,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="590" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>590</id>
 			<name>ER Medium Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>35</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8752,7 +9058,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="591" type="mekhq.campaign.parts.equipment.AmmoBin">
 			<id>591</id>
 			<name>LRM 20 (Clan) Artemis-capable Ammo Bin</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>35</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8767,7 +9073,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="592" type="mekhq.campaign.parts.equipment.AmmoBin">
 			<id>592</id>
 			<name>LRM 20 (Clan) Artemis-capable Ammo Bin</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>35</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8782,7 +9088,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="593" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>593</id>
 			<name>LRM 20</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>35</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8797,7 +9103,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="594" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>594</id>
 			<name>Artemis IV FCS</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>35</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8826,7 +9132,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="596" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>596</id>
 			<name>LRM 20</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>35</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8841,7 +9147,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="597" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>597</id>
 			<name>Artemis IV FCS</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>35</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8856,7 +9162,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="598" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>598</id>
 			<name>Small Pulse Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>35</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>

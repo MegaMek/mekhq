@@ -29,6 +29,7 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.handler.TOETransferHandler;
 import mekhq.gui.model.CrewListModel;
 import mekhq.gui.model.OrgTreeModel;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.ForceViewPanel;
 import mekhq.gui.view.PersonViewPanel;
 import mekhq.gui.view.UnitViewPanel;
@@ -44,8 +45,11 @@ public final class TOETab extends CampaignGuiTab {
     private JTree orgTree;
     private JSplitPane splitOrg;
     private JPanel panForceView;
+    private JTabbedPane tabUnit;
 
     private OrgTreeModel orgModel;
+
+    private int tabUnitLastSelectedIndex;
 
     //region Constructors
     public TOETab(CampaignGUI gui, String name) {
@@ -81,7 +85,7 @@ public final class TOETab extends CampaignGuiTab {
         panForceView.setPreferredSize(new Dimension(550, 600));
         panForceView.setLayout(new BorderLayout());
 
-        JScrollPane scrollOrg = new JScrollPane(orgTree);
+        JScrollPane scrollOrg = new JScrollPaneWithSpeed(orgTree);
         splitOrg = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOrg, panForceView);
         splitOrg.setOneTouchExpandable(true);
         splitOrg.setResizeWeight(1.0);
@@ -95,6 +99,8 @@ public final class TOETab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(splitOrg, gridBagConstraints);
+
+        tabUnitLastSelectedIndex = 0;
     }
 
     @Override
@@ -109,6 +115,11 @@ public final class TOETab extends CampaignGuiTab {
         });
     }
 
+
+    public void forceViewTabChange() {
+        tabUnitLastSelectedIndex = tabUnit.getSelectedIndex();
+    }
+
     public void refreshForceView() {
         panForceView.removeAll();
         Object node = orgTree.getLastSelectedPathComponent();
@@ -117,12 +128,12 @@ public final class TOETab extends CampaignGuiTab {
         }
         if (node instanceof Unit) {
             Unit u = ((Unit) node);
-            JTabbedPane tabUnit = new JTabbedPane();
+            tabUnit = new JTabbedPane();
             int crewSize = u.getCrew().size();
             if (crewSize > 0) {
                 JPanel crewPanel = new JPanel(new BorderLayout());
                 crewPanel.getAccessibleContext().setAccessibleName("Crew for " + u.getName());
-                final JScrollPane scrollPerson = new JScrollPane();
+                final JScrollPane scrollPerson = new JScrollPaneWithSpeed();
                 crewPanel.add(scrollPerson, BorderLayout.CENTER);
                 CrewListModel model = new CrewListModel();
                 model.setData(u);
@@ -150,7 +161,7 @@ public final class TOETab extends CampaignGuiTab {
                 });
                 crewList.setSelectedIndex(0);
                 if (crewSize > 1) {
-                    crewPanel.add(new JScrollPane(crewList), BorderLayout.NORTH);
+                    crewPanel.add(new JScrollPaneWithSpeed(crewList), BorderLayout.NORTH);
                 }
                 String name = "Crew";
                 if (u.usesSoloPilot()) {
@@ -160,12 +171,18 @@ public final class TOETab extends CampaignGuiTab {
                 tabUnit.add(name, crewPanel);
                 SwingUtilities.invokeLater(() -> scrollPerson.getVerticalScrollBar().setValue(0));
             }
-            final JScrollPane scrollUnit = new JScrollPane(new UnitViewPanel(u, getCampaign()));
+            final JScrollPane scrollUnit = new JScrollPaneWithSpeed(new UnitViewPanel(u, getCampaign()));
             tabUnit.add("Unit", scrollUnit);
             panForceView.add(tabUnit, BorderLayout.CENTER);
             SwingUtilities.invokeLater(() -> scrollUnit.getVerticalScrollBar().setValue(0));
+            try {
+                tabUnit.setSelectedIndex(tabUnitLastSelectedIndex);
+                tabUnit.addChangeListener(evt -> forceViewTabChange()); // added late so it won't overwrite
+            } catch (ArrayIndexOutOfBoundsException ignored) {}
+            // We can ignore here because if the selected index is out of bounds, we're just going
+            // to not select the unit in the TO&E.
         } else if (node instanceof Force) {
-            final JScrollPane scrollForce = new JScrollPane(new ForceViewPanel((Force) node, getCampaign()));
+            final JScrollPane scrollForce = new JScrollPaneWithSpeed(new ForceViewPanel((Force) node, getCampaign()));
             panForceView.add(scrollForce, BorderLayout.CENTER);
             SwingUtilities.invokeLater(() -> scrollForce.getVerticalScrollBar().setValue(0));
         }

@@ -18,36 +18,39 @@
  */
 package mekhq.campaign.universe.eras;
 
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.universe.enums.EraFlag;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.universe.enums.EraFlag;
+import mekhq.utilities.MHQXMLUtility;
+
 public class Era {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(Era.class);
+
+    // region Variable Declarations
     private String code;
     private String name;
     private LocalDate end;
     private Set<EraFlag> flags;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public Era() {
         setCode("???");
         setName("");
         setEnd(LocalDate.ofYearDay(9999, 1));
         setFlags(new HashSet<>());
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public String getCode() {
         return code;
     }
@@ -75,13 +78,13 @@ public class Era {
     public void setFlags(final Set<EraFlag> flags) {
         this.flags = flags;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
     public boolean hasFlag(final EraFlag... flags) {
         return Stream.of(flags).anyMatch(getFlags()::contains);
     }
 
-    //region File I/O
+    // region File I/O
     public static @Nullable Era generateInstanceFromXML(final NodeList nl) {
         final Era era = new Era();
 
@@ -103,14 +106,14 @@ public class Era {
                         break;
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
                 return null;
             }
         }
 
         return era.getCode().equals("???") ? null : era;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

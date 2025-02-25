@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,76 +19,97 @@
 package mekhq.campaign.stratcon;
 
 import megamek.common.Compute;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
+import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.stratcon.StratconContractDefinition.ObjectiveParameters;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
-import org.apache.logging.log4j.LogManager;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+
+import static java.lang.Math.min;
+import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateInitialSupportPoints;
 
 /**
  * This class handles StratCon state initialization when a contract is signed.
  */
 public class StratconContractInitializer {
+    private static final MMLogger logger = MMLogger.create(StratconContractInitializer.class);
+
     public static final int NUM_LANCES_PER_TRACK = 3;
     public static final int ZERO_CELSIUS_IN_KELVIN = 273;
 
     /**
-     * Initializes the campaign state given a contract, campaign and contract definition
+     * Initializes the campaign state given a contract, campaign and contract
+     * definition
      */
-    public static void initializeCampaignState(AtBContract contract, Campaign campaign, StratconContractDefinition contractDefinition) {
+    public static void initializeCampaignState(AtBContract contract, Campaign campaign,
+            StratconContractDefinition contractDefinition) {
         StratconCampaignState campaignState = new StratconCampaignState(contract);
-        campaignState.setBriefingText(contractDefinition.getBriefing() + "<br/>" + contract.getCommandRights().getStratConText());
+        campaignState.setBriefingText(
+                contractDefinition.getBriefing() + "<br/>" + contract.getCommandRights().getStratConText());
         campaignState.setAllowEarlyVictory(contractDefinition.isAllowEarlyVictory());
 
-        // dependency: this is required here in order for scenario initialization to work properly
+        // dependency: this is required here in order for scenario initialization to
+        // work properly
         contract.setStratconCampaignState(campaignState);
 
         // First, initialize the proper number of tracks. Then:
         // for each objective:
-        //  step 1: calculate objective count
-        //          if scaled, multiply # required lances by factor, round up, otherwise just fixed #
-        //  step 2: evenly distribute objectives through tracks
-        //          if uneven number remaining, distribute randomly
-        //          when objective is specific scenario victory, place specially flagged scenarios
-        //          when objective is allied/hostile facility, place those facilities
+        // step 1: calculate objective count
+        // if scaled, multiply # required lances by factor, round up, otherwise just
+        // fixed #
+        // step 2: evenly distribute objectives through tracks
+        // if uneven number remaining, distribute randomly
+        // when objective is specific scenario victory, place specially flagged
+        // scenarios
+        // when objective is allied/hostile facility, place those facilities
 
-        int numTracks = contract.getRequiredLances() / NUM_LANCES_PER_TRACK;
+        int maximumTrackIndex = Math.max(0, contract.getRequiredCombatTeams() / NUM_LANCES_PER_TRACK);
         int planetaryTemperature = campaign.getLocation().getPlanet().getTemperature(campaign.getLocalDate());
 
-        for (int x = 0; x < numTracks; x++) {
-            int scenarioOdds = contractDefinition.getScenarioOdds().get(Compute.randomInt(contractDefinition.getScenarioOdds().size()));
-            int deploymentTime = contractDefinition.getDeploymentTimes().get(Compute.randomInt(contractDefinition.getDeploymentTimes().size()));
+        for (int x = 0; x < maximumTrackIndex; x++) {
+            int scenarioOdds = contractDefinition.getScenarioOdds()
+                    .get(Compute.randomInt(contractDefinition.getScenarioOdds().size()));
+            int deploymentTime = contractDefinition.getDeploymentTimes()
+                    .get(Compute.randomInt(contractDefinition.getDeploymentTimes().size()));
 
-            StratconTrackState track = initializeTrackState(NUM_LANCES_PER_TRACK, scenarioOdds, deploymentTime, planetaryTemperature);
-            track.setDisplayableName(String.format("Track %d", x));
+            StratconTrackState track = initializeTrackState(NUM_LANCES_PER_TRACK, scenarioOdds, deploymentTime,
+                    planetaryTemperature);
+            track.setDisplayableName(String.format("Sector %d", x));
             campaignState.addTrack(track);
         }
 
         // a campaign will have X tracks going at a time, where
-        // X = # required lances / 3, rounded up. The last track will have fewer required lances.
-        int oddLanceCount = contract.getRequiredLances() % NUM_LANCES_PER_TRACK;
+        // X = # required lances / 3, rounded up. The last track will have fewer
+        // required lances.
+        int oddLanceCount = contract.getRequiredCombatTeams() % NUM_LANCES_PER_TRACK;
         if (oddLanceCount > 0) {
-            int scenarioOdds = contractDefinition.getScenarioOdds().get(Compute.randomInt(contractDefinition.getScenarioOdds().size()));
-            int deploymentTime = contractDefinition.getDeploymentTimes().get(Compute.randomInt(contractDefinition.getDeploymentTimes().size()));
+            int scenarioOdds = contractDefinition.getScenarioOdds()
+                    .get(Compute.randomInt(contractDefinition.getScenarioOdds().size()));
+            int deploymentTime = contractDefinition.getDeploymentTimes()
+                    .get(Compute.randomInt(contractDefinition.getDeploymentTimes().size()));
 
-            StratconTrackState track = initializeTrackState(oddLanceCount, scenarioOdds, deploymentTime, planetaryTemperature);
-            track.setDisplayableName(String.format("Track %d", campaignState.getTracks().size()));
+            StratconTrackState track = initializeTrackState(oddLanceCount, scenarioOdds, deploymentTime,
+                    planetaryTemperature);
+            track.setDisplayableName(String.format("Sector %d", campaignState.getTracks().size()));
             campaignState.addTrack(track);
         }
 
         // now seed the tracks with objectives and facilities
         for (ObjectiveParameters objectiveParams : contractDefinition.getObjectiveParameters()) {
-            int objectiveCount = objectiveParams.objectiveCount > 0 ?
-                    (int) objectiveParams.objectiveCount :
-                    (int) Math.max(1, -objectiveParams.objectiveCount * contract.getRequiredLances());
+            int objectiveCount = objectiveParams.objectiveCount > 0 ? (int) objectiveParams.objectiveCount
+                    : (int) Math.max(1, -objectiveParams.objectiveCount * contract.getRequiredCombatTeams());
 
             List<Integer> trackObjects = trackObjectDistribution(objectiveCount, campaignState.getTracks().size());
 
@@ -135,7 +156,7 @@ public class StratconContractInitializer {
         // if any modifiers are to be applied across all scenarios in the campaign
         // do so here; do not add duplicates
         if (contractDefinition.getGlobalScenarioModifiers() != null) {
-            for (String modifier : contractDefinition.getGlobalScenarioModifiers() ) {
+            for (String modifier : contractDefinition.getGlobalScenarioModifiers()) {
                 if (!campaignState.getGlobalScenarioModifiers().contains(modifier)) {
                     campaignState.getGlobalScenarioModifiers().add(modifier);
                 }
@@ -143,9 +164,9 @@ public class StratconContractInitializer {
         }
 
         // non-objective allied facilities
-        int facilityCount = contractDefinition.getAlliedFacilityCount() > 0 ?
-                (int) contractDefinition.getAlliedFacilityCount() :
-                (int) (-contractDefinition.getAlliedFacilityCount() * contract.getRequiredLances());
+        int facilityCount = contractDefinition.getAlliedFacilityCount() > 0
+                ? (int) contractDefinition.getAlliedFacilityCount()
+                : (int) (-contractDefinition.getAlliedFacilityCount() * contract.getRequiredCombatTeams());
 
         List<Integer> trackObjects = trackObjectDistribution(facilityCount, campaignState.getTracks().size());
 
@@ -157,9 +178,9 @@ public class StratconContractInitializer {
         }
 
         // non-objective hostile facilities
-        facilityCount = contractDefinition.getHostileFacilityCount() > 0 ?
-                (int) contractDefinition.getHostileFacilityCount() :
-                (int) (-contractDefinition.getHostileFacilityCount() * contract.getRequiredLances());
+        facilityCount = contractDefinition.getHostileFacilityCount() > 0
+                ? (int) contractDefinition.getHostileFacilityCount()
+                : (int) (-contractDefinition.getHostileFacilityCount() * contract.getRequiredCombatTeams());
 
         trackObjects = trackObjectDistribution(facilityCount, campaignState.getTracks().size());
 
@@ -169,11 +190,11 @@ public class StratconContractInitializer {
             initializeTrackFacilities(campaignState.getTrack(x), numObjects, ForceAlignment.Opposing,
                     false, Collections.emptyList());
         }
-        
+
         // clean up objectives for integrated command:
         // we're still going to have all the objective facilities and scenarios
         // but the player has no control over where they go, so they're
-        // not on the hook for actually completing objectives, 
+        // not on the hook for actually completing objectives,
         // just fighting where they're told to fight
         if (contract.getCommandRights() == ContractCommandRights.INTEGRATED) {
             for (StratconTrackState track : campaignState.getTracks()) {
@@ -181,19 +202,65 @@ public class StratconContractInitializer {
             }
         }
 
+        // Determine starting morale
+        if (contract.getContractType().isGarrisonDuty()) {
+            contract.setMoraleLevel(AtBMoraleLevel.ROUTED);
+
+            LocalDate routEnd = contract.getStartDate().plusMonths(Math.max(1, Compute.d6() - 3)).minusDays(1);
+            contract.setRoutEndDate(routEnd);
+        } else {
+            contract.checkMorale(campaign, campaign.getLocalDate());
+
+            if (contract.getMoraleLevel().isRouted()) {
+                contract.setMoraleLevel(AtBMoraleLevel.CRITICAL);
+            }
+
+            if (contract.getContractType().isReliefDuty()) {
+                int currentMoraleLevel = min(6, contract.getMoraleLevel().ordinal() + 1);
+
+                contract.setMoraleLevel(AtBMoraleLevel.parseFromString(String.valueOf(currentMoraleLevel)));
+            }
+        }
+
+        // Determine starting Support Points
+        negotiateInitialSupportPoints(campaign, contract);
+
+        // Roll to see if a hidden cache is present
+        if (campaign.getLocalDate().isAfter(LocalDate.of(2900, 1, 1))) {
+//            if (Compute.randomInt(100) == 0) {
+//                ScenarioTemplate template = ScenarioTemplate.Deserialize(
+//                    "data/scenariotemplates/Chasing a Rumor.xml");
+//
+//                if (template != null) {
+//                    StratconScenario hiddenCache = addHiddenExternalScenario(campaign, contract,
+//                        null, template, false);
+//
+//                    if (hiddenCache != null) {
+//                        logger.info(String.format("A secret cache has been spawned for contract %s",
+//                            contract.getName()));
+//                    }
+//                } else {
+//                    logger.error("'Chasing a Rumor' scenario failed to deserialize");
+//                }
+//            }
+        }
+
         // now we're done
     }
 
     /**
-     * Set up initial state of a track, dimensions are based on number of assigned lances.
+     * Set up initial state of a track, dimensions are based on number of assigned
+     * lances.
      */
     public static StratconTrackState initializeTrackState(int numLances, int scenarioOdds,
-                                                          int deploymentTime, int planetaryTemp) {
+            int deploymentTime, int planetaryTemp) {
         // to initialize a track,
         // 1. we set the # of required lances
-        // 2. set the track size to a total of numlances * 28 hexes, a rectangle that is wider than it is taller
-        //      the idea being to create a roughly rectangular playing field that,
-        //      if one deploys a scout lance each week to a different spot, can be more or less fully covered
+        // 2. set the track size to a total of numlances * 28 hexes, a rectangle that is
+        // wider than it is taller
+        // the idea being to create a roughly rectangular playing field that,
+        // if one deploys a scout lance each week to a different spot, can be more or
+        // less fully covered
 
         StratconTrackState retVal = new StratconTrackState();
         retVal.setRequiredLanceCount(numLances);
@@ -208,8 +275,10 @@ public class StratconContractInitializer {
         retVal.setScenarioOdds(scenarioOdds);
         retVal.setDeploymentTime(deploymentTime);
 
-        // figure out track "average" temperature; this is the equatorial temperature with
-        // a random number between 10 and -40 added to it: equator is about as hot as it gets with some exceptions
+        // figure out track "average" temperature; this is the equatorial temperature
+        // with
+        // a random number between 10 and -40 added to it: equator is about as hot as it
+        // gets with some exceptions
         int tempVariation = Compute.randomInt(51) - 40;
         retVal.setTemperature(planetaryTemp + tempVariation);
 
@@ -220,7 +289,8 @@ public class StratconContractInitializer {
     }
 
     /**
-     * Generates an array list representing the number of objects to place in a given number of tracks.
+     * Generates an array list representing the number of objects to place in a
+     * given number of tracks.
      */
     private static List<Integer> trackObjectDistribution(int numObjects, int numTracks) {
         List<Integer> retVal = new ArrayList<>();
@@ -244,8 +314,10 @@ public class StratconContractInitializer {
     }
 
     /**
-     * Worker function that takes a trackstate and plops down the given number of facilities owned by the given faction
-     * Avoids places with existing facilities and scenarios, capable of taking facility sub set and setting strategic objective flag.
+     * Worker function that takes a trackstate and plops down the given number of
+     * facilities owned by the given faction
+     * Avoids places with existing facilities and scenarios, capable of taking
+     * facility sub set and setting strategic objective flag.
      */
     private static void initializeTrackFacilities(StratconTrackState trackState, int numFacilities,
             ForceAlignment owner, boolean strategicObjective, List<String> modifiers) {
@@ -258,15 +330,21 @@ public class StratconContractInitializer {
                 break;
             }
 
-            StratconFacility sf = owner == ForceAlignment.Allied ?
-                    StratconFacilityFactory.getRandomAlliedFacility() :
-                    StratconFacilityFactory.getRandomHostileFacility();
+            StratconFacility sf = owner == ForceAlignment.Allied ? StratconFacilityFactory.getRandomAlliedFacility()
+                    : StratconFacilityFactory.getRandomHostileFacility();
 
             sf.setOwner(owner);
             sf.setStrategicObjective(strategicObjective);
             sf.getLocalModifiers().addAll(modifiers);
 
-            StratconCoords coords = getUnoccupiedCoords(trackState);
+            StratconCoords coords = getUnoccupiedCoords(trackState, false);
+
+            if (coords == null) {
+                logger.warn(String.format("Unable to place facility on track %s," +
+                        " as all coords were occupied. Aborting.",
+                    trackState.getDisplayableName()));
+                return;
+            }
 
             trackState.addFacility(coords, sf);
 
@@ -289,9 +367,34 @@ public class StratconContractInitializer {
     }
 
     /**
-     * Worker function that takes a trackstate and plops down the given number of facilities owned by the given faction
+     * Initializes and populates a StratCon track with a specified number of objective scenarios.
+     * This method selects scenario templates, places them on the track in unoccupied coordinates,
+     * and optionally assigns facilities and objectives based on predefined rules.
+     *
+     * <p>The key steps of this method include:
+     * <ul>
+     *   <li>Selecting scenario templates from the provided list of objective scenarios.</li>
+     *   <li>Identifying unoccupied coordinates on the track to place each scenario.</li>
+     *   <li>Adding facilities if the scenario template requires them (hostile or allied).</li>
+     *   <li>Generating and configuring scenarios with relevant attributes and modifiers:</li>
+     *   <ul>
+     *     <li>Clearing scenario dates to maintain persistence.</li>
+     *     <li>Marking scenarios as strategic objectives.</li>
+     *     <li>Adding optional modifiers to provide additional effects or conditions.</li>
+     *   </ul>
+     *   <li>Tracking newly added scenarios as strategic objectives for gameplay purposes.</li>
+     * </ul>
+     *
+     * @param campaign            the {@link Campaign} managing the state of the overall gameplay
+     * @param contract            the {@link AtBContract} related to the current StratCon campaign
+     * @param trackState          the {@link StratconTrackState} representing the track where objectives are placed
+     * @param numScenarios        the number of objective scenarios to generate
+     * @param objectiveScenarios  a list of {@link String} identifiers for potential scenarios that can be generated
+     * @param objectiveModifiers  a list of optional {@link String} modifiers to apply to the generated scenarios;
+     *                             can be {@code null} if no modifiers are required
      */
-    private static void initializeObjectiveScenarios(Campaign campaign, AtBContract contract, StratconTrackState trackState,
+    private static void initializeObjectiveScenarios(Campaign campaign, AtBContract contract,
+            StratconTrackState trackState,
             int numScenarios, List<String> objectiveScenarios, List<String> objectiveModifiers) {
         // pick scenario from subset
         // place it on the map somewhere nothing else has been placed yet
@@ -311,28 +414,39 @@ public class StratconContractInitializer {
             ScenarioTemplate template = StratconScenarioFactory.getSpecificScenario(
                     objectiveScenarios.get(Compute.randomInt(objectiveScenarios.size())));
 
-            StratconCoords coords = getUnoccupiedCoords(trackState);
+            StratconCoords coords = getUnoccupiedCoords(trackState, false);
+
+            if (coords == null) {
+                logger.error(String.format("Unable to place objective scenario on track %s," +
+                        " as all coords were occupied. Aborting.",
+                    trackState.getDisplayableName()));
+                return;
+            }
 
             // facility
             if (template.isFacilityScenario()) {
-                StratconFacility facility = template.isHostileFacility() ?
-                        StratconFacilityFactory.getRandomHostileFacility() : StratconFacilityFactory.getRandomAlliedFacility();
+                StratconFacility facility = template.isHostileFacility()
+                        ? StratconFacilityFactory.getRandomHostileFacility()
+                        : StratconFacilityFactory.getRandomAlliedFacility();
                 trackState.addFacility(coords, facility);
             }
 
             // create scenario - don't assign a force yet
-            StratconScenario scenario = StratconRulesManager.generateScenario(campaign, contract, trackState, Force.FORCE_NONE, coords, template);
+            StratconScenario scenario = StratconRulesManager.generateScenario(campaign, contract, trackState,
+                    Force.FORCE_NONE, coords, template, null);
 
             // clear dates, because we don't want the scenario disappearing on us
             scenario.setDeploymentDate(null);
             scenario.setActionDate(null);
             scenario.setReturnDate(null);
             scenario.setStrategicObjective(true);
+            scenario.setTurningPoint(true);
             scenario.getBackingScenario().setCloaked(true);
             // apply objective mods
             if (objectiveModifiers != null) {
                 for (String modifier : objectiveModifiers) {
-                    scenario.getBackingScenario().addScenarioModifier(AtBScenarioModifier.getScenarioModifier(modifier));
+                    scenario.getBackingScenario()
+                            .addScenarioModifier(AtBScenarioModifier.getScenarioModifier(modifier));
                 }
             }
 
@@ -347,23 +461,55 @@ public class StratconContractInitializer {
     }
 
     /**
-     * Utility function that, given a track state, picks a random set of unoccupied coordinates.
+     * Searches for a suitable coordinate on the given {@link StratconTrackState}.
+     * The suitability of a coordinate is determined by the absence of a scenario in the coordinate
+     * and the absence of a facility or the presence of a player-allied facility (determined by the
+     * value of allowPlayerFacilities).
+     * <p>
+     * The method iterates through all possible coordinates and shuffles them to ensure randomness.
+     * A random coordinate is then selected from the list of suitable coordinates and returned.
+     *
+     * @param trackState            the {@link StratconTrackState} object on which to perform the search
+     * @param allowPlayerFacilities a {@link boolean} value indicating whether player-owned facilities
+     *                             should be considered suitable
+     * @return a {@link StratconCoords} object representing the coordinates of a suitable location,
+     * or {@code null} if no suitable location was found
      */
-    private static StratconCoords getUnoccupiedCoords(StratconTrackState trackState) {
-        // plonk
-        int x = Compute.randomInt(trackState.getWidth());
-        int y = Compute.randomInt(trackState.getHeight());
-        StratconCoords coords = new StratconCoords(x, y);
+    public static @Nullable StratconCoords getUnoccupiedCoords(StratconTrackState trackState, boolean allowPlayerFacilities) {
+        int trackHeight = trackState.getHeight();
+        int trackWidth = trackState.getWidth();
 
-        // make sure we don't put the facility down on top of anything else
-        while ((trackState.getFacility(coords) != null) ||
-                (trackState.getScenario(coords) != null)) {
-            x = Compute.randomInt(trackState.getWidth());
-            y = Compute.randomInt(trackState.getHeight());
-            coords = new StratconCoords(x, y);
+        List<StratconCoords> suitableCoords = new ArrayList<>();
+
+        for (int y = 0; y < trackHeight; y++) {
+            for (int x = 0; x < trackWidth; x++) {
+                StratconCoords coords = new StratconCoords(x, y);
+
+                if (trackState.getScenario(coords) != null) {
+                    continue;
+                }
+
+                if (trackState.getFacility(coords) == null) {
+                    suitableCoords.add(coords);
+                    continue;
+                }
+
+                if (trackState.getFacility(coords).getOwner() != ForceAlignment.Opposing) {
+                    if (allowPlayerFacilities) {
+                        suitableCoords.add(coords);
+                    }
+                }
+            }
         }
 
-        return coords;
+        Collections.shuffle(suitableCoords);
+
+        if (suitableCoords.isEmpty()) {
+            return null;
+        } else {
+            int randomIndex = new Random().nextInt(suitableCoords.size());
+            return suitableCoords.get(randomIndex);
+        }
     }
 
     /**
@@ -371,10 +517,11 @@ public class StratconContractInitializer {
      * such as pointers from StratCon scenario objects to AtB scenario objects.
      */
     public static void restoreTransientStratconInformation(Mission m, Campaign campaign) {
-        if (m instanceof AtBContract) {
-            // Having loaded scenarios and such, we now need to go through any StratCon scenarios for this contract
-            // and set their backing scenario pointers to the existing scenarios stored in the campaign for this contract
-            AtBContract atbContract = (AtBContract) m;
+        if (m instanceof AtBContract atbContract) {
+            // Having loaded scenarios and such, we now need to go through any StratCon
+            // scenarios for this contract
+            // and set their backing scenario pointers to the existing scenarios stored in
+            // the campaign for this contract
             if (atbContract.getStratconCampaignState() != null) {
                 for (StratconTrackState track : atbContract.getStratconCampaignState().getTracks()) {
                     for (StratconScenario scenario : track.getScenarios().values()) {
@@ -383,8 +530,9 @@ public class StratconContractInitializer {
                         if ((campaignScenario instanceof AtBDynamicScenario)) {
                             scenario.setBackingScenario((AtBDynamicScenario) campaignScenario);
                         } else {
-                            LogManager.getLogger().warn(String.format("Unable to set backing scenario for stratcon scenario in track %s ID %d",
-                                            track.getDisplayableName(), scenario.getBackingScenarioID()));
+                            logger.warn(String.format(
+                                    "Unable to set backing scenario for stratcon scenario in track %s ID %d",
+                                    track.getDisplayableName(), scenario.getBackingScenarioID()));
                         }
                     }
                 }

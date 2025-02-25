@@ -19,14 +19,16 @@
 package mekhq.gui.adapter;
 
 import megamek.common.Entity;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
-import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -35,29 +37,31 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(ProcurementTableMouseAdapter.class);
+
+    // region Variable Declarations
     private final CampaignGUI gui;
     private final JTable table;
     private final ProcurementTableModel model;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     protected ProcurementTableMouseAdapter(final CampaignGUI gui, final JTable table,
-                                           final ProcurementTableModel model) {
+            final ProcurementTableModel model) {
         this.gui = gui;
         this.table = table;
         this.model = model;
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Initialization
+    // region Initialization
     public static void connect(final CampaignGUI gui, final JTable table, final ProcurementTableModel model) {
         new ProcurementTableMouseAdapter(gui, table, model).connect(table);
     }
-    //endregion Initialization
+    // endregion Initialization
 
     @Override
     protected Optional<JPopupMenu> createPopupMenu() {
@@ -89,7 +93,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         });
         popup.add(menuItem);
 
-        //region GM Menu
+        // region GM Menu
         if (gui.getCampaign().isGM()) {
             popup.addSeparator();
 
@@ -149,7 +153,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
 
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }
-        //endregion GM Menu
+        // endregion GM Menu
 
         return Optional.of(popup);
     }
@@ -160,35 +164,39 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
      */
     private boolean tryProcureOneItem(final IAcquisitionWork acquisition) {
         if (acquisition.getQuantity() <= 0) {
-            LogManager.getLogger().info("Attempted to acquire item with no quantity remaining, ignoring the attempt.");
+            logger.info("Attempted to acquire item with no quantity remaining, ignoring the attempt.");
             return false;
         }
         final Object equipment = acquisition.getNewEquipment();
-        final int transitTime = gui.getCampaign().calculatePartTransitTime(0);
+        final int transitTime = gui.getCampaign().calculatePartTransitTime(acquisition.getAvailability());
         final boolean success;
         if (equipment instanceof Part) {
             success = gui.getCampaign().getQuartermaster().buyPart((Part) equipment, transitTime);
         } else if (equipment instanceof Entity) {
             success = gui.getCampaign().getQuartermaster().buyUnit((Entity) equipment, transitTime);
         } else {
-            LogManager.getLogger().error("Attempted to acquire unknown equipment of " + acquisition.getAcquisitionName());
+            logger.error("Attempted to acquire unknown equipment of {}", acquisition.getAcquisitionName());
             return false;
         }
 
         if (success) {
-            gui.getCampaign().addReport(String.format(resources.getString("ProcurementTableMouseAdapter.ProcuredItem.report"),
-                    acquisition.getAcquisitionName()));
+            gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                    + String.format(resources.getString("ProcurementTableMouseAdapter.ProcuredItem.report") + "</font>",
+                            acquisition.getAcquisitionName()));
             acquisition.decrementQuantity();
         } else {
-            gui.getCampaign().addReport(String.format(resources.getString("ProcurementTableMouseAdapter.CannotAffordToPurchaseItem.report"),
-                    acquisition.getAcquisitionName()));
+            gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                    + String.format(
+                            resources.getString("ProcurementTableMouseAdapter.CannotAffordToPurchaseItem.report")
+                                    + "</font>",
+                            acquisition.getAcquisitionName()));
         }
         return success;
     }
 
     private void addOneItem(final IAcquisitionWork acquisition) {
         if (acquisition.getQuantity() <= 0) {
-            LogManager.getLogger().info("Attempted to add item with no quantity remaining, ignoring the attempt.");
+            logger.info("Attempted to add item with no quantity remaining, ignoring the attempt.");
             return;
         }
 
@@ -196,14 +204,23 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         if (equipment instanceof Part) {
             gui.getCampaign().getQuartermaster().addPart((Part) equipment, 0);
         } else if (equipment instanceof Entity) {
-            gui.getCampaign().addNewUnit((Entity) equipment, false, 0);
+            PartQuality quality;
+
+            if (gui.getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
+                quality = Unit.getRandomUnitQuality(0);
+            } else {
+                quality = PartQuality.QUALITY_D;
+            }
+
+            gui.getCampaign().addNewUnit((Entity) equipment, false, 0, quality);
         } else {
-            LogManager.getLogger().error("Attempted to add unknown equipment of " + acquisition.getAcquisitionName());
+            logger.error("Attempted to add unknown equipment of {}", acquisition.getAcquisitionName());
             return;
         }
 
-        gui.getCampaign().addReport(String.format(resources.getString("ProcurementTableMouseAdapter.GMAdded.report"),
-                acquisition.getAcquisitionName()));
+        gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                + String.format(resources.getString("ProcurementTableMouseAdapter.GMAdded.report") + "</font>",
+                        acquisition.getAcquisitionName()));
         acquisition.decrementQuantity();
     }
 }

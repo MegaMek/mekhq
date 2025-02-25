@@ -18,19 +18,29 @@
  */
 package mekhq.campaign.mission.atb.scenario;
 
-import megamek.common.*;
+import java.util.ArrayList;
+import java.util.UUID;
+
+import megamek.common.Board;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.EntityWeightClass;
+import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
-
-import java.util.ArrayList;
-import java.util.UUID;
 
 @AtBScenarioEnabled
 public class CivilianRiotBuiltInScenario extends AtBScenario {
@@ -90,7 +100,7 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+            ArrayList<Entity> enemyEntities) {
         // north, south, east, west
         int boardEdge = (Compute.randomInt(4) + 1) * 2;
         setStartingPos(boardEdge);
@@ -117,13 +127,15 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
         addBotForce(new BotForce(RIOTER_FORCE_ID, 2, Board.START_CENTER, otherForce), campaign);
 
         for (int i = 0; i < 3; i++) {
-            // 3 mech rebel lance, use employer RAT, enemy skill
+            // 3 mek rebel lance, use employer RAT, enemy skill
             enemyEntities.add(getEntity(getContract(campaign).getEmployerCode(), getContract(campaign).getEnemySkill(),
                     IUnitRating.DRAGOON_F, UnitType.MEK,
                     Compute.d6() < 4 ? EntityWeightClass.WEIGHT_LIGHT : EntityWeightClass.WEIGHT_MEDIUM, campaign));
         }
 
-        addBotForce(new BotForce(REBEL_FORCE_ID, 2, AtBDynamicScenarioFactory.getOppositeEdge(boardEdge), enemyEntities), campaign);
+        addBotForce(
+                new BotForce(REBEL_FORCE_ID, 2, AtBDynamicScenarioFactory.getOppositeEdge(boardEdge), enemyEntities),
+                campaign);
     }
 
     @Override

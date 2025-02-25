@@ -19,19 +19,19 @@
 package mekhq.campaign.mission.atb.scenario;
 
 import megamek.client.bot.princess.BehaviorSettingsFactory;
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.OffBoardDirection;
+import megamek.common.*;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
-import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
 
 @AtBScenarioEnabled
 public class BreakthroughBuiltInScenario extends AtBScenario {
+    private static final MMLogger logger = MMLogger.create(BreakthroughBuiltInScenario.class);
+
     @Override
     public int getScenarioType() {
         return BREAKTHROUGH;
@@ -50,7 +50,7 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
     @Override
     public int getMapX() {
         // make it a little wider for bigger scenarios
-        return 18 + this.getLanceCount();
+        return 18 + this.getForceCount();
     }
 
     @Override
@@ -65,7 +65,7 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+            ArrayList<Entity> enemyEntities) {
         int enemyStart;
         int playerHome;
 
@@ -90,13 +90,16 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
             addBotForce(allyEntitiesForce, campaign);
         }
 
-        addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
+        CombatTeam combatTeam = getCombatTeamById(campaign);
+        int weightClass = combatTeam != null ? combatTeam.getWeightClass(campaign) : EntityWeightClass.WEIGHT_LIGHT;
+        addEnemyForce(enemyEntities, weightClass, campaign);
         BotForce botForce = getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities);
 
         try {
             if (isAttacker()) {
                 if (null != allyEntitiesForce) {
-                    allyEntitiesForce.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
+                    allyEntitiesForce
+                            .setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
                     allyEntitiesForce.setDestinationEdge(AtBDynamicScenarioFactory.getOppositeEdge(getStartingPos()));
                 }
             } else {
@@ -104,7 +107,7 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
                 botForce.setDestinationEdge(getEnemyHome());
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
 
         addBotForce(botForce, campaign);

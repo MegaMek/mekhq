@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,7 +19,7 @@
 package mekhq.gui.panels;
 
 import megamek.client.ui.swing.util.UIUtil;
-import megamek.client.ui.swing.widget.MegamekButton;
+import megamek.client.ui.swing.widget.MegaMekButton;
 import megamek.client.ui.swing.widget.SkinSpecification;
 import megamek.client.ui.swing.widget.SkinSpecification.UIComponents;
 import megamek.client.ui.swing.widget.SkinXMLHandler;
@@ -28,6 +28,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.preference.PreferenceManager;
 import megamek.common.util.ImageUtil;
 import megamek.common.util.fileUtils.MegaMekFile;
+import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -36,7 +37,6 @@ import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
 import mekhq.gui.dialog.DataLoadingDialog;
 import mekhq.gui.dialog.StoryArcSelectionDialog;
-import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,7 +49,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class StartupScreenPanel extends AbstractMHQPanel {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(StartupScreenPanel.class);
+
+    // region Variable Declarations
     private MekHQ app;
     private File lastSaveFile;
     private BufferedImage backgroundIcon;
@@ -58,18 +60,17 @@ public class StartupScreenPanel extends AbstractMHQPanel {
     static public FilenameFilter saveFilter = new FilenameFilter() {
         @Override
         public boolean accept(File dir, String name) {
-            // Allow any .xml, .cpnx, and .cpnx.gz file that is not in the list of excluded files
-            List<String> toReject = Arrays.asList(
-                    PreferenceManager.DEFAULT_CFG_FILE_NAME.toLowerCase()
-            );
+            // Allow any .xml, .cpnx, and .cpnx.gz file that is not in the list of excluded
+            // files
+            List<String> toReject = List.of(PreferenceManager.DEFAULT_CFG_FILE_NAME.toLowerCase());
             return (((name.toLowerCase().endsWith(".cpnx") || name.toLowerCase().endsWith(".xml"))
-                        || name.toLowerCase().endsWith(".cpnx.gz")) && !toReject.contains(name.toLowerCase()));
+                    || name.toLowerCase().endsWith(".cpnx.gz")) && !toReject.contains(name.toLowerCase()));
         }
     };
 
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public StartupScreenPanel(final MekHQ app) {
         super(new JFrame(MHQConstants.PROJECT_NAME), "StartupScreenPanel");
 
@@ -78,9 +79,9 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
         initialize();
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Initialization
+    // region Initialization
     @Override
     protected void initialize() {
         SkinSpecification skinSpec = SkinXMLHandler.getSkin(UIComponents.MainMenuBorder.getComp(), true);
@@ -88,7 +89,8 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         setBackground(UIManager.getColor("controlHighlight"));
 
         Dimension scaledMonitorSize = UIUtil.getScaledScreenSize(getFrame());
-        JLabel splash = UIUtil.createSplashComponent(app.getIconPackage().getStartupScreenImagesScreenImages(), getFrame());
+        JLabel splash = UIUtil.createSplashComponent(app.getIconPackage().getStartupScreenImagesScreenImages(),
+                getFrame());
         add(splash, BorderLayout.CENTER);
 
         if (skinSpec.hasBackgrounds()) {
@@ -96,7 +98,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
                 File file = new MegaMekFile(Configuration.widgetsDir(),
                         skinSpec.backgrounds.get(1)).getFile();
                 if (!file.exists()) {
-                    LogManager.getLogger().error("Background icon doesn't exist: " + file.getAbsolutePath());
+                    logger.error("Background icon doesn't exist: " + file.getAbsolutePath());
                 } else {
                     backgroundIcon = (BufferedImage) ImageUtil.loadImageFromFile(file.toString());
                 }
@@ -107,39 +109,68 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
         final JLabel lblVersion = new JLabel(String.format("%s %s %s", MHQConstants.PROJECT_NAME,
                 resources.getString("Version.text"), MHQConstants.VERSION), JLabel.CENTER);
-        lblVersion.setPreferredSize(new Dimension(250,15));
+        lblVersion.setPreferredSize(new Dimension(250, 15));
         if (!skinSpec.fontColors.isEmpty()) {
             lblVersion.setForeground(skinSpec.fontColors.get(0));
         }
 
-        MegamekButton btnNewCampaign = new MegamekButton(resources.getString("btnNewCampaign.text"),
+        MegaMekButton btnNewCampaign = new MegaMekButton(resources.getString("btnNewCampaign.text"),
                 UIComponents.MainMenuButton.getComp(), true);
-        btnNewCampaign.addActionListener(evt -> startCampaign(null));
+        btnNewCampaign.addActionListener(evt -> {
+            btnNewCampaign.setEnabled(false);
 
-        MegamekButton btnLoadCampaign = new MegamekButton(resources.getString("btnLoadCampaign.text"),
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    startCampaign(null);
+                } finally {
+                    btnNewCampaign.setEnabled(true);
+                }
+            });
+        });
+
+        MegaMekButton btnLoadCampaign = new MegaMekButton(resources.getString("btnLoadCampaign.text"),
                 UIComponents.MainMenuButton.getComp(), true);
         btnLoadCampaign.addActionListener(evt -> {
-            final File file = selectCampaignFile();
-            if (file != null) {
-                startCampaign(file);
-            }
+            btnLoadCampaign.setEnabled(false);
+
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    final File file = selectCampaignFile();
+                    if (file != null) {
+                        startCampaign(file);
+                    }
+                } finally {
+                    btnLoadCampaign.setEnabled(true);
+                }
+            });
         });
 
-        MegamekButton btnLoadLastCampaign = new MegamekButton(resources.getString("btnLoadLastCampaign.text"),
+        MegaMekButton btnLoadLastCampaign = new MegaMekButton(resources.getString("btnLoadLastCampaign.text"),
                 UIComponents.MainMenuButton.getComp(), true);
         btnLoadLastCampaign.setEnabled(lastSaveFile != null);
-        btnLoadLastCampaign.addActionListener(evt -> startCampaign(lastSaveFile));
-
-        MegamekButton btnLoadStoryArc = new MegamekButton(resources.getString("btnLoadStoryArc.text"),
-                UIComponents.MainMenuButton.getComp(), true);
-        btnLoadStoryArc.addActionListener(evt -> {
-            StoryArcStub storyArcStub = selectStoryArc();
-            if ((null != storyArcStub) && (null != storyArcStub.getInitCampaignFile())) {
-                startCampaign(storyArcStub.getInitCampaignFile(), storyArcStub);
-            }
+        btnLoadLastCampaign.addActionListener(evt -> {
+            btnLoadLastCampaign.setEnabled(false);
+            startCampaign(lastSaveFile);
         });
 
-        MegamekButton btnStoryArcEditor = new MegamekButton(resources.getString("btnStoryArcEditor.text"),
+        MegaMekButton btnLoadStoryArc = new MegaMekButton(resources.getString("btnLoadStoryArc.text"),
+                UIComponents.MainMenuButton.getComp(), true);
+        btnLoadStoryArc.addActionListener(evt -> {
+            btnLoadStoryArc.setEnabled(false);
+
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    StoryArcStub storyArcStub = selectStoryArc();
+                    if ((null != storyArcStub) && (null != storyArcStub.getInitCampaignFile())) {
+                        startCampaign(storyArcStub.getInitCampaignFile(), storyArcStub);
+                    }
+                } finally {
+                    btnLoadStoryArc.setEnabled(true);
+                }
+            });
+        });
+
+        MegaMekButton btnStoryArcEditor = new MegaMekButton(resources.getString("btnStoryArcEditor.text"),
                 UIComponents.MainMenuButton.getComp(), true);
         btnStoryArcEditor.addActionListener(evt -> {
             // FIXME: for starters we will only load existing arcs, but later need an option to start a new arc
@@ -149,18 +180,23 @@ public class StartupScreenPanel extends AbstractMHQPanel {
             }
         });
 
-        MegamekButton btnQuit = new MegamekButton(resources.getString("Quit.text"),
+        MegaMekButton btnQuit = new MegaMekButton(resources.getString("Quit.text"),
                 UIComponents.MainMenuButton.getComp(), true);
         btnQuit.addActionListener(evt -> System.exit(0));
 
         FontMetrics metrics = btnNewCampaign.getFontMetrics(btnNewCampaign.getFont());
         int width = metrics.stringWidth(btnNewCampaign.getText());
         int height = metrics.getHeight();
-        Dimension textDim =  new Dimension(width + 50, height + 10);
+        Dimension textDim = new Dimension(width + 50, height + 10);
 
         // Strive for no more than ~90% of the screen and use golden ratio to make
         // the button width "look" reasonable.
         int maximumWidth = (int) (0.9 * scaledMonitorSize.width) - splash.getPreferredSize().width;
+
+        //no more than 50% of image width
+        if (maximumWidth > (int) (0.5 * splash.getPreferredSize().width)) {
+            maximumWidth = (int) (0.5 * splash.getPreferredSize().width);
+        }
 
         Dimension minButtonDim = new Dimension((int) (maximumWidth / 1.618), 25);
         if (textDim.getWidth() > minButtonDim.getWidth()) {
@@ -186,20 +222,26 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         // Left Column
         c.anchor = GridBagConstraints.WEST;
         c.insets = new Insets(10, 5, 10, 10);
-        c.ipadx = 10; c.ipady = 5;
-        c.gridx = 0;  c.gridy = 0;
+        c.ipadx = 10;
+        c.ipady = 5;
+        c.gridx = 0;
+        c.gridy = 0;
         c.fill = GridBagConstraints.NONE;
-        c.weightx = 0.0; c.weighty = 0.0;
+        c.weightx = 0.0;
+        c.weighty = 0.0;
         c.gridwidth = 1;
         c.gridheight = 12;
         add(splash, c);
         // Right Column
         c.insets = new Insets(2, 2, 2, 10);
         c.fill = GridBagConstraints.BOTH;
-        c.weightx = 1.0; c.weighty = 1.0;
-        c.ipadx = 0; c.ipady = 0;
+        c.weightx = 1.0;
+        c.weighty = 1.0;
+        c.ipadx = 0;
+        c.ipady = 0;
         c.gridheight = 1;
-        c.gridx = 1; c.gridy = 0;
+        c.gridx = 1;
+        c.gridy = 0;
         add(lblVersion, c);
         c.gridy++;
         add(btnNewCampaign, c);
@@ -229,32 +271,32 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         // center window in screen
         getFrame().setLocationRelativeTo(null);
     }
-    //endregion Initialization
+    // endregion Initialization
 
-    //region Button Actions
+    // region Button Actions
     private void startCampaign(final @Nullable File file) {
         startCampaign(file, null);
     }
 
     private void startCampaign(final @Nullable File file, @Nullable StoryArcStub storyArcStub) {
-        new DataLoadingDialog(getFrame(), app, file, storyArcStub).setVisible(true);
+        new DataLoadingDialog(getFrame(), app, file, storyArcStub, false).setVisible(true);
     }
 
     private void startStoryArcEditor(@Nullable StoryArcStub storyArcStub) {
-        new DataLoadingDialog(getFrame(), app, storyArcStub.getInitCampaignFile(), storyArcStub, true).setVisible(true);
+        new DataLoadingDialog(getFrame(), app, storyArcStub.getInitCampaignFile(), storyArcStub, true, true).setVisible(true);
     }
 
     private @Nullable File selectCampaignFile() {
         return FileDialogs.openCampaign(getFrame()).orElse(null);
     }
-    //endregion Button Actions
+    // endregion Button Actions
 
     private @Nullable StoryArcStub selectStoryArc() {
         final StoryArcSelectionDialog storyArcSelectionDialog = new StoryArcSelectionDialog(getFrame(), true);
         if (storyArcSelectionDialog.showDialog().isCancelled()) {
             return null;
         }
-        return(storyArcSelectionDialog.getSelectedStoryArc());
+        return (storyArcSelectionDialog.getSelectedStoryArc());
     }
 
     @Override

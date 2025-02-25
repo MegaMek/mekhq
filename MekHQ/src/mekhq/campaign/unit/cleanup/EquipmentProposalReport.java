@@ -26,14 +26,15 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.unit.Unit;
 
 public final class EquipmentProposalReport {
-    //region Constructors
+    // region Constructors
     private EquipmentProposalReport() {
 
     }
-    //endregion Constructors
+    // endregion Constructors
 
     /**
      * Creates a message detailing the results of the unscrambling.
+     * 
      * @param proposal The unscrambling proposal.
      * @return A String describing the result of the unscrambling operation.
      */
@@ -69,18 +70,21 @@ public final class EquipmentProposalReport {
             }
 
             final boolean isMissing = !proposal.hasProposal(part);
-            final String eName = isMissing ? "<Incorrect>" : ((equipNum >= 0) ? unit.getEntity().getEquipment(equipNum).getName() : "<None>");
+            final String eName = isMissing ? "<Incorrect>"
+                    : ((equipNum >= 0) ? unit.getEntity().getEquipment(equipNum).getName() : "<None>");
 
-            builder.append(String.format(" %d: %s %s %s %s\n", (!isMissing ? equipNum : proposal.getOriginalMapping(part)),
-                    part.getName(), part.getLocationName(), eName, isMissing ? " (Missing)" : ""));
+            builder.append(
+                    String.format(" %d: %s %s %s %s\n", (!isMissing ? equipNum : proposal.getOriginalMapping(part)),
+                            part.getName(), part.getLocationName(), eName, isMissing ? " (Missing)" : ""));
         }
 
         builder.append("\nEquipment:\n");
-        for (final Mounted m : unit.getEntity().getEquipment()) {
+        for (final Mounted<?> m : unit.getEntity().getEquipment()) {
             final int equipNum = unit.getEntity().getEquipmentNum(m);
             final EquipmentType mType = m.getType();
             final boolean isAvailable = proposal.getEquipment(equipNum) != null;
-            builder.append(String.format(" %d: %s %s%s\n", equipNum, m.getName(), mType.getName(), isAvailable ? " (Available)" : ""));
+            builder.append(String.format(" %d: %s %s%s\n", equipNum, m.getName(), mType.getName(),
+                    isAvailable ? " (Available)" : ""));
         }
 
         return builder.toString();

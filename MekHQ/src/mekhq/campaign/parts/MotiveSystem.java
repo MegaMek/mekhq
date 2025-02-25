@@ -20,23 +20,26 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Entity;
 import megamek.common.Tank;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MotiveSystem extends Part {
+    private static final MMLogger logger = MMLogger.create(MotiveSystem.class);
+
     int damage;
     int penalty;
 
@@ -104,7 +107,7 @@ public class MotiveSystem extends Part {
                     penalty = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
 
@@ -148,8 +151,8 @@ public class MotiveSystem extends Part {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        //motive systems don't have to check for destruction since they
-        //cannot be removed
+        // motive systems don't have to check for destruction since they
+        // cannot be removed
         if (null != unit && unit.getEntity() instanceof Tank) {
             Tank t = (Tank) unit.getEntity();
             damage = t.getMotiveDamage();
@@ -160,7 +163,7 @@ public class MotiveSystem extends Part {
     @Override
     public void updateConditionFromPart() {
         // TODO Auto-generated method stub
-        //you can't get here so, dont worry about it
+        // you can't get here so, dont worry about it
     }
 
     @Override

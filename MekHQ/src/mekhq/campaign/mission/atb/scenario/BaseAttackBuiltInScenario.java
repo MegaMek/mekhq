@@ -18,23 +18,19 @@
  */
 package mekhq.campaign.mission.atb.scenario;
 
-import java.util.ArrayList;
-
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.enums.AtBLanceRole;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.CommonObjectiveFactory;
-import mekhq.campaign.mission.ObjectiveEffect;
-import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
+import mekhq.campaign.mission.enums.CombatRole;
+
+import java.util.ArrayList;
 
 @AtBScenarioEnabled
 public class BaseAttackBuiltInScenario extends AtBScenario {
@@ -103,7 +99,13 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
          * Ally deploys 2 lances of a lighter weight class than the player,
          * minimum light
          */
-        int allyForceWeight = Math.max(getLance(campaign).getWeightClass(campaign) - 1, EntityWeightClass.WEIGHT_LIGHT);
+        CombatTeam combatTeam = getCombatTeamById(campaign);
+        int allyForceWeight;
+        if (combatTeam != null) {
+            allyForceWeight = Math.max(getCombatTeamById(campaign).getWeightClass(campaign) - 1, EntityWeightClass.WEIGHT_LIGHT);
+        } else {
+            allyForceWeight = EntityWeightClass.WEIGHT_LIGHT;
+        }
         addLance(allyEntities, getContract(campaign).getEmployerCode(), getContract(campaign).getAllySkill(),
                 getContract(campaign).getAllyQuality(), allyForceWeight, campaign);
         addLance(allyEntities, getContract(campaign).getEmployerCode(), getContract(campaign).getAllySkill(),
@@ -143,14 +145,16 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
         addBotForce(new BotForce(BASE_TURRET_FORCE_ID, isAttacker() ? 2 : 1, defenderStart, defenderHome, turretForce), campaign);
 
         /* Roll 2x on bot lances roll */
-        addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
+        int weightClass = combatTeam != null ? combatTeam.getWeightClass(campaign) : EntityWeightClass.WEIGHT_LIGHT;
+
+        addEnemyForce(enemyEntities, weightClass, campaign);
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities), campaign);
 
         // the "second" enemy force will either flee in the same direction as
         // the first enemy force in case of the player being the attacker
         // or where it came from in case of player being defender
         ArrayList<Entity> secondBotEntities = new ArrayList<>();
-        addEnemyForce(secondBotEntities, getLance(campaign).getWeightClass(campaign), campaign);
+        addEnemyForce(secondBotEntities, weightClass, campaign);
         BotForce secondBotForce = getEnemyBotForce(getContract(campaign),
                 isAttacker() ? enemyStart : secondAttackerForceStart,
                 isAttacker() ? getEnemyHome() : secondAttackerForceStart, secondBotEntities);
@@ -184,8 +188,8 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
             // while completing this scenario on others just puts the morale to
             // Rout for a while
             ObjectiveEffect victoryEffect = new ObjectiveEffect();
-            final AtBLanceRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
-            if (requiredLanceRole.isFighting() || requiredLanceRole.isScouting()) {
+            final CombatRole requiredLanceRole = contract.getContractType().getRequiredCombatRole();
+            if (requiredLanceRole.isManeuver() || requiredLanceRole.isPatrol()) {
                 victoryEffect.effectType = ObjectiveEffectType.ContractVictory;
                 destroyHostiles.addDetail(getResourceBundle().getString("battleDetails.baseAttack.attacker.details.winnerFightScout"));
             } else {

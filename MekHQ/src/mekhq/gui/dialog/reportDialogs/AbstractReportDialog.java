@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,7 +18,8 @@
  */
 package mekhq.gui.dialog.reportDialogs;
 
-import mekhq.gui.baseComponents.AbstractMHQDialog;
+import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -29,7 +30,7 @@ import java.awt.*;
  *
  * Inheriting classes must call initialize() in their constructors and override getText.
  */
-public abstract class AbstractReportDialog extends AbstractMHQDialog {
+public abstract class AbstractReportDialog extends AbstractMHQDialogBasic {
     //region Constructors
     protected AbstractReportDialog(final JFrame frame, final String name, final String title) {
         super(frame, name, title);
@@ -39,7 +40,7 @@ public abstract class AbstractReportDialog extends AbstractMHQDialog {
     //region Initialization
     @Override
     protected Container createCenterPane() {
-        final JScrollPane scrollPane = new JScrollPane(createTxtReport());
+        final JScrollPane scrollPane = new JScrollPaneWithSpeed(createTxtReport());
         scrollPane.setBorder(new EmptyBorder(2, 10, 2, 2));
         scrollPane.setName("reportPane");
 

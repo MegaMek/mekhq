@@ -20,21 +20,27 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
-import mekhq.MekHQ;
-import mekhq.campaign.ResolveScenarioTracker;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.KeyEvent;
 import java.util.ResourceBundle;
+
+import javax.swing.*;
+
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.ResolveScenarioTracker;
 
 /**
  * @author Taharqa
  */
 public class ChooseMulFilesDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(ChooseMulFilesDialog.class);
+
     private ResolveScenarioTracker tracker;
 
     private JTextField txtUnitFile;
@@ -78,8 +84,8 @@ public class ChooseMulFilesDialog extends JDialog {
         txtInstructions.setWrapStyleWord(true);
         txtInstructions.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
-        txtInstructions.setPreferredSize(new Dimension(400,200));
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        txtInstructions.setPreferredSize(new Dimension(400, 200));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -171,7 +177,7 @@ public class ChooseMulFilesDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 

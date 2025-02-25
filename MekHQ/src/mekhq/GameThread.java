@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2011-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,35 +18,41 @@
  */
 package mekhq;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+
+import io.sentry.Sentry;
 import megamek.client.AbstractClient;
 import megamek.client.Client;
 import megamek.client.CloseClientListener;
 import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.Princess;
-import megamek.client.ui.swing.ClientGUI;
+import megamek.client.ui.swing.*;
 import megamek.client.ui.swing.util.MegaMekController;
-import megamek.common.*;
-import megamek.common.planetaryconditions.PlanetaryConditions;
+import megamek.common.Entity;
+import megamek.common.MapSettings;
+import megamek.common.WeaponOrderHandler;
 import megamek.common.preference.PreferenceManager;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
-
-import java.awt.*;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 class GameThread extends Thread implements CloseClientListener {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(GameThread.class);
+
+    // region Variable Declarations
     protected String myname;
     protected String password;
     protected Client client;
-    protected ClientGUI swingGui;
+    protected IClientGUI swingGui;
+    protected ILocalBots localBots;
     protected MegaMekController controller;
     protected MekHQ app;
     protected Campaign campaign;
@@ -57,53 +63,107 @@ class GameThread extends Thread implements CloseClientListener {
     protected volatile boolean stop = false;
 
     private final Scenario scenario;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
-    public GameThread(String name, String password, Client c, MekHQ app, List<Unit> units, Scenario s) {
-        this(name, password, c, app, units, s, true);
+    // region Constructors
+
+    /**
+     * GameThread
+     * <p>
+     *     Initializes a new thread for a game.
+     * </p>
+     *
+     * @param name          The player name
+     * @param password      The game password
+     * @param client        The client
+     * @param app           The MekHQ instance
+     * @param units         The list of units you intend to play with in your side
+     * @param scenario      The scenario that is going to be initialized for the game
+     */
+    public GameThread(String name, String password, Client client, MekHQ app, List<Unit> units, Scenario scenario) {
+        this(name, password, client, app, units, scenario, true);
     }
 
-    public GameThread(String name, Client c, MekHQ app, List<Unit> units, Scenario s, boolean started) {
-        this(name, "", c, app, units, s, started);
+
+    /**
+     * GameThread
+     * <p>
+     *     Initializes a new thread for a game.
+     * </p>
+     *
+     * @param name          The player name
+     * @param client        The client
+     * @param app           The MekHQ instance
+     * @param units         The list of units you intend to play with in your side
+     * @param scenario      The scenario that is going to be initialized for the game
+     * @param started       Whether the game has already started
+     */
+    public GameThread(String name, Client client, MekHQ app, List<Unit> units, Scenario scenario, boolean started) {
+        this(name, "", client, app, units, scenario, started);
     }
 
-    public GameThread(String name, String password, Client c, MekHQ app, List<Unit> units, Scenario s, boolean started) {
+
+    /**
+     * GameThread
+     * <p>
+     *     Initializes a new thread for a game.
+     * </p>
+     *
+     * @param name          The player name
+     * @param password      The game password
+     * @param client        The client
+     * @param app           The MekHQ instance
+     * @param units         The list of units you intend to play with in your side
+     * @param scenario      The scenario that is going to be initialized for the game
+     * @param started       Whether the game has already started
+     */
+    public GameThread(String name, String password, Client client, MekHQ app, List<Unit> units, Scenario scenario,
+            boolean started) {
         super(name);
         myname = name.trim();
         this.password = password;
-        this.client = c;
+        this.client = client;
         this.app = app;
         this.units = Objects.requireNonNull(units);
         this.started = started;
         this.campaign = app.getCampaign();
-        this.scenario = Objects.requireNonNull(s);
+        this.scenario = Objects.requireNonNull(scenario);
     }
-    //endregion Constructors
+    // endregion Constructors
 
     public Client getClient() {
         return client;
+    }
+
+    protected Map<String, AbstractClient> getLocalBots() {
+        if (localBots == null) {
+            return Collections.emptyMap();
+        }
+        return localBots.getLocalBots();
     }
 
     @Override
     public void run() {
         client.addCloseClientListener(this);
 
-        if (swingGui != null) {
-            for (AbstractClient client2 : swingGui.getLocalBots().values()) {
+        if (!getLocalBots().isEmpty()) {
+            for (AbstractClient client2 : getLocalBots().values()) {
                 client2.die();
             }
-            swingGui.getLocalBots().clear();
+            getLocalBots().clear();
         }
+
         createController();
         swingGui = new ClientGUI(client, controller);
         controller.clientgui = swingGui;
+        localBots = (ClientGUI) swingGui;
         swingGui.initialize();
 
         try {
             client.connect();
         } catch (Exception ex) {
-            LogManager.getLogger().error("MegaMek client failed to connect to server", ex);
+            Sentry.captureException(ex);
+            logger.error("MegaMek client failed to connect to server", ex);
             return;
         }
 
@@ -116,11 +176,12 @@ class GameThread extends Thread implements CloseClientListener {
             for (int i = 0; (i < MekHQ.getMHQOptions().getStartGameClientRetryCount())
                     && client.getGame().getPhase().isUnknown(); i++) {
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameClientDelay());
-                LogManager.getLogger().warn("Client has not finished initialization, and is currently in an unknown phase.");
+                logger
+                        .warn("Client has not finished initialization, and is currently in an unknown phase.");
             }
 
             if ((client.getGame() != null) && client.getGame().getPhase().isLounge()) {
-                LogManager.getLogger().info("Thread in lounge");
+                logger.info("Thread in lounge");
                 client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
 
                 if (started) {
@@ -151,24 +212,32 @@ class GameThread extends Thread implements CloseClientListener {
                             mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                         }
                     } else {
-                        File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml"); // TODO : remove inline file path
+                        File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml"); // TODO : remove inline
+                                                                                                 // file path
                         try (InputStream is = new FileInputStream(mapgenFile)) {
                             mapSettings = MapSettings.getInstance(is);
                         } catch (FileNotFoundException ex) {
-                            LogManager.getLogger().error("Could not load map file data/mapgen/" + scenario.getMap() + ".xml", ex);  // TODO : remove inline file path
+                            logger
+                                    .error(
+                                            String.format("Could not load map file data/mapgen/%s.xml",
+                                                    scenario.getMap()),
+                                            ex);
+                            // TODO: remove inline file path
                         }
 
                         if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
                             mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                         }
 
-                        // duplicate code, but getting a new instance of map settings resets the size parameters
+                        // duplicate code, but getting a new instance of map settings resets the size
+                        // parameters
                         mapSettings.setBoardSize(scenario.getMapSizeX(), scenario.getMapSizeY());
                         mapSettings.setMapSize(1, 1);
                         mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                     }
                 } else {
-                    LogManager.getLogger().error("invalid map settings provided for scenario " + scenario.getName());
+                    logger.error(
+                            String.format("invalid map settings provided for scenario %s", scenario.getName()));
                 }
 
                 client.sendMapSettings(mapSettings);
@@ -185,6 +254,7 @@ class GameThread extends Thread implements CloseClientListener {
                 client.getLocalPlayer().setStartingAnyNWy(scenario.getStartingAnyNWy());
                 client.getLocalPlayer().setStartingAnySEx(scenario.getStartingAnySEx());
                 client.getLocalPlayer().setStartingAnySEy(scenario.getStartingAnySEy());
+                client.getLocalPlayer().setConstantInitBonus(campaign.getInitiativeBonus());
 
                 client.getLocalPlayer().setTeam(1);
 
@@ -205,9 +275,9 @@ class GameThread extends Thread implements CloseClientListener {
                 for (int i = 0; i < scenario.getNumBots(); i++) {
                     BotForce bf = scenario.getBotForce(i);
                     String name = bf.getName();
-                    if (swingGui.getLocalBots().containsKey(name)) {
+                    if (getLocalBots().containsKey(name)) {
                         int append = 2;
-                        while (swingGui.getLocalBots().containsKey(name + append)) {
+                        while (getLocalBots().containsKey(name + append)) {
                             append++;
                         }
                         name += append;
@@ -217,9 +287,11 @@ class GameThread extends Thread implements CloseClientListener {
                     try {
                         botClient.connect();
                     } catch (Exception e) {
-                        LogManager.getLogger().error("Could not connect with Bot name " + bf.getName(), e);
+                        Sentry.captureException(e);
+                        logger.error(
+                                String.format("Could not connect with Bot name %s", bf.getName()), e);
                     }
-                    swingGui.getLocalBots().put(name, botClient);
+                    getLocalBots().put(name, botClient);
 
                     // chill out while bot is created and connects to megamek
                     Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
@@ -231,13 +303,20 @@ class GameThread extends Thread implements CloseClientListener {
                 Thread.sleep(50);
             }
         } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+            Sentry.captureException(e);
+            logger.error("", e);
         } finally {
-            swingGui.setDisconnectQuietly(true);
+            disconnectGuiSilently();
             client.die();
             client = null;
             swingGui = null;
             controller = null;
+        }
+    }
+
+    protected void disconnectGuiSilently() {
+        if (swingGui != null && swingGui instanceof IDisconnectSilently disconnectSilently) {
+            disconnectSilently.setDisconnectQuietly(true);
         }
     }
 
@@ -246,11 +325,13 @@ class GameThread extends Thread implements CloseClientListener {
      * camo, and entities
      *
      * @param botClient a BotClient to manage the bot
-     * @param botForce a BotForce that will send its info and entities to the botClient
+     * @param botForce  a BotForce that will send its info and entities to the
+     *                  botClient
      */
     private void configureBot(BotClient botClient, BotForce botForce) {
         try {
-            // Wait for the server to add the bot client, but allow a timeout rather than blocking
+            // Wait for the server to add the bot client, but allow a timeout rather than
+            // blocking
             int retryCount = 0;
             while ((botClient.getLocalPlayer() == null)
                     && (retryCount++ < MekHQ.getMHQOptions().getStartGameBotClientRetryCount())) {
@@ -262,11 +343,12 @@ class GameThread extends Thread implements CloseClientListener {
             }
 
             if (botClient.getLocalPlayer() == null) {
-                LogManager.getLogger().error("Could not configure bot " + botClient.getName());
+                logger.error(
+                        String.format("Could not configure bot %s", botClient.getName()));
             } else {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
 
-                //set deployment
+                // set deployment
                 botClient.getLocalPlayer().setStartingPos(botForce.getStartingPos());
                 botClient.getLocalPlayer().setStartOffset(botForce.getStartOffset());
                 botClient.getLocalPlayer().setStartWidth(botForce.getStartWidth());
@@ -285,7 +367,8 @@ class GameThread extends Thread implements CloseClientListener {
                 botClient.sendAddEntity(entities);
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            Sentry.captureException(ex);
+            logger.error("", ex);
         }
     }
 
@@ -297,9 +380,10 @@ class GameThread extends Thread implements CloseClientListener {
             entity.setOwner(botClient.getLocalPlayer());
             entity.setForceString(forceName);
             /*
-             Only overwrite deployment round for entities if they have an individual deployment round of zero.
-             Otherwise, we will overwrite entity specific deployment information.
-            */
+             * Only overwrite deployment round for entities if they have an individual
+             * deployment round of zero.
+             * Otherwise, we will overwrite entity specific deployment information.
+             */
             if (entity.getDeployRound() == 0) {
                 entity.setDeployRound(botForce.getDeployRound());
             }
@@ -324,7 +408,8 @@ class GameThread extends Thread implements CloseClientListener {
         try {
             WeaponOrderHandler.saveWeaponOrderFile();
         } catch (IOException e) {
-            LogManager.getLogger().error("Error saving custom weapon orders!", e);
+            Sentry.captureException(e);
+            logger.error("Error saving custom weapon orders!", e);
         }
         stop = true;
     }
@@ -341,10 +426,8 @@ class GameThread extends Thread implements CloseClientListener {
     }
 
     public void createController() {
-        controller = new MegaMekController();
-        KeyboardFocusManager kbfm = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-        kbfm.addKeyEventDispatcher(controller);
-
-        KeyBindParser.parseKeyBindings(controller);
+        MegaMekGUI megaMekGUI = new MegaMekGUI();
+        megaMekGUI.createController();
+        controller = MegaMekGUI.getKeyDispatcher();
     }
 }

@@ -18,26 +18,27 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import mekhq.MekHQ;
-import org.junit.jupiter.api.Test;
-
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class FamilialRelationshipDisplayLevelTest {
-    //region Variable Declarations
+import java.util.ResourceBundle;
+
+import org.junit.jupiter.api.Test;
+
+import mekhq.MekHQ;
+
+class FamilialRelationshipDisplayLevelTest {
+    // region Variable Declarations
     private static final FamilialRelationshipDisplayLevel[] levels = FamilialRelationshipDisplayLevel.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     @Test
-    public void testIsSpouse() {
+    void testIsSpouse() {
         for (final FamilialRelationshipDisplayLevel familialRelationshipDisplayLevel : levels) {
             if (familialRelationshipDisplayLevel == FamilialRelationshipDisplayLevel.SPOUSE) {
                 assertTrue(familialRelationshipDisplayLevel.isSpouse());
@@ -48,7 +49,7 @@ public class FamilialRelationshipDisplayLevelTest {
     }
 
     @Test
-    public void testIsParentsChildrenSiblings() {
+    void testIsParentsChildrenSiblings() {
         for (final FamilialRelationshipDisplayLevel familialRelationshipDisplayLevel : levels) {
             if (familialRelationshipDisplayLevel == FamilialRelationshipDisplayLevel.PARENTS_CHILDREN_SIBLINGS) {
                 assertTrue(familialRelationshipDisplayLevel.isParentsChildrenSiblings());
@@ -59,7 +60,7 @@ public class FamilialRelationshipDisplayLevelTest {
     }
 
     @Test
-    public void testIsGrandparentsGrandchildren() {
+    void testIsGrandparentsGrandchildren() {
         for (final FamilialRelationshipDisplayLevel familialRelationshipDisplayLevel : levels) {
             if (familialRelationshipDisplayLevel == FamilialRelationshipDisplayLevel.GRANDPARENTS_GRANDCHILDREN) {
                 assertTrue(familialRelationshipDisplayLevel.isGrandparentsGrandchildren());
@@ -70,7 +71,7 @@ public class FamilialRelationshipDisplayLevelTest {
     }
 
     @Test
-    public void testIsAuntsUnclesCousins() {
+    void testIsAuntsUnclesCousins() {
         for (final FamilialRelationshipDisplayLevel familialRelationshipDisplayLevel : levels) {
             if (familialRelationshipDisplayLevel == FamilialRelationshipDisplayLevel.AUNTS_UNCLES_COUSINS) {
                 assertTrue(familialRelationshipDisplayLevel.isAuntsUnclesCousins());
@@ -81,7 +82,7 @@ public class FamilialRelationshipDisplayLevelTest {
     }
 
     @Test
-    public void testDisplayParentsChildrenSiblings() {
+    void testDisplayParentsChildrenSiblings() {
         assertFalse(FamilialRelationshipDisplayLevel.SPOUSE.displayParentsChildrenSiblings());
         assertTrue(FamilialRelationshipDisplayLevel.PARENTS_CHILDREN_SIBLINGS.displayParentsChildrenSiblings());
         assertTrue(FamilialRelationshipDisplayLevel.GRANDPARENTS_GRANDCHILDREN.displayParentsChildrenSiblings());
@@ -89,30 +90,22 @@ public class FamilialRelationshipDisplayLevelTest {
     }
 
     @Test
-    public void testDisplayGrandparentsGrandchildren() {
+    void testDisplayGrandparentsGrandchildren() {
         assertFalse(FamilialRelationshipDisplayLevel.SPOUSE.displayGrandparentsGrandchildren());
         assertFalse(FamilialRelationshipDisplayLevel.PARENTS_CHILDREN_SIBLINGS.displayGrandparentsGrandchildren());
         assertTrue(FamilialRelationshipDisplayLevel.GRANDPARENTS_GRANDCHILDREN.displayGrandparentsGrandchildren());
         assertTrue(FamilialRelationshipDisplayLevel.AUNTS_UNCLES_COUSINS.displayGrandparentsGrandchildren());
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     @Test
-    public void testParseFromString() {
+    void testParseFromString() {
         // Normal Parsing
         assertEquals(FamilialRelationshipDisplayLevel.SPOUSE,
                 FamilialRelationshipDisplayLevel.parseFromString("SPOUSE"));
         assertEquals(FamilialRelationshipDisplayLevel.AUNTS_UNCLES_COUSINS,
                 FamilialRelationshipDisplayLevel.parseFromString("AUNTS_UNCLES_COUSINS"));
-
-        // Legacy Parsing
-        assertEquals(FamilialRelationshipDisplayLevel.PARENTS_CHILDREN_SIBLINGS,
-                FamilialRelationshipDisplayLevel.parseFromString("0"));
-        assertEquals(FamilialRelationshipDisplayLevel.GRANDPARENTS_GRANDCHILDREN,
-                FamilialRelationshipDisplayLevel.parseFromString("1"));
-        assertEquals(FamilialRelationshipDisplayLevel.AUNTS_UNCLES_COUSINS,
-                FamilialRelationshipDisplayLevel.parseFromString("2"));
 
         // Error Case
         assertEquals(FamilialRelationshipDisplayLevel.PARENTS_CHILDREN_SIBLINGS,
@@ -120,10 +113,10 @@ public class FamilialRelationshipDisplayLevelTest {
         assertEquals(FamilialRelationshipDisplayLevel.PARENTS_CHILDREN_SIBLINGS,
                 FamilialRelationshipDisplayLevel.parseFromString("blah"));
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Test
-    public void testToStringOverride() {
+    void testToStringOverride() {
         assertEquals(resources.getString("FamilialRelationshipDisplayLevel.SPOUSE.text"),
                 FamilialRelationshipDisplayLevel.SPOUSE.toString());
         assertEquals(resources.getString("FamilialRelationshipDisplayLevel.AUNTS_UNCLES_COUSINS.text"),

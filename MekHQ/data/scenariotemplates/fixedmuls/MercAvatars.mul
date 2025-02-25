@@ -1,69 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<unit version="0.49.16-SNAPSHOT" >
+<unit version="0.49.16-SNAPSHOT">
 
-		<entity chassis="Beast Infantry (Branth)" model="(Laser Rifle)" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="ca8d463f-85f4-45a4-a3f5-48bbf984d9c7">
-			<pilot size="1" name="Dewitt Ito" nick="" gender="MALE" gunnery="3" piloting="8" externalId="0f63bbdb-9d45-418e-9cd4-9796dbfd8855" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="16"/>
-		</entity>
+	<entity chassis="Beast Infantry (Branth)" model="(Laser Rifle)" type="VTOL" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="ca8d463f-85f4-45a4-a3f5-48bbf984d9c7">
+		<pilot size="1" name="Dewitt Ito" nick="" gender="MALE" gunnery="3" piloting="8"
+			externalId="0f63bbdb-9d45-418e-9cd4-9796dbfd8855" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="16" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Branth)" model="(Laser Rifle)" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="2f43bdc9-63ba-4560-9102-82d3b43e8b08">
-			<pilot size="1" name="Gabriel Evseev" nick="" gender="MALE" gunnery="4" piloting="8" externalId="c42c7a05-7ecc-4442-8c46-f7a694b4d49c" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="17"/>
-		</entity>
+	<entity chassis="Beast Infantry (Branth)" model="(Laser Rifle)" type="VTOL" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="2f43bdc9-63ba-4560-9102-82d3b43e8b08">
+		<pilot size="1" name="Gabriel Evseev" nick="" gender="MALE" gunnery="4" piloting="8"
+			externalId="c42c7a05-7ecc-4442-8c46-f7a694b4d49c" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="17" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Branth)" model="(Auto-Rifle)" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="c5330ff6-4e49-4145-8b0b-3d54897979d2">
-			<pilot size="1" name="Ashlynn Englefield" nick="" gender="FEMALE" gunnery="3" piloting="8" externalId="861f7b75-691d-4f9a-bd76-1d495d074639" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="18"/>
-		</entity>
+	<entity chassis="Beast Infantry (Branth)" model="(Auto-Rifle)" type="VTOL" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="c5330ff6-4e49-4145-8b0b-3d54897979d2">
+		<pilot size="1" name="Ashlynn Englefield" nick="" gender="FEMALE" gunnery="3" piloting="8"
+			externalId="861f7b75-691d-4f9a-bd76-1d495d074639" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="18" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Branth)" model="(Auto-Rifle)" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="3ffa27bc-5fb3-4439-95d9-f5ed50409eea">
-			<pilot size="1" name="Marvin MacIlvain" nick="" gender="MALE" gunnery="4" piloting="8" externalId="0bde2693-454c-44aa-8a6d-ac9a5860264b" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="19"/>
-		</entity>
+	<entity chassis="Beast Infantry (Branth)" model="(Auto-Rifle)" type="VTOL" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="3ffa27bc-5fb3-4439-95d9-f5ed50409eea">
+		<pilot size="1" name="Marvin MacIlvain" nick="" gender="MALE" gunnery="4" piloting="8"
+			externalId="0bde2693-454c-44aa-8a6d-ac9a5860264b" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="19" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Branth)" model="(Auto-Rifle)" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="5e634640-03af-46a0-a881-7e2e1e97f449">
-			<pilot size="1" name="Jake Sully" nick="" gender="MALE" gunnery="2" piloting="3" externalId="724923dd-764a-48ba-99a9-21175d9b271a" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="12"/>
-		</entity>
+	<entity chassis="Beast Infantry (Branth)" model="(Auto-Rifle)" type="VTOL" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="5e634640-03af-46a0-a881-7e2e1e97f449">
+		<pilot size="1" name="Jake Sully" nick="" gender="MALE" gunnery="2" piloting="3"
+			externalId="724923dd-764a-48ba-99a9-21175d9b271a" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="12" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Branth)" model="(Auto-Rifle)" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="8a44e42e-2794-4693-af77-7329f1f74c49">
-			<pilot size="1" name="Neytiri Navi" nick="" gender="FEMALE" gunnery="3" piloting="3" externalId="f0de076b-0b0b-4081-9a85-ef7adf43e376" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="13"/>
-		</entity>
+	<entity chassis="Beast Infantry (Branth)" model="(Auto-Rifle)" type="VTOL" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="8a44e42e-2794-4693-af77-7329f1f74c49">
+		<pilot size="1" name="Neytiri Navi" nick="" gender="FEMALE" gunnery="3" piloting="3"
+			externalId="f0de076b-0b0b-4081-9a85-ef7adf43e376" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="13" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Branth)" model="(Laser Rifle)" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="9f433b52-409d-496d-8c3c-e2a4e364b8c8">
-			<pilot size="1" name="Steve Vinogradsky" nick="" gender="MALE" gunnery="4" piloting="8" externalId="234a5077-27f8-4cc4-a46b-f5a2ff9cefc0" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="14"/>
-		</entity>
+	<entity chassis="Beast Infantry (Branth)" model="(Laser Rifle)" type="VTOL" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="9f433b52-409d-496d-8c3c-e2a4e364b8c8">
+		<pilot size="1" name="Steve Vinogradsky" nick="" gender="MALE" gunnery="4" piloting="8"
+			externalId="234a5077-27f8-4cc4-a46b-f5a2ff9cefc0" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="14" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Branth)" model="(Laser Rifle)" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="22bbbf45-5ec1-4dd8-ba8a-f59ad7176eaa">
-			<pilot size="1" name="Jani Chong" nick="" gender="MALE" gunnery="3" piloting="8" externalId="ce714dd2-7187-4915-8315-8a2121e4f83c" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="15"/>
-		</entity>
+	<entity chassis="Beast Infantry (Branth)" model="(Laser Rifle)" type="VTOL" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="22bbbf45-5ec1-4dd8-ba8a-f59ad7176eaa">
+		<pilot size="1" name="Jani Chong" nick="" gender="MALE" gunnery="3" piloting="8"
+			externalId="ce714dd2-7187-4915-8315-8a2121e4f83c" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="15" />
+	</entity>
 
 </unit>

@@ -33,13 +33,13 @@ public class CompanyGenerationPersonTracker {
     //region Variable Declarations
     private CompanyGenerationPersonType personType;
     private Person person;
-    private AtBRandomMechParameters parameters;
+    private AtBRandomMekParameters parameters;
     private Entity entity;
     //endregion Variable Declarations
 
     //region Constructors
     public CompanyGenerationPersonTracker(final Person person) {
-        this(CompanyGenerationPersonType.MECHWARRIOR, person);
+        this(CompanyGenerationPersonType.MEKWARRIOR, person);
     }
 
     public CompanyGenerationPersonTracker(final CompanyGenerationPersonType personType,
@@ -68,11 +68,11 @@ public class CompanyGenerationPersonTracker {
         this.person = person;
     }
 
-    public @Nullable AtBRandomMechParameters getParameters() {
+    public @Nullable AtBRandomMekParameters getParameters() {
         return parameters;
     }
 
-    public void setParameters(final @Nullable AtBRandomMechParameters parameters) {
+    public void setParameters(final @Nullable AtBRandomMekParameters parameters) {
         this.parameters = parameters;
     }
 

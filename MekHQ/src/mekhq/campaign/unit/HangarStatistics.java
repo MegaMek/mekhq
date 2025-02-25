@@ -75,8 +75,8 @@ public class HangarStatistics {
                 hashMap.put(Entity.ETYPE_FIGHTER_SQUADRON, hashMap.getOrDefault(Entity.ETYPE_FIGHTER_SQUADRON, 0) + 1);
             } else if (en instanceof Jumpship) {
                 hashMap.put(Entity.ETYPE_JUMPSHIP, hashMap.getOrDefault(Entity.ETYPE_JUMPSHIP, 0) + 1);
-            } else if (en instanceof Mech) {
-                hashMap.put(Entity.ETYPE_MECH, hashMap.getOrDefault(Entity.ETYPE_MECH, 0) + 1);
+            } else if (en instanceof Mek) {
+                hashMap.put(Entity.ETYPE_MEK, hashMap.getOrDefault(Entity.ETYPE_MEK, 0) + 1);
             } else if (en instanceof Dropship) {
                 hashMap.put(Entity.ETYPE_DROPSHIP, hashMap.getOrDefault(Entity.ETYPE_DROPSHIP, 0) + 1);
             } else if (en instanceof SmallCraft) {
@@ -101,8 +101,8 @@ public class HangarStatistics {
                     hashMap.put(Entity.ETYPE_TANK | SUPER_HEAVY_BIT,
                             hashMap.getOrDefault(Entity.ETYPE_TANK | SUPER_HEAVY_BIT, 0) + 1);
                 }
-            } else if (en instanceof Protomech) {
-                hashMap.put(Entity.ETYPE_PROTOMECH, hashMap.getOrDefault(Entity.ETYPE_PROTOMECH, 0) + 1);
+            } else if (en instanceof ProtoMek) {
+                hashMap.put(Entity.ETYPE_PROTOMEK, hashMap.getOrDefault(Entity.ETYPE_PROTOMEK, 0) + 1);
             }
         }
 
@@ -126,8 +126,8 @@ public class HangarStatistics {
 
         int num = bayMap.getOrDefault(key, 0);
 
-        if (type == Entity.ETYPE_MECH) {
-            return Math.min(getTotalMechBays(), num);
+        if (type == Entity.ETYPE_MEK) {
+            return Math.min(getTotalMekBays(), num);
         }
 
         // Okay to do an equality check here because this is the hash key, not the entity's ETYPE value.
@@ -154,8 +154,8 @@ public class HangarStatistics {
             return Math.min(getTotalSmallCraftBays(), num);
         }
 
-        if (type == Entity.ETYPE_PROTOMECH) {
-            return Math.min(getTotalProtomechBays(), num);
+        if (type == Entity.ETYPE_PROTOMEK) {
+            return Math.min(getTotalProtomekBays(), num);
         }
 
         if (type == Entity.ETYPE_DROPSHIP) {
@@ -165,9 +165,9 @@ public class HangarStatistics {
         return -1; // default, this is an error condition
     }
 
-    public int getTotalMechBays() {
+    public int getTotalMekBays() {
         return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getMechCapacity)
+            .mapToDouble(Unit::getMekCapacity)
             .sum());
     }
 
@@ -207,9 +207,9 @@ public class HangarStatistics {
             .sum());
     }
 
-    public int getTotalProtomechBays() {
+    public int getTotalProtomekBays() {
         return (int) Math.round(getHangar().getUnitsStream()
-            .mapToDouble(Unit::getProtomechCapacity)
+            .mapToDouble(Unit::getProtoMekCapacity)
             .sum());
     }
 

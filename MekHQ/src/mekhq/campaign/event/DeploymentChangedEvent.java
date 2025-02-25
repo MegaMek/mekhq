@@ -24,13 +24,14 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.Unit;
 
 /**
- * Triggered when a force or unit is deployed to a scenario or undeployed from it.
+ * Triggered when a force or unit is deployed to a scenario or undeployed from
+ * it.
  *
  */
 public class DeploymentChangedEvent extends ScenarioChangedEvent {
 
-    final private Unit unit;
-    final private Force force;
+    private final Unit unit;
+    private final Force force;
 
     public DeploymentChangedEvent(Unit unit, Scenario scenario) {
         super(scenario);

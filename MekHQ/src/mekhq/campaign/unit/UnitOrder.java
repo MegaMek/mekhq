@@ -20,20 +20,22 @@
  */
 package mekhq.campaign.unit;
 
+import java.io.PrintWriter;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * We use an extension of unit to create a unit order acquisition work
@@ -41,6 +43,7 @@ import java.io.PrintWriter;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class UnitOrder extends Unit implements IAcquisitionWork {
+    private static final MMLogger logger = MMLogger.create(UnitOrder.class);
 
     int quantity;
     int daysToWait;
@@ -95,8 +98,9 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
     @Override
     public String getAcquisitionName() {
         // This cannot be hyperlinked name due to the fact that we have a null unit ID
-        // Also, the field this goes into does not currently support html, and would need our listener attached
-        //  - Dylan
+        // Also, the field this goes into does not currently support html, and would
+        // need our listener attached
+        // - Dylan
         return getName();
     }
 
@@ -115,17 +119,16 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
 
     @Override
     public Object getNewEquipment() {
-        String name = getEntity().getChassis() + " " + getEntity().getModel();
-        name = name.trim();
-        MechSummary summary = MechSummaryCache.getInstance().getMech(name);
+        String name = getEntity().getShortNameRaw();
+        MekSummary summary = MekSummaryCache.getInstance().getMek(name);
         if (null == summary) {
-            LogManager.getLogger().error("Could not find a mech summary for " + name);
+            logger.error("Could not find a mek summary for " + name);
             return null;
         }
         try {
-            return new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+            return new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
         } catch (EntityLoadingException e) {
-            LogManager.getLogger().error("Could not load " + summary.getEntryName());
+            logger.error("Could not load " + summary.getEntryName());
             return null;
         }
     }
@@ -180,38 +183,42 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
 
     @Override
     public String find(int transitDays) {
-        //TODO: probably get a duplicate entity
+        // TODO: probably get a duplicate entity
         if (getCampaign().getQuartermaster().buyUnit((Entity) getNewEquipment(), transitDays)) {
-            return "<font color='green'><b> unit found</b>.</font> It will be delivered in " + transitDays + " days.";
+            return "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
+                    + "'><b> unit found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
-            return "<font color='red'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";
+            return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                    + "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";
         }
     }
 
     @Override
     public String failToFind() {
-        return "<font color='red'><b> unit not found</b>.</font>";
+        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                + "'><b> unit not found</b>.</font>";
     }
 
     @Override
     public TargetRoll getAllAcquisitionMods() {
         TargetRoll target = new TargetRoll();
         if (!entity.isCanon()) {
-            //TODO: custom job
+            // TODO: custom job
         }
         if (entity.isClan() && getCampaign().getCampaignOptions().getClanAcquisitionPenalty() > 0) {
             target.addModifier(getCampaign().getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
         } else if (getCampaign().getCampaignOptions().getIsAcquisitionPenalty() > 0) {
             target.addModifier(getCampaign().getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
         }
-        //TODO: Fix weight classes
-        //TODO: aero large craft
-        //TODO: support vehicles
-        if (entity instanceof Mech) {
-            if (!((Mech) entity).isIndustrial()) {
-                target.addModifier(0, "BattleMech");
+        // TODO: Fix weight classes
+        // TODO: aero large craft
+        // TODO: support vehicles
+        // see EntityWeightClass.java in megamek for weight classes
+        if (entity instanceof Mek) {
+            if (!((Mek) entity).isIndustrial()) {
+                target.addModifier(0, "BattleMek");
             } else {
-                target.addModifier(-1, "IndustrialMech");
+                target.addModifier(-1, "IndustrialMek");
             }
             switch (entity.getWeightClass()) {
                 case EntityWeightClass.WEIGHT_LIGHT:
@@ -226,6 +233,18 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
                 case EntityWeightClass.WEIGHT_ASSAULT:
                 default:
                     target.addModifier(3, "Assault");
+            }
+        } else if (entity instanceof SupportTank) {
+            switch (entity.getWeightClass()) {
+                case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                    target.addModifier(-1, "Small Support");
+                    break;
+                case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                    target.addModifier(0, "Medium Support");
+                    break;
+                case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                    target.addModifier(1, "Large Support");
+                    break;
             }
         } else if (entity instanceof BattleArmor) {
             target.addModifier(0, "BattleArmor");
@@ -256,7 +275,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
                     target.addModifier(3, "Assault");
             }
         } else if (entity instanceof ConvFighter) {
-            target.addModifier(+0, "Conventional Fighter");
+            target.addModifier(0, "Conventional Fighter");
         } else if (entity instanceof Aero) {
             target.addModifier(0, "Aerospace Fighter");
             switch (entity.getWeightClass()) {
@@ -273,10 +292,10 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
                 default:
                     target.addModifier(3, "Assault");
             }
-        } else if (entity instanceof Protomech) {
-            target.addModifier(+1, "Protomech");
+        } else if (entity instanceof ProtoMek) {
+            target.addModifier(+1, "ProtoMek");
         }
-        //parts need to be initialized for this to work
+        // parts need to be initialized for this to work
         int avail = getAvailability();
         if (this.isExtinctIn(getCampaign().getGameYear())) {
             avail = EquipmentType.RATING_X;
@@ -286,10 +305,10 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
         return target;
     }
 
-
     @Override
     public int getAvailability() {
-        return calcYearAvailability(getCampaign().getGameYear(), getCampaign().useClanTechBase(), getCampaign().getTechFaction());
+        return calcYearAvailability(getCampaign().getGameYear(), getCampaign().useClanTechBase(),
+                getCampaign().getTechFaction());
     }
 
     @Override
@@ -343,7 +362,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
 
         retVal.initializeParts(false);

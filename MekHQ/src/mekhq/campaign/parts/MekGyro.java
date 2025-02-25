@@ -20,26 +20,29 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Compute;
 import megamek.common.CriticalSlot;
-import megamek.common.Mech;
+import megamek.common.Mek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.SkillType;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MekGyro extends Part {
+    private static final MMLogger logger = MMLogger.create(MekGyro.class);
+
     protected int type;
     protected double gyroTonnage;
     protected boolean isClan;
@@ -55,7 +58,7 @@ public class MekGyro extends Part {
     public MekGyro(int tonnage, int type, double gyroTonnage, boolean isClan, Campaign c) {
         super(tonnage, c);
         this.type = type;
-        this.name = Mech.getGyroTypeString(type);
+        this.name = Mek.getGyroTypeString(type);
         this.gyroTonnage = gyroTonnage;
         this.isClan = isClan;
     }
@@ -77,11 +80,11 @@ public class MekGyro extends Part {
 
     public static double getGyroTonnage(int walkMP, int gyroType, int unitTonnage) {
         int gyroBaseTonnage = MekGyro.getGyroBaseTonnage(walkMP, unitTonnage);
-        if (gyroType == Mech.GYRO_XL) {
+        if (gyroType == Mek.GYRO_XL) {
             return gyroBaseTonnage * 0.5;
-        } else if (gyroType == Mech.GYRO_COMPACT) {
+        } else if (gyroType == Mek.GYRO_COMPACT) {
             return gyroBaseTonnage * 1.5;
-        } else if (gyroType == Mech.GYRO_HEAVY_DUTY) {
+        } else if (gyroType == Mek.GYRO_HEAVY_DUTY) {
             return gyroBaseTonnage * 2;
         }
 
@@ -95,11 +98,11 @@ public class MekGyro extends Part {
 
     @Override
     public Money getStickerPrice() {
-        if (getType() == Mech.GYRO_XL) {
+        if (getType() == Mek.GYRO_XL) {
             return Money.of(750000.0 * getTonnage());
-        } else if (getType() == Mech.GYRO_COMPACT) {
+        } else if (getType() == Mek.GYRO_COMPACT) {
             return Money.of(400000.0 * getTonnage());
-        } else if (getType() == Mech.GYRO_HEAVY_DUTY) {
+        } else if (getType() == Mek.GYRO_HEAVY_DUTY) {
             return Money.of(500000.0 * getTonnage());
         } else {
             return Money.of(300000.0 * getTonnage());
@@ -140,7 +143,7 @@ public class MekGyro extends Part {
                     uTonnage = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
         if (gyroTonnage == 0) {
@@ -153,7 +156,7 @@ public class MekGyro extends Part {
     public void fix() {
         super.fix();
         if (null != unit) {
-            unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
+            unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_GYRO, Mek.LOC_CT);
         }
 
     }
@@ -166,7 +169,7 @@ public class MekGyro extends Part {
     @Override
     public void remove(boolean salvage) {
         if (null != unit) {
-            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
+            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_GYRO, Mek.LOC_CT);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
                 campaign.getWarehouse().removePart(this);
@@ -187,7 +190,7 @@ public class MekGyro extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if (null != unit) {
             int priorHits = hits;
-            hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
+            hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_GYRO, Mek.LOC_CT);
             if (checkForDestruction && hits > priorHits && hits >= 3
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
@@ -226,9 +229,9 @@ public class MekGyro extends Part {
     public void updateConditionFromPart() {
         if (null != unit) {
             if (hits == 0) {
-                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_GYRO, Mek.LOC_CT);
             } else {
-                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, hits);
+                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_GYRO, hits);
             }
         }
     }
@@ -238,8 +241,8 @@ public class MekGyro extends Part {
         if (null == unit) {
             return null;
         }
-        if (!isSalvaging() && unit.isLocationBreached(Mech.LOC_CT)) {
-            return unit.getEntity().getLocationName(Mech.LOC_CT) + " is breached.";
+        if (!isSalvaging() && unit.isLocationBreached(Mek.LOC_CT)) {
+            return unit.getEntity().getLocationName(Mek.LOC_CT) + " is breached.";
         }
         return null;
     }
@@ -251,7 +254,7 @@ public class MekGyro extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MECH);
+        return skillType.equals(SkillType.S_TECH_MEK);
     }
 
     @Override
@@ -260,22 +263,22 @@ public class MekGyro extends Part {
         return null;
     }
 
-    public static final int GYRO_STANDARD = Mech.GYRO_STANDARD;
+    public static final int GYRO_STANDARD = Mek.GYRO_STANDARD;
 
-    public static final int GYRO_XL = Mech.GYRO_XL;
+    public static final int GYRO_XL = Mek.GYRO_XL;
 
-    public static final int GYRO_COMPACT = Mech.GYRO_COMPACT;
+    public static final int GYRO_COMPACT = Mek.GYRO_COMPACT;
 
-    public static final int GYRO_HEAVY_DUTY = Mech.GYRO_HEAVY_DUTY;
+    public static final int GYRO_HEAVY_DUTY = Mek.GYRO_HEAVY_DUTY;
 
     @Override
     public int getLocation() {
-        return Mech.LOC_CT;
+        return Mek.LOC_CT;
     }
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        return Mech.getGyroTechAdvancement(type);
+        return Mek.getGyroTechAdvancement(type);
     }
 
     @Override

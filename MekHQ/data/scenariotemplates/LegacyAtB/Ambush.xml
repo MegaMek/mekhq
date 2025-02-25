@@ -2,11 +2,11 @@
 <ScenarioTemplate>
     <name>Special Scenario: Ambush</name>
     <shortBriefing></shortBriefing>
-    <detailedBriefing>One of your MechWarriors has been ambushed by hostile forces. Destroy them.</detailedBriefing>
+    <detailedBriefing>One of your MekWarriors has been ambushed by hostile forces. Destroy them.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
-        <allowedTerrainTypes/>
+        <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
         <baseHeight>0</baseHeight>
         <baseWidth>0</baseWidth>
@@ -40,7 +40,7 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces/>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -48,7 +48,7 @@
             </value>
         </entry>
         <entry>
-            <key>Primary Opfor</key>
+            <key>OpFor</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
@@ -66,12 +66,12 @@
                 <fixedUnitCount>2</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Primary Opfor</forceName>
+                <forceName>OpFor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces/>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -79,5 +79,5 @@
             </value>
         </entry>
     </scenarioForces>
-    <scenarioObjectives/>
+    <scenarioObjectives />
 </ScenarioTemplate>

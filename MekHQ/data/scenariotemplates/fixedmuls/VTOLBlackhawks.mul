@@ -1,125 +1,157 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<unit version="0.49.16-SNAPSHOT" >
+<unit version="0.49.16-SNAPSHOT">
 
-		<entity chassis="Strike Falcon Attack VTOL" model="" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" elevation="1" externalId="521b10c6-2171-4da5-892a-d33453c46c00">
-			<pilot size="3" name="Parveen MacLeish" nick="" gender="FEMALE" gunnery="3" piloting="4" externalId="dd92651f-0114-420f-a07a-ae1b0a271c87" ejected="false"/>
-      <motive damage="0" penalty="0"/>
-      Tanks have special needs, so don't delete any ammo slots.
-      The first slot in a location is at index="1".
-			<location index="0"> Body
-				<slot index="2" type="IS Ammo SRM-4" shots="25"/>
-				<slot index="3" type="IS Machine Gun Ammo - Half" shots="100"/>
-			</location>
-			<Game id="3"/>
-		</entity>
+	<entity chassis="Strike Falcon Attack VTOL" model="" type="VTOL" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" elevation="1"
+		externalId="521b10c6-2171-4da5-892a-d33453c46c00">
+		<pilot size="3" name="Parveen MacLeish" nick="" gender="FEMALE" gunnery="3" piloting="4"
+			externalId="dd92651f-0114-420f-a07a-ae1b0a271c87" ejected="false" />
+      <motive damage="0"
+			penalty="0" /> Tanks have special needs, so don't delete any ammo slots. The first slot in a
+		location is at index="1". <location index="0"> Body <slot index="2" type="IS Ammo SRM-4"
+				shots="25" />
+				<slot index="3" type="IS Machine Gun Ammo - Half" shots="100" />
+		</location>
+			<Game
+			id="3" />
+	</entity>
 
-		<entity chassis="Strike Falcon Attack VTOL" model="" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" elevation="1" externalId="22da0c59-768a-4ef4-af89-51d5c0357337">
-			<pilot size="3" name="Derforgala Crew" nick="" gender="FEMALE" gunnery="4" piloting="4" externalId="e247e7f8-8d02-4dea-bae9-68a68a65c3cd" ejected="false"/>
-      <motive damage="0" penalty="0"/>
-      Tanks have special needs, so don't delete any ammo slots.
-      The first slot in a location is at index="1".
-			<location index="0"> Body
-				<slot index="2" type="IS Ammo SRM-4" shots="25"/>
-				<slot index="3" type="IS Machine Gun Ammo - Half" shots="100"/>
-			</location>
-			<Game id="4"/>
-		</entity>
+	<entity chassis="Strike Falcon Attack VTOL" model="" type="VTOL" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" elevation="1"
+		externalId="22da0c59-768a-4ef4-af89-51d5c0357337">
+		<pilot size="3" name="Derforgala Crew" nick="" gender="FEMALE" gunnery="4" piloting="4"
+			externalId="e247e7f8-8d02-4dea-bae9-68a68a65c3cd" ejected="false" />
+      <motive damage="0"
+			penalty="0" /> Tanks have special needs, so don't delete any ammo slots. The first slot in a
+		location is at index="1". <location index="0"> Body <slot index="2" type="IS Ammo SRM-4"
+				shots="25" />
+				<slot index="3" type="IS Machine Gun Ammo - Half" shots="100" />
+		</location>
+			<Game
+			id="4" />
+	</entity>
 
-		<entity chassis="Strike Falcon Attack VTOL" model="" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" elevation="1" externalId="34fe3442-1512-4aa9-92e6-2fb92999ec2b">
-			<pilot size="3" name="Gonorata Strilich" nick="" gender="FEMALE" gunnery="4" piloting="4" externalId="fc1aa41a-1e3d-4bd5-b453-dc9071c0f476" ejected="false"/>
-      <motive damage="0" penalty="0"/>
-      Tanks have special needs, so don't delete any ammo slots.
-      The first slot in a location is at index="1".
-			<location index="0"> Body
-				<slot index="2" type="IS Ammo SRM-4" shots="25"/>
-				<slot index="3" type="IS Machine Gun Ammo - Half" shots="100"/>
-			</location>
-			<Game id="5"/>
-		</entity>
+	<entity chassis="Strike Falcon Attack VTOL" model="" type="VTOL" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" elevation="1"
+		externalId="34fe3442-1512-4aa9-92e6-2fb92999ec2b">
+		<pilot size="3" name="Gonorata Strilich" nick="" gender="FEMALE" gunnery="4" piloting="4"
+			externalId="fc1aa41a-1e3d-4bd5-b453-dc9071c0f476" ejected="false" />
+      <motive damage="0"
+			penalty="0" /> Tanks have special needs, so don't delete any ammo slots. The first slot in a
+		location is at index="1". <location index="0"> Body <slot index="2" type="IS Ammo SRM-4"
+				shots="25" />
+				<slot index="3" type="IS Machine Gun Ammo - Half" shots="100" />
+		</location>
+			<Game
+			id="5" />
+	</entity>
 
-		<entity chassis="Strike Falcon Attack VTOL" model="" type="VTOL" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" elevation="1" externalId="0e387cac-82cf-435c-9a08-937a1f654641">
-			<pilot size="3" name="Zarek Sampras" nick="" gender="MALE" gunnery="4" piloting="4" externalId="a923a653-0e57-4299-9004-6024cfc4df04" ejected="false"/>
-      <motive damage="0" penalty="0"/>
-      Tanks have special needs, so don't delete any ammo slots.
-      The first slot in a location is at index="1".
-			<location index="0"> Body
-				<slot index="2" type="IS Ammo SRM-4" shots="25"/>
-				<slot index="3" type="IS Machine Gun Ammo - Half" shots="100"/>
-			</location>
-			<Game id="6"/>
-		</entity>
+	<entity chassis="Strike Falcon Attack VTOL" model="" type="VTOL" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" elevation="1"
+		externalId="0e387cac-82cf-435c-9a08-937a1f654641">
+		<pilot size="3" name="Zarek Sampras" nick="" gender="MALE" gunnery="4" piloting="4"
+			externalId="a923a653-0e57-4299-9004-6024cfc4df04" ejected="false" />
+      <motive damage="0"
+			penalty="0" /> Tanks have special needs, so don't delete any ammo slots. The first slot in a
+		location is at index="1". <location index="0"> Body <slot index="2" type="IS Ammo SRM-4"
+				shots="25" />
+				<slot index="3" type="IS Machine Gun Ammo - Half" shots="100" />
+		</location>
+			<Game
+			id="6" />
+	</entity>
 
-		<entity chassis="Jump Platoon" model="(Grenade Launcher)" type="Jump" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="d8d7305d-2a6e-403a-985e-01168b8a8914">
-			<pilot size="1" name="Blondell Magno" nick="" gender="FEMALE" gunnery="3" piloting="8" externalId="71f04fc0-56f3-42e1-a15f-f30db995548f" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Conveyance id="3"/>
-			<Game id="7"/>
-		</entity>
+	<entity chassis="Jump Platoon" model="(Grenade Launcher)" type="Jump" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="d8d7305d-2a6e-403a-985e-01168b8a8914">
+		<pilot size="1" name="Blondell Magno" nick="" gender="FEMALE" gunnery="3" piloting="8"
+			externalId="71f04fc0-56f3-42e1-a15f-f30db995548f" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Conveyance id="3" />
+		<Game id="7" />
+	</entity>
 
-		<entity chassis="Jump Platoon" model="(Grenade Launcher)" type="Jump" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="760d8f1c-f522-437f-9e78-929ee751dc4a">
-			<pilot size="1" name="Arnie Traill" nick="" gender="MALE" gunnery="4" piloting="8" externalId="e302fbcf-9ee0-4831-9d3b-de3d740044cc" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Conveyance id="4"/>
-			<Game id="8"/>
-		</entity>
+	<entity chassis="Jump Platoon" model="(Grenade Launcher)" type="Jump" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="760d8f1c-f522-437f-9e78-929ee751dc4a">
+		<pilot size="1" name="Arnie Traill" nick="" gender="MALE" gunnery="4" piloting="8"
+			externalId="e302fbcf-9ee0-4831-9d3b-de3d740044cc" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Conveyance id="4" />
+		<Game id="8" />
+	</entity>
 
-		<entity chassis="Foot Platoon" model="(Laser)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="7cd872db-477b-401f-9349-fa805f1ac476">
-			<pilot size="1" name="Genoveva Otero" nick="" gender="FEMALE" gunnery="4" piloting="8" externalId="5face558-0c52-431e-b01c-1faef4334eb1" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Conveyance id="3"/>
-			<Game id="9"/>
-		</entity>
+	<entity chassis="Foot Platoon" model="(Laser)" type="Leg" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="7cd872db-477b-401f-9349-fa805f1ac476">
+		<pilot size="1" name="Genoveva Otero" nick="" gender="FEMALE" gunnery="4" piloting="8"
+			externalId="5face558-0c52-431e-b01c-1faef4334eb1" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Conveyance id="3" />
+		<Game id="9" />
+	</entity>
 
-		<entity chassis="Foot Platoon" model="(Laser)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="1ed186b1-4568-4d93-a2be-8b4f6fad9b32">
-			<pilot size="1" name="George Saito" nick="" gender="MALE" gunnery="4" piloting="8" externalId="9104c507-7528-469f-9b74-a3aa21a09535" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Conveyance id="4"/>
-			<Game id="10"/>
-		</entity>
+	<entity chassis="Foot Platoon" model="(Laser)" type="Leg" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="1ed186b1-4568-4d93-a2be-8b4f6fad9b32">
+		<pilot size="1" name="George Saito" nick="" gender="MALE" gunnery="4" piloting="8"
+			externalId="9104c507-7528-469f-9b74-a3aa21a09535" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Conveyance id="4" />
+		<Game id="10" />
+	</entity>
 
-		<entity chassis="Jump Platoon" model="(Rifle)" type="Jump" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="5e004e8e-5f0e-4734-8e23-aec697e1ee31">
-			<pilot size="1" name="Callum Hannay" nick="" gender="MALE" gunnery="4" piloting="4" externalId="6864c2c4-a342-4684-b966-187801d2652a" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Conveyance id="5"/>
-			<Game id="11"/>
-		</entity>
+	<entity chassis="Jump Platoon" model="(Rifle)" type="Jump" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="5e004e8e-5f0e-4734-8e23-aec697e1ee31">
+		<pilot size="1" name="Callum Hannay" nick="" gender="MALE" gunnery="4" piloting="4"
+			externalId="6864c2c4-a342-4684-b966-187801d2652a" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Conveyance id="5" />
+		<Game id="11" />
+	</entity>
 
-		<entity chassis="Jump Platoon" model="(Rifle)" type="Jump" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="f5476e3d-11ca-4a3c-a9dc-c55408a80c43">
-			<pilot size="1" name="Kieran Granahan" nick="" gender="MALE" gunnery="3" piloting="4" externalId="68b54b2e-d305-4fdf-8ba1-73ecdc12e562" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Conveyance id="6"/>
-			<Game id="12"/>
-		</entity>
+	<entity chassis="Jump Platoon" model="(Rifle)" type="Jump" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="f5476e3d-11ca-4a3c-a9dc-c55408a80c43">
+		<pilot size="1" name="Kieran Granahan" nick="" gender="MALE" gunnery="3" piloting="4"
+			externalId="68b54b2e-d305-4fdf-8ba1-73ecdc12e562" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Conveyance id="6" />
+		<Game id="12" />
+	</entity>
 
-		<entity chassis="Foot Platoon" model="(SRM)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="dfe4c5c3-316a-4989-87aa-38e51a7f6e09">
-			<pilot size="1" name="Lucas Steinle" nick="" gender="MALE" gunnery="4" piloting="8" externalId="6485b81e-8ec1-4e6f-a04e-ed0addcab8c4" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Conveyance id="5"/>
-			<Game id="13"/>
-		</entity>
+	<entity chassis="Foot Platoon" model="(SRM)" type="Leg" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="dfe4c5c3-316a-4989-87aa-38e51a7f6e09">
+		<pilot size="1" name="Lucas Steinle" nick="" gender="MALE" gunnery="4" piloting="8"
+			externalId="6485b81e-8ec1-4e6f-a04e-ed0addcab8c4" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Conveyance id="5" />
+		<Game id="13" />
+	</entity>
 
-		<entity chassis="Foot Platoon" model="(SRM)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="67ebb31b-ddc9-48a4-9336-849469243d19">
-			<pilot size="1" name="Kai Imran" nick="" gender="MALE" gunnery="3" piloting="8" externalId="be549d4c-0d58-4b8c-b0ee-8219cc6cb98c" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Conveyance id="6"/>
-			<Game id="14"/>
-		</entity>
+	<entity chassis="Foot Platoon" model="(SRM)" type="Leg" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="67ebb31b-ddc9-48a4-9336-849469243d19">
+		<pilot size="1" name="Kai Imran" nick="" gender="MALE" gunnery="3" piloting="8"
+			externalId="be549d4c-0d58-4b8c-b0ee-8219cc6cb98c" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Conveyance id="6" />
+		<Game id="14" />
+	</entity>
 
 </unit>

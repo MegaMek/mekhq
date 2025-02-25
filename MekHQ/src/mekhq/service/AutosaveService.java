@@ -20,13 +20,6 @@
  */
 package mekhq.service;
 
-import megamek.codeUtilities.StringUtility;
-import megamek.common.annotations.Nullable;
-import mekhq.MHQConstants;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import org.apache.logging.log4j.LogManager;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
@@ -43,12 +36,21 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
 
+import megamek.codeUtilities.StringUtility;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+
 public class AutosaveService implements IAutosaveService {
-    //region Constructors
+    private static final MMLogger logger = MMLogger.create(AutosaveService.class);
+
+    // region Constructors
     public AutosaveService() {
 
     }
-    //endregion Constructors
+    // endregion Constructors
 
     @Override
     public void requestDayAdvanceAutosave(final Campaign campaign) {
@@ -83,17 +85,17 @@ public class AutosaveService implements IAutosaveService {
             final String fileName = getAutosaveFilename(campaign);
             if (!StringUtility.isNullOrBlank(fileName)) {
                 try (FileOutputStream fos = new FileOutputStream(fileName);
-                     GZIPOutputStream gos = new GZIPOutputStream(fos);
-                     OutputStreamWriter osw = new OutputStreamWriter(gos, StandardCharsets.UTF_8);
-                     PrintWriter writer = new PrintWriter(osw)) {
+                        GZIPOutputStream gos = new GZIPOutputStream(fos);
+                        OutputStreamWriter osw = new OutputStreamWriter(gos, StandardCharsets.UTF_8);
+                        PrintWriter writer = new PrintWriter(osw)) {
                     campaign.writeToXML(writer);
                     writer.flush();
                 }
             } else {
-                LogManager.getLogger().error("Unable to perform an autosave because of a null or empty file name");
+                logger.error("Unable to perform an autosave because of a null or empty file name");
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
     }
 
@@ -116,7 +118,7 @@ public class AutosaveService implements IAutosaveService {
                 if (autosaveFiles.get(index).delete()) {
                     autosaveFiles.remove(index);
                 } else {
-                    LogManager.getLogger().error("Unable to delete file " + autosaveFiles.get(index).getName());
+                    logger.error("Unable to delete file " + autosaveFiles.get(index).getName());
                     index++;
                 }
             }

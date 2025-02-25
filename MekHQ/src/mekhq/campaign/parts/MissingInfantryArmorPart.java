@@ -20,22 +20,25 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.Entity;
-import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.enums.PartRepairType;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
+import megamek.common.Entity;
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingInfantryArmorPart extends MissingPart {
+    private static final MMLogger logger = MMLogger.create(MissingInfantryArmorPart.class);
+
     private double damageDivisor;
     private boolean encumbering;
     private boolean spaceSuit;
@@ -48,7 +51,8 @@ public class MissingInfantryArmorPart extends MissingPart {
         this(0, null, 1.0, false, false, false, false, false, false);
     }
 
-    public MissingInfantryArmorPart(int tonnage, Campaign c, double divisor, boolean enc, boolean dest, boolean camo, boolean ir, boolean ecm, boolean space) {
+    public MissingInfantryArmorPart(int tonnage, Campaign c, double divisor, boolean enc, boolean dest, boolean camo,
+            boolean ir, boolean ecm, boolean space) {
         super(tonnage, c);
         this.damageDivisor = divisor;
         this.encumbering = enc;
@@ -99,7 +103,8 @@ public class MissingInfantryArmorPart extends MissingPart {
 
     @Override
     public Part getNewPart() {
-        return new InfantryArmorPart(getUnitTonnage(), campaign, damageDivisor, encumbering, dest, sneak_camo, sneak_ecm, sneak_ir, spaceSuit);
+        return new InfantryArmorPart(getUnitTonnage(), campaign, damageDivisor, encumbering, dest, sneak_camo,
+                sneak_ecm, sneak_ir, spaceSuit);
     }
 
     @Override
@@ -155,7 +160,7 @@ public class MissingInfantryArmorPart extends MissingPart {
                     spaceSuit = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }

@@ -20,35 +20,38 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.CriticalSlot;
-import megamek.common.Mech;
-import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.enums.PartRepairType;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
+import megamek.common.CriticalSlot;
+import megamek.common.Mek;
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingMekCockpit extends MissingPart {
+    private static final MMLogger logger = MMLogger.create(MissingMekCockpit.class);
+
     private int type;
     protected boolean isClan;
 
     public MissingMekCockpit() {
-        this(0, Mech.COCKPIT_STANDARD, false, null);
+        this(0, Mek.COCKPIT_STANDARD, false, null);
     }
 
-    public MissingMekCockpit(int tonnage, int t, boolean isClan,Campaign c) {
+    public MissingMekCockpit(int tonnage, int t, boolean isClan, Campaign c) {
         super(tonnage, c);
         this.type = t;
         this.isClan = isClan;
-        this.name = Mech.getCockpitDisplayString(type);
+        this.name = Mek.getCockpitDisplayString(type);
     }
 
     @Override
@@ -64,30 +67,30 @@ public class MissingMekCockpit extends MissingPart {
     @Override
     public double getTonnage() {
         switch (type) {
-            case Mech.COCKPIT_SMALL:
+            case Mek.COCKPIT_SMALL:
                 return 2.0;
-            case Mech.COCKPIT_TORSO_MOUNTED:
-            case Mech.COCKPIT_DUAL:
-            case Mech.COCKPIT_SUPERHEAVY:
-            case Mech.COCKPIT_SUPERHEAVY_INDUSTRIAL:
-            case Mech.COCKPIT_TRIPOD:
-            case Mech.COCKPIT_TRIPOD_INDUSTRIAL:
-            case Mech.COCKPIT_INTERFACE:
-            case Mech.COCKPIT_QUADVEE:
+            case Mek.COCKPIT_TORSO_MOUNTED:
+            case Mek.COCKPIT_DUAL:
+            case Mek.COCKPIT_SUPERHEAVY:
+            case Mek.COCKPIT_SUPERHEAVY_INDUSTRIAL:
+            case Mek.COCKPIT_TRIPOD:
+            case Mek.COCKPIT_TRIPOD_INDUSTRIAL:
+            case Mek.COCKPIT_INTERFACE:
+            case Mek.COCKPIT_QUADVEE:
                 return 4.0;
-            case Mech.COCKPIT_PRIMITIVE:
-            case Mech.COCKPIT_PRIMITIVE_INDUSTRIAL:
-            case Mech.COCKPIT_SUPERHEAVY_TRIPOD:
-            case Mech.COCKPIT_SUPERHEAVY_TRIPOD_INDUSTRIAL:
-            case Mech.COCKPIT_SMALL_COMMAND_CONSOLE:
+            case Mek.COCKPIT_PRIMITIVE:
+            case Mek.COCKPIT_PRIMITIVE_INDUSTRIAL:
+            case Mek.COCKPIT_SUPERHEAVY_TRIPOD:
+            case Mek.COCKPIT_SUPERHEAVY_TRIPOD_INDUSTRIAL:
+            case Mek.COCKPIT_SMALL_COMMAND_CONSOLE:
                 return 5.0;
-            case Mech.COCKPIT_COMMAND_CONSOLE:
+            case Mek.COCKPIT_COMMAND_CONSOLE:
                 return 6.0;
-            case Mech.COCKPIT_SUPERHEAVY_COMMAND_CONSOLE:
+            case Mek.COCKPIT_SUPERHEAVY_COMMAND_CONSOLE:
                 return 7.0;
-            case Mech.COCKPIT_STANDARD:
-            case Mech.COCKPIT_INDUSTRIAL:
-            case Mech.COCKPIT_VRRP:
+            case Mek.COCKPIT_STANDARD:
+            case Mek.COCKPIT_INDUSTRIAL:
+            case Mek.COCKPIT_VRRP:
             default:
                 return 3.0;
         }
@@ -112,7 +115,7 @@ public class MissingMekCockpit extends MissingPart {
                     type = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }
@@ -137,7 +140,7 @@ public class MissingMekCockpit extends MissingPart {
             return null;
         }
         for (int i = 0; i < unit.getEntity().locations(); i++) {
-            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, i) > 0) {
+            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_COCKPIT, i) > 0) {
                 if (unit.isLocationBreached(i)) {
                     return unit.getEntity().getLocationName(i) + " is breached.";
                 } else if (unit.isLocationDestroyed(i)) {
@@ -156,7 +159,7 @@ public class MissingMekCockpit extends MissingPart {
     @Override
     public void updateConditionFromPart() {
         if (null != unit) {
-            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT);
+            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_COCKPIT);
         }
     }
 
@@ -167,16 +170,16 @@ public class MissingMekCockpit extends MissingPart {
 
     @Override
     public int getLocation() {
-        if (type == Mech.COCKPIT_TORSO_MOUNTED) {
-            return Mech.LOC_CT;
+        if (type == Mek.COCKPIT_TORSO_MOUNTED) {
+            return Mek.LOC_CT;
         } else {
-            return Mech.LOC_HEAD;
+            return Mek.LOC_HEAD;
         }
     }
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        return Mech.getCockpitTechAdvancement(type);
+        return Mek.getCockpitTechAdvancement(type);
     }
 
     @Override

@@ -2,7 +2,7 @@
  * Money.java
  *
  * Copyright (c) 2019 - Vicente Cartas Espinel (vicente.cartas at outlook.com). All Rights Reserved.
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -128,6 +128,10 @@ public class Money implements Comparable<Money> {
 
     public Money minus(double amount) {
         return new Money(getWrapped().minus(amount));
+    }
+
+    public Money minus(List<Money> amounts) {
+        return new Money(getWrapped().minus((Iterable<BigMoney>) (amounts.stream().map(Money::getWrapped)::iterator)));
     }
 
     public Money multipliedBy(long amount) {

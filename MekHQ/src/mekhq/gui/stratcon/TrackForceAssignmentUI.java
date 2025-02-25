@@ -21,6 +21,7 @@ import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.gui.StratconPanel;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import java.awt.*;
@@ -69,14 +70,12 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
         getContentPane().add(forceAssignmentInstructions, gbc);
         gbc.gridy++;
 
-        JScrollPane forceListContainer = new JScrollPane();
-
-        ScenarioWizardLanceModel lanceModel;
+        JScrollPane forceListContainer = new JScrollPaneWithSpeed();
 
         // if we're waiting to assign primary forces, we can only do so from the current track
-        lanceModel = new ScenarioWizardLanceModel(campaign,
-                StratconRulesManager.getAvailableForceIDs(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX,
-                        campaign, ownerPanel.getCurrentTrack(), false, null, currentCampaignState));
+        ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign,
+            StratconRulesManager.getAvailableForceIDs(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX,
+                campaign, ownerPanel.getCurrentTrack(), false, null, currentCampaignState));
 
         availableForceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         availableForceList.setModel(lanceModel);
@@ -93,6 +92,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
 
         pack();
         repaint();
+        setModal(true);
     }
 
     /**
@@ -110,22 +110,17 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case CMD_CONFIRM:
-                // sometimes the scenario templates take a little while to load, we don't want the user
-                // clicking the button fifty times and getting a bunch of scenarios.
-                btnConfirm.setEnabled(false);
-                for (Force force : availableForceList.getSelectedValuesList()) {
-                    StratconRulesManager.deployForceToCoords(
-                            ownerPanel.getSelectedCoords(),
-                            force.getId(),
-                            campaign, currentCampaignState.getContract(),
-                            ownerPanel.getCurrentTrack(), false);
-                }
-                setVisible(false);
-                ownerPanel.repaint();
-                btnConfirm.setEnabled(true);
-                break;
+        if (e.getActionCommand().equals(CMD_CONFIRM)) {
+            // sometimes the scenario templates take a little while to load, we don't want the user
+            // clicking the button fifty times and getting a bunch of scenarios.
+            btnConfirm.setEnabled(false);
+            for (Force force : availableForceList.getSelectedValuesList()) {
+                StratconRulesManager.deployForceToCoords(ownerPanel.getSelectedCoords(),
+                    force.getId(), campaign, currentCampaignState.getContract(), ownerPanel.getCurrentTrack(), false);
+            }
+            setVisible(false);
+            ownerPanel.repaint();
+            btnConfirm.setEnabled(true);
         }
     }
 }

@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<unit version="0.49.13-SNAPSHOT" >
+<unit version="0.49.13-SNAPSHOT">
 
-		<entity chassis="Awesome" model="AWS-8Q" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="a647ca03-544c-4e95-8912-3ccf6ca9488b">
-			<pilot size="1" name="Admes Thanou" nick="Overheat" gender="MALE" gunnery="2" piloting="3" toughness="1" externalId="67aab0dc-45c5-491e-bb3f-be349370e02e" ejected="false" advantages="aptitude_piloting::some_like_it_hot" edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
-			<Game id="1"/>
-		</entity>
+	<entity chassis="Awesome" model="AWS-8Q" type="Biped" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="a647ca03-544c-4e95-8912-3ccf6ca9488b">
+		<pilot size="1" name="Admes Thanou" nick="Overheat" gender="MALE" gunnery="2" piloting="3"
+			toughness="1" externalId="67aab0dc-45c5-491e-bb3f-be349370e02e" ejected="false"
+			advantages="aptitude_piloting::some_like_it_hot"
+			edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails"
+			autoeject="true" />
+		<Game id="1" />
+	</entity>
 
 </unit>

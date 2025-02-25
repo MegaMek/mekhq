@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -22,9 +22,9 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
-import org.apache.logging.log4j.LogManager;
+import mekhq.utilities.MHQXMLUtility;
 
 import javax.xml.transform.Source;
 import java.io.File;
@@ -35,16 +35,19 @@ import java.util.TreeMap;
 
 /**
  * This represents a facility in the StratCon context
+ *
  * @author NickAragua
  */
 @XmlRootElement(name = "StratconFacility")
 public class StratconFacility implements Cloneable {
+    private static final MMLogger logger = MMLogger.create(StratconFacility.class);
+
     public enum FacilityType {
         MekBase,
         TankBase,
         AirBase,
         ArtilleryBase,
-        SupplyDepot,
+        SpacePort,
         DataCenter,
         IndustrialFacility,
         CommandCenter,
@@ -56,24 +59,27 @@ public class StratconFacility implements Cloneable {
     private ForceAlignment owner;
     private String displayableName;
     private FacilityType facilityType;
+    private String userDescription;
     private boolean visible;
     private int aggroRating;
     private List<String> sharedModifiers = new ArrayList<>();
     private List<String> localModifiers = new ArrayList<>();
     private String capturedDefinition;
     private boolean revealTrack;
+    private boolean increaseScanRange;
     private int scenarioOddsModifier;
-    private int weeklySPModifier;
+    private int monthlySPModifier;
     private boolean preventAerospace;
-    //TODO: post-MVP
-    //private Map<String, Integer> fixedGarrisonUnitStates = new HashMap<>();
+    // TODO: post-MVP
+    // private Map<String, Integer> fixedGarrisonUnitStates = new HashMap<>();
     private boolean isStrategicObjective;
     private List<StratconBiome> biomes = new ArrayList<>();
-    
+
     private transient TreeMap<Integer, StratconBiome> biomeTempMap = new TreeMap<>();
 
     /**
-     * A temporary variable used to track situations where changing the ownership of this facility
+     * A temporary variable used to track situations where changing the ownership of
+     * this facility
      * hinges upon multiple objectives
      */
     private transient int ownershipChangeScore;
@@ -89,16 +95,19 @@ public class StratconFacility implements Cloneable {
         clone.localModifiers = new ArrayList<>(localModifiers);
         clone.setCapturedDefinition(capturedDefinition);
         clone.revealTrack = revealTrack;
+        clone.increaseScanRange = increaseScanRange;
         clone.scenarioOddsModifier = scenarioOddsModifier;
-        clone.weeklySPModifier = weeklySPModifier;
+        clone.monthlySPModifier = monthlySPModifier;
         clone.preventAerospace = preventAerospace;
+        clone.userDescription = userDescription;
         clone.biomes = new ArrayList<>(biomes);
         ReconstructTransientData(clone);
         return clone;
     }
 
     /**
-     * Copies data from the source facility to here. Does cosmetic data. Reconstructs file-driven transient data.
+     * Copies data from the source facility to here. Does cosmetic data.
+     * Reconstructs file-driven transient data.
      */
     public void copyRulesDataFrom(StratconFacility facility) {
         setCapturedDefinition(facility.getCapturedDefinition());
@@ -106,10 +115,12 @@ public class StratconFacility implements Cloneable {
         setSharedModifiers(new ArrayList<>(facility.getSharedModifiers()));
         setOwner(facility.getOwner());
         setRevealTrack(facility.getRevealTrack());
+        setIncreaseScanRange(facility.getIncreaseScanRange());
         setScenarioOddsModifier(facility.getScenarioOddsModifier());
-        setWeeklySPModifier(facility.getWeeklySPModifier());
+        setMonthlySPModifier(facility.getMonthlySPModifier());
         setPreventAerospace(facility.preventAerospace());
         setBiomes(new ArrayList<>(facility.getBiomes()));
+        setUserDescription(facility.getUserDescription());
         ReconstructTransientData(this);
     }
 
@@ -154,7 +165,8 @@ public class StratconFacility implements Cloneable {
     }
 
     /**
-     * This is a list of scenario modifier IDs that affect scenarios in the same track as this facility.
+     * This is a list of scenario modifier IDs that affect scenarios in the same
+     * track as this facility.
      */
     public List<String> getSharedModifiers() {
         return sharedModifiers;
@@ -165,7 +177,8 @@ public class StratconFacility implements Cloneable {
     }
 
     /**
-     * This is a list of scenario modifier IDs that affect scenarios involving this facility directly.
+     * This is a list of scenario modifier IDs that affect scenarios involving this
+     * facility directly.
      */
     public List<String> getLocalModifiers() {
         return localModifiers;
@@ -235,6 +248,14 @@ public class StratconFacility implements Cloneable {
         this.revealTrack = revealTrack;
     }
 
+    public boolean getIncreaseScanRange() {
+        return increaseScanRange;
+    }
+
+    public void setIncreaseScanRange(boolean increaseScanRange) {
+        this.increaseScanRange = increaseScanRange;
+    }
+
     public int getScenarioOddsModifier() {
         return scenarioOddsModifier;
     }
@@ -243,30 +264,41 @@ public class StratconFacility implements Cloneable {
         this.scenarioOddsModifier = scenarioOddsModifier;
     }
 
-    public int getWeeklySPModifier() {
-        return weeklySPModifier;
-    }
-
-    public void setWeeklySPModifier(int weeklySPModifier) {
-        this.weeklySPModifier = weeklySPModifier;
+    /**
+     * @return The facility's monthly SP (Support Points) modifier as an integer.
+     */
+    public int getMonthlySPModifier() {
+        return monthlySPModifier;
     }
 
     /**
-     * Returns the biome temperature map (note: temperature mapping is in kelvins but stored in celsius)
+     * Sets a new value for the monthly SP (Support Points) modifier.
+     *
+     * @param monthlySPModifier The new monthly SP modifier value.
+     */
+    public void setMonthlySPModifier(int monthlySPModifier) {
+        this.monthlySPModifier = monthlySPModifier;
+    }
+
+    /**
+     * Returns the biome temperature map (note: temperature mapping is in kelvins
+     * but stored in celsius)
      */
     public TreeMap<Integer, StratconBiome> getBiomeTempMap() {
         return biomeTempMap;
     }
-    
+
     /**
-     * Attempt to deserialize an instance of a StratconFacility from the passed-in file name
+     * Attempt to deserialize an instance of a StratconFacility from the passed-in
+     * file name
+     *
      * @return Possibly an instance of a StratconFacility
      */
     public static StratconFacility deserialize(String fileName) {
         StratconFacility resultingFacility = null;
         File inputFile = new File(fileName);
         if (!inputFile.exists()) {
-            LogManager.getLogger().warn(String.format("Specified file %s does not exist", fileName));
+            logger.warn(String.format("Specified file %s does not exist", fileName));
             return null;
         }
 
@@ -279,14 +311,14 @@ public class StratconFacility implements Cloneable {
                 resultingFacility = facilityElement.getValue();
             }
         } catch (Exception e) {
-            LogManager.getLogger().error(String.format("Error Deserializing Facility %s", fileName), e);
+            logger.error(String.format("Error Deserializing Facility %s", fileName), e);
         }
-       
+
         ReconstructTransientData(resultingFacility);
 
         return resultingFacility;
     }
-    
+
     private static void ReconstructTransientData(StratconFacility facility) {
         for (StratconBiome biome : facility.getBiomes()) {
             facility.getBiomeTempMap().put(biome.allowedTemperatureLowerBound, biome);
@@ -299,5 +331,13 @@ public class StratconFacility implements Cloneable {
 
     public void setPreventAerospace(boolean preventAerospace) {
         this.preventAerospace = preventAerospace;
+    }
+
+    public String getUserDescription() {
+        return userDescription;
+    }
+
+    public void setUserDescription(String userDescription) {
+        this.userDescription = userDescription;
     }
 }

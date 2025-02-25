@@ -18,31 +18,34 @@
  */
 package mekhq.campaign.finances.financialInstitutions;
 
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.time.LocalDate;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.utilities.MHQXMLUtility;
+
 public class FinancialInstitution {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(FinancialInstitution.class);
+
+    // region Variable Declarations
     private String name;
     private LocalDate foundationDate;
     private LocalDate shutterDate;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public FinancialInstitution() {
         setName("");
         setFoundationDate(null);
         setShutterDate(null);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public void setName(final String name) {
         this.name = name;
     }
@@ -62,9 +65,9 @@ public class FinancialInstitution {
     public void setShutterDate(final @Nullable LocalDate shutterDate) {
         this.shutterDate = shutterDate;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
-    //region File I/O
+    // region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "institution");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", toString());
@@ -94,11 +97,11 @@ public class FinancialInstitution {
             }
             return financialInstitution;
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return null;
         }
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

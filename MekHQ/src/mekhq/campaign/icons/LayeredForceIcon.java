@@ -18,40 +18,53 @@
  */
 package mekhq.campaign.icons;
 
-import megamek.common.annotations.Nullable;
-import megamek.common.icons.AbstractIcon;
-import mekhq.MHQStaticDirectoryManager;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.icons.enums.LayeredForceIconLayer;
-import org.apache.logging.log4j.LogManager;
+import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.PrintWriter;
-import java.util.List;
-import java.util.*;
+import megamek.common.annotations.Nullable;
+import megamek.common.icons.AbstractIcon;
+import megamek.logging.MMLogger;
+import mekhq.MHQStaticDirectoryManager;
+import mekhq.campaign.icons.enums.LayeredForceIconLayer;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
- * LayeredForceIcon is an implementation of StandardForceIcon that contains ForcePieceIcons for the
- * LayeredForceIconLayer layers. The icons stored are merged in a set order when the base image is
- * drawn, thereby allowing for the creation of a custom Force Icon from the various Pieces located
+ * LayeredForceIcon is an implementation of StandardForceIcon that contains
+ * ForcePieceIcons for the
+ * LayeredForceIconLayer layers. The icons stored are merged in a set order when
+ * the base image is
+ * drawn, thereby allowing for the creation of a custom Force Icon from the
+ * various Pieces located
  * in the Force Icon directory's Pieces category.
+ * 
  * @see LayeredForceIconLayer
  * @see ForcePieceIcon
  * @see StandardForceIcon
  * @see AbstractIcon
  */
 public class LayeredForceIcon extends StandardForceIcon {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(LayeredForceIcon.class);
+
+    // region Variable Declarations
     public static final String LAYERED_CATEGORY = "Layered";
     public static final String XML_TAG = "layeredForceIcon";
 
     private Map<LayeredForceIconLayer, List<ForcePieceIcon>> pieces = new HashMap<>();
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public LayeredForceIcon() {
         this(LAYERED_CATEGORY, DEFAULT_ICON_FILENAME);
     }
@@ -61,7 +74,7 @@ public class LayeredForceIcon extends StandardForceIcon {
     }
 
     public LayeredForceIcon(final String category, final String filename,
-                            final @Nullable Map<LayeredForceIconLayer, List<ForcePieceIcon>> pieces) {
+            final @Nullable Map<LayeredForceIconLayer, List<ForcePieceIcon>> pieces) {
         super(category, filename);
 
         if (pieces == null) {
@@ -71,9 +84,9 @@ public class LayeredForceIcon extends StandardForceIcon {
             setPieces(pieces);
         }
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public Map<LayeredForceIconLayer, List<ForcePieceIcon>> getPieces() {
         return pieces;
     }
@@ -81,7 +94,7 @@ public class LayeredForceIcon extends StandardForceIcon {
     public void setPieces(final Map<LayeredForceIconLayer, List<ForcePieceIcon>> pieces) {
         this.pieces = pieces;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
     @Override
     public Image getBaseImage() {
@@ -126,7 +139,7 @@ public class LayeredForceIcon extends StandardForceIcon {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
 
         // Fallback to the default force icon
@@ -135,14 +148,14 @@ public class LayeredForceIcon extends StandardForceIcon {
                 base = (BufferedImage) MHQStaticDirectoryManager.getForceIcons().getItem("",
                         DEFAULT_FORCE_ICON_FILENAME);
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         }
 
         return base;
     }
 
-    //region File I/O
+    // region File I/O
     @Override
     public void writeToXML(final PrintWriter pw, final int indent) {
         writeToXML(pw, indent, XML_TAG);
@@ -170,7 +183,7 @@ public class LayeredForceIcon extends StandardForceIcon {
         try {
             icon.parseNodes(wn.getChildNodes());
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return new LayeredForceIcon();
         }
         return icon;
@@ -210,7 +223,7 @@ public class LayeredForceIcon extends StandardForceIcon {
         }
         return pieces;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

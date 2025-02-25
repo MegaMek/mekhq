@@ -18,50 +18,60 @@
  */
 package mekhq.gui.dialog.iconDialogs;
 
+import java.awt.Container;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+
 import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.preferences.JSplitPanePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.panels.LayeredForceIconCreationPanel;
 import mekhq.gui.panels.StandardForceIconChooser;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
 
 /**
- * A LayeredForceIconDialog is used to select a Force Icon, which may be either a LayeredForceIcon
- * or a StandardForceIcon. It allows one to swap a force between the two types without issue, and
+ * A LayeredForceIconDialog is used to select a Force Icon, which may be either
+ * a LayeredForceIcon
+ * or a StandardForceIcon. It allows one to swap a force between the two types
+ * without issue, and
  * handles having both types open at the same time.
  */
 public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(LayeredForceIconDialog.class);
+
+    // region Variable Declarations
     private StandardForceIcon originalForceIcon;
 
     private JTabbedPane tabbedPane;
     private StandardForceIconChooser standardForceIconChooser;
     private LayeredForceIconCreationPanel layeredForceIconCreationPanel;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public LayeredForceIconDialog(final JFrame parent, final @Nullable StandardForceIcon originalForceIcon) {
         super(parent, "LayeredForceIconDialog", "LayeredForceIconDialog.title");
         if (originalForceIcon instanceof UnitIcon) {
-            LogManager.getLogger().error("This dialog was never designed for Unit Icon selection. Creating a standard force icon based on it, using the base null protections that provides.");
-            setOriginalForceIcon(new StandardForceIcon(originalForceIcon.getCategory(), originalForceIcon.getFilename()));
+            logger.error(
+                    "This dialog was never designed for Unit Icon selection. Creating a standard force icon based on it, using the base null protections that provides.");
+            setOriginalForceIcon(
+                    new StandardForceIcon(originalForceIcon.getCategory(), originalForceIcon.getFilename()));
         } else {
             setOriginalForceIcon(originalForceIcon);
         }
         initialize();
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public @Nullable StandardForceIcon getOriginalForceIcon() {
         return originalForceIcon;
     }
@@ -106,9 +116,9 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
             return getLayeredForceIconCreationPanel().createForceIcon();
         }
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
-    //region Initialization
+    // region Initialization
     @Override
     protected Container createCenterPane() {
         setTabbedPane(new JTabbedPane());
@@ -151,13 +161,16 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
         super.setCustomPreferences(preferences);
         preferences.manage(new JSplitPanePreference(getStandardForceIconChooser().getSplitPane()));
     }
-    //endregion Initialization
+    // endregion Initialization
 
-    //region Button Actions
+    // region Button Actions
     /**
-     * This does a complete directory refresh, starting with the StandardForceIconChooser (which
-     * refreshes the Force Icon directory and implements it), and then refreshing the
-     * implementations under the LayeredForceIconCreationPanel without actually refreshing the Force
+     * This does a complete directory refresh, starting with the
+     * StandardForceIconChooser (which
+     * refreshes the Force Icon directory and implements it), and then refreshing
+     * the
+     * implementations under the LayeredForceIconCreationPanel without actually
+     * refreshing the Force
      * Icon Directory.
      *
      * @param evt the triggering event
@@ -166,5 +179,5 @@ public class LayeredForceIconDialog extends AbstractMHQButtonDialog {
         getStandardForceIconChooser().refreshDirectory();
         getLayeredForceIconCreationPanel().refreshDirectory(false);
     }
-    //endregion Button Actions
+    // endregion Button Actions
 }

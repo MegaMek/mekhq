@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,51 +19,56 @@
 package mekhq.campaign.mission.enums;
 
 import megamek.common.Compute;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.universe.enums.EraFlag;
-import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
 public enum AtBContractType {
-    //region Enum Declarations
+    // TODO: Missing Camops Mission Types: ASSASSINATION, ESPIONAGE, MOLE_HUNTING, OBSERVATION_RAID,
+    //  RETAINER, SABOTAGE, TERRORISM, HIGH_RISK
+    // region Enum Declarations
     GARRISON_DUTY("AtBContractType.GARRISON_DUTY.text", "AtBContractType.GARRISON_DUTY.toolTipText", 18, 1.0),
     CADRE_DUTY("AtBContractType.CADRE_DUTY.text", "AtBContractType.CADRE_DUTY.toolTipText", 12, 0.8),
     SECURITY_DUTY("AtBContractType.SECURITY_DUTY.text", "AtBContractType.SECURITY_DUTY.toolTipText", 6, 1.2),
     RIOT_DUTY("AtBContractType.RIOT_DUTY.text", "AtBContractType.RIOT_DUTY.toolTipText", 4, 1.0),
-    PLANETARY_ASSAULT("AtBContractType.PLANETARY_ASSAULT.text", "AtBContractType.PLANETARY_ASSAULT.toolTipText", 9, 1.5),
+    PLANETARY_ASSAULT("AtBContractType.PLANETARY_ASSAULT.text", "AtBContractType.PLANETARY_ASSAULT.toolTipText", 9,
+            1.5),
     RELIEF_DUTY("AtBContractType.RELIEF_DUTY.text", "AtBContractType.RELIEF_DUTY.toolTipText", 9, 1.4),
-    GUERRILLA_WARFARE("AtBContractType.GUERRILLA_WARFARE.text", "AtBContractType.GUERRILLA_WARFARE.toolTipText", 24, 2.1),
+    GUERRILLA_WARFARE("AtBContractType.GUERRILLA_WARFARE.text", "AtBContractType.GUERRILLA_WARFARE.toolTipText", 24,
+            2.1),
     PIRATE_HUNTING("AtBContractType.PIRATE_HUNTING.text", "AtBContractType.PIRATE_HUNTING.toolTipText", 6, 1.0),
-    DIVERSIONARY_RAID("AtBContractType.DIVERSIONARY_RAID.text", "AtBContractType.DIVERSIONARY_RAID.toolTipText", 3, 1.8),
+    DIVERSIONARY_RAID("AtBContractType.DIVERSIONARY_RAID.text", "AtBContractType.DIVERSIONARY_RAID.toolTipText", 3,
+            1.8),
     OBJECTIVE_RAID("AtBContractType.OBJECTIVE_RAID.text", "AtBContractType.OBJECTIVE_RAID.toolTipText", 3, 1.6),
     RECON_RAID("AtBContractType.RECON_RAID.text", "AtBContractType.RECON_RAID.toolTipText", 3, 1.6),
     EXTRACTION_RAID("AtBContractType.EXTRACTION_RAID.text", "AtBContractType.EXTRACTION_RAID.toolTipText", 3, 1.6);
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String toolTipText;
     private final int constantLength;
-    private final double paymentMultiplier;
-    //endregion Variable Declarations
+    private final double operationsTempoMultiplier;
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     AtBContractType(final String name, final String toolTipText, final int constantLength,
-                    final double paymentMultiplier) {
+            final double operationsTempoMultiplier) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.constantLength = constantLength;
-        this.paymentMultiplier = paymentMultiplier;
+        this.operationsTempoMultiplier = operationsTempoMultiplier;
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public String getToolTipText() {
         return toolTipText;
     }
@@ -72,12 +77,12 @@ public enum AtBContractType {
         return constantLength;
     }
 
-    public double getPaymentMultiplier() {
-        return paymentMultiplier;
+    public double getOperationsTempoMultiplier() {
+        return operationsTempoMultiplier;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isGarrisonDuty() {
         return this == GARRISON_DUTY;
     }
@@ -133,7 +138,7 @@ public enum AtBContractType {
     public boolean isRaidType() {
         return isDiversionaryRaid() || isObjectiveRaid() || isReconRaid() || isExtractionRaid();
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
     public int calculateLength(final boolean variable, final AtBContract contract) {
         return variable ? calculateVariableLength(contract) : getConstantLength();
@@ -166,74 +171,60 @@ public enum AtBContractType {
     }
 
     /**
-     * AtB Rules apply an additional -1 from 2950 to 3040, which is superseded by MekHQ's era
-     * variation code
+     * Determines the availability level of parts and units based on the type of operation being
+     * conducted.
+     *
+     * <p>The availability level is represented as an integer and varies depending on the specific
+     * mission type. Higher values indicate worse availability, while lower values signify more
+     * restricted access to parts.
+     *
+     * @return an integer representing the availability level of parts for the current mission type.
      */
     public int calculatePartsAvailabilityLevel() {
-        switch (this) {
-            case GUERRILLA_WARFARE:
-                return 0;
-            case DIVERSIONARY_RAID:
-            case OBJECTIVE_RAID:
-            case RECON_RAID:
-            case EXTRACTION_RAID:
-                return 1;
-            case PLANETARY_ASSAULT:
-            case RELIEF_DUTY:
-                return 2;
-            case PIRATE_HUNTING:
-                return 3;
-            default:
-                return 4;
-        }
+        return switch (this) {
+            case GUERRILLA_WARFARE -> 2;
+            case DIVERSIONARY_RAID, OBJECTIVE_RAID, RECON_RAID, EXTRACTION_RAID -> 1;
+            case PLANETARY_ASSAULT, RELIEF_DUTY -> 0;
+            case PIRATE_HUNTING -> -1;
+            default -> -2;
+        };
     }
 
-    public AtBLanceRole getRequiredLanceRole() {
-        switch (this) {
-            case CADRE_DUTY:
-                return AtBLanceRole.TRAINING;
-            case GARRISON_DUTY:
-            case SECURITY_DUTY:
-            case RIOT_DUTY:
-                return AtBLanceRole.DEFENCE;
-            case GUERRILLA_WARFARE:
-            case PIRATE_HUNTING:
-            case PLANETARY_ASSAULT:
-            case RELIEF_DUTY:
-                return AtBLanceRole.FIGHTING;
-            case DIVERSIONARY_RAID:
-            case EXTRACTION_RAID:
-            case OBJECTIVE_RAID:
-            case RECON_RAID:
-                return AtBLanceRole.SCOUTING;
-            default:
-                return AtBLanceRole.UNASSIGNED;
-        }
+    /**
+     * Determines the required combat role for the current contract type.
+     *
+     * <p>Each contract type specifies a primary {@link CombatRole} that defines
+     * the focus of the contract. For example, some contracts may require a patrol role,
+     * while others require maneuver or frontline support.</p>
+     *
+     * @return the {@link CombatRole} required for the current contract type.
+     */
+    public CombatRole getRequiredCombatRole() {
+        return switch (this) {
+            case CADRE_DUTY -> CombatRole.TRAINING;
+            case GARRISON_DUTY, SECURITY_DUTY, RIOT_DUTY -> CombatRole.MANEUVER;
+            case GUERRILLA_WARFARE, PIRATE_HUNTING, PLANETARY_ASSAULT, RELIEF_DUTY -> CombatRole.FRONTLINE;
+            case DIVERSIONARY_RAID, EXTRACTION_RAID, OBJECTIVE_RAID, RECON_RAID -> CombatRole.PATROL;
+        };
     }
 
-    public int getFatigue() {
-        switch (this) {
-            case GARRISON_DUTY:
-            case SECURITY_DUTY:
-            case CADRE_DUTY:
-                return -1;
-            case RIOT_DUTY:
-            case PIRATE_HUNTING:
-                return 1;
-            case DIVERSIONARY_RAID:
-            case EXTRACTION_RAID:
-            case RECON_RAID:
-            case RELIEF_DUTY:
-            case OBJECTIVE_RAID:
-                return 2;
-            case GUERRILLA_WARFARE:
-            case PLANETARY_ASSAULT:
-                return 3;
-            default:
-                return 0;
+    /**
+     * Generates an event type for the campaign based on the current contract type.
+     *
+     * <p>This method calculates a random event, with probabilities defined by
+     * the type of contract. The result is used to trigger specific in-game scenarios or effects.</p>
+     *
+     * <p>If StratCon is enabled the event is instead generated by the
+     * {@link #generateStratConEvent()} method.</p>
+     *
+     * @param campaign the {@link Campaign} instance for which the event is being generated.
+     * @return an integer representing the event type.
+     */
+    public int generateEventType(Campaign campaign) {
+        if (campaign.getCampaignOptions().isUseStratCon()) {
+            return generateStratConEvent();
         }
-    }
-    public int generateEventType() {
+
         final int roll = Compute.randomInt(20) + 1;
 
         switch (this) {
@@ -347,100 +338,208 @@ public enum AtBContractType {
         }
     }
 
+    /**
+     * Generates an event type based on the current contract type.
+     *
+     * <p>This method is similar to {@link #generateEventType(Campaign)} but is specifically
+     * tailored for StratCon-enabled campaigns. It uses a die roll to determine the
+     * resulting event, with probabilities varying by contract type.</p>
+     *
+     * @return an integer representing the event type.
+     */
+    public int generateStratConEvent() {
+        final int roll = Compute.randomInt(20) + 1;
+
+        return switch (this) {
+            case DIVERSIONARY_RAID, OBJECTIVE_RAID, RECON_RAID, EXTRACTION_RAID -> {
+                if (roll < 14) {
+                    yield AtBContract.EVT_BONUSROLL;
+                } else if (roll < 16) {
+                    yield AtBContract.EVT_BETRAYAL;
+                } else if (roll < 17) {
+                    yield AtBContract.EVT_TREACHERY;
+                } else if (roll < 18) {
+                    yield AtBContract.EVT_LOGISTICSFAILURE;
+                } else if (roll < 19) {
+                    yield AtBContract.EVT_REINFORCEMENTS;
+                } else {
+                    yield AtBContract.EVT_SPECIALEVENTS;
+                }
+            }
+            case GARRISON_DUTY -> {
+                if (roll < 12) {
+                    yield AtBContract.EVT_BONUSROLL;
+                } else if (roll < 13) {
+                    yield AtBContract.EVT_CIVILDISTURBANCE;
+                } else if (roll < 14) {
+                    yield AtBContract.EVT_SPORADICUPRISINGS;
+                } else if (roll < 15) {
+                    yield AtBContract.EVT_REBELLION;
+                } else if (roll < 16) {
+                    yield AtBContract.EVT_BETRAYAL;
+                } else if (roll < 17) {
+                    yield AtBContract.EVT_TREACHERY;
+                } else if (roll < 18) {
+                    yield AtBContract.EVT_LOGISTICSFAILURE;
+                } else if (roll < 19) {
+                    yield AtBContract.EVT_REINFORCEMENTS;
+                } else {
+                    yield AtBContract.EVT_SPECIALEVENTS;
+                }
+            }
+            case RIOT_DUTY -> {
+                if (roll < 11) {
+                    yield AtBContract.EVT_BONUSROLL;
+                } else if (roll < 12) {
+                    yield AtBContract.EVT_CIVILDISTURBANCE;
+                } else if (roll < 13) {
+                    yield AtBContract.EVT_SPORADICUPRISINGS;
+                } else if (roll < 15) {
+                    yield AtBContract.EVT_REBELLION;
+                } else if (roll < 16) {
+                    yield AtBContract.EVT_BETRAYAL;
+                } else if (roll < 17) {
+                    yield AtBContract.EVT_TREACHERY;
+                } else if (roll < 18) {
+                    yield AtBContract.EVT_LOGISTICSFAILURE;
+                } else if (roll < 19) {
+                    yield AtBContract.EVT_REINFORCEMENTS;
+                } else {
+                    yield AtBContract.EVT_SPECIALEVENTS;
+                }
+            }
+            case PIRATE_HUNTING -> {
+                if (roll < 14) {
+                    yield AtBContract.EVT_BONUSROLL;
+                } else if (roll < 15) {
+                    yield AtBContract.EVT_CIVILDISTURBANCE;
+                } else if (roll < 16) {
+                    yield AtBContract.EVT_BETRAYAL;
+                } else if (roll < 17) {
+                    yield AtBContract.EVT_TREACHERY;
+                } else if (roll < 18) {
+                    yield AtBContract.EVT_LOGISTICSFAILURE;
+                } else if (roll < 19) {
+                    yield AtBContract.EVT_REINFORCEMENTS;
+                } else {
+                    yield AtBContract.EVT_SPECIALEVENTS;
+                }
+            }
+            default -> {
+                if (roll < 15) {
+                    yield AtBContract.EVT_BONUSROLL;
+                } else if (roll < 16) {
+                    yield AtBContract.EVT_BETRAYAL;
+                } else if (roll < 17) {
+                    yield AtBContract.EVT_TREACHERY;
+                } else if (roll < 18) {
+                    yield AtBContract.EVT_LOGISTICSFAILURE;
+                } else if (roll < 19) {
+                    yield AtBContract.EVT_REINFORCEMENTS;
+                } else {
+                    yield AtBContract.EVT_SPECIALEVENTS;
+                }
+            }
+        };
+    }
+
     public int generateSpecialScenarioType(final Campaign campaign) {
-        // Our roll is era-based. If it is pre-spaceflight, early spaceflight, or Age of War there
+        // Our roll is era-based. If it is pre-spaceflight, early spaceflight, or Age of
+        // War there
         // cannot be Star League Caches as the Star League hasn't formed
         final int roll = Compute.randomInt(campaign.getEra().hasFlag(EraFlag.PRE_SPACEFLIGHT,
                 EraFlag.EARLY_SPACEFLIGHT, EraFlag.AGE_OF_WAR) ? 12 : 20) + 1;
-        switch (this) {
-            case DIVERSIONARY_RAID:
-            case OBJECTIVE_RAID:
-            case RECON_RAID:
-            case EXTRACTION_RAID:
+        return switch (this) {
+            case DIVERSIONARY_RAID, OBJECTIVE_RAID, RECON_RAID, EXTRACTION_RAID -> {
                 if (roll <= 1) {
-                    return AtBScenario.OFFICERDUEL;
-                } else if (roll <= 2) {
-                    return AtBScenario.ACEDUEL;
+                    yield AtBScenario.OFFICERDUEL;
+                } else if (roll == 2) {
+                    yield AtBScenario.ACEDUEL;
                 } else if (roll <= 6) {
-                    return AtBScenario.AMBUSH;
-                } else if (roll <= 7) {
-                    return AtBScenario.CIVILIANHELP;
-                } else if (roll <= 8) {
-                    return AtBScenario.ALLIEDTRAITORS;
+                    yield AtBScenario.AMBUSH;
+                } else if (roll == 7) {
+                    yield AtBScenario.CIVILIANHELP;
+                } else if (roll == 8) {
+                    yield AtBScenario.ALLIEDTRAITORS;
                 } else if (roll <= 12) {
-                    return AtBScenario.PRISONBREAK;
+                    yield AtBScenario.PRISONBREAK;
                 } else if (roll <= 16) {
-                    return AtBScenario.STARLEAGUECACHE1;
+                    yield AtBScenario.STARLEAGUECACHE1;
                 } else {
-                    return AtBScenario.STARLEAGUECACHE2;
+                    yield AtBScenario.STARLEAGUECACHE2;
                 }
-            case GARRISON_DUTY:
+            }
+            case GARRISON_DUTY -> {
                 if (roll <= 2) {
-                    return AtBScenario.OFFICERDUEL;
+                    yield AtBScenario.OFFICERDUEL;
                 } else if (roll <= 4) {
-                    return AtBScenario.ACEDUEL;
+                    yield AtBScenario.ACEDUEL;
                 } else if (roll <= 6) {
-                    return AtBScenario.AMBUSH;
+                    yield AtBScenario.AMBUSH;
                 } else if (roll <= 10) {
-                    return AtBScenario.CIVILIANHELP;
+                    yield AtBScenario.CIVILIANHELP;
                 } else if (roll <= 12) {
-                    return AtBScenario.ALLIEDTRAITORS;
+                    yield AtBScenario.ALLIEDTRAITORS;
                 } else if (roll <= 16) {
-                    return AtBScenario.STARLEAGUECACHE1;
+                    yield AtBScenario.STARLEAGUECACHE1;
                 } else {
-                    return AtBScenario.STARLEAGUECACHE2;
+                    yield AtBScenario.STARLEAGUECACHE2;
                 }
-            case RIOT_DUTY:
+            }
+            case RIOT_DUTY -> {
                 if (roll <= 1) {
-                    return AtBScenario.OFFICERDUEL;
+                    yield AtBScenario.OFFICERDUEL;
                 } else if (roll <= 3) {
-                    return AtBScenario.ACEDUEL;
+                    yield AtBScenario.ACEDUEL;
                 } else if (roll <= 7) {
-                    return AtBScenario.AMBUSH;
-                } else if (roll <= 8) {
-                    return AtBScenario.CIVILIANHELP;
+                    yield AtBScenario.AMBUSH;
+                } else if (roll == 8) {
+                    yield AtBScenario.CIVILIANHELP;
                 } else if (roll <= 12) {
-                    return AtBScenario.ALLIEDTRAITORS;
+                    yield AtBScenario.ALLIEDTRAITORS;
                 } else if (roll <= 16) {
-                    return AtBScenario.STARLEAGUECACHE1;
+                    yield AtBScenario.STARLEAGUECACHE1;
                 } else {
-                    return AtBScenario.STARLEAGUECACHE2;
+                    yield AtBScenario.STARLEAGUECACHE2;
                 }
-            case PIRATE_HUNTING:
+            }
+            case PIRATE_HUNTING -> {
                 if (roll <= 1) {
-                    return AtBScenario.OFFICERDUEL;
+                    yield AtBScenario.OFFICERDUEL;
                 } else if (roll <= 4) {
-                    return AtBScenario.ACEDUEL;
+                    yield AtBScenario.ACEDUEL;
                 } else if (roll <= 7) {
-                    return AtBScenario.AMBUSH;
+                    yield AtBScenario.AMBUSH;
                 } else if (roll <= 11) {
-                    return AtBScenario.CIVILIANHELP;
-                } else if (roll <= 12) {
-                    return AtBScenario.ALLIEDTRAITORS;
+                    yield AtBScenario.CIVILIANHELP;
+                } else if (roll == 12) {
+                    yield AtBScenario.ALLIEDTRAITORS;
                 } else if (roll <= 16) {
-                    return AtBScenario.STARLEAGUECACHE1;
+                    yield AtBScenario.STARLEAGUECACHE1;
                 } else {
-                    return AtBScenario.STARLEAGUECACHE2;
+                    yield AtBScenario.STARLEAGUECACHE2;
                 }
-            default:
+            }
+            default -> {
                 if (roll <= 2) {
-                    return AtBScenario.OFFICERDUEL;
+                    yield AtBScenario.OFFICERDUEL;
                 } else if (roll <= 4) {
-                    return AtBScenario.ACEDUEL;
+                    yield AtBScenario.ACEDUEL;
                 } else if (roll <= 6) {
-                    return AtBScenario.AMBUSH;
+                    yield AtBScenario.AMBUSH;
                 } else if (roll <= 8) {
-                    return AtBScenario.CIVILIANHELP;
+                    yield AtBScenario.CIVILIANHELP;
                 } else if (roll <= 10) {
-                    return AtBScenario.ALLIEDTRAITORS;
+                    yield AtBScenario.ALLIEDTRAITORS;
                 } else if (roll <= 12) {
-                    return AtBScenario.PRISONBREAK;
+                    yield AtBScenario.PRISONBREAK;
                 } else if (roll <= 16) {
-                    return AtBScenario.STARLEAGUECACHE1;
+                    yield AtBScenario.STARLEAGUECACHE1;
                 } else {
-                    return AtBScenario.STARLEAGUECACHE2;
+                    yield AtBScenario.STARLEAGUECACHE2;
                 }
-        }
+            }
+        };
     }
 
     public int generateBigBattleType() {
@@ -504,7 +603,7 @@ public enum AtBContractType {
         }
     }
 
-    //region File I/O
+    // region File I/O
     /**
      * @param text containing the AtBContractType
      * @return the saved AtBContractType
@@ -549,11 +648,12 @@ public enum AtBContractType {
 
         }
 
-        LogManager.getLogger().error("Failed to parse text " + text + " into an AtBContractType, returning GARRISON_DUTY.");
+        MMLogger.create(AtBContractType.class)
+                .error("Failed to parse text " + text + " into an AtBContractType, returning GARRISON_DUTY.");
 
         return GARRISON_DUTY;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

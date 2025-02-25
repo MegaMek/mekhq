@@ -20,21 +20,30 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.*;
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
+import megamek.common.Aero;
+import megamek.common.ConvFighter;
+import megamek.common.Dropship;
+import megamek.common.Entity;
+import megamek.common.SimpleTechLevel;
+import megamek.common.SmallCraft;
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class StructuralIntegrity extends Part {
+    private static final MMLogger logger = MMLogger.create(StructuralIntegrity.class);
+
     // Slight variations for ASFs, CFs, and SC/DS
     static final TechAdvancement TA_ASF = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2200, 2470, 2490).setApproximate(true, false, false)
@@ -70,7 +79,6 @@ public class StructuralIntegrity extends Part {
         clone.pointsNeeded = this.pointsNeeded;
         return clone;
     }
-
 
     @Override
     public Money getStickerPrice() {
@@ -110,7 +118,7 @@ public class StructuralIntegrity extends Part {
                     pointsNeeded = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         }
     }

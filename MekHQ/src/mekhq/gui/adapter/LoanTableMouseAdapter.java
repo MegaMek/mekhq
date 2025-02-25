@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.adapter;
 
 import mekhq.MekHQ;
@@ -46,7 +64,7 @@ public class LoanTableMouseAdapter extends JPopupMenuAdapter {
             if (0 == JOptionPane
                     .showConfirmDialog(
                             null,
-                            "Defaulting on this loan will affect your unit rating the same as a contract breach.\nDo you wish to proceed?",
+                            "Defaulting on this loan will affect your unit rating.\nDo you wish to proceed?",
                             "Default on " + selectedLoan + "?", JOptionPane.YES_NO_OPTION)) {
                 PayCollateralDialog pcd = new PayCollateralDialog(
                         gui.getFrame(), true, gui.getCampaign(), selectedLoan);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,7 +18,9 @@
  */
 package mekhq.gui.view;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.options.IOption;
+import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -28,19 +30,20 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.education.Academy;
+import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.dialog.MedicalViewDialog;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
-import mekhq.gui.utilities.ImageHelpers;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.WrapLayout;
-import org.apache.logging.log4j.LogManager;
 
 import javax.accessibility.AccessibleRelation;
 import javax.swing.*;
@@ -54,12 +57,18 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
+import static mekhq.campaign.personnel.Person.getLoyaltyName;
+
 /**
  * A custom panel that gets filled in with goodies from a Person record
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class PersonViewPanel extends JScrollablePanel {
+    private static final MMLogger logger = MMLogger.create(PersonViewPanel.class);
+
     private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 4;
 
     private final CampaignGUI gui;
@@ -79,8 +88,6 @@ public class PersonViewPanel extends JScrollablePanel {
     }
 
     private void initComponents() {
-        GridBagConstraints gridBagConstraints;
-
         setLayout(new GridBagLayout());
         getAccessibleContext().setAccessibleName("Details for " + person.getFullName());
 
@@ -94,7 +101,7 @@ public class PersonViewPanel extends JScrollablePanel {
         add(pnlPortrait, gbc_pnlPortrait);
 
         JPanel pnlInfo = fillInfo();
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
@@ -188,6 +195,27 @@ public class PersonViewPanel extends JScrollablePanel {
             }
         }
 
+        if ((!person.getPersonalityDescription().isBlank())
+                && (campaign.getCampaignOptions().isUseRandomPersonalities())
+                && (!person.isChild(campaign.getLocalDate()))) { // we don't display for children, as most of the
+                                                                 // descriptions won't fit
+            JTextPane txtDesc = new JTextPane();
+            txtDesc.setName("personalityDescription");
+            txtDesc.setEditable(false);
+            txtDesc.setContentType("text/html");
+            txtDesc.setText(person.getPersonalityDescription());
+            txtDesc.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlPersonality.title")));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(txtDesc, gridBagConstraints);
+            gridy++;
+        }
+
         if (!person.getBiography().isBlank()) {
             JTextPane txtDesc = new JTextPane();
             txtDesc.setName("txtDesc");
@@ -212,11 +240,12 @@ public class PersonViewPanel extends JScrollablePanel {
             JPanel pnlLogHeader = new JPanel();
             pnlLogHeader.setName("pnlLogHeader");
             pnlLogHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlLogHeader.title")));
+            pnlLogHeader.setVisible(!campaign.getCampaignOptions().isDisplayPersonnelLog());
 
             JPanel pnlLog = fillLog();
-            pnlLog.setVisible(false);
             pnlLog.setName("pnlLog");
             pnlLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlLog.title")));
+            pnlLog.setVisible(campaign.getCampaignOptions().isDisplayPersonnelLog());
 
             pnlLogHeader.addMouseListener(getSwitchListener(pnlLogHeader, pnlLog));
             pnlLog.addMouseListener(getSwitchListener(pnlLog, pnlLogHeader));
@@ -236,7 +265,9 @@ public class PersonViewPanel extends JScrollablePanel {
         if (!person.getScenarioLog().isEmpty()) {
             JPanel pnlScenariosLogHeader = new JPanel();
             pnlScenariosLogHeader.setName("scenarioLogHeader");
-            pnlScenariosLogHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("scenarioLogHeader.title")));
+            pnlScenariosLogHeader
+                    .setBorder(BorderFactory.createTitledBorder(resourceMap.getString("scenarioLogHeader.title")));
+            pnlScenariosLogHeader.setVisible(!campaign.getCampaignOptions().isDisplayScenarioLog());
 
             JPanel pnlScenariosLog = fillScenarioLog();
 
@@ -244,11 +275,10 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlScenariosLog.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createTitledBorder(resourceMap.getString("scenarioLog.title")),
                     BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-            pnlScenariosLog.setVisible(false);
+            pnlScenariosLog.setVisible(campaign.getCampaignOptions().isDisplayScenarioLog());
 
             pnlScenariosLogHeader.addMouseListener(getSwitchListener(pnlScenariosLogHeader, pnlScenariosLog));
             pnlScenariosLog.addMouseListener(getSwitchListener(pnlScenariosLog, pnlScenariosLogHeader));
-
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -266,6 +296,7 @@ public class PersonViewPanel extends JScrollablePanel {
             JPanel pnlKillsHeader = new JPanel();
             pnlKillsHeader.setName("killsHeader");
             pnlKillsHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlKillsHeader.title")));
+            pnlKillsHeader.setVisible(!campaign.getCampaignOptions().isDisplayKillRecord());
 
             JPanel pnlKills = fillKillRecord();
 
@@ -273,7 +304,7 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlKills.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createTitledBorder(resourceMap.getString("pnlKills.title")),
                     BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-            pnlKills.setVisible(false);
+            pnlKills.setVisible(campaign.getCampaignOptions().isDisplayKillRecord());
 
             pnlKillsHeader.addMouseListener(getSwitchListener(pnlKillsHeader, pnlKills));
             pnlKills.addMouseListener(getSwitchListener(pnlKills, pnlKillsHeader));
@@ -320,7 +351,8 @@ public class PersonViewPanel extends JScrollablePanel {
         Box boxRibbons = Box.createVerticalBox();
         boxRibbons.add(Box.createRigidArea(new Dimension(100, 0)));
 
-        List<Award> awards = person.getAwardController().getAwards().stream().filter(a -> a.getNumberOfRibbonFiles() > 0)
+        List<Award> awards = person.getAwardController().getAwards().stream()
+                .filter(a -> a.getNumberOfRibbonFiles() > 0)
                 .sorted().collect(Collectors.toList());
         Collections.reverse(awards);
 
@@ -337,8 +369,11 @@ public class PersonViewPanel extends JScrollablePanel {
                 rowRibbonsBox.setBackground(Color.RED);
             }
             try {
-                int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
-                String ribbonFileName = award.getRibbonFileName(numberOfAwards);
+                int maximumTiers = award.getNumberOfRibbonFiles();
+                int awardTierCount = getAwardTierCount(award, maximumTiers);
+
+                String ribbonFileName = award.getRibbonFileName(awardTierCount);
+
                 ribbon = (Image) MHQStaticDirectoryManager.getAwardIcons()
                         .getItem(award.getSet() + "/ribbons/", ribbonFileName);
                 if (ribbon == null) {
@@ -346,10 +381,10 @@ public class PersonViewPanel extends JScrollablePanel {
                 }
                 ribbon = ribbon.getScaledInstance(25, 8, Image.SCALE_DEFAULT);
                 ribbonLabel.setIcon(new ImageIcon(ribbon));
-                ribbonLabel.setToolTipText(award.getTooltip());
+                ribbonLabel.setToolTipText(award.getTooltip(campaign.getCampaignOptions(), person));
                 rowRibbonsBox.add(ribbonLabel, 0);
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
 
             i++;
@@ -370,32 +405,72 @@ public class PersonViewPanel extends JScrollablePanel {
     }
 
     /**
+     * Returns the number of image tiers for an award based on the maximum number of
+     * tiers and the number of awards received.
+     *
+     * @param award        The award for which to calculate the number of tiers.
+     * @param maximumTiers The maximum number of tiers allowed for the award.
+     * @return The number of tiers for the award. The value is clamped between 1 and
+     *         the maximum number of tiers.
+     */
+    private int getAwardTierCount(Award award, int maximumTiers) {
+        int numAwards = person.getAwardController().getNumberOfAwards(award);
+        int tierSize = campaign.getCampaignOptions().getAwardTierSize();
+
+        int divisionResult = numAwards / tierSize;
+        int addition = (tierSize == 1) ? 0 : 1;
+
+        return MathUtility.clamp(
+                divisionResult + addition,
+                1, maximumTiers);
+    }
+
+    /**
      * Draws the medals above the personal log.
      */
     private JPanel drawMedals() {
         JPanel pnlMedals = new JPanel();
 
-        List<Award> awards = person.getAwardController().getAwards().stream().filter(a -> a.getNumberOfMedalFiles() > 0)
-                .sorted().collect(Collectors.toList());
+        List<Award> awards = new ArrayList<>();
+        for (Award award : person.getAwardController().getAwards()) {
+            if (award.getNumberOfMedalFiles() > 0) {
+                awards.add(award);
+            }
+        }
+        Collections.sort(awards);
 
         for (Award award : awards) {
             JLabel medalLabel = new JLabel();
 
             Image medal;
             try {
-                int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
-                String medalFileName = award.getMedalFileName(numberOfAwards);
+                int maximumTiers = award.getNumberOfMedalFiles();
+                int awardTierCount = getAwardTierCount(award, maximumTiers);
+
+                String medalFileName = award.getMedalFileName(awardTierCount);
+
                 medal = (Image) MHQStaticDirectoryManager.getAwardIcons()
                         .getItem(award.getSet() + "/medals/", medalFileName);
                 if (medal == null) {
                     continue;
                 }
-                medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30, 60), Image.SCALE_DEFAULT);
+
+                int width = medal.getWidth(null);
+                int height = medal.getHeight(null);
+
+                if (width == height) {
+                    medal = medal.getScaledInstance(40, 40, Image.SCALE_FAST);
+                } else if (width < height) {
+                    medal = medal.getScaledInstance(20, 40, Image.SCALE_FAST);
+                } else {
+                    medal = medal.getScaledInstance(40, 20, Image.SCALE_FAST);
+                }
+
                 medalLabel.setIcon(new ImageIcon(medal));
-                medalLabel.setToolTipText(award.getTooltip());
+                medalLabel.setToolTipText(award.getTooltip(campaign.getCampaignOptions(), person));
                 pnlMedals.add(medalLabel);
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
 
@@ -406,32 +481,52 @@ public class PersonViewPanel extends JScrollablePanel {
      * Draws the misc awards below the medals.
      */
     private JPanel drawMiscAwards() {
-        JPanel pnlMiscAwards = new JPanel();
-        ArrayList<Award> awards = person.getAwardController().getAwards().stream().filter(a -> a.getNumberOfMiscFiles() > 0)
-                .collect(Collectors.toCollection(ArrayList::new));
+        JPanel pnlMiscs = new JPanel();
+
+        List<Award> awards = new ArrayList<>();
+        for (Award award : person.getAwardController().getAwards()) {
+            if (award.getNumberOfMiscFiles() > 0) {
+                awards.add(award);
+            }
+        }
+        Collections.sort(awards);
 
         for (Award award : awards) {
             JLabel miscLabel = new JLabel();
 
-            Image miscAward;
+            Image misc;
             try {
-                int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
-                String miscFileName = award.getMiscFileName(numberOfAwards);
-                Image miscAwardBufferedImage = (Image) MHQStaticDirectoryManager.getAwardIcons()
-                        .getItem(award.getSet() + "/misc/", miscFileName);
-                if (miscAwardBufferedImage == null) {
+                int maximumTiers = award.getNumberOfMedalFiles();
+                int awardTierCount = getAwardTierCount(award, maximumTiers);
+
+                String miscFileName = award.getMiscFileName(awardTierCount);
+
+                misc = (Image) MHQStaticDirectoryManager.getAwardIcons()
+                    .getItem(award.getSet() + "/misc/", miscFileName);
+                if (misc == null) {
                     continue;
                 }
-                miscAward = ImageHelpers.getScaledForBoundaries(miscAwardBufferedImage, new Dimension(100, 100),
-                        Image.SCALE_DEFAULT);
-                miscLabel.setIcon(new ImageIcon(miscAward));
-                miscLabel.setToolTipText(award.getTooltip());
-                pnlMiscAwards.add(miscLabel);
+
+                int width = misc.getWidth(null);
+                int height = misc.getHeight(null);
+
+                if (width == height) {
+                    misc = misc.getScaledInstance(40, 40, Image.SCALE_FAST);
+                } else if (width < height) {
+                    misc = misc.getScaledInstance(20, 40, Image.SCALE_FAST);
+                } else {
+                    misc = misc.getScaledInstance(40, 20, Image.SCALE_FAST);
+                }
+
+                miscLabel.setIcon(new ImageIcon(misc));
+                miscLabel.setToolTipText(award.getTooltip(campaign.getCampaignOptions(), person));
+                pnlMiscs.add(miscLabel);
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
-        return pnlMiscAwards;
+
+        return pnlMiscs;
     }
 
     /**
@@ -479,6 +574,8 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblAge2 = new JLabel();
         JLabel lblGender1 = new JLabel();
         JLabel lblGender2 = new JLabel();
+        JLabel lblOriginalUnit1 = new JLabel();
+        JLabel lblOriginalUnit2 = new JLabel();
         JLabel lblDueDate1 = new JLabel();
         JLabel lblDueDate2 = new JLabel();
         JLabel lblRecruited1 = new JLabel();
@@ -486,16 +583,14 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblTimeServed1 = new JLabel();
         JLabel lblTimeServed2 = new JLabel();
 
-        GridBagConstraints gridBagConstraints;
-
-        int firsty = 0, secondy = 0;
+        int y = 0;
 
         lblType.setName("lblType");
         lblType.setText(String.format(resourceMap.getString("format.italic"), person.getRoleDesc()));
         lblType.getAccessibleContext().setAccessibleName("Role: " + person.getRoleDesc());
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = firsty;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 4;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
@@ -503,13 +598,13 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInfo.add(lblType, gridBagConstraints);
-        firsty++;
+        y++;
 
         lblStatus1.setName("lblStatus1");
         lblStatus1.setText(resourceMap.getString("lblStatus1.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = firsty;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInfo.add(lblStatus1, gridBagConstraints);
@@ -519,21 +614,21 @@ public class PersonViewPanel extends JScrollablePanel {
         lblStatus1.setLabelFor(lblStatus2);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = firsty;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInfo.add(lblStatus2, gridBagConstraints);
-        firsty++;
+        y++;
 
         if (campaign.getCampaignOptions().isShowOriginFaction()) {
             lblOrigin1.setName("lblOrigin1");
             lblOrigin1.setText(resourceMap.getString("lblOrigin1.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblOrigin1, gridBagConstraints);
@@ -564,14 +659,14 @@ public class PersonViewPanel extends JScrollablePanel {
             }
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 3;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblOrigin2, gridBagConstraints);
-            firsty++;
+            y++;
         }
 
         if (!person.getCallsign().equals("-") && !person.getCallsign().isBlank()) {
@@ -579,7 +674,7 @@ public class PersonViewPanel extends JScrollablePanel {
             lblCall1.setText(resourceMap.getString("lblCall1.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblCall1, gridBagConstraints);
@@ -589,21 +684,21 @@ public class PersonViewPanel extends JScrollablePanel {
             lblCall1.setLabelFor(lblCall2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 3;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblCall2, gridBagConstraints);
-            firsty++;
+            y++;
         }
 
         lblAge1.setName("lblAge1");
         lblAge1.setText(resourceMap.getString("lblAge1.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = firsty;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInfo.add(lblAge1, gridBagConstraints);
@@ -613,20 +708,19 @@ public class PersonViewPanel extends JScrollablePanel {
         lblAge1.setLabelFor(lblAge2);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = firsty;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInfo.add(lblAge2, gridBagConstraints);
-        firsty++;
-        secondy = firsty;
+        y++;
 
         lblGender1.setName("lblGender1");
         lblGender1.setText(resourceMap.getString("lblGender1.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = firsty;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInfo.add(lblGender1, gridBagConstraints);
@@ -636,20 +730,59 @@ public class PersonViewPanel extends JScrollablePanel {
         lblGender1.setLabelFor(lblGender2);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = firsty;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInfo.add(lblGender2, gridBagConstraints);
-        firsty++;
+        y++;
+
+        boolean displayOriginalUnit = person.getOriginalUnitId() != null
+            || person.getOriginalUnitWeight() != WEIGHT_ULTRA_LIGHT;
+
+        if (displayOriginalUnit) {
+            lblOriginalUnit1.setName("lblOriginalUnit1");
+            lblOriginalUnit1.setText(resourceMap.getString("lblOriginalUnit1.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlInfo.add(lblOriginalUnit1, gridBagConstraints);
+
+            lblOriginalUnit2.setName("lblOriginalUnit2");
+
+            if (campaign.getUnit(person.getOriginalUnitId()) != null) {
+                lblOriginalUnit2.setText(campaign.getUnit(person.getOriginalUnitId()).getName());
+            } else {
+                List<String> originalUnitWeight = List.of("None", "Light", "Medium", "Heavy", "Assault");
+                int originalUnitWeightIndex = person.getOriginalUnitWeight();
+
+                List<String> originalUnitTech = List.of("IS1", "IS2", "Clan");
+                int originalUnitTechIndex = person.getOriginalUnitTech();
+
+                lblOriginalUnit2.setText(originalUnitWeight.get(originalUnitWeightIndex)
+                    + " (" + originalUnitTech.get(originalUnitTechIndex) + ')');
+            }
+            lblOriginalUnit1.setLabelFor(lblOriginalUnit2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlInfo.add(lblOriginalUnit2, gridBagConstraints);
+            y++;
+        }
 
         if (person.isPregnant()) {
             lblDueDate1.setName("lblDueDate1");
             lblDueDate1.setText(resourceMap.getString("lblDueDate1.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblDueDate1, gridBagConstraints);
@@ -659,13 +792,13 @@ public class PersonViewPanel extends JScrollablePanel {
             lblDueDate1.setLabelFor(lblDueDate2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblDueDate2, gridBagConstraints);
-            firsty++;
+            y++;
         }
 
         if (person.getRetirement() != null) {
@@ -673,7 +806,7 @@ public class PersonViewPanel extends JScrollablePanel {
             lblRetirement1.setName("lblRetirement1");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblRetirement1, gridBagConstraints);
@@ -683,16 +816,17 @@ public class PersonViewPanel extends JScrollablePanel {
             lblRetirement1.setLabelFor(lblRetirement2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblRetirement2, gridBagConstraints);
-            firsty++;
+            y++;
         }
 
-        // We show the following if track total earnings is on for a free person or if the
+        // We show the following if track total earnings is on for a free person or if
+        // the
         // person has previously tracked total earnings
         if (campaign.getCampaignOptions().isTrackTotalEarnings()
                 && (person.getPrisonerStatus().isFree() || person.getTotalEarnings().isGreaterThan(Money.zero()))) {
@@ -700,7 +834,7 @@ public class PersonViewPanel extends JScrollablePanel {
             lblTotalEarnings1.setName("lblTotalEarnings1");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblTotalEarnings1, gridBagConstraints);
@@ -710,16 +844,17 @@ public class PersonViewPanel extends JScrollablePanel {
             lblTotalEarnings1.setLabelFor(lblTotalEarnings2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblTotalEarnings2, gridBagConstraints);
-            firsty++;
+            y++;
         }
 
-        // We show the following if track total xp earnings is on for a free person or if the
+        // We show the following if track total xp earnings is on for a free person or
+        // if the
         // person has previously tracked total xp earnings
         if (campaign.getCampaignOptions().isTrackTotalXPEarnings()
                 && (person.getPrisonerStatus().isFree() || (person.getTotalXPEarnings() != 0))) {
@@ -727,7 +862,7 @@ public class PersonViewPanel extends JScrollablePanel {
             lblTotalXPEarnings1.setName("lblTotalXPEarnings1");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblTotalXPEarnings1, gridBagConstraints);
@@ -737,21 +872,21 @@ public class PersonViewPanel extends JScrollablePanel {
             lblTotalXPEarnings1.setLabelFor(lblTotalXPEarnings2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblTotalXPEarnings2, gridBagConstraints);
-            firsty++;
+            y++;
         }
 
         if (person.getRecruitment() != null) {
             lblRecruited1.setName("lblRecruited1");
             lblRecruited1.setText(resourceMap.getString("lblRecruited1.text"));
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblRecruited1, gridBagConstraints);
@@ -760,20 +895,20 @@ public class PersonViewPanel extends JScrollablePanel {
             lblRecruited2.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(person.getRecruitment()));
             lblRecruited1.setLabelFor(lblRecruited2);
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblRecruited2, gridBagConstraints);
-            secondy++;
+            y++;
 
             lblTimeServed1.setName("lblTimeServed1");
             lblTimeServed1.setText(resourceMap.getString("lblTimeServed1.text"));
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblTimeServed1, gridBagConstraints);
@@ -782,44 +917,45 @@ public class PersonViewPanel extends JScrollablePanel {
             lblTimeServed2.setText(person.getTimeInService(campaign));
             lblTimeServed1.setLabelFor(lblTimeServed2);
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblTimeServed2, gridBagConstraints);
-            secondy++;
+            y++;
         }
 
         if (person.getLastRankChangeDate() != null) {
             JLabel lblLastRankChangeDate1 = new JLabel(resourceMap.getString("lblLastRankChangeDate1.text"));
             lblLastRankChangeDate1.setName("lblLastRankChangeDate1");
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblLastRankChangeDate1, gridBagConstraints);
 
-            JLabel lblLastRankChangeDate2 = new JLabel(MekHQ.getMHQOptions().getDisplayFormattedDate(person.getLastRankChangeDate()));
+            JLabel lblLastRankChangeDate2 = new JLabel(
+                    MekHQ.getMHQOptions().getDisplayFormattedDate(person.getLastRankChangeDate()));
             lblLastRankChangeDate2.setName("lblLastRankChangeDate2");
             lblLastRankChangeDate1.setLabelFor(lblLastRankChangeDate2);
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblLastRankChangeDate2, gridBagConstraints);
-            secondy++;
+            y++;
 
             JLabel lblTimeInRank1 = new JLabel(resourceMap.getString("lblTimeInRank1.text"));
             lblTimeInRank1.setName("lblTimeInRank1");
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblTimeInRank1, gridBagConstraints);
@@ -828,14 +964,13 @@ public class PersonViewPanel extends JScrollablePanel {
             lblTimeInRank2.setName("lblTimeInRank2");
             lblTimeInRank1.setLabelFor(lblTimeInRank2);
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblTimeInRank2, gridBagConstraints);
-            secondy++;
         }
 
         return pnlInfo;
@@ -879,7 +1014,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
             lblSpouse2.setName("lblSpouse2");
             lblSpouse1.setLabelFor(lblSpouse2);
-            lblSpouse2.setText(String.format("<html>%s</html>", spouse.getHyperlinkedName()));
+            lblSpouse2.setText(String.format("<html>%s</html>", spouse.getHyperlinkedFullTitle()));
             lblSpouse2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             lblSpouse2.addMouseListener(new MouseAdapter() {
                 @Override
@@ -909,17 +1044,21 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
 
-            for (FormerSpouse formerSpouse : person.getGenealogy().getFormerSpouses()) {
+            List<FormerSpouse> formerSpouses = person.getGenealogy().getFormerSpouses();
+            Collections.reverse(person.getGenealogy().getFormerSpouses());
+
+            for (FormerSpouse formerSpouse : formerSpouses) {
                 Person ex = formerSpouse.getFormerSpouse();
+                String name = getRelativeName(ex);
+
                 gridBagConstraints.gridy = firsty;
                 lblFormerSpouses2 = new JLabel();
                 lblFormerSpouses2.setName("lblFormerSpouses2");
                 lblFormerSpouses2.getAccessibleContext().getAccessibleRelationSet().add(
-                    new AccessibleRelation(AccessibleRelation.LABELED_BY, lblFormerSpouses1)
-                );
+                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblFormerSpouses1));
                 lblFormerSpouses2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a>, %s, %s</html>",
-                        ex.getFullName(), formerSpouse.getReason(),
+                lblFormerSpouses2.setText(String.format("<html>%s, %s, %s</html>",
+                        name, formerSpouse.getReason(),
                         MekHQ.getMHQOptions().getDisplayFormattedDate(formerSpouse.getDate())));
                 lblFormerSpouses2.addMouseListener(new MouseAdapter() {
                     @Override
@@ -949,14 +1088,15 @@ public class PersonViewPanel extends JScrollablePanel {
                 gridBagConstraints.insets = new Insets(0, 10, 0, 0);
 
                 for (Person child : children) {
+                    String name = getRelativeName(child);
+
                     gridBagConstraints.gridy = firsty;
                     lblChildren2 = new JLabel();
                     lblChildren2.setName("lblChildren2");
                     lblChildren2.getAccessibleContext().getAccessibleRelationSet().add(
-                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblChildren1)
-                    );
+                            new AccessibleRelation(AccessibleRelation.LABELED_BY, lblChildren1));
                     lblChildren2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    lblChildren2.setText(String.format("<html><a href='#'>%s</a></html>", child.getFullName()));
+                    lblChildren2.setText(String.format("<html>%s</html>", name));
                     lblChildren2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -969,7 +1109,8 @@ public class PersonViewPanel extends JScrollablePanel {
             }
 
             final List<Person> grandchildren = person.getGenealogy().getGrandchildren();
-            if (!grandchildren.isEmpty() && campaign.getCampaignOptions().getFamilyDisplayLevel().displayGrandparentsGrandchildren()) {
+            if (!grandchildren.isEmpty()
+                    && campaign.getCampaignOptions().getFamilyDisplayLevel().displayGrandparentsGrandchildren()) {
                 lblGrandchildren1.setName("lblGrandchildren1");
                 lblGrandchildren1.setText(resourceMap.getString("lblGrandchildren1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -987,14 +1128,15 @@ public class PersonViewPanel extends JScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
                 for (Person grandchild : grandchildren) {
+                    String name = getRelativeName(grandchild);
+
                     gridBagConstraints.gridy = firsty;
                     lblGrandchildren2 = new JLabel();
                     lblGrandchildren2.setName("lblGrandchildren2");
                     lblGrandchildren2.getAccessibleContext().getAccessibleRelationSet().add(
-                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblGrandchildren1)
-                    );
+                            new AccessibleRelation(AccessibleRelation.LABELED_BY, lblGrandchildren1));
                     lblGrandchildren2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    lblGrandchildren2.setText(String.format("<html><a href='#'>%s</a></html>", grandchild.getFullName()));
+                    lblGrandchildren2.setText(String.format("<html>%s</html>", name));
                     lblGrandchildren2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -1008,7 +1150,8 @@ public class PersonViewPanel extends JScrollablePanel {
 
             for (Person parent : person.getGenealogy().getParents()) {
                 JLabel labelParent = new JLabel(resourceMap.getString(parent.getGender().isMale()
-                        ? "lblFather1.text" : "lblMother1.text"));
+                        ? "lblFather1.text"
+                        : "lblMother1.text"));
                 labelParent.setName("lblParent");
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
@@ -1053,11 +1196,13 @@ public class PersonViewPanel extends JScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
                 for (Person sibling : siblings) {
+                    String name = getRelativeName(sibling);
+
                     gridBagConstraints.gridy = firsty;
-                    lblSiblings2 = new JLabel(String.format("<html>%s</html>", sibling.getHyperlinkedName()));
+                    lblSiblings2 = new JLabel(String.format("<html>%s</html>", name));
                     lblSiblings2.setName("lblSiblings2");
                     lblSiblings2.getAccessibleContext().getAccessibleRelationSet().add(
-                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblSiblings1));
+                            new AccessibleRelation(AccessibleRelation.LABELED_BY, lblSiblings1));
 
                     lblSiblings2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblSiblings2.addMouseListener(new MouseAdapter() {
@@ -1072,7 +1217,8 @@ public class PersonViewPanel extends JScrollablePanel {
             }
 
             final List<Person> grandparents = person.getGenealogy().getGrandparents();
-            if (!grandparents.isEmpty() && campaign.getCampaignOptions().getFamilyDisplayLevel().displayGrandparentsGrandchildren()) {
+            if (!grandparents.isEmpty()
+                    && campaign.getCampaignOptions().getFamilyDisplayLevel().displayGrandparentsGrandchildren()) {
                 lblGrandparents1.setName("lblGrandparents1");
                 lblGrandparents1.setText(resourceMap.getString("lblGrandparents1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -1090,12 +1236,14 @@ public class PersonViewPanel extends JScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
                 for (Person grandparent : grandparents) {
+                    String name = getRelativeName(grandparent);
+
                     gridBagConstraints.gridy = firsty;
                     lblGrandparents2 = new JLabel(String.format("<html>%s</html>",
-                            grandparent.getHyperlinkedName()));
+                            name));
                     lblGrandparents2.setName("lblGrandparents2");
                     lblGrandparents2.getAccessibleContext().getAccessibleRelationSet().add(
-                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblGrandparents1));
+                            new AccessibleRelation(AccessibleRelation.LABELED_BY, lblGrandparents1));
                     lblGrandparents2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblGrandparents2.addMouseListener(new MouseAdapter() {
                         @Override
@@ -1109,7 +1257,8 @@ public class PersonViewPanel extends JScrollablePanel {
             }
 
             final List<Person> auntsAndUncles = person.getGenealogy().getsAuntsAndUncles();
-            if (!auntsAndUncles.isEmpty() && campaign.getCampaignOptions().getFamilyDisplayLevel().isAuntsUnclesCousins()) {
+            if (!auntsAndUncles.isEmpty()
+                    && campaign.getCampaignOptions().getFamilyDisplayLevel().isAuntsUnclesCousins()) {
                 lblAuntsOrUncles1.setName("lblAuntsOrUncles1");
                 lblAuntsOrUncles1.setText(resourceMap.getString("lblAuntsOrUncles1.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -1127,12 +1276,14 @@ public class PersonViewPanel extends JScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
                 for (Person auntOrUncle : auntsAndUncles) {
+                    String name = getRelativeName(auntOrUncle);
+
                     gridBagConstraints.gridy = firsty;
                     lblAuntsOrUncles2 = new JLabel(String.format("<html>%s</html>",
-                            auntOrUncle.getHyperlinkedName()));
+                            name));
                     lblAuntsOrUncles2.setName("lblAuntsOrUncles2");
                     lblAuntsOrUncles2.getAccessibleContext().getAccessibleRelationSet().add(
-                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblAuntsOrUncles1));
+                            new AccessibleRelation(AccessibleRelation.LABELED_BY, lblAuntsOrUncles1));
 
                     lblAuntsOrUncles2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblAuntsOrUncles2.addMouseListener(new MouseAdapter() {
@@ -1165,13 +1316,15 @@ public class PersonViewPanel extends JScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
                 for (Person cousin : cousins) {
+                    String name = getRelativeName(cousin);
+
                     gridBagConstraints.gridy = firsty;
                     lblCousins2 = new JLabel();
                     lblCousins2.setName("lblCousins2");
                     lblCousins2.getAccessibleContext().getAccessibleRelationSet().add(
-                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblCousins1));
+                            new AccessibleRelation(AccessibleRelation.LABELED_BY, lblCousins1));
                     lblCousins2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    lblCousins2.setText(String.format("<html>%s</html>", cousin.getHyperlinkedName()));
+                    lblCousins2.setText(String.format("<html>%s</html>", name));
                     lblCousins2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -1187,6 +1340,21 @@ public class PersonViewPanel extends JScrollablePanel {
         return pnlFamily;
     }
 
+    /**
+     * If the relative has joined the campaign, the hyperlinked full title is returned.
+     * Otherwise, the full name of the relative is returned.
+     *
+     * @param relative The relative.
+     * @return The relative's name.
+     */
+    private static String getRelativeName(Person relative) {
+        if (relative.getJoinedCampaign() == null) {
+            return relative.getFirstName();
+        } else {
+            return "<a href='#'>" + relative.getHyperlinkedFullTitle() + "</a>";
+        }
+    }
+
     private JPanel fillSkills() {
         // skill panel
         JPanel pnlSkills = new JPanel(new GridBagLayout());
@@ -1200,13 +1368,29 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblEdgeAvail1 = new JLabel();
         JLabel lblEdgeAvail2 = new JLabel();
 
+        JLabel lblLoyalty1 = new JLabel();
+        JLabel lblLoyalty2 = new JLabel();
+
+        JLabel lblFatigue1 = new JLabel();
+        JLabel lblFatigue2 = new JLabel();
+
+        // education
+        JLabel lblEducationLevel1 = new JLabel();
+        JLabel lblEducationLevel2 = new JLabel();
+        JLabel lblEducationStage1 = new JLabel();
+        JLabel lblEducationStage2 = new JLabel();
+        JLabel lblEducationJourneyDays1 = new JLabel();
+        JLabel lblEducationJourneyDays2 = new JLabel();
+        JLabel lblEducationDays1 = new JLabel();
+        JLabel lblEducationDays2 = new JLabel();
+
         GridBagConstraints gridBagConstraints;
 
         JLabel lblName;
         JLabel lblValue;
 
-        int firsty=0;
-        int colBreak = Math.max((int) Math.ceil(person.getSkillNumber() / 2.0)+1, 3);
+        int firsty = 0;
+        int colBreak = Math.max((int) Math.ceil(person.getSkillNumber() / 2.0) + 1, 3);
         int addition = 0;
         double weight = 0.5;
 
@@ -1219,7 +1403,8 @@ public class PersonViewPanel extends JScrollablePanel {
                     firsty = 0;
                     weight = 1.0;
                 }
-                lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), SkillType.getSkillList()[i]));
+                lblName = new JLabel(
+                        String.format(resourceMap.getString("format.itemHeader"), SkillType.getSkillList()[i]));
                 lblValue = new JLabel(person.getSkill(SkillType.getSkillList()[i]).toString());
                 lblName.setLabelFor(lblValue);
                 gridBagConstraints = new GridBagConstraints();
@@ -1243,7 +1428,8 @@ public class PersonViewPanel extends JScrollablePanel {
         // reset firsty
         firsty = colBreak;
 
-        if (campaign.getCampaignOptions().isUseAbilities() && (person.countOptions(PersonnelOptions.LVL3_ADVANTAGES) > 0)) {
+        if (campaign.getCampaignOptions().isUseAbilities()
+                && (person.countOptions(PersonnelOptions.LVL3_ADVANTAGES) > 0)) {
             JLabel lblAbility1 = new JLabel(resourceMap.getString("lblAbility1.text"));
             lblAbility1.setName("lblAbility1");
             gridBagConstraints = new GridBagConstraints();
@@ -1262,17 +1448,19 @@ public class PersonViewPanel extends JScrollablePanel {
                 IOption option = i.nextElement();
                 if (option.booleanValue()) {
                     JLabel lblAbility2 = new JLabel(Utilities.getOptionDisplayName(option));
-                    lblAbility2.setToolTipText(option.getDescription());
+                    lblAbility2.setToolTipText(wordWrap(
+                        option.getDescription().replaceAll("\\n", "<br>")));
                     lblAbility2.setName("lblAbility2");
                     lblAbility2.getAccessibleContext().getAccessibleRelationSet().add(
-                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblAbility1));
+                            new AccessibleRelation(AccessibleRelation.LABELED_BY, lblAbility1));
                     gridBagConstraints.gridy = firsty++;
                     pnlSkills.add(lblAbility2, gridBagConstraints);
                 }
             }
         }
 
-        if (campaign.getCampaignOptions().isUseImplants() && (person.countOptions(PersonnelOptions.MD_ADVANTAGES) > 0)) {
+        if (campaign.getCampaignOptions().isUseImplants()
+                && (person.countOptions(PersonnelOptions.MD_ADVANTAGES) > 0)) {
             JLabel lblImplants1 = new JLabel(resourceMap.getString("lblImplants1.text"));
             lblImplants1.setName("lblImplants1");
             gridBagConstraints = new GridBagConstraints();
@@ -1292,10 +1480,11 @@ public class PersonViewPanel extends JScrollablePanel {
 
                 if (option.booleanValue()) {
                     JLabel lblImplants2 = new JLabel(Utilities.getOptionDisplayName(option));
-                    lblImplants2.setToolTipText(option.getDescription());
+                    lblImplants2.setToolTipText(wordWrap(
+                        option.getDescription().replaceAll("\\n", "<br>")));
                     lblImplants2.setName("lblImplants2");
                     lblImplants2.getAccessibleContext().getAccessibleRelationSet().add(
-                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblImplants1));
+                            new AccessibleRelation(AccessibleRelation.LABELED_BY, lblImplants1));
                     gridBagConstraints.gridy = firsty++;
                     pnlSkills.add(lblImplants2, gridBagConstraints);
                 }
@@ -1371,6 +1560,217 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSkills.add(lblTough2, gridBagConstraints);
+
+            firsty++;
+        }
+
+        int loyaltyModifier = person.getLoyaltyModifier(person.getLoyalty());
+
+        if (person.isCommander()) {
+            loyaltyModifier = person.getLoyaltyModifier(person.getLoyalty() + 2);
+        }
+
+        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
+                && (!campaign.getCampaignOptions().isUseHideLoyalty())
+                && (loyaltyModifier != 0)) {
+            lblLoyalty1.setName("lblLoyalty1");
+            lblLoyalty1.setText(resourceMap.getString("lblLoyalty1.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblLoyalty1, gridBagConstraints);
+
+            lblLoyalty2.setName("lblLoyalty2");
+
+            lblLoyalty2.setText(loyaltyModifier + " (" + getLoyaltyName(loyaltyModifier) + ')');
+            lblLoyalty2.setLabelFor(lblLoyalty2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblLoyalty2, gridBagConstraints);
+
+            firsty++;
+        }
+
+        if ((campaign.getCampaignOptions().isUseFatigue()) && (person.getEffectiveFatigue(campaign) > 0)) {
+            lblFatigue1.setName("lblFatigue1");
+            lblFatigue1.setText(resourceMap.getString("lblFatigue1.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblFatigue1, gridBagConstraints);
+
+            StringBuilder fatigueDisplay = new StringBuilder();
+
+            int effectiveFatigue = person.getEffectiveFatigue(campaign);
+            int fatigueTurnoverModifier = MathUtility.clamp(((person.getEffectiveFatigue(campaign) - 1) / 4) - 1, 0, 3);
+
+            fatigueDisplay.append(effectiveFatigue);
+
+            if (fatigueTurnoverModifier > 0) {
+                fatigueDisplay.append(" (-").append(fatigueTurnoverModifier).append(')');
+            }
+
+            lblFatigue2.setName("lblFatigue2");
+            lblFatigue2.setText(fatigueDisplay.toString());
+            lblFatigue2.setLabelFor(lblFatigue2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblFatigue2, gridBagConstraints);
+
+            firsty++;
+        }
+
+        if (campaign.getCampaignOptions().isUseEducationModule()) {
+            lblEducationLevel1.setName("lblEducationLevel1");
+            lblEducationLevel1.setText(resourceMap.getString("lblEducationLevel1.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblEducationLevel1, gridBagConstraints);
+
+            lblEducationLevel2.setName("lblEducationLevel2");
+            lblEducationLevel2.setText(person.getEduHighestEducation().toString());
+            lblEducationLevel1.setLabelFor(lblEducationLevel2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblEducationLevel2, gridBagConstraints);
+
+            firsty++;
+
+            if (person.getEduEducationStage() != EducationStage.NONE) {
+                lblEducationStage1.setName("lblEducationStage1");
+                lblEducationStage1.setText(resourceMap.getString("lblEducationStage1.text"));
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlSkills.add(lblEducationStage1, gridBagConstraints);
+
+                lblEducationStage2.setName("lblEducationStage2");
+                lblEducationStage2.setText(person.getEduEducationStage().toString());
+                lblEducationStage2.setLabelFor(lblEducationStage2);
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.gridwidth = 3;
+                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlSkills.add(lblEducationStage2, gridBagConstraints);
+
+                firsty++;
+
+                String educationText;
+
+                switch (person.getEduEducationStage()) {
+                    case EDUCATION:
+                        lblEducationDays1.setName("lblEducationDays1");
+                        lblEducationDays1.setText(resourceMap.getString("lblEducationDays1.text"));
+                        gridBagConstraints = new GridBagConstraints();
+                        gridBagConstraints.gridx = 0;
+                        gridBagConstraints.gridy = firsty;
+                        gridBagConstraints.fill = GridBagConstraints.NONE;
+                        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                        pnlSkills.add(lblEducationDays1, gridBagConstraints);
+
+                        Academy academy = EducationController.getAcademy(person.getEduAcademySet(),
+                                person.getEduAcademyNameInSet());
+
+                        lblEducationDays2.setName("lblEducationDays2");
+                        if (academy.isPrepSchool()) {
+                            educationText = String.format(resourceMap.getString("lblEducationDurationAge.text"),
+                                    academy.getAgeMax());
+                        } else {
+                            educationText = String.format(resourceMap.getString("lblEducationDurationDays.text"),
+                                    person.getEduEducationTime());
+                        }
+
+                        lblEducationDays2.setName("lblEducationDays2");
+                        lblEducationDays2.setText(educationText);
+                        lblEducationDays2.setLabelFor(lblEducationDays2);
+                        gridBagConstraints = new GridBagConstraints();
+                        gridBagConstraints.gridx = 1;
+                        gridBagConstraints.gridy = firsty;
+                        gridBagConstraints.gridwidth = 3;
+                        gridBagConstraints.weightx = 1.0;
+                        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                        gridBagConstraints.fill = GridBagConstraints.NONE;
+                        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                        pnlSkills.add(lblEducationDays2, gridBagConstraints);
+
+                        break;
+                    case JOURNEY_TO_CAMPUS:
+                    case JOURNEY_FROM_CAMPUS:
+                        lblEducationJourneyDays1.setName("lblEducationJourneyDays1");
+                        lblEducationJourneyDays1.setText(resourceMap.getString("lblEducationJourneyDays1.text"));
+                        gridBagConstraints = new GridBagConstraints();
+                        gridBagConstraints.gridx = 0;
+                        gridBagConstraints.gridy = firsty;
+                        gridBagConstraints.fill = GridBagConstraints.NONE;
+                        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                        pnlSkills.add(lblEducationJourneyDays1, gridBagConstraints);
+
+                        if (person.getEduEducationStage() == EducationStage.JOURNEY_TO_CAMPUS) {
+                            educationText = String.format(resourceMap.getString("lblEducationTravelTo.text"),
+                                    person.getEduDaysOfTravel(),
+                                    person.getEduJourneyTime(),
+                                    campaign.getSystemById(person.getEduAcademySystem())
+                                            .getName(campaign.getLocalDate()));
+                        } else {
+                            educationText = String.format(resourceMap.getString("lblEducationTravelFrom.text"),
+                                    person.getEduDaysOfTravel(),
+                                    person.getEduJourneyTime(),
+                                    campaign.getSystemById(person.getEduAcademySystem())
+                                            .getName(campaign.getLocalDate()));
+
+                        }
+
+                        lblEducationJourneyDays2.setName("lblEducationJourneyDays2");
+                        lblEducationJourneyDays2.setText(educationText);
+                        lblEducationJourneyDays2.setLabelFor(lblEducationJourneyDays2);
+                        gridBagConstraints = new GridBagConstraints();
+                        gridBagConstraints.gridx = 1;
+                        gridBagConstraints.gridy = firsty;
+                        gridBagConstraints.gridwidth = 3;
+                        gridBagConstraints.weightx = 1.0;
+                        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                        gridBagConstraints.fill = GridBagConstraints.NONE;
+                        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                        pnlSkills.add(lblEducationJourneyDays2, gridBagConstraints);
+                        break;
+                    case GRADUATING:
+                    case DROPPING_OUT:
+                    case NONE:
+
+                        break;
+                }
+            }
         }
 
         return pnlSkills;
@@ -1378,6 +1778,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private JPanel fillLog() {
         List<LogEntry> logs = person.getPersonnelLog();
+        Collections.reverse(logs);
 
         JPanel pnlLog = new JPanel(new GridBagLayout());
 
@@ -1388,7 +1789,7 @@ public class PersonViewPanel extends JScrollablePanel {
         eventTable.setRowSelectionAllowed(false);
         eventTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         TableColumn column;
-        for (int i = 0; i < eventModel.getColumnCount(); ++ i) {
+        for (int i = 0; i < eventModel.getColumnCount(); ++i) {
             column = eventTable.getColumnModel().getColumn(i);
             column.setCellRenderer(eventModel.getRenderer());
             column.setPreferredWidth(eventModel.getPreferredWidth(i));
@@ -1416,6 +1817,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private JPanel fillScenarioLog() {
         List<LogEntry> scenarioLog = person.getScenarioLog();
+        Collections.reverse(scenarioLog);
 
         JPanel pnlScenariosLog = new JPanel(new GridBagLayout());
 
@@ -1468,7 +1870,8 @@ public class PersonViewPanel extends JScrollablePanel {
         JButton medicalButton = new JButton(new ImageIcon("data/images/misc/medical.png"));
         medicalButton.getAccessibleContext().setAccessibleName(resourceMap.getString("btnMedical.tooltip"));
         medicalButton.addActionListener(event -> {
-            MedicalViewDialog medDialog = new MedicalViewDialog(SwingUtilities.getWindowAncestor(this), campaign, person);
+            MedicalViewDialog medDialog = new MedicalViewDialog(SwingUtilities.getWindowAncestor(this), campaign,
+                    person);
             medDialog.setModalityType(ModalityType.APPLICATION_MODAL);
             medDialog.setVisible(true);
             removeAll();
@@ -1488,15 +1891,12 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlInjuryDetails.getAccessibleContext().setAccessibleName("Injury Details for " + person.getFullName());
         pnlInjuryDetails.setAlignmentY(Component.TOP_ALIGNMENT);
 
-
         JLabel lblAdvancedMedical1 = new JLabel();
         JLabel lblAdvancedMedical2 = new JLabel();
 
-        GridBagConstraints gridBagConstraints;
-
         lblAdvancedMedical1.setName("lblAdvancedMedical1");
         lblAdvancedMedical1.setText(resourceMap.getString("lblAdvancedMedical1.text"));
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
@@ -1562,6 +1962,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     /**
      * Gets the advanced medical effects active for the person.
+     *
      * @return an HTML encoded string of effects
      */
     private String getAdvancedMedalEffectString(Person p) {
@@ -1588,6 +1989,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private JPanel fillKillRecord() {
         List<Kill> kills = campaign.getKillsFor(person.getId());
+        Collections.reverse(kills);
 
         JPanel pnlKills = new JPanel(new GridBagLayout());
 
@@ -1609,7 +2011,7 @@ public class PersonViewPanel extends JScrollablePanel {
         killTable.setRowSelectionAllowed(false);
         killTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         TableColumn column;
-        for (int i = 0; i < killModel.getColumnCount(); ++ i) {
+        for (int i = 0; i < killModel.getColumnCount(); ++i) {
             column = killTable.getColumnModel().getColumn(i);
             column.setCellRenderer(killModel.getRenderer());
             column.setPreferredWidth(killModel.getPreferredWidth(i));

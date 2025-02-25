@@ -22,21 +22,25 @@ import megamek.common.BayType;
 import megamek.common.Entity;
 import megamek.common.ITechnology;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import org.apache.logging.log4j.LogManager;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
+import java.util.Objects;
 
 /**
- * A transport bay cubicle for a Mech, ProtoMech, vehicle, fighter, or small craft.
+ * A transport bay cubicle for a Mek, ProtoMek, vehicle, fighter, or small
+ * craft.
  *
  * @author Neoancient
  */
 public class Cubicle extends Part {
+    private static final MMLogger logger = MMLogger.create(Cubicle.class);
+
     private BayType bayType;
 
     public Cubicle() {
@@ -120,7 +124,8 @@ public class Cubicle extends Part {
 
     @Override
     public boolean needsFixing() {
-        // Per replacement repair tables in SO, cubicles are replaced rather than repaired.
+        // Per replacement repair tables in SO, cubicles are replaced rather than
+        // repaired.
         return false;
     }
 
@@ -159,10 +164,22 @@ public class Cubicle extends Part {
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("bayType")) {
-                bayType = BayType.parse(wn2.getTextContent());
+                // <50.01 compatibility handler
+                String bayRawValue = wn2.getTextContent();
+
+                if (Objects.equals(bayRawValue, "MECH")) {
+                    bayRawValue = "MEK";
+                }
+
+                if (Objects.equals(bayRawValue, "PROTOMECH")) {
+                    bayRawValue = "PROTOMEK";
+                }
+
+                bayType = BayType.parse(bayRawValue);
                 if (null == bayType) {
-                    LogManager.getLogger().error("Could not parse bay type " + wn2.getTextContent());
-                    bayType = BayType.MECH;
+                    logger.error(String.format("Could not parse bay type %s treating as BayType.Mek",
+                        wn2.getTextContent()));
+                    bayType = BayType.MEK;
                 }
                 name = bayType.getDisplayName() + " Cubicle";
             }

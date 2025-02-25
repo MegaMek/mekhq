@@ -21,29 +21,32 @@
  */
 package mekhq.campaign.finances;
 
-import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.finances.enums.TransactionType;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.Objects;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Transaction {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(Transaction.class);
+
+    // region Variable Declarations
     private TransactionType type;
     private LocalDate date;
     private Money amount;
     private String description;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public Transaction() {
         this(TransactionType.MISCELLANEOUS, LocalDate.now(), Money.zero(), "");
     }
@@ -54,15 +57,15 @@ public class Transaction {
     }
 
     public Transaction(final TransactionType type, final LocalDate date, final Money amount,
-                       final String description) {
+            final String description) {
         setType(type);
         setDate(date);
         setAmount(amount);
         setDescription(description);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public TransactionType getType() {
         return type;
     }
@@ -94,7 +97,7 @@ public class Transaction {
     public void setDescription(final String description) {
         this.description = description;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
     @Deprecated // I'd be better as part of the GUI class
     public String updateTransaction(Transaction previousTransaction) {
@@ -108,7 +111,7 @@ public class Transaction {
         return "Deleted Transaction: " + toString();
     }
 
-    //region File I/O
+    // region File I/O
     protected void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "transaction");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", getType().name());
@@ -132,16 +135,14 @@ public class Transaction {
                     transaction.setAmount(Money.fromXmlString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("description")) {
                     transaction.setDescription(MHQXMLUtility.unEscape(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("category")) { // Legacy - 0.49.4 Removal
-                    transaction.setType(TransactionType.parseFromString(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
         return transaction;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

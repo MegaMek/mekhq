@@ -20,22 +20,29 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.*;
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.SkillType;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
+import megamek.common.Compute;
+import megamek.common.Dropship;
+import megamek.common.Entity;
+import megamek.common.SimpleTechLevel;
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author MKerensky
  */
 public class KfBoom extends Part {
+    private static final MMLogger logger = MMLogger.create(KfBoom.class);
+
     static final TechAdvancement TA_KFBOOM = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2458, 2470, 2500).setPrototypeFactions(F_TH)
             .setProductionFactions(F_TH).setTechRating(RATING_C)
@@ -77,16 +84,16 @@ public class KfBoom extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         int priorHits = hits;
         if (null != unit && unit.getEntity() instanceof Dropship) {
-             if (((Dropship) unit.getEntity()).isKFBoomDamaged()) {
-                 hits = 1;
-             } else {
-                 hits = 0;
-             }
-             if (checkForDestruction
-                     && hits > priorHits
-                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
-                 remove(false);
-             }
+            if (((Dropship) unit.getEntity()).isKFBoomDamaged()) {
+                hits = 1;
+            } else {
+                hits = 0;
+            }
+            if (checkForDestruction
+                    && hits > priorHits
+                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                remove(false);
+            }
         }
     }
 
@@ -161,7 +168,7 @@ public class KfBoom extends Part {
         if (boomType == Dropship.BOOM_STANDARD) {
             return Money.of(10000);
         } else if (boomType == Dropship.BOOM_PROTOTYPE) {
-            return Money.of(1010000) ;
+            return Money.of(1010000);
         } else {
             return Money.zero();
         }
@@ -197,7 +204,7 @@ public class KfBoom extends Part {
                     boomType = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         }
     }

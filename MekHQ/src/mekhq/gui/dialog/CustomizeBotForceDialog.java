@@ -18,14 +18,38 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+
+import javax.swing.*;
+
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.PrincessException;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.BotConfigDialog;
 import megamek.client.ui.dialogs.CamoChooserDialog;
-import megamek.common.*;
+import megamek.common.Entity;
+import megamek.common.EntityListFile;
+import megamek.common.EntityWeightClass;
+import megamek.common.MULParser;
+import megamek.common.Player;
+import megamek.common.UnitType;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -36,17 +60,10 @@ import mekhq.campaign.universe.Factions;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.displayWrappers.FactionDisplay;
-import org.apache.logging.log4j.LogManager;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
-
-public class CustomizeBotForceDialog  extends JDialog {
+public class CustomizeBotForceDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(CustomizeBotForceDialog.class);
 
     private JFrame frame;
     private BotForce botForce;
@@ -58,7 +75,7 @@ public class CustomizeBotForceDialog  extends JDialog {
     private boolean useRandomUnits;
     private List<Entity> fixedEntities;
 
-    //gui components
+    // gui components
     private JTextField txtName;
     private JComboBox<String> choiceTeam;
     private JButton btnDeployment;
@@ -103,7 +120,7 @@ public class CustomizeBotForceDialog  extends JDialog {
         try {
             behavior = botForce.getBehaviorSettings().getCopy();
         } catch (PrincessException ex) {
-            LogManager.getLogger().error("Error copying princess behaviors", ex);
+            logger.error("Error copying princess behaviors", ex);
         }
         useRandomUnits = botForce.getBotForceRandomizer() != null;
         if (useRandomUnits) {
@@ -166,7 +183,7 @@ public class CustomizeBotForceDialog  extends JDialog {
         choiceTeam = new JComboBox<>();
         for (int i = 1; i < 6; i++) {
             String choice = resourceMap.getString("choiceTeam.text") + " " + i;
-            if (i ==1) {
+            if (i == 1) {
                 choice = choice + " (" + resourceMap.getString("choiceAllied.text") + ")";
             }
             choiceTeam.addItem(choice);
@@ -201,14 +218,12 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.fill = GridBagConstraints.NONE;
         panLeft.add(btnCamo, gbc);
 
-
         intBehaviorPanel(resourceMap);
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         panLeft.add(panBehavior, gbc);
-
 
         initRandomForcesPanel(resourceMap);
         gbc = new GridBagConstraints();
@@ -242,12 +257,12 @@ public class CustomizeBotForceDialog  extends JDialog {
 
         panFixedUnits = new DefaultMHQScrollablePanel(frame, "panFixedEntity", new GridBagLayout());
         refreshFixedEntityPanel();
-        JScrollPane scrollFixedUnits = new JScrollPane(panFixedUnits);
+        JScrollPane scrollFixedUnits = new JScrollPaneWithSpeed(panFixedUnits);
         scrollFixedUnits.setMinimumSize(new Dimension(400, 200));
         scrollFixedUnits.setPreferredSize(new Dimension(400, 200));
         scrollFixedUnits.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("scrollFixedUnits.title")),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.weightx = 1.0;
@@ -262,7 +277,7 @@ public class CustomizeBotForceDialog  extends JDialog {
         panBehavior = new JPanel(new GridBagLayout());
         panBehavior.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("panBehavior.title")),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         GridBagConstraints gbcLeft = new GridBagConstraints();
         gbcLeft.gridx = 0;
@@ -289,7 +304,6 @@ public class CustomizeBotForceDialog  extends JDialog {
         lblPilotingRisk = new JLabel(Integer.toString(behavior.getFallShameIndex()));
         lblForcedWithdrawal = new JLabel(getForcedWithdrawalDescription(behavior));
         lblAutoFlee = new JLabel(getAutoFleeDescription(behavior));
-
 
         panBehavior.add(new JLabel(resourceMap.getString("lblCowardice.text")), gbcLeft);
         panBehavior.add(lblCowardice, gbcRight);
@@ -329,7 +343,7 @@ public class CustomizeBotForceDialog  extends JDialog {
         panRandomUnits = new JPanel(new GridBagLayout());
         panRandomUnits.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("panRandomUnits.title")),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -405,9 +419,9 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.weightx = 1.0;
         panRandomUnits.add(choiceUnitType, gbc);
 
-        //leave out none as a skill option
-        ArrayList<SkillLevel> skills = Arrays.stream(SkillLevel.values()).
-                filter(skill -> !skill.isNone()).collect(Collectors.toCollection(() -> new ArrayList<>()));
+        // leave out none as a skill option
+        ArrayList<SkillLevel> skills = Arrays.stream(SkillLevel.values()).filter(skill -> !skill.isNone())
+                .collect(Collectors.toCollection(() -> new ArrayList<>()));
         choiceSkillLevel = new MMComboBox("choiceSkillLevel", skills.toArray());
         choiceSkillLevel.setSelectedItem(randomizer.getSkill());
         choiceSkillLevel.setEnabled(useRandomUnits);
@@ -569,7 +583,7 @@ public class CustomizeBotForceDialog  extends JDialog {
             try {
                 parser = new MULParser(units.get(), campaign.getGameOptions());
             } catch (Exception ex) {
-                LogManager.getLogger().error("Could not parse BotForce entities", ex);
+                logger.error("Could not parse BotForce entities", ex);
                 return;
             }
             fixedEntities = Collections.list(parser.getEntities().elements());
@@ -585,7 +599,7 @@ public class CustomizeBotForceDialog  extends JDialog {
             try {
                 EntityListFile.saveTo(saveUnits.get(), (ArrayList<Entity>) fixedEntities);
             } catch (Exception ex) {
-                LogManager.getLogger().error("Could not save BotForce to file", ex);
+                logger.error("Could not save BotForce to file", ex);
             }
         }
     }
@@ -602,6 +616,7 @@ public class CustomizeBotForceDialog  extends JDialog {
             return behavior.getRetreatEdge().toString();
         }
     }
+
     private String getAutoFleeDescription(BehaviorSettings behavior) {
         if (!behavior.shouldAutoFlee()) {
             return "NO";
@@ -612,7 +627,7 @@ public class CustomizeBotForceDialog  extends JDialog {
 
     private void done(ActionEvent evt) {
         botForce.setName(txtName.getText());
-        botForce.setTeam(choiceTeam.getSelectedIndex()+1);
+        botForce.setTeam(choiceTeam.getSelectedIndex() + 1);
         Utilities.updatePlayerSettings(botForce, player);
         botForce.setCamouflage(camo);
         botForce.setBehaviorSettings(behavior);
@@ -637,6 +652,7 @@ public class CustomizeBotForceDialog  extends JDialog {
 
         this.setVisible(false);
     }
+
     private void cancel(ActionEvent evt) {
         botForce = null;
         this.setVisible(false);

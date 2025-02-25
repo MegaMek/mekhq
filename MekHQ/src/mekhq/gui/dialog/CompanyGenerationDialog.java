@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -29,12 +29,15 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
+import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationPersonTracker;
 import mekhq.campaign.universe.generators.companyGenerators.AbstractCompanyGenerator;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.panels.CompanyGenerationOptionsPanel;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import java.awt.*;
@@ -92,7 +95,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     protected Container createCenterPane() {
         setCompanyGenerationOptionsPanel(new CompanyGenerationOptionsPanel(getFrame(), getCampaign(),
                 getCompanyGenerationOptions()));
-        return new JScrollPane(getCompanyGenerationOptionsPanel());
+        return new JScrollPaneWithSpeed(getCompanyGenerationOptionsPanel());
     }
 
     @Override
@@ -144,7 +147,16 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         final Contract contract = null;
         generator.applyPhaseThreeToCampaign(getCampaign(), trackers, units, parts, armour, ammunition, contract);
 
-        MekHQ.triggerEvent(new OrganizationChangedEvent(getCompanyGenerationOptionsPanel().getCampaign().getForces()));
+        MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCompanyGenerationOptionsPanel().getCampaign().getForces()));
+
+        if (campaign.getCampaignOptions().isEnableAutoAwards()) {
+            AutoAwardsController autoAwardsController = new AutoAwardsController();
+            autoAwardsController.ManualController(campaign, false);
+        }
+
+        ReputationController reputationController = new ReputationController();
+        reputationController.initializeReputation(campaign);
+        campaign.setReputation(reputationController);
     }
 
     @Override

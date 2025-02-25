@@ -18,8 +18,6 @@
  */
 package mekhq.module;
 
-import org.apache.logging.log4j.LogManager;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,12 +26,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import megamek.logging.MMLogger;
+
 /**
- * Tracks which plugins are installed and which are active. Provides class loader for use by ServiceLoader.
+ * Tracks which plugins are installed and which are active. Provides class
+ * loader for use by ServiceLoader.
  *
  * @author Neoancient
  */
 public class PluginManager {
+    private static final MMLogger logger = MMLogger.create(PluginManager.class);
+
     private static PluginManager instance;
     private static final String PLUGIN_DIR = "./plugins";
 
@@ -48,26 +51,28 @@ public class PluginManager {
     }
 
     private PluginManager() {
-        LogManager.getLogger().debug("Initializing plugin manager.");
+        logger.debug("Initializing plugin manager.");
 
         scriptFiles = new ArrayList<>();
         File dir = new File(PLUGIN_DIR);
         if (!dir.exists()) {
-            LogManager.getLogger().warn("Could not find plugin directory");
+            logger.warn("Could not find plugin directory");
         }
         URL[] urls = new URL[0];
         if (dir.exists() && dir.isDirectory()) {
             List<URL> plugins = getPluginsFromDir(dir);
             urls = plugins.toArray(urls);
         } else {
-            LogManager.getLogger().warn("Could not find plugin directory.");
+            logger.warn("Could not find plugin directory.");
         }
-        LogManager.getLogger().debug("Found " + urls.length + " plugins");
+        logger.debug("Found " + urls.length + " plugins");
         classLoader = new URLClassLoader(urls);
     }
 
     /**
-     * Recursively checks the plugin directory for jar files and adds them to the list.
+     * Recursively checks the plugin directory for jar files and adds them to the
+     * list.
+     * 
      * @param origin The origin file to check
      * @return A list of all jar files in the directory and subdirectories
      */
@@ -80,7 +85,7 @@ public class PluginManager {
             return new ArrayList<>();
         }
 
-        LogManager.getLogger().debug("Now checking directory " + origin.getName());
+        logger.debug("Now checking directory " + origin.getName());
         final List<URL> plugins = new ArrayList<>();
         for (final File file : files) {
             if (file.getName().startsWith(".")) {
@@ -90,7 +95,7 @@ public class PluginManager {
             plugins.addAll(getPluginsFromDir(file));
 
             if (file.getName().toLowerCase().endsWith(".jar")) {
-                LogManager.getLogger().debug("Now adding plugin " + file.getName() + " to class loader.");
+                logger.debug("Now adding plugin " + file.getName() + " to class loader.");
                 try {
                     plugins.add(file.toURI().toURL());
                 } catch (MalformedURLException ignored) {

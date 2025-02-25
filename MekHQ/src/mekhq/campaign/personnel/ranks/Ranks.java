@@ -21,41 +21,56 @@
  */
 package mekhq.campaign.personnel.ranks;
 
-import megamek.Version;
-import megamek.common.annotations.Nullable;
-import megamek.common.preference.PreferenceManager;
-import mekhq.MHQConstants;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.enums.RankSystemType;
-import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import megamek.Version;
+import megamek.common.annotations.Nullable;
+import megamek.common.preference.PreferenceManager;
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.enums.RankSystemType;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
- * Ranks keeps track of all data-file loaded rank systems. It does not include the campaign rank
+ * Ranks keeps track of all data-file loaded rank systems. It does not include
+ * the campaign rank
  * system, if there is a custom one there.
  */
 public class Ranks {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(Ranks.class);
+
+    // region Variable Declarations
     public static final String DEFAULT_SYSTEM_CODE = "SSLDF";
 
     private static Map<String, RankSystem> rankSystems;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     private Ranks() {
         // This Class should never be constructed
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public static Map<String, RankSystem> getRankSystems() {
         return rankSystems;
     }
@@ -68,9 +83,9 @@ public class Ranks {
         final RankSystem ranks = getRankSystems().get(code);
         return (ranks == null) ? getRankSystems().get(DEFAULT_SYSTEM_CODE) : ranks;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
-    //region File I/O
+    // region File I/O
     public static void exportRankSystemsToFile(final @Nullable File file, final RankSystem rankSystem) {
         if (file == null) {
             return;
@@ -84,7 +99,7 @@ public class Ranks {
     }
 
     public static void exportRankSystemsToFile(@Nullable File file,
-                                               final Collection<RankSystem> rankSystems) {
+            final Collection<RankSystem> rankSystems) {
         if (file == null) {
             return;
         }
@@ -95,9 +110,9 @@ public class Ranks {
         }
         int indent = 0;
         try (OutputStream fos = new FileOutputStream(file);
-             OutputStream bos = new BufferedOutputStream(fos);
-             OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
-             PrintWriter pw = new PrintWriter(osw)) {
+                OutputStream bos = new BufferedOutputStream(fos);
+                OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
+                PrintWriter pw = new PrintWriter(osw)) {
             // Then save it out to that file.
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "rankSystems", "version", MHQConstants.VERSION);
@@ -106,12 +121,12 @@ public class Ranks {
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "rankSystems");
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
     }
 
     public static void initializeRankSystems() {
-        LogManager.getLogger().info("Starting Rank Systems XML load...");
+        logger.info("Starting Rank Systems XML load...");
         setRankSystems(new HashMap<>());
         final RankValidator rankValidator = new RankValidator();
         for (final RankSystemType type : RankSystemType.values()) {
@@ -124,7 +139,8 @@ public class Ranks {
                 if (!userDir.isBlank() && new File(userDir).isDirectory()) {
                     File userDirRanks = new File(userDir + "/" + MHQConstants.RANKS_FILE_PATH);
                     if (userDirRanks.exists()) {
-                        rankSystems.addAll(loadRankSystemsFromFile(new File(userDir + "/" + MHQConstants.RANKS_FILE_PATH), type));
+                        rankSystems.addAll(
+                                loadRankSystemsFromFile(new File(userDir + "/" + MHQConstants.RANKS_FILE_PATH), type));
                     }
                 }
             }
@@ -136,12 +152,12 @@ public class Ranks {
         }
 
         if (!getRankSystems().containsKey(DEFAULT_SYSTEM_CODE)) {
-            LogManager.getLogger().fatal("Ranks MUST load the " + DEFAULT_SYSTEM_CODE
+            logger.fatal("Ranks MUST load the " + DEFAULT_SYSTEM_CODE
                     + " system. Initialization failure, shutting MekHQ down.");
             System.exit(-1);
         }
 
-        LogManager.getLogger().info("Completed Rank System XML Load");
+        logger.info("Completed Rank System XML Load");
     }
 
     public static void reinitializeRankSystems(final Campaign campaign) {
@@ -154,7 +170,7 @@ public class Ranks {
     }
 
     public static List<RankSystem> loadRankSystemsFromFile(final @Nullable File file,
-                                                           final RankSystemType type) {
+            final RankSystemType type) {
         if (file == null) {
             return new ArrayList<>();
         }
@@ -164,7 +180,7 @@ public class Ranks {
         try (InputStream is = new FileInputStream(file)) {
             xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
         } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
             return new ArrayList<>();
         }
 
@@ -181,7 +197,8 @@ public class Ranks {
             }
 
             if (wn.getNodeName().equalsIgnoreCase("rankSystem") && wn.hasChildNodes()) {
-                final RankSystem rankSystem = RankSystem.generateInstanceFromXML(wn.getChildNodes(), version, true, type);
+                final RankSystem rankSystem = RankSystem.generateInstanceFromXML(wn.getChildNodes(), version, true,
+                        type);
                 if (rankSystem != null) {
                     rankSystems.add(rankSystem);
                 }
@@ -189,5 +206,5 @@ public class Ranks {
         }
         return rankSystems;
     }
-    //endregion File I/O
+    // endregion File I/O
 }

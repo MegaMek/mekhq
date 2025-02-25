@@ -19,25 +19,28 @@
  */
 package mekhq.campaign.personnel.ranks;
 
-import megamek.Version;
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.personnel.enums.Profession;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.Version;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.enums.Profession;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
  * A specific rank with information about officer status and payment multipliers
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Rank {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(Rank.class);
+    // region Variable Declarations
     // Rank Size Codes
     // Enlisted
     public static final int RE_MIN = 0; // Rank "None"
@@ -58,9 +61,9 @@ public class Rank {
     private Map<Profession, Integer> rankLevels;
     private boolean officer;
     private double payMultiplier;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public Rank() {
         this(new String[0], false, 1.0);
     }
@@ -81,9 +84,9 @@ public class Rank {
         setOfficer(officer);
         setPayMultiplier(payMultiplier);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public Map<Profession, String> getRankNames() {
         return rankNames;
     }
@@ -115,9 +118,9 @@ public class Rank {
     public void setPayMultiplier(final double payMultiplier) {
         this.payMultiplier = payMultiplier;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
-    //region Initialization
+    // region Initialization
     private void initializeRank(final String... names) {
         setRankNames(new HashMap<>());
         setRankLevels(new HashMap<>());
@@ -129,22 +132,23 @@ public class Rank {
                 name = split[0];
                 try {
                     level = Integer.parseInt(split[1].trim());
-                } catch (Exception e) {
-                    LogManager.getLogger().error("", e);
+                } catch (Exception ex) {
+                    logger.error(ex, "Unknown Exception - initializeRank");
                 }
             }
             getRankNames().put(profession, name);
             getRankLevels().put(profession, level);
         }
     }
-    //endregion Initialization
+    // endregion Initialization
 
     public String getName(final Profession profession) {
         return getRankNames().get(profession);
     }
 
     public String getNameWithLevels(final Profession profession) {
-        return getRankNames().get(profession) + ((getRankLevels().get(profession) > 1) ? ":" + getRankLevels().get(profession) : "");
+        return getRankNames().get(profession)
+                + ((getRankLevels().get(profession) > 1) ? ":" + getRankLevels().get(profession) : "");
     }
 
     public String getRankNamesAsString(final String delimiter) {
@@ -161,7 +165,7 @@ public class Rank {
         return joiner.toString();
     }
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isEmpty(final Profession profession) {
         return !getRankNames().containsKey(profession) || getRankNames().get(profession).isBlank()
                 || getRankNames().get(profession).equals("-");
@@ -170,9 +174,9 @@ public class Rank {
     public boolean indicatesAlternativeSystem(final Profession profession) {
         return getRankNames().containsKey(profession) && getRankNames().get(profession).startsWith("--");
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     public void writeToXML(final PrintWriter pw, int indent, final int index) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "rank");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rankNames", getRankNamesAsString(","));
@@ -198,7 +202,7 @@ public class Rank {
     }
 
     public static @Nullable Rank generateInstanceFromXML(final Node wn, final Version version,
-                                                         final boolean e0) {
+            final boolean e0) {
         final Rank rank = new Rank();
         try {
             final NodeList nl = wn.getChildNodes();
@@ -208,9 +212,6 @@ public class Rank {
 
                 if (wn2.getNodeName().equalsIgnoreCase("rankNames")) {
                     String names = wn2.getTextContent();
-                    if (version.isLowerThan("0.49.0")) {
-                        names += e0 ? ",--TECH,--TECH,--ADMIN" : ",-,-,-";
-                    }
                     rank.initializeRank(names.split(",", -1));
                 } else if (wn2.getNodeName().equalsIgnoreCase("officer")) {
                     rank.setOfficer(Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -218,12 +219,12 @@ public class Rank {
                     rank.setPayMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 }
             }
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+        } catch (Exception exception) {
+            logger.error(exception, "Unknown Exception");
             return null;
         }
 
         return rank;
     }
-    //endregion File I/O
+    // endregion File I/O
 }

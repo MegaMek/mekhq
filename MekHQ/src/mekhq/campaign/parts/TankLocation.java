@@ -20,24 +20,34 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.*;
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.CriticalSlot;
+import megamek.common.IArmorState;
+import megamek.common.ILocationExposureStatus;
+import megamek.common.Mounted;
+import megamek.common.SimpleTechLevel;
+import megamek.common.Tank;
+import megamek.common.TargetRoll;
+import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class TankLocation extends Part {
+    private static final MMLogger logger = MMLogger.create(TankLocation.class);
+
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2460, 2470, 2510).setApproximate(true, false, false)
             .setPrototypeFactions(F_TH).setProductionFactions(F_TH)
@@ -89,8 +99,8 @@ public class TankLocation extends Part {
         computeCost();
     }
 
-    protected void computeCost () {
-        //TODO: implement
+    protected void computeCost() {
+        // TODO: implement
     }
 
     @Override
@@ -134,7 +144,7 @@ public class TankLocation extends Part {
                     breached = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }
@@ -153,7 +163,7 @@ public class TankLocation extends Part {
                         continue;
                     }
                     slot.setBreached(false);
-                    Mounted m = slot.getMount();
+                    Mounted<?> m = slot.getMount();
                     if (null != m) {
                         m.setBreached(false);
                     }
@@ -232,15 +242,22 @@ public class TankLocation extends Part {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
+        StringBuilder toReturn = new StringBuilder();
+
+        toReturn.append(super.getDetails(includeRepairDetails));
+
         if (includeRepairDetails) {
             if (isBreached()) {
-                return "Breached";
-            } else {
-                return damage + " point(s) of damage";
+                toReturn.append(", Breached");
+            } else if (damage > 0) {
+                toReturn.append(", ")
+                    .append(damage)
+                    .append(damage == 1 ? " point" : " points")
+                    .append(" of damage");
             }
-        } else {
-            return super.getDetails(false);
         }
+
+        return toReturn.toString();
     }
 
     @Override
@@ -293,7 +310,7 @@ public class TankLocation extends Part {
         if (!isBreached() || isSalvaging()) {
             return super.getDesc();
         }
-        String toReturn = "<html><font size='2'";
+        String toReturn = "<html><font";
         String scheduled = "";
         if (getTech() != null) {
             scheduled = " (scheduled) ";
@@ -307,18 +324,18 @@ public class TankLocation extends Part {
         return toReturn;
     }
 
-     @Override
-     public boolean isRightTechType(String skillType) {
-         return skillType.equals(SkillType.S_TECH_MECHANIC);
-     }
+    @Override
+    public boolean isRightTechType(String skillType) {
+        return skillType.equals(SkillType.S_TECH_MECHANIC);
+    }
 
-     @Override
-     public void doMaintenanceDamage(int d) {
-         int points = unit.getEntity().getInternal(loc);
-         points = Math.max(points -d, 1);
-         unit.getEntity().setInternal(points, loc);
-         updateConditionFromEntity(false);
-     }
+    @Override
+    public void doMaintenanceDamage(int d) {
+        int points = unit.getEntity().getInternal(loc);
+        points = Math.max(points - d, 1);
+        unit.getEntity().setInternal(points, loc);
+        updateConditionFromEntity(false);
+    }
 
     @Override
     public String getLocationName() {

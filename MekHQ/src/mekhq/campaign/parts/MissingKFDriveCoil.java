@@ -57,6 +57,7 @@ public class MissingKFDriveCoil extends MissingPart {
         this.coreType = coreType;
         this.docks = docks;
         this.name = "K-F Drive Coil";
+        this.unitTonnageMatters = true;
     }
 
     @Override

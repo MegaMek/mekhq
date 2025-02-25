@@ -21,15 +21,18 @@ package mekhq.campaign.mission.atb.scenario;
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.PrincessException;
 import megamek.common.*;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
-import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
 
 @AtBScenarioEnabled
 public class ChaseBuiltInScenario extends AtBScenario {
+    private static final MMLogger logger = MMLogger.create(ChaseBuiltInScenario.class);
+
     @Override
     public int getScenarioType() {
         return CHASE;
@@ -47,7 +50,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
 
     @Override
     public int getMapX() {
-        return 18 + getLanceCount();
+        return 18 + getForceCount();
     }
 
     @Override
@@ -62,7 +65,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+            ArrayList<Entity> enemyEntities) {
         boolean startNorth = Compute.d6() > 3;
 
         int destinationEdge = startNorth ? Board.START_S : Board.START_N;
@@ -78,9 +81,11 @@ public class ChaseBuiltInScenario extends AtBScenario {
             addBotForce(allyEntitiesForce, campaign);
         }
 
-        addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), EntityWeightClass.WEIGHT_ASSAULT, 0,
+        CombatTeam combatTeam = getCombatTeamById(campaign);
+        int weightClass = combatTeam != null ? combatTeam.getWeightClass(campaign) : EntityWeightClass.WEIGHT_LIGHT;
+        addEnemyForce(enemyEntities, weightClass, EntityWeightClass.WEIGHT_ASSAULT, 0,
                 -1, campaign);
-        addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), EntityWeightClass.WEIGHT_ASSAULT, 0,
+        addEnemyForce(enemyEntities, weightClass, EntityWeightClass.WEIGHT_ASSAULT, 0,
                 -1, campaign);
 
         BotForce botForce = getEnemyBotForce(getContract(campaign), startEdge, getEnemyHome(), enemyEntities);
@@ -98,7 +103,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
                 botForce.setDestinationEdge(destinationEdge);
             }
         } catch (PrincessException e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
 
         addBotForce(botForce, campaign);
@@ -110,7 +115,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
             int speed = en.getWalkMP();
 
             if (en.getJumpMP() > 0) {
-                if (en instanceof megamek.common.Infantry) {
+                if (en instanceof Infantry) {
                     speed = en.getJumpMP();
                 } else {
                     speed++;
@@ -124,7 +129,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
             int speed = en.getWalkMP();
 
             if (en.getJumpMP() > 0) {
-                if (en instanceof megamek.common.Infantry) {
+                if (en instanceof Infantry) {
                     speed = en.getJumpMP();
                 } else {
                     speed++;
@@ -141,7 +146,8 @@ public class ChaseBuiltInScenario extends AtBScenario {
 
         ScenarioObjective destroyHostiles = isAttacker()
                 ? CommonObjectiveFactory.getBreakthrough(contract, this, campaign, 1, 50,
-                        OffBoardDirection.translateBoardStart(AtBDynamicScenarioFactory.getOppositeEdge(getStartingPos())))
+                        OffBoardDirection
+                                .translateBoardStart(AtBDynamicScenarioFactory.getOppositeEdge(getStartingPos())))
                 : CommonObjectiveFactory.getPreventEnemyBreakthrough(contract, 1, 50,
                         OffBoardDirection.translateBoardStart(getEnemyHome()));
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,

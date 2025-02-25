@@ -20,25 +20,35 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.util.Enumeration;
+import java.util.Map;
+import java.util.Vector;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.WindowConstants;
+
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.Vector;
 
 /**
  * @author Taharqa
  */
 public class SelectUnusedAbilityDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(SelectUnusedAbilityDialog.class);
+
     private JButton btnClose;
     private JButton btnOK;
     private ButtonGroup group;
@@ -47,7 +57,7 @@ public class SelectUnusedAbilityDialog extends JDialog {
     private Map<String, SpecialAbility> currentSPA;
 
     public SelectUnusedAbilityDialog(final JFrame frame, final Vector<String> unused,
-                                     final Map<String, SpecialAbility> c) {
+            final Map<String, SpecialAbility> c) {
         super(frame, true);
         choices = unused;
         currentSPA = c;
@@ -64,7 +74,7 @@ public class SelectUnusedAbilityDialog extends JDialog {
         group = new ButtonGroup();
 
         int ncol = 2;
-        JPanel panMain = new JPanel(new GridLayout((int) Math.ceil(choices.size() / (ncol * 1.0)),ncol));
+        JPanel panMain = new JPanel(new GridLayout((int) Math.ceil(choices.size() / (ncol * 1.0)), ncol));
 
         JRadioButton chk;
         for (String name : choices) {
@@ -76,7 +86,7 @@ public class SelectUnusedAbilityDialog extends JDialog {
             panMain.add(chk);
         }
 
-        JPanel panButtons = new JPanel(new GridLayout(0,2));
+        JPanel panButtons = new JPanel(new GridLayout(0, 2));
         btnOK.setText("Done");
         btnOK.addActionListener(evt -> done());
 
@@ -103,7 +113,7 @@ public class SelectUnusedAbilityDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -166,7 +176,7 @@ public class SelectUnusedAbilityDialog extends JDialog {
             for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
                 IOption option = j.nextElement();
                 if (option.getName().equals(lookup)) {
-                    return(option.getDisplayableName());
+                    return (option.getDisplayableName());
                 }
             }
         }

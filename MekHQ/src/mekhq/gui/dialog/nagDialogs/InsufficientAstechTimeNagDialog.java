@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,47 +18,73 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import mekhq.MekHQ;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
-import javax.swing.*;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAstechTimeNagLogic.getAsTechTimeDeficit;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAstechTimeNagLogic.hasAsTechTimeDeficit;
 
+/**
+ * A dialog used to notify the user about insufficient available time for astechs to complete the
+ * required maintenance tasks. Not to be confused with {@link InsufficientAstechsNagDialog}.
+ *
+ * <p>
+ * This nag dialog is triggered when the available work time for the astech pool is inadequate to meet
+ * the maintenance time requirements for the current campaign's hangar units. It provides a localized
+ * message detailing the time deficit and allows the user to take necessary action or dismiss the dialog.
+ * </p>
+ *
+ * <strong>Features:</strong>
+ * <ul>
+ *   <li>Calculates the time deficit for the astech pool based on hangar unit maintenance requirements.</li>
+ *   <li>Notifies the user when there is inadequate time available to maintain all units.</li>
+ *   <li>Extends {@link AbstractMHQNagDialog} for consistent nag dialog behavior.</li>
+ * </ul>
+ */
 public class InsufficientAstechTimeNagDialog extends AbstractMHQNagDialog {
-    //region Constructors
-    public InsufficientAstechTimeNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, "InsufficientAstechTimeNagDialog", "InsufficientAstechTimeNagDialog.title",
-                "", campaign, MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME);
+    /**
+     * Constructs an {@code InsufficientAstechTimeNagDialog} for the given campaign.
+     *
+     * <p>
+     * This dialog calculates the astech time deficit and uses a localized message
+     * to notify the user about the shortage of available time. The message provides
+     * the commander's address, the time deficit, and a pluralized suffix for correctness.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} tied to this nag dialog.
+     *                 The campaign provides data about hangar units and astech availability.
+     */
+    public InsufficientAstechTimeNagDialog(final Campaign campaign) {
+        super(campaign, MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME);
+
+        int asTechsTimeDeficit = getAsTechTimeDeficit(campaign);
+
+        String pluralizer = (asTechsTimeDeficit > 1) ? "s" : "";
+
+        final String DIALOG_BODY = "InsufficientAstechTimeNagDialog.text";
+        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
+            campaign.getCommanderAddress(false), asTechsTimeDeficit, pluralizer));
+        showDialog();
     }
-    //endregion Constructors
 
-    @Override
-    protected boolean checkNag() {
-        if (MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                || !getCampaign().getCampaignOptions().isCheckMaintenance()) {
-            return false;
-        }
+    /**
+     * Checks if a nag dialog should be displayed for insufficient AsTech time in the given campaign.
+     *
+     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
+     * <ul>
+     *     <li>If the nag dialog for insufficient AsTech time has not been ignored in the user options.</li>
+     *     <li>If there is a deficit in the available AsTech time for the given campaign.</li>
+     * </ul>
+     *
+     * @param campaign the {@link Campaign} to check for nagging conditions
+     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
+     */
+    public static boolean checkNag(Campaign campaign) {
+        final String NAG_KEY = MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME;
 
-        // Units are only valid if they are maintained, present, and not self crewed (as the crew
-        // maintain it in that case). For each unit this is valid for, we need six astechs to assist
-        // the tech for the maintenance.
-        final int need = getCampaign().getHangar().getUnitsStream()
-                .filter(unit -> !unit.isUnmaintained() && unit.isPresent() && !unit.isSelfCrewed())
-                .mapToInt(unit -> unit.getMaintenanceTime() * 6).sum();
-
-        int available = getCampaign().getPossibleAstechPoolMinutes();
-        if (getCampaign().isOvertimeAllowed()) {
-            available += getCampaign().getPossibleAstechPoolOvertime();
-        }
-
-        if (available < need) {
-            final int astechsNeeded = (int) Math.ceil((need - available) / (double) Person.PRIMARY_ROLE_SUPPORT_TIME);
-            setDescription(String.format(resources.getString("InsufficientAstechTimeNagDialog.text"), astechsNeeded));
-            return true;
-        } else {
-            return false;
-        }
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && hasAsTechTimeDeficit(campaign);
     }
 }

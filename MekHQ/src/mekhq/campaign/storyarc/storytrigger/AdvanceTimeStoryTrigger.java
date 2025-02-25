@@ -34,11 +34,23 @@ import org.w3c.dom.NodeList;
 import javax.swing.*;
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.io.PrintWriter;
+import java.text.ParseException;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * This StoryTrigger will advance time a certain number of days.
  */
 public class AdvanceTimeStoryTrigger extends StoryTrigger {
+    private static final MMLogger logger = MMLogger.create(AdvanceTimeStoryTrigger.class);
 
     int days = 1;
 
@@ -89,7 +101,7 @@ public class AdvanceTimeStoryTrigger extends StoryTrigger {
                 }
 
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

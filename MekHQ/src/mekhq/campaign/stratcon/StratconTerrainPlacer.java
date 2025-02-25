@@ -17,8 +17,7 @@
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.stratcon;
-import java.util.HashSet;
-import java.util.Set;
+
 import megamek.common.Compute;
 import megamek.common.Coords;
 
@@ -28,17 +27,20 @@ import megamek.common.Coords;
 public class StratconTerrainPlacer {
     /**
      * Loads base terrain and "stripes" the passed-in track.
+     * 
      * @param track The track to process.
      */
     public static void InitializeTrackTerrain(StratconTrackState track) {
         // 1. get the correct biome list according to track temperature
         // 2. pick random biome to be "base terrain"; apply it to all track hexes
         // 3. "stripe" the other biomes:
-        //      striping is "starting coordinate" (random track coord) and "ending coordinate"
-        //      TODO: Maybe more than one of each biome?
-        //      TODO: Map category being displayed for some reason
+        // striping is "starting coordinate" (random track coord) and "ending
+        // coordinate"
+        // TODO: Maybe more than one of each biome?
+        // TODO: Map category being displayed for some reason
         int kelvinTemp = track.getTemperature() + StratconContractInitializer.ZERO_CELSIUS_IN_KELVIN;
-        StratconBiome biome = StratconBiomeManifest.getInstance().getTempMap(StratconBiomeManifest.TERRAN_BIOME).floorEntry(kelvinTemp).getValue();
+        StratconBiome biome = StratconBiomeManifest.getInstance().getTempMap(StratconBiomeManifest.TERRAN_BIOME)
+                .floorEntry(kelvinTemp).getValue();
 
         int baseTerrainIndex = Compute.randomInt(biome.allowedTerrainTypes.size());
 
@@ -48,24 +50,28 @@ public class StratconTerrainPlacer {
             }
         }
 
-        // the following code is useful for quickly displaying all possible (Terran) terrain types on a newly generated track
+        // the following code is useful for quickly displaying all possible (Terran)
+        // terrain types on a newly generated track
         // unclean, but a pain enough to reproduce that I've left it here
-        /*int x = 0;
-        int y = 0;
-        Set<String> terrainTypes = new HashSet<>();
-        for (StratconBiome testBiome : StratconBiomeManifest.getInstance().getTempMap("Terran").values()) {
-            terrainTypes.addAll(testBiome.allowedTerrainTypes);
-        }
-        
-        for (String biomeName : terrainTypes) {
-            track.setTerrainTile(new StratconCoords(x, y), biomeName);
-            x++;
-            if (x >= track.getWidth()) {
-                x = 0;
-                y++;
-            }
-        }*/
-        
+        /*
+         * int x = 0;
+         * int y = 0;
+         * Set<String> terrainTypes = new HashSet<>();
+         * for (StratconBiome testBiome :
+         * StratconBiomeManifest.getInstance().getTempMap("Terran").values()) {
+         * terrainTypes.addAll(testBiome.allowedTerrainTypes);
+         * }
+         * 
+         * for (String biomeName : terrainTypes) {
+         * track.setTerrainTile(new StratconCoords(x, y), biomeName);
+         * x++;
+         * if (x >= track.getWidth()) {
+         * x = 0;
+         * y++;
+         * }
+         * }
+         */
+
         for (int x = 0; x < biome.allowedTerrainTypes.size(); x++) {
             if (x != baseTerrainIndex) {
                 DrawStripe(track, biome.allowedTerrainTypes.get(x));
@@ -75,7 +81,8 @@ public class StratconTerrainPlacer {
 
     /**
      * Draws a "stripe" of the given terrain type on the given track
-     * @param track Track to stripe
+     * 
+     * @param track           Track to stripe
      * @param terrainTypeName Terrain type
      */
     private static void DrawStripe(StratconTrackState track, String terrainTypeName) {
@@ -87,7 +94,7 @@ public class StratconTerrainPlacer {
         Coords startPoint = new Coords(startX, startY);
         Coords endPoint = new Coords(endX, endY);
 
-        for(Coords coords : StratconCoords.intervening(startPoint, endPoint)) {
+        for (Coords coords : StratconCoords.intervening(startPoint, endPoint)) {
             track.setTerrainTile(new StratconCoords(coords.getX(), coords.getY()), terrainTypeName);
         }
     }

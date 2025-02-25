@@ -18,26 +18,27 @@
  */
 package mekhq.campaign.market.enums;
 
-import mekhq.MekHQ;
-import org.junit.jupiter.api.Test;
-
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class UnitMarketTypeTest {
-    //region Variable Declarations
+import java.util.ResourceBundle;
+
+import org.junit.jupiter.api.Test;
+
+import mekhq.MekHQ;
+
+class UnitMarketTypeTest {
+    // region Variable Declarations
     private static final UnitMarketType[] types = UnitMarketType.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     @Test
-    public void testIsOpen() {
+    void testIsOpen() {
         for (final UnitMarketType unitMarketType : types) {
             if (unitMarketType == UnitMarketType.OPEN) {
                 assertTrue(unitMarketType.isOpen());
@@ -48,7 +49,7 @@ public class UnitMarketTypeTest {
     }
 
     @Test
-    public void testIsEmployer() {
+    void testIsEmployer() {
         for (final UnitMarketType unitMarketType : types) {
             if (unitMarketType == UnitMarketType.EMPLOYER) {
                 assertTrue(unitMarketType.isEmployer());
@@ -59,7 +60,7 @@ public class UnitMarketTypeTest {
     }
 
     @Test
-    public void testIsMercenary() {
+    void testIsMercenary() {
         for (final UnitMarketType unitMarketType : types) {
             if (unitMarketType == UnitMarketType.MERCENARY) {
                 assertTrue(unitMarketType.isMercenary());
@@ -70,7 +71,7 @@ public class UnitMarketTypeTest {
     }
 
     @Test
-    public void testIsFactory() {
+    void testIsFactory() {
         for (final UnitMarketType unitMarketType : types) {
             if (unitMarketType == UnitMarketType.FACTORY) {
                 assertTrue(unitMarketType.isFactory());
@@ -81,7 +82,7 @@ public class UnitMarketTypeTest {
     }
 
     @Test
-    public void testIsBlackMarket() {
+    void testIsBlackMarket() {
         for (final UnitMarketType unitMarketType : types) {
             if (unitMarketType == UnitMarketType.BLACK_MARKET) {
                 assertTrue(unitMarketType.isBlackMarket());
@@ -90,30 +91,23 @@ public class UnitMarketTypeTest {
             }
         }
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     @Test
-    public void testParseFromString() {
+    void testParseFromString() {
         // Normal Parsing
         assertEquals(UnitMarketType.OPEN, UnitMarketType.parseFromString("OPEN"));
         assertEquals(UnitMarketType.FACTORY, UnitMarketType.parseFromString("FACTORY"));
-
-        // Legacy Parsing
-        assertEquals(UnitMarketType.OPEN, UnitMarketType.parseFromString("0"));
-        assertEquals(UnitMarketType.EMPLOYER, UnitMarketType.parseFromString("1"));
-        assertEquals(UnitMarketType.MERCENARY, UnitMarketType.parseFromString("2"));
-        assertEquals(UnitMarketType.FACTORY, UnitMarketType.parseFromString("3"));
-        assertEquals(UnitMarketType.BLACK_MARKET, UnitMarketType.parseFromString("4"));
 
         // Error Case
         assertEquals(UnitMarketType.OPEN, UnitMarketType.parseFromString("5"));
         assertEquals(UnitMarketType.OPEN, UnitMarketType.parseFromString("blah"));
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Test
-    public void testToStringOverride() {
+    void testToStringOverride() {
         assertEquals(resources.getString("UnitMarketType.EMPLOYER.text"),
                 UnitMarketType.EMPLOYER.toString());
         assertEquals(resources.getString("UnitMarketType.BLACK_MARKET.text"),

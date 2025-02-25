@@ -18,26 +18,27 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import mekhq.MekHQ;
-import org.junit.jupiter.api.Test;
-
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ManeiDominiRankTest {
-    //region Variable Declarations
+import java.util.ResourceBundle;
+
+import org.junit.jupiter.api.Test;
+
+import mekhq.MekHQ;
+
+class ManeiDominiRankTest {
+    // region Variable Declarations
     private static final ManeiDominiRank[] maneiDominiRanks = ManeiDominiRank.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     @Test
-    public void testIsNone() {
+    void testIsNone() {
         for (final ManeiDominiRank maneiDominiRank : maneiDominiRanks) {
             if (maneiDominiRank == ManeiDominiRank.NONE) {
                 assertTrue(maneiDominiRank.isNone());
@@ -48,7 +49,7 @@ public class ManeiDominiRankTest {
     }
 
     @Test
-    public void testIsAlpha() {
+    void testIsAlpha() {
         for (final ManeiDominiRank maneiDominiRank : maneiDominiRanks) {
             if (maneiDominiRank == ManeiDominiRank.ALPHA) {
                 assertTrue(maneiDominiRank.isAlpha());
@@ -59,7 +60,7 @@ public class ManeiDominiRankTest {
     }
 
     @Test
-    public void testIsBeta() {
+    void testIsBeta() {
         for (final ManeiDominiRank maneiDominiRank : maneiDominiRanks) {
             if (maneiDominiRank == ManeiDominiRank.BETA) {
                 assertTrue(maneiDominiRank.isBeta());
@@ -70,7 +71,7 @@ public class ManeiDominiRankTest {
     }
 
     @Test
-    public void testIsOmega() {
+    void testIsOmega() {
         for (final ManeiDominiRank maneiDominiRank : maneiDominiRanks) {
             if (maneiDominiRank == ManeiDominiRank.OMEGA) {
                 assertTrue(maneiDominiRank.isOmega());
@@ -81,7 +82,7 @@ public class ManeiDominiRankTest {
     }
 
     @Test
-    public void testIsTau() {
+    void testIsTau() {
         for (final ManeiDominiRank maneiDominiRank : maneiDominiRanks) {
             if (maneiDominiRank == ManeiDominiRank.TAU) {
                 assertTrue(maneiDominiRank.isTau());
@@ -92,7 +93,7 @@ public class ManeiDominiRankTest {
     }
 
     @Test
-    public void testIsDelta() {
+    void testIsDelta() {
         for (final ManeiDominiRank maneiDominiRank : maneiDominiRanks) {
             if (maneiDominiRank == ManeiDominiRank.DELTA) {
                 assertTrue(maneiDominiRank.isDelta());
@@ -103,7 +104,7 @@ public class ManeiDominiRankTest {
     }
 
     @Test
-    public void testIsSigma() {
+    void testIsSigma() {
         for (final ManeiDominiRank maneiDominiRank : maneiDominiRanks) {
             if (maneiDominiRank == ManeiDominiRank.SIGMA) {
                 assertTrue(maneiDominiRank.isSigma());
@@ -114,7 +115,7 @@ public class ManeiDominiRankTest {
     }
 
     @Test
-    public void testIsOmicron() {
+    void testIsOmicron() {
         for (final ManeiDominiRank maneiDominiRank : maneiDominiRanks) {
             if (maneiDominiRank == ManeiDominiRank.OMICRON) {
                 assertTrue(maneiDominiRank.isOmicron());
@@ -123,27 +124,23 @@ public class ManeiDominiRankTest {
             }
         }
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     @Test
-    public void testParseFromString() {
+    void testParseFromString() {
         // Normal Parsing
         assertEquals(ManeiDominiRank.NONE, ManeiDominiRank.parseFromString("NONE"));
         assertEquals(ManeiDominiRank.DELTA, ManeiDominiRank.parseFromString("DELTA"));
-
-        // Legacy Parsing
-        assertEquals(ManeiDominiRank.ALPHA, ManeiDominiRank.parseFromString("0"));
-        assertEquals(ManeiDominiRank.OMICRON, ManeiDominiRank.parseFromString("6"));
 
         // Error Case
         assertEquals(ManeiDominiRank.NONE, ManeiDominiRank.parseFromString("7"));
         assertEquals(ManeiDominiRank.NONE, ManeiDominiRank.parseFromString("blah"));
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Test
-    public void testToStringOverride() {
+    void testToStringOverride() {
         assertEquals(resources.getString("ManeiDominiRank.NONE.text"), ManeiDominiRank.NONE.toString());
         assertEquals(resources.getString("ManeiDominiRank.OMICRON.text"), ManeiDominiRank.OMICRON.toString());
     }

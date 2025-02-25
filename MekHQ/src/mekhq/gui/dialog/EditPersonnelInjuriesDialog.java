@@ -19,28 +19,43 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Injury;
-import mekhq.campaign.personnel.Person;
-import org.apache.logging.log4j.LogManager;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.util.List;
+import java.util.ResourceBundle;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.List;
-import java.util.ResourceBundle;
+
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.Person;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Ralgith
  */
 public class EditPersonnelInjuriesDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(EditPersonnelInjuriesDialog.class);
+
     private JFrame frame;
     private Campaign campaign;
     private Person person;
@@ -51,7 +66,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
     private JTable injuriesTable;
 
     public EditPersonnelInjuriesDialog(final JFrame frame, final boolean modal,
-                                       final Campaign campaign, final Person person) {
+            final Campaign campaign, final Person person) {
         super(frame, modal);
         this.frame = frame;
         this.campaign = campaign;
@@ -75,7 +90,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         setTitle(resourceMap.getString("Form.title") + " " + person.getFullName());
         getContentPane().setLayout(new BorderLayout());
 
-        JPanel panBtns = new JPanel(new GridLayout(1,0));
+        JPanel panBtns = new JPanel(new GridLayout(1, 0));
         btnAdd.setText(resourceMap.getString("btnAdd.text"));
         btnAdd.setName("btnAdd");
         btnAdd.addActionListener(evt -> addEntry());
@@ -108,11 +123,10 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         injuriesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         injuriesTable.getSelectionModel().addListSelectionListener(this::injuriesTableValueChanged);
 
-        JScrollPane scrollInjuryTable = new JScrollPane();
+        JScrollPane scrollInjuryTable = new JScrollPaneWithSpeed();
         scrollInjuryTable.setName("scrollInjuryTable");
         scrollInjuryTable.setViewportView(injuriesTable);
         getContentPane().add(scrollInjuryTable, BorderLayout.CENTER);
-
 
         btnOK.setText(resourceMap.getString("btnOK.text"));
         btnOK.setName("btnOK");
@@ -129,7 +143,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -184,7 +198,8 @@ public class EditPersonnelInjuriesDialog extends JDialog {
     }
 
     /**
-     * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
+     * A table model for displaying parts - similar to the one in CampaignGUI, but
+     * not exactly
      */
     public static class InjuryTableModel extends AbstractTableModel {
         protected String[] columnNames;
@@ -283,7 +298,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
             return data.get(row);
         }
 
-         public int getColumnWidth(int c) {
+        public int getColumnWidth(int c) {
             switch (c) {
                 case COL_DAYS:
                 case COL_HITS:
@@ -331,8 +346,8 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         public class Renderer extends DefaultTableCellRenderer {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
-                                                           boolean isSelected, boolean hasFocus,
-                                                           int row, int column) {
+                    boolean isSelected, boolean hasFocus,
+                    int row, int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setOpaque(true);
                 int actualCol = table.convertColumnIndexToModel(column);

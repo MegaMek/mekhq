@@ -18,23 +18,12 @@
  */
 package mekhq.gui;
 
-import megamek.common.Dropship;
-import megamek.common.Jumpship;
-import megamek.common.util.ImageUtil;
-import mekhq.MHQConstants;
-import mekhq.Utilities;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.JumpPath;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.StarUtil;
-import org.apache.logging.log4j.LogManager;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.image.AffineTransformOp;
@@ -45,12 +34,37 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLayeredPane;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
+
+import megamek.common.Dropship;
+import megamek.common.Jumpship;
+import megamek.common.util.ImageUtil;
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
+import mekhq.Utilities;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.JumpPath;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.StarUtil;
+
 /**
- * This panel displays a particular star system with suns and planets and information about
+ * This panel displays a particular star system with suns and planets and
+ * information about
  * the player's unit's position if in the system
+ *
  * @author Taharqa (Aaron Gullickson)
  */
 public class PlanetarySystemMapPanel extends JPanel {
+    private static final MMLogger logger = MMLogger.create(PlanetarySystemMapPanel.class);
     private JLayeredPane pane;
     private JPanel mapPanel;
     private JButton btnBack;
@@ -89,41 +103,57 @@ public class PlanetarySystemMapPanel extends JPanel {
             imgSpace = ImageIO.read(new File("data/images/universe/space.jpg")); // TODO : Remove inline file path
         } catch (IOException e1) {
             imgSpace = null;
-            LogManager.getLogger().error("missing default space image");
+            logger.error("missing default space image");
         }
         try {
-            imgZenithPoint = ImageIO.read(new File("data/images/universe/default_zenithpoint.png")); // TODO : Remove inline file path
+            imgZenithPoint = ImageIO.read(new File("data/images/universe/default_zenithpoint.png")); // TODO : Remove
+                                                                                                     // inline file path
         } catch (IOException e) {
             imgZenithPoint = null;
-            LogManager.getLogger().error("missing default zenith point image");
+            logger.error("missing default zenith point image");
         }
 
         try {
-            imgNadirPoint = ImageIO.read(new File("data/images/universe/default_nadirpoint.png")); // TODO : Remove inline file path
+            imgNadirPoint = ImageIO.read(new File("data/images/universe/default_nadirpoint.png")); // TODO : Remove
+                                                                                                   // inline file path
         } catch (IOException e) {
             imgNadirPoint = null;
-            LogManager.getLogger().error("missing default nadir point image");
+            logger.error("missing default nadir point image");
         }
 
         try {
-            imgRechargeStation = ImageIO.read(new File("data/images/universe/default_recharge_station.png")); // TODO : Remove inline file path
+            imgRechargeStation = ImageIO.read(new File("data/images/universe/default_recharge_station.png")); // TODO :
+                                                                                                              // Remove
+                                                                                                              // inline
+                                                                                                              // file
+                                                                                                              // path
         } catch (IOException e) {
             imgRechargeStation = null;
-            LogManager.getLogger().error("missing default recharge station image");
+            logger.error("missing default recharge station image");
         }
 
         try {
-            imgDefaultDropshipFleet = ImageIO.read(new File("data/images/universe/default_dropship_fleet.png")); // TODO : Remove inline file path
+            imgDefaultDropshipFleet = ImageIO.read(new File("data/images/universe/default_dropship_fleet.png")); // TODO
+                                                                                                                 // :
+                                                                                                                 // Remove
+                                                                                                                 // inline
+                                                                                                                 // file
+                                                                                                                 // path
         } catch (IOException e) {
             imgDefaultDropshipFleet = null;
-            LogManager.getLogger().error("missing default DropShip fleet image");
+            logger.error("missing default DropShip fleet image");
         }
 
         try {
-            imgDefaultJumpshipFleet = ImageIO.read(new File("data/images/universe/default_jumpship_fleet.png")); // TODO : Remove inline file path
+            imgDefaultJumpshipFleet = ImageIO.read(new File("data/images/universe/default_jumpship_fleet.png")); // TODO
+                                                                                                                 // :
+                                                                                                                 // Remove
+                                                                                                                 // inline
+                                                                                                                 // file
+                                                                                                                 // path
         } catch (IOException e) {
             imgDefaultJumpshipFleet = null;
-            LogManager.getLogger().error("missing default JumpShip fleet image");
+            logger.error("missing default JumpShip fleet image");
         }
 
         pane = new JLayeredPane();
@@ -151,7 +181,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                 int n = system.getPlanets().size();
                 // star size is minimum of half the image or 20% of total width
                 int starWidth = Math.min(maxStarWidth, (int) Math.round(0.2 * getWidth()));
-                int rectWidth = (getWidth()-starWidth) / n;
+                int rectWidth = (getWidth() - starWidth) / n;
                 int midpoint = rectWidth / 2;
                 int y = getHeight() / 2;
                 int x = 0;
@@ -174,10 +204,12 @@ public class PlanetarySystemMapPanel extends JPanel {
                 }
 
                 // choose the font based on sizes
-                chooseFont(g2, system, campaign, rectWidth-6);
+                chooseFont(g2, system, campaign, rectWidth - 6);
 
                 // place the sun first
-                Image starIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(system)); // TODO : Remove inline file path
+                Image starIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(system)); // TODO : Remove
+                                                                                                       // inline file
+                                                                                                       // path
                 g2.drawImage(starIcon, starWidth - starImgSize, y - (starImgSize / 2), starImgSize, starImgSize, null);
 
                 // draw nadir and zenith points
@@ -185,13 +217,15 @@ public class PlanetarySystemMapPanel extends JPanel {
                     g2.drawImage(imgZenithPoint, zenithX, zenithY, jumpPointImgWidth, jumpPointImgHeight, null);
                 }
                 if (system.isZenithCharge(campaign.getLocalDate()) && (null != imgRechargeStation)) {
-                    drawRotatedImage(g2, imgRechargeStation, 90.0, zenithX, zenithY + 12, rechargeImgSize, rechargeImgSize);
+                    drawRotatedImage(g2, imgRechargeStation, 90.0, zenithX, zenithY + 12, rechargeImgSize,
+                            rechargeImgSize);
                 }
                 if (null != imgNadirPoint) {
                     g2.drawImage(imgNadirPoint, nadirX, nadirY, jumpPointImgWidth, jumpPointImgHeight, null);
                 }
                 if (system.isNadirCharge(campaign.getLocalDate()) && (null != imgRechargeStation)) {
-                    drawRotatedImage(g2, imgRechargeStation, 90.0, nadirX, nadirY + 12, rechargeImgSize, rechargeImgSize);
+                    drawRotatedImage(g2, imgRechargeStation, 90.0, nadirX, nadirY + 12, rechargeImgSize,
+                            rechargeImgSize);
                 }
 
                 // get the biggest diameter allowed within this space for a planet
@@ -218,7 +252,8 @@ public class PlanetarySystemMapPanel extends JPanel {
                         // diameters need to be scaled relative to largest planet, but linear
                         // scale will make all but gas/ice giants tiny. log scale made sizes too close,
                         // but cubic root scale seems to work pretty well.
-                        int diameter = (int) ((biggestDiameterPixels) * (Math.cbrt(p.getDiameter()) / Math.cbrt(biggestDiameter)));
+                        int diameter = (int) ((biggestDiameterPixels)
+                                * (Math.cbrt(p.getDiameter()) / Math.cbrt(biggestDiameter)));
                         if (diameter < minDiameter) {
                             diameter = minDiameter;
                         } else if (diameter > maxDiameter) {
@@ -227,7 +262,8 @@ public class PlanetarySystemMapPanel extends JPanel {
                         int radius = diameter / 2;
 
                         // check for current location - we assume you are on primary planet for now
-                        if (campaign.getLocation().getCurrentSystem().equals(system) && i == system.getPrimaryPlanetPosition()) {
+                        if (campaign.getLocation().getCurrentSystem().equals(system)
+                                && i == system.getPrimaryPlanetPosition()) {
                             updateShipImages();
 
                             JumpPath jp = campaign.getLocation().getJumpPath();
@@ -236,44 +272,57 @@ public class PlanetarySystemMapPanel extends JPanel {
                             int lineX2 = jumpshipX + shipImgSize;
                             int lineY2 = jumpshipY + shipImgSize;
                             if (!campaign.getLocation().isJumpZenith()) {
-                                lineY2 = jumpshipY-shipImgSize;
+                                lineY2 = jumpshipY - shipImgSize;
                             }
-                            if (null != jp && (!campaign.getLocation().isAtJumpPoint() || jp.getLastSystem().equals(system))) {
+                            if (null != jp
+                                    && (!campaign.getLocation().isAtJumpPoint() || jp.getLastSystem().equals(system))) {
                                 // the unit has a flight plan in this system so draw the line
                                 // in transit so draw a path
                                 g2.setColor(Color.YELLOW);
-                                Stroke dashed = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 9 }, 0);
+                                Stroke dashed = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0,
+                                        new float[] { 9 }, 0);
                                 g2.setStroke(dashed);
                                 g2.drawLine(lineX1, lineY1, lineX2, lineY2);
                             }
                             if (campaign.getLocation().isAtJumpPoint()) {
                                 // draw a ring around jumpship
-                                drawRing(g2, jumpshipX + (shipImgSize / 2), jumpshipY + (shipImgSize / 2), shipImgSize / 2, Color.ORANGE);
+                                drawRing(g2, jumpshipX + (shipImgSize / 2), jumpshipY + (shipImgSize / 2),
+                                        shipImgSize / 2, Color.ORANGE);
                                 if (null != imgJumpshipFleet) {
-                                    drawRotatedImage(g2, imgJumpshipFleet, 90, jumpshipX, jumpshipY, shipImgSize, shipImgSize);
+                                    drawRotatedImage(g2, imgJumpshipFleet, 90, jumpshipX, jumpshipY, shipImgSize,
+                                            shipImgSize);
                                 }
                             } else if (campaign.getLocation().isOnPlanet()) {
                                 drawRing(g2, x, y, radius, Color.ORANGE);
                                 if (null != imgDropshipFleet) {
-                                    g2.drawImage(imgDropshipFleet, x - radius - shipImgSize, y - radius - shipImgSize, shipImgSize, shipImgSize, null);
+                                    g2.drawImage(imgDropshipFleet, x - radius - shipImgSize, y - radius - shipImgSize,
+                                            shipImgSize, shipImgSize, null);
                                 }
                                 // draw jumpship too
                                 if (null != imgJumpshipFleet) {
-                                    drawRotatedImage(g2, imgJumpshipFleet, 90, jumpshipX, jumpshipY, shipImgSize, shipImgSize);
+                                    drawRotatedImage(g2, imgJumpshipFleet, 90, jumpshipX, jumpshipY, shipImgSize,
+                                            shipImgSize);
                                 }
                             } else {
                                 if (null != imgDropshipFleet) {
-                                    int lengthX = lineX1-lineX2;
-                                    int lengthY = lineY1-lineY2;
-                                    double rotationRequired = getFlightRotation(lengthX, lengthY, null != jp && jp.getLastSystem().equals(system), campaign.getLocation().isJumpZenith());
-                                    int partialX = lineX2 + (int) Math.round(lengthX * campaign.getLocation().getPercentageTransit());
-                                    int partialY = lineY2 + (int) Math.round(lengthY * campaign.getLocation().getPercentageTransit());
+                                    int lengthX = lineX1 - lineX2;
+                                    int lengthY = lineY1 - lineY2;
+                                    double rotationRequired = getFlightRotation(lengthX, lengthY,
+                                            null != jp && jp.getLastSystem().equals(system),
+                                            campaign.getLocation().isJumpZenith());
+                                    int partialX = lineX2
+                                            + (int) Math.round(lengthX * campaign.getLocation().getPercentageTransit());
+                                    int partialY = lineY2
+                                            + (int) Math.round(lengthY * campaign.getLocation().getPercentageTransit());
                                     drawRing(g2, partialX, partialY, shipImgSize / 2, Color.ORANGE);
-                                    drawRotatedImage(g2, imgDropshipFleet, rotationRequired, partialX - (shipImgSize / 2), partialY - (shipImgSize / 2), shipImgSize, shipImgSize);
+                                    drawRotatedImage(g2, imgDropshipFleet, rotationRequired,
+                                            partialX - (shipImgSize / 2), partialY - (shipImgSize / 2), shipImgSize,
+                                            shipImgSize);
                                 }
                                 // draw jumpship too
                                 if (null != imgJumpshipFleet) {
-                                    drawRotatedImage(g2, imgJumpshipFleet, 90, jumpshipX, jumpshipY, shipImgSize, shipImgSize);
+                                    drawRotatedImage(g2, imgJumpshipFleet, 90, jumpshipX, jumpshipY, shipImgSize,
+                                            shipImgSize);
                                 }
                             }
                         }
@@ -284,13 +333,17 @@ public class PlanetarySystemMapPanel extends JPanel {
                         }
 
                         // draw the planet icon
-                        Image planetIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(p)); // TODO : Remove inline file path
+                        Image planetIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(p)); // TODO :
+                                                                                                            // Remove
+                                                                                                            // inline
+                                                                                                            // file path
                         g2.drawImage(planetIcon, x - radius, y - radius, diameter, diameter, null);
                         final String planetName = p.getPrintableName(campaign.getLocalDate());
 
                         // planet name
                         g2.setColor(Color.WHITE);
-                        drawCenteredString(g2, planetName, x, y + (biggestDiameterPixels / 2) + 12 + g.getFontMetrics().getHeight(), rectWidth - 6);
+                        drawCenteredString(g2, planetName, x,
+                                y + (biggestDiameterPixels / 2) + 12 + g.getFontMetrics().getHeight(), rectWidth - 6);
                     }
                 }
             }
@@ -349,8 +402,6 @@ public class PlanetarySystemMapPanel extends JPanel {
             }
         });
 
-
-
         mapPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -386,10 +437,11 @@ public class PlanetarySystemMapPanel extends JPanel {
 
     /**
      * Choose a font size based on how large it needs to be to fit within the space
-     * @param g - a <code>Graphics</code> device
+     *
+     * @param g      - a <code>Graphics</code> device
      * @param system - a <code>PlanetarySystem</code>
-     * @param c - a <code>Campaign</code>
-     * @param limit - an integer indicating how large the text can be
+     * @param c      - a <code>Campaign</code>
+     * @param limit  - an integer indicating how large the text can be
      */
     private void chooseFont(Graphics g, PlanetarySystem system, Campaign c, int limit) {
         // start with 16
@@ -403,17 +455,18 @@ public class PlanetarySystemMapPanel extends JPanel {
 
     /**
      * Determine if planet names are too big for the display at current font size
-     * @param g - a <code>Graphics</code> device
+     *
+     * @param g      - a <code>Graphics</code> device
      * @param system - a <code>PlanetarySystem</code>
-     * @param when - <code>DateTime</code> object
-     * @param limit - an integer indicating how large the text can be
+     * @param when   - <code>DateTime</code> object
+     * @param limit  - an integer indicating how large the text can be
      * @return
      */
     private boolean areNamesTooBig(Graphics g, PlanetarySystem system, LocalDate when, int limit) {
         for (Planet p : system.getPlanets()) {
             String name = p.getName(when);
             if (g.getFontMetrics().stringWidth(name) > limit) {
-                //try splitting
+                // try splitting
                 if (name.contains(" ")) {
                     for (String line : name.split("\\s+")) {
                         if (g.getFontMetrics().stringWidth(line) > limit) {
@@ -435,12 +488,14 @@ public class PlanetarySystemMapPanel extends JPanel {
     }
 
     /**
-     * Draw a string that is centered on x and y. It will wrap text by spaces of hyphens
+     * Draw a string that is centered on x and y. It will wrap text by spaces of
+     * hyphens
      * if too large.
-     * @param g - a <code>Graphics2D</code> device to draw on
-     * @param text - a <code>String</code> of text to be drawn
-     * @param x - an <code>int</code> for the x-axis position
-     * @param y - an <code>int</code> for the y-axis position
+     *
+     * @param g     - a <code>Graphics2D</code> device to draw on
+     * @param text  - a <code>String</code> of text to be drawn
+     * @param x     - an <code>int</code> for the x-axis position
+     * @param y     - an <code>int</code> for the y-axis position
      * @param limit - an <code>int</coce> for how big the text can be
      */
     private void drawCenteredString(Graphics2D g, String text, int x, int y, int limit) {
@@ -448,28 +503,29 @@ public class PlanetarySystemMapPanel extends JPanel {
         y = y - (metrics.getHeight() / 2);
         if (metrics.stringWidth(text) > limit && (text.contains(" ") || text.contains("-"))) {
             if (text.contains(" ")) {
-                //try spaces first
+                // try spaces first
                 for (String line : text.split("\\s+")) {
-                    g.drawString(line, x- (metrics.stringWidth(line) / 2), y += g.getFontMetrics().getHeight());
+                    g.drawString(line, x - (metrics.stringWidth(line) / 2), y += g.getFontMetrics().getHeight());
                 }
             } else {
-                //otherwise break on the hyphen
+                // otherwise break on the hyphen
                 String[] lines = text.split("-");
                 for (int i = 0; i < lines.length; i++) {
                     String line = lines[i];
-                    if (i != (lines.length-1)) {
+                    if (i != (lines.length - 1)) {
                         line = line + "-";
                     }
-                    g.drawString(line, x- (metrics.stringWidth(line) / 2), y += g.getFontMetrics().getHeight());
+                    g.drawString(line, x - (metrics.stringWidth(line) / 2), y += g.getFontMetrics().getHeight());
                 }
             }
         } else {
-            g.drawString(text, x- (metrics.stringWidth(text) / 2), y + g.getFontMetrics().getHeight());
+            g.drawString(text, x - (metrics.stringWidth(text) / 2), y + g.getFontMetrics().getHeight());
         }
     }
 
     /**
      * Update and repaint the panel for a new planetary system.
+     *
      * @param s - a {@link PlanetarySystem} to paint
      */
     public void updatePlanetarySystem(PlanetarySystem s) {
@@ -483,6 +539,7 @@ public class PlanetarySystemMapPanel extends JPanel {
 
     /**
      * Update and repaint the panel for a new {@link Planet}
+     *
      * @param p - a {@link Planet} to paint.
      */
     public void updatePlanetarySystem(Planet p) {
@@ -504,7 +561,9 @@ public class PlanetarySystemMapPanel extends JPanel {
 
     /**
      * Change the selected planets and notify listeners so view is changed
-     * @param pos - an <code>int</code> giving the position of the newly selected planet
+     *
+     * @param pos - an <code>int</code> giving the position of the newly selected
+     *            planet
      */
     private void changeSelectedPlanet(int pos) {
         selectedPlanet = pos;
@@ -512,8 +571,10 @@ public class PlanetarySystemMapPanel extends JPanel {
     }
 
     /**
-     * Find any planet in the display that contains the x and y parameters. Used to identify if planets
+     * Find any planet in the display that contains the x and y parameters. Used to
+     * identify if planets
      * were selected by the cursor.
+     *
      * @param x - the x-value of the selection
      * @param y - the y-value of the selection
      * @return - a planet position
@@ -521,17 +582,17 @@ public class PlanetarySystemMapPanel extends JPanel {
     private int nearestNeighbour(double x, double y) {
         int n = system.getPlanets().size();
         int starWidth = Math.min(maxStarWidth, (int) Math.round(0.2 * getWidth()));
-        int rectWidth = (getWidth()-starWidth) / n;
+        int rectWidth = (getWidth() - starWidth) / n;
         int midpoint = rectWidth / 2;
         int xTarget;
         int yTarget = getHeight() / 2;
 
         for (int i = 1; i <= n; i++) {
-            xTarget = starWidth+rectWidth*(i-1)+midpoint;
-            //must be within total possible radius
-            int radius = maxDiameter/2;
-            if (x <= (xTarget+radius) & x >= (xTarget-radius) &
-                    y <= (yTarget+radius) & y >= (yTarget-radius)) {
+            xTarget = starWidth + rectWidth * (i - 1) + midpoint;
+            // must be within total possible radius
+            int radius = maxDiameter / 2;
+            if (x <= (xTarget + radius) & x >= (xTarget - radius) &
+                    y <= (yTarget + radius) & y >= (yTarget - radius)) {
                 return i;
             }
         }
@@ -540,15 +601,17 @@ public class PlanetarySystemMapPanel extends JPanel {
 
     /**
      * Draw and image with the given rotation
-     * @param g - the <code>Graphics2D</code> device to draw on
-     * @param image - a <code>BufferedImage</code> to be drawn
+     *
+     * @param g       - the <code>Graphics2D</code> device to draw on
+     * @param image   - a <code>BufferedImage</code> to be drawn
      * @param degrees - A <code>double</code> giving the rotation to apply
-     * @param x - the x position for placement
-     * @param y - the y position for placement
-     * @param width - the width to draw the image to
-     * @param height - the height to draw the image to
+     * @param x       - the x position for placement
+     * @param y       - the y position for placement
+     * @param width   - the width to draw the image to
+     * @param height  - the height to draw the image to
      */
-    private void drawRotatedImage(Graphics2D g, BufferedImage image, double degrees, int x, int y, int width, int height) {
+    private void drawRotatedImage(Graphics2D g, BufferedImage image, double degrees, int x, int y, int width,
+            int height) {
         double rotationRequired = Math.toRadians(degrees);
         double locationX = image.getWidth() / 2;
         double locationY = image.getHeight() / 2;
@@ -559,36 +622,45 @@ public class PlanetarySystemMapPanel extends JPanel {
     }
 
     /**
-     * Draw a selection ring of the given color around some point. This will draw over everything in the ring with a black background, so
+     * Draw a selection ring of the given color around some point. This will draw
+     * over everything in the ring with a black background, so
      * should be placed before anything selected.
-     * @param g - the <code>Graphics2D</code> device to draw on
-     * @param x - an <code>int</code> giving the x-position of the center of the ring
-     * @param y - an <code>int</code> giving the y-position of the center of the ring
+     *
+     * @param g      - the <code>Graphics2D</code> device to draw on
+     * @param x      - an <code>int</code> giving the x-position of the center of
+     *               the ring
+     * @param y      - an <code>int</code> giving the y-position of the center of
+     *               the ring
      * @param radius - an <code>int</code> giving the radius of the ring
-     * @param c - the <code>Color</code> of the ring
+     * @param c      - the <code>Color</code> of the ring
      */
     private void drawRing(Graphics2D g, int x, int y, int radius, Color c) {
         Arc2D.Double arc = new Arc2D.Double();
         g.setPaint(c);
-        arc.setArcByCenter(x, y, radius+6, 0, 360, Arc2D.OPEN);
+        arc.setArcByCenter(x, y, radius + 6, 0, 360, Arc2D.OPEN);
         g.fill(arc);
         g.setPaint(Color.BLACK);
-        arc.setArcByCenter(x, y, radius+4, 0, 360, Arc2D.OPEN);
+        arc.setArcByCenter(x, y, radius + 4, 0, 360, Arc2D.OPEN);
         g.fill(arc);
         g.setPaint(c);
-        arc.setArcByCenter(x, y, radius+3, 0, 360, Arc2D.OPEN);
+        arc.setArcByCenter(x, y, radius + 3, 0, 360, Arc2D.OPEN);
         g.fill(arc);
         g.setPaint(Color.BLACK);
-        arc.setArcByCenter(x, y, radius+2, 0, 360, Arc2D.OPEN);
+        arc.setArcByCenter(x, y, radius + 2, 0, 360, Arc2D.OPEN);
         g.fill(arc);
     }
 
     /**
-     * Determine the degree of rotation for a ship in flight to to the planet or jump point
-     * @param lengthX - An <code>int</code> giving the length of the x-axis by the triangle formed between the planet and the jump point
-     * @param lengthY - An <code>int</code> giving the length of the y-axis by the triangle formed between the planet and the jump point
-     * @param inbound - A <code>boolean</code> for whether the flight is inbound.
-     * @param zenithJump - A <code>boolean</code> for whether the the zenith point is the jump point (false if nadir).
+     * Determine the degree of rotation for a ship in flight to to the planet or
+     * jump point
+     *
+     * @param lengthX    - An <code>int</code> giving the length of the x-axis by
+     *                   the triangle formed between the planet and the jump point
+     * @param lengthY    - An <code>int</code> giving the length of the y-axis by
+     *                   the triangle formed between the planet and the jump point
+     * @param inbound    - A <code>boolean</code> for whether the flight is inbound.
+     * @param zenithJump - A <code>boolean</code> for whether the the zenith point
+     *                   is the jump point (false if nadir).
      * @return a <code>double</code> giving the proper rotation.
      */
     private double getFlightRotation(int lengthX, int lengthY, boolean inbound, boolean zenithJump) {
@@ -596,14 +668,16 @@ public class PlanetarySystemMapPanel extends JPanel {
         // rotation depends on inbound or outbound
         if ((zenithJump && !inbound) || (!zenithJump && inbound)) {
             return 0 - rotation;
-        } else  {
-            return 180-rotation;
+        } else {
+            return 180 - rotation;
         }
     }
 
     /**
-     * Get the best DropShip among the player's units. For choosing which one to display on screen for transit. This is
+     * Get the best DropShip among the player's units. For choosing which one to
+     * display on screen for transit. This is
      * determined by weight.
+     *
      * @return a <code>Unit</code> for the best DropShip.
      */
     private Unit getBestDropship() {
@@ -619,8 +693,10 @@ public class PlanetarySystemMapPanel extends JPanel {
     }
 
     /**
-     * Get the best JumpShip among the player's units. For choosing which one to display on screen
+     * Get the best JumpShip among the player's units. For choosing which one to
+     * display on screen
      * for transit, this is determined by weight.
+     *
      * @return a <code>Unit</code> for the best JumpShip.
      */
     private Unit getBestJumpship() {
@@ -636,8 +712,10 @@ public class PlanetarySystemMapPanel extends JPanel {
     }
 
     /**
-     * Update the DropShip and JumpShip fleet images by the player's campaign's best DropShip and
-     * JumpShip, respectively. If the campaign has none, then it returns the default.
+     * Update the DropShip and JumpShip fleet images by the player's campaign's best
+     * DropShip and
+     * JumpShip, respectively. If the campaign has none, then it returns the
+     * default.
      */
     public void updateShipImages() {
         dropship = getBestDropship();

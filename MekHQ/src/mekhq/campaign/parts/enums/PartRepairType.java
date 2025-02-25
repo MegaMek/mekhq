@@ -18,16 +18,16 @@
  */
 package mekhq.campaign.parts.enums;
 
-import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+
 public enum PartRepairType {
-    //region Enum Declarations
+    // region Enum Declarations
     ARMOUR("PartRepairType.ARMOUR.text", true),
     AMMUNITION("PartRepairType.AMMUNITION.text", true),
     WEAPON("PartRepairType.WEAPON.text", true),
@@ -42,29 +42,29 @@ public enum PartRepairType {
     PHYSICAL_WEAPON("PartRepairType.PHYSICAL_WEAPON.text", false),
     POD_SPACE("PartRepairType.POD_SPACE.text", true),
     UNKNOWN_LOCATION("PartRepairType.UNKNOWN_LOCATION.text", false);
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final boolean validForMRMS;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     PartRepairType(final String name, final boolean validForMRMS) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.validForMRMS = validForMRMS;
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public boolean isValidForMRMS() {
         return validForMRMS;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isArmour() {
         return this == ARMOUR;
     }
@@ -120,7 +120,7 @@ public enum PartRepairType {
     public boolean isUnknownLocation() {
         return this == UNKNOWN_LOCATION;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
     public static List<PartRepairType> getMRMSValidTypes() {
         return Arrays.stream(values())
@@ -128,7 +128,7 @@ public enum PartRepairType {
                 .collect(Collectors.toList());
     }
 
-    //region File I/O
+    // region File I/O
     public static PartRepairType parseFromString(final String text) {
         try {
             return valueOf(text);
@@ -178,13 +178,14 @@ public enum PartRepairType {
                     break;
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            MMLogger.create(PartRepairType.class).error("", ex);
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into a PartRepairType. Returning GENERAL_LOCATION.");
+        MMLogger.create(PartRepairType.class)
+                .error("Unable to parse " + text + " into a PartRepairType. Returning GENERAL_LOCATION.");
         return GENERAL_LOCATION;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

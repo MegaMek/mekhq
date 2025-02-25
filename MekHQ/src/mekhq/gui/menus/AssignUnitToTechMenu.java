@@ -22,7 +22,6 @@ import megamek.codeUtilities.StringUtility;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
 
@@ -30,22 +29,23 @@ import javax.swing.*;
 import java.util.stream.Stream;
 
 /**
- * This is a standard menu that takes either a unit or multiple units, and allows the user to
+ * This is a standard menu that takes either a unit or multiple units, and
+ * allows the user to
  * assign or remove a tech from them.
  */
 public class AssignUnitToTechMenu extends JScrollableMenu {
-    //region Constructors
+    // region Constructors
     /**
      * @param campaign the campaign the unit is a part of
-     * @param units the units in question
+     * @param units    the units in question
      */
     public AssignUnitToTechMenu(final Campaign campaign, final Unit... units) {
         super("AssignUnitToTechMenu");
         initialize(campaign, units);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Initialization
+    // region Initialization
     private void initialize(final Campaign campaign, final Unit... units) {
         // Default Return for Illegal Assignment
         // 1) No Units to assign
@@ -53,7 +53,6 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
         if ((units.length == 0) || Stream.of(units).anyMatch(Unit::isSelfCrewed)) {
             return;
         }
-
 
         // Initialize Menu
         setText(resources.getString("AssignUnitToTechMenu.title"));
@@ -73,11 +72,13 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
             final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillLevel.VETERAN.toString());
             final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
             final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
-            final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillLevel.ULTRA_GREEN.toString());
+            final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu",
+                    SkillLevel.ULTRA_GREEN.toString());
 
             // Boolean Parsing Values
             final boolean allShareTech = Stream.of(units).allMatch(unit -> (units[0].getTech() == null)
-                    ? (unit.getTech() == null) : units[0].getTech().equals(unit.getTech()));
+                    ? (unit.getTech() == null)
+                    : units[0].getTech().equals(unit.getTech()));
 
             for (final Person tech : campaign.getTechs()) {
                 if (allShareTech && tech.equals(units[0].getTech())) {
@@ -120,7 +121,8 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
 
                     if (subMenu != null) {
                         final JMenuItem miAssignTech = new JMenuItem(String.format(
-                                resources.getString("miAssignTech.text"), tech.getFullTitle(), tech.getMaintenanceTimeUsing()));
+                                resources.getString("miAssignTech.text"), tech.getFullTitle(),
+                                tech.getMaintenanceTimeUsing()));
                         miAssignTech.setName("miAssignTech");
                         miAssignTech.addActionListener(evt -> {
                             for (final Unit unit : units) {
@@ -144,13 +146,15 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
             add(ultraGreenMenu);
         }
 
-        // And finally add the ability to simply unassign, provided at least one unit has a tech
+        // And finally add the ability to simply unassign, provided at least one unit
+        // has a tech
         if (Stream.of(units).anyMatch(unit -> unit.getTech() != null)) {
             final JMenuItem miUnassignTech = new JMenuItem(resources.getString("miUnassignTech.text"));
             miUnassignTech.setName("miUnassignTech");
-            miUnassignTech.addActionListener(evt -> Stream.of(units).forEach(unit -> unit.remove(unit.getTech(), true)));
+            miUnassignTech
+                    .addActionListener(evt -> Stream.of(units).forEach(unit -> unit.remove(unit.getTech(), true)));
             add(miUnassignTech);
         }
     }
-    //endregion Initialization
+    // endregion Initialization
 }

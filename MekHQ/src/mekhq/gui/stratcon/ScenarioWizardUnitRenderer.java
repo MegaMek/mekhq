@@ -13,10 +13,19 @@
 */
 package mekhq.gui.stratcon;
 
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.unit.Unit;
 
 import javax.swing.*;
 import java.awt.*;
+
+import static mekhq.campaign.icons.enums.OperationalStatus.NOT_OPERATIONAL;
+import static mekhq.campaign.icons.enums.OperationalStatus.determineLayeredForceIconOperationalStatus;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * Handles rendering individual units in lists in the StratCon scenario wizard.
@@ -28,10 +37,41 @@ public class ScenarioWizardUnitRenderer extends JLabel implements ListCellRender
     }
 
     @Override
-    public Component getListCellRendererComponent(JList<? extends Unit> list, Unit value, int index,
+    public Component getListCellRendererComponent(JList<? extends Unit> list, Unit unit, int index,
             boolean isSelected, boolean cellHasFocus) {
+        Campaign campaign = unit.getCampaign();
 
-        setText(String.format("%s (BV: %d)", value.getName(), value.getEntity().calculateBattleValue()));
+        int valueForceId = unit.getForceId();
+        Force force = campaign.getForce(valueForceId);
+
+        // Determine name color
+        OperationalStatus operationalStatus = determineLayeredForceIconOperationalStatus(unit);
+
+        String statusOpenFormat = switch (operationalStatus) {
+            case NOT_OPERATIONAL -> "<s>";
+            case MARGINALLY_OPERATIONAL -> spanOpeningWithCustomColor(
+                MekHQ.getMHQOptions().getFontColorNegativeHexColor());
+            case SUBSTANTIALLY_OPERATIONAL -> spanOpeningWithCustomColor(
+                MekHQ.getMHQOptions().getFontColorWarningHexColor());
+            case FULLY_OPERATIONAL, FACTORY_FRESH -> spanOpeningWithCustomColor(
+                MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+        };
+
+        String statusCloseFormat = operationalStatus == NOT_OPERATIONAL ? "</s>" : CLOSING_SPAN_TAG;
+
+        // Adjust force name to remove unnecessary information
+        String forceName = "";
+        if (force != null) {
+            forceName = force.getFullName();
+            String originNodeName = ", " + campaign.getForce(0).getName();
+            forceName = forceName.replaceAll(originNodeName, "");
+        }
+
+        // Format string
+        setText(String.format("<html><b>%s%s%s (%s/%s)</b> - Base BV: %d<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>%s</i></html>",
+            statusOpenFormat, unit.getName(), statusCloseFormat, unit.getEntity().getCrew().getGunnery(),
+            unit.getEntity().getCrew().getPiloting(), unit.getEntity().calculateBattleValue(true, true),
+            forceName));
 
         if (isSelected) {
             setBackground(list.getSelectionBackground());

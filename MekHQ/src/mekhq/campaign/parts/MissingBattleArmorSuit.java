@@ -259,12 +259,13 @@ public class MissingBattleArmorSuit extends MissingPart {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        if (null == unit) {
-            return super.getDetails(includeRepairDetails);
-
+        StringBuilder toReturn = new StringBuilder();
+        if (null != unit) {
+            toReturn.append(unit.getEntity().getLocationName(trooper))
+                .append("<br>");
         }
-        String toReturn = unit.getEntity().getLocationName(trooper) + "<br>";
-        return toReturn + super.getDetails(includeRepairDetails);
+        toReturn.append(super.getDetails(includeRepairDetails));
+        return toReturn.toString();
     }
 
     @Override

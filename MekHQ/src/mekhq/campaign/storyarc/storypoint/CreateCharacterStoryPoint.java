@@ -23,9 +23,8 @@ package mekhq.campaign.storyarc.storypoint;
 import megamek.Version;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.gui.dialog.CreateCharacterDialog.NameRestrictions;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.PersonNewEvent;
@@ -33,16 +32,19 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
+import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.dialog.CreateCharacterDialog;
-import org.apache.logging.log4j.LogManager;
+import mekhq.gui.dialog.CreateCharacterDialog.NameRestrictions;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -51,12 +53,17 @@ import java.text.ParseException;
 import java.util.Enumeration;
 import java.util.UUID;
 
+import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
+
 /**
- * This StoryPoint opens a {@link CreateCharacterDialog CreateCharacterDialog} which allows a player to create a new
- * character. Various initial values can be set, as well as an initial experience point pool. Additionally, the ability
+ * This StoryPoint opens a {@link CreateCharacterDialog CreateCharacterDialog}
+ * which allows a player to create a new
+ * character. Various initial values can be set, as well as an initial
+ * experience point pool. Additionally, the ability
  * to edit certain parts of the character can be restricted.
  */
 public class CreateCharacterStoryPoint extends StoryPoint {
+    private static final MMLogger logger = MMLogger.create(CreateCharacterStoryPoint.class);
 
     /** how much XP does the player have to spend on the character **/
     int xpPool;
@@ -76,7 +83,8 @@ public class CreateCharacterStoryPoint extends StoryPoint {
     private int edge;
 
     /**
-     * The id of the person in the campaign. This will otherwise be set randomly. By setting it manually we can
+     * The id of the person in the campaign. This will otherwise be set randomly. By
+     * setting it manually we can
      * reference it later.
      */
     private UUID personId;
@@ -96,7 +104,6 @@ public class CreateCharacterStoryPoint extends StoryPoint {
     private UUID assignedUnitId;
     private int assignedForceId;
 
-
     public CreateCharacterStoryPoint() {
         super();
         firstname = "Bob";
@@ -106,7 +113,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         commander = true;
         clan = false;
         phenotype = Phenotype.NONE;
-        primaryRole = PersonnelRole.MECHWARRIOR;
+        primaryRole = PersonnelRole.MEKWARRIOR;
 
         editOrigin = false;
         editBirthday = false;
@@ -126,31 +133,33 @@ public class CreateCharacterStoryPoint extends StoryPoint {
     }
 
     public Person createPerson() {
+        Campaign campaign = getCampaign();
+
         if (null == faction) {
-            faction = getCampaign().getFaction();
+            faction = campaign.getFaction();
         }
-        Person p = new Person(getCampaign(), faction.getShortName());
+        Person person = new Person(campaign, faction.getShortName());
         if (null != primaryRole) {
-            p.setPrimaryRole(getCampaign(), primaryRole);
+            person.setPrimaryRole(campaign, primaryRole);
         }
-        p.setClanPersonnel(clan);
-        if (p.isClanPersonnel() && null != phenotype) {
-            p.setPhenotype(phenotype);
+        person.setClanPersonnel(clan);
+        if (person.isClanPersonnel() && null != phenotype) {
+            person.setPhenotype(phenotype);
         }
 
-        p.setCommander(commander);
-        p.setGivenName(firstname);
-        p.setSurname(surname);
-        p.setBloodname(bloodname);
-        p.setBiography(biography);
-        p.setRank(rank);
+        person.setCommander(commander);
+        person.setGivenName(firstname);
+        person.setSurname(surname);
+        person.setBloodname(bloodname);
+        person.setBiography(biography);
+        person.setRank(rank);
         if (edge > 0) {
-            p.changeEdge(edge);
-            setEdgeTriggers(p);
+            person.changeEdge(edge);
+            setEdgeTriggers(person);
         }
 
         if (null != personId) {
-            p.setId(personId);
+            person.setId(personId);
         }
 
         // We need to generate basic skills in order to get any phenotype bonuses
@@ -163,17 +172,26 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         skillPrefs.setAntiMekProb(0);
         skillPrefs.setSecondSkillProb(0);
         skillPrefs.setSecondSkillBonus(-12);
-        skillPrefs.setTacticsMod(0,-12);
-        skillPrefs.setSpecialAbilBonus(0, -12);
+        skillPrefs.setTacticsMod(0, -12);
+        skillPrefs.setSpecialAbilityBonus(0, -12);
         skillPrefs.setOverallRecruitBonus(-12);
         skillPrefs.setCombatSmallArmsBonus(-12);
         skillPrefs.setSupportSmallArmsBonus(-12);
         AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPrefs);
-        skillGenerator.generateSkills(getCampaign(), p, SkillType.EXP_ULTRA_GREEN);
+        skillGenerator.generateSkills(getCampaign(), person, SkillType.EXP_ULTRA_GREEN);
 
-        p.setBirthday(getCampaign().getLocalDate().minusYears(age));
+        person.setDateOfBirth(getCampaign().getLocalDate().minusYears(age));
 
-        return p;
+        // generate background
+        BackgroundsController.generateBackground(campaign, person);
+
+        // generate personality
+        PersonalityController.generatePersonality(person);
+
+        // set education
+        setInitialEducationLevel(campaign, person);
+
+        return person;
     }
 
     @Override
@@ -189,7 +207,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
             Unit u = getCampaign().getUnit(assignedUnitId);
             if (null != u && u.isUnmanned()) {
                 u.addPilotOrSoldier(person, false);
-                //only assign to force if properly assigned to a unit
+                // only assign to force if properly assigned to a unit
                 Force force = getCampaign().getForce(assignedForceId);
                 if (null != force && null != person.getUnit()) {
                     getCampaign().addUnitToForce(u, force.getId());
@@ -201,7 +219,8 @@ public class CreateCharacterStoryPoint extends StoryPoint {
     }
 
     private void setEdgeTriggers(Person p) {
-        //just check them all to be sure - no good way to separate these by primary role at the moment
+        // just check them all to be sure - no good way to separate these by primary
+        // role at the moment
         PersonnelOptions options = p.getOptions();
 
         for (Enumeration<IOptionGroup> i = options.getGroups(); i
@@ -264,7 +283,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
                     xpPool = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("age")) {
                     age = Integer.parseInt(wn2.getTextContent().trim());
-                }  else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
                     rank = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("firstname")) {
                     firstname = wn2.getTextContent().trim();
@@ -286,13 +305,13 @@ public class CreateCharacterStoryPoint extends StoryPoint {
                     faction = Factions.getInstance().getFaction(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("editOrigin")) {
                     editOrigin = Boolean.parseBoolean(wn2.getTextContent().trim());
-                }  else if (wn2.getNodeName().equalsIgnoreCase("editBirthday")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("editBirthday")) {
                     editBirthday = Boolean.parseBoolean(wn2.getTextContent().trim());
-                }  else if (wn2.getNodeName().equalsIgnoreCase("editGender")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("editGender")) {
                     editGender = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("limitFaction")) {
                     limitFaction = Boolean.parseBoolean(wn2.getTextContent().trim());
-                }  else if (wn2.getNodeName().equalsIgnoreCase("nameRestrictions")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("nameRestrictions")) {
                     nameRestrictions = NameRestrictions.valueOf(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("instructions")) {
                     instructions = wn2.getTextContent().trim();
@@ -306,7 +325,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
                     personId = UUID.fromString(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

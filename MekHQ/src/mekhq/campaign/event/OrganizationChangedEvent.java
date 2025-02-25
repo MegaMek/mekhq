@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2017-2024 The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,6 +19,7 @@
 package mekhq.campaign.event;
 
 import megamek.common.event.MMEvent;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.unit.Unit;
 
@@ -31,6 +32,16 @@ public class OrganizationChangedEvent extends MMEvent {
     private final Force force;
     private final Unit unit;
 
+    /**
+     * This version also populates formation levels
+     */
+    public OrganizationChangedEvent(Campaign campaign, Force force) {
+        this.force = force;
+        this.unit = null;
+
+        Force.populateFormationLevelsFromOrigin(campaign);
+    }
+
     public OrganizationChangedEvent(Force force) {
         this.force = force;
         this.unit = null;
@@ -41,9 +52,14 @@ public class OrganizationChangedEvent extends MMEvent {
         this.unit = unit;
     }
 
-    public OrganizationChangedEvent(Force force, Unit unit) {
+    /**
+     * This version also populates formation levels
+     */
+    public OrganizationChangedEvent(Campaign campaign, Force force, Unit unit) {
         this.force = force;
         this.unit = unit;
+
+        Force.populateFormationLevelsFromOrigin(campaign);
     }
 
     public Force getForce() {

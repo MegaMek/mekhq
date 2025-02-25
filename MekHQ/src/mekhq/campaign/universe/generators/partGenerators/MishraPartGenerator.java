@@ -18,7 +18,7 @@
  */
 package mekhq.campaign.universe.generators.partGenerators;
 
-import megamek.common.Mech;
+import megamek.common.Mek;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.HeatSink;
@@ -30,11 +30,11 @@ import java.util.List;
 
 /**
  * The Rules for this Generator:
- * 1) Remove all non-'Mech Units
+ * 1) Remove all non-'Mek Units
  * 2) Start with Triple Parts
  * 3) Remove all Engines
  * 3) All Heat Sinks are capped at 30 per type
- * 4) All 'Mech Heads [Sensors, Life Support] are capped at 2 per weight/type
+ * 4) All 'Mek Heads [Sensors, Life Support] are capped at 2 per weight/type
  * 5) All Gyros are capped at 1 per weight/type
  * 6) MASC is capped at 1 per type
  * 7) Any other parts are capped at 6.
@@ -51,7 +51,7 @@ public class MishraPartGenerator extends MultiplePartGenerator {
     @Override
     public List<Part> generate(final List<Unit> units, final boolean includeArmour,
                                final boolean includeAmmunition) {
-        units.removeIf(unit -> !(unit.getEntity() instanceof Mech));
+        units.removeIf(unit -> !(unit.getEntity() instanceof Mek));
         return super.generate(units, includeArmour, includeAmmunition);
     }
 
@@ -64,7 +64,7 @@ public class MishraPartGenerator extends MultiplePartGenerator {
                 part.setQuantity(Math.min(part.getQuantity(), 30));
             } else if ((part instanceof MekCockpit) || (part instanceof MekLifeSupport)
                     || (part instanceof MekSensor)
-                    || ((part instanceof MekLocation) && ((MekLocation) part).getLoc() == Mech.LOC_HEAD)) {
+                    || ((part instanceof MekLocation) && ((MekLocation) part).getLoc() == Mek.LOC_HEAD)) {
                 part.setQuantity(Math.min(part.getQuantity(), 2));
             } else if ((part instanceof MekGyro) || (part instanceof MASC)) {
                 part.setQuantity(Math.min(part.getQuantity(), 1));

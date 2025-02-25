@@ -32,7 +32,7 @@ public class ApproximateMatchStep extends UnscrambleStep {
     }
 
     public void visit(final EquipmentProposal proposal, final AmmoBin ammoBin) {
-        final Mounted mount = proposal.getEquipment(ammoBin.getEquipmentNum());
+        final Mounted<?> mount = proposal.getEquipment(ammoBin.getEquipmentNum());
         if ((mount != null) && (mount.getType() instanceof AmmoType)
                 && ammoBin.canChangeMunitions((AmmoType) mount.getType())) {
             proposal.proposeMapping(ammoBin, ammoBin.getEquipmentNum());

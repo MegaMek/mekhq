@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -55,11 +55,11 @@ public class DisabledRandomProcreationTest {
 
     @Test
     public void testRandomlyDies() {
-        assertFalse(new DisabledRandomProcreation(mockOptions).relationshipProcreation(mockPerson));
+        assertFalse(new DisabledRandomProcreation(mockOptions).procreation(mockPerson));
     }
 
     @Test
     public void testRelationshiplessProcreation() {
-        assertFalse(new DisabledRandomProcreation(mockOptions).relationshiplessProcreation(mockPerson));
+        assertFalse(new DisabledRandomProcreation(mockOptions).procreation(mockPerson));
     }
 }

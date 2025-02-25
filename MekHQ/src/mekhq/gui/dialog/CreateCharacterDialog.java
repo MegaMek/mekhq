@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,6 +20,7 @@ package mekhq.gui.dialog;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.PortraitChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -37,11 +38,15 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.randomEvents.PersonalityController;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.*;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
@@ -53,7 +58,6 @@ import java.time.Period;
 import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 /**
  * This dialog is used to create a character in story arcs from a pool of XP
@@ -66,26 +70,26 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         NONE
     }
 
-    private Person person;
-    private boolean editOrigin;
-    private boolean editBirthday;
-    private boolean editGender;
+    private final Person person;
+    private final boolean editOrigin;
+    private final boolean editBirthday;
+    private final boolean editGender;
     private boolean limitFaction;
-    private NameRestrictions nameRestrictions;
+    private final NameRestrictions nameRestrictions;
 
     private String instructions;
-    private int xpPool;
+    private final int xpPool;
 
     private Portrait portrait;
 
     private List<DialogOptionComponent> optionComps = new ArrayList<>();
-    private Map<String, JSpinner> skillLvls = new Hashtable<>();
-    private Map<String, JSpinner> skillBonus = new Hashtable<>();
-    private Map<String, JLabel> skillValues = new Hashtable<>();
-    private Map<String, JCheckBox> skillChks = new Hashtable<>();
+    private final Map<String, JSpinner> skillLvls = new Hashtable<>();
+    private final Map<String, JSpinner> skillBonus = new Hashtable<>();
+    private final Map<String, JLabel> skillValues = new Hashtable<>();
+    private final Map<String, JCheckBox> skillChks = new Hashtable<>();
     private PersonnelOptions options;
     private LocalDate birthdate;
-    private JFrame frame;
+    private final JFrame frame;
 
     private JButton btnDate;
     private JComboBox<Gender> choiceGender;
@@ -93,6 +97,15 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private JPanel panSkills;
     private JPanel panOptions;
     private JTextField textToughness;
+    private JComboBox<EducationLevel> textEducationLevel;
+    private JTextField textLoyalty;
+
+    private MMComboBox<Aggression> comboAggression;
+    private MMComboBox<Ambition> comboAmbition;
+    private MMComboBox<Greed> comboGreed;
+    private MMComboBox<Social> comboSocial;
+    private MMComboBox<PersonalityQuirk> comboPersonalityQuirk;
+    private MMComboBox<Intelligence> comboIntelligence;
     private JTextField textPreNominal;
     private JTextField textGivenName;
     private JTextField textSurname;
@@ -113,7 +126,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
     private JButton doneButton;
 
-    private Campaign campaign;
+    private final Campaign campaign;
 
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CreateCharacterDialog",
         MekHQ.getMHQOptions().getLocale());
@@ -145,7 +158,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     }
 
     private void initializePilotAndOptions () {
-        birthdate = person.getBirthday();
+        birthdate = person.getDateOfBirth();
         selectedPhenotype = person.getPhenotype();
         options = person.getOptions();
         portrait = person.getPortrait();
@@ -187,6 +200,10 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         textBloodname = new JTextField();
         textToughness = new JTextField();
         JLabel lblToughness = new JLabel();
+        textEducationLevel = new JComboBox<>();
+        textLoyalty = new JTextField();
+        JLabel lblLoyalty = new JLabel();
+        JLabel lblEducationLevel = new JLabel();
 
         JButton btnRandomName = new JButton();
         JButton btnRandomBloodname = new JButton();
@@ -329,14 +346,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
         demogPanel.add(lblGender, gridBagConstraints);
 
-        DefaultComboBoxModel<Gender> genderModel = new DefaultComboBoxModel<>();
-        for (Gender gender : Gender.getExternalOptions()) {
-            genderModel.addElement(gender);
-        }
-        choiceGender = new JComboBox<>(genderModel);
+        choiceGender = new JComboBox<>(Gender.values());
         choiceGender.setName("choiceGender");
-        choiceGender.setSelectedItem(person.getGender().isExternal() ? person.getGender()
-                : person.getGender().getExternalVariant());
+        choiceGender.setSelectedItem(person.getGender());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
@@ -366,8 +378,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                                                           final boolean isSelected,
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Faction) {
-                    Faction faction = (Faction)value;
+                if (value instanceof Faction faction) {
                     setText(String.format("%s [%s]",
                             faction.getFullName(campaign.getGameYear()),
                             faction.getShortName()));
@@ -424,8 +435,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected,
                         cellHasFocus);
-                if (value instanceof PlanetarySystem) {
-                    PlanetarySystem system = (PlanetarySystem) value;
+                if (value instanceof PlanetarySystem system) {
                     setText(system.getName(campaign.getLocalDate()));
                 }
 
@@ -484,8 +494,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected,
                         cellHasFocus);
-                if (value instanceof Planet) {
-                    Planet planet = (Planet) value;
+                if (value instanceof Planet planet) {
                     setText(planet.getName(campaign.getLocalDate()));
                 }
 
@@ -597,6 +606,204 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             demogPanel.add(textToughness, gridBagConstraints);
+
+            y++;
+        }
+
+        lblToughness.setText(resourceMap.getString("lblToughness.text")); // NOI18N
+        lblToughness.setName("lblToughness"); // NOI18N
+
+        textToughness.setText(Integer.toString(person.getToughness()));
+        textToughness.setName("textToughness"); // NOI18N
+
+        if (campaign.getCampaignOptions().isUseToughness()) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(lblToughness, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            demogPanel.add(textToughness, gridBagConstraints);
+
+            y++;
+        }
+
+        lblEducationLevel.setText(resourceMap.getString("lblEducationLevel.text"));
+        lblEducationLevel.setName("lblEducationLevel");
+
+        for (EducationLevel level : EducationLevel.values()) {
+            textEducationLevel.addItem(level);
+        }
+
+        textEducationLevel.setName("textEducationLevel");
+
+        if (campaign.getCampaignOptions().isUseEducationModule()) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(lblEducationLevel, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            demogPanel.add(textEducationLevel, gridBagConstraints);
+
+            y++;
+        }
+
+        lblLoyalty.setText(resourceMap.getString("lblLoyalty.text"));
+        lblLoyalty.setName("lblLoyalty");
+
+        textLoyalty.setText(Integer.toString(person.getLoyalty()));
+        textLoyalty.setName("textLoyalty");
+
+        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
+                && (!campaign.getCampaignOptions().isUseHideLoyalty())) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(lblLoyalty, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            demogPanel.add(textLoyalty, gridBagConstraints);
+
+            y++;
+        }
+
+        //region random personality
+        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+            JLabel labelAggression = new JLabel();
+            labelAggression.setText("Aggression:");
+            labelAggression.setName("labelAggression");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(labelAggression, gridBagConstraints);
+
+            comboAggression = new MMComboBox<>("comboAggression", Aggression.values());
+            comboAggression.setSelectedItem(person.getAggression());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(comboAggression, gridBagConstraints);
+
+            JLabel labelAmbition = new JLabel();
+            labelAmbition.setText("Ambition:");
+            labelAmbition.setName("labelAmbition");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(labelAmbition, gridBagConstraints);
+
+            comboAmbition = new MMComboBox<>("comboAmbition", Ambition.values());
+            comboAmbition.setSelectedItem(person.getAmbition());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(comboAmbition, gridBagConstraints);
+
+            JLabel labelGreed = new JLabel();
+            labelGreed.setText("Greed:");
+            labelGreed.setName("labelGreed");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(labelGreed, gridBagConstraints);
+
+            comboGreed = new MMComboBox<>("comboGreed", Greed.values());
+            comboGreed.setSelectedItem(person.getGreed());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(comboGreed, gridBagConstraints);
+
+            JLabel labelSocial = new JLabel();
+            labelSocial.setText("Social:");
+            labelSocial.setName("labelSocial");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(labelSocial, gridBagConstraints);
+
+            comboSocial = new MMComboBox<>("comboSocial", Social.values());
+            comboSocial.setSelectedItem(person.getSocial());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(comboSocial, gridBagConstraints);
+
+            JLabel labelPersonalityQuirk = new JLabel();
+            labelPersonalityQuirk.setText("Quirk:");
+            labelPersonalityQuirk.setName("labelPersonalityQuirk");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(labelPersonalityQuirk, gridBagConstraints);
+
+            comboPersonalityQuirk = new MMComboBox<>("comboPersonalityQuirk", PersonalityQuirk.values());
+            comboPersonalityQuirk.setSelectedItem(person.getPersonalityQuirk());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(comboPersonalityQuirk, gridBagConstraints);
+
+            JLabel labelIntelligence = new JLabel();
+            labelIntelligence.setText("Intelligence:");
+            labelIntelligence.setName("labelIntelligence");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(labelIntelligence, gridBagConstraints);
+
+            comboIntelligence = new MMComboBox<>("comboIntelligence", Intelligence.values());
+            comboIntelligence.setSelectedItem(person.getIntelligence());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(comboIntelligence, gridBagConstraints);
         }
 
         y++;
@@ -659,9 +866,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         rightPanel.add(topPanel, BorderLayout.PAGE_START);
 
-        JScrollPane scrOptions = new JScrollPane();
+        JScrollPane scrOptions = new JScrollPaneWithSpeed();
         panOptions = new JPanel();
-        JScrollPane scrSkills = new JScrollPane();
+        JScrollPane scrSkills = new JScrollPaneWithSpeed();
         panSkills = new JPanel();
 
         JTabbedPane tabStats = new JTabbedPane();
@@ -692,9 +899,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         JPanel buttonPanel = new JPanel(new BorderLayout());
 
         doneButton = new JButton("Done");
-        doneButton.addActionListener(e -> {
-            done();
-        });
+        doneButton.addActionListener(e -> done());
         buttonPanel.add(doneButton, BorderLayout.LINE_END);
 
         return buttonPanel;
@@ -710,7 +915,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         int year = campaign.getGameYear();
         List<Faction> orderedFactions = Factions.getInstance().getFactions().stream()
                 .sorted((a, b) -> a.getFullName(year).compareToIgnoreCase(b.getFullName(year)))
-                .collect(Collectors.toList());
+                .toList();
 
         DefaultComboBoxModel<Faction> factionsModel = new DefaultComboBoxModel<>();
         for (Faction faction : orderedFactions) {
@@ -728,7 +933,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                 int endYear = person.getRecruitment() != null
                         ? Math.min(person.getRecruitment().getYear(), year)
                         : year;
-                if (faction.validBetween(person.getBirthday().getYear(), endYear)) {
+                if (faction.validBetween(person.getDateOfBirth().getYear(), endYear)) {
                     factionsModel.addElement(faction);
                 }
             }
@@ -744,7 +949,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
                 .sorted(Comparator.comparing(a -> a.getName(campaign.getLocalDate())))
-                .collect(Collectors.toList());
+                .toList();
         for (PlanetarySystem system : orderedSystems) {
             model.addElement(system);
         }
@@ -755,9 +960,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         DefaultComboBoxModel<PlanetarySystem> model = new DefaultComboBoxModel<>();
 
         List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
-                .filter(a -> a.getFactionSet(person.getBirthday()).contains(faction))
-                .sorted(Comparator.comparing(a -> a.getName(person.getBirthday())))
-                .collect(Collectors.toList());
+                .filter(a -> a.getFactionSet(person.getDateOfBirth()).contains(faction))
+                .sorted(Comparator.comparing(a -> a.getName(person.getDateOfBirth())))
+                .toList();
         for (PlanetarySystem system : orderedSystems) {
             model.addElement(system);
         }
@@ -902,13 +1107,12 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             }
         }
         IOption option;
-        for (final Object newVar : optionComps) {
-            DialogOptionComponent comp = (DialogOptionComponent) newVar;
-            option = comp.getOption();
-            if ((comp.getValue().equals("None"))) {
+        for (final DialogOptionComponent newVar : optionComps) {
+            option = newVar.getOption();
+            if ((newVar.getValue().equals("None"))) {
                 person.getOptions().getOption(option.getName()).setValue("None");
             } else {
-                person.getOptions().getOption(option.getName()).setValue(comp.getValue());
+                person.getOptions().getOption(option.getName()).setValue(newVar.getValue());
             }
         }
     }
@@ -1002,7 +1206,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             optionComp.setSelected(option.stringValue());
         } else if (OptionsConstants.MISC_HUMAN_TRO.equals(option.getName())) {
             optionComp.addValue(Crew.HUMANTRO_NONE);
-            optionComp.addValue(Crew.HUMANTRO_MECH);
+            optionComp.addValue(Crew.HUMANTRO_MEK);
             optionComp.addValue(Crew.HUMANTRO_AERO);
             optionComp.addValue(Crew.HUMANTRO_VEE);
             optionComp.addValue(Crew.HUMANTRO_BA);
@@ -1024,14 +1228,13 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
     private void setOptions() {
         IOption option;
-        for (final Object newVar : optionComps) {
-            DialogOptionComponent comp = (DialogOptionComponent) newVar;
-            option = comp.getOption();
-            if ((comp.getValue().equals("None"))) {
+        for (final DialogOptionComponent newVar : optionComps) {
+            option = newVar.getOption();
+            if ((newVar.getValue().equals("None"))) {
                 person.getOptions().getOption(option.getName()).setValue("None");
             } else {
                 person.getOptions().getOption(option.getName())
-                        .setValue(comp.getValue());
+                        .setValue(newVar.getValue());
             }
         }
     }
@@ -1050,10 +1253,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         }
 
         //now figure out SPA costs
-        for (final Object newVar : optionComps) {
-            DialogOptionComponent comp = (DialogOptionComponent) newVar;
-            if (!comp.isDefaultValue()) {
-                SpecialAbility spa = SpecialAbility.getOption(comp.getOption().getName());
+        for (final DialogOptionComponent newVar : optionComps) {
+            if (!newVar.isDefaultValue()) {
+                SpecialAbility spa = SpecialAbility.getOption(newVar.getOption().getName());
                 totalCost = totalCost + spa.getCost();
             }
         }
@@ -1143,13 +1345,13 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         if (chkClan.isSelected() || (newPhenotype == Phenotype.NONE)) {
             if ((newPhenotype != null) && (newPhenotype != selectedPhenotype)) {
                 switch (selectedPhenotype) {
-                    case MECHWARRIOR:
-                        decreasePhenotypeBonus(SkillType.S_GUN_MECH);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_MECH);
+                    case MEKWARRIOR:
+                        decreasePhenotypeBonus(SkillType.S_GUN_MEK);
+                        decreasePhenotypeBonus(SkillType.S_PILOT_MEK);
                         break;
                     case ELEMENTAL:
                         decreasePhenotypeBonus(SkillType.S_GUN_BA);
-                        decreasePhenotypeBonus(SkillType.S_ANTI_MECH);
+                        decreasePhenotypeBonus(SkillType.S_ANTI_MEK);
                         break;
                     case AEROSPACE:
                         decreasePhenotypeBonus(SkillType.S_GUN_AERO);
@@ -1163,7 +1365,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                         decreasePhenotypeBonus(SkillType.S_PILOT_NVEE);
                         decreasePhenotypeBonus(SkillType.S_PILOT_VTOL);
                         break;
-                    case PROTOMECH:
+                    case PROTOMEK:
                         decreasePhenotypeBonus(SkillType.S_GUN_PROTO);
                         break;
                     case NAVAL:
@@ -1177,13 +1379,13 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                 }
 
                 switch (newPhenotype) {
-                    case MECHWARRIOR:
-                        increasePhenotypeBonus(SkillType.S_GUN_MECH);
-                        increasePhenotypeBonus(SkillType.S_PILOT_MECH);
+                    case MEKWARRIOR:
+                        increasePhenotypeBonus(SkillType.S_GUN_MEK);
+                        increasePhenotypeBonus(SkillType.S_PILOT_MEK);
                         break;
                     case ELEMENTAL:
                         increasePhenotypeBonus(SkillType.S_GUN_BA);
-                        increasePhenotypeBonus(SkillType.S_ANTI_MECH);
+                        increasePhenotypeBonus(SkillType.S_ANTI_MEK);
                         break;
                     case AEROSPACE:
                         increasePhenotypeBonus(SkillType.S_GUN_AERO);
@@ -1197,7 +1399,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                         increasePhenotypeBonus(SkillType.S_PILOT_NVEE);
                         increasePhenotypeBonus(SkillType.S_PILOT_VTOL);
                         break;
-                    case PROTOMECH:
+                    case PROTOMEK:
                         increasePhenotypeBonus(SkillType.S_GUN_PROTO);
                         break;
                     case NAVAL:
@@ -1248,11 +1450,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                 ? "" : textBloodname.getText());
         person.setBiography(txtBio.getText());
         if (choiceGender.getSelectedItem() != null) {
-            person.setGender(person.getGender().isInternal()
-                    ? ((Gender) choiceGender.getSelectedItem()).getInternalVariant()
-                    : (Gender) choiceGender.getSelectedItem());
+            person.setGender((Gender) choiceGender.getSelectedItem());
         }
-        person.setBirthday(birthdate);
+        person.setDateOfBirth(birthdate);
         person.setOriginFaction((Faction) choiceFaction.getSelectedItem());
         if (choiceSystem.getSelectedItem() != null && choicePlanet.getSelectedItem() != null) {
             person.setOriginPlanet((Planet)choicePlanet.getSelectedItem());
@@ -1261,9 +1461,33 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         }
         person.setPhenotype((Phenotype) choicePhenotype.getSelectedItem());
         person.setClanPersonnel(chkClan.isSelected());
-        try {
-            person.setToughness(Integer.parseInt(textToughness.getText()));
-        } catch (NumberFormatException ignored) { }
+
+        if (campaign.getCampaignOptions().isUseToughness()) {
+            try {
+                person.setToughness(Integer.parseInt(textToughness.getText()));
+            } catch (NumberFormatException ignored) {}
+        }
+
+        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            try {
+                person.setLoyalty(Integer.parseInt(textLoyalty.getText()));
+            } catch (NumberFormatException ignored) {}
+        }
+
+        if (campaign.getCampaignOptions().isUseEducationModule()) {
+            person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
+        }
+
+        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+            person.setAggression(comboAggression.getSelectedItem());
+            person.setAmbition(comboAmbition.getSelectedItem());
+            person.setGreed(comboGreed.getSelectedItem());
+            person.setSocial(comboSocial.getSelectedItem());
+            person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
+            person.setIntelligence(comboIntelligence.getSelectedItem());
+            PersonalityController.writeDescription(person);
+        }
+
         person.setPortrait(portrait);
         int xpSpent = xpPool - getSkillXpSpent();
         if (xpSpent > 0) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 MegaMek team
+ * Copyright (C) 2019-2024 MegaMek team
  *
  * This file is part of MekHQ.
  *
@@ -18,16 +18,22 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import megamek.common.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 
 import java.util.Objects;
+
+import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 
 /**
  * Creates {@link Person} instances using the default MekHQ algorithm.
@@ -72,7 +78,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         person.setPrimaryRoleDirect(primaryRole);
         person.setSecondaryRoleDirect(secondaryRole);
 
-        int expLvl = generateExperienceLevel(campaign, person);
+        int expLvl = generateExperienceLevel(person);
 
         generateXp(campaign, person);
 
@@ -83,17 +89,61 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(getSkillPreferences());
         skillGenerator.generateSkills(campaign, person, expLvl);
 
-        AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
-        specialAbilityGenerator.setSkillPreferences(getSkillPreferences());
-        specialAbilityGenerator.generateSpecialAbilities(campaign, person, expLvl);
+        // Limit skills by age for children and adolescents
+        int age = person.getAge(campaign.getLocalDate());
+
+        if (age < 16) {
+            person.removeAllSkills();
+            // regenerate expLvl to factor in skill changes from age
+            expLvl = generateExperienceLevel(person);
+        } else if (age < 18) {
+            person.limitSkills(1);
+
+            expLvl = generateExperienceLevel(person);
+        }
+
+        // set SPAs
+        if (expLvl >= 0) {
+            AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
+            specialAbilityGenerator.setSkillPreferences(new RandomSkillPreferences());
+            specialAbilityGenerator.generateSpecialAbilities(campaign, person, expLvl);
+        }
+
+        // set interest in marriage and children flags
+        int interestInMarriageDiceSize = campaign.getCampaignOptions().getNoInterestInMarriageDiceSize();
+        person.setMarriageable(((interestInMarriageDiceSize != 0) && (Compute.randomInt(interestInMarriageDiceSize)) != 0));
+
+        int interestInChildren = campaign.getCampaignOptions().getNoInterestInChildrenDiceSize();
+        person.setTryingToConceive(((interestInChildren != 0) && (Compute.randomInt(interestInChildren)) != 0));
 
         // Do naming at the end, to ensure the keys are set
-        generateName(campaign, person, gender);
+        generateNameAndGender(campaign, person, gender);
 
         //check for Bloodname
         campaign.checkBloodnameAdd(person, false);
 
         person.setDaysToWaitForHealing(campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
+
+        // set loyalty
+        if (expLvl <= 0) {
+            person.setLoyalty(Compute.d6(3) + 2);
+        } else if (expLvl == 1) {
+            person.setLoyalty(Compute.d6(3) + 1);
+        } else {
+            person.setLoyalty(Compute.d6(3));
+        }
+
+        // set starting education
+        setInitialEducationLevel(campaign, person);
+
+        // generate personality
+        PersonalityController.generatePersonality(person);
+
+        // generate background
+        BackgroundsController.generateBackground(campaign, person);
+
+        // generate personality
+        PersonalityController.generatePersonality(person);
 
         return person;
     }

@@ -33,14 +33,25 @@ import org.w3c.dom.NodeList;
 import javax.swing.*;
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.io.PrintWriter;
+import java.text.ParseException;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.storyarc.StoryTrigger;
 
 /**
  * A StoryTrigger that adds a Person to the Campaign.
  */
 public class AddPersonStoryTrigger extends StoryTrigger {
+    private static final MMLogger logger = MMLogger.create(AddPersonStoryTrigger.class);
 
     private Person person;
-
 
     @Override
     protected void execute() {
@@ -81,7 +92,7 @@ public class AddPersonStoryTrigger extends StoryTrigger {
                     person = Person.generateInstanceFromXML(wn2, c, v);
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

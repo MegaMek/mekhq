@@ -32,18 +32,29 @@ import javax.swing.*;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
- * A Story Trigger can be added to a StoryPoint or a StoryOutcome and when the StoryPoint is completed the StoryTrigger
- * will be executed and will do some things. This is a way to have StoryPoints affect things other than just the
+ * A Story Trigger can be added to a StoryPoint or a StoryOutcome and when the
+ * StoryPoint is completed the StoryTrigger
+ * will be executed and will do some things. This is a way to have StoryPoints
+ * affect things other than just the
  * next story point
  */
 public abstract class StoryTrigger {
+    private static final MMLogger logger = MMLogger.create(StoryTrigger.class);
 
     /** The story arc that this trigger is a part of **/
     private StoryArc arc;
 
     public StoryTrigger() {
-        //nothing here at the moment
+        // nothing here at the moment
     }
 
     public void setStoryArc(StoryArc a) {
@@ -67,7 +78,7 @@ public abstract class StoryTrigger {
 
     public abstract StoryTriggerPanel getPanel(JFrame frame);
 
-    //region I/O
+    // region I/O
     public abstract void writeToXml(PrintWriter pw1, int indent);
 
     protected void writeToXmlBegin(PrintWriter pw1, int indent) {
@@ -94,11 +105,11 @@ public abstract class StoryTrigger {
             retVal.loadFieldsFromXmlNode(wn, c, v);
 
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            logger.error(ex);
         }
 
         return retVal;
     }
-    //endregion I/O
+    // endregion I/O
 
 }

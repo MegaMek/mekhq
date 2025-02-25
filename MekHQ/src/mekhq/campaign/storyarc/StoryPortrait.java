@@ -20,26 +20,29 @@
  */
 package mekhq.campaign.storyarc;
 
+import java.awt.Image;
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+
 import megamek.client.ui.swing.tileset.MMStaticDirectoryManager;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Portrait;
+import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-
-import java.awt.*;
-import java.io.PrintWriter;
 
 /**
  * This class extends the Portrait class to look in the story arc data directory
- * for additional portraits that may be available. It could be extended in other ways in the future
+ * for additional portraits that may be available. It could be extended in other
+ * ways in the future
  * if needed.
  */
 public class StoryPortrait extends Portrait {
+    private static final MMLogger logger = MMLogger.create(StoryPortrait.class);
 
     public static final String XML_TAG = "portrait";
 
-    //region Constructors
+    // region Constructors
     public StoryPortrait() {
         super();
     }
@@ -47,7 +50,7 @@ public class StoryPortrait extends Portrait {
     public StoryPortrait(final @Nullable String category, final @Nullable String filename) {
         super(category, filename);
     }
-    //endregion Constructors
+    // endregion Constructors
 
     @Override
     public Image getBaseImage() {
@@ -64,23 +67,24 @@ public class StoryPortrait extends Portrait {
         try {
             portrait = (Image) MMStaticDirectoryManager.getPortraits().getItem(category, filename);
             if (portrait == null) {
-                //ok lets see if this portrait is in the story arc data
+                // ok lets see if this portrait is in the story arc data
                 if (null != MHQStaticDirectoryManager.getUserStoryPortraits()) {
                     portrait = (Image) MHQStaticDirectoryManager.getUserStoryPortraits().getItem(category, filename);
                 }
                 if (portrait == null) {
-                    //if it's still null, then try the default image
+                    // if it's still null, then try the default image
                     portrait = (Image) MMStaticDirectoryManager.getPortraits().getItem("",
                             DEFAULT_PORTRAIT_FILENAME);
                 }
             }
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            logger.error(e);
         }
 
         return portrait;
     }
-    //region File I/O
+
+    // region File I/O
     @Override
     public void writeToXML(final PrintWriter pw, final int indent) {
         writeToXML(pw, indent, XML_TAG);
@@ -91,12 +95,12 @@ public class StoryPortrait extends Portrait {
         try {
             icon.parseNodes(wn.getChildNodes());
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            logger.error(e);
             return new StoryPortrait();
         }
         return icon;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public StoryPortrait clone() {

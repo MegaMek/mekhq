@@ -36,11 +36,22 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
  * This StoryPoint checks the value of a stored string variable from the
- * {@link mekhq.campaign.storyarc.StoryArc StoryArc}. It returns the result of that value.
+ * {@link mekhq.campaign.storyarc.StoryArc StoryArc}. It returns the result of
+ * that value.
  */
 public class CheckStringVariableStoryPoint extends StoryPoint {
+    private static final MMLogger logger = MMLogger.create(CheckStringVariableStoryPoint.class);
 
     /**
      * the key of the desired variable
@@ -111,10 +122,10 @@ public class CheckStringVariableStoryPoint extends StoryPoint {
 
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("key")) {
-                    key =wn2.getTextContent().trim();
+                    key = wn2.getTextContent().trim();
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

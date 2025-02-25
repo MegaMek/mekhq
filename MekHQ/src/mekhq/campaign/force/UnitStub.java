@@ -20,25 +20,29 @@
  */
 package mekhq.campaign.force;
 
-import megamek.codeUtilities.StringUtility;
-import megamek.common.icons.AbstractIcon;
-import megamek.common.icons.Portrait;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
+import megamek.codeUtilities.StringUtility;
+import megamek.common.icons.AbstractIcon;
+import megamek.common.icons.Portrait;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
+import mekhq.utilities.MHQXMLUtility;
 
 public class UnitStub {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(UnitStub.class);
+
+    // region Variable Declarations
     private String desc;
     private AbstractIcon portrait;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public UnitStub() {
         portrait = new Portrait();
         desc = "";
@@ -49,9 +53,9 @@ public class UnitStub {
         Person commander = u.getCommander();
         portrait = (commander == null) ? new Portrait() : commander.getPortrait();
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public AbstractIcon getPortrait() {
         return portrait;
     }
@@ -67,21 +71,21 @@ public class UnitStub {
     public void setDesc(final String desc) {
         this.desc = desc;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
     private String getUnitDescription(Unit u) {
-        String name = "<font color='red'>No Crew</font>";
+        String name = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>No Crew</font>";
         Person pp = u.getCommander();
         if (null != pp) {
             name = pp.getFullTitle();
             name += " (" + u.getEntity().getCrew().getGunnery() + "/" + u.getEntity().getCrew().getPiloting() + ")";
             if (pp.needsFixing()) {
-                name = "<font color='red'>" + name + "</font>";
+                name = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + name + "</font>";
             }
         }
         String uname = "<i>" + u.getName() + "</i>";
         if (u.isDamaged()) {
-            uname = "<font color='red'>" + uname + "</font>";
+            uname = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + uname + "</font>";
         }
         return "<html>" + name + ", " + uname + "</html>";
     }
@@ -108,14 +112,10 @@ public class UnitStub {
                     retVal.setDesc(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase(Portrait.XML_TAG)) {
                     retVal.setPortrait(Portrait.parseFromXML(wn2));
-                } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) { // Legacy - 0.49.3 removal
-                    retVal.getPortrait().setCategory(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("portraitFileName")) { // Legacy - 0.49.3 removal
-                    retVal.getPortrait().setFilename(wn2.getTextContent().trim());
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
         return retVal;
     }

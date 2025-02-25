@@ -18,40 +18,41 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.enums.Gender;
-import mekhq.MekHQ;
-import mekhq.campaign.personnel.Person;
-import org.junit.jupiter.api.Test;
-
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class BabySurnameStyleTest {
-    //region Variable Declarations
+import java.util.ResourceBundle;
+
+import org.junit.jupiter.api.Test;
+
+import megamek.common.enums.Gender;
+import mekhq.MekHQ;
+import mekhq.campaign.personnel.Person;
+
+class BabySurnameStyleTest {
+    // region Variable Declarations
     private static final BabySurnameStyle[] styles = BabySurnameStyle.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Getters
+    // region Getters
     @Test
-    public void testGetToolTipText() {
+    void testGetToolTipText() {
         assertEquals(resources.getString("BabySurnameStyle.FATHERS.toolTipText"),
                 BabySurnameStyle.FATHERS.getToolTipText());
         assertEquals(resources.getString("BabySurnameStyle.WELSH_MATRONYMICS.toolTipText"),
                 BabySurnameStyle.WELSH_MATRONYMICS.getToolTipText());
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     @Test
-    public void testIsFathers() {
+    void testIsFathers() {
         for (final BabySurnameStyle babySurnameStyle : styles) {
             if (babySurnameStyle == BabySurnameStyle.FATHERS) {
                 assertTrue(babySurnameStyle.isFathers());
@@ -62,7 +63,7 @@ public class BabySurnameStyleTest {
     }
 
     @Test
-    public void testIsMothers() {
+    void testIsMothers() {
         for (final BabySurnameStyle babySurnameStyle : styles) {
             if (babySurnameStyle == BabySurnameStyle.MOTHERS) {
                 assertTrue(babySurnameStyle.isMothers());
@@ -73,7 +74,7 @@ public class BabySurnameStyleTest {
     }
 
     @Test
-    public void testIsMothersFathers() {
+    void testIsMothersFathers() {
         for (final BabySurnameStyle babySurnameStyle : styles) {
             if (babySurnameStyle == BabySurnameStyle.MOTHERS_FATHERS) {
                 assertTrue(babySurnameStyle.isMothersFathers());
@@ -84,7 +85,7 @@ public class BabySurnameStyleTest {
     }
 
     @Test
-    public void testIsMothersHyphenFathers() {
+    void testIsMothersHyphenFathers() {
         for (final BabySurnameStyle babySurnameStyle : styles) {
             if (babySurnameStyle == BabySurnameStyle.MOTHERS_HYPHEN_FATHERS) {
                 assertTrue(babySurnameStyle.isMothersHyphenFathers());
@@ -95,7 +96,7 @@ public class BabySurnameStyleTest {
     }
 
     @Test
-    public void testIsFathersMothers() {
+    void testIsFathersMothers() {
         for (final BabySurnameStyle babySurnameStyle : styles) {
             if (babySurnameStyle == BabySurnameStyle.FATHERS_MOTHERS) {
                 assertTrue(babySurnameStyle.isFathersMothers());
@@ -106,7 +107,7 @@ public class BabySurnameStyleTest {
     }
 
     @Test
-    public void testIsFathersHyphenMothers() {
+    void testIsFathersHyphenMothers() {
         for (final BabySurnameStyle babySurnameStyle : styles) {
             if (babySurnameStyle == BabySurnameStyle.FATHERS_HYPHEN_MOTHERS) {
                 assertTrue(babySurnameStyle.isFathersHyphenMothers());
@@ -117,7 +118,7 @@ public class BabySurnameStyleTest {
     }
 
     @Test
-    public void testIsWelshPatronymics() {
+    void testIsWelshPatronymics() {
         for (final BabySurnameStyle babySurnameStyle : styles) {
             if (babySurnameStyle == BabySurnameStyle.WELSH_PATRONYMICS) {
                 assertTrue(babySurnameStyle.isWelshPatronymics());
@@ -128,7 +129,7 @@ public class BabySurnameStyleTest {
     }
 
     @Test
-    public void testIsWelshMatronymics() {
+    void testIsWelshMatronymics() {
         for (final BabySurnameStyle babySurnameStyle : styles) {
             if (babySurnameStyle == BabySurnameStyle.WELSH_MATRONYMICS) {
                 assertTrue(babySurnameStyle.isWelshMatronymics());
@@ -139,7 +140,7 @@ public class BabySurnameStyleTest {
     }
 
     @Test
-    public void testIsIcelandicPatronymics() {
+    void testIsIcelandicPatronymics() {
         for (final BabySurnameStyle babySurnameStyle : styles) {
             if (babySurnameStyle == BabySurnameStyle.ICELANDIC_PATRONYMICS) {
                 assertTrue(babySurnameStyle.isIcelandicPatronymics());
@@ -150,7 +151,7 @@ public class BabySurnameStyleTest {
     }
 
     @Test
-    public void testIsIcelandicMatronymics() {
+    void testIsIcelandicMatronymics() {
         for (final BabySurnameStyle babySurnameStyle : styles) {
             if (babySurnameStyle == BabySurnameStyle.ICELANDIC_MATRONYMICS) {
                 assertTrue(babySurnameStyle.isIcelandicMatronymics());
@@ -161,7 +162,7 @@ public class BabySurnameStyleTest {
     }
 
     @Test
-    public void testIsIcelandicCombinationNymics() {
+    void testIsIcelandicCombinationNymics() {
         for (final BabySurnameStyle babySurnameStyle : styles) {
             if (babySurnameStyle == BabySurnameStyle.ICELANDIC_COMBINATION_NYMICS) {
                 assertTrue(babySurnameStyle.isIcelandicCombinationNymics());
@@ -172,7 +173,7 @@ public class BabySurnameStyleTest {
     }
 
     @Test
-    public void testIsRussianPatronymics() {
+    void testIsRussianPatronymics() {
         for (final BabySurnameStyle babySurnameStyle : styles) {
             if (babySurnameStyle == BabySurnameStyle.RUSSIAN_PATRONYMICS) {
                 assertTrue(babySurnameStyle.isRussianPatronymics());
@@ -181,10 +182,10 @@ public class BabySurnameStyleTest {
             }
         }
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
     @Test
-    public void testGenerateBabySurnameBaseline() {
+    void testGenerateBabySurnameBaseline() {
         final Person mother = mock(Person.class);
         when(mother.getSurname()).thenReturn("Mother");
         final Person father = mock(Person.class);
@@ -193,18 +194,22 @@ public class BabySurnameStyleTest {
         assertEquals("Father", BabySurnameStyle.FATHERS.generateBabySurname(mother, father, Gender.MALE));
         assertEquals("Mother", BabySurnameStyle.FATHERS.generateBabySurname(mother, null, Gender.MALE));
         assertEquals("Mother", BabySurnameStyle.MOTHERS.generateBabySurname(mother, father, Gender.MALE));
-        assertEquals("Mother Father", BabySurnameStyle.MOTHERS_FATHERS.generateBabySurname(mother, father, Gender.MALE));
+        assertEquals("Mother Father",
+                BabySurnameStyle.MOTHERS_FATHERS.generateBabySurname(mother, father, Gender.MALE));
         assertEquals("Mother", BabySurnameStyle.MOTHERS_FATHERS.generateBabySurname(mother, null, Gender.MALE));
-        assertEquals("Mother-Father", BabySurnameStyle.MOTHERS_HYPHEN_FATHERS.generateBabySurname(mother, father, Gender.MALE));
+        assertEquals("Mother-Father",
+                BabySurnameStyle.MOTHERS_HYPHEN_FATHERS.generateBabySurname(mother, father, Gender.MALE));
         assertEquals("Mother", BabySurnameStyle.MOTHERS_HYPHEN_FATHERS.generateBabySurname(mother, null, Gender.MALE));
-        assertEquals("Father Mother", BabySurnameStyle.FATHERS_MOTHERS.generateBabySurname(mother, father, Gender.MALE));
+        assertEquals("Father Mother",
+                BabySurnameStyle.FATHERS_MOTHERS.generateBabySurname(mother, father, Gender.MALE));
         assertEquals("Mother", BabySurnameStyle.FATHERS_MOTHERS.generateBabySurname(mother, null, Gender.MALE));
-        assertEquals("Father-Mother", BabySurnameStyle.FATHERS_HYPHEN_MOTHERS.generateBabySurname(mother, father, Gender.MALE));
+        assertEquals("Father-Mother",
+                BabySurnameStyle.FATHERS_HYPHEN_MOTHERS.generateBabySurname(mother, father, Gender.MALE));
         assertEquals("Mother", BabySurnameStyle.FATHERS_HYPHEN_MOTHERS.generateBabySurname(mother, null, Gender.MALE));
     }
 
     @Test
-    public void testGenerateBabySurnameWelsh() {
+    void testGenerateBabySurnameWelsh() {
         final Person mother = mock(Person.class);
         final Person father = mock(Person.class);
 
@@ -212,27 +217,32 @@ public class BabySurnameStyleTest {
         // Owain - Expect ab Owain / ferch Owain
         when(father.getGivenName()).thenReturn("Owain");
         assertEquals("ab Owain", BabySurnameStyle.WELSH_PATRONYMICS.generateBabySurname(mother, father, Gender.MALE));
-        assertEquals("ferch Owain", BabySurnameStyle.WELSH_PATRONYMICS.generateBabySurname(mother, father, Gender.FEMALE));
+        assertEquals("ferch Owain",
+                BabySurnameStyle.WELSH_PATRONYMICS.generateBabySurname(mother, father, Gender.FEMALE));
 
         // Rhys - Expect ap Rhys / ferch Rhys
         when(father.getGivenName()).thenReturn("Rhys");
         assertEquals("ap Rhys", BabySurnameStyle.WELSH_PATRONYMICS.generateBabySurname(mother, father, Gender.MALE));
-        assertEquals("ferch Rhys", BabySurnameStyle.WELSH_PATRONYMICS.generateBabySurname(mother, father, Gender.FEMALE));
+        assertEquals("ferch Rhys",
+                BabySurnameStyle.WELSH_PATRONYMICS.generateBabySurname(mother, father, Gender.FEMALE));
 
-        // Null Father - Expect Matronymic Surname - Gwendolen - ap Gwendolen / ferch Gwendolen
+        // Null Father - Expect Matronymic Surname - Gwendolen - ap Gwendolen / ferch
+        // Gwendolen
         when(mother.getGivenName()).thenReturn("Gwendolen");
         assertEquals("ap Gwendolen", BabySurnameStyle.WELSH_PATRONYMICS.generateBabySurname(mother, null, Gender.MALE));
-        assertEquals("ferch Gwendolen", BabySurnameStyle.WELSH_PATRONYMICS.generateBabySurname(mother, null, Gender.FEMALE));
+        assertEquals("ferch Gwendolen",
+                BabySurnameStyle.WELSH_PATRONYMICS.generateBabySurname(mother, null, Gender.FEMALE));
 
         // Matronymics
         // Rhiannon - ap Rhiannon / ferch Rhiannon
         when(mother.getGivenName()).thenReturn("Rhiannon");
         assertEquals("ap Rhiannon", BabySurnameStyle.WELSH_MATRONYMICS.generateBabySurname(mother, null, Gender.MALE));
-        assertEquals("ferch Rhiannon", BabySurnameStyle.WELSH_MATRONYMICS.generateBabySurname(mother, null, Gender.FEMALE));
+        assertEquals("ferch Rhiannon",
+                BabySurnameStyle.WELSH_MATRONYMICS.generateBabySurname(mother, null, Gender.FEMALE));
     }
 
     @Test
-    public void testGenerateBabySurnameIcelandic() {
+    void testGenerateBabySurnameIcelandic() {
         final Person mother = mock(Person.class);
         final Person father = mock(Person.class);
 
@@ -291,7 +301,7 @@ public class BabySurnameStyleTest {
     }
 
     @Test
-    public void testGenerateBabySurnameRussianPatronymics() {
+    void testGenerateBabySurnameRussianPatronymics() {
         final Person mother = mock(Person.class);
         when(mother.getSurname()).thenReturn("Mother");
 
@@ -300,46 +310,45 @@ public class BabySurnameStyleTest {
         // Rada - Expect Radevich / Radevna
         when(father.getGivenName()).thenReturn("Rada");
         assertEquals("Radevich", BabySurnameStyle.RUSSIAN_PATRONYMICS.generateBabySurname(mother, father, Gender.MALE));
-        assertEquals("Radevna", BabySurnameStyle.RUSSIAN_PATRONYMICS.generateBabySurname(mother, father, Gender.FEMALE));
+        assertEquals("Radevna",
+                BabySurnameStyle.RUSSIAN_PATRONYMICS.generateBabySurname(mother, father, Gender.FEMALE));
 
         // Dimitri - Expect Dimitrevich / Dimitrevna
         when(father.getGivenName()).thenReturn("Dimitri");
-        assertEquals("Dimitrevich", BabySurnameStyle.RUSSIAN_PATRONYMICS.generateBabySurname(mother, father, Gender.MALE));
-        assertEquals("Dimitrevna", BabySurnameStyle.RUSSIAN_PATRONYMICS.generateBabySurname(mother, father, Gender.FEMALE));
+        assertEquals("Dimitrevich",
+                BabySurnameStyle.RUSSIAN_PATRONYMICS.generateBabySurname(mother, father, Gender.MALE));
+        assertEquals("Dimitrevna",
+                BabySurnameStyle.RUSSIAN_PATRONYMICS.generateBabySurname(mother, father, Gender.FEMALE));
 
         // Ivan - Expect Ivanovich / Ivanova
         when(father.getGivenName()).thenReturn("Ivan");
-        assertEquals("Ivanovich", BabySurnameStyle.RUSSIAN_PATRONYMICS.generateBabySurname(mother, father, Gender.MALE));
-        assertEquals("Ivanovna", BabySurnameStyle.RUSSIAN_PATRONYMICS.generateBabySurname(mother, father, Gender.FEMALE));
+        assertEquals("Ivanovich",
+                BabySurnameStyle.RUSSIAN_PATRONYMICS.generateBabySurname(mother, father, Gender.MALE));
+        assertEquals("Ivanovna",
+                BabySurnameStyle.RUSSIAN_PATRONYMICS.generateBabySurname(mother, father, Gender.FEMALE));
 
         // Null Father - Expect Mother's Surname
         assertEquals("Mother", BabySurnameStyle.RUSSIAN_PATRONYMICS.generateBabySurname(mother, null, Gender.FEMALE));
     }
 
-    //region File I/O
+    // region File I/O
     @Test
-    public void testParseFromString() {
+    void testParseFromString() {
         // Normal Parsing
         assertEquals(BabySurnameStyle.MOTHERS, BabySurnameStyle.parseFromString("MOTHERS"));
         assertEquals(BabySurnameStyle.ICELANDIC_MATRONYMICS, BabySurnameStyle.parseFromString("ICELANDIC_MATRONYMICS"));
-
-        // Legacy Parsing - Enum Renames
-        assertEquals(BabySurnameStyle.MOTHERS_HYPHEN_FATHERS, BabySurnameStyle.parseFromString("MOTHERS_HYP_FATHERS"));
-        assertEquals(BabySurnameStyle.FATHERS_HYPHEN_MOTHERS, BabySurnameStyle.parseFromString("FATHERS_HYP_MOTHERS"));
-
-        // Legacy Parsing - Magic Numbers
-        assertEquals(BabySurnameStyle.MOTHERS, BabySurnameStyle.parseFromString("0"));
-        assertEquals(BabySurnameStyle.FATHERS, BabySurnameStyle.parseFromString("1"));
 
         // Error Case
         assertEquals(BabySurnameStyle.MOTHERS, BabySurnameStyle.parseFromString("2"));
         assertEquals(BabySurnameStyle.MOTHERS, BabySurnameStyle.parseFromString("blah"));
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Test
-    public void testToStringOverride() {
-        assertEquals(resources.getString("BabySurnameStyle.RUSSIAN_PATRONYMICS.text"), BabySurnameStyle.RUSSIAN_PATRONYMICS.toString());
-        assertEquals(resources.getString("BabySurnameStyle.ICELANDIC_MATRONYMICS.text"), BabySurnameStyle.ICELANDIC_MATRONYMICS.toString());
+    void testToStringOverride() {
+        assertEquals(resources.getString("BabySurnameStyle.RUSSIAN_PATRONYMICS.text"),
+                BabySurnameStyle.RUSSIAN_PATRONYMICS.toString());
+        assertEquals(resources.getString("BabySurnameStyle.ICELANDIC_MATRONYMICS.text"),
+                BabySurnameStyle.ICELANDIC_MATRONYMICS.toString());
     }
 }

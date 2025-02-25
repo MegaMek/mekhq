@@ -2,7 +2,7 @@
  * NewKillDialog.java
  *
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,12 +24,12 @@ package mekhq.gui.dialog;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
-import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -44,32 +44,28 @@ public class AddOrEditKillEntryDialog extends JDialog {
     private static final int ADD_OPERATION = 1;
     private static final int EDIT_OPERATION = 2;
 
-    private JFrame frame;
-    private int operationType;
+    private final JFrame frame;
+    private final int operationType;
     private Kill kill;
     private LocalDate date;
-    private int missionId;
-    private int scenarioId;
-    private Campaign campaign;
+    private final int missionId;
+    private final int scenarioId;
+    private final int forceId;
+    private final Campaign campaign;
 
-    private JButton btnClose;
-    private JButton btnOK;
-    private JLabel lblKill;
     private JTextField txtKill;
-    private JLabel lblKiller;
     private JTextField txtKiller;
-    private JLabel lblDate;
     private JButton btnDate;
-    private JLabel lblMissionId;
     private MMComboBox<Mission> cboMissionId;
     private ArrayList<Integer> missionIdList;
-    private JLabel lblScenarioId;
     private MMComboBox<String> cboScenarioId;
     private ArrayList<Integer> scenarioIdList;
 
+    private static final MMLogger logger = MMLogger.create(AddOrEditKillEntryDialog.class);
+
     public AddOrEditKillEntryDialog(JFrame parent, boolean modal, UUID killerPerson, String killerUnit, LocalDate entryDate, Campaign campaign) {
         // We default missionId & scenarioId to 0 when adding new kills
-        this(parent, modal, ADD_OPERATION, new Kill(killerPerson, "?", killerUnit, entryDate, 0, 0), campaign);
+        this(parent, modal, ADD_OPERATION, new Kill(killerPerson, "?", killerUnit, entryDate, 0, 0, -1, -1), campaign);
     }
 
     public AddOrEditKillEntryDialog(JFrame parent, boolean modal, Kill kill, Campaign campaign) {
@@ -86,6 +82,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         this.date = this.kill.getDate();
         this.missionId = this.kill.getMissionId();
         this.scenarioId = this.kill.getScenarioId();
+        this.forceId = this.kill.getForceId();
         this.operationType = operationType;
         initComponents();
         setLocationRelativeTo(parent);
@@ -110,7 +107,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         }
         getContentPane().setLayout(new GridBagLayout());
 
-        lblKill = new JLabel();
+        JLabel lblKill = new JLabel();
         lblKill.setText(resourceMap.getString("lblKill.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -133,7 +130,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(txtKill, gridBagConstraints);
 
-        lblKiller = new JLabel();
+        JLabel lblKiller = new JLabel();
         lblKiller.setText(resourceMap.getString("lblKiller.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -156,7 +153,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(txtKiller, gridBagConstraints);
 
-        lblDate = new JLabel();
+        JLabel lblDate = new JLabel();
         lblDate.setText(resourceMap.getString("lblDate.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -178,7 +175,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         getContentPane().add(btnDate, gridBagConstraints);
 
-        lblMissionId = new JLabel();
+        JLabel lblMissionId = new JLabel();
         lblMissionId.setText(resourceMap.getString("lblMissionId.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -213,7 +210,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(cboMissionId, gridBagConstraints);
 
-        lblScenarioId = new JLabel();
+        JLabel lblScenarioId = new JLabel();
         lblScenarioId.setText(resourceMap.getString("lblScenarioId.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -249,7 +246,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(cboScenarioId, gridBagConstraints);
 
-        btnOK = new JButton();
+        JButton btnOK = new JButton();
         btnOK.setText(resourceMap.getString("btnOK.text"));
         btnOK.setName("btnOK");
         btnOK.addActionListener(this::btnOKActionPerformed);
@@ -261,7 +258,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(btnOK, gridBagConstraints);
 
-        btnClose = new JButton();
+        JButton btnClose = new JButton();
         btnClose.setText(resourceMap.getString("btnClose.text"));
         btnClose.setName("btnClose");
         btnClose.addActionListener(this::btnCloseActionPerformed);
@@ -283,7 +280,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -303,6 +300,13 @@ public class AddOrEditKillEntryDialog extends JDialog {
             kill.setScenarioId(0);
         } else {
             kill.setScenarioId(scenarioIdList.get(cboScenarioId.getSelectedIndex()));
+        }
+
+        // we attempt to log the Force ID, but there is a lot of information that could potentially be missing.
+        if (forceId == -1) {
+            try {
+                kill.setForceId(campaign.getPerson(kill.getPilotId()).getUnit().getForceId());
+            } catch (Exception ignored) {}
         }
 
         this.setVisible(false);

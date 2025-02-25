@@ -18,13 +18,13 @@
  */
 package mekhq.campaign.mission.enums;
 
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
 
 import java.util.ResourceBundle;
 
 public enum ScenarioStatus {
-    //region Enum Declarations
+    // region Enum Declarations
     CURRENT("ScenarioStatus.CURRENT.text", "ScenarioStatus.CURRENT.toolTipText"),
     DECISIVE_VICTORY("ScenarioStatus.DECISIVE_VICTORY.text", "ScenarioStatus.DECISIVE_VICTORY.toolTipText"),
     VICTORY("ScenarioStatus.VICTORY.text", "ScenarioStatus.VICTORY.toolTipText"),
@@ -33,30 +33,31 @@ public enum ScenarioStatus {
     DRAW("ScenarioStatus.DRAW.text", "ScenarioStatus.DRAW.toolTipText"),
     MARGINAL_DEFEAT("ScenarioStatus.MARGINAL_DEFEAT.text", "ScenarioStatus.MARGINAL_DEFEAT.toolTipText"),
     DEFEAT("ScenarioStatus.DEFEAT.text", "ScenarioStatus.DEFEAT.toolTipText"),
-    DECISIVE_DEFEAT("ScenarioStatus.DECISIVE_DEFEAT.text", "ScenarioStatus.DECISIVE_DEFEAT.toolTipText");
-    //endregion Enum Declarations
+    DECISIVE_DEFEAT("ScenarioStatus.DECISIVE_DEFEAT.text", "ScenarioStatus.DECISIVE_DEFEAT.toolTipText"),
+    REFUSED_ENGAGEMENT("ScenarioStatus.REFUSED_ENGAGEMENT.text", "ScenarioStatus.REFUSED_ENGAGEMENT.toolTipText");
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String toolTipText;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     ScenarioStatus(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public String getToolTipText() {
         return toolTipText;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isCurrent() {
         return this == CURRENT;
     }
@@ -93,16 +94,20 @@ public enum ScenarioStatus {
         return this == DECISIVE_DEFEAT;
     }
 
+    public boolean isRefusedEngagement() {
+        return this == REFUSED_ENGAGEMENT;
+    }
+
     public boolean isOverallVictory() {
         return isDecisiveVictory() || isVictory() || isMarginalVictory() || isPyrrhicVictory();
     }
 
     public boolean isOverallDefeat() {
-        return isDecisiveDefeat() || isDefeat() || isMarginalDefeat();
+        return isDecisiveDefeat() || isDefeat() || isMarginalDefeat() || isRefusedEngagement();
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     public static ScenarioStatus parseFromString(final String text) {
         try {
             return valueOf(text);
@@ -131,10 +136,11 @@ public enum ScenarioStatus {
 
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into a ScenarioStatus. Returning CURRENT.");
+        MMLogger.create(ScenarioStatus.class)
+                .error("Unable to parse " + text + " into a ScenarioStatus. Returning CURRENT.");
         return CURRENT;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

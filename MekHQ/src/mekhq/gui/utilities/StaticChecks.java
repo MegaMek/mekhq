@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2014-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,11 +25,10 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.unit.Unit;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.StringJoiner;
-import java.util.Vector;
+import java.util.*;
 import java.util.stream.Stream;
+
+import static mekhq.campaign.force.ForceType.STANDARD;
 
 public class StaticChecks {
 
@@ -39,8 +38,8 @@ public class StaticChecks {
                         .map(campaign::getUnit).noneMatch(unit -> (unit != null) && unit.isDeployed());
     }
 
-    public static boolean areAllCombatForces(Vector<Force> forces) {
-        return forces.stream().allMatch(Force::isCombatForce);
+    public static boolean areAllStandardForces(Vector<Force> forces) {
+        return forces.stream().allMatch(force -> force.isForceType(STANDARD));
     }
 
     public static boolean areAllUnitsAvailable(Vector<Unit> units) {
@@ -88,7 +87,7 @@ public class StaticChecks {
         int numberHVee = 0;
         int numberInfantry = 0;
         int numberLVee = 0;
-        int numberMech = 0;
+        int numberMek = 0;
         int numberProto = 0;
         int numberSC = 0;
         int numberSHVee = 0;
@@ -113,7 +112,7 @@ public class StaticChecks {
                 numberInfantry += (int) Math.ceil(unit.getEntity().getWeight());
             } else if (unit.getEntity().getUnitType() == UnitType.MEK) {
                 // Includes LAMs and Quadvees
-                numberMech++;
+                numberMek++;
             } else if (unit.getEntity().getUnitType() == UnitType.PROTOMEK) {
                 numberProto++;
             } else if (unit.getEntity().getUnitType() == UnitType.TANK
@@ -158,13 +157,13 @@ public class StaticChecks {
             loadOK = false;
         }
 
-        if (numberMech > ship.getCurrentMechCapacity()) {
-            reason.add("    Selection of Units includes too many Mechs. \n");
+        if (numberMek > ship.getCurrentMekCapacity()) {
+            reason.add("    Selection of Units includes too many Meks. \n");
             loadOK = false;
         }
 
-        if (numberProto > ship.getCurrentProtomechCapacity()) {
-            reason.add("    Selection of Units includes too many ProtoMechs. \n");
+        if (numberProto > ship.getCurrentProtoMekCapacity()) {
+            reason.add("    Selection of Units includes too many ProtoMeks. \n");
             loadOK = false;
         }
 
@@ -198,7 +197,7 @@ public class StaticChecks {
 
     public static boolean areAllUnitsNotC3iNetworked(Vector<Unit> units) {
         return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasC3i()
-                && (u.getEntity().calculateFreeC3Nodes() < 5));
+                && (u.getEntity().calculateFreeC3Nodes() == 5)); // 5 is the magic number for C3 network
     }
 
     public static boolean areAllUnitsC3iNetworked(Vector<Unit> units) {
@@ -303,7 +302,11 @@ public class StaticChecks {
     }
 
     public static boolean areAllActive(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getStatus().isActive());
+        return Arrays.stream(people).allMatch(p -> p.getStatus().isActive());
+    }
+
+    public static boolean areAllStudents(Person... people) {
+        return Arrays.stream(people).allMatch(p -> p.getStatus().isStudent());
     }
 
     public static boolean areAllClanEligible(Person... people) {
@@ -338,8 +341,16 @@ public class StaticChecks {
         return Stream.of(people).allMatch(p -> p.getPrisonerStatus().isCurrentPrisoner());
     }
 
+    public static boolean areAllPow(Person... people) {
+        return Stream.of(people).allMatch(p -> p.getStatus().isPoW());
+    }
+
     public static boolean areAnyWillingToDefect(Person... people) {
         return Stream.of(people).anyMatch(p -> p.getPrisonerStatus().isPrisonerDefector());
+    }
+
+    public static boolean areAnyBondsmen(Person... people) {
+        return Stream.of(people).anyMatch(p -> p.getPrisonerStatus().isBondsman());
     }
 
     public static boolean areAllSameSite(Unit... units) {

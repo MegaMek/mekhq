@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -163,6 +163,17 @@ public class PersonnelTabViewTest {
                 assertTrue(personnelTabView.isFlags());
             } else {
                 assertFalse(personnelTabView.isFlags());
+            }
+        }
+    }
+
+    @Test
+    public void testIsPersonality() {
+        for (final PersonnelTabView personnelTabView : views) {
+            if (personnelTabView == PersonnelTabView.PERSONALITY) {
+                assertTrue(personnelTabView.isPersonality());
+            } else {
+                assertFalse(personnelTabView.isPersonality());
             }
         }
     }

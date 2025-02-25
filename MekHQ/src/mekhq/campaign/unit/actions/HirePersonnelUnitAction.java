@@ -29,7 +29,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.unit.Unit;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Hires a full complement of personnel for a unit.
@@ -50,10 +50,10 @@ public class HirePersonnelUnitAction implements IUnitAction {
     public void execute(Campaign campaign, Unit unit) {
         while (unit.canTakeMoreDrivers()) {
             Person p = null;
-            if (unit.getEntity() instanceof LandAirMech) {
+            if (unit.getEntity() instanceof LandAirMek) {
                 p = campaign.newPerson(PersonnelRole.LAM_PILOT);
-            } else if (unit.getEntity() instanceof Mech) {
-                p = campaign.newPerson(PersonnelRole.MECHWARRIOR);
+            } else if (unit.getEntity() instanceof Mek) {
+                p = campaign.newPerson(PersonnelRole.MEKWARRIOR);
             } else if (unit.getEntity() instanceof SmallCraft
                     || unit.getEntity() instanceof Jumpship) {
                 p = campaign.newPerson(PersonnelRole.VESSEL_PILOT);
@@ -74,8 +74,8 @@ public class HirePersonnelUnitAction implements IUnitAction {
                     default:
                         p = campaign.newPerson(PersonnelRole.GROUND_VEHICLE_DRIVER);
                 }
-            } else if (unit.getEntity() instanceof Protomech) {
-                p = campaign.newPerson(PersonnelRole.PROTOMECH_PILOT);
+            } else if (unit.getEntity() instanceof ProtoMek) {
+                p = campaign.newPerson(PersonnelRole.PROTOMEK_PILOT);
             } else if (unit.getEntity() instanceof BattleArmor) {
                 p = campaign.newPerson(PersonnelRole.BATTLE_ARMOUR);
             } else if (unit.getEntity() instanceof Infantry) {
@@ -103,8 +103,8 @@ public class HirePersonnelUnitAction implements IUnitAction {
             } else if (unit.getEntity() instanceof SmallCraft
                     || unit.getEntity() instanceof Jumpship) {
                 p = campaign.newPerson(PersonnelRole.VESSEL_GUNNER);
-            } else if (unit.getEntity() instanceof Mech) {
-                p = campaign.newPerson(PersonnelRole.MECHWARRIOR);
+            } else if (unit.getEntity() instanceof Mek) {
+                p = campaign.newPerson(PersonnelRole.MEKWARRIOR);
             }
             if (p == null) {
                 break;
@@ -141,7 +141,7 @@ public class HirePersonnelUnitAction implements IUnitAction {
             if (unit.getEntity() instanceof Tank) {
                 p = campaign.newPerson(PersonnelRole.VEHICLE_GUNNER);
             } else {
-                p = campaign.newPerson(PersonnelRole.MECHWARRIOR);
+                p = campaign.newPerson(PersonnelRole.MEKWARRIOR);
             }
             if (!campaign.recruitPerson(p, isGM)) {
                 return;
@@ -155,7 +155,7 @@ public class HirePersonnelUnitAction implements IUnitAction {
                 && unit.getEntity().getWeaponList().stream()
                         .anyMatch(weapon -> (weapon.getType() instanceof WeaponType)
                                 && (((WeaponType) weapon.getType()).getDamage() == WeaponType.DAMAGE_ARTILLERY))) {
-            final List<Person> gunners = unit.getGunners();
+            final Set<Person> gunners = unit.getGunners();
             if (!gunners.isEmpty() && gunners.stream().noneMatch(person -> person.getSkills().hasSkill(SkillType.S_ARTILLERY))) {
                 new DefaultSkillGenerator(campaign.getRandomSkillPreferences()).generateArtillerySkill(ObjectUtility.getRandomItem(gunners));
             }

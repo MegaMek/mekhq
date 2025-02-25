@@ -27,7 +27,7 @@ import java.util.function.IntUnaryOperator;
 import megamek.common.Aero;
 import megamek.common.Compute;
 import megamek.common.Entity;
-import megamek.common.Mech;
+import megamek.common.Mek;
 import mekhq.campaign.*;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.ServiceLogger;
@@ -107,10 +107,10 @@ public final class InjuryUtil {
     public static Collection<Injury> genInjuries(Campaign c, Person p, int hits) {
         final Unit u = p.getUnit();
         final Entity en = (null != u) ? u.getEntity() : null;
-        final boolean mwasf = ((en instanceof Mech) || (en instanceof Aero));
+        final boolean mwasf = ((en instanceof Mek) || (en instanceof Aero));
         final int critMod = mwasf ? 0 : 2;
         final BiFunction<IntUnaryOperator, Function<BodyLocation, Boolean>, BodyLocation> generator
-            = mwasf ? HitLocationGen::mechAndAsf : HitLocationGen::generic;
+            = mwasf ? HitLocationGen::mekAndAsf : HitLocationGen::generic;
         final Map<BodyLocation, Integer> hitAccumulator = new HashMap<>();
 
         for (int i = 0; i < hits; i++) {

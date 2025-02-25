@@ -46,6 +46,7 @@ public class Rotor extends TankLocation {
         super(VTOL.LOC_ROTOR, tonnage, c);
         this.name = "Rotor";
         this.damage = 0;
+        this.unitTonnageMatters = true;
     }
 
     @Override

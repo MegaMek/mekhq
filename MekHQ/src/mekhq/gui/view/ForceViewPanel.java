@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2011-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,10 +25,13 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.ForceType;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
+import mekhq.utilities.ReportingUtilities;
 
 import javax.swing.*;
 import java.awt.*;
@@ -42,27 +45,11 @@ import java.util.UUID;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ForceViewPanel extends JScrollablePanel {
-    private Force force;
-    private Campaign campaign;
+    private final Force force;
+    private final Campaign campaign;
 
-    private JLabel lblIcon;
     private JPanel pnlStats;
     private JPanel pnlSubUnits;
-    private JTextPane txtDesc;
-
-    private JLabel lblType;
-    private JLabel lblAssign1;
-    private JLabel lblAssign2;
-    private JLabel lblCommander1;
-    private JLabel lblCommander2;
-    private JLabel lblBV1;
-    private JLabel lblBV2;
-    private JLabel lblTonnage1;
-    private JLabel lblTonnage2;
-    private JLabel lblCost1;
-    private JLabel lblCost2;
-    private JLabel lblTech1;
-    private JLabel lblTech2;
 
     public ForceViewPanel(Force f, Campaign c) {
         super();
@@ -74,10 +61,10 @@ public class ForceViewPanel extends JScrollablePanel {
     private void initComponents() {
         getAccessibleContext().setAccessibleName("Selected Force: " + force.getFullName());
 
-        lblIcon = new JLabel();
+        JLabel lblIcon = new JLabel();
         pnlStats = new JPanel();
         pnlSubUnits = new JPanel();
-        txtDesc = new JTextPane();
+        JTextPane txtDesc = new JTextPane();
 
         setLayout(new GridBagLayout());
 
@@ -142,19 +129,21 @@ public class ForceViewPanel extends JScrollablePanel {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceViewPanel",
                 MekHQ.getMHQOptions().getLocale());
 
-        lblType = new JLabel();
-        lblAssign1 = new JLabel();
-        lblAssign2 = new JLabel();
-        lblCommander1 = new JLabel();
-        lblCommander2 = new JLabel();
-        lblBV1 = new JLabel();
-        lblBV2 = new JLabel();
-        lblCost1 = new JLabel();
-        lblCost2 = new JLabel();
-        lblTonnage1 = new JLabel();
-        lblTonnage2 = new JLabel();
-        lblTech1 = new JLabel();
-        lblTech2 = new JLabel();
+        JLabel lblType = new JLabel();
+        JLabel lblAssign1 = new JLabel();
+        JLabel lblAssign2 = new JLabel();
+        JLabel lblFormationType1 = new JLabel();
+        JLabel lblFormationType2 = new JLabel();
+        JLabel lblCommander1 = new JLabel();
+        JLabel lblCommander2 = new JLabel();
+        JLabel lblBV1 = new JLabel();
+        JLabel lblBV2 = new JLabel();
+        JLabel lblCost1 = new JLabel();
+        JLabel lblCost2 = new JLabel();
+        JLabel lblTonnage1 = new JLabel();
+        JLabel lblTonnage2 = new JLabel();
+        JLabel lblTech1 = new JLabel();
+        JLabel lblTech2 = new JLabel();
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
 
@@ -163,14 +152,17 @@ public class ForceViewPanel extends JScrollablePanel {
         long bv = 0;
         Money cost = Money.zero();
         double ton = 0;
-        String commander = "";
         String lanceTech = "";
         String assigned = "";
         String type = null;
-        
+
         Person commanderPerson = campaign.getPerson(force.getForceCommanderID());
-        commander = commanderPerson != null ? commanderPerson.getFullTitle() : "";
-        
+        String commander = commanderPerson != null ? commanderPerson.getFullTitle() : "";
+
+        if (force.getId() == 0) {
+            commander = campaign.getFlaggedCommander() != null ? campaign.getFlaggedCommander().getFullTitle() : "";
+        }
+
         for (UUID uid : force.getAllUnits(false)) {
             Unit u = campaign.getUnit(uid);
             if (null != u) {
@@ -200,10 +192,19 @@ public class ForceViewPanel extends JScrollablePanel {
         int nexty = 0;
 
         if (null != type) {
-            lblType.setName("lblCommander2");
-            String forceType = (force.isCombatForce() ? "" : "Non-Combat ") + type + " " + resourceMap.getString("unit");
-            lblType.setText("<html><i>" + forceType + "</i></html>");
-            lblType.getAccessibleContext().setAccessibleDescription("Force Type: " + forceType);
+            lblType.setName("lblType");
+
+            ForceType forceType = force.getForceType();
+
+            String forceLabel;
+            if (forceType.isStandard()) {
+                forceLabel = force.getFormationLevel().toString();
+            } else {
+                forceLabel = forceType.getDisplayName() + ' ' + force.getFormationLevel().toString();
+            }
+
+            lblType.setText("<html><i>" + forceLabel + "</i></html>");
+            lblType.getAccessibleContext().setAccessibleDescription("Force Type: " + forceLabel);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = nexty;
@@ -238,6 +239,29 @@ public class ForceViewPanel extends JScrollablePanel {
             pnlStats.add(lblCommander2, gridBagConstraints);
             nexty++;
         }
+
+        lblFormationType1.setName("lblFormationType1");
+        lblFormationType1.setText(resourceMap.getString("lblFormationType1.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = nexty;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblFormationType1, gridBagConstraints);
+
+        lblFormationType2.setName("lblFormationType2");
+        lblFormationType2.setText(force.getFormationLevel().toString());
+        lblFormationType1.setLabelFor(lblFormationType2);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = nexty;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblFormationType2, gridBagConstraints);
+        nexty++;
+
         if (null != force.getTechID()) {
             if (!lanceTech.isBlank()) {
                 lblTech1.setName("lblTech1");
@@ -378,7 +402,7 @@ public class ForceViewPanel extends JScrollablePanel {
         int nexty = 0;
         for (Force subForce : force.getSubForces()) {
             lblForce = new JLabel();
-            lblForce.setText(getSummaryFor(subForce));
+            lblForce.setText(getForceSummary(subForce));
             lblForce.setIcon(subForce.getForceIcon().getImageIcon(72));
             nexty++;
             gridBagConstraints = new GridBagConstraints();
@@ -416,7 +440,7 @@ public class ForceViewPanel extends JScrollablePanel {
             lblPerson = new JLabel();
             lblUnit = new JLabel();
             if (null != p) {
-                lblPerson.setText(getSummaryFor(p, unit));
+                lblPerson.setText(getForceSummary(p, unit));
                 lblPerson.setIcon(p.getPortrait().getImageIcon());
             } else {
                 lblPerson.getAccessibleContext().setAccessibleName("Unmanned Unit");
@@ -430,7 +454,7 @@ public class ForceViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSubUnits.add(lblPerson, gridBagConstraints);
-            lblUnit.setText(getSummaryFor(unit));
+            lblUnit.setText(getForceSummary(unit));
             lblUnit.setIcon(new ImageIcon(unit.getImage(lblUnit)));
             lblPerson.setLabelFor(lblUnit);
             gridBagConstraints = new GridBagConstraints();
@@ -445,20 +469,72 @@ public class ForceViewPanel extends JScrollablePanel {
         }
     }
 
-    public String getSummaryFor(Person person, Unit unit) {
-        String toReturn = "<html><font size='2'><b>" + person.getFullTitle() + "</b><br/>";
-        toReturn += person.getSkillLevel(campaign, false) + " " + person.getRoleDesc();
-        if (null != unit && null != unit.getEntity()
-                && null != unit.getEntity().getCrew() && unit.getEntity().getCrew().getHits() > 0) {
-            toReturn += "<br><font color='red' size='2'>" + unit.getEntity().getCrew().getHits() + " hit(s)";
+    public String getForceSummary(Person person, Unit unit) {
+        if(null == person) {
+            return "";
         }
-        toReturn += "</font></html>";
-        return toReturn;
+
+        StringBuilder toReturn = new StringBuilder();
+        toReturn.append("<html><nobr><font size='3'><b>")
+            .append(person.getFullTitle())
+            .append("</b><br/><b>")
+            .append(SkillType.getColoredExperienceLevelName(person.getSkillLevel(campaign, false)))
+            .append("</b> ")
+            .append(person.getRoleDesc());
+
+        toReturn.append("<br>");
+
+        boolean isInjured = false;
+        boolean isFatigued = false;
+
+        if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
+            if (person.hasInjuries(true)) {
+                isInjured = true;
+                int injuryCount = person.getInjuries().size();
+
+                String injuriesMessage = " " + injuryCount + (injuryCount == 1 ? " injury" : " injuries");
+
+                toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), injuriesMessage));
+            }
+
+        } else {
+            if (null != unit && null != unit.getEntity() && null != unit.getEntity().getCrew()
+                    && unit.getEntity().getCrew().getHits() > 0) {
+                isInjured = true;
+                int hitCount = unit.getEntity().getCrew().getHits();
+
+                String hitsMessage = " " + hitCount + (hitCount == 1 ? " hit" : " hits");
+
+                toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), hitsMessage));
+            }
+        }
+
+        if (campaign.getCampaignOptions().isUseFatigue() && (person.getEffectiveFatigue(campaign) > 0)) {
+            isFatigued = true;
+            if (isInjured) {
+                toReturn.append(',');
+            }
+            toReturn.append(' ');
+
+            String fatigueMessage = person.getEffectiveFatigue(campaign) + " fatigue";
+
+            toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorWarningHexColor(), fatigueMessage));
+        }
+
+        if (!(isInjured || isFatigued)) {
+            toReturn.append("&nbsp;");
+        }
+
+        toReturn.append("</font></nobr></html>");
+        return toReturn.toString();
     }
 
-    public String getSummaryFor(Unit unit) {
-        String toReturn = "<html><font size='3'><b>" + unit.getName() + "</b></font><br/>";
-        toReturn += "<font size='2'><b>BV:</b> " + unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) + "<br/>";
+    public String getForceSummary(Unit unit) {
+        String toReturn = "<html><font size='4'><b>" + unit.getName() + "</b></font><br/>";
+        toReturn += "<font><b>BV:</b> " + unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) + "<br/>";
         toReturn += unit.getStatus();
         Entity entity = unit.getEntity();
         if (entity.hasNavalC3()) {
@@ -495,8 +571,8 @@ public class ForceViewPanel extends JScrollablePanel {
         if (!unit.getEntity().getTransportBays().isEmpty()) {
             int veeTotal = (int) (unit.getCurrentLightVehicleCapacity() + unit.getCurrentHeavyVehicleCapacity() + unit.getCurrentSuperHeavyVehicleCapacity());
             int aeroTotal = (int) (unit.getCurrentASFCapacity() + unit.getCurrentSmallCraftCapacity());
-            if (unit.getCurrentMechCapacity() > 0) {
-                toReturn += "<br><i>" + "Mech Bays: " + (int) unit.getCurrentMechCapacity() + " free.</i>";
+            if (unit.getCurrentMekCapacity() > 0) {
+                toReturn += "<br><i>" + "Mek Bays: " + (int) unit.getCurrentMekCapacity() + " free.</i>";
             }
             if (veeTotal > 0) {
                 toReturn += "<br><i>" + "Vehicle Bays: " + veeTotal + " free.</i>";
@@ -504,8 +580,8 @@ public class ForceViewPanel extends JScrollablePanel {
             if (aeroTotal > 0) {
                 toReturn += "<br><i>" + "ASF/SC Bays: " + aeroTotal + " free.</i>";
             }
-            if (unit.getCurrentProtomechCapacity() > 0) {
-                toReturn += "<br><i>" + "ProtoMech Bays: " + (int) unit.getCurrentProtomechCapacity() + " free.</i>";
+            if (unit.getCurrentProtoMekCapacity() > 0) {
+                toReturn += "<br><i>" + "ProtoMek Bays: " + (int) unit.getCurrentProtoMekCapacity() + " free.</i>";
             }
             if (unit.getCurrentBattleArmorCapacity() > 0) {
                 toReturn += "<br><i>" + "Battle Armor Bays: " + (int) unit.getCurrentBattleArmorCapacity() + " free.</i>";
@@ -514,47 +590,70 @@ public class ForceViewPanel extends JScrollablePanel {
                 toReturn += "<br><i>" + "Infantry Bays: " + (int) unit.getCurrentInfantryCapacity() + " tons free.</i>";
             }
         }
+        //Let's get preferred transport too
+        if (unit.hasTacticalTransportAssignment()) {
+            toReturn += "<br><i>" + "Transported by: ";
+            toReturn += unit.getTacticalTransportAssignment().getTransport().getName();
+            toReturn += "</i>";
+        }
         toReturn += "</font></html>";
         return toReturn;
     }
 
-    public String getSummaryFor(Force f) {
-        // we are not going to use the campaign methods here because we can be more efficient
-        // by only traversing once
-        int bv = 0;
+    /**
+     * Returns a summary of the given Force in HTML format.
+     *
+     * @param force the Force to generate the summary for
+     * @return a summary of the Force in HTML format
+     */
+    public String getForceSummary(Force force) {
+        int battleValue = 0;
         Money cost = Money.zero();
-        double ton = 0;
+        double tonnage = 0;
         int number = 0;
         String commander = "No personnel found";
-        ArrayList<Person> people = new ArrayList<>();
-        for (UUID uid : f.getAllUnits(false)) {
-            Unit u = campaign.getUnit(uid);
-            if (null != u) {
-                Person p = u.getCommander();
+
+        for (UUID uid : force.getAllUnits(false)) {
+            Unit unit = campaign.getUnit(uid);
+            if (null != unit) {
+                boolean crewExists = unit.getCommander() != null;
+                battleValue += unit.getEntity().calculateBattleValue(true, !crewExists);
+                cost = cost.plus(unit.getEntity().getCost(true));
+                tonnage += unit.getEntity().getWeight();
                 number++;
-                if (p != null) {
-                    bv += u.getEntity().calculateBattleValue(true, false);
-                } else {
-                    bv += u.getEntity().calculateBattleValue(true, true);
-                }
-                cost = cost.plus(u.getEntity().getCost(true));
-                ton += u.getEntity().getWeight();
-                if (p != null) {
-                    people.add(p);
-                }
             }
         }
-        // sort person vector by rank
-        people.sort((p1, p2) -> ((Comparable<Integer>) p2.getRankNumeric()).compareTo(p1.getRankNumeric()));
-        if (!people.isEmpty()) {
-            commander = people.get(0).getFullTitle();
+
+        if (force.getForceCommanderID() != null) {
+            Person forceCommander = campaign.getPerson(force.getForceCommanderID());
+
+            if (forceCommander != null) {
+                commander = forceCommander.getFullTitle();
+            } else {
+                commander = "No Commander";
+            }
         }
-        String toReturn = "<html><font size='2'><b>" + f.getName() + "</b> (" + commander + ")<br/>";
-        toReturn += "<b>Number of Units:</b> " + number + "<br/>";
-        toReturn += bv + " BV, ";
-        toReturn += DecimalFormat.getInstance().format(ton) + " tons, ";
-        toReturn += cost.toAmountAndSymbolString();
-        toReturn += "</font></html>";
-        return toReturn;
+
+        StringBuilder summary = new StringBuilder();
+        summary.append("<html><font size='4'><b>").append(force.getName()).append("</b> (").append(commander).append(")</font><br/>");
+        summary.append("<font>");
+        appendSummary(summary, "Number of Units", number);
+        appendSummary(summary, "BV", battleValue);
+        appendSummary(summary, "Tonnage", DecimalFormat.getInstance().format(tonnage));
+        appendSummary(summary, "Value", cost.toAmountAndSymbolString());
+        summary.append("</font></html>");
+
+        return summary.toString();
+    }
+
+    /**
+     * Appends a summary line to the provided StringBuilder.
+     *
+     * @param string    the StringBuilder to append the summary line to
+     * @param attribute the attribute name to display in bold
+     * @param value     the value associated with the attribute
+     */
+    private void appendSummary(StringBuilder string, String attribute, Object value) {
+        string.append("<b>").append(attribute).append(":</b> ").append(value).append("<br/>");
     }
 }

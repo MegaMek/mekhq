@@ -33,7 +33,7 @@ import megamek.common.CriticalSlot;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
-import megamek.common.Mech;
+import megamek.common.Mek;
 import megamek.common.SimpleTechLevel;
 import megamek.common.SmallCraft;
 import megamek.common.TechAdvancement;
@@ -175,7 +175,7 @@ public class SpacecraftEngine extends Part {
     @Override
     public void remove(boolean salvage) {
         if (null != unit) {
-            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE);
             if (unit.getEntity() instanceof Aero) {
                 ((Aero) unit.getEntity()).setEngineHits(((Aero) unit.getEntity()).getMaxEngineHits());
             }

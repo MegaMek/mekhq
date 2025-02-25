@@ -20,36 +20,46 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.EquipmentType;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.personnel.Person;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
+import megamek.common.EquipmentType;
+import megamek.common.MiscType;
+import megamek.common.Mounted;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.Person;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  *
- * BA equipment is never critted so we are going to disable salvaging as well. It would
- * be nice at some point to allow for this but we would need some way in MM of tracking
+ * BA equipment is never critted so we are going to disable salvaging as well.
+ * It would
+ * be nice at some point to allow for this but we would need some way in MM of
+ * tracking
  * how many actual weapons on the squad are operational (nWeapon?)
- * When an individual suit is removed we also remove all the equipment and keep it with
+ * When an individual suit is removed we also remove all the equipment and keep
+ * it with
  * the suit. See BattleArmorSuit for details.
  *
- * Taharqa: as of 8/7/2015, I am working on making a change to this to allow for salvaging out parts
- * that are modularly mounted. The way I am planning on handling this is to set up a check in Unit
- * for whether a BattleSuit is operable or not and if not then soldiers would not be allowed to mount
- * it. It will be defined as inoperable if it is missing modular equipment. I will also likely have
+ * Taharqa: as of 8/7/2015, I am working on making a change to this to allow for
+ * salvaging out parts
+ * that are modularly mounted. The way I am planning on handling this is to set
+ * up a check in Unit
+ * for whether a BattleSuit is operable or not and if not then soldiers would
+ * not be allowed to mount
+ * it. It will be defined as inoperable if it is missing modular equipment. I
+ * will also likely have
  * to make changes to the BattleArmorSuit object to accommodate this as well.
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class BattleArmorEquipmentPart extends EquipmentPart {
+    private static final MMLogger logger = MMLogger.create(BattleArmorEquipmentPart.class);
+
     private int trooper;
 
     public BattleArmorEquipmentPart() {
@@ -102,7 +112,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
                     trooper = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
         restore();
@@ -115,16 +125,16 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
             Part missing = getMissingPart();
             unit.addPart(missing);
             campaign.getQuartermaster().addPart(missing, 0);
-            //need to record this as missing for trooper on entity
-            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+            // need to record this as missing for trooper on entity
+            Mounted<?> mounted = unit.getEntity().getEquipment(equipmentNum);
             if (null != mounted && isModular()) {
                 mounted.setMissingForTrooper(trooper, true);
             }
-            //sorry dude, but you can't pilot a messed up BA suit
+            // sorry dude, but you can't pilot a messed up BA suit
             if (unit.getEntity().getInternal(trooper) > 0) {
                 unit.getEntity().setInternal(0, trooper);
                 if (!unit.getCrew().isEmpty()) {
-                    Person trooperToRemove = unit.getCrew().get(unit.getCrew().size()-1);
+                    Person trooperToRemove = unit.getCrew().get(unit.getCrew().size() - 1);
                     if (null != trooperToRemove) {
                         unit.remove(trooperToRemove, true);
                     }
@@ -142,7 +152,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if (null != unit && isModular()) {
-            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+            Mounted<?> mounted = unit.getEntity().getEquipment(equipmentNum);
             if (null != mounted) {
                 if (mounted.isMissingForTrooper(trooper)) {
                     remove(false);
@@ -186,7 +196,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
     @Override
     public void updateConditionFromPart() {
         if (isModular()) {
-            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+            Mounted<?> mounted = unit.getEntity().getEquipment(equipmentNum);
             if (null != mounted) {
                 mounted.setMissingForTrooper(trooper, false);
             }
@@ -235,7 +245,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
 
     public int getBaMountLocation() {
         if (null != unit) {
-            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+            Mounted<?> mounted = unit.getEntity().getEquipment(equipmentNum);
             if (null != mounted) {
                 return mounted.getBaMountLoc();
             }
@@ -247,17 +257,19 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
         if (null == unit) {
             return false;
         }
-        for (Mounted m : unit.getEntity().getMisc()) {
+        for (Mounted<?> m : unit.getEntity().getMisc()) {
             if (m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_BA_MEA) &&
                     type instanceof MiscType && type.hasFlag(MiscType.F_BA_MANIPULATOR)
-                    && this.getBaMountLocation()== m.getBaMountLoc()) {
+                    && this.getBaMountLocation() == m.getBaMountLoc()) {
                 return true;
             }
-            /*if (type instanceof InfantryWeapon &&
-                    m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_AP_MOUNT)
-                    && this.getBaMountLocation()== m.getBaMountLoc()) {
-                return true;
-            }*/
+            /*
+             * if (type instanceof InfantryWeapon &&
+             * m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_AP_MOUNT)
+             * && this.getBaMountLocation()== m.getBaMountLoc()) {
+             * return true;
+             * }
+             */
         }
         return false;
     }

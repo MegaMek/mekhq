@@ -20,28 +20,39 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.*;
+import java.io.PrintWriter;
+import java.text.DecimalFormat;
+import java.util.Objects;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.Entity;
+import megamek.common.EquipmentType;
+import megamek.common.IArmorState;
+import megamek.common.ITechnology;
+import megamek.common.Tank;
+import megamek.common.TargetRoll;
+import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.ArmorType;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.WorkTime;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.text.DecimalFormat;
-import java.util.Objects;
+import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Armor extends Part implements IAcquisitionWork {
+    private static final MMLogger logger = MMLogger.create(Armor.class);
+
     protected int type;
     protected int amount;
     protected int amountNeeded;
@@ -112,33 +123,34 @@ public class Armor extends Part implements IAcquisitionWork {
         if (isSalvaging()) {
             return super.getDesc();
         }
-        String bonus = getAllMods(null).getValueAsString();
-        if (getAllMods(null).getValue() > -1) {
-            bonus = "+" + bonus;
+        StringBuilder toReturn = new StringBuilder();
+        toReturn.append("<html><b>Replace ")
+            .append(getName());
+        if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
+            toReturn.append(" - ")
+            .append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                SkillType.getExperienceLevelColor(getSkillMin()),
+                SkillType.getExperienceLevelName(getSkillMin()) + "+"));
         }
-        bonus = "(" + bonus + ")";
-        String toReturn = "<html><font size='2'";
+        toReturn.append("</b><br/>")
+            .append(getDetails())
+            .append("<br/>");
 
-        String scheduled = "";
-        if (getTech() != null) {
-            scheduled = " (scheduled) ";
-        }
-
-        toReturn += ">";
-        toReturn += "<b>Replace " + getName() + "</b><br/>";
-        toReturn += getDetails() + "<br/>";
-        if (getAmountAvailable() > 0) {
-            toReturn += "" + getTimeLeft() + " minutes" + scheduled;
-            if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
-                toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
+        if (getSkillMin() <= SkillType.EXP_ELITE) {
+            toReturn.append(getTimeLeft())
+                .append(" minutes")
+                .append(null != getTech() ? " (scheduled)" : "")
+                .append(" <b>TN:</b> ")
+                .append(getAllMods(null).getValue() > -1 ? "+" : "")
+                .append(getAllMods(null).getValueAsString());
+            if (getMode() != WorkTime.NORMAL) {
+                toReturn.append(" <i>")
+                    .append(getCurrentModeName())
+                    .append( "</i>");
             }
-            toReturn += " " + bonus;
         }
-        if (getMode() != WorkTime.NORMAL) {
-            toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
-        }
-        toReturn += "</font></html>";
-        return toReturn;
+        toReturn.append("</html>");
+        return toReturn.toString();
     }
 
     @Override
@@ -148,31 +160,58 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
+        StringBuilder toReturn = new StringBuilder();
         if (null != unit) {
-            String rearMount = "";
-            if (rear) {
-                rearMount = " (R)";
-            }
-            if (!isSalvaging()) {
-                String availability;
+            if (isSalvaging()) {
+                toReturn.append(unit.getEntity().getLocationName(location))
+                .append(rear ? " (Rear)" : "")
+                .append(", ")
+                .append(amount)
+                .append(amount == 1 ? " point" : " points");
+            } else {
+                toReturn.append(unit.getEntity().getLocationName(location))
+                    .append(rear ? " (Rear)" : "")
+                    .append(", ")
+                    .append(amountNeeded)
+                    .append(amountNeeded == 1 ? " point" : " points")
+                    .append("<br/>");
+
                 int amountAvailable = getAmountAvailable();
-                PartInventory inventories = campaign.getPartInventory(getNewPart());
-
-                String orderTransitString = getOrderTransitStringForDetails(inventories);
-
-                if (amountAvailable == 0) {
-                    availability = "<br><font color='red'>No armor " + orderTransitString + "</font>";
+                if(amountAvailable == 0) {
+                    toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                        MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "None in stock"));
                 } else if (amountAvailable < amountNeeded) {
-                    availability = "<br><font color='red'>Only " + amountAvailable + " available " + orderTransitString + "</font>";
+                    toReturn.append(ReportingUtilities.spanOpeningWithCustomColor(
+                            MekHQ.getMHQOptions().getFontColorNegativeHexColor()))
+                        .append("Only ")
+                        .append(amountAvailable)
+                        .append(" in stock")
+                        .append(ReportingUtilities.CLOSING_SPAN_TAG);
                 } else {
-                    availability = "<br><font color='green'>" + amountAvailable + " available " + orderTransitString + "</font>";
+                    toReturn.append(ReportingUtilities.spanOpeningWithCustomColor(
+                            MekHQ.getMHQOptions().getFontColorPositiveHexColor()))
+                        .append(amountAvailable)
+                        .append(" in stock")
+                        .append(ReportingUtilities.CLOSING_SPAN_TAG);
                 }
-
-                return unit.getEntity().getLocationName(location) + rearMount + ", " + amountNeeded + " points" + availability;
+    
+                PartInventory inventories = campaign.getPartInventory(getNewPart());
+                String orderTransitString = inventories.getTransitOrderedDetails();
+                if (!orderTransitString.isEmpty()) {
+                    toReturn.append(ReportingUtilities.spanOpeningWithCustomColor(
+                            MekHQ.getMHQOptions().getFontColorWarningHexColor()))
+                        .append(" (")
+                        .append(orderTransitString)
+                        .append(")")
+                        .append(ReportingUtilities.CLOSING_SPAN_TAG);
+                }
             }
-            return unit.getEntity().getLocationName(location) + rearMount + ", " + amount + " points";
+        
+        } else {
+            toReturn.append(amount)
+                .append(" points");
         }
-        return amount + " points";
+        return toReturn.toString();
     }
 
     public int getType() {
@@ -220,10 +259,10 @@ public class Armor extends Part implements IAcquisitionWork {
     public boolean isSameType(Armor armor) {
         if (getType() == EquipmentType.T_ARMOR_STANDARD
                 && armor.getType() == EquipmentType.T_ARMOR_STANDARD) {
-            //standard armor is compatible between clan and IS
+            // standard armor is compatible between clan and IS
             return true;
         }
-        return getType() == armor.getType()  && isClanTechBase() == armor.isClanTechBase();
+        return getType() == armor.getType() && isClanTechBase() == armor.isClanTechBase();
     }
 
     @Override
@@ -292,7 +331,7 @@ public class Armor extends Part implements IAcquisitionWork {
                     clan = wn2.getTextContent().equalsIgnoreCase("true");
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }
@@ -304,8 +343,10 @@ public class Armor extends Part implements IAcquisitionWork {
         }
         int amountFound = Math.min(getAmountAvailable(), amountNeeded);
         int fixAmount = Math.min(amount +
-                // Make sure that we handle the capital scale conversion when setting the fix amount
-                (unit.getEntity().isCapitalScale() ? (amountFound / 10) : amountFound), unit.getEntity().getOArmor(location, rear));
+        // Make sure that we handle the capital scale conversion when setting the fix
+        // amount
+                (unit.getEntity().isCapitalScale() ? (amountFound / 10) : amountFound),
+                unit.getEntity().getOArmor(location, rear));
         unit.getEntity().setArmor(fixAmount, location, rear);
         changeAmountAvailable(-1 * amountFound);
         updateConditionFromEntity(false);
@@ -319,9 +360,11 @@ public class Armor extends Part implements IAcquisitionWork {
         newPart.setBrandNew(true);
         newPart.setDaysToArrival(transitDays);
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
-            return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
+            return "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
+                    + "'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
-            return "<font color='red'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
+            return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                    + "'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
         }
     }
 
@@ -332,12 +375,13 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public String failToFind() {
-        return "<font color='red'><b> part not found</b>.</font>";
+        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                + "'><b> part not found</b>.</font>";
     }
 
     @Override
     public MissingPart getMissingPart() {
-        //no such thing
+        // no such thing
         return null;
     }
 
@@ -350,7 +394,8 @@ public class Armor extends Part implements IAcquisitionWork {
     public void remove(boolean salvage) {
         unit.getEntity().setArmor(IArmorState.ARMOR_DESTROYED, location, rear);
         if (salvage) {
-            // Account for capital-scale units when warehouse armor is stored at standard scale.
+            // Account for capital-scale units when warehouse armor is stored at standard
+            // scale.
             if (unit.getEntity().isCapitalScale()) {
                 amount *= 10;
             }
@@ -364,14 +409,13 @@ public class Armor extends Part implements IAcquisitionWork {
             if (entity instanceof Tank) {
                 return 3;
             }
-            //December 2017 errata, only large craft should return 15m/point.
+            // December 2017 errata, only large craft should return 15m/point.
             else if (entity.hasETypeFlag(Entity.ETYPE_DROPSHIP) || entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
                 return 15;
             }
         }
         return 5;
     }
-
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
@@ -449,7 +493,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public String getAcquisitionDesc() {
-        String toReturn = "<html><font size='2'";
+        String toReturn = "<html><font";
 
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
@@ -496,15 +540,19 @@ public class Armor extends Part implements IAcquisitionWork {
         // Faction and Tech mod
         if (isClanTechBase() && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {
             target.addModifier(campaign.getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
-        }
-        else if (campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
+        } else if (campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
             target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
         }
-        //availability mod
+        // availability mod
         int avail = getAvailability();
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
+        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ')');
         return target;
+    }
+
+    @Override
+    public int getSellableQuantity() {
+        return amount;
     }
 
     public double getArmorPointsPerTon() {
@@ -530,9 +578,9 @@ public class Armor extends Part implements IAcquisitionWork {
 
     public void changeAmountAvailable(int amount) {
         Armor a = (Armor) campaign.getWarehouse().findSparePart(part -> (part instanceof Armor)
-            && part.isPresent()
-            && Objects.equals(getRefitUnit(), part.getRefitUnit())
-            && isSameType((Armor) part));
+                && part.isPresent()
+                && Objects.equals(getRefitUnit(), part.getRefitUnit())
+                && isSameType((Armor) part));
 
         if (null != a) {
             a.setAmount(a.getAmount() + amount);
@@ -540,7 +588,8 @@ public class Armor extends Part implements IAcquisitionWork {
                 campaign.getWarehouse().removePart(a);
             }
         } else if (amount > 0) {
-            campaign.getQuartermaster().addPart(new Armor(getUnitTonnage(), type, amount, -1, false, isClanTechBase(), campaign), 0);
+            campaign.getQuartermaster()
+                    .addPart(new Armor(getUnitTonnage(), type, amount, -1, false, isClanTechBase(), campaign), 0);
         }
     }
 
@@ -558,10 +607,13 @@ public class Armor extends Part implements IAcquisitionWork {
                 remove(false);
             } else {
                 skillMin = SkillType.EXP_GREEN;
-                changeAmountAvailable(-1 * Math.min((unit.getEntity().isCapitalScale() ? (amountNeeded * 10) : amountNeeded), getAmountAvailable()));
+                changeAmountAvailable(
+                        -1 * Math.min((unit.getEntity().isCapitalScale() ? (amountNeeded * 10) : amountNeeded),
+                                getAmountAvailable()));
             }
         }
-        return " <font color='red'><b> failed." + scrap + "</b></font>";
+        return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> failed." + scrap
+                + "</b></font>";
     }
 
     @Override
@@ -579,9 +631,9 @@ public class Armor extends Part implements IAcquisitionWork {
     @Override
     public String getQuantityName(int quan) {
         double totalTon = quan * getTonnage();
-        String report = "" + DecimalFormat.getInstance().format(totalTon) + " tons of " + getName();
+        String report = DecimalFormat.getInstance().format(totalTon) + " tons of " + getName();
         if (totalTon == 1.0) {
-            report = "" + DecimalFormat.getInstance().format(totalTon) + " ton of " + getName();
+            report = DecimalFormat.getInstance().format(totalTon) + " ton of " + getName();
         }
         return report;
     }
@@ -606,8 +658,8 @@ public class Armor extends Part implements IAcquisitionWork {
         } else {
             unit.getEntity().setArmor(current - d, location, rear);
 
-       }
-       updateConditionFromEntity(false);
+        }
+        updateConditionFromEntity(false);
     }
 
     @Override

@@ -20,13 +20,11 @@ package mekhq.gui.view;
 
 import megamek.client.ui.swing.util.FluffImageHelper;
 import megamek.common.Entity;
-import megamek.common.MechView;
+import megamek.common.MekView;
 import megamek.common.TechConstants;
-import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.ImgLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
@@ -38,7 +36,7 @@ import java.util.ResourceBundle;
  * A custom panel that gets filled in with goodies from a unit record
  * @author  Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class UnitViewPanel extends JScrollablePanel {
+public class UnitViewPanel extends JPanel {
     private Unit unit;
     private Entity entity;
     private Campaign campaign;
@@ -82,7 +80,7 @@ public class UnitViewPanel extends JScrollablePanel {
         int compWidth = 1;
         Image image = FluffImageHelper.getFluffImage(entity);
         if (null != image) {
-            // fluff image exists so use custom ImgLabel to get full mech porn
+            // fluff image exists so use custom ImgLabel to get full mek porn
             lblImage = new  ImgLabel(image);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
@@ -125,12 +123,12 @@ public class UnitViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
 
-        MechView mview = new MechView(entity, false, true);
+        MekView mview = new MekView(entity, false, true);
         txtReadout.setName("txtReadout");
         txtReadout.setContentType(resourceMap.getString("txtReadout.contentType"));
         txtReadout.setEditable(false);
         txtReadout.setFont(Font.decode(resourceMap.getString("txtReadout.font")));
-        txtReadout.setText("<div style='font: 12pt monospaced'>" + mview.getMechReadoutBasic() + "<br>" + mview.getMechReadoutLoadout() + "</div>");
+        txtReadout.setText("<div style='font: 12pt monospaced'>" + mview.getMekReadoutBasic() + "<br>" + mview.getMekReadoutLoadout() + "</div>");
         txtReadout.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Technical Readout"),
                 BorderFactory.createEmptyBorder(0,2,2,2)));
@@ -184,7 +182,7 @@ public class UnitViewPanel extends JScrollablePanel {
         pnlStats.setLayout(new GridBagLayout());
 
         lblType.setName("lblType");
-        lblType.setText("<html><i>" + UnitType.getTypeDisplayableName(entity.getUnitType()) + "</i></html>");
+        lblType.setText("<html><i>" + unit.getTypeDisplayableNameWithOmni() + "</i></html>");
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;

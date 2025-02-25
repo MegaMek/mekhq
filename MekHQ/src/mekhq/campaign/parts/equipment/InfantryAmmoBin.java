@@ -19,18 +19,24 @@
 
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.*;
-import megamek.common.annotations.Nullable;
-import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.*;
+import java.io.PrintWriter;
+import java.util.Objects;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
-import java.util.Objects;
+import megamek.common.AmmoType;
+import megamek.common.Entity;
+import megamek.common.EquipmentType;
+import megamek.common.Mounted;
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
+import megamek.common.weapons.infantry.InfantryWeapon;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.InfantryAmmoStorage;
+import mekhq.campaign.parts.Part;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * Ammo bin for infantry weapons used by small support vehicles
@@ -39,7 +45,7 @@ public class InfantryAmmoBin extends AmmoBin {
     private InfantryWeapon weaponType;
 
     // Used in deserialization
-    @SuppressWarnings("unused")
+
     public InfantryAmmoBin() {
         this(0, null, 0, 0, null, 0, false, null);
     }
@@ -47,14 +53,14 @@ public class InfantryAmmoBin extends AmmoBin {
     /**
      * Construct a new bin for infantry ammo
      *
-     * @param tonnage     The weight of the unit it's installed on
-     * @param ammoType    The type of ammo
-     * @param equipNum    The equipment index on the unit
-     * @param shots       The number of shots of ammo needed to refill the bin
-     * @param weaponType  The weapon this ammo is for
-     * @param clips       The number of clips of ammo
-     * @param omniPodded  Whether the weapon is pod-mounted on an omnivehicle
-     * @param c           The campaign instance
+     * @param tonnage    The weight of the unit it's installed on
+     * @param ammoType   The type of ammo
+     * @param equipNum   The equipment index on the unit
+     * @param shots      The number of shots of ammo needed to refill the bin
+     * @param weaponType The weapon this ammo is for
+     * @param clips      The number of clips of ammo
+     * @param omniPodded Whether the weapon is pod-mounted on an omnivehicle
+     * @param c          The campaign instance
      */
     public InfantryAmmoBin(int tonnage, @Nullable AmmoType ammoType, int equipNum, int shots,
             @Nullable InfantryWeapon weaponType, int clips, boolean omniPodded, @Nullable Campaign c) {
@@ -107,7 +113,7 @@ public class InfantryAmmoBin extends AmmoBin {
 
     @Override
     public int getLocation() {
-        Mounted mounted = getMounted();
+        Mounted<?> mounted = getMounted();
         if (mounted != null) {
             while (mounted.getLinkedBy() != null) {
                 mounted = mounted.getLinkedBy();
@@ -128,7 +134,8 @@ public class InfantryAmmoBin extends AmmoBin {
     }
 
     /**
-     * Changes the capacity of this bin. This is done when redistributing capacity between
+     * Changes the capacity of this bin. This is done when redistributing capacity
+     * between
      * standard and inferno munitions.
      *
      * @param clips The new capacity in number of clips
@@ -137,7 +144,8 @@ public class InfantryAmmoBin extends AmmoBin {
         int current = getCurrentShots();
         size = clips;
         shotsNeeded = getFullShots() - current;
-        // Wait until loading/unloading to change the full number of shots on the Entity.
+        // Wait until loading/unloading to change the full number of shots on the
+        // Entity.
     }
 
     /**
@@ -154,7 +162,7 @@ public class InfantryAmmoBin extends AmmoBin {
 
     @Override
     public void loadBin() {
-        Mounted mounted = getMounted();
+        Mounted<?> mounted = getMounted();
 
         // Check if we have too much ammo in the bin ...
         if (shotsNeeded < 0) {
@@ -199,7 +207,7 @@ public class InfantryAmmoBin extends AmmoBin {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         super.updateConditionFromEntity(checkForDestruction);
 
-        Mounted mounted = getMounted();
+        Mounted<?> mounted = getMounted();
         if (mounted != null) {
             shotsNeeded = mounted.getOriginalShots() - mounted.getBaseShotsLeft();
         }
@@ -228,7 +236,8 @@ public class InfantryAmmoBin extends AmmoBin {
     @Override
     public void fix() {
         // If we have reconfigured the distribution between standard and inferno ammo,
-        // there may be extra that needs to be removed from the partner bin to make room.
+        // there may be extra that needs to be removed from the partner bin to make
+        // room.
         // We'll do that automatically to make it simpler.
         InfantryAmmoBin partner = findPartnerBin();
         if ((partner != null) && (partner.getShotsNeeded() < 0)) {
@@ -268,10 +277,11 @@ public class InfantryAmmoBin extends AmmoBin {
 
     /**
      * Weapons with configurable ammo have two ammo bin parts.
+     *
      * @return The other bin for the same weapon, or null if there isn't one.
      */
     public @Nullable InfantryAmmoBin findPartnerBin() {
-        Mounted mounted = getMounted();
+        Mounted<?> mounted = getMounted();
         if (mounted != null) {
             int index = -1;
             if (mounted.getLinked() != null) {

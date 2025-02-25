@@ -9,7 +9,7 @@
 		<arrivalTurn>0</arrivalTurn>
 		<canReinforceLinked>true</canReinforceLinked>
 		<contributesToBV>false</contributesToBV>
-		<contributesToMapSize>false</contributesToMapSize>
+		<contributesToMapSize>true</contributesToMapSize>
 		<contributesToUnitCount>false</contributesToUnitCount>
 		<deploymentZones>
 			<deploymentZone>1</deploymentZone>
@@ -25,7 +25,7 @@
 		<destinationZone>5</destinationZone>
 		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>3</forceAlignment>
-		<forceMultiplier>1.0</forceMultiplier>
+		<forceMultiplier>0.5</forceMultiplier>
 		<forceName>Unidentified Hostiles</forceName>
 		<generationMethod>2</generationMethod>
 		<generationOrder>3</generationOrder>

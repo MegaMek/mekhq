@@ -39,7 +39,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.math.BigInteger;
 
 import static mekhq.campaign.parts.equipment.EquipmentUtilities.getEquipmentType;
 import static org.junit.jupiter.api.Assertions.*;
@@ -212,25 +211,25 @@ public class MissingEquipmentPartTest {
         // Just because we're MiscType doesn't mean we're omnipoddable ...
         assertFalse(missingPart.isOmniPoddable());
 
-        // ... we need to be Mech Equipment ...
+        // ... we need to be Mek Equipment ...
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
-            return MiscType.F_MECH_EQUIPMENT.equals(flag);
-        }).when(miscType).hasFlag(any());
+            EquipmentFlag flag = inv.getArgument(0);
+            return MiscType.F_MEK_EQUIPMENT.equals(flag);
+        }).when(miscType).hasFlag(any(EquipmentFlag.class));
         assertTrue(missingPart.isOmniPoddable());
 
         // ... or Tank Equipment ...
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
+            EquipmentFlag flag = inv.getArgument(0);
             return MiscType.F_TANK_EQUIPMENT.equals(flag);
-        }).when(miscType).hasFlag(any());
+        }).when(miscType).hasFlag(any(EquipmentFlag.class));
         assertTrue(missingPart.isOmniPoddable());
 
         // ... or Aero Equipment ...
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
+            EquipmentFlag flag = inv.getArgument(0);
             return MiscType.F_FIGHTER_EQUIPMENT.equals(flag);
-        }).when(miscType).hasFlag(any());
+        }).when(miscType).hasFlag(any(EquipmentFlag.class));
         assertTrue(missingPart.isOmniPoddable());
 
         // WeaponType
@@ -241,32 +240,32 @@ public class MissingEquipmentPartTest {
         // Just because we're WeaponType doesn't mean we're omnipoddable ...
         assertFalse(missingPart.isOmniPoddable());
 
-        // ... we need to be Mech Equipment ...
+        // ... we need to be Mek Equipment ...
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
-            return WeaponType.F_MECH_WEAPON.equals(flag);
-        }).when(weaponType).hasFlag(any());
+            EquipmentFlag flag = inv.getArgument(0);
+            return WeaponType.F_MEK_WEAPON.equals(flag);
+        }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         assertTrue(missingPart.isOmniPoddable());
 
         // ... or Tank Equipment ...
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
+            EquipmentFlag flag = inv.getArgument(0);
             return WeaponType.F_TANK_WEAPON.equals(flag);
-        }).when(weaponType).hasFlag(any());
+        }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         assertTrue(missingPart.isOmniPoddable());
 
         // ... or Fighter Equipment ...
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
+            EquipmentFlag flag = inv.getArgument(0);
             return WeaponType.F_AERO_WEAPON.equals(flag);
-        }).when(weaponType).hasFlag(any());
+        }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         assertTrue(missingPart.isOmniPoddable());
 
         // ... but not Capital scale.
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
+            EquipmentFlag flag = inv.getArgument(0);
             return WeaponType.F_AERO_WEAPON.equals(flag);
-        }).when(weaponType).hasFlag(any());
+        }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         when(weaponType.isCapital()).thenReturn(true);
         assertFalse(missingPart.isOmniPoddable());
     }
@@ -323,7 +322,7 @@ public class MissingEquipmentPartTest {
 
         // Put a mount behind the equipment on the unit
         Mounted mounted = mock(Mounted.class);
-        int location = Mech.LOC_RT;
+        int location = Mek.LOC_RT;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
@@ -359,8 +358,8 @@ public class MissingEquipmentPartTest {
 
         // Put a mount behind the equipment on the unit
         Mounted mounted = mock(Mounted.class);
-        String locationName = "Mech Right Torso";
-        int location = Mech.LOC_RT;
+        String locationName = "Mek Right Torso";
+        int location = Mek.LOC_RT;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
         doReturn(locationName).when(entity).getLocationName(eq(location));
@@ -387,7 +386,7 @@ public class MissingEquipmentPartTest {
         doReturn(equipTonnage).when(type).getTonnage(any(), anyDouble());
 
         int equipmentNum = 42;
-        String locationName = "Mech Right Torso";
+        String locationName = "Mek Right Torso";
 
         MissingEquipmentPart missingPart = new MissingEquipmentPart(75, type, equipmentNum, mockCampaign, equipTonnage, size, false);
 
@@ -402,7 +401,7 @@ public class MissingEquipmentPartTest {
 
         // Put a mount behind the equipment on the unit
         Mounted mounted = mock(Mounted.class);
-        int location = Mech.LOC_RT;
+        int location = Mek.LOC_RT;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
@@ -416,7 +415,7 @@ public class MissingEquipmentPartTest {
         assertFalse(missingPart.isInLocation(locationName));
 
         // Split the mount and have the second location be the one we want
-        when(mounted.getLocation()).thenReturn(Mech.LOC_RLEG);
+        when(mounted.getLocation()).thenReturn(Mek.LOC_RLEG);
         when(mounted.isSplit()).thenReturn(true);
         when(mounted.getSecondLocation()).thenReturn(location);
 
@@ -663,7 +662,7 @@ public class MissingEquipmentPartTest {
 
         // Mount equipment at the index
         Mounted mounted = mock(Mounted.class);
-        int location = Mech.LOC_LARM;
+        int location = Mek.LOC_LARM;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
@@ -677,7 +676,7 @@ public class MissingEquipmentPartTest {
 
         // Swap over to the secondary location
         doReturn(false).when(unit).hasBadHipOrShoulder(eq(location));
-        int secondLocation = Mech.LOC_LT;
+        int secondLocation = Mek.LOC_LT;
         when(mounted.getSecondLocation()).thenReturn(secondLocation);
         when(mounted.isSplit()).thenReturn(true);
         doReturn(true).when(unit).hasBadHipOrShoulder(eq(secondLocation));
@@ -723,8 +722,8 @@ public class MissingEquipmentPartTest {
 
         // Mount equipment at the index
         Mounted mounted = mock(Mounted.class);
-        String locationName = "Mech Left Torso";
-        int location = Mech.LOC_LT;
+        String locationName = "Mek Left Torso";
+        int location = Mek.LOC_LT;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
         doReturn(locationName).when(entity).getLocationName(eq(location));
@@ -742,8 +741,8 @@ public class MissingEquipmentPartTest {
         doReturn(true).when(unit).isLocationDestroyed(eq(location));
         assertNotNull(missingPart.checkFixable());
 
-        String secondaryLocationName = "Mech Left Arm";
-        int secondaryLocation = Mech.LOC_LARM;
+        String secondaryLocationName = "Mek Left Arm";
+        int secondaryLocation = Mek.LOC_LARM;
         when(mounted.getSecondLocation()).thenReturn(secondaryLocation);
         when(mounted.isSplit()).thenReturn(true);
         doReturn(secondaryLocationName).when(entity).getLocationName(secondaryLocation);
@@ -1093,7 +1092,7 @@ public class MissingEquipmentPartTest {
 
         // Put the variable cost part back on a unit
         Mounted mounted = mock(Mounted.class);
-        int location = Mech.LOC_CT;
+        int location = Mek.LOC_CT;
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
         doReturn(cost * 10.0).when(type).getCost(eq(entity), anyBoolean(), eq(location), eq(size));

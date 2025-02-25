@@ -18,23 +18,36 @@
  */
 package mekhq.campaign.universe;
 
-import megamek.common.annotations.Nullable;
-import mekhq.MHQConstants;
-import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.*;
-
-import javax.xml.parsers.DocumentBuilder;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
+
+import javax.xml.parsers.DocumentBuilder;
+
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Neoancient
  */
 public class FactionHints {
+    private static final MMLogger logger = MMLogger.create(FactionHints.class);
+
     private final Set<Faction> neutralFactions;
 
     private final Map<Faction, Map<Faction, List<FactionHint>>> wars;
@@ -57,6 +70,7 @@ public class FactionHints {
 
     /**
      * Factory that loads the default data
+     * 
      * @return
      */
     public static FactionHints defaultFactionHints() {
@@ -69,16 +83,17 @@ public class FactionHints {
         try {
             loadFactionHints();
         } catch (DOMException e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
     }
 
     /**
-     * Accounts for non-existent factions that are used to indicate special status of the planet
+     * Accounts for non-existent factions that are used to indicate special status
+     * of the planet
      * (undiscovered, abandoned).
      *
      * @param f The input faction
-     * @return  Whether the faction is not a true faction
+     * @return Whether the faction is not a true faction
      */
     public static boolean isEmptyFaction(Faction f) {
         return Stream.of("ABN", "UND", "NONE").anyMatch(s -> f.getShortName().equals(s));
@@ -87,7 +102,7 @@ public class FactionHints {
     /**
      * @param f1 Faction One
      * @param f2 Faction Two
-     * @return   Whether the factions are allies
+     * @return Whether the factions are allies
      */
     public boolean isAlliedWith(Faction f1, Faction f2, LocalDate date) {
         return hintApplies(alliances, f1, f2, date);
@@ -96,7 +111,7 @@ public class FactionHints {
     /**
      * @param f1 Faction One
      * @param f2 Faction Two
-     * @return   Whether the factions are rivals
+     * @return Whether the factions are rivals
      */
     public boolean isRivalOf(Faction f1, Faction f2, LocalDate date) {
         return hintApplies(rivals, f1, f2, date);
@@ -105,7 +120,7 @@ public class FactionHints {
     /**
      * @param f1 Faction One
      * @param f2 Faction Two
-     * @return   Whether the factions are at war on the given date
+     * @return Whether the factions are at war on the given date
      */
     public boolean isAtWarWith(Faction f1, Faction f2, LocalDate date) {
         return hintApplies(wars, f1, f2, date);
@@ -113,13 +128,15 @@ public class FactionHints {
 
     /**
      *
-     * @param f1    A faction
-     * @param f2    Another faction
-     * @param date  The current campaign date
-     * @return      The name of the current war the two factions are involved in, or {@code null} if they
-     *              are not currently at war.
+     * @param f1   A faction
+     * @param f2   Another faction
+     * @param date The current campaign date
+     * @return The name of the current war the two factions are involved in, or
+     *         {@code null} if they
+     *         are not currently at war.
      */
-    @Nullable public String getCurrentWar(Faction f1, Faction f2, LocalDate date) {
+    @Nullable
+    public String getCurrentWar(Faction f1, Faction f2, LocalDate date) {
         if (wars.get(f1) != null && wars.get(f1).get(f2) != null) {
             for (FactionHint fh : wars.get(f1).get(f2)) {
                 if (fh.isInDateRange(date)) {
@@ -138,25 +155,28 @@ public class FactionHints {
     }
 
     /**
-     * Indicates a faction is neutral (e.g. ComStar) or non-combatant and should not be chosen as an
+     * Indicates a faction is neutral (e.g. ComStar) or non-combatant and should not
+     * be chosen as an
      * employer or enemy unless at war at the time.
      *
-     * @param faction  Any faction
-     * @return         Whether the faction is considered neutral
+     * @param faction Any faction
+     * @return Whether the faction is considered neutral
      */
     public boolean isNeutral(Faction faction) {
         return neutralFactions.contains(faction);
     }
 
     /**
-     * Indicates a faction is neutral toward a particular potential opponent. Factions that are generally
-     * non-combatant may have certain factions that are exceptions (like pirates) or have particular
+     * Indicates a faction is neutral toward a particular potential opponent.
+     * Factions that are generally
+     * non-combatant may have certain factions that are exceptions (like pirates) or
+     * have particular
      * periods where they go to war despite their normal non-combative nature.
      *
      * @param faction  A potentially neutral faction
      * @param opponent A possible opponent
      * @param date     The campaign date
-     * @return         true if the potential opponent should not be considered as an enemy
+     * @return true if the potential opponent should not be considered as an enemy
      */
     public boolean isNeutral(Faction faction, Faction opponent, LocalDate date) {
         return neutralFactions.contains(faction)
@@ -165,7 +185,7 @@ public class FactionHints {
     }
 
     private boolean hintApplies(Map<Faction, Map<Faction, List<FactionHint>>> hints,
-                                Faction f1, Faction f2, LocalDate date) {
+            Faction f1, Faction f2, LocalDate date) {
         if (hints.get(f1) != null && hints.get(f1).get(f2) != null) {
             for (FactionHint fh : hints.get(f1).get(f2)) {
                 if (fh.isInDateRange(date)) {
@@ -184,14 +204,18 @@ public class FactionHints {
     }
 
     /**
-     * Some factions are present within the borders of another and do not have any planets that are considered
-     * theirs, but still participate in military action. This includes Clan Wolf-in-Exile, the abjured
-     * Nova Cats, and the other Inner Sphere powers which operated in the Draconis Combine during
+     * Some factions are present within the borders of another and do not have any
+     * planets that are considered
+     * theirs, but still participate in military action. This includes Clan
+     * Wolf-in-Exile, the abjured
+     * Nova Cats, and the other Inner Sphere powers which operated in the Draconis
+     * Combine during
      * Operation Bulldog.
      *
-     * @param f     A potential host faction
-     * @param date  The campaign date
-     * @return      A Set of all factions (if any) contained within the borders of the host faction.
+     * @param f    A potential host faction
+     * @param date The campaign date
+     * @return A Set of all factions (if any) contained within the borders of the
+     *         host faction.
      */
     public Set<Faction> getContainedFactions(Faction f, LocalDate date) {
         HashSet<Faction> retval = new HashSet<>();
@@ -208,13 +232,17 @@ public class FactionHints {
     }
 
     /**
-     * @param contained  A faction that is potentially hosted within the borders of another,
-     *                   with no planets directly controlled.
-     * @param date       The campaign date.
-     * @return           The faction that controls the planets where the contained faction is positioned,
-     *                   or {@code null} if the faction is not contained within another at the time.
+     * @param contained A faction that is potentially hosted within the borders of
+     *                  another,
+     *                  with no planets directly controlled.
+     * @param date      The campaign date.
+     * @return The faction that controls the planets where the contained faction is
+     *         positioned,
+     *         or {@code null} if the faction is not contained within another at the
+     *         time.
      */
-    @Nullable public Faction getContainedFactionHost(Faction contained, LocalDate date) {
+    @Nullable
+    public Faction getContainedFactionHost(Faction contained, LocalDate date) {
         for (Faction f : containedFactions.keySet()) {
             List<AltLocation> locs = containedFactions.get(f).get(contained);
             if (null != locs) {
@@ -229,12 +257,14 @@ public class FactionHints {
     }
 
     /**
-     * Designates the proportion of space a contained faction takes up within the borders of the host
+     * Designates the proportion of space a contained faction takes up within the
+     * borders of the host
      *
      * @param host      The host faction
      * @param contained The contained faction
      * @param date      The campaign date
-     * @return          The ratio of space taken up by the contained faction to that of the host.
+     * @return The ratio of space taken up by the contained faction to that of the
+     *         host.
      */
     public double getAltLocationFraction(Faction host, Faction contained, LocalDate date) {
         if (containedFactions.get(host) != null && containedFactions.get(host).get(contained) != null) {
@@ -248,19 +278,26 @@ public class FactionHints {
     }
 
     /**
-     * Determines whether a faction that is contained within another can consider a third faction to
-     * be an opponent. A contained faction is one that does not have any planets assigned to it but
-     * occupies space in another faction's space, such as the exiled Clan Wolf or the abjured Clan
-     * Nova Cat. Normally these are treated the same way as the containing faction, but in some cases
-     * the inner faction may have a reduced set of opponents, such as the Second Star League force
-     * in the Draconis Combine during Operation Bulldog, which should only be considered opponents of
+     * Determines whether a faction that is contained within another can consider a
+     * third faction to
+     * be an opponent. A contained faction is one that does not have any planets
+     * assigned to it but
+     * occupies space in another faction's space, such as the exiled Clan Wolf or
+     * the abjured Clan
+     * Nova Cat. Normally these are treated the same way as the containing faction,
+     * but in some cases
+     * the inner faction may have a reduced set of opponents, such as the Second
+     * Star League force
+     * in the Draconis Combine during Operation Bulldog, which should only be
+     * considered opponents of
      * Clan Smoke Jaguar and not the DC neighbors.
      *
-     * @param outer     The faction that controls the planets in the region.
-     * @param inner     The faction that occupies planets within the outer faction's space.
-     * @param opponent  A potential opponent of the inner faction
-     * @param date      The campaign date
-     * @return          Whether {@code opponent} can be treated as an enemy of {@code inner}.
+     * @param outer    The faction that controls the planets in the region.
+     * @param inner    The faction that occupies planets within the outer faction's
+     *                 space.
+     * @param opponent A potential opponent of the inner faction
+     * @param date     The campaign date
+     * @return Whether {@code opponent} can be treated as an enemy of {@code inner}.
      */
     public boolean isContainedFactionOpponent(Faction outer, Faction inner, Faction opponent, LocalDate date) {
         if (containedFactions.get(outer) != null && containedFactions.get(outer).get(inner) != null) {
@@ -289,18 +326,20 @@ public class FactionHints {
      * @param end          The alliance end date
      * @param parties      All the factions involved in the alliance
      */
-    protected void addAlliance(String allianceName, @Nullable LocalDate start, @Nullable LocalDate end, Faction... parties) {
+    protected void addAlliance(String allianceName, @Nullable LocalDate start, @Nullable LocalDate end,
+            Faction... parties) {
         addFactionHint(alliances, allianceName, start, end, parties);
     }
 
     /**
-     * Adds a war. All named factions are considered to be at war with each other. To add a war
+     * Adds a war. All named factions are considered to be at war with each other.
+     * To add a war
      * with multiple parties on each side, add a war record for each combination.
      *
-     * @param warName      The name of the war
-     * @param start        The war start date
-     * @param end          The war end date
-     * @param parties      All the factions involved in the war.
+     * @param warName The name of the war
+     * @param start   The war start date
+     * @param end     The war end date
+     * @param parties All the factions involved in the war.
      */
     protected void addWar(String warName, @Nullable LocalDate start, @Nullable LocalDate end, Faction... parties) {
         addFactionHint(wars, warName, start, end, parties);
@@ -309,12 +348,13 @@ public class FactionHints {
     /**
      * Adds a rivalry
      *
-     * @param rivalryName  The name of the rivalry
-     * @param start        The rivalry start date.
-     * @param end          The rivalry end date
-     * @param parties      All the factions involved in the rivalry
+     * @param rivalryName The name of the rivalry
+     * @param start       The rivalry start date.
+     * @param end         The rivalry end date
+     * @param parties     All the factions involved in the rivalry
      */
-    protected void addRivalry(String rivalryName, @Nullable LocalDate start, @Nullable LocalDate end, Faction... parties) {
+    protected void addRivalry(String rivalryName, @Nullable LocalDate start, @Nullable LocalDate end,
+            Faction... parties) {
         addFactionHint(rivals, rivalryName, start, end, parties);
     }
 
@@ -324,10 +364,11 @@ public class FactionHints {
      * @param start      The start date for the exception
      * @param end        The end date for the exception
      * @param faction    The generally neutral faction
-     * @param exceptions The factions that should be considered exceptions to neutrality
+     * @param exceptions The factions that should be considered exceptions to
+     *                   neutrality
      */
     protected void addNeutralExceptions(String exceptionName, @Nullable LocalDate start,
-                                        @Nullable LocalDate end, Faction faction, Faction... exceptions) {
+            @Nullable LocalDate end, Faction faction, Faction... exceptions) {
         neutralExceptions.putIfAbsent(faction, new HashMap<>());
         for (Faction exception : exceptions) {
             neutralExceptions.get(faction).putIfAbsent(exception, new ArrayList<>());
@@ -337,6 +378,7 @@ public class FactionHints {
 
     /**
      * Adds faction to list of non-combatants
+     * 
      * @param f
      */
     protected void addNeutralFaction(Faction f) {
@@ -346,40 +388,45 @@ public class FactionHints {
     }
 
     /**
-     * Gives a faction a presence inside another faction without controlling any systems there.
+     * Gives a faction a presence inside another faction without controlling any
+     * systems there.
      *
-     * @param host       The faction that controls the space
-     * @param contained  The faction inside the other
-     * @param start      The start date
-     * @param end        The end date
-     * @param ratio      The ratio of the size of the contained faction to that of the host
+     * @param host      The faction that controls the space
+     * @param contained The faction inside the other
+     * @param start     The start date
+     * @param end       The end date
+     * @param ratio     The ratio of the size of the contained faction to that of
+     *                  the host
      */
     protected void addContainedFaction(Faction host, Faction contained, LocalDate start,
-                                       LocalDate end, double ratio) {
+            LocalDate end, double ratio) {
         addContainedFaction(host, contained, start, end, ratio, null);
     }
 
     /**
-     * Gives a faction a presence inside another faction without controlling any systems there and
+     * Gives a faction a presence inside another faction without controlling any
+     * systems there and
      * gives it a restricted list of opponents that can be attacked from there.
      *
-     * @param host       The faction that controls the space
-     * @param contained  The faction inside the other
-     * @param start      The start date
-     * @param end        The end date
-     * @param ratio      The ratio of the size of the contained faction to that of the host
-     * @param opponents  If non-null, all possible opponents based on the position within the other
-     *                   faction should be restricted to this list.
+     * @param host      The faction that controls the space
+     * @param contained The faction inside the other
+     * @param start     The start date
+     * @param end       The end date
+     * @param ratio     The ratio of the size of the contained faction to that of
+     *                  the host
+     * @param opponents If non-null, all possible opponents based on the position
+     *                  within the other
+     *                  faction should be restricted to this list.
      */
     protected void addContainedFaction(Faction host, Faction contained, LocalDate start, LocalDate end,
-                                       double ratio, @Nullable List<Faction> opponents) {
+            double ratio, @Nullable List<Faction> opponents) {
         containedFactions.putIfAbsent(host, new HashMap<>());
         containedFactions.get(host).putIfAbsent(contained, new ArrayList<>());
         containedFactions.get(host).get(contained).add(new AltLocation(start, end, ratio, opponents));
     }
 
     private void addFactionHint(Map<Faction, Map<Faction, List<FactionHint>>> hintMap, String name,
-                                LocalDate start, LocalDate end, Faction[] parties) {
+            LocalDate start, LocalDate end, Faction[] parties) {
         FactionHint hint = new FactionHint(name, start, end);
         for (int i = 0; i < parties.length - 1; i++) {
             for (int j = i + 1; j < parties.length; j++) {
@@ -393,7 +440,7 @@ public class FactionHints {
     }
 
     private void loadFactionHints() throws DOMException {
-        LogManager.getLogger().info("Starting load of faction hint data from XML...");
+        logger.info("Starting load of faction hint data from XML...");
         Document xmlDoc;
 
         try (InputStream is = new FileInputStream(MHQConstants.FACTION_HINTS_FILE)) {
@@ -401,7 +448,7 @@ public class FactionHints {
 
             xmlDoc = db.parse(is);
         } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
             return;
         }
 
@@ -423,7 +470,7 @@ public class FactionHints {
                     String fKey = wn.getAttributes().getNamedItem("faction").getTextContent().trim();
                     Faction f = Factions.getInstance().getFaction(fKey);
                     if (f.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
-                        LogManager.getLogger().error("Invalid faction code in factionhints.xml: " + fKey);
+                        logger.error("Invalid faction code in factionhints.xml: " + fKey);
                     } else {
                         neutralFactions.add(f);
                         addNeutralExceptions(f, wn);
@@ -442,7 +489,8 @@ public class FactionHints {
                     String innerCode = "";
                     List<Faction> opponents = null;
                     if (wn.getAttributes().getNamedItem("start") != null) {
-                        start = MHQXMLUtility.parseDate(wn.getAttributes().getNamedItem("start").getTextContent().trim());
+                        start = MHQXMLUtility
+                                .parseDate(wn.getAttributes().getNamedItem("start").getTextContent().trim());
                     }
                     if (wn.getAttributes().getNamedItem("end") != null) {
                         end = MHQXMLUtility.parseDate(wn.getAttributes().getNamedItem("end").getTextContent().trim());
@@ -471,7 +519,7 @@ public class FactionHints {
                                     break;
                             }
                         } catch (Exception e) {
-                            LogManager.getLogger().error("", e);
+                            logger.error("", e);
                         }
                     }
 
@@ -479,7 +527,7 @@ public class FactionHints {
                     final Faction inner = Factions.getInstance().getFaction(innerCode);
                     if (outer.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)
                             || inner.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
-                        LogManager.getLogger().error("Invalid faction code in factionhints.xml: "
+                        logger.error("Invalid faction code in factionhints.xml: "
                                 + outerCode + "/" + innerCode);
                     } else {
                         addContainedFaction(outer, inner, start, end, fraction, opponents);
@@ -508,7 +556,8 @@ public class FactionHints {
                 LocalDate localStart = start;
                 LocalDate localEnd = end;
                 if (wn.getAttributes().getNamedItem("start") != null) {
-                    localStart = MHQXMLUtility.parseDate(wn.getAttributes().getNamedItem("start").getTextContent().trim());
+                    localStart = MHQXMLUtility
+                            .parseDate(wn.getAttributes().getNamedItem("start").getTextContent().trim());
                 }
                 if (wn.getAttributes().getNamedItem("end") != null) {
                     localEnd = MHQXMLUtility.parseDate(wn.getAttributes().getNamedItem("end").getTextContent().trim());
@@ -519,7 +568,7 @@ public class FactionHints {
                 for (int i = 0; i < factionKeys.length; i++) {
                     final Faction faction = Factions.getInstance().getFaction(factionKeys[i]);
                     if (faction.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
-                        LogManager.getLogger().error("Invalid faction code in factionhints.xml: " + factionKeys[i]);
+                        logger.error("Invalid faction code in factionhints.xml: " + factionKeys[i]);
                         continue;
                     }
                     parties[i] = faction;
@@ -541,7 +590,8 @@ public class FactionHints {
                 LocalDate localStart = null;
                 LocalDate localEnd = end;
                 if (wn.getAttributes().getNamedItem("start") != null) {
-                    localStart = MHQXMLUtility.parseDate(wn.getAttributes().getNamedItem("start").getTextContent().trim());
+                    localStart = MHQXMLUtility
+                            .parseDate(wn.getAttributes().getNamedItem("start").getTextContent().trim());
                 }
 
                 if (wn.getAttributes().getNamedItem("end") != null) {
@@ -553,7 +603,7 @@ public class FactionHints {
                 for (String party : parties) {
                     final Faction f = Factions.getInstance().getFaction(party);
                     if (f.getShortName().equalsIgnoreCase(Faction.DEFAULT_CODE)) {
-                        LogManager.getLogger().error("Invalid faction code in factionhints.xml: " + party);
+                        logger.error("Invalid faction code in factionhints.xml: " + party);
                         continue;
                     }
                     addNeutralExceptions("", localStart, localEnd, faction, f);
@@ -571,7 +621,7 @@ public class FactionHints {
         private final LocalDate start;
         private final LocalDate end;
 
-        public FactionHint (final String name, final @Nullable LocalDate start, final @Nullable LocalDate end) {
+        public FactionHint(final String name, final @Nullable LocalDate start, final @Nullable LocalDate end) {
             this.name = name;
             this.start = start;
             this.end = end;
@@ -591,8 +641,8 @@ public class FactionHints {
         private final double fraction;
         private final List<Faction> opponents;
 
-        public AltLocation (final @Nullable LocalDate start, final @Nullable LocalDate end,
-                            final double fraction, final @Nullable List<Faction> opponents) {
+        public AltLocation(final @Nullable LocalDate start, final @Nullable LocalDate end,
+                final double fraction, final @Nullable List<Faction> opponents) {
             super("", start, end);
             this.fraction = fraction;
             this.opponents = (opponents == null) ? new ArrayList<>() : new ArrayList<>(opponents);

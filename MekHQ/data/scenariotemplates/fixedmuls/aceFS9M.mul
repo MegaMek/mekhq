@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<unit version="0.49.13-SNAPSHOT" >
+<unit version="0.49.13-SNAPSHOT">
 
-		<entity chassis="Firestarter" model="FS9-M 'Mirage'" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="0dac1950-aec0-48b1-b26f-0524858d20ec">
-			<pilot size="1" name="Taisuke Kichida" nick="Flash" gender="MALE" gunnery="3" piloting="3" externalId="35736654-20aa-4e9c-b8ee-7295b6b93f51" ejected="false" advantages="jumping_jack::some_like_it_hot" edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
-      The first slot in a location is at index="1".
-			<location index="2"> Right Torso
-				<slot index="4" type="IS Ammo MG - Full" shots="200"/>
-			</location>
-			<Game id="1"/>
-		</entity>
+	<entity chassis="Firestarter" model="FS9-M 'Mirage'" type="Biped" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="0dac1950-aec0-48b1-b26f-0524858d20ec">
+		<pilot size="1" name="Taisuke Kichida" nick="Flash" gender="MALE" gunnery="3" piloting="3"
+			externalId="35736654-20aa-4e9c-b8ee-7295b6b93f51" ejected="false"
+			advantages="jumping_jack::some_like_it_hot"
+			edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails"
+			autoeject="true" /> The first slot in a location is at index="1". <location index="2"> Right
+		Torso <slot index="4" type="IS Ammo MG - Full" shots="200" />
+		</location>
+			<Game id="1" />
+	</entity>
 
 </unit>

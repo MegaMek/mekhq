@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.personnel.marriage;
 
+import megamek.client.generator.RandomGenderGenerator;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -29,11 +30,12 @@ import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.MergingSurnameStyle;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
 /**
  * AbstractMarriage is the baseline class for marriage in MekHQ. It holds all the common logic for
@@ -45,7 +47,6 @@ public abstract class AbstractMarriage {
     private final RandomMarriageMethod method;
     private boolean useClanPersonnelMarriages;
     private boolean usePrisonerMarriages;
-    private boolean useRandomSameSexMarriages;
     private boolean useRandomClanPersonnelMarriages;
     private boolean useRandomPrisonerMarriages;
 
@@ -58,7 +59,6 @@ public abstract class AbstractMarriage {
         this.method = method;
         setUseClanPersonnelMarriages(options.isUseClanPersonnelMarriages());
         setUsePrisonerMarriages(options.isUsePrisonerMarriages());
-        setUseRandomSameSexMarriages(options.isUseRandomSameSexMarriages());
         setUseRandomClanPersonnelMarriages(options.isUseRandomClanPersonnelMarriages());
         setUseRandomPrisonerMarriages(options.isUseRandomPrisonerMarriages());
     }
@@ -85,14 +85,6 @@ public abstract class AbstractMarriage {
         this.usePrisonerMarriages = usePrisonerMarriages;
     }
 
-    public boolean isUseRandomSameSexMarriages() {
-        return useRandomSameSexMarriages;
-    }
-
-    public void setUseRandomSameSexMarriages(final boolean useRandomSameSexMarriages) {
-        this.useRandomSameSexMarriages = useRandomSameSexMarriages;
-    }
-
     public boolean isUseRandomClanPersonnelMarriages() {
         return useRandomClanPersonnelMarriages;
     }
@@ -112,29 +104,42 @@ public abstract class AbstractMarriage {
 
     /**
      * This is used to determine if a person can marry
-     * @param campaign the campaign the person is a part of
      * @param today the current date
      * @param person the person to determine for
      * @param randomMarriage if this is for random marriage or manual marriage
      * @return null if they can, otherwise the reason why they cannot
      */
-    public @Nullable String canMarry(final Campaign campaign, final LocalDate today,
-                                     final Person person, final boolean randomMarriage) {
+    public @Nullable String canMarry(final LocalDate today, final Person person, final boolean randomMarriage) {
         if (!person.isMarriageable()) {
             return resources.getString("cannotMarry.NotMarriageable.text");
-        } else if (person.getGenealogy().hasSpouse()) {
+        }
+
+        if (person.getGenealogy().hasSpouse()) {
             return resources.getString("cannotMarry.AlreadyMarried.text");
-        } else if (!person.getStatus().isActive()) {
+        }
+
+        if (!person.getStatus().isActive()) {
             return resources.getString("cannotMarry.Inactive.text");
-        } else if (person.isDeployed()) {
+        }
+
+        if (person.isDeployed()) {
             return resources.getString("cannotMarry.Deployed.text");
-        } else if (person.getAge(today) < campaign.getCampaignOptions().getMinimumMarriageAge()) {
+        }
+
+        // Not allowing under-18s to marry is project policy
+        if (person.isChild(today, true)) {
             return resources.getString("cannotMarry.TooYoung.text");
-        } else if (!isUseClanPersonnelMarriages() && person.isClanPersonnel()) {
+        }
+
+        if (!isUseClanPersonnelMarriages() && person.isClanPersonnel()) {
             return resources.getString("cannotMarry.ClanPersonnel.text");
-        } else if (!isUsePrisonerMarriages() && person.getPrisonerStatus().isCurrentPrisoner()) {
+        }
+
+        if (!isUsePrisonerMarriages() && person.getPrisonerStatus().isCurrentPrisoner()) {
             return resources.getString("cannotMarry.Prisoner.text");
-        } else if (randomMarriage) {
+        }
+
+        if (randomMarriage) {
             if (!isUseRandomClanPersonnelMarriages() && person.isClanPersonnel()) {
                 return resources.getString("cannotMarry.RandomClanPersonnel.text");
             } else if (!isUseRandomPrisonerMarriages() && person.getPrisonerStatus().isCurrentPrisoner()) {
@@ -165,7 +170,7 @@ public abstract class AbstractMarriage {
         // marriages.
 
         if (person.equals(potentialSpouse)
-                || (canMarry(campaign, today, potentialSpouse, randomMarriage) != null)
+                || (canMarry(today, potentialSpouse, randomMarriage) != null)
                 || person.getGenealogy().checkMutualAncestors(potentialSpouse,
                         campaign.getCampaignOptions().getCheckMutualAncestorsDepth())) {
             return false;
@@ -183,13 +188,35 @@ public abstract class AbstractMarriage {
      * @param origin the origin person being married
      * @param spouse the person's spouse, which can be null if no marriage is to occur
      * @param surnameStyle the style for how the two people's surnames will change as part of the marriage
+     * @param isBackground whether the marriage occurred as part of a character's background
      */
     public void marry(final Campaign campaign, final LocalDate today, final Person origin,
-                      final @Nullable Person spouse, final MergingSurnameStyle surnameStyle) {
+                      final @Nullable Person spouse, final MergingSurnameStyle surnameStyle,
+                      boolean isBackground) {
         if (spouse == null) {
             return;
         }
 
+        performMarriageChanges(campaign, today, origin, spouse, surnameStyle, isBackground);
+
+        // And finally, we trigger person changed events
+        MekHQ.triggerEvent(new PersonChangedEvent(origin));
+        MekHQ.triggerEvent(new PersonChangedEvent(spouse));
+    }
+
+    /**
+     * Updates the necessary information to perform a marriage between two individuals.
+     *
+     * @param campaign the campaign in which the marriage is taking place
+     * @param today the current date of the marriage
+     * @param origin the first person getting married
+     * @param spouse the second person getting married
+     * @param surnameStyle the style of surname changes to be applied
+     * @param isBackground whether the marriage occurred as part of a character's background
+     */
+    public static void performMarriageChanges(Campaign campaign, LocalDate today, Person origin,
+                                              Person spouse, MergingSurnameStyle surnameStyle,
+                                              boolean isBackground) {
         // Immediately set both Maiden Names, to avoid any divorce bugs (as the default is now an empty string)
         origin.setMaidenName(origin.getSurname());
         spouse.setMaidenName(spouse.getSurname());
@@ -205,10 +232,34 @@ public abstract class AbstractMarriage {
         PersonalLogger.marriage(origin, spouse, today);
         PersonalLogger.marriage(spouse, origin, today);
 
-        campaign.addReport(String.format(resources.getString("marriage.report"), origin.getHyperlinkedName(),
-                spouse.getHyperlinkedName()));
+        if (!isBackground) {
+            campaign.addReport(String.format(resources.getString("marriage.report"),
+                    origin.getHyperlinkedName(),
+                    spouse.getHyperlinkedName()));
 
-        // And finally we trigger person changed events
+            // Process the loyalty change
+            if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+                origin.performRandomizedLoyaltyChange(campaign, false, true);
+                spouse.performRandomizedLoyaltyChange(campaign, false, true);
+            }
+        }
+
+        // log the origin spouse for both partners
+        origin.getGenealogy().setOriginSpouse(origin);
+        spouse.getGenealogy().setOriginSpouse(origin);
+
+        // recruit the spouse if they're not already in the unit
+        if ((!isBackground) && (spouse.getJoinedCampaign() == null)) {
+            campaign.recruitPerson(spouse, PrisonerStatus.FREE, true, false);
+
+            ResourceBundle recruitmentResources = ResourceBundle.getBundle("mekhq.resources.Campaign",
+                    MekHQ.getMHQOptions().getLocale());
+
+            campaign.addReport(String.format(recruitmentResources.getString("dependentJoinsForce.text"),
+                    spouse.getHyperlinkedFullTitle()));
+        }
+
+        // And finally, we trigger person changed events
         MekHQ.triggerEvent(new PersonChangedEvent(origin));
         MekHQ.triggerEvent(new PersonChangedEvent(spouse));
     }
@@ -219,51 +270,149 @@ public abstract class AbstractMarriage {
      * @param campaign the campaign to process
      * @param today the current day
      * @param person the person to process
+     * @param isBackground whether the marriage occurred in a character's background
      */
-    public void processNewDay(final Campaign campaign, final LocalDate today, final Person person) {
-        if (canMarry(campaign, today, person, true) != null) {
+    public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person, boolean isBackground) {
+        if (canMarry(today, person, true) != null) {
             return;
         }
 
-        if (randomOppositeSexMarriage(person)) {
-            marryRandomSpouse(campaign, today, person, false);
-        } else if (isUseRandomSameSexMarriages() && randomSameSexMarriage(person)) {
-            marryRandomSpouse(campaign, today, person, true);
+        if (randomMarriage()) {
+            boolean isSameSex = false;
+
+            int sameSexDiceSize = campaign.getCampaignOptions().getRandomSameSexMarriageDiceSize();
+
+            if (sameSexDiceSize == 1) {
+                isSameSex = true;
+            } else if ((sameSexDiceSize != 0) && (Compute.randomInt(sameSexDiceSize) == 0)) {
+                isSameSex = true;
+            }
+
+            boolean isInterUnit = false;
+
+            int interUnitDiceSize = campaign.getCampaignOptions().getRandomNewDependentMarriage();
+
+            if (interUnitDiceSize == 1) {
+                isInterUnit = true;
+            } else if ((interUnitDiceSize != 0) && (Compute.randomInt(interUnitDiceSize) == 0)) {
+                isInterUnit = true;
+            }
+
+            marryRandomSpouse(campaign, today, person, isSameSex, isInterUnit, isBackground);
+        }
+    }
+
+    /**
+     * This method is used to check for marriages that occurred in a character's background
+     *
+     * @param campaign the campaign for which to process the marriage rolls
+     * @param today the current date
+     * @param person the person for whom to process the marriage rolls
+     */
+    public void processBackgroundMarriageRolls(final Campaign campaign, final LocalDate today, final Person person) {
+        if (canMarry(today, person, true) != null) {
+            return;
+        }
+
+        if (randomMarriage()) {
+            boolean isSameSex = false;
+
+            int sameSexDiceSize = campaign.getCampaignOptions().getRandomSameSexMarriageDiceSize();
+
+            if (sameSexDiceSize == 1) {
+                isSameSex = true;
+            } else if ((sameSexDiceSize != 0) && (Compute.randomInt(sameSexDiceSize) == 0)) {
+                isSameSex = true;
+            }
+
+            marryRandomSpouse(campaign, today, person, isSameSex, false, true);
         }
     }
 
     //region Random Marriage
     /**
      * This determines if a person will randomly marry an opposite sex spouse.
-     * @param person the person to determine if they are getting randomly married
      * @return true if the person is to randomly marry
      */
-    protected abstract boolean randomOppositeSexMarriage(final Person person);
-
-    /**
-     * This determines if a person will randomly marry a same-sex spouse.
-     * @param person the person who may be randomly marrying a same-sex spouse
-     * @return true if the person is to randomly marry a same-sex spouse
-     */
-    protected abstract boolean randomSameSexMarriage(final Person person);
+    protected abstract boolean randomMarriage();
 
     /**
      * This finds a random spouse and marries them to the provided person.
-     * @param campaign the campaign the person is a part of
-     * @param today the current date
-     * @param person the person who is getting randomly married
-     * @param sameSex whether the marriage is homosexual or heterosexual
+     *
+     * @param campaign    the campaign the person is a part of
+     * @param today       the current date
+     * @param person      the person who is getting randomly married
+     * @param sameSex     whether the marriage is between same-sex partners
+     * @param isInterUnit whether the marriage is to another character chosen from among potential partners already in the campaign unit.
+     * @param isBackground whether the marriage occurred in a character's background
      */
     protected void marryRandomSpouse(final Campaign campaign, final LocalDate today,
-                                     final Person person, final boolean sameSex) {
-        final Gender gender = sameSex ? person.getGender() : (person.getGender().isMale() ? Gender.FEMALE : Gender.MALE);
-        final List<Person> potentials = campaign.getActivePersonnel().stream()
-                .filter(potentialSpouse -> isPotentialRandomSpouse(campaign, today, person, potentialSpouse, gender))
-                .collect(Collectors.toList());
-        if (!potentials.isEmpty()) {
-            marry(campaign, today, person, potentials.get(Compute.randomInt(potentials.size())),
-                    MergingSurnameStyle.WEIGHTED);
+                                     final Person person, final boolean sameSex,
+                                     boolean isInterUnit, boolean isBackground) {
+        Gender personGender = person.getGender();
+
+        boolean isNonBinary = (campaign.getCampaignOptions().getNonBinaryDiceSize() > 0)
+                && (Compute.randomInt(campaign.getCampaignOptions().getNonBinaryDiceSize()) == 0);
+
+        Gender spouseGender = switch (personGender) {
+            case MALE, OTHER_MALE -> sameSex ? (isNonBinary ?
+                    Gender.OTHER_MALE : Gender.MALE) : (isNonBinary ? Gender.OTHER_FEMALE : Gender.FEMALE);
+            case FEMALE, OTHER_FEMALE -> sameSex ? (isNonBinary ?
+                    Gender.OTHER_FEMALE : Gender.FEMALE) : (isNonBinary ? Gender.OTHER_MALE : Gender.MALE);
+            case RANDOMIZE -> RandomGenderGenerator.generate();
+        };
+
+        List<Person> potentialSpouses = new ArrayList<>();
+        Person spouse = null;
+
+        if (isInterUnit) {
+            potentialSpouses = campaign.getActivePersonnel().stream()
+                    .filter(potentialSpouse -> isPotentialRandomSpouse(campaign, today, person, potentialSpouse, spouseGender))
+                    .toList();
+
+            if (!potentialSpouses.isEmpty()) {
+                spouse = potentialSpouses.get(Compute.randomInt(potentialSpouses.size()));
+            }
         }
+
+        if ((!isInterUnit) || (potentialSpouses.isEmpty())) {
+            spouse = createExternalSpouse(campaign, today, person, spouseGender);
+        }
+
+        marry(campaign, today, person, spouse, MergingSurnameStyle.WEIGHTED, isBackground);
+    }
+
+    /**
+     * Creates a spouse for the given person.
+     *
+     * @param campaign the campaign the person is a part of
+     * @param today the current date
+     * @param person the person for whom the external spouse is being created
+     * @param gender the gender of the external spouse
+     * @return the created external spouse
+     */
+    Person createExternalSpouse(final Campaign campaign, final LocalDate today, final Person person, Gender gender) {
+        Person externalSpouse = campaign.newDependent(gender);
+
+
+        // Calculate person's age and the maximum and minimum allowable spouse ages
+        int personAge = person.getAge(today);
+        int externalSpouseAge = externalSpouse.getAge(today);
+        int maximumAgeDifference = campaign.getCampaignOptions().getRandomMarriageAgeRange();
+        int externalSpouseMinAge = Math.max (18, personAge - maximumAgeDifference);
+        int externalSpouseMaxAge = personAge + maximumAgeDifference;
+
+        if (externalSpouseAge < externalSpouseMinAge) {
+            int difference = externalSpouseMinAge - externalSpouseAge;
+
+            externalSpouse.setDateOfBirth(externalSpouse.getDateOfBirth().minusYears(difference));
+        } else if (externalSpouseAge > externalSpouseMaxAge) {
+            int difference = externalSpouseAge - externalSpouseMaxAge;
+
+            externalSpouse.setDateOfBirth(externalSpouse.getDateOfBirth().plusYears(difference));
+        }
+
+        return externalSpouse;
     }
 
     /**

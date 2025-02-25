@@ -18,44 +18,50 @@
  */
 package mekhq.campaign.icons;
 
-import megamek.common.annotations.Nullable;
-import mekhq.MHQStaticDirectoryManager;
-import mekhq.MHQConstants;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.icons.enums.LayeredForceIconLayer;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-
-import java.awt.*;
+import java.awt.Image;
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
+import mekhq.MHQStaticDirectoryManager;
+import mekhq.campaign.icons.enums.LayeredForceIconLayer;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
- * ForcePieceIcon is an implementation of StandardForceIcon that contains and displays a Force Icon
- * Piece from the Force Icon Directory's Pieces Subdirectory. These are then combined together to
+ * ForcePieceIcon is an implementation of StandardForceIcon that contains and
+ * displays a Force Icon
+ * Piece from the Force Icon Directory's Pieces Subdirectory. These are then
+ * combined together to
  * form a single LayeredForceIcon.
+ * 
  * @see LayeredForceIconLayer
  * @see LayeredForceIcon
  * @see StandardForceIcon
  */
 public class ForcePieceIcon extends StandardForceIcon {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(ForcePieceIcon.class);
+
+    // region Variable Declarations
     public static final String XML_TAG = "forcePieceIcon";
     private LayeredForceIconLayer layer;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public ForcePieceIcon() {
         this(LayeredForceIconLayer.FRAME, ROOT_CATEGORY, MHQConstants.LAYERED_FORCE_ICON_DEFAULT_FRAME_FILENAME);
     }
 
     public ForcePieceIcon(final LayeredForceIconLayer layer, final @Nullable String category,
-                          final @Nullable String filename) {
+            final @Nullable String filename) {
         super(category, filename);
         setLayer(layer);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public LayeredForceIconLayer getLayer() {
         return layer;
     }
@@ -67,7 +73,7 @@ public class ForcePieceIcon extends StandardForceIcon {
     public String getCategoryPath() {
         return hasDefaultCategory() ? getLayer().getLayerPath() : getLayer().getLayerPath() + getCategory();
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
     @Override
     public @Nullable Image getBaseImage() {
@@ -79,12 +85,12 @@ public class ForcePieceIcon extends StandardForceIcon {
         try {
             return (Image) MHQStaticDirectoryManager.getForceIcons().getItem(getCategoryPath(), getFilename());
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return null;
         }
     }
 
-    //region File I/O
+    // region File I/O
     @Override
     public void writeToXML(final PrintWriter pw, final int indent) {
         writeToXML(pw, indent, XML_TAG);
@@ -101,7 +107,7 @@ public class ForcePieceIcon extends StandardForceIcon {
         try {
             icon.parseNodes(wn.getChildNodes());
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return new ForcePieceIcon();
         }
         return icon;
@@ -115,7 +121,7 @@ public class ForcePieceIcon extends StandardForceIcon {
             setLayer(LayeredForceIconLayer.valueOf(wn.getTextContent().trim()));
         }
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

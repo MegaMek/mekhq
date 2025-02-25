@@ -20,30 +20,42 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.*;
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.SkillType;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
+import megamek.common.Compute;
+import megamek.common.DockingCollar;
+import megamek.common.Entity;
+import megamek.common.Jumpship;
+import megamek.common.SimpleTechLevel;
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author MKerensky
  */
 public class JumpshipDockingCollar extends Part {
+    private static final MMLogger logger = MMLogger.create(JumpshipDockingCollar.class);
+
     static final TechAdvancement TA_BOOM = new TechAdvancement(TECH_BASE_ALL)
-            .setAdvancement(2458, 2470, 2500).setPrototypeFactions(F_TH)
-            .setProductionFactions(F_TH).setTechRating(RATING_C)
+            .setAdvancement(2458, 2470, 2500)
+            .setPrototypeFactions(F_TH)
+            .setProductionFactions(F_TH)
+            .setTechRating(RATING_C)
             .setAvailability(RATING_C, RATING_C, RATING_C, RATING_C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
     static final TechAdvancement TA_NO_BOOM = new TechAdvancement(TECH_BASE_ALL)
-            .setAdvancement(2304, 2350, 2364, 2520).setPrototypeFactions(F_TA)
-            .setProductionFactions(F_TH).setTechRating(RATING_B)
+            .setAdvancement(2304, 2350, 2364, 2520)
+            .setPrototypeFactions(F_TA)
+            .setProductionFactions(F_TH)
+            .setTechRating(RATING_B)
             .setAvailability(RATING_C, RATING_X, RATING_X, RATING_X)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
@@ -177,7 +189,7 @@ public class JumpshipDockingCollar extends Part {
         if (collarType == Jumpship.COLLAR_STANDARD) {
             return Money.of(100000);
         } else {
-            return Money.of(500000) ;
+            return Money.of(500000);
         }
     }
 
@@ -214,7 +226,7 @@ public class JumpshipDockingCollar extends Part {
                     collarNumber = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }

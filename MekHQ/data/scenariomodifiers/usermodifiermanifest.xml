@@ -1,7 +1,7 @@
 <!-- This is *all* possible scenario modifiers -->
 <scenarioModifierManifest>
 	<modifiers>
-	
+
 		<!-- Fixed scenario modifiers suitable for specific scenario types go here -->
 
 
@@ -10,7 +10,7 @@
 
 		<!-- Scenario modifiers that come from campaign state go here -->
 
-		
+
 		<!-- and the air versions -->
 
 	</modifiers>

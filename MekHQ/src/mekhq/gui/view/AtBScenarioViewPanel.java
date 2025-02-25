@@ -30,6 +30,7 @@ import megamek.common.planetaryconditions.PlanetaryConditions;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
 import mekhq.campaign.mission.*;
@@ -292,8 +293,14 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             gridBagConstraints.gridwidth = 1;
             panStats.add(lblForce, gridBagConstraints);
 
-            if (null != scenario.getLance(campaign)) {
-                lblForceDesc.setText(campaign.getForce(scenario.getLanceForceId()).getFullName());
+            if (null != scenario.getCombatTeamById(campaign)) {
+                Force force = campaign.getForce(scenario.getCombatTeamId());
+
+                if (force != null) {
+                    lblForceDesc.setText(campaign.getForce(scenario.getCombatTeamId()).getFullName());
+                } else {
+                    lblForceDesc.setText("Unknown Force ID: " + scenario.getCombatTeamId());
+                }
             } else if (scenario instanceof AtBDynamicScenario) {
                 StringBuilder forceBuilder = new StringBuilder();
                 forceBuilder.append("<html>");
@@ -376,12 +383,12 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
         for (ScenarioObjective objective : scenario.getScenarioObjectives()) {
             objectiveBuilder.append(objective.getDescription());
-            objectiveBuilder.append("\n");
+            objectiveBuilder.append('\n');
 
             for (String forceName : objective.getAssociatedForceNames()) {
-                objectiveBuilder.append("\t");
+                objectiveBuilder.append('\t');
                 objectiveBuilder.append(forceName);
-                objectiveBuilder.append("\n");
+                objectiveBuilder.append('\n');
             }
 
             for (String associatedUnitID : objective.getAssociatedUnitIDs()) {
@@ -399,22 +406,22 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 if (associatedUnitName.isBlank()) {
                     continue;
                 }
-                objectiveBuilder.append("\t");
+                objectiveBuilder.append('\t');
                 objectiveBuilder.append(associatedUnitName);
-                objectiveBuilder.append("\n");
+                objectiveBuilder.append('\n');
             }
 
-            objectiveBuilder.append("\t");
+            objectiveBuilder.append('\t');
             objectiveBuilder.append(objective.getTimeLimitString());
-            objectiveBuilder.append("\n");
+            objectiveBuilder.append('\n');
 
             for (String detail : objective.getDetails()) {
-                objectiveBuilder.append("\t");
+                objectiveBuilder.append('\t');
                 objectiveBuilder.append(detail);
-                objectiveBuilder.append("\n");
+                objectiveBuilder.append('\n');
             }
 
-            objectiveBuilder.append("\n");
+            objectiveBuilder.append('\n');
         }
 
         objectiveBuilder.append(scenario.getBattlefieldControlDescription());
@@ -443,7 +450,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             gridBagConstraints.insets = new Insets(0, 0, 5, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            panStats.add(new JLabel("<html><b>Scenario Costs & Payouts:</b></html>"), gridBagConstraints);
+            panStats.add(new JLabel("<html><b>Scenario Costs or Loot:</b></html>"), gridBagConstraints);
 
             for (Loot loot : scenario.getLoot()) {
                 gridBagConstraints.gridx = 0;
@@ -539,7 +546,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             chkReroll[REROLL_MAPSIZE].addItemListener(checkBoxListener);
         }
 
-        lblMapSizeDesc.setText(scenario.getMapX() + "x" + scenario.getMapY());
+        lblMapSizeDesc.setText(scenario.getMapX() + " W x " + scenario.getMapY() + " H");
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblMapSizeDesc, gridBagConstraints);
@@ -721,7 +728,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             chkReroll[REROLL_MAPSIZE].addItemListener(checkBoxListener);
         }
 
-        lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
+        lblMapSizeDesc.setText(scenario.getMapSizeX() + " W x " + scenario.getMapSizeY() + " H");
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblMapSizeDesc, gridBagConstraints);
@@ -764,7 +771,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             chkReroll[REROLL_MAPSIZE].addItemListener(checkBoxListener);
         }
 
-        lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
+        lblMapSizeDesc.setText(scenario.getMapSizeX() + " W x " + scenario.getMapSizeY() + " H");
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblMapSizeDesc, gridBagConstraints);
@@ -797,22 +804,26 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     private void rerollBattleConditions() {
         if (chkReroll[REROLL_TERRAIN] != null && chkReroll[REROLL_TERRAIN].isSelected()) {
             scenario.setTerrain();
-            scenario.setMapFile();
+            scenario.setScenarioMap(campaign.getCampaignOptions().getFixedMapChance());
             scenario.useReroll();
             chkReroll[REROLL_TERRAIN].setSelected(false);
             lblTerrainDesc.setText(scenario.getTerrainType());
-            lblMapDesc.setText(scenario.getMap());
+            lblMapDesc.setText(scenario.getMapForDisplay());
+            lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
         }
         if (chkReroll[REROLL_MAP] != null && chkReroll[REROLL_MAP].isSelected()) {
-            scenario.setMapFile();
+            scenario.setScenarioMap(campaign.getCampaignOptions().getFixedMapChance());
             scenario.useReroll();
             chkReroll[REROLL_MAP].setSelected(false);
-            lblMapDesc.setText(scenario.getMap());
+            lblMapDesc.setText(scenario.getMapForDisplay());
+            lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
         }
         if (chkReroll[REROLL_MAPSIZE] != null && chkReroll[REROLL_MAPSIZE].isSelected()) {
             scenario.setMapSize();
+            scenario.setScenarioMap(campaign.getCampaignOptions().getFixedMapChance());
             scenario.useReroll();
             chkReroll[REROLL_MAPSIZE].setSelected(false);
+            lblMapDesc.setText(scenario.getMapForDisplay());
             lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
         }
         if (chkReroll[REROLL_LIGHT] != null && chkReroll[REROLL_LIGHT].isSelected()) {
@@ -923,11 +934,11 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
     private class TreeMouseAdapter extends MouseInputAdapter implements ActionListener {
         private JTree tree;
-        int index;
+        int forceIndex;
 
-        public TreeMouseAdapter(JTree tree, int index) {
+        public TreeMouseAdapter(JTree tree, int forceIndex) {
             this.tree = tree;
-            this.index = index;
+            this.forceIndex = forceIndex;
         }
 
         @Override
@@ -937,21 +948,20 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             if (command.equalsIgnoreCase("CONFIG_BOT")) {
                 BotConfigDialog pbd = new BotConfigDialog(frame,
                         null,
-                        scenario.getBotForce(index).getBehaviorSettings(),
+                        scenario.getBotForce(forceIndex).getBehaviorSettings(),
                         null);
-                pbd.setBotName(scenario.getBotForce(index).getName());
+                pbd.setBotName(scenario.getBotForce(forceIndex).getName());
                 pbd.setVisible(true);
                 if (!pbd.getResult().isCancelled()) {
-                    scenario.getBotForce(index).setBehaviorSettings(pbd.getBehaviorSettings());
-                    scenario.getBotForce(index).setName(pbd.getBotName());
+                    scenario.getBotForce(forceIndex).setBehaviorSettings(pbd.getBehaviorSettings());
+                    scenario.getBotForce(forceIndex).setName(pbd.getBotName());
                 }
             } else if (command.equalsIgnoreCase("EDIT_UNIT")) {
                 if ((tree.getSelectionCount() > 0) && (tree.getSelectionRows() != null)) {
-                    // row 0 is root node
-                    int i = tree.getSelectionRows()[0] - 1;
-                    UnitEditorDialog med = new UnitEditorDialog(frame,
-                            scenario.getBotForce(index).getFullEntityList(campaign).get(i));
-                    med.setVisible(true);
+                    int unitIndex = tree.getSelectionRows()[0] - 1;
+                    UnitEditorDialog editorDialog = new UnitEditorDialog(frame,
+                            scenario.getBotForce(this.forceIndex).getFullEntityList(campaign).get(unitIndex));
+                    editorDialog.setVisible(true);
                 }
             }
         }
@@ -975,7 +985,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 }
 
                 JMenuItem menuItem;
-                if (path.getPathCount() > 1) {
+                if ((path.getPathCount() > 1) && (tree.getSelectionRows() != null)
+                    && (tree.getSelectionRows()[0] != 0)) {
                     menuItem = new JMenuItem("Edit Unit...");
                     menuItem.setActionCommand("EDIT_UNIT");
                     menuItem.addActionListener(this);

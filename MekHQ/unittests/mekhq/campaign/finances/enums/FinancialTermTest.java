@@ -18,37 +18,38 @@
  */
 package mekhq.campaign.finances.enums;
 
-import mekhq.MekHQ;
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class FinancialTermTest {
-    //region Variable Declarations
+import java.time.LocalDate;
+import java.util.ResourceBundle;
+
+import org.junit.jupiter.api.Test;
+
+import mekhq.MekHQ;
+
+class FinancialTermTest {
+    // region Variable Declarations
     private static final FinancialTerm[] terms = FinancialTerm.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Getters
+    // region Getters
     @Test
-    public void testGetToolTipText() {
+    void testGetToolTipText() {
         assertEquals(resources.getString("FinancialTerm.BIWEEKLY.toolTipText"),
                 FinancialTerm.BIWEEKLY.getToolTipText());
         assertEquals(resources.getString("FinancialTerm.ANNUALLY.toolTipText"),
                 FinancialTerm.ANNUALLY.getToolTipText());
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     @Test
-    public void testIsBiweekly() {
+    void testIsBiweekly() {
         for (final FinancialTerm financialTerm : terms) {
             if (financialTerm == FinancialTerm.BIWEEKLY) {
                 assertTrue(financialTerm.isBiweekly());
@@ -59,7 +60,7 @@ public class FinancialTermTest {
     }
 
     @Test
-    public void testIsMonthly() {
+    void testIsMonthly() {
         for (final FinancialTerm financialTerm : terms) {
             if (financialTerm == FinancialTerm.MONTHLY) {
                 assertTrue(financialTerm.isMonthly());
@@ -70,7 +71,7 @@ public class FinancialTermTest {
     }
 
     @Test
-    public void testIsQuarterly() {
+    void testIsQuarterly() {
         for (final FinancialTerm financialTerm : terms) {
             if (financialTerm == FinancialTerm.QUARTERLY) {
                 assertTrue(financialTerm.isQuarterly());
@@ -81,7 +82,7 @@ public class FinancialTermTest {
     }
 
     @Test
-    public void testIsSemiannually() {
+    void testIsSemiannually() {
         for (final FinancialTerm financialTerm : terms) {
             if (financialTerm == FinancialTerm.SEMIANNUALLY) {
                 assertTrue(financialTerm.isSemiannually());
@@ -92,7 +93,7 @@ public class FinancialTermTest {
     }
 
     @Test
-    public void testIsAnnually() {
+    void testIsAnnually() {
         for (final FinancialTerm financialTerm : terms) {
             if (financialTerm == FinancialTerm.ANNUALLY) {
                 assertTrue(financialTerm.isAnnually());
@@ -101,10 +102,10 @@ public class FinancialTermTest {
             }
         }
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
     @Test
-    public void testNextValidDate() {
+    void testNextValidDate() {
         assertEquals(LocalDate.of(3025, 1, 10),
                 FinancialTerm.BIWEEKLY.nextValidDate(LocalDate.of(3024, 12, 27)));
         assertEquals(LocalDate.of(3025, 1, 10),
@@ -152,7 +153,7 @@ public class FinancialTermTest {
     }
 
     @Test
-    public void testEndsToday() {
+    void testEndsToday() {
         assertFalse(FinancialTerm.BIWEEKLY.endsToday(LocalDate.of(3024, 12, 31),
                 LocalDate.of(3025, 1, 1)));
         assertFalse(FinancialTerm.BIWEEKLY.endsToday(LocalDate.of(3025, 1, 8),
@@ -192,7 +193,7 @@ public class FinancialTermTest {
     }
 
     @Test
-    public void testDetermineYearlyDenominator() {
+    void testDetermineYearlyDenominator() {
         assertEquals(26, FinancialTerm.BIWEEKLY.determineYearlyDenominator());
         assertEquals(12, FinancialTerm.MONTHLY.determineYearlyDenominator());
         assertEquals(4, FinancialTerm.QUARTERLY.determineYearlyDenominator());
@@ -200,30 +201,23 @@ public class FinancialTermTest {
         assertEquals(1, FinancialTerm.ANNUALLY.determineYearlyDenominator());
     }
 
-    //region File I/O
+    // region File I/O
     @Test
-    public void testParseFromString() {
+    void testParseFromString() {
         // Enum.valueOf Testing
         assertEquals(FinancialTerm.MONTHLY, FinancialTerm.parseFromString("MONTHLY"));
         assertEquals(FinancialTerm.ANNUALLY, FinancialTerm.parseFromString("ANNUALLY"));
 
-        // Parsing Legacy Testing
-        assertEquals(FinancialTerm.BIWEEKLY, FinancialTerm.parseFromString("0"));
-        assertEquals(FinancialTerm.MONTHLY, FinancialTerm.parseFromString("1"));
-        assertEquals(FinancialTerm.QUARTERLY, FinancialTerm.parseFromString("2"));
-        assertEquals(FinancialTerm.ANNUALLY, FinancialTerm.parseFromString("3"));
-        assertEquals(FinancialTerm.ANNUALLY, FinancialTerm.parseFromString("4"));
-
         // Failure Testing
         assertEquals(FinancialTerm.ANNUALLY, FinancialTerm.parseFromString("failureFailsFake"));
     }
-    //endregion File I/O
+    // endregion File I/O
 
     /**
      * Testing to ensure the toString Override is working as intended
      */
     @Test
-    public void testToStringOverride() {
+    void testToStringOverride() {
         assertEquals(resources.getString("FinancialTerm.MONTHLY.text"), FinancialTerm.MONTHLY.toString());
         assertEquals(resources.getString("FinancialTerm.QUARTERLY.text"), FinancialTerm.QUARTERLY.toString());
         assertEquals(resources.getString("FinancialTerm.ANNUALLY.text"), FinancialTerm.ANNUALLY.toString());

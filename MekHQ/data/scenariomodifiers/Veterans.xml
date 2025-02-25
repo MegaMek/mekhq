@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Opfor markings indicate a veteran force.</additionalBriefingText>
+	<additionalBriefingText>OpFor markings indicate a veteran force.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
 	<eventRecipient>Opposing</eventRecipient>

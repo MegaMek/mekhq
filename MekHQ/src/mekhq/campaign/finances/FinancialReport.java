@@ -30,7 +30,7 @@ public class FinancialReport {
     private Money liabilities = Money.zero();
     private Money cash = Money.zero();
     private Money loans = Money.zero();
-    private Money mech = Money.zero();
+    private Money mek = Money.zero();
     private Money vee = Money.zero();
     private Money ba = Money.zero();
     private Money infantry = Money.zero();
@@ -51,7 +51,7 @@ public class FinancialReport {
     }
 
     public Money getTotalAssets() {
-        return assets.plus(cash).plus(mech).plus(vee).plus(ba).plus(infantry).plus(largeCraft)
+        return assets.plus(cash).plus(mek).plus(vee).plus(ba).plus(infantry).plus(largeCraft)
                     .plus(smallCraft).plus(proto).plus(spareParts);
     }
 
@@ -107,7 +107,7 @@ public class FinancialReport {
         return spareParts;
     }
 
-    public Money getProtomechValue() {
+    public Money getProtoMekValue() {
         return proto;
     }
 
@@ -131,8 +131,8 @@ public class FinancialReport {
         return vee;
     }
 
-    public Money getMechValue() {
-        return mech;
+    public Money getMekValue() {
+        return mek;
     }
 
     public static FinancialReport calculate(Campaign campaign) {
@@ -144,8 +144,8 @@ public class FinancialReport {
 
         campaign.getHangar().forEachUnit(u -> {
             Money value = u.getSellValue();
-            if (u.getEntity() instanceof Mech) {
-                r.mech = r.mech.plus(value);
+            if (u.getEntity() instanceof Mek) {
+                r.mek = r.mek.plus(value);
             } else if (u.getEntity() instanceof Tank) {
                 r.vee = r.vee.plus(value);
             } else if (u.getEntity() instanceof BattleArmor) {
@@ -157,7 +157,7 @@ public class FinancialReport {
                 r.largeCraft = r.largeCraft.plus(value);
             } else if (u.getEntity() instanceof Aero) {
                 r.smallCraft = r.smallCraft.plus(value);
-            } else if (u.getEntity() instanceof Protomech) {
+            } else if (u.getEntity() instanceof ProtoMek) {
                 r.proto = r.proto.plus(value);
             }
         });

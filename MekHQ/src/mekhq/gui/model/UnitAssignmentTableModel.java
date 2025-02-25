@@ -1,4 +1,32 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.model;
+
+import java.awt.Component;
+import java.awt.Image;
+import java.util.ArrayList;
+import java.util.UUID;
+
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
 
 import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
@@ -9,13 +37,6 @@ import mekhq.gui.BasicInfo;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.UUID;
-
 public class UnitAssignmentTableModel extends AbstractTableModel {
     public final static int COL_UNIT = 0;
     public final static int COL_CLASS = 1;
@@ -23,7 +44,7 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
     public final static int N_COL = 3;
 
     private final static String[] colNames = {
-        "Unit", "Class", "Cost"
+            "Unit", "Class", "Cost"
     };
 
     private Campaign campaign;
@@ -123,8 +144,8 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
     public class TextRenderer extends MekHqTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                                                       boolean isSelected, boolean hasFocus,
-                                                       int row, int column) {
+                boolean isSelected, boolean hasFocus,
+                int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             int actualCol = table.convertColumnIndexToModel(column);
             setHorizontalAlignment(getAlignment(actualCol));
@@ -139,7 +160,7 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                       boolean hasFocus, int row, int column) {
+                boolean hasFocus, int row, int column) {
             Component c = this;
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);

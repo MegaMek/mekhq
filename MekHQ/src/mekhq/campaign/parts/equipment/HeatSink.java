@@ -25,6 +25,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 
+import java.util.StringJoiner;
+
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
@@ -45,15 +47,16 @@ public class HeatSink extends EquipmentPart {
     }
 
     /**
-     * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
+     * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer
+     * detail, boolean ignoreAmmo)
      *
      */
     @Override
     public Money getStickerPrice() {
         if (type.hasFlag(MiscType.F_DOUBLE_HEAT_SINK) || type.hasFlag(MiscType.F_LASER_HEAT_SINK)) {
-            return Money.of(isOmniPodded()? 7500 : 6000);
+            return Money.of(isOmniPodded() ? 7500 : 6000);
         } else {
-            return Money.of(isOmniPodded()? 2500 : 2000);
+            return Money.of(isOmniPodded() ? 2500 : 2000);
         }
     }
 
@@ -66,13 +69,14 @@ public class HeatSink extends EquipmentPart {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if (null != unit) {
             int priorHits = hits;
-            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+            Mounted<?> mounted = unit.getEntity().getEquipment(equipmentNum);
             if (null != mounted) {
                 if (mounted.isMissing()) {
                     remove(false);
                     return;
                 }
-                hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getLocation());
+                hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum,
+                        mounted.getLocation());
             }
             if (checkForDestruction
                     && hits > priorHits
@@ -111,5 +115,30 @@ public class HeatSink extends EquipmentPart {
     @Override
     public boolean isOmniPoddable() {
         return true;
+    }
+
+    /**
+     * Gets a string containing details regarding the part,
+     * and optionally include information on its repair
+     * status.
+     *
+     * @param includeRepairDetails {@code true} if the details
+     *                             should include information such as the number of
+     *                             hits or how much it would cost to repair the
+     *                             part.
+     * @return A string containing details regarding the part.
+     */
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
+        StringJoiner sj = new StringJoiner(", ");
+        if (getName() != null && getName().equals("Double Heat Sink")) {
+            sj.add(getTechBaseName());
+        }
+
+        if( !super.getDetails(includeRepairDetails).isEmpty()) {
+            sj.add(super.getDetails(includeRepairDetails));
+        }
+
+        return sj.toString();
     }
 }

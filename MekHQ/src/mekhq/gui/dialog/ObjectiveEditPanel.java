@@ -27,6 +27,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.campaign.mission.ScenarioTemplate;
 
 import javax.swing.*;
@@ -185,7 +186,7 @@ public class ObjectiveEditPanel extends JDialog {
     private void addDescriptionUI(GridBagConstraints gbc) {
         lblShortDescription = new JLabel("Short Description:");
 
-        JScrollPane txtScroll = new JScrollPane();
+        JScrollPane txtScroll = new JScrollPaneWithSpeed();
         txtShortDescription = new JTextArea();
         txtShortDescription.setColumns(40);
         txtShortDescription.setRows(5);

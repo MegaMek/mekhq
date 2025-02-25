@@ -1,21 +1,53 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.unit.cleanup;
-
-import megamek.common.*;
-import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.equipment.MissingEquipmentPart;
-import mekhq.campaign.unit.Unit;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
+import megamek.common.AmmoType;
+import megamek.common.BattleArmor;
+import megamek.common.Entity;
+import megamek.common.EquipmentType;
+import megamek.common.MiscType;
+import megamek.common.Mounted;
+import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.unit.Unit;
 
 public class EquipmentUnscramblerTest {
     @Test
@@ -154,7 +186,7 @@ public class EquipmentUnscramblerTest {
 
         Mounted mount0 = createEquipment(mockEntity, 0, et0);
         Mounted mount1 = createEquipment(mockEntity, 1, et1);
-        
+
         // ammo bins swapped positions
         Mounted mount2 = createEquipment(mockEntity, 2, at1);
         Mounted mount3 = createEquipment(mockEntity, 3, at0);
@@ -174,9 +206,9 @@ public class EquipmentUnscramblerTest {
 
         verify(ep0, times(1)).setEquipmentNum(0);
         verify(ep1, times(1)).setEquipmentNum(1);
-        
+
         // these should swap positions
-        verify(ep2, times(1)).setEquipmentNum(3); 
+        verify(ep2, times(1)).setEquipmentNum(3);
         verify(ep3, times(1)).setEquipmentNum(2);
     }
 
@@ -259,7 +291,7 @@ public class EquipmentUnscramblerTest {
 
         verify(epMissing, times(1)).setEquipmentNum(-1);
     }
-    
+
     private Mounted createEquipment(Entity entity, int equipmentNum, EquipmentType type) {
         Mounted mockMounted = mock(Mounted.class);
         when(mockMounted.getType()).thenReturn(type);
