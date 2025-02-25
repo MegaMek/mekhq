@@ -75,7 +75,7 @@ public class CampaignTransportUtilities {
      */
     public static double transportCapacityUsage(TransporterType transporterType, Entity transportedUnit) {
         if (transportedUnit instanceof Infantry) {
-            if (transporterType == INFANTRY_BAY) {
+            if (transporterType == INFANTRY_BAY || transporterType == CARGO_BAY) { // TODO from MekHQ#5928: Add Cargo Container
                 return calcInfantryBayWeight(transportedUnit);
             }
             else if (transporterType == INFANTRY_COMPARTMENT) {
@@ -240,6 +240,8 @@ public class CampaignTransportUtilities {
                 //Ship transports can't use some transport types
                 if (!(campaignTransportType.isShipTransport())) {
                     transporters.add(INFANTRY_COMPARTMENT);
+                    transporters.add(CARGO_BAY);
+                    // TODO from MekHQ#5928: Add Cargo Container
                 }
 
                 if (entity instanceof BattleArmor baEntity) {
