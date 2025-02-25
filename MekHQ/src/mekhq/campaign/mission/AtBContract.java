@@ -1344,6 +1344,7 @@ public class AtBContract extends Contract {
         return employerCode;
     }
 
+    @Deprecated
     public void setEmployerCode(final String code, final LocalDate date) {
         employerCode = code;
         setEmployer(getEmployerName(date.getYear()));
