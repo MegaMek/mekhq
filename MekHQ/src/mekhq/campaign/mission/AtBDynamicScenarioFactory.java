@@ -98,7 +98,7 @@ public class AtBDynamicScenarioFactory {
     // indexed by dragoons rating
     private static final int[] infantryToBAUpgradeTNs = { 12, 10, 8, 6, 4, 2 };
 
-    private static final int REINFORCEMENT_ARRIVAL_SCALE = 20;
+    private static final int REINFORCEMENT_ARRIVAL_SCALE = 30;
 
     private static final ResourceBundle resources = ResourceBundle.getBundle(
             "mekhq.resources.AtBDynamicScenarioFactory",
