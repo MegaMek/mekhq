@@ -38,6 +38,7 @@ import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerEscapeeScenarioDial
 
 import java.util.*;
 
+import static java.io.File.separator;
 import static megamek.common.Board.START_SW;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
@@ -217,7 +218,7 @@ public class PrisonEscapeScenario {
      * @param mobUnits A list of {@link Unit} objects representing the escapee mobs to be included in the scenario.
      */
     private void createEscapeeScenario(List<Unit> mobUnits) {
-        final String DIRECTORY = "data/scenariotemplates/";
+        final String DIRECTORY = "data" + separator + "scenariotemplates" + separator;
         final String GENERIC = DIRECTORY + "Intercept the Escapees.xml";
 
         ScenarioTemplate template = ScenarioTemplate.Deserialize(GENERIC);
