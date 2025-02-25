@@ -56,11 +56,17 @@ import mekhq.campaign.handler.PostScenarioDialogHandler;
 import mekhq.campaign.handler.XPHandler;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.stratcon.StratconRulesManager;
+import mekhq.campaign.unit.Unit;
+import mekhq.gui.CampaignGUI;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.ChooseMulFilesDialog;
+import mekhq.campaign.storyarc.StoryArc;
+import mekhq.gui.StoryArcEditorGUI;
+
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.panels.StartupScreenPanel;
 import mekhq.gui.preferences.StringPreference;
@@ -117,6 +123,7 @@ public class MekHQ implements GameListener {
     // the actual campaign - this is where the good stuff is
     private CampaignController campaignController;
     private CampaignGUI campaignGUI;
+    private StoryArcEditorGUI storyArcEditorGUI;
 
     private final IconPackage iconPackage = new IconPackage();
 
@@ -272,6 +279,10 @@ public class MekHQ implements GameListener {
 
     public void showNewView() {
         campaignGUI = new CampaignGUI(this);
+    }
+
+    public void showNewStoryArcEditor(StoryArc arc) {
+        storyArcEditorGUI = new StoryArcEditorGUI(this, arc);
     }
 
     /**

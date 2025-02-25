@@ -20,8 +20,21 @@
  */
 package mekhq.campaign.storyarc.storypoint;
 
+import megamek.Version;
+import mekhq.campaign.storyarc.StoryArc;
+import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger;
+import mekhq.utilities.MHQXMLUtility;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.storyarc.StoryPoint;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -58,6 +71,33 @@ public class CheckStringVariableStoryPoint extends StoryPoint {
     @Override
     protected String getResult() {
         return getStoryArc().getCustomStringVariable(key);
+    }
+
+    @Override
+    public List<String> getAllPossibleResults() {
+        // this one is complicated, but we can find all the triggers where this has been changed and collect
+        // all possibilities
+        List<String> results = new ArrayList<>();
+        for(StoryPoint sp : getStoryArc().getStoryPoints()) {
+            for(StoryTrigger trigger : sp.getStoryTriggers()) {
+                if(trigger instanceof ChangeStringVariableStoryTrigger) {
+                    if(!((ChangeStringVariableStoryTrigger)trigger).getKey().equals(key)) {
+                        continue;
+                    }
+                    String value = ((ChangeStringVariableStoryTrigger)trigger).getValue();
+                    if(!results.contains(value)) {
+                        results.add(value);
+                    }
+                }
+            }
+        }
+        // finally, check the current value of this variable and add it if not already there
+        String value = getStoryArc().getCustomStringVariable(key);
+        if(!results.contains(value)) {
+            results.add(value);
+        }
+        results.add(DEFAULT_OUTCOME);
+        return results;
     }
 
     @Override

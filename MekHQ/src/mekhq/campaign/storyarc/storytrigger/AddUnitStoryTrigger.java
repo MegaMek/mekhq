@@ -20,6 +20,20 @@
  */
 package mekhq.campaign.storyarc.storytrigger;
 
+import megamek.Version;
+import megamek.common.Entity;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.gui.panels.storytriggerpanels.FakeStoryTriggerPanel;
+import mekhq.gui.panels.storytriggerpanels.StoryTriggerPanel;
+import mekhq.utilities.MHQXMLUtility;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.swing.*;
+import java.io.PrintWriter;
+import java.text.ParseException;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
@@ -71,6 +85,16 @@ public class AddUnitStoryTrigger extends StoryTrigger {
         }
 
         getCampaign().addNewUnit(en, false, 0, quality);
+    }
+
+    @Override
+    public String getDescription() {
+        return "Add unit(s)";
+    }
+
+    @Override
+    public StoryTriggerPanel getPanel(JFrame frame) {
+        return new FakeStoryTriggerPanel(frame, "StoryTriggerPanel", this);
     }
 
     @Override

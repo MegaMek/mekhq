@@ -20,6 +20,20 @@
  */
 package mekhq.campaign.storyarc.storytrigger;
 
+import megamek.Version;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.gui.panels.storytriggerpanels.AdvanceTimeStoryTriggerPanel;
+import mekhq.gui.panels.storytriggerpanels.FakeStoryTriggerPanel;
+import mekhq.gui.panels.storytriggerpanels.StoryTriggerPanel;
+import mekhq.utilities.MHQXMLUtility;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.swing.*;
+import java.io.PrintWriter;
+import java.text.ParseException;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
@@ -38,7 +52,7 @@ import mekhq.utilities.MHQXMLUtility;
 public class AdvanceTimeStoryTrigger extends StoryTrigger {
     private static final MMLogger logger = MMLogger.create(AdvanceTimeStoryTrigger.class);
 
-    int days;
+    int days = 1;
 
     @Override
     protected void execute() {
@@ -47,6 +61,24 @@ public class AdvanceTimeStoryTrigger extends StoryTrigger {
             getCampaign().newDay();
             i++;
         }
+    }
+
+    public int getDays() {
+        return days;
+    }
+
+    public void setDays(int days) {
+        this.days = days;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Advance time (" + days + " days)";
+    }
+
+    @Override
+    public StoryTriggerPanel getPanel(JFrame frame) {
+        return new AdvanceTimeStoryTriggerPanel(frame, "StoryTriggerPanel", this);
     }
 
     @Override

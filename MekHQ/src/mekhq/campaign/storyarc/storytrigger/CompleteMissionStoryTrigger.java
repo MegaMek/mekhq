@@ -20,6 +20,22 @@
  */
 package mekhq.campaign.storyarc.storytrigger;
 
+import megamek.Version;
+import mekhq.gui.StoryPointHyperLinkListener;
+import mekhq.gui.panels.storytriggerpanels.CompleteMissionStoryTriggerPanel;
+import mekhq.gui.panels.storytriggerpanels.FakeStoryTriggerPanel;
+import mekhq.gui.panels.storytriggerpanels.StoryTriggerPanel;
+import mekhq.utilities.MHQXMLUtility;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.campaign.storyarc.storypoint.MissionStoryPoint;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.swing.*;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.UUID;
@@ -47,6 +63,22 @@ public class CompleteMissionStoryTrigger extends StoryTrigger {
     UUID missionStoryPointId;
     MissionStatus missionStatus;
 
+    public UUID getMissionStoryPointId() {
+        return missionStoryPointId;
+    }
+
+    public void setMissionStoryPointId(UUID missionStoryPointId) {
+        this.missionStoryPointId = missionStoryPointId;
+    }
+
+    public MissionStatus getMissionStatus() {
+        return missionStatus;
+    }
+
+    public void setMissionStatus(MissionStatus missionStatus) {
+        this.missionStatus = missionStatus;
+    }
+
     @Override
     protected void execute() {
         StoryPoint storyPoint = getStoryArc().getStoryPoint(missionStoryPointId);
@@ -56,6 +88,29 @@ public class CompleteMissionStoryTrigger extends StoryTrigger {
             }
             storyPoint.complete();
         }
+    }
+
+    @Override
+    public String getDescription() {
+        StoryPoint storyPoint = getStoryArc().getStoryPoint(missionStoryPointId);
+        StringBuilder sb = new StringBuilder();
+        sb.append("Complete ");
+        if(storyPoint == null) {
+            sb.append("mission (MISSING)");
+        } else {
+            sb.append(storyPoint.getHyperlinkedName());
+        }
+        if(missionStatus != null) {
+            sb.append(" (");
+            sb.append(missionStatus.name());
+            sb.append(")");
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public StoryTriggerPanel getPanel(JFrame frame) {
+        return new CompleteMissionStoryTriggerPanel(frame, "StoryTriggerPanel", this);
     }
 
     @Override

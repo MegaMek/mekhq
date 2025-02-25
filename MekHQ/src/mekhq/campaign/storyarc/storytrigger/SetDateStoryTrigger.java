@@ -18,6 +18,22 @@
  */
 package mekhq.campaign.storyarc.storytrigger;
 
+import megamek.Version;
+import mekhq.MekHQ;
+import mekhq.gui.StoryPointHyperLinkListener;
+import mekhq.gui.panels.storytriggerpanels.FakeStoryTriggerPanel;
+import mekhq.gui.panels.storytriggerpanels.SetDateStoryTriggerPanel;
+import mekhq.gui.panels.storytriggerpanels.StoryTriggerPanel;
+import mekhq.utilities.MHQXMLUtility;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.swing.*;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -68,6 +84,31 @@ public class SetDateStoryTrigger extends StoryTrigger {
     }
     // endregion Constructors
 
+
+    public UUID getStoryPointId() {
+        return storyPointId;
+    }
+
+    public void setStoryPointId(UUID storyPointId) {
+        this.storyPointId = storyPointId;
+    }
+
+    public int getFutureDays() {
+        return futureDays;
+    }
+
+    public void setFutureDays(int futureDays) {
+        this.futureDays = futureDays;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
     @Override
     protected void execute() {
         StoryPoint storyPoint = getStoryArc().getStoryPoint(storyPointId);
@@ -79,6 +120,31 @@ public class SetDateStoryTrigger extends StoryTrigger {
             date = getCampaign().getLocalDate().plusDays(futureDays);
             ((CheckDateReachedStoryPoint) storyPoint).setDate(date);
         }
+    }
+
+    @Override
+    public String getDescription() {
+        StoryPoint storyPoint = getStoryArc().getStoryPoint(storyPointId);
+        StringBuilder sb = new StringBuilder();
+        sb.append("Set date");
+        if(storyPoint != null) {
+            sb.append(" in ");
+            sb.append(storyPoint.getHyperlinkedName());
+            if(date == null) {
+                sb.append(" ahead by ");
+                sb.append(futureDays);
+                sb.append(" days");
+            } else {
+                sb.append(" to ");
+                sb.append(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
+            }
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public StoryTriggerPanel getPanel(JFrame frame) {
+        return new SetDateStoryTriggerPanel(frame, "StoryTriggerPanel", this);
     }
 
     @Override

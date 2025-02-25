@@ -84,6 +84,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
     private JLabel splash;
     private JProgressBar progressBar;
     private StoryArcStub storyArcStub;
+    private boolean storyArcEditor;
     private boolean isInAppNewCampaign;
 
     private final LocalDate DEFAULT_START_DATE = LocalDate.of(3051, 1, 1);
@@ -93,15 +94,22 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
     // region Constructors
     public DataLoadingDialog(final JFrame frame, final MekHQ application,
             final @Nullable File campaignFile) {
-        this(frame, application, campaignFile, null, false);
+        this(frame, application, campaignFile, null, false, false);
     }
 
     public DataLoadingDialog(final JFrame frame, final MekHQ application,
-            final @Nullable File campaignFile, StoryArcStub stub, final boolean isInAppNewCampaign) {
+                             final @Nullable File campaignFile, StoryArcStub stub, final boolean isInAppNewCampaign) {
+        this(frame, application, campaignFile, stub, isInAppNewCampaign, false);
+    }
+
+    public DataLoadingDialog(final JFrame frame, final MekHQ application,
+            final @Nullable File campaignFile, StoryArcStub stub, final boolean isInAppNewCampaign,
+            boolean storyArcEditor) {
         super(frame, "DataLoadingDialog", "DataLoadingDialog.title");
         this.application = application;
         this.campaignFile = campaignFile;
         this.storyArcStub = stub;
+        this.storyArcEditor = storyArcEditor;
         this.isInAppNewCampaign = isInAppNewCampaign;
         this.task = new Task(this);
         getTask().addPropertyChangeListener(this);
@@ -510,9 +518,13 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             if (campaign != null) {
                 getApplication().setCampaign(campaign);
                 getApplication().getCampaignController().setHost(campaign.getId());
-                getApplication().showNewView();
+                if(storyArcEditor) {
+                    getApplication().showNewStoryArcEditor(storyArcStub.loadStoryArc(campaign));
+                } else {
+                    getApplication().showNewView();
+                }
                 getFrame().dispose();
-                if (null != storyArcStub) {
+                if (null != storyArcStub && !storyArcEditor) {
                     StoryArc storyArc = storyArcStub.loadStoryArc(campaign);
                     if (null != storyArc) {
                         campaign.useStoryArc(storyArc, true);

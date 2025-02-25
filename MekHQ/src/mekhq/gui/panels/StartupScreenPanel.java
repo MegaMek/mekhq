@@ -169,6 +169,17 @@ public class StartupScreenPanel extends AbstractMHQPanel {
                 }
             });
         });
+
+        MegaMekButton btnStoryArcEditor = new MegaMekButton(resources.getString("btnStoryArcEditor.text"),
+                UIComponents.MainMenuButton.getComp(), true);
+        btnStoryArcEditor.addActionListener(evt -> {
+            // FIXME: for starters we will only load existing arcs, but later need an option to start a new arc
+            StoryArcStub storyArcStub = selectStoryArc();
+            if ((null != storyArcStub) && (null != storyArcStub.getInitCampaignFile())) {
+                startStoryArcEditor(storyArcStub);
+            }
+        });
+
         MegaMekButton btnQuit = new MegaMekButton(resources.getString("Quit.text"),
                 UIComponents.MainMenuButton.getComp(), true);
         btnQuit.addActionListener(evt -> System.exit(0));
@@ -200,6 +211,8 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         btnLoadLastCampaign.setPreferredSize(minButtonDim);
         btnLoadStoryArc.setMinimumSize(minButtonDim);
         btnLoadStoryArc.setPreferredSize(minButtonDim);
+        btnStoryArcEditor.setMinimumSize(minButtonDim);
+        btnStoryArcEditor.setPreferredSize(minButtonDim);
         btnQuit.setMinimumSize(minButtonDim);
         btnQuit.setPreferredSize(minButtonDim);
 
@@ -239,6 +252,8 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         c.gridy++;
         add(btnLoadStoryArc, c);
         c.gridy++;
+        add(btnStoryArcEditor, c);
+        c.gridy++;
         add(btnQuit, c);
 
         getFrame().setResizable(false);
@@ -265,6 +280,10 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
     private void startCampaign(final @Nullable File file, @Nullable StoryArcStub storyArcStub) {
         new DataLoadingDialog(getFrame(), app, file, storyArcStub, false).setVisible(true);
+    }
+
+    private void startStoryArcEditor(@Nullable StoryArcStub storyArcStub) {
+        new DataLoadingDialog(getFrame(), app, storyArcStub.getInitCampaignFile(), storyArcStub, true, true).setVisible(true);
     }
 
     private @Nullable File selectCampaignFile() {

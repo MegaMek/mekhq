@@ -24,8 +24,12 @@ import megamek.Version;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.gui.panels.storytriggerpanels.FakeStoryTriggerPanel;
+import mekhq.gui.panels.storytriggerpanels.GameOverStoryTriggerPanel;
+import mekhq.gui.panels.storytriggerpanels.StoryTriggerPanel;
 import org.w3c.dom.Node;
 
+import javax.swing.*;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
@@ -39,6 +43,16 @@ public class GameOverStoryTrigger extends StoryTrigger {
     protected void execute() {
         MekHQ.unregisterHandler(getCampaign().getStoryArc());
         getCampaign().getApp().restart();
+    }
+
+    @Override
+    public String getDescription() {
+        return "Game Over";
+    }
+
+    @Override
+    public StoryTriggerPanel getPanel(JFrame frame) {
+        return new GameOverStoryTriggerPanel(frame, "StoryTriggerPanel", this);
     }
 
     @Override

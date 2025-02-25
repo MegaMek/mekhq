@@ -198,6 +198,10 @@ public class StoryArc {
         return startingPointId;
     }
 
+    public List<StoryPoint> getStoryPoints() {
+        return new ArrayList<StoryPoint>(storyPoints.values());
+    }
+
     public void setInitCampaignPath(String s) {
         this.initCampaignPath = s;
     }
@@ -287,6 +291,15 @@ public class StoryArc {
     @Override
     public String toString() {
         return getTitle();
+    }
+
+    public boolean isDuplicateName(String name) {
+        for(StoryPoint sp : getStoryPoints()) {
+            if(sp.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // region EventHandlers
@@ -575,7 +588,7 @@ public class StoryArc {
 
     /**
      * This method will replace tokens in narrative text
-     * 
+     *
      * @param text <code>String</code> containing the original text with tokens.
      * @return <code>String</code> containing the text with tokens replaced.
      */

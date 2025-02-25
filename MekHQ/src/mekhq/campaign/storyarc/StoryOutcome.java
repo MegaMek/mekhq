@@ -52,7 +52,7 @@ public class StoryOutcome {
     /** A list of StoryTriggers to replace the defaults on this outcome */
     List<StoryTrigger> storyTriggers;
 
-    StoryOutcome() {
+    public StoryOutcome()  {
         storyTriggers = new ArrayList<>();
     }
 
@@ -60,17 +60,29 @@ public class StoryOutcome {
         return result;
     }
 
+    public void setResult(String r) {
+        this.result = r;
+    }
+
     public UUID getNextStoryPointId() {
         return nextStoryPointId;
+    }
+
+    public void setNextStoryPointId(UUID id) {
+        this.nextStoryPointId = id;
     }
 
     public List<StoryTrigger> getStoryTriggers() {
         return storyTriggers;
     }
 
+    public void setStoryTriggers(List<StoryTrigger> triggers) {
+        this.storyTriggers = triggers;
+    }
+
     /**
      * Set the StoryArc on all StoryTriggers here
-     * 
+     *
      * @param a a {@link StoryArc StoryArc}
      */
     public void setStoryArc(StoryArc a) {

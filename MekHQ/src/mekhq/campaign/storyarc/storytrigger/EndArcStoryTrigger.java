@@ -23,8 +23,11 @@ package mekhq.campaign.storyarc.storytrigger;
 import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.gui.panels.storytriggerpanels.EndArcStoryTriggerPanel;
+import mekhq.gui.panels.storytriggerpanels.StoryTriggerPanel;
 import org.w3c.dom.Node;
 
+import javax.swing.*;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
@@ -37,6 +40,16 @@ public class EndArcStoryTrigger extends StoryTrigger {
     @Override
     protected void execute() {
         getCampaign().unloadStoryArc();
+    }
+
+    @Override
+    public String getDescription() {
+        return "Complete story arc";
+    }
+
+    @Override
+    public StoryTriggerPanel getPanel(JFrame frame) {
+        return new EndArcStoryTriggerPanel(frame, "StoryTriggerPanel", this);
     }
 
     @Override
