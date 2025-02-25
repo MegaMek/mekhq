@@ -91,7 +91,7 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
  * @author NickAragua
  */
 public class StratconRulesManager {
-    public final static int BASE_LEADERSHIP_BUDGET = 750;
+    public final static int BASE_LEADERSHIP_BUDGET = 500;
 
     private static final MMLogger logger = MMLogger.create(StratconRulesManager.class);
 
