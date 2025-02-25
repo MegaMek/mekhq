@@ -21,6 +21,7 @@ package mekhq.campaign.stratcon;
 import megamek.common.Minefield;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.SkillLevel;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -37,11 +38,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
-import mekhq.campaign.mission.enums.CombatRole;
-import mekhq.campaign.mission.enums.ContractCommandRights;
-import mekhq.campaign.mission.enums.ScenarioStatus;
-import mekhq.campaign.mission.enums.ScenarioType;
+import mekhq.campaign.mission.enums.*;
 import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache;
 import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache.CacheType;
 import mekhq.campaign.personnel.Person;
@@ -94,7 +91,7 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
  * @author NickAragua
  */
 public class StratconRulesManager {
-    public final static int BASE_LEADERSHIP_BUDGET = 1000;
+    public final static int BASE_LEADERSHIP_BUDGET = 750;
 
     private static final MMLogger logger = MMLogger.create(StratconRulesManager.class);
 
@@ -1707,20 +1704,12 @@ public class StratconRulesManager {
         reinforcementTargetNumber.addModifier(facilityModifier, "Facilities");
 
         // Skill Modifier
-        int skillModifier = -contract.getAllySkill().getAdjustedValue();
+        int skillModifier = contract.getEnemySkill().getAdjustedValue() - SkillLevel.REGULAR.getAdjustedValue();
 
-        ContractCommandRights commandRights = contract.getCommandRights();
-        if (commandRights.isIndependent()) {
-            if (campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
-                skillModifier = -campaign.getReputation().getAverageSkillLevel().getAdjustedValue();
-            }
-        }
-
-        skillModifier += contract.getEnemySkill().getAdjustedValue();
-
-        reinforcementTargetNumber.addModifier(skillModifier, "Skill Modifier");
+        reinforcementTargetNumber.addModifier(skillModifier, "Enemy Skill Modifier");
 
         // Liaison Modifier
+        ContractCommandRights commandRights = contract.getCommandRights();
          if (commandRights.isLiaison()) {
             int liaisonModifier = -1;
             reinforcementTargetNumber.addModifier(liaisonModifier, "Liaison Command Rights");
@@ -2662,13 +2651,13 @@ public class StratconRulesManager {
     /**
      * Processes completion of a Stratcon scenario that is linked to another scenario
      * pulls force off completed scenario, checks to see if entire force is moving on or subset of units
-     * 
+     *
      * Should only be used after a scenario is resolved
      */
     public static void linkedScenarioProcessing(ResolveScenarioTracker tracker, HashMap<Integer, List<UUID>> linkedForces) {
         Scenario nextScenario = tracker.getCampaign().getScenario(tracker.getScenario().getLinkedScenario());
         Campaign campaign = tracker.getCampaign();
-   
+
         if (nextScenario instanceof AtBScenario nextAtBScenario) {
 
             StratconCampaignState campaignState = nextAtBScenario.getContract(campaign).getStratconCampaignState();
@@ -2683,13 +2672,13 @@ public class StratconRulesManager {
         //if so deploy whole force.  Otherwise just deploy selected units.
                     for(int forceId : linkedForces.keySet()){
                         track.unassignForce(forceId);
-                
+
                         if(linkedForces.get(forceId).size() == campaign.getForce(forceId).getAllUnits(false).size()){
                             scenario.addForce(campaign.getForce(forceId), ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID, campaign);
                         } else {
                             for( UUID unitId : linkedForces.get(forceId)){
                                 scenario.addUnit(campaign.getUnit(unitId), ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID, false);
-                            }          
+                            }
                         }
                     }
                 }
