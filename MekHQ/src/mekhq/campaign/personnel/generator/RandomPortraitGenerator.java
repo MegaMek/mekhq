@@ -42,13 +42,16 @@ public class RandomPortraitGenerator {
      * @param p         the {@link Person} to generate a unique portrait for
      * @return the generated portrait
      */
-    public static Portrait generate(Collection<Person> personnel, Person p) {
+    public static Portrait generate(Collection<Person> personnel, Person p,
+            Boolean allowDuplicatePortraits) {
         // first create a list of existing portrait strings, so we can check for
-        // duplicates
+        // duplicates - unless they are allowed in campaign options
         Set<String> existingPortraits = new HashSet<>();
-        for (Person existingPerson : personnel) {
-            existingPortraits.add(existingPerson.getPortrait().getCategory() + ':'
+        if (!allowDuplicatePortraits) {
+            for (Person existingPerson : personnel) {
+                existingPortraits.add(existingPerson.getPortrait().getCategory() + ':'
                     + existingPerson.getPortrait().getFilename());
+            }
         }
 
         List<String> possiblePortraits;
