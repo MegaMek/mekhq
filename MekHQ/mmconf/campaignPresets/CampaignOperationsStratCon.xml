@@ -541,6 +541,7 @@
 		<limitLanceWeight>false</limitLanceWeight>
 		<limitLanceNumUnits>false</limitLanceNumUnits>
 		<assignPortraitOnRoleChange>false</assignPortraitOnRoleChange>
+        <allowDuplicatePortraits>false</allowDuplicatePortraits>
 		<allowOpForAeros>false</allowOpForAeros>
 		<allowOpForLocalUnits>false</allowOpForLocalUnits>
 		<opForAeroChance>5</opForAeroChance>
