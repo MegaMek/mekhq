@@ -19,6 +19,7 @@
 package mekhq.utilities;
 
 import megamek.common.Entity;
+import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
@@ -49,5 +50,23 @@ public class EntityUtilities {
         }
 
         return unit.getEntity();
+    }
+
+    /**
+     * Checks if the given unit type is unsupported in MekHQ.
+     *
+     * <p>This method evaluates whether the specified unit type is considered unsupported.
+     * Currently, it checks if the unit type matches {@link UnitType#GUN_EMPLACEMENT}.
+     *
+     * @param unitType The unit type to be checked, represented as an integer.
+     * @return {@code true} if the unit type is unsupported (e.g., {@link UnitType#GUN_EMPLACEMENT}),
+     *         otherwise {@code false}.
+     */
+    public static boolean isUnsupportedUnitType(int unitType) {
+        if (unitType == UnitType.GUN_EMPLACEMENT) {
+            return true;
+        }
+
+        return false;
     }
 }
