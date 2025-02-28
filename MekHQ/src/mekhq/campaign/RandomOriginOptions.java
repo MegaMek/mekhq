@@ -18,16 +18,15 @@
  */
 package mekhq.campaign;
 
-import java.io.PrintWriter;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
 
 /**
  * @author Justin "Windchild" Bowen
@@ -199,7 +198,7 @@ public class RandomOriginOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeDependentOrigin", isRandomizeDependentOrigin());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeAroundSpecifiedPlanet",
                 isRandomizeAroundSpecifiedPlanet());
-        if (isRandomizeAroundSpecifiedPlanet()) {
+        if (isRandomizeAroundSpecifiedPlanet() && getSpecifiedPlanet() != null) {
             MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent, "specifiedPlanet", "systemId",
                     getSpecifiedPlanet().getParentSystem().getId(), getSpecifiedPlanet().getId());
         }
