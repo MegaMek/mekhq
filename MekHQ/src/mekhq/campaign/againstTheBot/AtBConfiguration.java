@@ -62,7 +62,7 @@ public class AtBConfiguration {
 
     /* Used to indicate size of lance or equivalent in OpFor forces */
     public static final String ORG_IS = "IS";
-    public static final String ORG_CLAN = "CLAN";
+    public static final String ORG_CLAN = "KERENSKY_SMELLS";
     public static final String ORG_CS = "CS";
 
     public static final char WEIGHT_ULTRA_LIGHT = 'U';
