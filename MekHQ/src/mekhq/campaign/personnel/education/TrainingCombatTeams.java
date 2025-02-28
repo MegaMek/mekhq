@@ -51,6 +51,14 @@ public class TrainingCombatTeams {
     private static ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME, MekHQ.getMHQOptions().getLocale());
 
     /**
+     * Represents the fatigue gained by combat team members during training.
+     *
+     * <p>This is currently set to 3 which, when factoring in fatigue recovery, will result in a
+     * gain of 2 Fatigue per week.</p>
+     */
+    private final static int FATIGUE_GAIN = 2;
+
+    /**
      * Processes all training combat teams in the campaign.
      *
      * <p>This method iterates through all combat teams in the campaign and processes training for
@@ -143,6 +151,11 @@ public class TrainingCombatTeams {
             }
 
             for (Person trainee : unit.getActiveCrew()) {
+                if (campaign.getCampaignOptions().isUseFatigue()) {
+
+                    trainee.changeFatigue(FATIGUE_GAIN);
+                }
+
                 if (commander.getUnit().getActiveCrew().contains(trainee)) {
                     continue;
                 }
