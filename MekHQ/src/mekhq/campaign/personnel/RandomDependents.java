@@ -177,13 +177,13 @@ public class RandomDependents {
 
                     Genealogy genealogy = dependent.getGenealogy();
                     for (Person child : genealogy.getChildren()) {
-                        if (child.isChild(currentDay)) {
+                        if (child != null && child.isChild(currentDay)) {
                             dependentsToRemove.add(child);
                         }
                     }
 
                     Person spouse = genealogy.getSpouse();
-                    if (spouse.isDependent()) {
+                    if (spouse != null && spouse.isDependent()) {
                         dependentsToRemove.add(spouse);
                     }
                 }
