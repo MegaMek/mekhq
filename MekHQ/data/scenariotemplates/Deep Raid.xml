@@ -2,7 +2,7 @@
 <ScenarioTemplate>
     <name>Deep Raid</name>
     <shortBriefing>Destroy or cripple DropShip.</shortBriefing>
-    <detailedBriefing>A grounded DropShip must be destroyed or crippled before it lifts off. This raid takes place deep behind enemy lines, and the DropShip’s defenders are not important. Preserve 50% of your forces during the operation to ensure mission success.</detailedBriefing>
+    <detailedBriefing></detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
@@ -10,10 +10,10 @@
         <allowRotation>false</allowRotation>
         <baseHeight>0</baseHeight>
         <baseWidth>0</baseWidth>
-        <heightScalingIncrement>5</heightScalingIncrement>
+        <heightScalingIncrement>10</heightScalingIncrement>
         <mapLocation>AllGroundTerrain</mapLocation>
         <useStandardAtBSizing>true</useStandardAtBSizing>
-        <widthScalingIncrement>5</widthScalingIncrement>
+        <widthScalingIncrement>10</widthScalingIncrement>
     </mapParameters>
     <scenarioForces>
         <entry>
