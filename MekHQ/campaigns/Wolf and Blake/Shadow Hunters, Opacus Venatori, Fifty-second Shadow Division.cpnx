@@ -243,7 +243,7 @@
 		<contractMarketReportRefresh>true</contractMarketReportRefresh>
 		<unitMarketReportRefresh>true</unitMarketReportRefresh>
 		<assignPortraitOnRoleChange>false</assignPortraitOnRoleChange>
-		<allowDuplicatePortraits>false</allowDuplicatePortraits>
+		<allowDuplicatePortraits>true</allowDuplicatePortraits>
 		<allowOpforAeros>false</allowOpforAeros>
 		<allowOpforLocalUnits>false</allowOpforLocalUnits>
 		<opforAeroChance>5</opforAeroChance>
