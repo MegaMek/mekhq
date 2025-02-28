@@ -193,7 +193,7 @@ public class CapturePrisoners {
         processPrisoner(prisoner, campaignFaction, prisonerCaptureStyle.isMekHQ(), true);
 
         // Have they been removed via Bondsref?
-        if (!campaign.getPersonnel().contains(prisoner)) {
+        if (prisoner.getStatus().isDead()) {
             return;
         }
 
@@ -344,7 +344,7 @@ public class CapturePrisoners {
             return;
         }
 
-        processPrisoner(prisoner, searchingFaction, prisonerCaptureStyle.isMekHQ(), true);
+        processPrisoner(prisoner, searchingFaction, prisonerCaptureStyle.isMekHQ(), false);
 
         // Have they dead? Usually from performing Bondsref
         if (prisoner.getStatus().isDead()) {
