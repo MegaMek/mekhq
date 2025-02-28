@@ -198,12 +198,14 @@ public class RandomOriginOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeDependentOrigin", isRandomizeDependentOrigin());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeAroundSpecifiedPlanet",
                 isRandomizeAroundSpecifiedPlanet());
-        if (isRandomizeAroundSpecifiedPlanet() && getSpecifiedPlanet() != null) {
-            MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent, "specifiedPlanet", "systemId",
-                    getSpecifiedPlanet().getParentSystem().getId(), getSpecifiedPlanet().getId());
-        } else if (getSpecifiedPlanet() == null) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeAroundSpecifiedPlanet",
-                false);
+        if (isRandomizeAroundSpecifiedPlanet()) {
+            if (getSpecifiedPlanet() != null) {
+                MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent, "specifiedPlanet",
+                    "systemId", getSpecifiedPlanet().getParentSystem().getId(),
+                    getSpecifiedPlanet().getId());
+            } else {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeAroundSpecifiedPlanet", false);
+            }
         }
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "originSearchRadius", getOriginSearchRadius());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "originDistanceScale", getOriginDistanceScale());
