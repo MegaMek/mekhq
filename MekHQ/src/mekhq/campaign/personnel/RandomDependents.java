@@ -183,7 +183,7 @@ public class RandomDependents {
                     }
 
                     Person spouse = genealogy.getSpouse();
-                    if (spouse.isDependent()) {
+                    if (spouse != null && spouse.isDependent()) {
                         dependentsToRemove.add(spouse);
                     }
                 }
