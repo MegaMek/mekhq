@@ -342,6 +342,9 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
     public AmmoStorage getNewPart() {
+        if (getType().getKgPerShot() > 0) {
+            return new AmmoStorage(1, getType(), (int) Math.ceil(1000 / getType().getKgPerShot()), campaign);
+        }
         return new AmmoStorage(1, getType(), getType().getShots(), campaign);
     }
 
