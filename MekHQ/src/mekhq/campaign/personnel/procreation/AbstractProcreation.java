@@ -608,7 +608,7 @@ public abstract class AbstractProcreation {
 
             if (campaign.getCampaignOptions().isUseMaternityLeave()) {
                 if (person.getStatus().isActive()
-                    && (person.getDueDate().minusWeeks(20).isAfter(today.minusDays(1)))) {
+                    && (person.getDueDate().minusWeeks(20).isBefore(today))) {
                     person.changeStatus(campaign, today, PersonnelStatus.ON_MATERNITY_LEAVE);
                 }
             }
