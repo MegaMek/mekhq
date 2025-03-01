@@ -33,10 +33,8 @@ import mekhq.gui.utilities.MekHqTableCellRenderer;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
-import static mekhq.campaign.mission.enums.ScenarioStatus.CURRENT;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -113,13 +111,12 @@ public class ScenarioTableModel extends DataTableModel {
         }
 
         if (col == COL_NAME) {
+            return scenario.getName();
+        } else if (col == COL_STATUS) {
             if (campaign.getCampaignOptions().isUseStratCon()) {
                 if (scenario instanceof AtBScenario) {
-                    if (scenario.getStatus() != CURRENT) {
-                        return scenario.getName();
-                    }
-
-                    StratconScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(campaign);
+                    AtBContract contract = ((AtBScenario) scenario).getContract(campaign);
+                    StratconScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(contract, ((AtBScenario) scenario));
 
                     if (stratconScenario != null) {
                         boolean isTurningPoint = stratconScenario.isTurningPoint();
@@ -127,18 +124,17 @@ public class ScenarioTableModel extends DataTableModel {
                             ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor())
                             : "";
 
-                        String colorblindHelper = isTurningPoint ? " \u26A0" : "";
+                        String turningPointText = isTurningPoint ? ' ' + resources.getString("col_status.turningPoint") : "";
 
                         String closingSpan = isTurningPoint ? CLOSING_SPAN_TAG : "";
 
-                        return String.format("<html>%s%s%s%s</html", openingSpan,
-                            scenario.getName(), closingSpan, colorblindHelper);
+                        // We bold the text to assist colorblind players
+                        return String.format("<html>%s%s<b>%s</b>%s</html", scenario.getStatus().toString(),
+                            openingSpan, turningPointText, closingSpan);
                     }
                 }
             }
 
-            return scenario.getName();
-        } else if (col == COL_STATUS) {
             return scenario.getStatus();
         } else if (col == COL_DATE) {
             if (scenario.getDate() == null) {
@@ -153,20 +149,16 @@ public class ScenarioTableModel extends DataTableModel {
                 if (scenario instanceof AtBScenario) {
                     AtBContract contract = ((AtBScenario) scenario).getContract(campaign);
                     StratconCampaignState campaignState = contract.getStratconCampaignState();
+                    StratconScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(contract, ((AtBScenario) scenario));
 
-                    if (campaignState != null) {
-                        for (StratconTrackState track : campaignState.getTracks()) {
-                            for (StratconScenario stratconScenario : track.getScenarios().values()) {
-                                if (Objects.equals(stratconScenario.getBackingScenario(), scenario)) {
-                                    StratconCoords coords = stratconScenario.getCoords();
+                    if (campaignState != null && stratconScenario != null) {
+                        StratconTrackState track = stratconScenario.getTrackForScenario(campaign, campaignState);
+                        StratconCoords coords = stratconScenario.getCoords();
 
-                                    if (coords == null) {
-                                        return track.getDisplayableName();
-                                    } else {
-                                        return track.getDisplayableName() + '-' + coords.toBTString();
-                                    }
-                                }
-                            }
+                        if (coords == null) {
+                            return track.getDisplayableName();
+                        } else {
+                            return track.getDisplayableName() + '-' + coords.toBTString();
                         }
                     }
                 }

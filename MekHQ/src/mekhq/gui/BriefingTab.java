@@ -604,7 +604,9 @@ public final class BriefingTab extends CampaignGuiTab {
 
             // This handles StratCon undeployment
             if (scenario instanceof AtBScenario) {
-                StratconScenario stratConScenario = ((AtBScenario) scenario).getStratconScenario(getCampaign());
+                AtBContract contract = ((AtBScenario) scenario).getContract(getCampaign());
+                StratconScenario stratConScenario = ((AtBScenario) scenario).getStratconScenario(contract,
+                    (AtBScenario) scenario);
 
                 if (stratConScenario != null) {
                     stratConScenario.resetScenario(getCampaign());
