@@ -1384,7 +1384,13 @@ public class BiographyTab {
         originOptions.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
         originOptions.setRandomizeDependentOrigin(chkRandomizeDependentsOrigin.isSelected());
         originOptions.setRandomizeAroundSpecifiedPlanet(chkRandomizeAroundSpecifiedPlanet.isSelected());
-        originOptions.setSpecifiedPlanet(comboSpecifiedPlanet.getSelectedItem());
+
+        Planet selectedPlanet = comboSpecifiedPlanet.getSelectedItem();
+        if (selectedPlanet == null && comboSpecifiedPlanet.getItemCount() > 0) {
+            selectedPlanet = comboSpecifiedPlanet.getItemAt(0);
+        }
+        originOptions.setSpecifiedPlanet(selectedPlanet);
+
         originOptions.setOriginSearchRadius((int) spnOriginSearchRadius.getValue());
         originOptions.setOriginDistanceScale((double) spnOriginDistanceScale.getValue());
         originOptions.setAllowClanOrigins(chkAllowClanOrigins.isSelected());
