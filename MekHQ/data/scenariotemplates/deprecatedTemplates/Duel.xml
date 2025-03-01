@@ -2,7 +2,7 @@
 <ScenarioTemplate>
     <name>Duel</name>
     <shortBriefing>A duel between two MekWarriors.</shortBriefing>
-    <detailedBriefing></detailedBriefing>
+    <detailedBriefing>A duel between two MekWarriors.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
