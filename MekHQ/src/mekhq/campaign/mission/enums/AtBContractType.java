@@ -28,6 +28,8 @@ import mekhq.campaign.universe.enums.EraFlag;
 
 import java.util.ResourceBundle;
 
+import static mekhq.campaign.mission.enums.AtBEventType.*;
+
 public enum AtBContractType {
     // TODO: Missing Camops Mission Types: ASSASSINATION, ESPIONAGE, MOLE_HUNTING, OBSERVATION_RAID,
     //  RETAINER, SABOTAGE, TERRORISM, HIGH_RISK
@@ -233,65 +235,65 @@ public enum AtBContractType {
             case RECON_RAID:
             case EXTRACTION_RAID:
                 switch (roll) {
-                    case 21, 20 -> { return AtBEventType.BIGBATTLE; }
-                    case 19 -> { return AtBEventType.SPECIALEVENTS; }
-                    case 18 -> { return AtBEventType.REINFORCEMENTS; }
-                    case 17 -> { return AtBEventType.LOGISTICSFAILURE; }
-                    case 16 -> { return AtBEventType.TREACHERY; }
-                    case 15, 14 -> { return AtBEventType.BETRAYAL; }
-                    case 13, 12, 11, 10 -> { return AtBEventType.SPECIAL_SCENARIO; }
-                    default -> { return AtBEventType.BONUSROLL; }
+                    case 21, 20 -> { return BIGBATTLE; }
+                    case 19 -> { return SPECIALEVENTS; }
+                    case 18 -> { return REINFORCEMENTS; }
+                    case 17 -> { return LOGISTICSFAILURE; }
+                    case 16 -> { return TREACHERY; }
+                    case 15, 14 -> { return BETRAYAL; }
+                    case 13, 12, 11, 10 -> { return SPECIAL_SCENARIO; }
+                    default -> { return BONUSROLL; }
                 }
             case GARRISON_DUTY:
                 switch (roll) {
-                    case 21, 20 -> { return AtBEventType.BIGBATTLE; }
-                    case 19 -> { return AtBEventType.SPECIALEVENTS; }
-                    case 18 -> { return AtBEventType.REINFORCEMENTS; }
-                    case 17 -> { return AtBEventType.LOGISTICSFAILURE; }
-                    case 16 -> { return AtBEventType.TREACHERY; }
-                    case 15 -> { return AtBEventType.BETRAYAL; }
-                    case 14 -> { return AtBEventType.REBELLION; }
-                    case 13 -> { return AtBEventType.SPORADICUPRISINGS; }
-                    case 12 -> { return AtBEventType.CIVILDISTURBANCE; }
-                    case 11, 10, 9, 8 -> { return AtBEventType.SPECIAL_SCENARIO; }
-                    default -> { return AtBEventType.BONUSROLL; }
+                    case 21, 20 -> { return BIGBATTLE; }
+                    case 19 -> { return SPECIALEVENTS; }
+                    case 18 -> { return REINFORCEMENTS; }
+                    case 17 -> { return LOGISTICSFAILURE; }
+                    case 16 -> { return TREACHERY; }
+                    case 15 -> { return BETRAYAL; }
+                    case 14 -> { return REBELLION; }
+                    case 13 -> { return SPORADICUPRISINGS; }
+                    case 12 -> { return CIVILDISTURBANCE; }
+                    case 11, 10, 9, 8 -> { return SPECIAL_SCENARIO; }
+                    default -> { return BONUSROLL; }
                 }
             case RIOT_DUTY:
                 switch (roll) {
-                    case 21, 20 -> { return AtBEventType.BIGBATTLE; }
-                    case 19 -> { return AtBEventType.SPECIALEVENTS; }
-                    case 18 -> { return AtBEventType.REINFORCEMENTS; }
-                    case 17 -> { return AtBEventType.LOGISTICSFAILURE; }
-                    case 16 -> { return AtBEventType.TREACHERY; }
-                    case 15 -> { return AtBEventType.BETRAYAL; }
-                    case 14, 13 -> { return AtBEventType.REBELLION; }
-                    case 12 -> { return AtBEventType.SPORADICUPRISINGS; }
-                    case 11 -> { return AtBEventType.CIVILDISTURBANCE; }
-                    case 10, 9, 8 -> { return AtBEventType.SPECIAL_SCENARIO; }
-                    default -> { return AtBEventType.BONUSROLL; }
+                    case 21, 20 -> { return BIGBATTLE; }
+                    case 19 -> { return SPECIALEVENTS; }
+                    case 18 -> { return REINFORCEMENTS; }
+                    case 17 -> { return LOGISTICSFAILURE; }
+                    case 16 -> { return TREACHERY; }
+                    case 15 -> { return BETRAYAL; }
+                    case 14, 13 -> { return REBELLION; }
+                    case 12 -> { return SPORADICUPRISINGS; }
+                    case 11 -> { return CIVILDISTURBANCE; }
+                    case 10, 9, 8 -> { return SPECIAL_SCENARIO; }
+                    default -> { return BONUSROLL; }
                 }
             case PIRATE_HUNTING:
                 switch (roll) {
-                    case 21, 20 -> { return AtBEventType.BIGBATTLE; }
-                    case 19 -> { return AtBEventType.SPECIALEVENTS; }
-                    case 18 -> { return AtBEventType.REINFORCEMENTS; }
-                    case 17 -> { return AtBEventType.LOGISTICSFAILURE; }
-                    case 16 -> { return AtBEventType.TREACHERY; }
-                    case 15 -> { return AtBEventType.BETRAYAL; }
-                    case 14 -> { return AtBEventType.CIVILDISTURBANCE; }
-                    case 13, 12, 11, 10 -> { return AtBEventType.SPECIAL_SCENARIO; }
-                    default -> { return AtBEventType.BONUSROLL; }
+                    case 21, 20 -> { return BIGBATTLE; }
+                    case 19 -> { return SPECIALEVENTS; }
+                    case 18 -> { return REINFORCEMENTS; }
+                    case 17 -> { return LOGISTICSFAILURE; }
+                    case 16 -> { return TREACHERY; }
+                    case 15 -> { return BETRAYAL; }
+                    case 14 -> { return CIVILDISTURBANCE; }
+                    case 13, 12, 11, 10 -> { return SPECIAL_SCENARIO; }
+                    default -> { return BONUSROLL; }
                 }
             default:
                 switch (roll) {
-                    case 21, 20 -> { return AtBEventType.BIGBATTLE; }
-                    case 19 -> { return AtBEventType.SPECIALEVENTS; }
-                    case 18 -> { return AtBEventType.REINFORCEMENTS; }
-                    case 17 -> { return AtBEventType.LOGISTICSFAILURE; }
-                    case 16 -> { return AtBEventType.TREACHERY; }
-                    case 15 -> { return AtBEventType.BETRAYAL; }
-                    case 14, 13, 12, 11, 10 -> { return AtBEventType.SPECIAL_SCENARIO; }
-                    default -> { return AtBEventType.BONUSROLL; }
+                    case 21, 20 -> { return BIGBATTLE; }
+                    case 19 -> { return SPECIALEVENTS; }
+                    case 18 -> { return REINFORCEMENTS; }
+                    case 17 -> { return LOGISTICSFAILURE; }
+                    case 16 -> { return TREACHERY; }
+                    case 15 -> { return BETRAYAL; }
+                    case 14, 13, 12, 11, 10 -> { return SPECIAL_SCENARIO; }
+                    default -> { return BONUSROLL; }
                 }
         }
     }
@@ -310,61 +312,61 @@ public enum AtBContractType {
 
         switch (this) {
             case DIVERSIONARY_RAID, OBJECTIVE_RAID, RECON_RAID, EXTRACTION_RAID -> {
-                switch (roll) {
-                    case 21, 20, 19 -> { return AtBEventType.SPECIALEVENTS; }
-                    case 18 -> { return AtBEventType.REINFORCEMENTS; }
-                    case 17 -> { return AtBEventType.LOGISTICSFAILURE; }
-                    case 16 -> { return AtBEventType.TREACHERY; }
-                    case 15, 14 -> { return AtBEventType.BETRAYAL; }
-                    default -> { return AtBEventType.BONUSROLL; }
-                }
+                return switch (roll) {
+                    case 21, 20, 19 -> SPECIALEVENTS;
+                    case 18 -> REINFORCEMENTS;
+                    case 17 -> LOGISTICSFAILURE;
+                    case 16 -> TREACHERY;
+                    case 15, 14 -> BETRAYAL;
+                    default -> BONUSROLL;
+                };
             }
             case GARRISON_DUTY -> {
-                switch (roll) {
-                    case 21, 20, 19 -> { return AtBEventType.SPECIALEVENTS; }
-                    case 18 -> { return AtBEventType.REINFORCEMENTS; }
-                    case 17 -> { return AtBEventType.LOGISTICSFAILURE; }
-                    case 16 -> { return AtBEventType.TREACHERY; }
-                    case 15 -> { return AtBEventType.BETRAYAL; }
-                    case 14 -> { return AtBEventType.REBELLION; }
-                    case 13 -> { return AtBEventType.SPORADICUPRISINGS; }
-                    case 12 -> { return AtBEventType.CIVILDISTURBANCE; }
-                    default -> { return AtBEventType.BONUSROLL; }
-                }
+                return switch (roll) {
+                    case 21, 20, 19 -> SPECIALEVENTS;
+                    case 18 -> REINFORCEMENTS;
+                    case 17 -> LOGISTICSFAILURE;
+                    case 16 -> TREACHERY;
+                    case 15 -> BETRAYAL;
+                    case 14 -> REBELLION;
+                    case 13 -> SPORADICUPRISINGS;
+                    case 12 -> CIVILDISTURBANCE;
+                    default -> BONUSROLL;
+                };
             }
             case RIOT_DUTY -> {
-                switch (roll) {
-                    case 21, 20, 19 -> { return AtBEventType.SPECIALEVENTS; }
-                    case 18 -> { return AtBEventType.REINFORCEMENTS; }
-                    case 17 -> { return AtBEventType.LOGISTICSFAILURE; }
-                    case 16 -> { return AtBEventType.TREACHERY; }
-                    case 15 -> { return AtBEventType.BETRAYAL; }
-                    case 14, 13 -> { return AtBEventType.REBELLION; }
-                    case 12 -> { return AtBEventType.SPORADICUPRISINGS; }
-                    case 11 -> { return AtBEventType.CIVILDISTURBANCE; }
-                    default -> { return AtBEventType.BONUSROLL; }
-                }
+                return switch (roll) {
+                    case 21, 20, 19 -> SPECIALEVENTS;
+                    case 18 -> REINFORCEMENTS;
+                    case 17 -> LOGISTICSFAILURE;
+                    case 16 -> TREACHERY;
+                    case 15 -> BETRAYAL;
+                    case 14, 13 -> REBELLION;
+                    case 12 -> SPORADICUPRISINGS;
+                    case 11 -> CIVILDISTURBANCE;
+                    default -> BONUSROLL;
+                };
             }
             case PIRATE_HUNTING -> {
-                switch (roll) {
-                    case 21, 20, 19 -> { return AtBEventType.SPECIALEVENTS; }
-                    case 18 -> { return AtBEventType.REINFORCEMENTS; }
-                    case 17 -> { return AtBEventType.LOGISTICSFAILURE; }
-                    case 16 -> { return AtBEventType.TREACHERY; }
-                    case 15 -> { return AtBEventType.BETRAYAL; }
-                    case 14 -> { return AtBEventType.CIVILDISTURBANCE; }
-                    default -> { return AtBEventType.BONUSROLL; }
-                }
+                return switch (roll) {
+                    case 21, 20, 19 -> SPECIALEVENTS;
+                    case 18 -> REINFORCEMENTS;
+                    case 17 -> LOGISTICSFAILURE;
+                    case 16 -> TREACHERY;
+                    case 15 -> BETRAYAL;
+                    case 14 -> CIVILDISTURBANCE;
+                    default -> BONUSROLL;
+                };
             }
             default -> {
-                switch (roll) {
-                    case 21, 20, 19 -> { return AtBEventType.SPECIALEVENTS; }
-                    case 18 -> { return AtBEventType.REINFORCEMENTS; }
-                    case 17 -> { return AtBEventType.LOGISTICSFAILURE; }
-                    case 16 -> { return AtBEventType.TREACHERY; }
-                    case 15 -> { return AtBEventType.BETRAYAL; }
-                    default -> { return AtBEventType.BONUSROLL; }
-                }
+                return switch (roll) {
+                    case 21, 20, 19 -> SPECIALEVENTS;
+                    case 18 -> REINFORCEMENTS;
+                    case 17 -> LOGISTICSFAILURE;
+                    case 16 -> TREACHERY;
+                    case 15 -> BETRAYAL;
+                    default -> BONUSROLL;
+                };
             }
         }
     }
