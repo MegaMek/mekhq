@@ -508,6 +508,7 @@ public class CampaignOptions {
     private boolean useOriginFactionForNames;
     private final boolean[] usePortraitForRole;
     private boolean assignPortraitOnRoleChange;
+    private boolean allowDuplicatePortraits;
     // endregion Name and Portrait Generation
 
     // region Markets Tab
@@ -1103,6 +1104,7 @@ public class CampaignOptions {
         Arrays.fill(usePortraitForRole, false);
         usePortraitForRole[PersonnelRole.MEKWARRIOR.ordinal()] = true;
         assignPortraitOnRoleChange = false;
+        allowDuplicatePortraits = true;
         // endregion Name and Portrait Generation Tab
 
         // region Markets Tab
@@ -3770,6 +3772,14 @@ public class CampaignOptions {
         this.assignPortraitOnRoleChange = assignPortraitOnRoleChange;
     }
 
+    public boolean isAllowDuplicatePortraits() {
+        return allowDuplicatePortraits;
+    }
+
+    public void setAllowDuplicatePortraits(final boolean allowDuplicatePortraits) {
+        this.allowDuplicatePortraits = allowDuplicatePortraits;
+    }
+
     public int getVocationalXP() {
         return vocationalXP;
     }
@@ -5081,6 +5091,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceWeight", limitLanceWeight);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceNumUnits", limitLanceNumUnits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignPortraitOnRoleChange", assignPortraitOnRoleChange);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowDuplicatePortraits", allowDuplicatePortraits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowOpForAeros", isAllowOpForAeros());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowOpForLocalUnits", isAllowOpForLocalUnits());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForAeroChance", getOpForAeroChance());
@@ -5313,6 +5324,8 @@ public class CampaignOptions {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("assignPortraitOnRoleChange")) {
                     retVal.assignPortraitOnRoleChange = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("allowDuplicatePortraits")) {
+                    retVal.allowDuplicatePortraits = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("destroyByMargin")) {
                     retVal.destroyByMargin = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("destroyMargin")) {
