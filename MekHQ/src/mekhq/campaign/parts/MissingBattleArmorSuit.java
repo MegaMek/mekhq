@@ -53,6 +53,13 @@ public class MissingBattleArmorSuit extends MissingPart {
     protected EntityMovementMode jumpType;
     protected int weightClass;
 
+    // It is costly looking up entity, which is used to compare if two suits
+    // are the same even if the chassis name doesn't match. So let's save these
+    // values if we've already calculated them once.
+    private transient boolean entityDetailsCached = false;
+    private transient int suitBV;
+    private transient int weaponTypeListHash;
+
     public MissingBattleArmorSuit() {
         super(0, null);
     }
@@ -120,9 +127,27 @@ public class MissingBattleArmorSuit extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
+        refreshEntityDetailsCache();
+        if (entityDetailsCached) {
+            return part instanceof BattleArmorSuit baSuit
+                && getSuitBV() == baSuit.getSuitBV()
+                && getWeaponTypeListHash() == baSuit.getWeaponTypeListHash();
+        }
+
+        // If we didn't successfully cache entity details, use the old method for comparing.
         return part instanceof BattleArmorSuit
-                && chassis.equals(((BattleArmorSuit) part).getChassis())
-                && model.equals(((BattleArmorSuit ) part).getModel());
+            && chassis.equals(((BattleArmorSuit) part).getChassis())
+            && model.equals(((BattleArmorSuit ) part).getModel());
+    }
+
+    public int getSuitBV() {
+        refreshEntityDetailsCache();
+        return suitBV;
+    }
+
+    public int getWeaponTypeListHash() {
+        refreshEntityDetailsCache();
+        return weaponTypeListHash;
     }
 
     @Override
@@ -317,5 +342,17 @@ public class MissingBattleArmorSuit extends MissingPart {
     @Override
     public TechAdvancement getTechAdvancement() {
         return BattleArmor.getConstructionTechAdvancement(weightClass);
+    }
+
+    private void refreshEntityDetailsCache() {
+        if (!entityDetailsCached) {
+            mekhq.campaign.parts.utilities.BattleArmorSuitUtility battleArmorSuitUtility
+                = new  mekhq.campaign.parts.utilities.BattleArmorSuitUtility(chassis, model);
+            if (battleArmorSuitUtility.hasEntity()) {
+                suitBV = battleArmorSuitUtility.getBattleArmorSuitBV();
+                weaponTypeListHash = battleArmorSuitUtility.getWeaponTypeListHash();
+                entityDetailsCached = true;
+            }
+        }
     }
 }

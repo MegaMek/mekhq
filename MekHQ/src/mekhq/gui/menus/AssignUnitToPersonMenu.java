@@ -18,13 +18,6 @@
  */
 package mekhq.gui.menus;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.swing.JMenuItem;
-
 import megamek.common.*;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
@@ -35,6 +28,14 @@ import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.sorter.PersonTitleSorter;
+
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static mekhq.utilities.EntityUtilities.isUnsupportedUnitType;
 
 /**
  * This is a standard menu that takes either a unit or multiple units that
@@ -58,6 +59,14 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         // 2) Any units are currently unavailable
         if ((units.length == 0) || Stream.of(units).anyMatch(unit -> !unit.isAvailable())) {
             return;
+        }
+
+        for (Unit unit : units) {
+            Entity entity = unit.getEntity();
+
+            if (entity == null || isUnsupportedUnitType(entity.getUnitType())) {
+                return;
+            }
         }
 
         // Initialize Menu

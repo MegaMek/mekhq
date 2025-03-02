@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.regex.PatternSyntaxException;
 
+import static mekhq.utilities.EntityUtilities.isUnsupportedUnitType;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -131,7 +132,9 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     protected void select(boolean isGM) {
         if (getSelectedEntity() != null) {
             // Block the purchase if the unit type is unsupported
-            if (selectedUnit.getEntity() instanceof GunEmplacement) {
+            Entity entity = selectedUnit.getEntity();
+
+            if (entity == null || isUnsupportedUnitType(entity.getUnitType())) {
                 final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
                     MekHQ.getMHQOptions().getLocale());
 

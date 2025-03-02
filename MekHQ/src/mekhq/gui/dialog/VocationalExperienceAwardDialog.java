@@ -18,21 +18,17 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.MHQDialogImmersive;
 
 import java.util.List;
-import java.util.ResourceBundle;
-import java.util.UUID;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * A dialog that displays a notification to the commander about personnel
@@ -44,9 +40,9 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
  * personnel records via hyperlinks.</p>
  */
 public class VocationalExperienceAwardDialog extends MHQDialogImmersive {
-    private static final String BUNDLE_KEY = "mekhq.resources.VocationalExperienceAwardDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(
-        BUNDLE_KEY, MekHQ.getMHQOptions().getLocale());
+    private static final String PERSON_COMMAND_STRING = "PERSON";
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.VocationalExperienceAwardDialog";
 
     /**
      * Constructs the {@link VocationalExperienceAwardDialog}.
@@ -59,28 +55,10 @@ public class VocationalExperienceAwardDialog extends MHQDialogImmersive {
      */
     public VocationalExperienceAwardDialog(Campaign campaign) {
         super(campaign, getSpeaker(campaign), null, createInCharacterMessage(campaign),
-            createButtons(), createOutOfCharacterMessage(campaign), 0, null,
-            UIUtil.scaleForGUI(800), null);
+            createButtons(), createOutOfCharacterMessage(campaign), null);
 
         setModal(false);
         setAlwaysOnTop(true);
-    }
-
-    /**
-     * Handles the hyperlink click event in the dialog.
-     *
-     * <p>This method parses the hyperlink reference to focus on the personnel record identified by
-     * the provided UUID in the campaign's graphical user interface.</p>
-     *
-     * @param campaign the {@link Campaign} containing relevant personnel data
-     * @param hyperlinkReference     the hyperlink reference containing the UUID of the selected character
-     */
-    @Override
-    protected void handleHyperlinkClick(Campaign campaign, String hyperlinkReference) {
-        CampaignGUI campaignGUI = campaign.getApp().getCampaigngui();
-
-        final UUID id = UUID.fromString(hyperlinkReference.split(":")[1]);
-        campaignGUI.focusOnPerson(id);
     }
 
     /**
@@ -93,7 +71,7 @@ public class VocationalExperienceAwardDialog extends MHQDialogImmersive {
      */
     private static List<ButtonLabelTooltipPair> createButtons() {
         ButtonLabelTooltipPair btnConfirm = new ButtonLabelTooltipPair(
-            resources.getString("confirm.button"), null);
+            getFormattedTextAt(RESOURCE_BUNDLE, "confirm.button"), null);
 
         return List.of(btnConfirm);
     }
@@ -128,7 +106,7 @@ public class VocationalExperienceAwardDialog extends MHQDialogImmersive {
 
         StringBuilder message = new StringBuilder();
         message.append(commanderAddress);
-        message.append(resources.getString("dialog.message"));
+        message.append(getFormattedTextAt(RESOURCE_BUNDLE, "dialog.message"));
 
         // Create a table to hold the personnel
         message.append("<br><table style='width:100%; text-align:left;'>");
@@ -193,6 +171,6 @@ public class VocationalExperienceAwardDialog extends MHQDialogImmersive {
             }
         }
 
-        return String.format(resources.getString("dialog.ooc"), advancement);
+        return getFormattedTextAt(RESOURCE_BUNDLE, "dialog.ooc", advancement);
     }
 }

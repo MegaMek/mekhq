@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,6 +18,10 @@
  */
 package mekhq.campaign.universe.enums;
 
+import io.sentry.Sentry;
+import megamek.logging.MMLogger;
+import mekhq.campaign.universe.Atmosphere;
+
 /**
  * The level of a Hiring Hall as defined in CamOps (4th printing). Used to determine various modifiers
  * related to contract generation.
@@ -27,5 +31,13 @@ public enum HiringHallLevel {
     QUESTIONABLE,
     MINOR,
     STANDARD,
-    GREAT
+    GREAT;
+
+    private static final MMLogger logger = MMLogger.create(HiringHallLevel.class);
+
+    public boolean isNone() {
+        return this == NONE;
+    }
 }
+
+

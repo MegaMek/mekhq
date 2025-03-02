@@ -29,7 +29,6 @@ import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.RandomDeathMethod;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -38,7 +37,6 @@ import mekhq.gui.campaignOptions.components.*;
 import mekhq.gui.panes.RankSystemsPane;
 
 import javax.swing.*;
-import javax.swing.JSpinner.NumberEditor;
 import java.awt.*;
 import java.util.*;
 
@@ -109,14 +107,9 @@ public class BiographyTab {
     //end Backgrounds Tab
 
     //start Death Tab
-    private JCheckBox chkKeepMarriedNameUponSpouseDeath;
-    private JLabel lblRandomDeathMethod;
-    private MMComboBox<RandomDeathMethod> comboRandomDeathMethod;
-    private JCheckBox chkUseRandomClanPersonnelDeath;
-    private JCheckBox chkUseRandomPrisonerDeath;
     private JCheckBox chkUseRandomDeathSuicideCause;
-    private JLabel lblPercentageRandomDeathChance;
-    private JSpinner spnPercentageRandomDeathChance;
+    private JLabel lblRandomDeathMultiplier;
+    private JSpinner spnRandomDeathMultiplier;
 
     private JPanel pnlDeathAgeGroup;
     private Map<AgeGroup, JCheckBox> chkEnabledRandomDeathAgeGroups;
@@ -166,6 +159,7 @@ public class BiographyTab {
     private JButton btnEnableAllPortraits;
     private JButton btnDisableAllPortraits;
     private JCheckBox chkAssignPortraitOnRoleChange;
+    private JCheckBox chkAllowDuplicatePortraits;
     //end Name and Portrait Tab
 
     //start Rank Tab
@@ -222,6 +216,7 @@ public class BiographyTab {
         lblFactionNames = new JLabel();
         comboFactionNames = new MMComboBox<>("comboFactionNames", getFactionNamesModel());
         chkAssignPortraitOnRoleChange = new JCheckBox();
+        chkAllowDuplicatePortraits = new JCheckBox();
 
         pnlRandomPortrait = new JPanel();
         chkUsePortrait = new JCheckBox[1]; // We're going to properly initialize this later
@@ -281,14 +276,9 @@ public class BiographyTab {
      * </ul>
      */
     private void initializeDeathTab() {
-        chkKeepMarriedNameUponSpouseDeath = new JCheckBox();
-        lblRandomDeathMethod = new JLabel();
-        comboRandomDeathMethod = new MMComboBox<>("comboRandomDeathMethod", RandomDeathMethod.values());
-        chkUseRandomClanPersonnelDeath = new JCheckBox();
-        chkUseRandomPrisonerDeath = new JCheckBox();
         chkUseRandomDeathSuicideCause = new JCheckBox();
-        lblPercentageRandomDeathChance = new JLabel();
-        spnPercentageRandomDeathChance = new JSpinner();
+        lblRandomDeathMultiplier = new JLabel();
+        spnRandomDeathMultiplier = new JSpinner();
 
         pnlDeathAgeGroup = new JPanel();
         chkEnabledRandomDeathAgeGroups = new HashMap<>();
@@ -756,32 +746,11 @@ public class BiographyTab {
             getImageDirectory() + "logo_clan_fire_mandrills.png");
 
         // Contents
-        chkKeepMarriedNameUponSpouseDeath = new CampaignOptionsCheckBox("KeepMarriedNameUponSpouseDeath");
+        lblRandomDeathMultiplier = new CampaignOptionsLabel("RandomDeathMultiplier");
+        spnRandomDeathMultiplier = new CampaignOptionsSpinner("RandomDeathMultiplier",
+            1.0, 0, 100.0, 0.01);
 
-        lblRandomDeathMethod = new CampaignOptionsLabel("RandomDeathMethod");
-        comboRandomDeathMethod.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof RandomDeathMethod) {
-                    list.setToolTipText(((RandomDeathMethod) value).getToolTipText());
-                }
-                return this;
-            }
-        });
-
-        chkUseRandomClanPersonnelDeath = new CampaignOptionsCheckBox("UseRandomClanPersonnelDeath");
-        chkUseRandomPrisonerDeath = new CampaignOptionsCheckBox("UseRandomPrisonerDeath");
         chkUseRandomDeathSuicideCause = new CampaignOptionsCheckBox("UseRandomDeathSuicideCause");
-
-        lblPercentageRandomDeathChance = new CampaignOptionsLabel("PercentageRandomDeathChance");
-        spnPercentageRandomDeathChance = new CampaignOptionsSpinner("PercentageRandomDeathChance",
-            0, 0, 100, 0.000001);
-        NumberEditor editor = new NumberEditor(spnPercentageRandomDeathChance,
-            "0.000000");
-        spnPercentageRandomDeathChance.setEditor(editor);
 
         pnlDeathAgeGroup = createDeathAgeGroupsPanel();
 
@@ -791,29 +760,16 @@ public class BiographyTab {
 
         layoutLeft.gridy = 0;
         layoutLeft.gridx = 0;
-        layoutLeft.gridwidth = 2;
-        panelLeft.add(chkKeepMarriedNameUponSpouseDeath, layoutLeft);
-
-        layoutLeft.gridy++;
         layoutLeft.gridwidth = 1;
-        panelLeft.add(lblRandomDeathMethod, layoutLeft);
+        panelLeft.add(lblRandomDeathMultiplier, layoutLeft);
         layoutLeft.gridx++;
-        panelLeft.add(comboRandomDeathMethod, layoutLeft);
+        panelLeft.add(spnRandomDeathMultiplier, layoutLeft);
 
         layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(chkUseRandomClanPersonnelDeath, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(chkUseRandomPrisonerDeath, layoutLeft);
-
         layoutLeft.gridy++;
         panelLeft.add(chkUseRandomDeathSuicideCause, layoutLeft);
 
         layoutLeft.gridy++;
-        panelLeft.add(lblPercentageRandomDeathChance, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnPercentageRandomDeathChance, layoutLeft);
 
         final JPanel panelParent = new CampaignOptionsStandardPanel("DeathTab", true);
         final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
@@ -1154,6 +1110,8 @@ public class BiographyTab {
         // Contents
         chkAssignPortraitOnRoleChange = new CampaignOptionsCheckBox("AssignPortraitOnRoleChange");
 
+        chkAllowDuplicatePortraits = new CampaignOptionsCheckBox("AllowDuplicatePortraits");
+
         chkUseOriginFactionForNames = new CampaignOptionsCheckBox("UseOriginFactionForNames");
 
         lblFactionNames = new CampaignOptionsLabel("FactionNames");
@@ -1168,6 +1126,8 @@ public class BiographyTab {
         layoutTop.gridx = 0;
         layoutTop.gridy = 0;
         panelTop.add(chkAssignPortraitOnRoleChange, layoutTop);
+        layoutTop.gridy++;
+        panelTop.add(chkAllowDuplicatePortraits, layoutTop);
 
         layoutTop.gridy++;
         panelTop.add(chkUseOriginFactionForNames, layoutTop);
@@ -1342,12 +1302,8 @@ public class BiographyTab {
         chkExtraRandomOrigin.setSelected(originOptions.isExtraRandomOrigin());
 
         // Death
-        chkKeepMarriedNameUponSpouseDeath.setSelected(options.isKeepMarriedNameUponSpouseDeath());
-        comboRandomDeathMethod.setSelectedItem(options.getRandomDeathMethod());
-        chkUseRandomClanPersonnelDeath.setSelected(options.isUseRandomClanPersonnelDeath());
-        chkUseRandomPrisonerDeath.setSelected(options.isUseRandomPrisonerDeath());
         chkUseRandomDeathSuicideCause.setSelected(options.isUseRandomDeathSuicideCause());
-        spnPercentageRandomDeathChance.setValue(options.getPercentageRandomDeathChance());
+        spnRandomDeathMultiplier.setValue(options.getRandomDeathMultiplier());
 
         Map<AgeGroup, Boolean> deathAgeGroups = options.getEnabledRandomDeathAgeGroups();
         for (final AgeGroup ageGroup : AgeGroup.values()) {
@@ -1377,6 +1333,7 @@ public class BiographyTab {
         // 'RandomNameGenerator' is not stored in a Preset
         comboFactionNames.setSelectedItem(RandomNameGenerator.getInstance().getChosenFaction());
         chkAssignPortraitOnRoleChange.setSelected(options.isAssignPortraitOnRoleChange());
+        chkAllowDuplicatePortraits.setSelected(options.isAllowDuplicatePortraits());
 
         final boolean[] usePortraitForRole = options.isUsePortraitForRoles();
         for (int i = 0; i < chkUsePortrait.length; i++) {
@@ -1427,7 +1384,13 @@ public class BiographyTab {
         originOptions.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
         originOptions.setRandomizeDependentOrigin(chkRandomizeDependentsOrigin.isSelected());
         originOptions.setRandomizeAroundSpecifiedPlanet(chkRandomizeAroundSpecifiedPlanet.isSelected());
-        originOptions.setSpecifiedPlanet(comboSpecifiedPlanet.getSelectedItem());
+
+        Planet selectedPlanet = comboSpecifiedPlanet.getSelectedItem();
+        if (selectedPlanet == null && comboSpecifiedPlanet.getItemCount() > 0) {
+            selectedPlanet = comboSpecifiedPlanet.getItemAt(0);
+        }
+        originOptions.setSpecifiedPlanet(selectedPlanet);
+
         originOptions.setOriginSearchRadius((int) spnOriginSearchRadius.getValue());
         originOptions.setOriginDistanceScale((double) spnOriginDistanceScale.getValue());
         originOptions.setAllowClanOrigins(chkAllowClanOrigins.isSelected());
@@ -1435,12 +1398,8 @@ public class BiographyTab {
         options.setRandomOriginOptions(originOptions);
 
         // Death
-        options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());
-        options.setRandomDeathMethod(comboRandomDeathMethod.getSelectedItem());
-        options.setUseRandomClanPersonnelDeath(chkUseRandomClanPersonnelDeath.isSelected());
-        options.setUseRandomPrisonerDeath(chkUseRandomPrisonerDeath.isSelected());
         options.setUseRandomDeathSuicideCause(chkUseRandomDeathSuicideCause.isSelected());
-        options.setPercentageRandomDeathChance((double) spnPercentageRandomDeathChance.getValue());
+        options.setRandomDeathMultiplier((double) spnRandomDeathMultiplier.getValue());
         for (final AgeGroup ageGroup : AgeGroup.values()) {
             options.getEnabledRandomDeathAgeGroups().put(ageGroup,
                 chkEnabledRandomDeathAgeGroups.get(ageGroup).isSelected());
@@ -1467,6 +1426,7 @@ public class BiographyTab {
         // Name and Portraits
         options.setUseOriginFactionForNames(chkUseOriginFactionForNames.isSelected());
         options.setAssignPortraitOnRoleChange(chkAssignPortraitOnRoleChange.isSelected());
+        options.setAllowDuplicatePortraits(chkAllowDuplicatePortraits.isSelected());
         RandomNameGenerator.getInstance().setChosenFaction(comboFactionNames.getSelectedItem());
         for (int i = 0; i < chkUsePortrait.length; i++) {
             options.setUsePortraitForRole(i, chkUsePortrait[i].isSelected());

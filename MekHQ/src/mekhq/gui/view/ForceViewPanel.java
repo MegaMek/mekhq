@@ -23,8 +23,10 @@ import megamek.common.Entity;
 import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.ForceType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -193,19 +195,17 @@ public class ForceViewPanel extends JScrollablePanel {
         if (null != type) {
             lblType.setName("lblType");
 
-            String forceType;
-            if (force.isCombatForce()) {
-                forceType = type + ' ' + force.getFormationLevel().toString();
+            ForceType forceType = force.getForceType();
+
+            String forceLabel;
+            if (forceType.isStandard()) {
+                forceLabel = force.getFormationLevel().toString();
             } else {
-                if (force.isConvoyForce()) {
-                    forceType = "Resupply " + force.getFormationLevel().toString();
-                } else {
-                    forceType = "Support " + force.getFormationLevel().toString();
-                }
+                forceLabel = forceType.getDisplayName() + ' ' + force.getFormationLevel().toString();
             }
 
-            lblType.setText("<html><i>" + forceType + "</i></html>");
-            lblType.getAccessibleContext().setAccessibleDescription("Force Type: " + forceType);
+            lblType.setText("<html><i>" + forceLabel + "</i></html>");
+            lblType.getAccessibleContext().setAccessibleDescription("Force Type: " + forceLabel);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = nexty;
@@ -595,6 +595,13 @@ public class ForceViewPanel extends JScrollablePanel {
         if (unit.hasTacticalTransportAssignment()) {
             toReturn += "<br><i>" + "Transported by: ";
             toReturn += unit.getTacticalTransportAssignment().getTransport().getName();
+            toReturn += "</i>";
+        }
+
+        //Can't forget what's towing this unit!
+        if (unit.hasTransportAssignment(CampaignTransportType.TOW_TRANSPORT)) {
+            toReturn += "<br><i>" + "Towed by: ";
+            toReturn += unit.getTransportAssignment(CampaignTransportType.TOW_TRANSPORT).getTransport().getName();
             toReturn += "</i>";
         }
         toReturn += "</font></html>";

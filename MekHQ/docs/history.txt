@@ -1,6 +1,85 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.03-SNAPSHOT
+0.50.04-SNAPSHOT
++ PR #5852: RAW CamOps Delivery Times
++ PR #5853: Remove Legacy AtB's Campaign Parts Availability System
++ PR #5868: Updated Several Scenario Effects to use SupplyCache over SupportPointUpdate
++ Fix #5695: Refactored Personnel Cleanup and Random Dependent Removal
++ PR #5873: Added Force Type Enumeration
++ PR #5892: Refactored Resupply Messaging to use Internalization
++ PR #5905: Refactored Currency to No Longer Always Display as C-Bills
++ PR #5907: Implemented Clarion Note & Gray Monday
++ PR #5920: MegaMekLab Issue 1703: Allow bays to be added to aerospace fighters
++ PR #5955: Implemented Death Rework
++ PR #5959: Updated rankSystems version to 0.50.04-SNAPSHOT
++ PR #5962: Converted Honor Rating into an Enum
++ PR #5963: Refactored PrisonerStatus Enum and Reorganized Related Code
++ PR #5964: Use ModifiedConstantSkillGenerator for Skill Generation
++ PR #5965: Added "Intercept the Escapees" Scenario Template
++ PR #5966: Added 'None' Generation Method to ScenarioForceTemplate
++ Fix #5845: In Stratcon scenario wizard, leadership units consider transport assignments
++ PR #5982: Cap splashscreen button width
++ Fix #5980: Improved commander updating logic
++ PR #5985: Fixed backwards "last compatible version" check
++ PR #5988: Feat: refactor flags to use EquipmentFlag instead
++ Fix #5987: local bots property empty on non-atb games #5989
++ Fix #5922: Fixed Off-by-One Error in Mass Training Dialog
++ PR #5993: Adjusted Gray Monday Employer Dialog to Trigger on the Correct Day
++ PR #5999: Fixed Clan Ghost Bear Greeting Keys
++ Fix #5979: Force players to use commit when deploying forces
++ PR #6001: Added Glossary Functionality to MHQDialogImmersive with Clickable Hyperlink Support
++ PR #6004: Refactored Support Point Modification Method Name
++ PR #6005: Refactored Fatigue Modification Method Name
++ PR #6006: Added Shortcut Method to Check if a Unit is Battle Armor
++ Fix #6009: Improve Stratcon deployment logic to ensure units aren't deployed twice
++ PR #6012: Fixed Multiple Resupply Bugs
++ PR #6020: Manage Scenario will now use manage scenario and not manage forces
++ PR #6019: Change xml recording of hiring halls
++ Fix #5996: Typo in cargo, fixes bolding, addresses issue #5996
++ Fix #5784: Better handling for missing parts when replacing parts via "Pod Space"
++ PR #6014: Refactored Active Personnel Retrieval Logic
++ PR #6013: Refactored Random Dependents Removal-Addition into a Seperate Class
++ PR #6028: Cache finances balance
++ PR #6029: Linked scenario unit selection
++ PR #6031: Convert planetary system data to yaml + general planetary system overhaul
++ Fix #6025: Young Wolves Storyarc doesn't correctly assign main character or Tobias to the Mechwarrior Trueborn Caste
++ PR #6051: Read user force icons data from user directory
++ Fix #6033: RFE - MekHQ to MM trailer support
++ Refactor shares percent to be polymorphic #6060
++ Fix #5814: Change meklab check to last index check
++ PR #6068: Allow Battle Armor suits from different squad sizes to be used as replacements
++ Fix #6065: Unit History in UnitViewPanel does not wrap.
++ PR #5824: Extract AtB Event Types to enum
++ PR #6016: Implemented Prisoners of War & Abstracted Search and Rescue System
++ PR #6064: Add Tests for calculateContractDifficulty()
++ PR #6071: Further enhancement for BA Suit swappability in MekHQ
++ PR #6072: Add source information to PlanetViewPanel
++ Fix #6073: uses the correct getInstance instead of accessing directly the static map
++ PR #6075: Pintle turret and flags (MML #1741)
++ PR #6076: Added Reputation Sanity Options to Campaign Settings
++ PR #6077: When advancing day set cursor to wait cursor
++ PR #6083: Adjusted Prisoner Capacity Calculations and Event Logic
++ Fix #5719: Add setting for minimum daily repair time to MRMS
++ PR # #5998: Personality Revamp
++ PR #6086: Adjusted Reinforcement Arrival Time Scaling, Target Number, and Leadership Budget Logic
++ Fix #6084: Clear leadership units when setting a new scenario
++ Fix #4364: Add campaign option to allow duplicate portraits
++ PR #6095: Null Check for Random Dependents
++ Fix #6069: Updated Academy Training Types in Unit Education.xml
++ PR #6098: Corrected Glossary Links For Fatigue
++ Fix #6094: Fixed Prisoner Capture And Processing Logic #6099
++ Fix #6089: Refactored Unsupported Unit Handling
++ Fix #6088: Simplified Enum References And Removed Legacy Scenarios
++ Fix #6079: Fixed Incorrect Seed Force in Resupply Interceptions
++ Fix #6078: Added Fatigue Gain Mechanism for Training Combat Teams
++ Fix #6104: Fixed NullPointerException In RandomizeAroundSpecifiedPlanet
++ Fix #6063: Refactored StratCon Scenario Retrieval And Table Rendering
++ Fix #6055: Updated Scenario Briefings and Objectives
++ Fix #6107: Fixed Maternity Leave Activation Logic
+
+Fixes #6084
+
+0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment
 + PR #5559: Refactored Combat Team Handling in Scenarios for Better null Safety
 + Fix #5572: don't attempt to sum NaN tonnage equipment
@@ -132,6 +211,37 @@ MEKHQ VERSION HISTORY:
 + PR #5875: Rolled Back Window Size Setting
 + PR #5878: Fixed Mothball Info Saving & Loading Bug
 + PR #5879: Added Jackson Dependencies for YAML Processing in MekHQ
++ Fix #5799: Differentiating between IS & Clan DHS & unbreaking commas in Parts in use
++ Fix #5811: Fixed Multiple Follow-up Contract Bugs
++ Fix #5823: Added Weight Bypass Based on Role
++ Fix #5882: Fixed Clan Bidding
++ Fix #5883: Corrected Edge Cost Calculations
++ Fix #5884: Refactored Age Checks; Updated Unit Tests for Procreation and Marriage
++ Fix #5885: Corrected Morale Logic and Contract Type Checks
++ Fix #5886: Added Movement Filter to Entity Generation Logic
++ PR #5889: Replaced Internal Dissension Events in StratCon
++ PR #5891: Added 1,247 New Callsigns
++ PR #5893: Immersively Updated the Immersive Dialog to Be More Immersive
++ PR #5894: Added missing minimaps for MekHQ
++ PR #5900: Fixed Negative Contract Base Pay
++ PR #5874: Feature: minimap themes
++ PR #5908: Restored Missing Column Labels for Planetary Acquisition
++ Fix #5910: Added Fallback for AtB Bonus Unit Creation
++ PR #5912: Implemented NewsDialog for Immersive News Display
++ PR #5915: Update scenario panel facility objective text
++ PR #5925: Fixed Unit Role configuration in Resupply Scenario Templates
++ Fix #5934: Fixed Contract Multiplier Again
++ PR #5941: Corrected Weight Class Parameter Setting Logic
++ PR #5942: Renamed 'Fixed BV' to 'BV' in BotForce Scenario Details
++ Fix #5921: Fixed Used Parts Multiplier Labels to Ignore Quality Reversal in Finances Tab
++ Fix #5917: Added Soldier Requirements Handling in UnitTableModel
++ PR #5930: Format Part Names as Italicized when Brand New
++ PR #5933: Fixed Overwriting of 'Brand New' Part State
++ Fix #5685: More control settings for autoLogistics
++ PR #5931: Refactored Part Handling in Resupply Module
++ Fix #5932: Added check for injuries that are not permanent before going on leave
++ PR #5946: Implemented Linked Scenarios for Interceptions
++ Fix #5951: Fixed Cargo Capacity Calculation in For Cargo Items in Body
 
 0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.

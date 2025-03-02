@@ -925,7 +925,7 @@ public class Utilities {
 
         // Clamp age, if necessary
         if (experienceLevel != EXP_NONE) {
-            age = max(18, age);
+            age = max(16, age);
         }
 
         return age;
@@ -1149,6 +1149,9 @@ public class Utilities {
 
     /**
      * Run through the directory and call parser.parse(fis) for each XML file found.
+     * This was originally used to read in the planetary system data, but we are now doing that
+     * with YML code in Systems.java#loadDefault. Leaving this here, in case it is useful for
+     * something in the future.
      */
     public static void parseXMLFiles(String dirName, Consumer<FileInputStream> parser, boolean recurse) {
         if ((null == dirName) || (null == parser)) {
@@ -1366,6 +1369,62 @@ public class Utilities {
     private static void sendLoadEntity(Client client, int id, int trnId, Entity cargo) {
         client.sendLoadEntity(id, trnId, cargo.getTargetBay());
         // Add a wait to make sure that we don't start processing client.sendLoadEntity
+        // out of order
+        try {
+            Thread.sleep(500);
+        } catch (Exception ex) {
+            logger.error("", ex);
+        }
+    }
+
+    /**
+     * Handles towing a player's trailers by their tractors once a
+     * megamek scenario has actually started.
+     *
+     *
+     * @param tractorId          - The MM id of the tractor entity we want to tow with
+     * @param trailerId         - Entity id for the unit we want to tow
+     * @param client         - the player's Client instance
+     * @param isAlreadyReset - transports loaded via "Ship" will have been reset once, don't do it again here
+     * @see mekhq.campaign.enums.CampaignTransportType#TOW_TRANSPORT
+     * @see ITransportAssignment
+     */
+    public static void towPlayerTrailers(int tractorId, int trailerId, Client client,
+                                            boolean towTrailers, boolean isAlreadyReset) {
+        Set<Entity> alreadyTransportedEntities = new HashSet<>();
+        if (!towTrailers) {
+            // Nothing to do. Get outta here!
+            return;
+        }
+        Entity tractor = client.getEntity(tractorId);
+        Entity trailer = client.getEntity(trailerId);
+
+        if (tractor == null || trailer == null) {
+            return;
+        }
+
+        // Reset transporter status, as unit might still
+        // retain updates from when the Unit
+        // was assigned to the tractor on the TO&E tab
+        if (isAlreadyReset) {
+            alreadyTransportedEntities.addAll(tractor.getLoadedUnits());
+        }
+        tractor.resetTransporter();
+
+
+        //Restore the normal transported entities
+        for (Entity alreadyTransportedEntity : alreadyTransportedEntities) {
+            tractor.load(alreadyTransportedEntity, alreadyTransportedEntity.getTargetBay());
+        }
+        //Towed units should deploy on their tractor's turn
+        if (tractor.canTow(trailerId)) {
+            sendTowEntity(client, trailerId, tractorId);
+        }
+    }
+
+    private static void sendTowEntity(Client client, int trailerId, int tractorId) {
+        client.sendTowEntity(trailerId, tractorId);
+        // Add a wait to make sure that we don't start processing client.sendTowEntity
         // out of order
         try {
             Thread.sleep(500);

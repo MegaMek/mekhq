@@ -1,7 +1,7 @@
 /*
  * CreateCharacterStoryPoint.java
  *
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved
+ * Copyright (c) 2021-2025 - The MegaMek Team. All Rights Reserved
  *
  * This file is part of MekHQ.
  *
@@ -26,7 +26,6 @@ import megamek.common.options.IOptionGroup;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.PersonNewEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
@@ -35,9 +34,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
-import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
-import mekhq.campaign.personnel.randomEvents.PersonalityController;
+import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -145,6 +142,40 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         person.setClanPersonnel(clan);
         if (person.isClanPersonnel() && null != phenotype) {
             person.setPhenotype(phenotype);
+
+            switch (phenotype) {
+                case MEKWARRIOR:
+                    person.addSkill(SkillType.S_GUN_MEK, 0, 1);
+                    person.addSkill(SkillType.S_PILOT_MEK, 0, 1);
+                    break;
+                case ELEMENTAL:
+                    person.addSkill(SkillType.S_GUN_BA, 0, 1);
+                    person.addSkill(SkillType.S_ANTI_MEK, 0, 1);
+                    break;
+                case AEROSPACE:
+                    person.addSkill(SkillType.S_GUN_AERO, 0, 1);
+                    person.addSkill(SkillType.S_PILOT_AERO, 0, 1);
+                    person.addSkill(SkillType.S_GUN_JET, 0, 1);
+                    person.addSkill(SkillType.S_PILOT_JET, 0, 1);
+                    break;
+                case VEHICLE:
+                    person.addSkill(SkillType.S_GUN_VEE, 0, 1);
+                    person.addSkill(SkillType.S_PILOT_GVEE, 0, 1);
+                    person.addSkill(SkillType.S_PILOT_NVEE, 0, 1);
+                    person.addSkill(SkillType.S_PILOT_VTOL, 0, 1);
+                    break;
+                case PROTOMEK:
+                    person.addSkill(SkillType.S_GUN_PROTO, 0, 1);
+                    break;
+                case NAVAL:
+                    person.addSkill(SkillType.S_TECH_VESSEL, 0, 1);
+                    person.addSkill(SkillType.S_GUN_SPACE, 0, 1);
+                    person.addSkill(SkillType.S_PILOT_SPACE, 0, 1);
+                    person.addSkill(SkillType.S_NAV, 0, 1);
+                    break;
+                default:
+                    break;
+            }
         }
 
         person.setCommander(commander);
@@ -161,24 +192,6 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         if (null != personId) {
             person.setId(personId);
         }
-
-        // We need to generate basic skills in order to get any phenotype bonuses
-        // everything will be set to just produce the minimum proficiency in the role's
-        // necessary skills
-        RandomSkillPreferences skillPrefs = new RandomSkillPreferences();
-        skillPrefs.setArtilleryProb(0);
-        skillPrefs.setArtilleryBonus(-12);
-        skillPrefs.setRandomizeSkill(false);
-        skillPrefs.setAntiMekProb(0);
-        skillPrefs.setSecondSkillProb(0);
-        skillPrefs.setSecondSkillBonus(-12);
-        skillPrefs.setTacticsMod(0, -12);
-        skillPrefs.setSpecialAbilityBonus(0, -12);
-        skillPrefs.setOverallRecruitBonus(-12);
-        skillPrefs.setCombatSmallArmsBonus(-12);
-        skillPrefs.setSupportSmallArmsBonus(-12);
-        AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPrefs);
-        skillGenerator.generateSkills(getCampaign(), person, SkillType.EXP_ULTRA_GREEN);
 
         person.setDateOfBirth(getCampaign().getLocalDate().minusYears(age));
 

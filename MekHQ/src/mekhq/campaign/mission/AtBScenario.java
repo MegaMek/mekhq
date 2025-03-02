@@ -407,8 +407,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             // assume primary planet for now
             Planet p = psystem.getPrimaryPlanet();
             if (null != p) {
-                setAtmosphere(Atmosphere.getAtmosphere(
-                        ObjectUtility.nonNull(p.getPressure(campaign.getLocalDate()), getAtmosphere().ordinal())));
+                setAtmosphere(ObjectUtility.nonNull(p.getPressure(campaign.getLocalDate()), getAtmosphere()));
                 setGravity(ObjectUtility.nonNull(p.getGravity(), getGravity()).floatValue());
             }
         }
@@ -2121,24 +2120,29 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     /**
-     * Retrieves the {@link StratconScenario} associated with the current mission ID.
+     * Retrieves the {@link StratconScenario} associated with the given {@link AtBScenario}
+     * for the specified {@link AtBContract}.
      *
-     * <p>The method first retrieves the {@link AtBContract} from the given campaign.
-     * If the contract, its {@link StratconCampaignState}, or any required track data
-     * is unavailable, the method returns {@code null}. It iterates through all
-     * {@link StratconTrackState} objects in the campaign state and their associated scenarios.
-     * If a {@link StratconScenario} contains a non-null {@link AtBDynamicScenario} whose
-     * mission ID matches the current mission ID, it is returned.
+     * <p>This method attempts to locate a {@link StratconScenario} that matches the provided
+     * {@link AtBScenario} within the tracks of the {@link StratconCampaignState} associated
+     * with the provided contract. If the campaign state, tracks, or scenarios are unavailable,
+     * or if no match is found, the method returns {@code null}.
      *
-     * @param campaign the {@link Campaign} instance being queried for the scenario
+     * <p>The search proceeds by iterating through all {@link StratconTrackState} objects
+     * in the campaign state. For each track, it goes through the collection of associated
+     * {@link StratconScenario} instances. If a {@link StratconScenario} has a non-null
+     * {@link AtBDynamicScenario} that matches the provided {@link AtBScenario}, the method
+     * returns that {@link StratconScenario}.
+     *
+     * @param contract    the {@link AtBContract} from which to retrieve the
+     *                    {@link StratconCampaignState} and associated tracks
+     * @param atBScenario the {@link AtBScenario} to match against the backing scenarios
+     *                    of the {@link StratconScenario} instances
      * @return the matching {@link StratconScenario} if found, or {@code null} if no match
      *         is found or any required data is missing
-     * @throws NullPointerException if {@code campaign} is {@code null}
      */
-    public @Nullable StratconScenario getStratconScenario(Campaign campaign) {
-        // Get contract
-        AtBContract contract = getContract(campaign);
-        if (contract == null) {
+    public @Nullable StratconScenario getStratconScenario(AtBContract contract, AtBScenario atBScenario) {
+        if (contract == null || atBScenario == null) {
             return null;
         }
 
@@ -2152,14 +2156,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         for (StratconTrackState track : campaignState.getTracks()) {
             Collection<StratconScenario> trackScenarios = track.getScenarios().values();
 
-            for (StratconScenario scenario : trackScenarios) {
-                AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+            for (StratconScenario stratconScenario : trackScenarios) {
+                AtBDynamicScenario backingScenario = stratconScenario.getBackingScenario();
                 if (backingScenario == null) {
                     continue;
                 }
 
-                if (backingScenario.getMissionId() == getMissionId()) {
-                    return scenario;
+                if (Objects.equals(atBScenario, backingScenario)) {
+                    return stratconScenario;
                 }
             }
         }

@@ -18,6 +18,10 @@
  */
 package mekhq.campaign.universe;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+
 public enum Atmosphere {
     NONE("None"),
     TAINTEDPOISON("Tainted (Poisonous)"),
@@ -28,25 +32,14 @@ public enum Atmosphere {
     TOXICFLAME("Toxic (Flammable)"),
     BREATHABLE("Breathable");
 
-    // For old life form data
-    public static Atmosphere parseAtmosphere(String val) {
-        return switch (val.toLowerCase()) {
-            case "tainted (poisonous)" -> TAINTEDPOISON;
-            case "tainted (caustic)" -> TAINTEDCAUSTIC;
-            case "tainted (flammable)" -> TAINTEDFLAME;
-            case "toxic (poisonous)" -> TOXICPOISON;
-            case "toxic (caustic)" -> TOXICCAUSTIC;
-            case "toxic (flammable)" -> TOXICFLAME;
-            case "breathable" -> BREATHABLE;
-            default -> NONE;
-        };
-    }
-
     public final String name;
 
     Atmosphere(String name) {
         this.name = name;
     }
+
+    @Override
+    public String toString() { return name; }
 
     public boolean isNone() {
         return this == NONE;

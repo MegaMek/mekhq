@@ -36,6 +36,7 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.dialog.resupplyAndCaches.*;
@@ -58,9 +59,11 @@ import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RES
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsMajorityVTOLForces;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsOnlyAerialForces;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsOnlyVTOLForces;
+import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
 import static mekhq.gui.dialog.resupplyAndCaches.DialogItinerary.itineraryDialog;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -75,7 +78,7 @@ public class PerformResupply {
     private static final double INTERCEPTION_LOAD_INFLUENCE = 50;
     public static final String RESUPPLY_LOOT_BOX_NAME = "Resupply";
 
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Resupply";
 
     private static final MMLogger logger = MMLogger.create(PerformResupply.class);
 
@@ -177,12 +180,12 @@ public class PerformResupply {
             }
         }
 
-        logger.info("totalTonnage: " + totalTonnage);
+        logger.info("totalTonnage: {}", totalTonnage);
 
 
         // This shouldn't occur, but we include it as insurance.
         if (resupply.getConvoyContents().isEmpty()) {
-            campaign.addReport(String.format(resources.getString("convoyUnsuccessful.text"),
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "convoyUnsuccessful.text",
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                 CLOSING_SPAN_TAG));
             return;
@@ -246,7 +249,7 @@ public class PerformResupply {
         } else {
             final Campaign campaign = resupply.getCampaign();
 
-            campaign.addReport(String.format(resources.getString("convoySuccessfulSmuggler.text"),
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "convoySuccessfulSmuggler.text",
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                 CLOSING_SPAN_TAG));
             makeDelivery(resupply, null);
@@ -305,7 +308,7 @@ public class PerformResupply {
 
             convoyContents.removeAll(convoyItems);
 
-            campaign.addReport(String.format(resources.getString("convoyDispatched.text"),
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "convoyDispatched.text",
                 convoy.getName()));
             processConvoy(resupply, convoyItems, convoy);
         }
@@ -419,11 +422,12 @@ public class PerformResupply {
             final String STATUS_AFTERWARD = ".text";
 
             AtBMoraleLevel morale = contract.getMoraleLevel();
+            String commanderAddress = campaign.getCommanderAddress(false);
 
             String eventText;
             if (Compute.d6() <= 2) {
-                eventText = resources.getString(STATUS_FORWARD + Compute.randomInt(100)
-                    + STATUS_AFTERWARD);
+                eventText = getFormattedTextAt(RESOURCE_BUNDLE,
+                    STATUS_FORWARD + Compute.randomInt(100) + STATUS_AFTERWARD);
             } else {
                 int roll = Compute.randomInt(2);
 
@@ -431,8 +435,9 @@ public class PerformResupply {
                     morale = roll == 0 ? (morale.isAdvancing() ? DOMINATING : CRITICAL) : STALEMATE;
                 }
 
-                eventText = resources.getString(STATUS_FORWARD + "Enemy" + morale
-                    + Compute.randomInt(50) + STATUS_AFTERWARD);
+                eventText = getFormattedTextAt(RESOURCE_BUNDLE,
+                    STATUS_FORWARD + "Enemy" + morale + Compute.randomInt(50) + STATUS_AFTERWARD,
+                    commanderAddress);
             }
 
             new DialogRoleplayEvent(campaign, convoy, eventText);
@@ -450,7 +455,7 @@ public class PerformResupply {
     private static void completeSuccessfulDelivery(Resupply resupply, List<Part> convoyContents) {
         final Campaign campaign = resupply.getCampaign();
 
-        campaign.addReport(String.format(resources.getString("convoySuccessful.text"),
+        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "convoySuccessful.text",
             spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
             CLOSING_SPAN_TAG));
 
@@ -509,7 +514,7 @@ public class PerformResupply {
         // We report the error in this fashion, instead of hiding it in the log, as we want to
         // increase the likelihood the player is aware an error has occurred.
         if (template == null) {
-            campaign.addReport(String.format(resources.getString("convoyErrorTemplate.text"),
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "convoyErrorTemplate.text",
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                 templateAddress, CLOSING_SPAN_TAG));
 
@@ -525,7 +530,7 @@ public class PerformResupply {
             List<StratconTrackState> tracks = campaignState.getTracks();
             track = ObjectUtility.getRandomItem(tracks);
         } catch (NullPointerException e) {
-            campaign.addReport(String.format(resources.getString("convoyErrorTracks.text"),
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "convoyErrorTracks.text",
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                 templateAddress, CLOSING_SPAN_TAG));
 
@@ -533,11 +538,22 @@ public class PerformResupply {
             return;
         }
 
+        StratconCoords coords = getUnoccupiedCoords(track, false);
+
+        if (coords == null) {
+            handleFallbackMessage(resupply, convoyContents, campaign);
+            return;
+        }
+
+        if (targetConvoy != null) {
+            track.assignForce(targetConvoy.getId(), coords, campaign.getLocalDate(), false);
+        }
+
         // Generate the scenario, placing it in a random hex that does not currently contain a
         // scenario, or a facility. If the player is really lucky, the scenario will spawn on top
         // of a force already deployed to the Strategic Map.
         StratconScenario scenario = generateExternalScenario(campaign, contract, track,
-            null, template, false, 0);
+            coords, template, false, 0);
 
         // If we successfully generated a scenario, we need to make a couple of final
         // adjustments, including assigning the Resupply contents as loot and
@@ -548,10 +564,6 @@ public class PerformResupply {
             if (targetConvoy != null) {
                 String currentName = backingScenario.getName();
                 backingScenario.setName(currentName + " - " + targetConvoy.getName());
-
-                backingScenario.addForce(targetConvoy.getId(), ScenarioTemplate.PRIMARY_PLAYER_FORCE_ID);
-                targetConvoy.setScenarioId(backingScenario.getId(), campaign);
-                scenario.commitPrimaryForces();
             }
 
             Loot loot = new Loot();
@@ -566,18 +578,37 @@ public class PerformResupply {
             backingScenario.addLoot(loot);
 
             // Announce the situation to the player
-            campaign.addReport(String.format(resources.getString("convoyInterceptedStratCon.text"),
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "convoyInterceptedStratCon.text",
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                 CLOSING_SPAN_TAG));
         } else {
             // If we failed to generate a scenario, for whatever reason, we don't
             // want the player confused why there isn't a scenario, so we offer
             // this fluffy response.
-            campaign.addReport(String.format(resources.getString("convoyEscaped.text"),
-                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                CLOSING_SPAN_TAG));
-
-            makeDelivery(resupply, convoyContents);
+            handleFallbackMessage(resupply, convoyContents, campaign);
         }
+    }
+
+    /**
+     * Handles the fallback scenario where a resupply convoy escapes.
+     *
+     * <p>This method is triggered in situations where the convoy cannot complete the intended
+     * resupply operation due to certain fallback conditions. It logs a campaign report indicating
+     * the situation and attempts to make the delivery using the remaining convoy contents.</p>
+     *
+     * @param resupply        The {@link Resupply} instance representing the details of the current
+     *                        resupply operation.
+     * @param convoyContents  A {@link List} of {@link Part} objects representing the contents of the
+     *                        convoy at the time of the fallback. These are the items that will be
+     *                        delivered despite the fallback.
+     * @param campaign        The {@link Campaign} instance where the report of the fallback scenario
+     *                        will be added and the delivery will be processed.
+     */
+    private static void handleFallbackMessage(Resupply resupply, List<Part> convoyContents, Campaign campaign) {
+        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "convoyEscaped.text",
+            spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+            CLOSING_SPAN_TAG));
+
+        makeDelivery(resupply, convoyContents);
     }
 }

@@ -25,6 +25,7 @@ import megamek.common.TechConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.ImgLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
@@ -36,7 +37,7 @@ import java.util.ResourceBundle;
  * A custom panel that gets filled in with goodies from a unit record
  * @author  Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class UnitViewPanel extends JPanel {
+public class UnitViewPanel extends JScrollablePanel {
     private Unit unit;
     private Entity entity;
     private Campaign campaign;
@@ -86,7 +87,7 @@ public class UnitViewPanel extends JPanel {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 0;
             gridBagConstraints.gridheight = 3;
-            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weightx = 0.5;
             gridBagConstraints.insets = new Insets(5, 5, 5, 5);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
@@ -103,7 +104,7 @@ public class UnitViewPanel extends JPanel {
                 gridBagConstraints.gridx = 1;
                 gridBagConstraints.gridy = 0;
                 gridBagConstraints.gridheight = 1;
-                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.weightx = 0.0;
                 gridBagConstraints.fill = GridBagConstraints.BOTH;
                 gridBagConstraints.anchor = GridBagConstraints.CENTER;
                 add(lblImage, gridBagConstraints);
@@ -116,7 +117,7 @@ public class UnitViewPanel extends JPanel {
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weightx = 0.5;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
@@ -135,7 +136,7 @@ public class UnitViewPanel extends JPanel {
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weightx = 0.5;
         gridBagConstraints.gridwidth = compWidth;
         if (unit.getHistory().isBlank()) {
             gridBagConstraints.weighty = 1.0;
@@ -156,7 +157,7 @@ public class UnitViewPanel extends JPanel {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 2;
-            gridBagConstraints.weightx = 0.0;
+            gridBagConstraints.weightx = 0.5;
             gridBagConstraints.weighty = 1.0;
             gridBagConstraints.gridwidth = compWidth;
             gridBagConstraints.insets = new Insets(5, 5, 5, 5);

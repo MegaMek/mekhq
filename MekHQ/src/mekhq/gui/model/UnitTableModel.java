@@ -163,6 +163,9 @@ public class UnitTableModel extends DataTableModel {
         int driversAssigned = unit.getDrivers().size();
 
         Entity entity = unit.getEntity();
+        int soldiersNeeded = entity instanceof Infantry ? gunnersNeeded : 0;
+        int soldiersAssigned = entity instanceof Infantry ? gunnersAssigned : 0;
+
         int navigatorsNeeded = entity instanceof Jumpship && !(entity instanceof SpaceStation) ? 1 : 0;
         int navigatorsAssigned = unit.getNavigator() == null ? 0 : 1;
 
@@ -171,13 +174,19 @@ public class UnitTableModel extends DataTableModel {
 
         StringBuilder report = new StringBuilder("<html>");
 
-        if (driversNeeded > 0) {
+
+        if (driversNeeded > 0 && soldiersNeeded == 0) {
             appendReport(report, "Drivers", driversAssigned, driversNeeded);
         }
 
-        if (gunnersNeeded > 0) {
+        if (gunnersNeeded > 0 && soldiersNeeded == 0) {
             report.append("<br>");
             appendReport(report, "Gunners", gunnersAssigned, gunnersNeeded);
+        }
+
+        if (soldiersNeeded > 0) {
+            report.append("<br>");
+            appendReport(report, "Soldiers", soldiersAssigned, soldiersNeeded);
         }
 
         if (crewNeeded > 0) {

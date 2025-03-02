@@ -18,36 +18,6 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.Insets;
-import java.util.*;
-import java.util.Map.Entry;
-
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-
-import static javax.swing.GroupLayout.Alignment;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.LayoutStyle;
-import javax.swing.RowSorter;
-import javax.swing.SortOrder;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableRowSorter;
-
 import megamek.client.ui.swing.util.UIUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -61,8 +31,18 @@ import mekhq.gui.model.PartsInUseTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TwoNumbersSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
-import mekhq.campaign.parts.AmmoStorage;
-import mekhq.campaign.parts.Armor;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.List;
+import java.util.*;
 
 /**
  * A dialog to show parts in use, ordered, in transit with actionable buttons for buying or adding more
@@ -71,7 +51,7 @@ import mekhq.campaign.parts.Armor;
 public class PartsReportDialog extends JDialog {
 
     private JCheckBox ignoreMothballedCheck, topUpWeeklyCheck;
-    private JButton topUpButton, topUpGMButton;
+    private JButton topUpButton, topUpGMButton, resetRequestedStockButton;
     private JComboBox<String> ignoreSparesUnderQualityCB;
     private JTable overviewPartsInUseTable;
     private PartsInUseTableModel overviewPartsModel;
@@ -100,16 +80,16 @@ public class PartsReportDialog extends JDialog {
     }
 
     private void initComponents() {
-   
+
         this.setTitle(resourceMap.getString("Form.title"));
 
         Container container = this.getContentPane();
-        
+
         GroupLayout layout = new GroupLayout(container);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
         container.setLayout(layout);
-        
+
         overviewPartsModel = new PartsInUseTableModel();
         overviewPartsInUseTable = new JTable(overviewPartsModel);
         overviewPartsInUseTable.setRowSelectionAllowed(false);
@@ -305,6 +285,15 @@ public class PartsReportDialog extends JDialog {
         topUpGMButton.setMargin(new Insets(10,20,10,20));
         topUpGMButton.addActionListener(evt -> topUpGM());
 
+        resetRequestedStockButton = new JButton();
+        resetRequestedStockButton.setText(resourceMap.getString("resetRequestedStockBtn.text"));
+        resetRequestedStockButton.setIcon(null);
+        resetRequestedStockButton.setFocusPainted(false);
+        resetRequestedStockButton.setEnabled(true);
+        resetRequestedStockButton.setBorder(null);
+        resetRequestedStockButton.setMargin(new Insets(10,20,10,20));
+        resetRequestedStockButton.addActionListener(evt -> resetRequestedStock());
+
         boolean reverse = campaign.getCampaignOptions().isReverseQualityNames();
         String[] qualities = {
             " ", // Combo box is blank for first one because it accepts everything and is default
@@ -331,7 +320,7 @@ public class PartsReportDialog extends JDialog {
             setVisible(false);
             onClose();
         });
-        
+
         layout.setHorizontalGroup(layout.createParallelGroup()
             .addComponent(tableScroll)
             .addGroup(layout.createSequentialGroup()
@@ -343,6 +332,7 @@ public class PartsReportDialog extends JDialog {
                     .addComponent(topUpWeeklyCheck)
                     .addComponent(topUpButton)
                     .addComponent(topUpGMButton)
+                    .addComponent(resetRequestedStockButton)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnClose))));
 
@@ -355,6 +345,7 @@ public class PartsReportDialog extends JDialog {
                 .addComponent(topUpWeeklyCheck)
                 .addComponent(topUpButton)
                 .addComponent(topUpGMButton)
+                .addComponent(resetRequestedStockButton)
                 .addComponent(btnClose)));
 
         setPreferredSize(UIUtil.scaleForGUI(1400,1000));
@@ -393,7 +384,7 @@ public class PartsReportDialog extends JDialog {
 
     private void updateOverviewPartsInUse() {
         overviewPartsModel.setData(campaign.getPartsInUse(ignoreMothballedCheck.isSelected(),
-                getMinimumQuality((String) ignoreSparesUnderQualityCB.getSelectedItem())));
+            false, getMinimumQuality((String) ignoreSparesUnderQualityCB.getSelectedItem())));
         TableColumnModel tcm = overviewPartsInUseTable.getColumnModel();
         PartsInUseTableModel.ButtonColumn column = (PartsInUseTableModel.ButtonColumn) tcm
                 .getColumn(PartsInUseTableModel.COL_BUTTON_GMADD)
@@ -464,5 +455,13 @@ public class PartsReportDialog extends JDialog {
 
     private void onClose() {
         storePartInUseRequestedStockMap();
-    }  
+    }
+
+    /**
+     * Wipes the requested stock numbers back to their defaults
+     */
+    private void resetRequestedStock() {
+        campaign.wipePartsInUseMap();
+        updateOverviewPartsInUse();
+    }
 }

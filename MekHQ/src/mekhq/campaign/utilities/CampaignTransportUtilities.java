@@ -22,6 +22,8 @@ package mekhq.campaign.utilities;
 import megamek.common.*;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.enums.TransporterType;
+import mekhq.utilities.MHQInternationalization;
+import org.apache.commons.math3.util.Pair;
 
 import java.util.*;
 
@@ -50,12 +52,22 @@ public class CampaignTransportUtilities {
      * @return Transporter types that could potentially transport this entity
      */
     public static EnumSet<TransporterType> mapEntityToTransporters(CampaignTransportType campaignTransportType, Entity unit) {
+        if (campaignTransportType.isTowTransport()) {
+            if (unit.isTrailer()) {
+                return EnumSet.of(TANK_TRAILER_HITCH);
+            }
+            else {
+                return EnumSet.noneOf(TransporterType.class);
+            }
+        }
         return getTransportTypeClassifier(unit).map(v -> v.getTransporterTypes(unit, campaignTransportType)).orElse(EnumSet.noneOf(TransporterType.class));
     }
 
 
     /**
      * Most slots are 1:1, infantry use their tonnage in some cases
+     * TANK_TRAILER_HITCH use the maximum pulling capacity of its
+     * tractor so return the transported unit's weight
      *
      * @param transporterType type (Enum) of Transporter
      * @param transportedUnit Entity we want the capacity usage of
@@ -69,6 +81,8 @@ public class CampaignTransportUtilities {
             else if (transporterType == INFANTRY_COMPARTMENT) {
                 return calcInfantryCompartmentWeight(transportedUnit);
             }
+        } else if (transporterType == TANK_TRAILER_HITCH) {
+            return transportedUnit.getWeight();
         }
         return 1.0;
     }
@@ -255,6 +269,19 @@ public class CampaignTransportUtilities {
 
     private static Optional<Visitor> getTransportTypeClassifier(Entity entity) {
         return visitors.stream().filter(v -> v.isInterestedIn(entity)).findFirst();
+    }
+
+    /**
+     * Return "None" in the first position
+     * @return vector of transport options, with none first
+     */
+    public static Vector<Pair<String, CampaignTransportType>> getLeadershipDropdownVectorPair() {
+        Vector<Pair<String, CampaignTransportType>> retVal = new Vector<>();
+        retVal.add(new Pair<>(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "CampaignTransportUtilities.selectTransport.null.text"), null));
+        retVal.add(new Pair<>(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "CampaignTransportUtilities.selectTransport.TACTICAL_TRANSPORT.text"), CampaignTransportType.TACTICAL_TRANSPORT));
+        retVal.add(new Pair<>(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "CampaignTransportUtilities.selectTransport.SHIP_TRANSPORT.text"), CampaignTransportType.SHIP_TRANSPORT));
+
+        return retVal;
     }
     // endregion Static Helpers
 }

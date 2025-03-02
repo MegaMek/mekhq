@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2017-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -45,7 +45,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -73,6 +73,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
+import static mekhq.campaign.mission.enums.MissionStatus.PARTIAL;
+import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
 
 /**
  * Displays Mission/Contract and Scenario details.
@@ -373,6 +375,15 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
+        PrisonerMissionEndEvent prisoners = null;
+        if (mission instanceof AtBContract) {
+            prisoners = new PrisonerMissionEndEvent(getCampaign(), (AtBContract) mission);
+
+            if (!getCampaign().getPrisonerDefectors().isEmpty() && prisoners.handlePrisonerDefectors() == 0) { // This is the cancel choice index
+                return;
+            }
+        }
+
         if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
             if (((AtBContract) mission).contractExtended(getCampaign())) {
                 return;
@@ -400,55 +411,16 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        // resolve friendly PoW ransoming
-        // this needs to be before turnover and autoAwards so friendly PoWs can be
-        // factored into those events
-        if (getCampaign().getCampaignOptions().isUseAtBPrisonerRansom()) {
-            List<Person> alliedPoWs = getCampaign().getFriendlyPrisoners();
+        if (mission instanceof AtBContract) {
+            boolean wasOverallSuccess = cmd.getStatus() == SUCCESS || cmd.getStatus() == PARTIAL;
 
-            if (!alliedPoWs.isEmpty()) {
-                Money total = alliedPoWs.stream()
-                        .map(person -> person.getRansomValue(getCampaign()))
-                        .reduce(Money.zero(), Money::plus);
-
-                String message;
-                int dialogOption;
-
-                if (getCampaign().getFunds().isLessThan(total)) {
-                    message = String.format(resources.getString("unableToRansom.format"), alliedPoWs.size(),
-                            total.toAmountAndSymbolString());
-                    dialogOption = JOptionPane.OK_CANCEL_OPTION;
-                } else {
-                    message = String.format(resources.getString("ransomFriendlyQ.format"), alliedPoWs.size(),
-                            total.toAmountAndSymbolString());
-                    dialogOption = JOptionPane.YES_NO_CANCEL_OPTION;
+            if (prisoners != null) { // IDEA says we don't need the null check; I left it for insurance
+                if (!getCampaign().getFriendlyPrisoners().isEmpty()) {
+                    prisoners.handlePrisoners(wasOverallSuccess, true);
                 }
 
-                int optionSelected = JOptionPane.showConfirmDialog(
-                        null,
-                        message,
-                        resources.getString("ransom.text"),
-                        dialogOption);
-
-                if (optionSelected != JOptionPane.OK_OPTION && getCampaign().getFunds().isLessThan(total)) {
-                    return;
-                }
-
-                switch (optionSelected) {
-                    case JOptionPane.YES_OPTION -> {
-                        getCampaign().addReport(String.format(resources.getString("ransomReport.format"),
-                                alliedPoWs.size(), total.toAmountAndSymbolString()));
-                        getCampaign().removeFunds(TransactionType.RANSOM, total, resources.getString("ransom.text"));
-                        alliedPoWs.forEach(ally -> ally.changeStatus(getCampaign(), getCampaign().getLocalDate(),
-                                PersonnelStatus.ACTIVE));
-                    }
-
-                    case JOptionPane.NO_OPTION, JOptionPane.CANCEL_OPTION -> {
-                    }
-
-                    default -> {
-                        return;
-                    }
+                if (!getCampaign().getCurrentPrisoners().isEmpty()) {
+                    prisoners.handlePrisoners(wasOverallSuccess, false);
                 }
             }
         }
@@ -499,63 +471,6 @@ public final class BriefingTab extends CampaignGuiTab {
             // Successes as Success
             autoAwardsController.PostMissionController(getCampaign(), mission,
                     Objects.equals(String.valueOf(cmd.getStatus()), "Success"));
-        }
-
-        // prompt enemy prisoner ransom and freeing
-        // this should always be placed after autoAwards, so that prisoners are not
-        // factored into autoAwards
-        if (getCampaign().getCampaignOptions().isUseAtBPrisonerRansom()) {
-            List<Person> defectors = new ArrayList<>();
-            List<Person> prisoners = new ArrayList<>();
-
-            for (Person prisoner : getCampaign().getActivePersonnel()) {
-                if (prisoner.getPrisonerStatus().isPrisoner()) {
-                    prisoners.add(prisoner);
-                } else if (prisoner.getPrisonerStatus().isPrisonerDefector()) {
-                    defectors.add(prisoner);
-                }
-            }
-
-            if (!defectors.isEmpty()) {
-                // will return true if the prompt is canceled
-                if (prisonerPrompt(defectors, "ransomDefectorsQ.format", resources)) {
-                    return;
-                }
-            }
-
-            if (!prisoners.isEmpty()) {
-                if (prisonerPrompt(prisoners, "ransomQ.format", resources)) {
-                    return;
-                }
-            }
-        }
-
-        // we have to rebuild the list, so we can factor in any prisoners that have been
-        // ransomed.
-        List<Person> prisoners = getCampaign().getActivePersonnel().stream()
-                .filter(prisoner -> prisoner.getPrisonerStatus().isPrisoner())
-                .toList();
-
-        if (!prisoners.isEmpty()) {
-            String title = (prisoners.size() == 1) ? prisoners.get(0).getFullTitle()
-                    : String.format(resources.getString("numPrisoners.text"), prisoners.size());
-            int option = JOptionPane.showConfirmDialog(null,
-                    String.format(resources.getString("confirmFree.format"), title),
-                    resources.getString("freeQ.text"),
-                    JOptionPane.YES_NO_CANCEL_OPTION);
-
-            switch (option) {
-                case JOptionPane.YES_OPTION -> {
-                    for (Person prisoner : prisoners) {
-                        getCampaign().removePerson(prisoner);
-                    }
-                }
-                case JOptionPane.NO_OPTION -> {
-                }
-                default -> {
-                    return;
-                }
-            }
         }
 
         final List<Mission> missions = getCampaign().getSortedMissions();
@@ -689,7 +604,9 @@ public final class BriefingTab extends CampaignGuiTab {
 
             // This handles StratCon undeployment
             if (scenario instanceof AtBScenario) {
-                StratconScenario stratConScenario = ((AtBScenario) scenario).getStratconScenario(getCampaign());
+                AtBContract contract = ((AtBScenario) scenario).getContract(getCampaign());
+                StratconScenario stratConScenario = ((AtBScenario) scenario).getStratconScenario(contract,
+                    (AtBScenario) scenario);
 
                 if (stratConScenario != null) {
                     stratConScenario.resetScenario(getCampaign());
@@ -1296,7 +1213,9 @@ public final class BriefingTab extends CampaignGuiTab {
         // later
         SwingUtilities.invokeLater(() -> scrollScenarioView.getVerticalScrollBar().setValue(0));
 
-        final boolean canStartGame = scenario.canStartScenario(getCampaign());
+        final boolean canStartGame = (
+            (!getCampaign().checkLinkedScenario(scenario.getId())) && (scenario.canStartScenario(getCampaign()))
+            );
 
         btnStartGame.setEnabled(canStartGame);
         btnJoinGame.setEnabled(canStartGame);

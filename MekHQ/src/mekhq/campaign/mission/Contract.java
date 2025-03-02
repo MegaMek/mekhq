@@ -2,7 +2,7 @@
  * Contract.java
  *
  * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (c) 2024 The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -383,7 +383,7 @@ public class Contract extends Mission {
         return transitAmount;
     }
 
-    protected void setTransitAmount(Money amount) {
+    public void setTransitAmount(Money amount) {
         transitAmount = amount;
     }
 
@@ -703,19 +703,13 @@ public class Contract extends Mission {
 
     /**
      * Retrieves the percentage of shares for this contract.
-     * If the instance is of type AtBContract, it retrieves the dynamic Shares
-     * percentage.
-     * Otherwise, it returns a default value of 30.
+     * This currently returns a default value of 30.
      *
      * @return the percentage of shares
      */
     public int getSharesPercent() {
-        if (this instanceof AtBContract) {
-            return ((AtBContract) this).getAtBSharesPercentage();
-        } else {
-            // TODO make this campaign option configurable
-            return 30;
-        }
+        // TODO make this campaign option configurable
+        return 30;
     }
 
     @Override

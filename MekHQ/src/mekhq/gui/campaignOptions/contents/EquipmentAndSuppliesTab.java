@@ -95,17 +95,8 @@ public class EquipmentAndSuppliesTab {
 
     //start Delivery Tab
     private JPanel pnlDeliveries;
-    private JLabel lblNDiceTransitTime;
-    private JSpinner spnNDiceTransitTime;
-    private JLabel lblConstantTransitTime;
-    private JSpinner spnConstantTransitTime;
-    private JLabel lblAcquireMosBonus;
-    private JSpinner spnAcquireMosBonus;
-    private JLabel lblAcquireMinimum;
-    private JSpinner spnAcquireMinimum;
+    private JLabel lblTransitTimeUnits;
     private MMComboBox<String> choiceTransitTimeUnits;
-    private MMComboBox<String> choiceAcquireMosUnits;
-    private MMComboBox<String> choiceAcquireMinimumUnit;
     private static final int TRANSIT_UNIT_DAY = 0;
     private static final int TRANSIT_UNIT_WEEK = 1;
     private static final int TRANSIT_UNIT_MONTH = 2;
@@ -233,19 +224,8 @@ public class EquipmentAndSuppliesTab {
      */
     private void initializeDelivery() {
         pnlDeliveries = new JPanel();
-        lblNDiceTransitTime = new JLabel();
-        spnNDiceTransitTime = new JSpinner();
-        lblConstantTransitTime = new JLabel();
-        spnConstantTransitTime = new JSpinner();
+        lblTransitTimeUnits = new JLabel();
         choiceTransitTimeUnits = new MMComboBox<>("choiceTransitTimeUnits", getTransitUnitOptions());
-
-        lblAcquireMosBonus = new JLabel();
-        spnAcquireMosBonus = new JSpinner();
-        choiceAcquireMosUnits = new MMComboBox<>("choiceAcquireMosUnits", getTransitUnitOptions());
-
-        lblAcquireMinimum = new JLabel();
-        spnAcquireMinimum = new JSpinner();
-        choiceAcquireMinimumUnit = new MMComboBox<>("choiceAcquireMinimumUnit", getTransitUnitOptions());
     }
 
     /**
@@ -345,11 +325,11 @@ public class EquipmentAndSuppliesTab {
         panel.add(pnlAcquisitions, layoutParent);
 
         layoutParent.gridx++;
-        panel.add(pnlDeliveries, layoutParent);
+        panel.add(pnlAutoLogistics, layoutParent);
 
         layoutParent.gridx = 0;
         layoutParent.gridy++;
-        panel.add(pnlAutoLogistics, layoutParent);
+        panel.add(pnlDeliveries, layoutParent);
 
 
         // Create Parent Panel and return
@@ -527,21 +507,8 @@ public class EquipmentAndSuppliesTab {
      * @return a {@code JPanel} instance representing the delivery panel with all configured sub-panels and components.
      */
     private JPanel createDeliveryPanel() {
-        lblNDiceTransitTime = new CampaignOptionsLabel("NDiceTransitTime");
-        spnNDiceTransitTime = new CampaignOptionsSpinner("NDiceTransitTime", 0,
-            0, 365, 1);
-
-        lblConstantTransitTime = new CampaignOptionsLabel("ConstantTransitTime");
-        spnConstantTransitTime = new CampaignOptionsSpinner("ConstantTransitTime",
-            0, 0, 365, 1);
-
-        lblAcquireMosBonus = new CampaignOptionsLabel("AcquireMosBonus");
-        spnAcquireMosBonus = new CampaignOptionsSpinner("AcquireMosBonus",
-            0, 0, 365, 1);
-
-        lblAcquireMinimum = new CampaignOptionsLabel("AcquireMinimum");
-        spnAcquireMinimum = new CampaignOptionsSpinner("AcquireMinimum",
-            0, 0, 365, 1);
+        // Contents
+        lblTransitTimeUnits = new CampaignOptionsLabel("TransitTimeUnits");
 
         // Layout the Panel
         final JPanel panelTransit = new CampaignOptionsStandardPanel("DeliveryPanelTransit");
@@ -550,36 +517,9 @@ public class EquipmentAndSuppliesTab {
         layoutTransit.gridy = 0;
         layoutTransit.gridx = 0;
         layoutTransit.gridwidth = 1;
-        panelTransit.add(lblNDiceTransitTime, layoutTransit);
-        layoutTransit.gridx++;
-        panelTransit.add(spnNDiceTransitTime, layoutTransit);
-        layoutTransit.gridx++;
-        panelTransit.add(lblConstantTransitTime, layoutTransit);
-        layoutTransit.gridx++;
-        panelTransit.add(spnConstantTransitTime, layoutTransit);
+        panelTransit.add(lblTransitTimeUnits, layoutTransit);
         layoutTransit.gridx++;
         panelTransit.add(choiceTransitTimeUnits, layoutTransit);
-
-        // Layout the Panel
-        final JPanel panelDeliveries = new CampaignOptionsStandardPanel("DeliveryPanelDeliveries");
-        final GridBagConstraints layoutDeliveries = new CampaignOptionsGridBagConstraints(panelDeliveries);
-
-        layoutDeliveries.gridy = 0;
-        layoutDeliveries.gridx = 0;
-        layoutDeliveries.gridwidth = 1;
-        panelDeliveries.add(lblAcquireMosBonus, layoutDeliveries);
-        layoutDeliveries.gridx++;
-        panelDeliveries.add(spnAcquireMosBonus, layoutDeliveries);
-        layoutDeliveries.gridx++;
-        panelDeliveries.add(choiceAcquireMosUnits, layoutDeliveries);
-
-        layoutDeliveries.gridx = 0;
-        layoutDeliveries.gridy++;
-        panelDeliveries.add(lblAcquireMinimum, layoutDeliveries);
-        layoutDeliveries.gridx++;
-        panelDeliveries.add(spnAcquireMinimum, layoutDeliveries);
-        layoutDeliveries.gridx++;
-        panelDeliveries.add(choiceAcquireMinimumUnit, layoutDeliveries);
 
         final JPanel panelParent = new CampaignOptionsStandardPanel("DeliveryPanel", true,
             "DeliveryPanel");
@@ -589,8 +529,6 @@ public class EquipmentAndSuppliesTab {
         layoutParent.gridx = 0;
         layoutParent.gridwidth = 2;
         panelParent.add(panelTransit, layoutParent);
-        layoutParent.gridy++;
-        panelParent.add(panelDeliveries, layoutParent);
 
         return panelParent;
     }
@@ -766,16 +704,27 @@ public class EquipmentAndSuppliesTab {
      */
     private JPanel createTechModifiersPanel() {
         JLabel techLabel = new CampaignOptionsLabel("TechLabel");
-        techLabel.setName(String.format("<html><center>%s</center></html", techLabel.getText()));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("createTechModifiersPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
+        // Add the label
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 2;
+        layout.weightx = 1.0;
+        panel.add(techLabel, layout);
+
+        // Add the other elements
         for (int i = 0; i < 6; i++) {
             layout.gridx = 0;
-            layout.gridy = i;
+            layout.gridy = i + 1;
+            layout.gridwidth = 1;
+            layout.weightx = 0;
+            layout.anchor = GridBagConstraints.WEST;
             panel.add(lblPlanetAcquireTechBonus[i], layout);
+
             layout.gridx++;
             panel.add(spnPlanetAcquireTechBonus[i], layout);
         }
@@ -793,16 +742,27 @@ public class EquipmentAndSuppliesTab {
      */
     private JPanel createIndustryModifiersPanel() {
         JLabel industryLabel = new CampaignOptionsLabel("IndustryLabel");
-        industryLabel.setName(String.format("<html><center>%s</center></html", industryLabel.getText()));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("IndustryModifiersPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
+        // Add the label
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 2;
+        layout.weightx = 1.0;
+        panel.add(industryLabel, layout);
+
+        // Add the other elements
         for (int i = 0; i < 6; i++) {
             layout.gridx = 0;
-            layout.gridy = i;
+            layout.gridy = i + 1;
+            layout.gridwidth = 1;
+            layout.weightx = 0;
+            layout.anchor = GridBagConstraints.WEST;
             panel.add(lblPlanetAcquireIndustryBonus[i], layout);
+
             layout.gridx++;
             panel.add(spnPlanetAcquireIndustryBonus[i], layout);
         }
@@ -819,16 +779,27 @@ public class EquipmentAndSuppliesTab {
      */
     private JPanel createOutputModifiersPanel() {
         JLabel outputLabel = new CampaignOptionsLabel("OutputLabel");
-        outputLabel.setName(String.format("<html><center>%s</center></html", outputLabel.getText()));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("OutputModifiersPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
+        // Add the label
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 2;
+        layout.weightx = 1.0;
+        panel.add(outputLabel, layout);
+
+        // Add the other elements
         for (int i = 0; i < 6; i++) {
             layout.gridx = 0;
-            layout.gridy = i;
+            layout.gridy = i + 1;
+            layout.gridwidth = 1;
+            layout.weightx = 0;
+            layout.anchor = GridBagConstraints.WEST;
             panel.add(lblPlanetAcquireOutputBonus[i], layout);
+
             layout.gridx++;
             panel.add(spnPlanetAcquireOutputBonus[i], layout);
         }
@@ -1047,13 +1018,7 @@ public class EquipmentAndSuppliesTab {
         options.setAutoLogisticsOther((int) spnAutoLogisticsOther.getValue());
 
         // Delivery
-        options.setNDiceTransitTime((int) spnNDiceTransitTime.getValue());
-        options.setConstantTransitTime((int) spnConstantTransitTime.getValue());
         options.setUnitTransitTime(choiceTransitTimeUnits.getSelectedIndex());
-        options.setAcquireMosBonus((int) spnAcquireMosBonus.getValue());
-        options.setAcquireMosUnit(choiceAcquireMosUnits.getSelectedIndex());
-        options.setAcquireMinimumTime((int) spnAcquireMinimum.getValue());
-        options.setAcquireMinimumTimeUnit(choiceAcquireMinimumUnit.getSelectedIndex());
 
         // Planetary Acquisitions
         options.setPlanetaryAcquisition(usePlanetaryAcquisitions.isSelected());
@@ -1126,15 +1091,7 @@ public class EquipmentAndSuppliesTab {
         spnAutoLogisticsOther.setValue(options.getAutoLogisticsOther());
 
         // Delivery
-        spnNDiceTransitTime.setValue(options.getNDiceTransitTime());
-        spnConstantTransitTime.setValue(options.getConstantTransitTime());
         choiceTransitTimeUnits.setSelectedIndex(options.getUnitTransitTime());
-
-        spnAcquireMosBonus.setValue(options.getAcquireMosBonus());
-        choiceAcquireMosUnits.setSelectedIndex(options.getAcquireMosUnit());
-
-        spnAcquireMinimum.setValue(options.getAcquireMinimumTime());
-        choiceAcquireMinimumUnit.setSelectedIndex(options.getAcquireMinimumTimeUnit());
 
         // Planetary Acquisitions
         usePlanetaryAcquisitions.setSelected(options.isUsePlanetaryAcquisition());

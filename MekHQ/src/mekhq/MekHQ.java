@@ -2,7 +2,7 @@
  * MekHQ.java
  *
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -118,11 +118,12 @@ public class MekHQ implements GameListener {
     private CampaignController campaignController;
     private CampaignGUI campaignGUI;
 
-    private IconPackage iconPackage = new IconPackage();
+    private final IconPackage iconPackage = new IconPackage();
 
     private final IAutosaveService autosaveService;
     // endregion Variable Declarations
     private static final SanityInputFilter sanityInputFilter = new SanityInputFilter();
+    private static final String defaultTheme = "com.formdev.flatlaf.FlatDarculaLaf";
 
     public static SuitePreferences getMHQPreferences() {
         return mhqPreferences;
@@ -560,7 +561,7 @@ public class MekHQ implements GameListener {
                 return;
             }
 
-            PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), currentScenario, tracker, control);
+            PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), currentScenario, tracker);
 
         } catch (Exception ex) {
             logger.error(ex, "gameVictory()");
@@ -596,7 +597,7 @@ public class MekHQ implements GameListener {
             return;
         }
 
-        PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), selectedScenario, tracker, control);
+        PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), selectedScenario, tracker);
     }
 
     private boolean yourSideControlsTheBattlefieldDialogAsk(String message, String title) {
@@ -711,8 +712,7 @@ public class MekHQ implements GameListener {
                 }
                 return;
             }
-            PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), scenario, tracker,
-                autoResolveConcludedEvent.controlledScenario());
+            PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), scenario, tracker);
         } catch (Exception ex) {
             logger.error("Error during auto resolve concluded", ex);
         }
@@ -745,11 +745,28 @@ public class MekHQ implements GameListener {
     }
 
     private static void setLookAndFeel(String themeName) {
-        final String theme = themeName.isBlank() || themeName.equals("UITheme") ? "com.formdev.flatlaf.FlatDarculaLaf" : themeName;
+        final String theme = themeName.isBlank() || themeName.equals("UITheme") ? defaultTheme : themeName;
 
         Runnable runnable = () -> {
             try {
                 UIManager.setLookAndFeel(theme);
+                if (System.getProperty("os.name", "").startsWith("Mac OS X")) {
+                    // Ensure OSX key bindings are used for copy, paste etc
+                    addOSXKeyStrokes((InputMap) UIManager.get("EditorPane.focusInputMap"));
+                    addOSXKeyStrokes((InputMap) UIManager.get("FormattedTextField.focusInputMap"));
+                    addOSXKeyStrokes((InputMap) UIManager.get("TextField.focusInputMap"));
+                    addOSXKeyStrokes((InputMap) UIManager.get("TextPane.focusInputMap"));
+                    addOSXKeyStrokes((InputMap) UIManager.get("TextArea.focusInputMap"));
+                }
+
+                UIUtil.updateAfterUiChange();
+                return;
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                    | UnsupportedLookAndFeelException e) {
+                logger.error(e, "setLookAndFeel()");
+            }
+            try {
+                UIManager.setLookAndFeel(defaultTheme);
                 if (System.getProperty("os.name", "").startsWith("Mac OS X")) {
                     // Ensure OSX key bindings are used for copy, paste etc
                     addOSXKeyStrokes((InputMap) UIManager.get("EditorPane.focusInputMap"));

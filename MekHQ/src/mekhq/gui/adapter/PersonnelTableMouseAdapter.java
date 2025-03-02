@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -50,11 +50,12 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
-import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.randomEvents.personalities.PersonalityController;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -79,10 +80,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.Math.round;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(PersonnelTableMouseAdapter.class);
@@ -146,7 +150,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_PERSONALITY = "PERSONALITY";
     private static final String CMD_ADD_RANDOM_ABILITY = "ADD_RANDOM_ABILITY";
 
-    private static final String CMD_IMPRISON = "IMPRISON";
     private static final String CMD_FREE = "FREE";
     private static final String CMD_EXECUTE = "EXECUTE";
     private static final String CMD_JETTISON = "JETTISON";
@@ -320,6 +323,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 PersonnelRole role = PersonnelRole.valueOf(data[1]);
                 for (final Person person : people) {
                     person.setPrimaryRole(gui.getCampaign(), role);
+                    writePersonalityDescription(person);
                     gui.getCampaign().personUpdated(person);
                     if (gui.getCampaign().getCampaignOptions().isUsePortraitForRole(role)
                             && gui.getCampaign().getCampaignOptions().isAssignPortraitOnRoleChange()
@@ -628,14 +632,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
-            case CMD_IMPRISON: {
-                for (Person person : people) {
-                    if (!person.getPrisonerStatus().isCurrentPrisoner()) {
-                        person.setPrisonerStatus(gui.getCampaign(), PrisonerStatus.PRISONER, true);
-                    }
-                }
-                break;
-            }
             case CMD_FREE: {
                 processPrisonerResolutionCommand(
                         people,
@@ -913,8 +909,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_BUY_EDGE: {
-                final int cost = gui.getCampaign().getCampaignOptions().getEdgeCost();
+                int baseCost = gui.getCampaign().getCampaignOptions().getEdgeCost();
+                double costMultiplier = gui.getCampaign().getCampaignOptions().getXpCostMultiplier();
                 for (Person person : people) {
+                    double intelligenceCostMultiplier = person.getIntelligenceXpCostMultiplier(gui.getCampaign().getCampaignOptions());
+                    int cost = (int) round(baseCost * intelligenceCostMultiplier * costMultiplier);
+
                     selectedPerson.spendXP(cost);
                     person.changeEdge(1);
                     // Make the new edge point available to support personnel, but don't reset until
@@ -1147,7 +1147,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             person.getGender(), person.isClanPersonnel(), person.getOriginFaction().getShortName());
                     person.setGivenName(name[0]);
                     person.setSurname(name[1]);
-                    PersonalityController.writeDescription(person);
+                    writePersonalityDescription(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -1288,6 +1288,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 gui.getCampaign().removePerson(prisoner);
             }
         }
+
+        processAdHocExecution(gui.getCampaign(), prisoners.length);
     }
 
     private void loadGMToolsForPerson(Person person) {
@@ -1446,22 +1448,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
         popup.add(menu);
 
-        if (StaticChecks.areAnyFree(selected)) {
-            popup.add(newMenuItem(resources.getString("imprison.text"), CMD_IMPRISON));
+        if (gui.getCampaign().getLocation().isOnPlanet()) {
+            popup.add(newMenuItem(resources.getString("free.text"), CMD_FREE));
+            popup.add(newMenuItem(resources.getString("execute.text"), CMD_EXECUTE));
         } else {
-            if (gui.getCampaign().getLocation().isOnPlanet()) {
-                popup.add(newMenuItem(resources.getString("free.text"), CMD_FREE));
-                popup.add(newMenuItem(resources.getString("execute.text"), CMD_EXECUTE));
-            } else {
-                popup.add(newMenuItem(resources.getString("jettison.text"), CMD_JETTISON));
-            }
+            popup.add(newMenuItem(resources.getString("jettison.text"), CMD_JETTISON));
         }
 
-        if (gui.getCampaign().getCampaignOptions().isUseAtBPrisonerRansom() && StaticChecks.areAllPrisoners(selected)) {
+        if (StaticChecks.areAllPrisoners(selected) && gui.getCampaign().isGM()) {
             popup.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM));
-        }
-
-        if (gui.getCampaign().getCampaignOptions().isUseAtBPrisonerRansom() && StaticChecks.areAllPow(selected)) {
             popup.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM_FRIENDLY));
         }
 
@@ -1943,7 +1938,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (!spa.isEligible(person)) {
                         continue;
                     }
-                    cost = (int) Math.round((spa.getCost()
+                    cost = (int) round((spa.getCost()
                             * person.getIntelligenceXpCostMultiplier(gui.getCampaign().getCampaignOptions())
                             * gui.getCampaign().getCampaignOptions().getXpCostMultiplier()));
                     String costDesc;
@@ -2239,8 +2234,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 String type = SkillType.getSkillList()[i];
                 int cost = person.hasSkill(type) ? person.getSkill(type).getCostToImprove()
                         : SkillType.getType(type).getCost(0);
-                cost = (int) Math
-                        .round(cost * person.getIntelligenceXpCostMultiplier(gui.getCampaign().getCampaignOptions())
+                cost = (int) round(cost * person.getIntelligenceXpCostMultiplier(gui.getCampaign().getCampaignOptions())
                                 * gui.getCampaign().getCampaignOptions().getXpCostMultiplier());
 
                 if (cost >= 0) {
@@ -2262,7 +2256,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             // Edge Purchasing
             if (gui.getCampaign().getCampaignOptions().isUseEdge()) {
                 JMenu edgeMenu = new JMenu(resources.getString("edge.text"));
-                int cost = (int) Math.round(gui.getCampaign().getCampaignOptions().getEdgeCost()
+                int cost = (int) round(gui.getCampaign().getCampaignOptions().getEdgeCost()
                         * person.getIntelligenceXpCostMultiplier(gui.getCampaign().getCampaignOptions())
                         * gui.getCampaign().getCampaignOptions().getXpCostMultiplier());
 
@@ -2765,9 +2759,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menu.add(cbMenuItem);
         }
 
-        if (!gui.getCampaign().getCampaignOptions().getRandomDeathMethod().isNone()
-                && Stream.of(selected).noneMatch(p -> p.getStatus().isDead())
-                && Stream.of(selected).allMatch(p -> p.isImmortal() == person.isImmortal())) {
+        if (Stream.of(selected).noneMatch(p -> p.getStatus().isDead())
+            && Stream.of(selected).allMatch(p -> p.isImmortal() == person.isImmortal())) {
             cbMenuItem = new JCheckBoxMenuItem(resources.getString("miImmortal.text"));
             cbMenuItem.setToolTipText(resources.getString("miImmortal.toolTipText"));
             cbMenuItem.setName("miImmortal");

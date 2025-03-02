@@ -1,8 +1,25 @@
+/*
+ * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.mission.resupplyAndCaches;
 
 import megamek.common.Entity;
 import megamek.common.Mek;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -11,6 +28,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.market.procurement.Procurement;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
@@ -18,7 +36,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -28,6 +45,8 @@ import static java.lang.Math.round;
 import static megamek.common.MiscType.F_SPONSON_TURRET;
 import static megamek.common.enums.SkillLevel.NONE;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
+import static mekhq.campaign.force.ForceType.CONVOY;
+import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.market.procurement.Procurement.getFactionTechCode;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
@@ -372,7 +391,7 @@ public class Resupply {
                 continue;
             }
 
-            if (!force.isCombatForce()) {
+            if (!force.isForceType(STANDARD)) {
                 continue;
             }
 
@@ -383,7 +402,7 @@ public class Resupply {
                     continue;
                 }
 
-                if (isProhibitedUnitType(entity, false)) {
+                if (isProhibitedUnitType(entity, false, false)) {
                     continue;
                 }
 
@@ -407,26 +426,29 @@ public class Resupply {
     }
 
     /**
-     * Checks whether a unit type is prohibited from resupply based on its characteristics.
-     * Some units, such as large craft, super-heavy units, and conventional infantry, may
-     * be excluded.
-     * <p>
-     * If {@code excludeDropShipsFromCheck} is {@code true} DropShips will not be considered a
-     * prohibited unit
+     * Determines if the given entity is a prohibited unit type based on specific criteria.
      *
-     * @param entity                     The entity being checked.
-     * @param excludeDropShipsFromCheck  {@code true} to exclude DropShips from prohibited checks,
-     *                                   {@code false} otherwise.
-     * @return {@code true} if the unit type is prohibited, {@code false} otherwise.
+     * @param entity the entity to check for prohibited unit type
+     * @param excludeDropShipsFromCheck if true, DropShip entities are excluded from being
+     *                                 considered prohibited
+     * @param excludeSuperHeaviesFromCheck if true, Super Heavy entities are excluded from being
+     *                                    considered prohibited
+     * @return {@code true} if the entity is a prohibited unit type such as Small Craft, Large
+     * Craft, or Conventional Infantry, and not excluded by the specified parameters; {@code false}
+     * otherwise
      */
-    public static boolean isProhibitedUnitType(Entity entity, boolean excludeDropShipsFromCheck) {
+    public static boolean isProhibitedUnitType(Entity entity, boolean excludeDropShipsFromCheck,
+                                               boolean excludeSuperHeaviesFromCheck) {
         if (entity.isDropShip() && excludeDropShipsFromCheck) {
+            return false;
+        }
+
+        if (entity.isSuperHeavy() && excludeSuperHeaviesFromCheck) {
             return false;
         }
 
         return entity.isSmallCraft()
             || entity.isLargeCraft()
-            || entity.isSuperHeavy()
             || entity.isConventionalInfantry();
     }
 
@@ -436,7 +458,7 @@ public class Resupply {
      *
      * @param potentialParts   A map of potential parts to include in the supply drop, keyed by part name.
      */
-    private void buildPartsPools(Map<String, PartDetails> potentialParts) {
+    private void buildPartsPools(Map<Part, PartDetails> potentialParts) {
         partsPool = new ArrayList<>();
         armorPool = new ArrayList<>();
         ammoBinPool = new ArrayList<>();
@@ -445,25 +467,18 @@ public class Resupply {
             int weight = (int) Math.round(potentialPart.getWeight());
             for (int entry = 0; entry < weight; entry++) {
                 Part part = potentialPart.getPart();
-                Part preparedPart = preparePart(part);
 
-                // We don't need null protection for 'part' as if 'part' is null preparedPart will
-                // just return 'null', which we catch here.
-                if (preparedPart == null) {
+                if (part instanceof Armor) {
+                    armorPool.add(part);
                     continue;
                 }
 
-                if (preparedPart instanceof Armor) {
-                    armorPool.add(preparedPart);
+                if (part instanceof AmmoBin || part instanceof AmmoStorage) {
+                    ammoBinPool.add(part);
                     continue;
                 }
 
-                if (preparedPart instanceof AmmoBin) {
-                    ammoBinPool.add(preparedPart);
-                    continue;
-                }
-
-                partsPool.add(preparedPart);
+                partsPool.add(part);
             }
         }
 
@@ -481,133 +496,47 @@ public class Resupply {
     }
 
     /**
-     * Prepares a copy of a part for inclusion in the resupply pool. This involves cloning
-     * the part, marking it as new, and fixing any issues. If part cloning fails or the part
-     * is invalid for inclusion, {@code null} is returned.
+     * Collects all eligible parts from campaign units and organizes them into a map, where each part
+     * is associated with its corresponding details. The collection process considers various factors,
+     * including exclusion lists, location validation, and warehouse resources, to determine the
+     * eligibility and weight of each part.
      *
-     * @param originPart   The original part to prepare.
-     * @return The prepared part, or {@code null} if the part cannot be included.
-     */
-    private @Nullable Part preparePart(Part originPart) {
-        Part clonedPart = originPart.clone();
-
-        // If we failed to clone a part, it's likely because the part doesn't exist.
-        // This means it's been destroyed, and what we're detecting is the absence of a part.
-        // This is a major limitation of cloning parts, and one I've not fathomed a solution to.
-        if (clonedPart == null) {
-            return null;
-        }
-
-        // TODO: Improve handling of missing or destroyed locations and equipment.
-        //  This will likely need to be a >50.02 thing, unfortunately.
-
-        try {
-            clonedPart.fix();
-        } catch (Exception e) {
-            clonedPart.setHits(0);
-        }
-
-        clonedPart.setBrandNew(true);
-        clonedPart.setOmniPodded(false);
-
-        return clonedPart;
-    }
-
-    /**
-     * Collects eligible parts from campaign units and organizes them into a map. Each part
-     * is checked for eligibility using methods such as exclusion lists and location validation.
-     * Campaign warehouse resources are also factored into the weight of included resources.
+     * <p>This method leverages the campaign's existing parts in use, filters them based on specific
+     * criteria (e.g., unit exclusion, allowed quality levels), and applies warehouse-specific weight
+     * modifiers to calculate the resulting details.</p>
      *
-     * @return A map of part names with their corresponding details (e.g., weight).
+     * @return A {@link Map} where:
+     *         <ul>
+     *             <li>The key is a {@link Part} object representing the eligible part.</li>
+     *             <li>The value is a {@link PartDetails} object that contains detailed information
+     *                 about the part, such as adjusted weight, based on warehouse modifiers.</li>
+     *         </ul>
      */
-    private Map<String, PartDetails> collectParts() {
-        final Collection<UUID> unitIds = campaign.getForce(0).getAllUnits(true);
-        Map<String, PartDetails> processedParts = new HashMap<>();
 
-        boolean allowClan = (employerIsClan || campaign.getLocalDate().isAfter(BATTLE_OF_TUKAYYID))
-            && campaign.getCampaignOptions().isAllowClanPurchases();
-        boolean allowInnerSphere = campaign.getCampaignOptions().isAllowISPurchases();
+    private Map<Part, PartDetails> collectParts() {
+        Set<PartInUse> partsInUse = campaign.getPartsInUse(true, true,
+            PartQuality.QUALITY_A);
 
-        try {
-            for (UUID unitId : unitIds) {
-                Unit unit = campaign.getUnit(unitId);
+        Faction campaignFaction = campaign.getFaction();
+        LocalDate today = campaign.getLocalDate();
+        boolean removeClan = !campaignFaction.isClan() && today.isBefore(BATTLE_OF_TUKAYYID);
 
-                if (unit == null) {
-                    continue;
-                }
-
-                Entity entity = unit.getEntity();
-
-                if (entity == null) {
-                    continue;
-                }
-
-                if (isProhibitedUnitType(entity, false)) {
-                    logger.info("skipping " + unit.getName() + " as it is prohibited.");
-                    continue;
-                }
-
-                if (!unit.isSalvage() && (unit.isAvailable() || unit.isDeployed())) {
-                    List<Part> parts = unit.getParts();
-                    for (Part part : parts) {
-                        if (part.isClan()) {
-                            if (!allowClan) {
-                                continue;
-                            }
-                        } else {
-                            if (!allowInnerSphere) {
-                                continue;
-                            }
-                        }
-
-                        if (isIneligiblePart(part, unit)) {
-                            continue;
-                        }
-
-                        int dropWeight = part instanceof MissingPart ? 10 : 1;
-                        dropWeight = (int) floor(dropWeight * getPartMultiplier(part));
-
-                        PartDetails partDetails = new PartDetails(part, dropWeight);
-
-                        processedParts.merge(getPartKey(part), partDetails, (oldValue, newValue) -> {
-                            oldValue.setWeight(oldValue.getWeight() + newValue.getWeight());
-                            return oldValue;
-                        });
-                    }
-                }
+        Set<PartInUse> partsToRemove = new HashSet<>();
+        for (PartInUse partInUse : partsInUse) {
+            Part part = partInUse.getPartToBuy().getAcquisitionPart();
+            if (removeClan && (part.isClan() || part.isMixedTech())) {
+                partsToRemove.add(partInUse);
+                continue;
             }
 
-            applyWarehouseWeightModifiers(processedParts);
-        } catch (Exception exception) {
-            logger.error("Aborted parts collection.", exception);
+            if (isIneligiblePart(part)) {
+                partsToRemove.add(partInUse);
+            }
         }
 
-        return processedParts;
-    }
+        partsInUse.removeAll(partsToRemove);
 
-    /**
-     * Generates a key for the given part based on its name and tonnage.
-     *
-     * <p>The key is a combination of the part's name and its tonnage, separated by a colon.
-     * For specific part types such as {@link AmmoBin} and {@link Armor}, the tonnage is
-     * always set to a set value, regardless of the actual tonnage.</p>
-     *
-     * @param part The {@link Part} for which the key is generated. Must not be {@code null}.
-     * @return A unique key in the format {@code "partName:partTonnage"}, where
-     *         {@code partName} is the name of the part and {@code partTonnage} is the
-     *         tonnage of the part or a fixed value for {@link AmmoBin} and {@link Armor}.
-     */
-    private static String getPartKey(Part part) {
-        String partName = part.getName();
-        double partTonnage = part.getTonnage();
-
-        if (part instanceof AmmoBin) {
-            partTonnage = RESUPPLY_AMMO_TONNAGE;
-        } else if (part instanceof Armor) {
-            partTonnage = RESUPPLY_ARMOR_TONNAGE;
-        }
-
-        return partName + ':' + partTonnage;
+        return applyWarehouseWeightModifiers(partsInUse);
     }
 
     /**
@@ -615,12 +544,11 @@ public class Resupply {
      * determined based on exclusion lists, unit structure compatibility, and transporter checks.
      *
      * @param part   The part being checked.
-     * @param unit   The unit to which the part belongs.
      * @return {@code true} if the part is ineligible, {@code false} otherwise.
      */
-    private boolean isIneligiblePart(Part part, Unit unit) {
+    private boolean isIneligiblePart(Part part) {
         return checkExclusionList(part)
-            || checkMekLocation(part, unit)
+            || checkMekLocation(part)
             || checkTankLocation(part)
             || checkMotiveSystem(part)
             || checkTransporter(part);
@@ -635,13 +563,8 @@ public class Resupply {
      * @return {@code true} if the part is in the exclusion list, {@code false} otherwise.
      */
     private boolean checkExclusionList(Part part) {
-        if (part instanceof EquipmentPart) {
-            List<BigInteger> excludedTypes = List.of(F_SPONSON_TURRET);
-            for (BigInteger excludedType : excludedTypes) {
-                if (((EquipmentPart) part).getType().hasFlag(excludedType)) {
-                    return true;
-                }
-            }
+        if (part instanceof EquipmentPart equipmentPart) {
+            return equipmentPart.getType().hasFlag(F_SPONSON_TURRET);
         }
         return false;
     }
@@ -657,19 +580,17 @@ public class Resupply {
     }
 
     /**
-     * Checks if a part belonging to a 'Mek' unit is eligible for resupply, based on its location
-     * or whether the unit is considered extinct. For example, parts located in the center torso
-     * or parts from extinct units are deemed ineligible.
+     * Checks if a part belonging to a 'Mek' unit is eligible for resupply, based on its location.
+     * For example, parts located in the center torso or parts from extinct units are deemed
+     * ineligible.
      *
      * @param part   The part to check.
-     * @param mek    The unit to which the part belongs.
      * @return {@code true} if the part is ineligible due to its location or extinction,
      * {@code false} otherwise.
      */
-    private boolean checkMekLocation(Part part, Unit mek) {
+    private boolean checkMekLocation(Part part) {
         return part instanceof MekLocation &&
-            (((MekLocation) part).getLoc() == Mek.LOC_CT
-                || mek.isExtinct(currentYear, employerIsClan, employerTechCode));
+            (((MekLocation) part).getLoc() == Mek.LOC_CT);
     }
 
     /**
@@ -695,65 +616,55 @@ public class Resupply {
     }
 
     /**
-     * Adjusts the provided parts list by applying warehouse weight modifiers.
+     * Applies modifiers to adjust the weight of parts based on their usage and availability
+     * in the warehouse. This method calculates the adjusted weight for each part by taking
+     * into account its use count, store count, and a multiplier specific to the part.
      *
-     * <p>This method compares the in-campaign warehouse's spare parts inventory with the given
-     * parts list and reduces the weight (quantity) of parts in the list based on the warehouse
-     * stock. If the warehouse contains enough resources to fully satisfy the demand for a part,
-     * the part is removed from the parts list.</p>
+     * <p>The resulting adjusted weight is used to determine the importance or priority of the part,
+     * and only parts with a positive weight are included in the output map.</p>
      *
-     * <p>The adjustments are performed as follows:
-     * <ul>
-     *     <li>For each part in the warehouse:
+     * @param partsInUse A {@link Set} of {@link PartInUse} objects containing information about
+     *                   parts currently in use and their quantities in the warehouse.
+     * @return A {@link Map} where:
      *         <ul>
-     *             <li>The weight of the part in the part list is reduced by the quantity available
-     *             in the warehouse.</li>
-     *             <li>If the weight becomes zero or negative, the part is flagged for removal.</li>
+     *             <li>The key is a {@link Part} object representing the eligible part.</li>
+     *             <li>The value is a {@link PartDetails} object containing the adjusted weight of
+     *                 the part, calculated using its usage data and a multiplier.</li>
      *         </ul>
-     *     </li>
-     *     <li>All flagged parts are then removed from the part list.</li>
-     * </ul>
-     * </p>
-     *
-     * @param partsList A map containing part identifiers (keys) and their corresponding {@link PartDetails}.
-     *                  The map will be modified to reflect the warehouse adjustments.
+     *         Only parts with a positive adjusted weight are included in the resulting map.
      */
-    private void applyWarehouseWeightModifiers(Map<String, PartDetails> partsList) {
-        // Adjust based on the quantity in the warehouse
-        for (Part part : campaign.getWarehouse().getSpareParts()) {
-            int weight = part.getQuantity();
 
-            // We don't want empty AmmoStorage to reduce Resupply weighting
-            if (part instanceof AmmoStorage && (((AmmoStorage) part).getShots() == 0)) {
+    private Map<Part, PartDetails> applyWarehouseWeightModifiers(Set<PartInUse> partsInUse) {
+        Map<Part, PartDetails> parts = new HashMap<>();
+
+        // Adjust based on the quantity in the warehouse
+        for (PartInUse partInUse : partsInUse) {
+            int weight = partInUse.getUseCount();
+            weight -= partInUse.getStoreCount();
+
+            Part part = partInUse.getPartToBuy().getAcquisitionPart();
+
+            if (part == null) {
                 continue;
             }
 
-            // This prevents us accidentally adding new items to the pool
-            if (!partsList.containsKey(getPartKey(part))) {
+            if ((resupplyType != ResupplyType.RESUPPLY_LOOT)
+                && (resupplyType != ResupplyType.RESUPPLY_SMUGGLER)) {
+                part.setBrandNew(true);
+            }
+
+            weight = (int) floor(weight * getPartMultiplier(part));
+
+            if (weight <= 0) {
                 continue;
             }
 
             PartDetails partDetails = new PartDetails(part, weight);
-            partsList.merge(getPartKey(part), partDetails, (oldValue, newValue) -> {
-                oldValue.setWeight(oldValue.getWeight() - newValue.getWeight());
-                return oldValue;
-            });
+
+            parts.put(part, partDetails);
         }
 
-        // Remove any items that now have 0 (or negative) tickets left in the pool
-        List<String> removalList = new ArrayList<>();
-        for (PartDetails partDetails : partsList.values()) {
-            Part part = partDetails.getPart();
-            double weight = partDetails.getWeight();
-
-            if (weight <= 0) {
-                removalList.add(getPartKey(part));
-            }
-        }
-
-        for (String removalKey : removalList) {
-            partsList.remove(removalKey);
-        }
+        return parts;
     }
 
     /**
@@ -862,42 +773,45 @@ public class Resupply {
         totalPlayerCargoCapacity = 0;
 
         for (Force force : campaign.getAllForces()) {
-            if (!force.isConvoyForce()) {
+            if (!force.isForceType(CONVOY)) {
+                continue;
+            }
+
+            // This ensures each convoy is only counted once
+            if (force.getParentForce() != null && force.getParentForce().isForceType(CONVOY)) {
                 continue;
             }
 
             double cargoCapacitySubTotal = 0;
-            if (force.isConvoyForce()) {
-                boolean hasCargo = false;
-                for (UUID unitId : force.getAllUnits(false)) {
-                    try {
-                        Unit unit = campaign.getUnit(unitId);
-                        Entity entity = unit.getEntity();
+            boolean hasCargo = false;
+            for (UUID unitId : force.getAllUnits(false)) {
+                try {
+                    Unit unit = campaign.getUnit(unitId);
+                    Entity entity = unit.getEntity();
 
-                        if (unit.isDamaged()
-                            || !unit.isFullyCrewed()
-                            || isProhibitedUnitType(entity, true)) {
-                            continue;
-                        }
-
-                        double individualCargo = unit.getCargoCapacity();
-
-                        if (individualCargo > 0) {
-                            hasCargo = true;
-                        }
-
-                        cargoCapacitySubTotal += individualCargo;
-                    } catch (Exception ignored) {
-                        // If we run into an exception, it's because we failed to get Unit or Entity.
-                        // In either case, we just ignore that unit.
+                    if (unit.isDamaged()
+                        || !unit.isFullyCrewed()
+                        || isProhibitedUnitType(entity, true, true)) {
+                        continue;
                     }
+
+                    double individualCargo = unit.getCargoCapacity();
+
+                    if (individualCargo > 0) {
+                        hasCargo = true;
+                    }
+
+                    cargoCapacitySubTotal += individualCargo;
+                } catch (Exception ignored) {
+                    // If we run into an exception, it's because we failed to get Unit or Entity.
+                    // In either case, we just ignore that unit.
                 }
+            }
 
-                if (hasCargo) {
-                    if (cargoCapacitySubTotal > 0) {
-                        totalPlayerCargoCapacity += cargoCapacitySubTotal;
-                        playerConvoys.put(force, cargoCapacitySubTotal);
-                    }
+            if (hasCargo) {
+                if (cargoCapacitySubTotal > 0) {
+                    totalPlayerCargoCapacity += cargoCapacitySubTotal;
+                    playerConvoys.put(force, cargoCapacitySubTotal);
                 }
             }
         }

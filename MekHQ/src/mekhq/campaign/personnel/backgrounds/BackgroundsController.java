@@ -19,6 +19,7 @@
 
 package mekhq.campaign.personnel.backgrounds;
 
+import megamek.client.generator.RandomCallsignGenerator;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.weightedMaps.WeightedIntMap;
@@ -27,7 +28,6 @@ import mekhq.campaign.personnel.Person;
 
 import java.util.ResourceBundle;
 
-import static megamek.client.generator.RandomCallsignGenerator.getWeightedCallsigns;
 import static mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator.*;
 
 public class BackgroundsController {
@@ -124,7 +124,7 @@ public class BackgroundsController {
      */
     private static String getCommanderName(@Nullable Person commander) {
         if (commander == null) {
-            return getWeightedCallsigns().randomItem();
+            return RandomCallsignGenerator.getInstance().generate();
         } else {
             String name = commander.getCallsign().isBlank() ? commander.getSurname() : commander.getCallsign();
             return name.isBlank() ? commander.getFirstName() : name;

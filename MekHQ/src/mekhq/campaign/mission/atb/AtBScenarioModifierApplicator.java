@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,7 +20,7 @@ package mekhq.campaign.mission.atb;
 
 import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
-import megamek.client.generator.skillGenerators.TaharqaSkillGenerator;
+import megamek.client.generator.skillGenerators.ModifiedConstantSkillGenerator;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.*;
 import megamek.common.enums.SkillLevel;
@@ -214,7 +214,7 @@ public class AtBScenarioModifierApplicator {
                 scenario.getEffectiveOpforSkill().ordinal() + skillAdjustment,
                 SkillLevel.ULTRA_GREEN.ordinal(), SkillLevel.LEGENDARY.ordinal())];
         // fire up a skill generator set to the appropriate skill model
-        final AbstractSkillGenerator abstractSkillGenerator = new TaharqaSkillGenerator();
+        final AbstractSkillGenerator abstractSkillGenerator = new ModifiedConstantSkillGenerator();
         abstractSkillGenerator.setLevel(adjustedSkill);
 
         if (Factions.getInstance().getFaction(scenario.getContract(campaign).getEnemyCode()).isClan()) {

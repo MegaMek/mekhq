@@ -2,6 +2,7 @@
  * ContractMarket.java
  *
  * Copyright (c) 2014 Carl Spain. All rights reserved.
+ * Copyright (c) 2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -26,6 +27,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
@@ -40,6 +42,12 @@ import mekhq.campaign.universe.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Set;
+
+import static java.lang.Math.floor;
+import static megamek.codeUtilities.MathUtility.clamp;
+import static megamek.common.Compute.d6;
+import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
+import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 /**
  * Contract offers that are generated monthly under AtB rules.
@@ -66,6 +74,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
     @Override
     public void generateContractOffers(Campaign campaign, boolean newCampaign) {
+        boolean isGrayMonday = isGrayMonday(campaign);
+
         if (((campaign.getLocalDate().getDayOfMonth() == 1)) || newCampaign) {
             // need to copy to prevent concurrent modification errors
             new ArrayList<>(contracts).forEach(this::removeContract);
@@ -76,7 +86,19 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 checkForSubcontracts(campaign, contract, unitRatingMod);
             }
 
-            int numContracts = Compute.d6() - 4 + unitRatingMod;
+            int numContracts = d6() - 4 + unitRatingMod;
+
+            if (isGrayMonday) {
+                for (int i = 0; i < numContracts; i++) {
+                    if (d6() <= 2) {
+                        numContracts--;
+                    }
+                }
+            }
+
+            if (numContracts == 0) {
+                return;
+            }
 
             Set<Faction> currentFactions = campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate());
             final boolean inMinorFaction = currentFactions.stream()
@@ -180,7 +202,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 }
             }
             for (int i = numSubcontracts; i < unitRatingMod - 1; i++) {
-                int roll = Compute.d6(2);
+                int roll = d6(2);
                 if (roll >= 10) {
                     AtBContract sub = generateAtBSubcontract(campaign, contract, unitRatingMod);
                     if (sub.getEndingDate().isBefore(contract.getEndingDate())) {
@@ -405,15 +427,40 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         return contract;
     }
 
+    /**
+     * Creates and adds a follow-up contract based on the just concluded contract.
+     * <p>
+     * This method generates a new contract (`AtBContract`) as a follow-up to the provided `contract`.
+     * Certain properties of the original contract, such as employer, enemy, skill, system location,
+     * and other details, are carried over or modified as necessary based on the contract type.
+     * The method ensures that the follow-up contract contains all necessary details and is
+     * correctly initialized.
+     * </p>
+     *
+     * <p>
+     * <b>Order Dependency:</b> The operations in this method must match the order specified in
+     * `generateAtBContract` to maintain compatibility and consistency.
+     * </p>
+     *
+     * @param campaign the {@link Campaign} to which the follow-up contract belongs.
+     *                 This is used for retrieving campaign-wide settings and applying modifiers.
+     * @param contract the {@link AtBContract} that serves as the base for generating the follow-up contract.
+     *                 Key details from this contract are reused or adapted for the follow-up.
+     */
     private void addFollowup(Campaign campaign,
             AtBContract contract) {
         if (followupContracts.containsValue(contract.getId())) {
             return;
         }
+
+        // The order in this method needs to match generateAtBContract
+
         AtBContract followup = new AtBContract("Followup Contract");
+        lastId++;
+        followup.setId(lastId);
+        contractIds.put(lastId, followup);
+
         followup.setEmployerCode(contract.getEmployerCode(), campaign.getGameYear());
-        followup.setEnemyCode(contract.getEnemyCode());
-        followup.setSystemId(contract.getSystemId());
         switch (contract.getContractType()) {
             case DIVERSIONARY_RAID:
                 followup.setContractType(AtBContractType.OBJECTIVE_RAID);
@@ -427,23 +474,21 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             default:
                 break;
         }
-        followup.setAllySkill(contract.getAllySkill());
-        followup.setAllyQuality(contract.getAllyQuality());
+
+        followup.setEnemyCode(contract.getEnemyCode());
         followup.setEnemySkill(contract.getEnemySkill());
         followup.setEnemyQuality(contract.getEnemyQuality());
+        setAttacker(followup);
+        followup.setSystemId(contract.getSystemId());
+        followup.setAllySkill(contract.getAllySkill());
+        followup.setAllyQuality(contract.getAllyQuality());
         followup.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setContractClauses(followup, campaign.getAtBUnitRatingMod(), campaign);
-
-        contract.setRequiredCombatTeams(calculateRequiredCombatTeams(campaign, contract, false));
-        contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
-
+        followup.setRequiredCombatTeams(calculateRequiredCombatTeams(campaign, followup, false));
+        followup.setMultiplier(calculatePaymentMultiplier(campaign, followup));
         followup.setPartsAvailabilityLevel(followup.getContractType().calculatePartsAvailabilityLevel());
-
         followup.initContractDetails(campaign);
         followup.calculateContract(campaign);
-        lastId++;
-        followup.setId(lastId);
-        contractIds.put(lastId, followup);
 
         contracts.add(followup);
         followupContracts.put(followup.getId(), contract.getId());
@@ -451,12 +496,34 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
     @Override
     public double calculatePaymentMultiplier(Campaign campaign, AtBContract contract) {
-        int unitRatingMod = campaign.getAtBUnitRatingMod();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
         double multiplier = 1.0;
-        // IntOps reputation factor then Dragoons rating
-        if (campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
-            multiplier *= (unitRatingMod * 0.2) + 0.5;
+
+        // Operations tempo
+        multiplier *= contract.getContractType().getOperationsTempoMultiplier();
+
+        // Employer multiplier
+        final Faction employer = Factions.getInstance().getFaction(contract.getEmployerCode());
+        final Faction enemy = contract.getEnemy();
+        if (employer.isISMajorOrSuperPower() || employer.isClan()) {
+            multiplier *= 1.2;
+        } else if (enemy.isIndependent()) {
+            multiplier *= 1.0;
         } else {
+            multiplier *= 1.1;
+        }
+
+        // Reputation multiplier
+        if (campaignOptions.getUnitRatingMethod().isCampaignOperations()) {
+            double reputationFactor = campaign.getReputation().getReputationFactor();
+
+            if (campaignOptions.isClampReputationPayMultiplier()) {
+                reputationFactor = clamp(reputationFactor, 0.5, 2.0);
+            }
+
+            multiplier *= reputationFactor;
+        } else {
+            int unitRatingMod = campaign.getAtBUnitRatingMod();
             if (unitRatingMod >= IUnitRating.DRAGOON_A) {
                 multiplier *= 2.0;
             } else if (unitRatingMod == IUnitRating.DRAGOON_B) {
@@ -468,44 +535,50 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
         }
 
-        multiplier *= contract.getContractType().getOperationsTempoMultiplier();
+        // Unofficial modifiers
+        double unofficialMultiplier = getUnofficialMultiplier(campaign, contract);
 
-        final Faction employer = Factions.getInstance().getFaction(contract.getEmployerCode());
-        final Faction enemy = contract.getEnemy();
-        if (employer.isISMajorOrSuperPower() || employer.isClan()) {
-            multiplier *= 1.2;
-        } else if (enemy.isIndependent()) {
-            multiplier *= 1.0;
-        } else {
-            multiplier *= 1.1;
+        if (unofficialMultiplier > 0) {
+            multiplier *= (1.0 + unofficialMultiplier);
+        } else if (unofficialMultiplier < 0) {
+            multiplier *= (1.0 - unofficialMultiplier);
         }
 
-        if (enemy.isRebelOrPirate()) {
-            multiplier *= 1.1;
+        // This should always be last
+        if (isGrayMonday(campaign)) {
+            multiplier *= 0.25;
         }
+
+        return multiplier;
+    }
+
+    private static double getUnofficialMultiplier(Campaign campaign, AtBContract contract) {
+        double modifier = 0; // we apply these modifiers all together to avoid spiking the final pay
 
         // Adjust pay based on the percentage of the players' forces required by the contract
+        int maximumLanceCount = campaign.getAllCombatTeams().size();
+        int reserveLanceCount = (int) floor(maximumLanceCount / COMBAT_FORCE_DIVIDER);
         int requiredCombatTeams = contract.getRequiredCombatTeams();
-        double totalCombatTeams = campaign.getAllCombatTeams().size();
-        totalCombatTeams /= COMBAT_FORCE_DIVIDER;
 
-        if (totalCombatTeams > 0) {
-            multiplier *= (double) requiredCombatTeams / totalCombatTeams;
+        if (reserveLanceCount > 0) { // Ensure we don't divide by zero
+            double reservesDifference = ((requiredCombatTeams - reserveLanceCount) / (double) reserveLanceCount);
+
+            modifier += reservesDifference;
         }
 
         // Adjust pay based on difficulty if FG3 is enabled
         if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
-            double skulls = contract.calculateContractDifficulty(campaign);
-            skulls -= 5; // 5 skulls (or 2.5) is equivalent to the player force, so no modifier.
+            int difficulty = contract.calculateContractDifficulty(campaign);
+            int baseDifficulty = 5; // 2.5 skulls
 
-            if (skulls != 0) {
-                skulls *= 0.05; // each half-skull is a 5% pay change
-                multiplier *= (1 + skulls);
+            if (difficulty > 0) {
+                double difficultyDifference = ((difficulty - baseDifficulty) / (double) baseDifficulty);
+
+                modifier += difficultyDifference;
             }
         }
 
-
-        return multiplier;
+        return modifier;
     }
 
     @Override
@@ -513,7 +586,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         AtBContractType type = contract.getContractType();
         if (type.isDiversionaryRaid() || type.isReconRaid()
             || type.isRiotDuty()) {
-            int roll = Compute.d6();
+            int roll = d6();
             if (roll == 6) {
                 addFollowup(campaign, contract);
                 campaign.addReport(
@@ -552,7 +625,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         if (campaign.getCampaignOptions().isMercSizeLimited() &&
                 campaign.getFaction().isMercenary()) {
             int max = (unitRatingMod + 1) * 12;
-            int numMods = (AtBContract.getEffectiveNumUnits(campaign) - max) / 2;
+            int numMods = (getEffectiveNumUnits(campaign) - max) / 2;
             while (numMods > 0) {
                 mods.mods[Compute.randomInt(4)]--;
                 numMods--;

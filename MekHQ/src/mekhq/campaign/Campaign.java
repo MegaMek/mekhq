@@ -29,7 +29,6 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.*;
-import megamek.common.AmmoType.Munitions;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.equipment.BombMounted;
@@ -40,10 +39,6 @@ import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.EntitySavingException;
 import megamek.common.options.*;
 import megamek.common.util.BuildingBlock;
-import megamek.common.weapons.autocannons.ACWeapon;
-import megamek.common.weapons.flamers.FlamerWeapon;
-import megamek.common.weapons.gaussrifles.GaussWeapon;
-import megamek.common.weapons.lasers.EnergyWeapon;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
@@ -56,6 +51,7 @@ import mekhq.campaign.finances.*;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.ForceType;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.log.HistoricalLogEntry;
@@ -70,10 +66,8 @@ import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.CombatRole;
-import mekhq.campaign.mission.enums.MissionStatus;
-import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.enums.*;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.mod.am.InjuryUtil;
@@ -85,13 +79,16 @@ import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
-import mekhq.campaign.personnel.death.AbstractDeath;
-import mekhq.campaign.personnel.death.DisabledRandomDeath;
+import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
-import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
+import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.generator.*;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
@@ -102,6 +99,11 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
+import mekhq.campaign.randomEvents.GrayMonday;
+import mekhq.campaign.randomEvents.RandomEventLibraries;
+import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
+import mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
@@ -151,20 +153,26 @@ import java.util.stream.Collectors;
 
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
-import static java.lang.Math.round;
-import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
-import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
+import static megamek.common.Compute.d6;
+import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_MONTH;
+import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_WEEK;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
+import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_CLARION_NOTE;
+import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
+import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMAN;
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
@@ -191,8 +199,9 @@ public class Campaign implements ITechManager {
     // and more still - we're tracking DropShips and WarShips in a separate set so
     // that we can assign units to transports
     private final Hangar units = new Hangar();
-    CampaignTransporterMap shipTransporters = new CampaignTransporterMap(this, SHIP_TRANSPORT);
-    CampaignTransporterMap tacticalTransporters = new CampaignTransporterMap(this, TACTICAL_TRANSPORT);
+    CampaignTransporterMap shipTransporters = new CampaignTransporterMap(this, CampaignTransportType.SHIP_TRANSPORT);
+    CampaignTransporterMap tacticalTransporters = new CampaignTransporterMap(this, CampaignTransportType.TACTICAL_TRANSPORT);
+    CampaignTransporterMap towTransporters = new CampaignTransporterMap(this, CampaignTransportType.TOW_TRANSPORT);
     private final Map<UUID, Person> personnel = new LinkedHashMap<>();
     private Warehouse parts = new Warehouse();
     private final TreeMap<Integer, Force> forceIds = new TreeMap<>();
@@ -275,7 +284,7 @@ public class Campaign implements ITechManager {
     private AbstractContractMarket contractMarket;
     private AbstractUnitMarket unitMarket;
 
-    private transient AbstractDeath death;
+    private RandomDeath randomDeath;
     private transient AbstractDivorce divorce;
     private transient AbstractMarriage marriage;
     private transient AbstractProcreation procreation;
@@ -304,11 +313,18 @@ public class Campaign implements ITechManager {
     private final FameAndInfamyController fameAndInfamy;
     private BehaviorSettings autoResolveBehaviorSettings;
     private List<Unit> automatedMothballUnits;
+    private int temporaryPrisonerCapacity;
 
-     //options relating to parts in use and restock
+    //options relating to parts in use and restock
     private boolean ignoreMothballed;
     private boolean topUpWeekly;
     private PartQuality ignoreSparesUnderQuality;
+
+    // Libraries
+    // We deliberately don't write this data to the save file as we want it rebuilt every time the
+    // campaign loads. This ensures updates can be applied and there is no risk of bugs being
+    // permanently locked into the campaign file.
+    RandomEventLibraries randomEventLibraries;
 
     /**
      * Represents the different types of administrative specializations.
@@ -340,17 +356,17 @@ public class Campaign implements ITechManager {
         game.addPlayer(0, player);
         currentDay = LocalDate.ofYearDay(3067, 1);
         campaignStartDate = null;
-        CurrencyManager.getInstance().setCampaign(this);
-        location = new CurrentLocation(Systems.getInstance().getSystems().get("Outreach"), 0);
         campaignOptions = new CampaignOptions();
+        setFaction(Factions.getInstance().getDefaultFaction());
+        techFactionCode = ITechnology.F_MERC;
+        CurrencyManager.getInstance().setCampaign(this);
+        location = new CurrentLocation(Systems.getInstance().getSystems().get("Galatea"), 0);
         currentReport = new ArrayList<>();
         currentReportHTML = "";
         newReports = new ArrayList<>();
         name = randomMercenaryCompanyNameGenerator(null);
         overtime = false;
         gmMode = false;
-        setFaction(Factions.getInstance().getDefaultFaction());
-        techFactionCode = ITechnology.F_MERC;
         retainerEmployerCode = null;
         retainerStartDate = null;
         reputation = null;
@@ -377,7 +393,7 @@ public class Campaign implements ITechManager {
         setPersonnelMarket(new PersonnelMarket());
         setContractMarket(new AtbMonthlyContractMarket());
         setUnitMarket(new DisabledUnitMarket());
-        setDeath(new DisabledRandomDeath(getCampaignOptions(), false));
+        randomDeath = new RandomDeath(this);
         setDivorce(new DisabledRandomDivorce(getCampaignOptions()));
         setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
         setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
@@ -393,9 +409,13 @@ public class Campaign implements ITechManager {
         fameAndInfamy = new FameAndInfamyController();
         autoResolveBehaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
         automatedMothballUnits = new ArrayList<>();
+        temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
         topUpWeekly = false;
         ignoreMothballed =  false;
         ignoreSparesUnderQuality = QUALITY_A;
+
+        // Library initialization
+        randomEventLibraries = new RandomEventLibraries();
 
     }
 
@@ -626,14 +646,6 @@ public class Campaign implements ITechManager {
     // endregion Markets
 
     // region Personnel Modules
-    public AbstractDeath getDeath() {
-        return death;
-    }
-
-    public void setDeath(final AbstractDeath death) {
-        this.death = death;
-    }
-
     public AbstractDivorce getDivorce() {
         return divorce;
     }
@@ -816,7 +828,7 @@ public class Campaign implements ITechManager {
 
         long numDays = ChronoUnit.DAYS.between(getShipSearchStart(), getLocalDate());
         if (numDays > 21) {
-            int roll = Compute.d6(2);
+            int roll = d6(2);
             TargetRoll target = getAtBConfig().shipSearchTargetRoll(shipSearchType, this);
             setShipSearchStart(null);
             report.append("<br/>Ship search target: ").append(target.getValueAsString()).append(" roll: ")
@@ -877,7 +889,7 @@ public class Campaign implements ITechManager {
         Entity en = mekFileParser.getEntity();
 
         int transitDays = getCampaignOptions().isInstantUnitMarketDelivery() ? 0
-                : calculatePartTransitTime(Compute.d6(2) - 2);
+                : calculatePartTransitTime(en.calcYearAvailability(getGameYear(), useClanTechBase(), getTechFaction()));
 
         getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(), cost, "Purchased " + en.getShortName());
         PartQuality quality = PartQuality.QUALITY_D;
@@ -1412,6 +1424,14 @@ public class Campaign implements ITechManager {
 
         checkDuplicateNamesDuringAdd(unit.getEntity());
 
+        // Assign an entity ID to our new unit
+        if (Entity.NONE == unit.getEntity().getId()) {
+            unit.getEntity().setId(game.getNextEntityId());
+        }
+
+        // Entity should exist before we initialize transport space
+        game.addEntity(unit.getEntity());
+
         unit.initializeAllTransportSpace();
 
         if (!unit.isMothballed()) {
@@ -1422,12 +1442,6 @@ public class Campaign implements ITechManager {
             }
         }
 
-        // Assign an entity ID to our new unit
-        if (Entity.NONE == unit.getEntity().getId()) {
-            unit.getEntity().setId(game.getNextEntityId());
-        }
-
-        game.addEntity(unit.getEntity());
     }
 
 
@@ -1445,6 +1459,8 @@ public class Campaign implements ITechManager {
             shipTransporters.addTransporter(unit);
         } else if (campaignTransportType.isTacticalTransport()) {
             tacticalTransporters.addTransporter(unit);
+        } else if (campaignTransportType.isTowTransport()) {
+            towTransporters.addTransporter(unit);
         }
     }
 
@@ -1474,6 +1490,8 @@ public class Campaign implements ITechManager {
             shipTransporters.removeTransport(unit);
         } else if (campaignTransportType.isTacticalTransport()) {
             tacticalTransporters.removeTransport(unit);
+        } else if (campaignTransportType.isTowTransport()) {
+            towTransporters.removeTransport(unit);
         }
     }
 
@@ -1557,17 +1575,8 @@ public class Campaign implements ITechManager {
         en.setGame(game);
         en.setExternalIdAsString(unit.getId().toString());
 
-        unit.initializeAllTransportSpace();
         // Added to avoid the 'default force bug' when calculating cargo
         removeUnitFromForce(unit);
-
-        if (!unit.isMothballed()) {
-            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
-                if (!unit.getTransportCapabilities(campaignTransportType).isEmpty()) {
-                    addCampaignTransport(campaignTransportType, unit);
-                }
-            }
-        }
 
         unit.initializeParts(true);
         unit.runDiagnostic(false);
@@ -1592,6 +1601,16 @@ public class Campaign implements ITechManager {
             en.setId(game.getNextEntityId());
         }
         game.addEntity(en);
+
+        unit.initializeAllTransportSpace();
+
+        if (!unit.isMothballed()) {
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (!unit.getTransportCapabilities(campaignTransportType).isEmpty()) {
+                    addCampaignTransport(campaignTransportType, unit);
+                }
+            }
+        }
 
         checkDuplicateNamesDuringAdd(en);
         addReport(unit.getHyperlinkedName() + " has been added to the unit roster.");
@@ -2002,11 +2021,11 @@ public class Campaign implements ITechManager {
 
             // set loyalty
             if (experienceLevel <= 0) {
-                person.setLoyalty(Compute.d6(3) + 2);
+                person.setLoyalty(d6(3) + 2);
             } else if (experienceLevel == 1) {
-                person.setLoyalty(Compute.d6(3) + 1);
+                person.setLoyalty(d6(3) + 1);
             } else {
-                person.setLoyalty(Compute.d6(3));
+                person.setLoyalty(d6(3));
             }
 
             if (experienceLevel >= 0) {
@@ -2180,7 +2199,7 @@ public class Campaign implements ITechManager {
             bloodnameTarget += Math.min(0, getRankSystem().getOfficerCut() - person.getRankNumeric());
         }
 
-        if (ignoreDice || (Compute.d6(2) >= bloodnameTarget)) {
+        if (ignoreDice || (d6(2) >= bloodnameTarget)) {
             final Phenotype phenotype = person.getPhenotype().isNone() ? Phenotype.GENERAL : person.getPhenotype();
 
             final Bloodname bloodname = Bloodname.randomBloodname(
@@ -2230,14 +2249,56 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Provides a filtered list of personnel including only active Persons.
+     * Retrieves a list of all active personnel, including prisoners.
      *
-     * @return a {@link Person} <code>List</code> containing all active personnel
+     * <p>This method is deprecated and defaults to including prisoners in the result. Use
+     * {@link #getActivePersonnel(boolean)} instead for more explicit behavior control.</p>
+     *
+     * <p>This method was Deprecated during 50.04's dev cycle. In prior versions this method wasn't
+     * explicit in it's inclusion of prisoners in the return. I've opted to Deprecate this method
+     * as it is far better to be explicit in whether you want to include prisoners or not. This
+     * avoids a lot of potentially weird bugs.</p>
+     *
+     * @return A {@link List} of {@link Person} objects representing all active personnel,
+     * including prisoners.
+     * @deprecated Use {@link #getActivePersonnel(boolean)} to specify whether to include prisoners.
      */
+    @Deprecated
     public List<Person> getActivePersonnel() {
-        return getPersonnel().stream()
-                .filter(p -> p.getStatus().isActive())
-                .collect(Collectors.toList());
+        return getActivePersonnel(true);
+    }
+
+    /**
+     * Retrieves a list of active personnel in the campaign, optionally including prisoners.
+     *
+     * <p>This method iterates through all personnel and filters out inactive members. It then
+     * further filters prisoners based on the provided parameter:</p>
+     * <ul>
+     *   <li>If {@code includePrisoners} is {@code true}, all active personnel, including prisoners,
+     *   are included in the result.</li>
+     *   <li>If {@code includePrisoners} is {@code false}, only active personnel who are either
+     *   free or classified as bondsmen are included.</li>
+     * </ul>
+     *
+     * @param includePrisoners {@code true} to include all active prisoners in the result,
+     *                         {@code false} to exclude them unless they are free or bondsmen.
+     * @return A {@link List} of {@link Person} objects representing the filtered active personnel.
+     */
+    public List<Person> getActivePersonnel(boolean includePrisoners) {
+        List<Person> activePersonnel = new ArrayList<>();
+
+        for (Person person : getPersonnel()) {
+            if (!person.getStatus().isActive()) {
+                continue;
+            }
+
+            PrisonerStatus prisonerStatus = person.getPrisonerStatus();
+            if (includePrisoners || prisonerStatus.isFreeOrBondsman()) {
+                activePersonnel.add(person);
+            }
+        }
+
+        return activePersonnel;
     }
 
     /**
@@ -2250,7 +2311,7 @@ public class Campaign implements ITechManager {
      * @return a {@link List} of {@link Person} objects representing combat-capable personnel
      */
     public List<Person> getActiveCombatPersonnel() {
-        return getActivePersonnel().stream()
+        return getActivePersonnel(true).stream()
             .filter(p -> p.getPrimaryRole().isCombat() || p.getSecondaryRole().isCombat())
             .collect(Collectors.toList());
     }
@@ -2274,6 +2335,17 @@ public class Campaign implements ITechManager {
     public List<Person> getCurrentPrisoners() {
         return getActivePersonnel().stream()
             .filter(person -> person.getPrisonerStatus().isCurrentPrisoner())
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Provides a filtered list of personnel including only active prisoners who are willing to defect.
+     *
+     * @return a {@link Person} <code>List</code> containing all active personnel
+     */
+    public List<Person> getPrisonerDefectors() {
+        return getActivePersonnel(false).stream()
+            .filter(person -> person.getPrisonerStatus().isPrisonerDefector())
             .collect(Collectors.toList());
     }
 
@@ -2583,17 +2655,56 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Create a data set detailing all the parts being used (or not) and their warehouse spares
-     * @param ignoreMothballedUnits don't count parts in mothballed units
-     * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
-     * @return a Set of PartInUse data for display or inspection
+     * Analyzes the warehouse inventory and returns a data set that summarizes the usage state of
+     * all parts, including their use counts, store counts, and planned counts, while filtering
+     * based on specific conditions.
+     *
+     * <p>This method aggregates all parts currently in use or available as spares, while taking
+     * into account constraints like ignoring mothballed units or filtering spares below a specific
+     * quality. It uses a map structure to efficiently track and update parts during processing.</p>
+     *
+     * @param ignoreMothballedUnits If {@code true}, parts from mothballed units will not be
+     *                             included in the results.
+     * @param isResupply If {@code true}, specific units (e.g., prohibited unit types) are skipped
+     *                  based on the current context as defined in {@code Resupply.isProhibitedUnitType()}.
+     * @param ignoreSparesUnderQuality Spare parts of a lower quality than the specified value will
+     *                                be excluded from the results.
+     * @return A {@link Set} of {@link PartInUse} objects detailing the state of each relevant part,
+     * including:
+     *         <ul>
+     *             <li>Use count: How many of this part are currently in use.</li>
+     *             <li>Store count: How many of this part are available as spares in the warehouse.</li>
+     *             <li>Planned count: The quantity of this part included in acquisition orders or
+     *             planned procurement.</li>
+     *             <li>Requested stock: The target or default quantity to maintain, as derived from
+     *             settings or requests.</li>
+     *         </ul>
+     *         Only parts with non-zero counts (use, store, or planned) will be included in the
+     *         result.
      */
+
     public Set<PartInUse> getPartsInUse(boolean ignoreMothballedUnits,
-            PartQuality ignoreSparesUnderQuality) {
+            boolean isResupply, PartQuality ignoreSparesUnderQuality) {
         // java.util.Set doesn't supply a get(Object) method, so we have to use a
         // java.util.Map
         Map<PartInUse, PartInUse> inUse = new HashMap<>();
         getWarehouse().forEachPart(incomingPart -> {
+            if (isResupply) {
+                Unit unit = incomingPart.getUnit();
+
+                Entity entity = null;
+                if (unit != null) {
+                    entity = unit.getEntity();
+                }
+
+                if (entity != null) {
+                    if (isProhibitedUnitType(entity, false, false)) {
+                        return;
+                    }
+                }
+            }
+
+
             PartInUse partInUse = getPartInUse(incomingPart);
             if (null == partInUse) {
                 return;
@@ -2840,7 +2951,7 @@ public class Campaign implements ITechManager {
         report += doctor.getHyperlinkedFullTitle() + " attempts to heal "
                 + medWork.getFullName();
         TargetRoll target = getTargetFor(medWork, doctor);
-        int roll = Compute.d6(2);
+        int roll = d6(2);
         report = report + ",  needs " + target.getValueAsString()
                 + " and rolls " + roll + ':';
         int xpGained = 0;
@@ -2850,7 +2961,7 @@ public class Campaign implements ITechManager {
                 && doctor.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL)) {
             if ((roll == 2) && (doctor.getCurrentEdge() > 0) && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
                 doctor.changeCurrentEdge(-1);
-                roll = Compute.d6(2);
+                roll = d6(2);
                 report += medWork.fail() + '\n' + doctor.getHyperlinkedFullTitle() + " uses Edge to reroll:"
                         + " rolls " + roll + ':';
             }
@@ -3365,7 +3476,7 @@ public class Campaign implements ITechManager {
             }
             return PartAcquisitionResult.PlanetSpecificFailure;
         }
-        if (Compute.d6(2) < target.getValue()) {
+        if (d6(2) < target.getValue()) {
             // no contacts on this planet, move along
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
                 addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b>"
@@ -3448,7 +3559,7 @@ public class Campaign implements ITechManager {
             return false;
         }
 
-        int roll = Compute.d6(2);
+        int roll = d6(2);
         report += "  needs " + target.getValueAsString();
         report += " and rolls " + roll + ':';
         // Edge reroll, if applicable
@@ -3456,17 +3567,13 @@ public class Campaign implements ITechManager {
                 && person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL)
                 && (person.getCurrentEdge() > 0)) {
             person.changeCurrentEdge(-1);
-            roll = Compute.d6(2);
+            roll = d6(2);
             report += " <b>failed!</b> but uses Edge to reroll...getting a " + roll + ": ";
-        }
-        int mos = roll - target.getValue();
-        if (target.getValue() == TargetRoll.AUTOMATIC_SUCCESS) {
-            mos = roll - 2;
         }
         int xpGained = 0;
         if (roll >= target.getValue()) {
             if (transitDays < 0) {
-                transitDays = calculatePartTransitTime(mos);
+                transitDays = calculatePartTransitTime(acquisition.getAvailability());
             }
             report = report + acquisition.find(transitDays);
             found = true;
@@ -3656,7 +3763,7 @@ public class Campaign implements ITechManager {
                 int roll;
                 String wrongType = "";
                 if (tech.isRightTechTypeFor(theRefit)) {
-                    roll = Compute.d6(2);
+                    roll = d6(2);
                 } else {
                     roll = Utilities.roll3d6();
                     wrongType = " <b>Warning: wrong tech type for this refit.</b>";
@@ -3666,7 +3773,7 @@ public class Campaign implements ITechManager {
                         && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT)
                         && (tech.getCurrentEdge() > 0)) {
                     tech.changeCurrentEdge(-1);
-                    roll = tech.isRightTechTypeFor(theRefit) ? Compute.d6(2) : Utilities.roll3d6();
+                    roll = tech.isRightTechTypeFor(theRefit) ? d6(2) : Utilities.roll3d6();
                     // This is needed to update the edge values of individual crewmen
                     if (tech.isEngineer()) {
                         tech.setEdgeUsed(tech.getEdgeUsed() - 1);
@@ -3857,7 +3964,7 @@ public class Campaign implements ITechManager {
         int roll;
         String wrongType = "";
         if (tech.isRightTechTypeFor(partWork)) {
-            roll = Compute.d6(2);
+            roll = d6(2);
         } else {
             roll = Utilities.roll3d6();
             wrongType = " <b>Warning: wrong tech type for this repair.</b>";
@@ -3879,7 +3986,7 @@ public class Campaign implements ITechManager {
                                     || tech.getPrimaryRole().isVehicleCrew())) // For vessel crews
                             && (roll < target.getValue())) {
                 tech.changeCurrentEdge(-1);
-                roll = tech.isRightTechTypeFor(partWork) ? Compute.d6(2) : Utilities.roll3d6();
+                roll = tech.isRightTechTypeFor(partWork) ? d6(2) : Utilities.roll3d6();
                 // This is needed to update the edge values of individual crewmen
                 if (tech.isEngineer()) {
                     tech.setEdgeUsed(tech.getEdgeUsed() + 1);
@@ -4058,7 +4165,7 @@ public class Campaign implements ITechManager {
 
                 if (campaignOptions.isUseStratCon() && contract.getMoraleLevel().isRouted()) {
                     LocalDate newRoutEndDate = contract.getStartDate()
-                        .plusMonths(max(1, Compute.d6() - 3))
+                        .plusMonths(max(1, d6() - 3))
                         .minusDays(1);
                     contract.setRoutEndDate(newRoutEndDate);
                 }
@@ -4101,8 +4208,14 @@ public class Campaign implements ITechManager {
                                 (AtBDynamicScenario) scenario, contract.getStratconCampaignState());
 
                         if (stub) {
-                            if (scenario.getStratConScenarioType().isResupply()) {
+                            ScenarioType scenarioType = scenario.getStratConScenarioType();
+                            if (scenarioType.isResupply()) {
                                 processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
+                            }
+
+                            if (scenarioType.isJailBreak()) {
+                                StratconCampaignState campaignState = contract.getStratconCampaignState();
+                                campaignState.changeSupportPoints(-1);
                             }
 
                             scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
@@ -4273,7 +4386,7 @@ public class Campaign implements ITechManager {
     private void processResupply(AtBContract contract) {
         boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare();
 
-        if (!isGuerrilla || Compute.d6(1) > 4) {
+        if (!isGuerrilla || d6(1) > 4) {
             ResupplyType resupplyType = isGuerrilla ? ResupplyType.RESUPPLY_SMUGGLER : ResupplyType.RESUPPLY_NORMAL;
             Resupply resupply = new Resupply(this, contract, resupplyType);
             performResupply(resupply, contract);
@@ -4315,6 +4428,8 @@ public class Campaign implements ITechManager {
      * @see #getPersonnelFilteringOutDeparted() Filters out departed personnel before daily processing
      */
     public void processNewDayPersonnel() {
+        RecoverMIAPersonnel recovery = new RecoverMIAPersonnel(this, faction, getAtBUnitRatingMod());
+
         // This list ensures we don't hit a concurrent modification error
         List<Person> personnel = getPersonnelFilteringOutDeparted();
 
@@ -4340,9 +4455,20 @@ public class Campaign implements ITechManager {
             }
 
             // Daily events
-            if (getDeath().processNewDay(this, getLocalDate(), person)) {
-                // The person has died, so don't continue to process the dead
-                continue;
+            if (person.getStatus().isMIA()) {
+                recovery.attemptRescueOfPlayerCharacter(person);
+            }
+
+            if (person.getPrisonerStatus().isBecomingBondsman()) {
+                // We use 'isAfter' to avoid situations where we somehow manage to miss the date.
+                // This shouldn't be necessary, but a safety net never hurt
+                if (currentDay.isAfter(person.getBecomingBondsmanEndDate().minusDays(1))) {
+                    person.setPrisonerStatus(this, BONDSMAN, true);
+                    addReport(String.format(resources.getString("becomeBondsman.text"),
+                        person.getHyperlinkedName(),
+                        spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                        CLOSING_SPAN_TAG));
+                }
             }
 
             person.resetMinutesLeft();
@@ -4354,7 +4480,10 @@ public class Campaign implements ITechManager {
 
             // Weekly events
             if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY) {
-                processWeeklyRelationshipEvents(person);
+                if (!randomDeath.processNewWeek(this, getLocalDate(), person)) {
+                    // If the character has died, we don't need to process relationship events
+                    processWeeklyRelationshipEvents(person);
+                }
 
                 processWeeklyEdgeResets(person);
             }
@@ -4460,7 +4589,7 @@ public class Campaign implements ITechManager {
 
         person.setVocationalXPTimer(person.getVocationalXPTimer() + 1);
         if (person.getVocationalXPTimer() >= checkFrequency) {
-            if (Compute.d6(2) >= targetNumber) {
+            if (d6(2) >= targetNumber) {
                 person.awardXP(this, vocationalXpRate);
                 person.setVocationalXPTimer(0);
                 return true;
@@ -4540,7 +4669,7 @@ public class Campaign implements ITechManager {
             int dice = person.getExperienceLevel(this, false);
 
             if (dice > 0) {
-                score = Compute.d6(dice);
+                score = d6(dice);
             }
 
             multiplier += 0.5;
@@ -4550,7 +4679,7 @@ public class Campaign implements ITechManager {
             int dice = person.getExperienceLevel(this, true);
 
             if (dice > 0) {
-                score += Compute.d6(dice);
+                score += d6(dice);
             }
 
             multiplier += 0.5;
@@ -4798,7 +4927,13 @@ public class Campaign implements ITechManager {
         }
 
         if ((location.isOnPlanet()) && (currentDay.getDayOfMonth() == 1)) {
-            processRandomDependents();
+            RandomDependents randomDependents = new RandomDependents(this);
+            randomDependents.processMonthlyRemovalAndAddition();
+        }
+
+        // Prisoner events can occur on Monday or the 1st of the month depending on the type of event
+        if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY || currentDay.getDayOfMonth() == 1) {
+            new PrisonerEventManager(this);
         }
 
         resetAstechMinutes();
@@ -4812,15 +4947,13 @@ public class Campaign implements ITechManager {
         // check for anything in finances
         finances.newDay(this, yesterday, getLocalDate());
 
-        // process removal of old personnel data on the last day of each month
-        if ((campaignOptions.isUsePersonnelRemoval())
-                && (currentDay.getMonth().length(false) == currentDay.getDayOfMonth())) {
+        // process removal of old personnel data on the first day of each month
+        if ((campaignOptions.isUsePersonnelRemoval()) && (currentDay.getDayOfMonth() == 1)) {
             processPersonnelRemoval();
         }
 
         // this duplicates any turnover information so that it is still available on the
-        // new day.
-        // otherwise, it's only available if the user inspects history records
+        // new day. otherwise, it's only available if the user inspects history records
         if (!turnoverRetirementInformation.isEmpty()) {
             for (String entry : turnoverRetirementInformation) {
                 addReport(entry);
@@ -4828,8 +4961,14 @@ public class Campaign implements ITechManager {
         }
 
         if (topUpWeekly && currentDay.getDayOfWeek() == DayOfWeek.MONDAY) {
-            int bought = stockUpPartsInUse(getPartsInUse(ignoreMothballed, ignoreSparesUnderQuality));
+            int bought = stockUpPartsInUse(getPartsInUse(ignoreMothballed, false, ignoreSparesUnderQuality));
             addReport(String.format(resources.getString("weeklyStockCheck.text"), bought));
+        }
+
+        // Random Events
+        if (currentDay.equals(EVENT_DATE_CLARION_NOTE) ||
+            (currentDay.isBefore(EVENT_DATE_GRAY_MONDAY.plusDays(5)))) {
+            new GrayMonday(this, currentDay);
         }
 
         // This must be the last step before returning true
@@ -4909,150 +5048,6 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Processes the random addition and removal of dependents, adjusting the active dependents
-     * list based on campaign options, active personnel, and unit rating modifiers.
-     *
-     * <p>This method operates in the following steps:
-     * <ol>
-     *     <li>Filters active personnel into dependents and non-dependents. Dependents without a family
-     *     (i.e., an empty genealogy) are added to the list of active dependents, while eligible non-dependents
-     *     are counted to determine the dependent capacity.</li>
-     *     <li>Calculates the dependent capacity as 5% of active non-dependents, with a minimum
-     *     value of 1.</li>
-     *     <li>Randomly removes dependents from the active list based on campaign options and a roll
-     *     compared to the unit rating modifier.</li>
-     *     <li>Randomly adds new dependents, if allowed, ensuring the total number of dependents does not exceed
-     *     the dependent capacity. The addition is based on a roll relative to the unit rating modifier.</li>
-     * </ol>
-     *
-     * <p>The method ensures that the number of dependents is managed dynamically and reflects the
-     * current status of the campaign, its personnel, and relevant modifiers.
-     */
-    private void processRandomDependents() {
-        int activeNonDependents = 0;
-        List<Person> activeDependents = new ArrayList<>();
-
-        for (Person person : getActivePersonnel()) {
-            if (!person.getPrisonerStatus().isFreeOrBondsman()) {
-                continue;
-            }
-            if (person.isChild(currentDay)) {
-                continue;
-            }
-            if (person.isDependent()) {
-                if (person.getGenealogy().familyIsEmpty()) {
-                    activeDependents.add(person);
-                }
-                continue;
-            }
-
-            activeNonDependents++;
-        }
-
-        // Prepare the data
-        int dependentCapacity = max(1, (int) round(activeNonDependents * 0.05));
-        Collections.shuffle(activeDependents);
-
-        // roll for random removal
-        int dependentCount = dependentsRollForRemoval(activeDependents, dependentCapacity);
-
-        // then roll for random addition
-        dependentsAddNew(dependentCount, dependentCapacity);
-    }
-
-    /**
-     * Randomly removes dependents from the given list if the campaign options allow random
-     * dependent removal.
-     *
-     * @param dependents The list of dependents.
-     * @param dependentCapacity The maximum number of dependents allowed.
-     * @return The updated number of dependents.
-     */
-    int dependentsRollForRemoval(List<Person> dependents, int dependentCapacity) {
-        if (getCampaignOptions().isUseRandomDependentRemoval()) {
-            for (Person dependent : dependents) {
-                if (!isRemovalEligible(dependent, currentDay)) {
-                    continue;
-                }
-
-                int roll = Compute.randomInt(100);
-
-                if (dependents.size() > dependentCapacity) {
-                    roll = getLowerRandomInt(roll);
-                }
-
-                int targetNumber = 5 - getAtBUnitRatingMod();
-
-                if (roll <= targetNumber) {
-                    addReport(String.format(resources.getString("dependentLeavesForce.text"),
-                            dependent.getFullTitle()));
-
-                    removePerson(dependent, false);
-                }
-            }
-        }
-
-        return dependents.size();
-    }
-
-    /**
-     * @return The lower integer value between the given input and the randomly generated integer.
-     *
-     * @param firstRoll The input integer to compare with the randomly generated integer.
-     */
-    private int getLowerRandomInt(int firstRoll) {
-        int secondRoll = Compute.randomInt(100);
-        return Math.min(firstRoll, secondRoll);
-    }
-
-    /**
-     * Checks if a dependent is eligible for removal.
-     *
-     * @param dependent the person to check
-     * @param currentDate the current date
-     * @return {@code true} if the person is eligible for removal, {@code false} otherwise
-     */
-    boolean isRemovalEligible(Person dependent, LocalDate currentDate) {
-        boolean hasNonAdultChildren = dependent.getGenealogy().hasNonAdultChildren(currentDate);
-        boolean hasSpouse = dependent.getGenealogy().hasSpouse();
-        boolean isChild = dependent.isChild(currentDate);
-
-        return !hasNonAdultChildren && !hasSpouse && !isChild;
-    }
-
-    /**
-     * Randomly adds new dependents to the campaign.
-     *
-     * @param dependentCount the current number of dependents
-     * @param dependentCapacity the maximum capacity for dependents
-     */
-    void dependentsAddNew(int dependentCount, int dependentCapacity) {
-        if ((getCampaignOptions().isUseRandomDependentAddition()) && (dependentCount < dependentCapacity)) {
-            int availableCapacity = dependentCapacity - dependentCount;
-            int rollCount = (int) max(1, availableCapacity * 0.2);
-
-            for (int i = 0; i < rollCount; i++) {
-                int roll = Compute.randomInt(100);
-
-                if (dependentCount < (dependentCapacity / 2)) {
-                    roll = getLowerRandomInt(roll);
-                }
-
-                if (roll <= (getAtBUnitRatingMod() * 2)) {
-                    final Person dependent = newDependent(Gender.RANDOMIZE);
-
-                    recruitPerson(dependent, PrisonerStatus.FREE, true, false);
-
-                    addReport(String.format(resources.getString("dependentJoinsForce.text"),
-                            dependent.getHyperlinkedFullTitle()));
-
-                    dependentCount++;
-                }
-            }
-        }
-    }
-
-    /**
      * This method iterates through the list of personnel and deletes the records of
      * those who have left the unit and who match additional checks.
      */
@@ -5063,7 +5058,7 @@ public class Campaign implements ITechManager {
             PersonnelStatus status = person.getStatus();
 
             if (status.isDepartedUnit()) {
-                if (shouldRemovePerson(person, status)) {
+                if (shouldRemovePerson(person)) {
                     personnelToRemove.add(person);
                 }
             }
@@ -5080,39 +5075,50 @@ public class Campaign implements ITechManager {
 
     /**
      * Determines whether a person's records should be removed from the campaign
-     * based on their status and retirement month.
+     * based on their retirement date, date of death, personnel status, and genealogy activity.
+     *
+     * <p>The method evaluates the following conditions in order:
+     * <ul>
+     *   <li>If the person has a retirement date and retirees are exempt from removal as per
+     *   campaign options, the method returns {@code false}.</li>
+     *   <li>If the person has a date of death, and cemeteries are exempt from removal as per
+     *   campaign options, the method returns {@code false}.</li>
+     *   <li>If the person has an active genealogy, the method returns {@code false}.</li>
+     *   <li>If the person's retirement date is more than one month ago, the method returns {@code true}.</li>
+     *   <li>If the person's date of death is more than one month ago, the method returns {@code true}.</li>
+     * </ul>
+     *
+     * <p>If none of the above conditions are met, the method returns {@code false}.
      *
      * @param person The individual being checked.
-     * @param status The personnel status of the individual.
-     * @return true if the person should be removed, false otherwise.
+     * @return {@code true} if the person should be removed, {@code false} otherwise.
      */
-    private boolean shouldRemovePerson(Person person, PersonnelStatus status) {
-        // don't remove a character if they are related to a genealogy
-        // with at least one member still present in the campaign
-        Map<FamilialRelationshipType, List<Person>> family = person.getGenealogy().getFamily();
 
-        if (family.keySet().stream()
-                .flatMap(relationshipType -> family.get(relationshipType).stream())
-                .anyMatch(relation -> relation.getStatus().isDepartedUnit())) {
+    private boolean shouldRemovePerson(Person person) {
+        // We do these checks first, as they're cheaper than parsing the entire genealogy
+        LocalDate retirementDate = person.getRetirement();
+        if (retirementDate != null && campaignOptions.isUseRemovalExemptRetirees()) {
             return false;
         }
 
-        int retirementMonthValue;
-
-        if (person.getRetirement() != null) {
-            retirementMonthValue = person.getRetirement().getMonthValue();
-        } else {
-            person.setRetirement(getLocalDate());
+        LocalDate deathDate = person.getDateOfDeath();
+        if (deathDate != null && campaignOptions.isUseRemovalExemptCemetery()) {
             return false;
         }
 
-        // return true if the individual has left the campaign for over a month
-        // *AND*
-        // is dead (and we're not exempting the cemetery) *OR* is retired (and we're not
-        // exempting retirees)
-        return (retirementMonthValue < (getLocalDate().getMonthValue() + 1)) &&
-                (((status.isDead()) && (!campaignOptions.isUseRemovalExemptCemetery()))
-                        || ((status.isRetired()) && (!campaignOptions.isUseRemovalExemptRetirees())));
+        // Do not remove if the character has an active genealogy
+        Genealogy genealogy = person.getGenealogy();
+
+        if (genealogy.isActive()) {
+            return false;
+        }
+
+        // Did the departure occur more than a month ago?
+        LocalDate aMonthAgo = currentDay.minusMonths(1);
+        if (retirementDate != null && retirementDate.isBefore(aMonthAgo)) {
+            return true;
+        }
+        return deathDate != null && deathDate.isBefore(aMonthAgo);
     }
 
     /**
@@ -5525,15 +5531,11 @@ public class Campaign implements ITechManager {
      */
     public void cleanUp() {
         // Cleans non-existing spouses
-        for (Person p : personnel.values()) {
-            if (p.getGenealogy().hasSpouse()) {
-                if (!personnel.containsKey(p.getGenealogy().getSpouse().getId())) {
-                    p.getGenealogy().setSpouse(null);
-                    if (!getCampaignOptions().isKeepMarriedNameUponSpouseDeath()
-                            && (p.getMaidenName() != null)) {
-                        p.setSurname(p.getMaidenName());
-                    }
-                    p.setMaidenName(null);
+        for (Person person : personnel.values()) {
+            if (person.getGenealogy().hasSpouse()) {
+                if (!personnel.containsKey(person.getGenealogy().getSpouse().getId())) {
+                    person.getGenealogy().setSpouse(null);
+                    person.setMaidenName(null);
                 }
             }
         }
@@ -5668,7 +5670,7 @@ public class Campaign implements ITechManager {
         return crimeRating + crimePirateModifier;
     }
 
-    public LocalDate getDateOfLastCrime() {
+    public @Nullable LocalDate getDateOfLastCrime() {
         return dateOfLastCrime;
     }
 
@@ -5874,6 +5876,18 @@ public class Campaign implements ITechManager {
         this.automatedMothballUnits = automatedMothballUnits;
     }
 
+    public int getTemporaryPrisonerCapacity() {
+        return temporaryPrisonerCapacity;
+    }
+
+    public void setTemporaryPrisonerCapacity(int temporaryPrisonerCapacity) {
+        this.temporaryPrisonerCapacity = temporaryPrisonerCapacity;
+    }
+
+    public RandomEventLibraries getRandomEventLibraries() {
+        return randomEventLibraries;
+    }
+
     public void writeToXML(final PrintWriter pw) {
         int indent = 0;
 
@@ -6074,53 +6088,7 @@ public class Campaign implements ITechManager {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mothballedUnit", unit.getId());
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "automatedMothballUnits");
-
-        // Customised planetary events
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "customPlanetaryEvents");
-        for (PlanetarySystem psystem : Systems.getInstance().getSystems().values()) {
-            // first check for system-wide events
-            List<PlanetarySystemEvent> customSysEvents = new ArrayList<>();
-            for (PlanetarySystemEvent event : psystem.getEvents()) {
-                if (event.custom) {
-                    customSysEvents.add(event);
-                }
-            }
-            boolean startedSystem = false;
-            if (!customSysEvents.isEmpty()) {
-                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "system");
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", psystem.getId());
-                for (PlanetarySystemEvent event : customSysEvents) {
-                    Systems.getInstance().writePlanetarySystemEvent(pw, event);
-                    pw.println();
-                }
-                startedSystem = true;
-            }
-            // now check for planetary events
-            for (Planet p : psystem.getPlanets()) {
-                List<PlanetaryEvent> customEvents = p.getCustomEvents();
-                if (!customEvents.isEmpty()) {
-                    if (!startedSystem) {
-                        // only write this if we haven't already started the system
-                        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "system");
-                        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", psystem.getId());
-                    }
-                    MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "planet");
-                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sysPos", p.getSystemPosition());
-                    for (PlanetaryEvent event : customEvents) {
-                        Systems.getInstance().writePlanetaryEvent(pw, event);
-                        pw.println();
-                    }
-                    MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "planet");
-                    startedSystem = true;
-                }
-            }
-
-            if (startedSystem) {
-                // close the system
-                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "system");
-            }
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "customPlanetaryEvents");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "temporaryPrisonerCapacity", temporaryPrisonerCapacity);
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, ++indent, "partsInUse");
         writePartInUseToXML(pw, indent);
@@ -6879,8 +6847,7 @@ public class Campaign implements ITechManager {
             if (getLocation().isOnPlanet() && campaignOptions.isUsePlanetaryModifiers()) {
                 Planet planet = getLocation().getPlanet();
                 Atmosphere atmosphere = planet.getAtmosphere(getLocalDate());
-                megamek.common.planetaryconditions.Atmosphere planetaryConditions = megamek.common.planetaryconditions.Atmosphere
-                        .getAtmosphere(planet.getPressure(getLocalDate()));
+                megamek.common.planetaryconditions.Atmosphere planetaryConditions = planet.getPressure(getLocalDate());
                 int temperature = planet.getTemperature(getLocalDate());
 
                 if (planet.getGravity() < 0.8) {
@@ -6957,6 +6924,26 @@ public class Campaign implements ITechManager {
         return getTargetForAcquisition(acquisition, person, false);
     }
 
+    /**
+     * Determines the target roll required for successfully acquiring a specific part or unit
+     * based on various campaign settings, the acquisition details, and the person attempting the
+     * acquisition.
+     *
+     * <p>This method evaluates multiple conditions and factors to calculate the target roll, returning
+     * one of the following outcomes:
+     * <ul>
+     *     <li>{@code TargetRoll.AUTOMATIC_SUCCESS} if acquisitions are set to be automatic in the campaign options.</li>
+     *     <li>{@code TargetRoll.IMPOSSIBLE} if the acquisition is not permitted based on campaign settings,
+     *         such as missing personnel, parts restrictions, or unavailable technology.</li>
+     *     <li>A calculated target roll value based on the skill of the assigned person, acquisition modifiers,
+     *         and adjustments for specific campaign rules (e.g., {@code AtB} restrictions).</li>
+     * </ul>
+     *
+     * @param acquisition the {@link IAcquisitionWork} object containing details about the requested part or supply,
+     *                    such as tech base, technology level, and availability.
+     * @return a {@link TargetRoll} object representing the roll required to successfully acquire the requested item,
+     *         or an impossible/automatic result under specific circumstances.
+     */
     public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition,
             final @Nullable Person person,
             final boolean checkDaysToWait) {
@@ -6974,7 +6961,8 @@ public class Campaign implements ITechManager {
                 && checkDaysToWait) {
             return new TargetRoll(
                     TargetRoll.AUTOMATIC_FAIL,
-                    "You must wait until the new cycle to check for this part. Further attempts will be added to the shopping list.");
+                    "You must wait until the new cycle to check for this part. Further" +
+                        " attempts will be added to the shopping list.");
         }
         if (acquisition.getTechBase() == Part.T_CLAN
                 && !getCampaignOptions().isAllowClanPurchases()) {
@@ -7002,149 +6990,38 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "It is extinct!");
         }
-        if (getCampaignOptions().isUseAtB() &&
-                getCampaignOptions().isRestrictPartsByMission() && acquisition instanceof Part) {
-            int partAvailability = ((Part) acquisition).getAvailability();
-            EquipmentType et = null;
-            if (acquisition instanceof EquipmentPart) {
-                et = ((EquipmentPart) acquisition).getType();
-            } else if (acquisition instanceof MissingEquipmentPart) {
-                et = ((MissingEquipmentPart) acquisition).getType();
-            }
 
-            StringBuilder partAvailabilityLog = new StringBuilder("<html>");
-            partAvailabilityLog.append("Part Rating Level: ").append(partAvailability)
-                    .append(" (").append(EquipmentType.ratingNames[partAvailability]).append(')');
-
-            /*
-             * Even if we can acquire Clan parts, they have a minimum availability of F for
-             * non-Clan units
-             */
-            if (acquisition.getTechBase() == Part.T_CLAN && !getFaction().isClan()) {
-                partAvailability = max(partAvailability, EquipmentType.RATING_F);
-                partAvailabilityLog.append("<br>[clan part for non clan faction]");
-            } else if (et != null) {
-                /*
-                 * AtB rules do not simply affect the difficulty of getting parts, but whether
-                 * they can be obtained at all. Changing the system to use availability codes
-                 * can have a serious effect on game play, so we apply a few tweaks to keep some
-                 * of the more basic items from becoming completely unobtainable, while applying
-                 * a minimum for non-flamer energy weapons, which was the reason this rule was
-                 * included in AtB to begin with.
-                 */
-                if (et instanceof EnergyWeapon
-                        && !(et instanceof FlamerWeapon)
-                        && partAvailability < EquipmentType.RATING_C) {
-                    partAvailability = EquipmentType.RATING_C;
-                    partAvailabilityLog.append("<br>[Non-Flamer Lasers]");
-                }
-                if (et instanceof ACWeapon) {
-                    partAvailability -= 2;
-                    partAvailabilityLog.append("<br>Autocannon: -2");
-                }
-                if (et instanceof GaussWeapon
-                        || et instanceof FlamerWeapon) {
-                    partAvailability--;
-                    partAvailabilityLog.append("<br>Gauss Rifle or Flamer: -1");
-                }
-                if (et instanceof AmmoType) {
-                    switch (((AmmoType) et).getAmmoType()) {
-                        case AmmoType.T_AC:
-                            partAvailability -= 2;
-                            partAvailabilityLog.append("<br>Autocannon Ammo: -2");
-                            break;
-                        case AmmoType.T_GAUSS:
-                            partAvailability -= 1;
-                            partAvailabilityLog.append("<br>Gauss Ammo: -1");
-                            break;
-                    }
-                    if (EnumSet.of(Munitions.M_STANDARD).containsAll(
-                            ((AmmoType) et).getMunitionType())) {
-                        partAvailability--;
-                        partAvailabilityLog.append("<br>Standard Ammo: -1");
-                    }
-                }
-            }
-
-            if (((getGameYear() < 2950) || (getGameYear() > 3040))
-                    && (acquisition instanceof Armor || acquisition instanceof MissingMekActuator
-                            || acquisition instanceof MissingMekCockpit
-                            || acquisition instanceof MissingMekLifeSupport
-                            || acquisition instanceof MissingMekLocation
-                            || acquisition instanceof MissingMekSensor)) {
-                partAvailability--;
-                partAvailabilityLog.append("<br>Mek part prior to 2950 or after 3040: - 1");
-            }
-
-            int AtBPartsAvailability = findAtBPartsAvailabilityLevel(acquisition, null);
-            partAvailabilityLog.append("<br>Total part availability: ").append(partAvailability)
-                    .append("<br>Current campaign availability: ").append(AtBPartsAvailability)
-                    .append("</html>");
-            if (partAvailability > AtBPartsAvailability) {
-                return new TargetRoll(TargetRoll.IMPOSSIBLE, partAvailabilityLog.toString());
-            }
-        }
         TargetRoll target = new TargetRoll(skill.getFinalSkillValue(), skill.getSkillLevel().toString());
         target.append(acquisition.getAllAcquisitionMods());
+
+        if (getCampaignOptions().isUseAtB() &&
+                getCampaignOptions().isRestrictPartsByMission()) {
+            int contractAvailability = findAtBPartsAvailabilityLevel();
+
+            if (contractAvailability != 0) {
+                target.addModifier(contractAvailability, "Contract");
+            }
+        }
+
+
+        if (isGrayMonday(this)) {
+            target.addModifier(4, "Gray Monday");
+        }
+
         return target;
     }
 
-    public @Nullable AtBContract getAttachedAtBContract(Unit unit) {
-        if (null != unit && null != combatTeams.get(unit.getForceId())) {
-            return combatTeams.get(unit.getForceId()).getContract(this);
-        }
-        return null;
-    }
+    public int findAtBPartsAvailabilityLevel() {
+        Integer availabilityModifier = null;
+        for (AtBContract contract : getActiveAtBContracts()) {
+            int contractAvailability = contract.getPartsAvailabilityLevel();
 
-    public int findAtBPartsAvailabilityLevel(IAcquisitionWork acquisition, StringBuilder reportBuilder) {
-        AtBContract contract = (acquisition != null) ? getAttachedAtBContract(acquisition.getUnit()) : null;
-
-        /*
-         * If the unit is not assigned to a contract, use the least restrictive active
-         * contract. Don't restrict parts availability by contract if it has not
-         * started.
-         */
-        if (hasActiveContract()) {
-            for (final AtBContract c : getActiveAtBContracts()) {
-                if ((contract == null)
-                        || (c.getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel())) {
-                    contract = c;
-                }
+            if (availabilityModifier == null || contractAvailability < availabilityModifier) {
+                availabilityModifier = contractAvailability;
             }
         }
 
-        // if we have a contract and it has started
-        if ((null != contract) && contract.isActiveOn(getLocalDate(), true)) {
-            if (reportBuilder != null) {
-                reportBuilder.append(contract.getPartsAvailabilityLevel()).append(" (").append(contract.getType())
-                        .append(')');
-            }
-            return contract.getPartsAvailabilityLevel();
-        }
-
-        /* If contract is still null, the unit is not in a contract. */
-        final Person person = getLogisticsPerson();
-        final int experienceLevel;
-        if (person == null) {
-            experienceLevel = SkillType.EXP_ULTRA_GREEN;
-        } else if (CampaignOptions.S_TECH.equals(getCampaignOptions().getAcquisitionSkill())) {
-            experienceLevel = person.getBestTechSkill().getExperienceLevel();
-        } else {
-            experienceLevel = person.getSkill(getCampaignOptions().getAcquisitionSkill()).getExperienceLevel();
-        }
-
-        final int modifier = experienceLevel - SkillType.EXP_REGULAR;
-
-        if (reportBuilder != null) {
-            reportBuilder.append(getAtBUnitRatingMod()).append("(unit rating)");
-            if (person != null) {
-                reportBuilder.append(modifier).append('(').append(person.getFullName()).append(", logistics admin)");
-            } else {
-                reportBuilder.append(modifier).append("(no logistics admin)");
-            }
-        }
-
-        return getAtBUnitRatingMod() + modifier;
+        return Objects.requireNonNullElse(availabilityModifier, 0);
     }
 
     public void resetAstechMinutes() {
@@ -7580,7 +7457,8 @@ public class Campaign implements ITechManager {
      * @param person The {@link Person} who should receive a randomized portrait.
      */
     public void assignRandomPortraitFor(final Person person) {
-        final Portrait portrait = RandomPortraitGenerator.generate(getPersonnel(), person);
+        final Boolean allowDuplicatePortraits = getCampaignOptions().isAllowDuplicatePortraits();
+        final Portrait portrait = RandomPortraitGenerator.generate(getPersonnel(), person, allowDuplicatePortraits);
         if (!portrait.isDefault()) {
             person.setPortrait(portrait);
         }
@@ -8135,55 +8013,42 @@ public class Campaign implements ITechManager {
         // if you are delivering from the same planet then no transit times
         int currentTransitTime = (distance > 0) ? (int) Math.ceil(getCurrentSystem().getTimeToJumpPoint(1.0)) : 0;
         int originTransitTime = (distance > 0) ? (int) Math.ceil(system.getTimeToJumpPoint(1.0)) : 0;
-        int amazonFreeShipping = Compute.d6(1 + jumps);
+        int amazonFreeShipping = d6(1 + jumps);
         return (recharges * 7) + currentTransitTime + originTransitTime + amazonFreeShipping;
     }
 
-    /***
-     * Calculate transit times based on the margin of success from an acquisition
-     * roll. The values here
-     * are all based on what the user entered for the campaign options.
+    /**
+     * Calculates the transit time for the arrival of parts or supplies based on  the availability
+     * of the item, a random roll, and campaign-specific transit time settings.
      *
-     * @param mos - an integer of the margin of success of an acquisition roll
-     * @return the number of days that supplies will take to arrive.
+     * <p>The transit time is calculated using the following factors:
+     * <ul>
+     *     <li>A fixed base modifier value defined by campaign rules.</li>
+     *     <li>A random roll of 1d6 to add variability to the calculation.</li>
+     *     <li>The availability value of the requested parts or supplies from the acquisition details.</li>
+     * </ul>
+     *
+     * <p>The calculated duration is applied in units (days, weeks, or months) based on the campaign's
+     * configuration for transit time.</p>
+     *
+     * @param availability the availability code of the part or unit being acquired as an integer.
+     * @return the number of days required for the parts or units to arrive based on the
+     * calculated transit time.
      */
-    public int calculatePartTransitTime(int mos) {
-        int nDice = getCampaignOptions().getNDiceTransitTime();
-        int time = getCampaignOptions().getConstantTransitTime();
-        if (nDice > 0) {
-            time += Compute.d6(nDice);
-        }
+    public int calculatePartTransitTime(int availability) {
+        final int BASE_MODIFIER = 7; // CamOps p51
+        final int roll = d6(1);
+        final int total = max(1, (BASE_MODIFIER + roll + availability) / 4); // CamOps p51
+
         // now step forward through the calendar
-        LocalDate arrivalDate = getLocalDate();
-        arrivalDate = switch (getCampaignOptions().getUnitTransitTime()) {
-            case CampaignOptions.TRANSIT_UNIT_MONTH -> arrivalDate.plusMonths(time);
-            case CampaignOptions.TRANSIT_UNIT_WEEK -> arrivalDate.plusWeeks(time);
-            default -> arrivalDate.plusDays(time);
+        LocalDate arrivalDate = currentDay;
+        arrivalDate = switch (campaignOptions.getUnitTransitTime()) {
+            case TRANSIT_UNIT_MONTH -> arrivalDate.plusMonths(total);
+            case TRANSIT_UNIT_WEEK -> arrivalDate.plusWeeks(total);
+            default -> arrivalDate.plusDays(total);
         };
 
-        // now adjust for MoS and minimums
-        int mosBonus = getCampaignOptions().getAcquireMosBonus() * mos;
-        arrivalDate = switch (getCampaignOptions().getAcquireMosUnit()) {
-            case CampaignOptions.TRANSIT_UNIT_MONTH -> arrivalDate.minusMonths(mosBonus);
-            case CampaignOptions.TRANSIT_UNIT_WEEK -> arrivalDate.minusWeeks(mosBonus);
-            default -> arrivalDate.minusDays(mosBonus);
-        };
-
-        // now establish minimum date and if this is before
-        LocalDate minimumDate = getLocalDate();
-        minimumDate = switch (getCampaignOptions().getAcquireMinimumTimeUnit()) {
-            case CampaignOptions.TRANSIT_UNIT_MONTH ->
-                minimumDate.plusMonths(getCampaignOptions().getAcquireMinimumTime());
-            case CampaignOptions.TRANSIT_UNIT_WEEK ->
-                minimumDate.plusWeeks(getCampaignOptions().getAcquireMinimumTime());
-            default -> minimumDate.plusDays(getCampaignOptions().getAcquireMinimumTime());
-        };
-
-        if (arrivalDate.isBefore(minimumDate)) {
-            return Math.toIntExact(ChronoUnit.DAYS.between(getLocalDate(), minimumDate));
-        } else {
-            return Math.toIntExact(ChronoUnit.DAYS.between(getLocalDate(), arrivalDate));
-        }
+        return Math.toIntExact(ChronoUnit.DAYS.between(getLocalDate(), arrivalDate));
     }
 
     /**
@@ -8312,6 +8177,8 @@ public class Campaign implements ITechManager {
         }
         else if (campaignTransportType.isShipTransport()) {
             return shipTransporters;
+        } else if (campaignTransportType.isTowTransport()) {
+            return towTransporters;
         }
         return null;
     }
@@ -8368,6 +8235,10 @@ public class Campaign implements ITechManager {
         return shipTransporters.hasTransporters();
     }
 
+    private boolean hasTowTransports() {
+        return towTransporters.hasTransporters();
+    }
+
     /**
      * Do we have transports for the kind of transport?
      * @param campaignTransportType class of the TransportDetail
@@ -8376,9 +8247,10 @@ public class Campaign implements ITechManager {
     public boolean hasTransports(CampaignTransportType campaignTransportType) {
         if (campaignTransportType.isTacticalTransport()) {
             return hasTacticalTransports();
-        }
-        else if (campaignTransportType.isShipTransport()) {
+        } else if (campaignTransportType.isShipTransport()) {
             return hasShipTransports();
+        } else if (campaignTransportType.isTowTransport()) {
+            return hasTowTransports();
         }
         return false;
     }
@@ -8524,7 +8396,7 @@ public class Campaign implements ITechManager {
         }
 
         partReport += ", TN " + target.getValue() + '[' + target.getDesc() + ']';
-        int roll = Compute.d6(2);
+        int roll = d6(2);
         int margin = roll - target.getValue();
         partReport += " rolled a " + roll + ", margin of " + margin;
 
@@ -9119,6 +8991,14 @@ public class Campaign implements ITechManager {
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partInUseMapEntry");
         }
     }
+
+    /**
+     * Wipes the Parts in use map for the purpose of resetting all values to their default
+     */
+    public void wipePartsInUseMap() {
+        this.partsInUseRequestedStockMap.clear();
+    }
+
     /**
      * Retrieves the campaign faction icon for the specified {@link Campaign}.
      * If a custom icon is defined in the campaign's unit icon configuration, that icon is used.
@@ -9137,5 +9017,36 @@ public class Campaign implements ITechManager {
             icon = new ImageIcon(campaignIcon.getFilename());
         }
         return icon;
+    }
+
+    /**
+     * Checks if another active scenario has this scenarioID as it's linkedScenarioID and returns true if it finds one.
+     */
+    public boolean checkLinkedScenario(int scenarioID) {
+        for (Scenario scenario : getScenarios()) {
+            if ((scenario.getLinkedScenario() == scenarioID)
+                && (getScenario(scenario.getId()).getStatus().isCurrent())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns a list of entities (units) from all combat forces.
+     *
+     * @return a list of entities representing all combat units in the player force
+     */
+    public List<Entity> getAllCombatEntities() {
+        List<Entity> units = new ArrayList<>();
+        for (Force force : getAllForces()) {
+            if (!force.isForceType(ForceType.STANDARD)) {
+                continue;
+            }
+            for (UUID unitID : force.getUnits()) {
+                units.add(getUnit(unitID).getEntity());
+            }
+        }
+        return units;
     }
 }

@@ -2,7 +2,11 @@
 <ScenarioTemplate>
     <name>Convoy Raid</name>
     <shortBriefing>Intercept and disrupt enemy convoy.</shortBriefing>
-    <detailedBriefing>An enemy convoy carrying supplies is moving through the area. The objective is to prevent at least 50% of the convoy units from reaching the far edge of the map. The convoy will surrender if 50% of its escorts are destroyed or routed. Preserve 50% of friendly forces.</detailedBriefing>
+    <detailedBriefing>An enemy supply convoy is on the move, and this is our chance to cripple their logistics. Your mission is to intercept and raid the convoy before it can escape the engagement zone. These supplies are vital to the enemy’s war effort, and every truck or transport we eliminate weakens their ability to fight. Speed and aggression will be key—hit them hard, hit them fast, and get out before their reinforcements arrive.
+
+Your primary objective is to prevent at least 50% of the convoy from reaching the far side of the engagement zone. Disrupt their formation, destroy their transports, and force them to abandon their mission. If their escort force proves too formidable, you have an alternative route to success—destroy at least 50% of the convoy’s escorts to force the remaining defenders to surrender. With their protection shattered, the convoy will have no choice but to stand down.
+
+The more convoy units that survive, the greater the spoils. Disabling transports instead of outright destruction may increase salvage potential, but that is a secondary concern to stopping the convoy itself. However, do not linger. The enemy will respond quickly, and we will not control the field once the battle ends. Execute the raid with precision, neutralize the targets, and withdraw before the enemy's full force arrives.</detailedBriefing>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
@@ -129,11 +133,11 @@
                 <failureEffect>
                     <effectType>ScenarioDefeat</effectType>
                     <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
+                    <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Prevent the following force(s) and unit(s) from reaching the far map edge:</description>
+            <description>Prevent the following forces from reaching the far map edge. +2 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>PreventReachMapEdge</objectiveCriterion>
             <percentage>50</percentage>
@@ -147,15 +151,14 @@
             <associatedUnitIDs />
             <successEffects>
                 <successEffect>
-                    <effectType>SupportPointUpdate</effectType>
+                    <effectType>SupplyCache</effectType>
                     <effectScaling>Linear</effectScaling>
                     <howMuch>1</howMuch>
                 </successEffect>
             </successEffects>
             <failureEffects />
             <additionalDetails />
-            <description>Capture intact units from the following force(s) for additional support
-                points:</description>
+            <description>Capture intact units from the following force(s) for additional supplies.</description>
             <destinationEdge>NONE</destinationEdge>
             <fixedAmount>1</fixedAmount>
             <objectiveCriterion>Capture</objectiveCriterion>
@@ -172,7 +175,7 @@
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
                     <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
+                    <howMuch>2</howMuch>
                 </successEffect>
             </successEffects>
             <failureEffect>
@@ -181,37 +184,9 @@
                 <howMuch>1</howMuch>
             </failureEffect>
             <additionalDetails />
-            <description>Destroy or rout 50% of the following force(s) and unit(s) to force convoy
-                surrender:</description>
+            <description>Destroy or rout 50% of the following forces to force convoy surrender. +2 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
-            <percentage>50</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Player</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>

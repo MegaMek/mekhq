@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,6 +34,7 @@ import java.util.Vector;
 
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
+import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.CARGO_MULTIPLIER;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
@@ -83,18 +84,18 @@ public class ResupplyUtilities {
         for (Force force : campaign.getAllForces()) {
             Force parentForce = force.getParentForce();
 
-            if (parentForce != null && (force.getParentForce().isConvoyForce())) {
+            if (parentForce != null && (force.getParentForce().isForceType(CONVOY))) {
                 continue;
             }
 
-            if (force.isConvoyForce() && force.getScenarioId() == scenarioId) {
+            if (force.isForceType(CONVOY) && force.getScenarioId() == scenarioId) {
                 new DialogAbandonedConvoy(campaign, contract, force);
 
                 for (UUID unitID : force.getAllUnits(false)) {
                     Unit unit = campaign.getUnit(unitID);
 
                     for (Person crewMember : unit.getCrew()) {
-                        decideCrewMemberFate(campaign, crewMember);
+                        decideCrewMemberFate(campaign, contract, crewMember);
                     }
 
                     campaign.removeUnit(unitID);
@@ -118,11 +119,15 @@ public class ResupplyUtilities {
      * @param campaign the {@link Campaign} instance for date tracking and updating crew member status.
      * @param person   the {@link Person} representing the crew member whose fate is being decided.
      */
-    private static void decideCrewMemberFate(Campaign campaign, Person person) {
+    private static void decideCrewMemberFate(Campaign campaign, AtBContract contract, Person person) {
         PersonnelStatus status = KIA;
 
         if (Compute.d6(2) > 7) {
-            status = PersonnelStatus.POW;
+            if (contract.getEnemy().isClan()) {
+                status = PersonnelStatus.ENEMY_BONDSMAN;
+            } else {
+                status = PersonnelStatus.POW;
+            }
         }
 
         person.changeStatus(campaign, campaign.getLocalDate(), status);

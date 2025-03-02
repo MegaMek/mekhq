@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,7 +32,7 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence;
+import mekhq.campaign.randomEvents.personalities.enums.Intelligence;
 import mekhq.utilities.ReportingUtilities;
 
 import java.time.DayOfWeek;
@@ -40,8 +40,12 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static megamek.common.Compute.d6;
+import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.personnel.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.SkillType.EXP_VETERAN;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.PERSONALITY_QUIRK_CHANCE;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateAndApplyPersonalityQuirk;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 
 /**
  * The EducationController class is responsible for managing the education
@@ -833,7 +837,9 @@ public class EducationController {
         int adultDiceSize = campaign.getCampaignOptions().getAdultDropoutChance();
         int childDiceSize = campaign.getCampaignOptions().getChildrenDropoutChance();
 
-        if (person.isChild(campaign.getLocalDate())) {
+        // Under 18s don't generally have the same capacity for self-determination as 18+
+        // characters, so we treat them as children - even though at 16 they can take Roles.
+        if (person.isChild(campaign.getLocalDate(), true)) {
             if (childDiceSize > 1) {
                 roll = Compute.randomInt(childDiceSize);
             } else {
@@ -996,7 +1002,12 @@ public class EducationController {
         // been destroyed too.
         if ((campaign.getLocalDate().getYear() >= academy.getDestructionYear())
                 || (campaign.getSystemById(person.getEduAcademySystem()).getPopulation(campaign.getLocalDate()) == 0)) {
-            if ((!person.isChild(campaign.getLocalDate())) || (campaign.getCampaignOptions().isAllAges())) {
+
+            // We use the 'use18' clause here because we don't want to upset players by having
+            // children killed when their academy is attacked unless the player has explicitly
+            // opted in. While players can assign 16-year-olds to combat roles and have them killed
+            // there, that doesn't have the same connotations.
+            if ((!person.isChild(campaign.getLocalDate(), true)) || (campaign.getCampaignOptions().isAllAges())) {
                 if (d6(2) >= 5) {
                     String reportMessage = String.format(resources.getString("eventDestruction.text"),
                             person.getHyperlinkedFullTitle(),
@@ -1479,6 +1490,14 @@ public class EducationController {
         if (academy.isReeducationCamp()) {
             if (campaign.getCampaignOptions().isUseReeducationCamps()) {
                 person.setOriginFaction(campaign.getFaction());
+            }
+
+            // People coming out of re-education camps have a chance to become a little weird
+            if (person.getPersonalityQuirk().isNone()) {
+                if (randomInt(PERSONALITY_QUIRK_CHANCE / 2) == 0) {
+                    generateAndApplyPersonalityQuirk(person);
+                    writePersonalityDescription(person);
+                }
             }
 
             // brainwashed personnel should have higher than average loyalty, so they roll

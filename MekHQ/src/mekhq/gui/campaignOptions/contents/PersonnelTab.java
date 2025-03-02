@@ -24,7 +24,11 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Skills;
-import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.enums.AwardBonus;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.gui.campaignOptions.components.*;
 
 import javax.swing.*;
@@ -175,11 +179,6 @@ public class PersonnelTab {
     private JPanel prisonerPanel;
     private JLabel lblPrisonerCaptureStyle;
     private MMComboBox<PrisonerCaptureStyle> comboPrisonerCaptureStyle;
-    private JLabel lblPrisonerStatus;
-    private MMComboBox<PrisonerStatus> comboPrisonerStatus;
-    private JCheckBox chkPrisonerBabyStatus;
-    private JCheckBox chkAtBPrisonerDefection;
-    private JCheckBox chkAtBPrisonerRansom;
 
     private JPanel dependentsPanel;
     private JCheckBox chkUseRandomDependentAddition;
@@ -261,14 +260,6 @@ public class PersonnelTab {
         lblPrisonerCaptureStyle = new JLabel();
         comboPrisonerCaptureStyle = new MMComboBox<>("comboPrisonerCaptureStyle",
             PrisonerCaptureStyle.values());
-
-        lblPrisonerStatus = new JLabel();
-        comboPrisonerStatus = new MMComboBox<>("comboPrisonerStatus",
-            getPrisonerStatusOptions());
-
-        chkPrisonerBabyStatus = new JCheckBox();
-        chkAtBPrisonerDefection = new JCheckBox();
-        chkAtBPrisonerRansom = new JCheckBox();
 
         dependentsPanel = new JPanel();
         chkUseRandomDependentAddition = new JCheckBox();
@@ -1058,17 +1049,11 @@ public class PersonnelTab {
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PrisonerCaptureStyle) {
-                    list.setToolTipText(((PrisonerCaptureStyle) value).getToolTipText());
+                    list.setToolTipText(wordWrap(((PrisonerCaptureStyle) value).getTooltip()));
                 }
                 return this;
             }
         });
-
-        lblPrisonerStatus = new CampaignOptionsLabel("PrisonerStatus");
-
-        chkPrisonerBabyStatus = new CampaignOptionsCheckBox("PrisonerBabyStatus");
-        chkAtBPrisonerDefection = new CampaignOptionsCheckBox("AtBPrisonerDefection");
-        chkAtBPrisonerRansom = new CampaignOptionsCheckBox("AtBPrisonerRansom");
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PrisonersPanel", true,
@@ -1081,23 +1066,6 @@ public class PersonnelTab {
         panel.add(lblPrisonerCaptureStyle, layout);
         layout.gridx++;
         panel.add(comboPrisonerCaptureStyle, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblPrisonerStatus, layout);
-        layout.gridx++;
-        panel.add(comboPrisonerStatus, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 2;
-        panel.add(chkPrisonerBabyStatus, layout);
-
-        layout.gridy++;
-        panel.add(chkAtBPrisonerDefection, layout);
-
-        layout.gridy++;
-        panel.add(chkAtBPrisonerRansom, layout);
 
         return panel;
     }
@@ -1450,10 +1418,6 @@ public class PersonnelTab {
 
         // Prisoners and Dependents
         comboPrisonerCaptureStyle.setSelectedItem(options.getPrisonerCaptureStyle());
-        comboPrisonerStatus.setSelectedItem(options.getDefaultPrisonerStatus());
-        chkPrisonerBabyStatus.setSelected(options.isPrisonerBabyStatus());
-        chkAtBPrisonerDefection.setSelected(options.isUseAtBPrisonerDefection());
-        chkAtBPrisonerRansom.setSelected(options.isUseAtBPrisonerRansom());
         chkUseRandomDependentAddition.setSelected(options.isUseRandomDependentAddition());
         chkUseRandomDependentRemoval.setSelected(options.isUseRandomDependentRemoval());
 
@@ -1551,10 +1515,6 @@ public class PersonnelTab {
 
         // Prisoners and Dependents
         options.setPrisonerCaptureStyle(comboPrisonerCaptureStyle.getSelectedItem());
-        options.setDefaultPrisonerStatus(comboPrisonerStatus.getSelectedItem());
-        options.setPrisonerBabyStatus(chkPrisonerBabyStatus.isSelected());
-        options.setUseAtBPrisonerDefection(chkAtBPrisonerDefection.isSelected());
-        options.setUseAtBPrisonerRansom(chkAtBPrisonerRansom.isSelected());
         options.setUseRandomDependentAddition(chkUseRandomDependentAddition.isSelected());
         options.setUseRandomDependentRemoval(chkUseRandomDependentRemoval.isSelected());
 

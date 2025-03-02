@@ -1,7 +1,7 @@
 /*
  * Satellite.java
  *
- * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,24 +20,32 @@
  */
 package mekhq.campaign.universe;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * This is an object for satellites (i.e. moons around a planet)
  *
  * @author Aaron Gullickson (aarongullickson at gmail.com)
  */
-@XmlRootElement(name = "satellite")
-@XmlAccessorType(value = XmlAccessType.FIELD)
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Satellite {
-    private String name;
-    private String size;
+    @JsonProperty("name")
+    private SourceableValue<String> name;
+    @JsonProperty("size")
+    private SourceableValue<String> size;
+    @JsonProperty("icon")
     private String icon;
 
-    public String getDescription() {
-        return name + " (" + size + ")";
+    public SourceableValue getSourcedName() {
+        return name;
+    }
+
+    public String getSize() {
+        if(null == size) {
+            return "medium";
+        }
+        return size.getValue();
     }
 
     public String getIcon() {
