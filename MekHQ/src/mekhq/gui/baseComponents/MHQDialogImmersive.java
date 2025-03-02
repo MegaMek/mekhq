@@ -442,6 +442,9 @@ public class MHQDialogImmersive extends JDialog {
         for (JButton button : buttonList) {
             buttonPanel.add(button, gbc);
 
+            // This ensures we don't have a button selected by default
+            button.setFocusable(false);
+
             if (isVerticalLayout) {
                 // If we're using a vertical layout, we just want the buttons stacked
                 gbc.gridy++;
