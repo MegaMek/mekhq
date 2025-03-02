@@ -17,10 +17,13 @@
  * if not, see <https://www.gnu.org/licenses/>.
  *
  * NOTICE: The MegaMek organization is a non-profit group of volunteers
- * creating free software for the BattleTech community. BattleMech,
- * BattleTech, and MechWarrior are trademarks of The Topps Company, Inc.
- * The MegaMek organization is not affiliated with The Topps Company, Inc.
- * or Catalyst Game Labs.
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 
 package mekhq.campaign.market.procurement;
