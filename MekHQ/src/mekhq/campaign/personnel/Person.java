@@ -1603,6 +1603,32 @@ public class Person {
         return fatigue;
     }
 
+    /**
+     * Calculates the effective fatigue for a person.
+     *
+     * @param campaign the campaign for which to calculate the effective fatigue
+     * @return the effective fatigue value
+     */
+    public int getEffectiveFatigue(Campaign campaign) {
+        int effectiveFatigue = fatigue;
+
+        if (isClanPersonnel()) {
+            effectiveFatigue -= 2;
+        }
+
+        switch (getSkillLevel(campaign, false)) {
+            case VETERAN -> effectiveFatigue--;
+            case ELITE, HEROIC, LEGENDARY -> effectiveFatigue -= 2;
+            default -> {}
+        }
+
+        if (campaign.getFieldKitchenWithinCapacity()) {
+            effectiveFatigue--;
+        }
+
+        return effectiveFatigue;
+    }
+
     public void setFatigue(final int fatigue) {
         this.fatigue = fatigue;
     }
@@ -4702,42 +4728,6 @@ public class Person {
             case 17 -> -2;
             default -> -3;
         };
-    }
-
-    /**
-     * Calculates the effective fatigue for a person.
-     *
-     * @param campaign the campaign for which to calculate the effective fatigue
-     * @return the effective fatigue value
-     */
-    public int getEffectiveFatigue(Campaign campaign) {
-        int effectiveFatigue = fatigue;
-
-        if (isClanPersonnel()) {
-            effectiveFatigue -= 2;
-        }
-
-        switch (getSkillLevel(campaign, false)) {
-            case NONE:
-            case ULTRA_GREEN:
-            case GREEN:
-            case REGULAR:
-                break;
-            case VETERAN:
-                effectiveFatigue--;
-                break;
-            case ELITE:
-            case HEROIC:
-            case LEGENDARY:
-                effectiveFatigue -= 2;
-                break;
-        }
-
-        if (campaign.getFieldKitchenWithinCapacity()) {
-            effectiveFatigue--;
-        }
-
-        return effectiveFatigue;
     }
 
     /**
