@@ -62,10 +62,10 @@ public record Accountant(Campaign campaign) {
 
     private Money getTheoreticalPayroll(boolean noInfantry) {
         Money salaries = Money.zero();
-        for (Person p : campaign().getActivePersonnel()) {
+        for (Person person : campaign().getActivePersonnel(false)) {
             // Optionized infantry (Unofficial)
-            if (!(noInfantry && p.getPrimaryRole().isSoldier())) {
-                salaries = salaries.plus(p.getSalary(campaign()));
+            if (!(noInfantry && person.getPrimaryRole().isSoldier())) {
+                salaries = salaries.plus(person.getSalary(campaign()));
             }
         }
 
@@ -287,8 +287,8 @@ public record Accountant(Campaign campaign) {
      */
     public Map<Person, Money> getPayRollSummary() {
         Map<Person, Money> payRollSummary = new HashMap<>();
-        for (Person p : campaign().getActivePersonnel()) {
-            payRollSummary.put(p, p.getSalary(campaign()));
+        for (Person person : campaign().getActivePersonnel(false)) {
+            payRollSummary.put(person, person.getSalary(campaign()));
         }
         // And pay our pool
         payRollSummary.put(null, Money.of((campaign().getCampaignOptions().getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount().doubleValue() * campaign().getAstechPool()) + (campaign().getCampaignOptions().getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() * campaign().getMedicPool())));
