@@ -32,6 +32,7 @@ import mekhq.gui.dialog.GlossaryDialog;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent.EventType;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -115,6 +116,9 @@ public class MHQDialogImmersive extends JDialog {
 
         CENTER_WIDTH = (centerWidth != null) ? centerWidth : CENTER_WIDTH;
 
+        // Set the dialog to be undecorated (removes 'X', title bar, etc.)
+        setDefaultLookAndFeelDecorated(true);
+
         // Title
         setTitle();
 
@@ -184,6 +188,7 @@ public class MHQDialogImmersive extends JDialog {
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         setModal(true);
         setLocationRelativeTo(null); // Needs to be after pack
+        setResizable(false);
         setVisible(true);
     }
 
@@ -364,37 +369,81 @@ public class MHQDialogImmersive extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
 
-        for (ButtonLabelTooltipPair buttonStrings : buttons) {
-            JButton button;
-            if (isVerticalLayout) {
-                StringBuilder buttonLabel = new StringBuilder("<html><b>").append(buttonStrings.btnLabel()).append("</b>");
+        List<JButton> buttonList = new ArrayList<>();
+        Dimension largestSize = new Dimension(0, 0);
 
+        // First pass: Create buttons and determine the largest size
+        for (ButtonLabelTooltipPair buttonStrings : buttons) {
+            JButton button = null;
+
+            if (isVerticalLayout) {
+                StringBuilder buttonLabel = new StringBuilder("<html>");
+
+                String label = buttonStrings.btnLabel();
                 String tooltip = buttonStrings.btnTooltip();
-                if (tooltip != null) {
-                    buttonLabel.append("<br>").append(tooltip);
+                if (label != null && tooltip != null) {
+                    buttonLabel.append("<b>").append(buttonStrings.btnLabel()).append("</b>")
+                        .append("<br>").append(tooltip);
+                } else if (label == null && tooltip != null) {
+                    buttonLabel.append(tooltip);
+                } else if (label != null) {
+                    buttonLabel.append(label);
                 }
 
                 button = new JButton(buttonLabel.toString());
             } else {
-                button = new JButton(buttonStrings.btnLabel());
-
+                String label = buttonStrings.btnLabel();
                 String tooltip = buttonStrings.btnTooltip();
-                if (tooltip != null) {
-                    button.setToolTipText(wordWrap(tooltip));
+                if (label != null) {
+                    button = new JButton(label);
+
+                    if (tooltip != null) {
+                        button.setToolTipText(wordWrap(tooltip));
+                    }
+                } else if (tooltip != null) {
+                    button = new JButton(tooltip);
                 }
             }
 
-            button.setMinimumSize(button.getPreferredSize());
+            if (button == null) {
+                continue;
+            }
 
+            // Left-align text, if using vertical layout, otherwise we want text centralized (default)
+            if (isVerticalLayout) {
+                button.setHorizontalAlignment(SwingConstants.LEFT);
+                button.setHorizontalTextPosition(SwingConstants.LEFT);
+            }
+
+            // Add action listener
             button.addActionListener(evt -> {
                 dialogChoice = buttons.indexOf(buttonStrings);
                 dispose();
             });
 
+            // Update largest size
+            Dimension preferredSize = button.getPreferredSize();
+            if (preferredSize.width > largestSize.width) {
+                largestSize.width = preferredSize.width;
+            }
+            if (preferredSize.height > largestSize.height) {
+                largestSize.height = preferredSize.height;
+            }
+
+            buttonList.add(button);
+        }
+
+        // Second pass: Set all buttons to the largest size
+        for (JButton button : buttonList) {
+            button.setPreferredSize(largestSize);
+        }
+
+        // Final pass: Add buttons to the panel
+        for (JButton button : buttonList) {
             buttonPanel.add(button, gbc);
 
-            // Update the layout based on isVerticalLayout
             if (isVerticalLayout) {
+                // If we're using a vertical layout, we just want the buttons stacked
                 gbc.gridy++;
             } else {
                 // Horizontal layout with wrapping after every 3 buttons
@@ -535,11 +584,11 @@ public class MHQDialogImmersive extends JDialog {
          *
          * @param btnLabel   The label for the button. Must not be {@code null}.
          * @param btnTooltip The tooltip for the button. Can be {@code null} if no tooltip is given.
-         * @throws IllegalArgumentException if {@code btnLabel} is {@code null}.
+         * @throws IllegalArgumentException if both {@code btnLabel} and {@code btnTooltip} are {@code null}.
          */
         public ButtonLabelTooltipPair(String btnLabel, @Nullable String btnTooltip) {
-            if (btnLabel == null) {
-                throw new IllegalArgumentException("btnLabel cannot be null.");
+            if (btnLabel == null && btnTooltip == null) {
+                throw new IllegalArgumentException("btnLabel and btnTooltip cannot be null at the same time.");
             }
             this.btnLabel = btnLabel;
             this.btnTooltip = btnTooltip;

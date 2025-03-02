@@ -79,17 +79,17 @@ public class PrisonerEventDialog extends MHQDialogImmersive {
         List<ButtonLabelTooltipPair> buttons = new ArrayList<>();
 
         ButtonLabelTooltipPair btnResponseA = new ButtonLabelTooltipPair(
-            getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_0 + event.name() + SUFFIX_BUTTON),
+            null,
             getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_0 + event.name() + SUFFIX_TOOLTIP));
         buttons.add(btnResponseA);
 
         ButtonLabelTooltipPair btnResponseB = new ButtonLabelTooltipPair(
-            getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_1 + event.name() + SUFFIX_BUTTON),
+            null,
             getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_1 + event.name() + SUFFIX_TOOLTIP));
         buttons.add(btnResponseB);
 
         ButtonLabelTooltipPair btnResponseC = new ButtonLabelTooltipPair(
-            getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_2 + event.name() + SUFFIX_BUTTON),
+            null,
             getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_2 + event.name() + SUFFIX_TOOLTIP));
         buttons.add(btnResponseC);
 
