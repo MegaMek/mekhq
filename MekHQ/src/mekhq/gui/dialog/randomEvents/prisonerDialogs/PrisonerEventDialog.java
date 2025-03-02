@@ -49,7 +49,6 @@ public class PrisonerEventDialog extends MHQDialogImmersive {
     static final String OPTION_INDEX_1 = "1.";
     static final String OPTION_INDEX_2 = "2.";
     static final String SUFFIX_BUTTON = ".button";
-    static final String SUFFIX_TOOLTIP = ".tooltip";
 
     /**
      * Creates a dialog to ask the player how they would like to respond to a prisoner event.
@@ -80,17 +79,17 @@ public class PrisonerEventDialog extends MHQDialogImmersive {
 
         ButtonLabelTooltipPair btnResponseA = new ButtonLabelTooltipPair(
             null,
-            getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_0 + event.name() + SUFFIX_TOOLTIP));
+            getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_0 + event.name() + SUFFIX_BUTTON));
         buttons.add(btnResponseA);
 
         ButtonLabelTooltipPair btnResponseB = new ButtonLabelTooltipPair(
             null,
-            getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_1 + event.name() + SUFFIX_TOOLTIP));
+            getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_1 + event.name() + SUFFIX_BUTTON));
         buttons.add(btnResponseB);
 
         ButtonLabelTooltipPair btnResponseC = new ButtonLabelTooltipPair(
             null,
-            getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_2 + event.name() + SUFFIX_TOOLTIP));
+            getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_2 + event.name() + SUFFIX_BUTTON));
         buttons.add(btnResponseC);
 
         return buttons;
