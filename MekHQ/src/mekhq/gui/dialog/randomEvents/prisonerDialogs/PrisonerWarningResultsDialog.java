@@ -51,7 +51,7 @@ public class PrisonerWarningResultsDialog extends MHQDialogImmersive {
      */
     public PrisonerWarningResultsDialog(Campaign campaign, @Nullable Person speaker, boolean isExecute) {
         super(campaign, speaker, null, createInCharacterMessage(campaign, isExecute),
-            createButtons(), createOutOfCharacterMessage(), null);
+            createButtons(), createOutOfCharacterMessage(), null, false);
     }
 
     /**

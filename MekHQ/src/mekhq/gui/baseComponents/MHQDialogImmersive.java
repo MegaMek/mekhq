@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.campaign.force.Force.FORCE_NONE;
@@ -106,7 +107,7 @@ public class MHQDialogImmersive extends JDialog {
     public MHQDialogImmersive(Campaign campaign, @Nullable Person leftSpeaker,
                               @Nullable Person rightSpeaker, String centerMessage,
                               List<ButtonLabelTooltipPair> buttons, @Nullable String outOfCharacterMessage,
-                              @Nullable Integer centerWidth) {
+                              @Nullable Integer centerWidth, boolean isVerticalLayout) {
         // Initialize
         this.campaign = campaign;
         this.leftSpeaker = leftSpeaker;
@@ -140,7 +141,7 @@ public class MHQDialogImmersive extends JDialog {
         }
 
         // Center box for the message
-        JPanel pnlCenter = createCenterBox(centerMessage, buttons);
+        JPanel pnlCenter = createCenterBox(centerMessage, buttons, isVerticalLayout);
         constraints.gridx = gridx;
         constraints.gridy = 0;
         constraints.weightx = 2;
@@ -173,9 +174,15 @@ public class MHQDialogImmersive extends JDialog {
         add(southPanel, BorderLayout.SOUTH);
 
         // Dialog settings
+        pack();
+        // The reason for this unusual size setup is to account for the Windows taskbar
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int screenHeight = screenSize.height;
+        int screenWidth = screenSize.width;
+        setSize(min(screenWidth, getWidth()), (int) min(getHeight(), screenHeight * 0.8));
+
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         setModal(true);
-        pack();
         setLocationRelativeTo(null); // Needs to be after pack
         setVisible(true);
     }
@@ -204,13 +211,13 @@ public class MHQDialogImmersive extends JDialog {
      *                      tooltips, and custom actions.
      * @return A {@link JPanel} with the message displayed in the center and buttons at the bottom.
      */
-
-    private JPanel createCenterBox(String centerMessage, List<ButtonLabelTooltipPair> buttons) {
+    private JPanel createCenterBox(String centerMessage, List<ButtonLabelTooltipPair> buttons,
+                                   boolean isVerticalLayout) {
         northPanel = new JPanel(new BorderLayout());
 
         // Buttons panel
         buttonPanel = new JPanel();
-        populateButtonPanel(buttons);
+        populateButtonPanel(buttons, isVerticalLayout);
 
         // Create a JEditorPane for the center message
         JEditorPane editorPane = new JEditorPane();
@@ -348,7 +355,7 @@ public class MHQDialogImmersive extends JDialog {
      *
      * @param buttons A list of button label-tooltip pairs defining the content of the buttons.
      */
-    private void populateButtonPanel(List<ButtonLabelTooltipPair> buttons) {
+    private void populateButtonPanel(List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout) {
         buttonPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -358,11 +365,23 @@ public class MHQDialogImmersive extends JDialog {
         gbc.fill = GridBagConstraints.NONE;
 
         for (ButtonLabelTooltipPair buttonStrings : buttons) {
-            JButton button = new JButton(buttonStrings.btnLabel());
+            JButton button;
+            if (isVerticalLayout) {
+                StringBuilder buttonLabel = new StringBuilder("<html><b>").append(buttonStrings.btnLabel()).append("</b>");
 
-            String tooltip = buttonStrings.btnTooltip();
-            if (tooltip != null) {
-                button.setToolTipText(wordWrap(tooltip));
+                String tooltip = buttonStrings.btnTooltip();
+                if (tooltip != null) {
+                    buttonLabel.append("<br>").append(tooltip);
+                }
+
+                button = new JButton(buttonLabel.toString());
+            } else {
+                button = new JButton(buttonStrings.btnLabel());
+
+                String tooltip = buttonStrings.btnTooltip();
+                if (tooltip != null) {
+                    button.setToolTipText(wordWrap(tooltip));
+                }
             }
 
             button.setMinimumSize(button.getPreferredSize());
@@ -374,10 +393,16 @@ public class MHQDialogImmersive extends JDialog {
 
             buttonPanel.add(button, gbc);
 
-            gbc.gridx++;
-            if (gbc.gridx % 3 == 0) { // Move to a new row after every third button
-                gbc.gridx = 0;
+            // Update the layout based on isVerticalLayout
+            if (isVerticalLayout) {
                 gbc.gridy++;
+            } else {
+                // Horizontal layout with wrapping after every 3 buttons
+                gbc.gridx++;
+                if (gbc.gridx % 3 == 0) { // Move to a new row after every third button
+                    gbc.gridx = 0;
+                    gbc.gridy++;
+                }
             }
         }
     }
