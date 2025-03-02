@@ -1,21 +1,28 @@
 /*
- * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2025 The MegaMek Team
  *
  * This file is part of MekHQ.
  *
- * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
- * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community. BattleMech,
+ * BattleTech, and MechWarrior are trademarks of The Topps Company, Inc.
+ * The MegaMek organization is not affiliated with The Topps Company, Inc.
+ * or Catalyst Game Labs.
  */
+
 package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
@@ -182,7 +189,7 @@ public class ScenarioDeploymentLimit {
     // region Unit type methods
     /**
      * Add a UnitType integer to the allowed unit types list
-     * 
+     *
      * @param type an integer giving a unit type
      */
     private void addAllowedUnitType(int type) {
@@ -193,7 +200,7 @@ public class ScenarioDeploymentLimit {
      * Determines whether a given unit type is allowed in the scenario. If no unit
      * type limitations have been specified,
      * then this method will return true.
-     * 
+     *
      * @param unitType - an integer giving the UnitType
      * @return a boolean indicating whether the UnitType is allowed.
      */
@@ -204,7 +211,7 @@ public class ScenarioDeploymentLimit {
     /**
      * This method returns a description of what unit types are allowed for
      * graphical presentation
-     * 
+     *
      * @return a String of comma separated unit type descriptions
      */
     public String getAllowedUnitTypeDesc() {
@@ -224,7 +231,7 @@ public class ScenarioDeploymentLimit {
      * Determine how much unit quantity this unit counts toward, using the
      * appropriate measurement provided by
      * CountType. Units that are not allowed in this scenario will return zero.
-     * 
+     *
      * @param u - the Unit to be evaluated
      * @return an integer giving the quantity that this unit counts toward in the
      *         appropriate units of CountType
@@ -242,7 +249,7 @@ public class ScenarioDeploymentLimit {
 
     /**
      * The total quantity measured in the units of CountType that this force has.
-     * 
+     *
      * @param f - a Force to be evaluated
      * @param c - a pointer to the Campaign
      * @return the an integer giving the quantity that this force counts toward in
@@ -272,7 +279,7 @@ public class ScenarioDeploymentLimit {
      * scenario allows. If quantityType is PERCENT it will do this by looping
      * through all the forces
      * in the TO&amp;E and calculating force quantity.
-     * 
+     *
      * @param c a pointer to the campaign
      * @return an integer giving the maximum quantity allowed in this scenario
      */
@@ -292,7 +299,7 @@ public class ScenarioDeploymentLimit {
     /**
      * Calculate the quantity, measured in CountType units, of forces currently
      * deployed in the scenario
-     * 
+     *
      * @param s - a Scenario to be evaluated
      * @param c - a pointer to the campaign
      * @return an integer giving the current quantity of deployed forces in this
@@ -305,7 +312,7 @@ public class ScenarioDeploymentLimit {
     /**
      * Provides a String description of the quantity limits of the scenario for
      * graphical display
-     * 
+     *
      * @param s - a Scenario to get the description of
      * @param c - a point to the Campaign
      * @return a String describing the quantity limits
@@ -333,7 +340,7 @@ public class ScenarioDeploymentLimit {
     // region Required personnel methods
     /**
      * Checks whether any required personnel are currently deployed in the scenario
-     * 
+     *
      * @param s - a Scenario to evaluate
      * @param c - a pointer to the campaign
      * @return a boolean that evaluates to true if all required personnel are
@@ -360,7 +367,7 @@ public class ScenarioDeploymentLimit {
 
     /**
      * Determines whether a given Person is part of a Force
-     * 
+     *
      * @param personId - the id of a Person
      * @param force    - a Force
      * @param c        - a pointer to the campaign
@@ -383,7 +390,7 @@ public class ScenarioDeploymentLimit {
     /**
      * Returns a String giving a description of required personnel for graphical
      * display
-     * 
+     *
      * @param c - a pointer to the campaign
      * @return a String that is a comma separated list of required personnel names
      */
@@ -405,7 +412,7 @@ public class ScenarioDeploymentLimit {
     // region Required unit methods
     /**
      * Checks whether any required units are currently deployed in the scenario
-     * 
+     *
      * @param s - a Scenario to evaluate
      * @param c - a pointer to the campaign
      * @return a boolean that evaluates to true if all required units are currently
@@ -433,7 +440,7 @@ public class ScenarioDeploymentLimit {
 
     /**
      * Determines whether a given unit is part of a Force
-     * 
+     *
      * @param unitId - the id of a Person
      * @param force  - a Force
      * @param c      - a pointer to the campaign
@@ -452,7 +459,7 @@ public class ScenarioDeploymentLimit {
 
     /**
      * Returns a String giving a description of required units for graphical display
-     * 
+     *
      * @param c - a pointer to the campaign
      * @return a String that is a comma separated list of required unit names
      */

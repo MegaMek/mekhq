@@ -1,22 +1,26 @@
 /*
- * PartQuality.java
- *
- * Copyright (c) 2022-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2025 The MegaMek Team
  *
  * This file is part of MekHQ.
  *
- * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
- * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community. BattleMech,
+ * BattleTech, and MechWarrior are trademarks of The Topps Company, Inc.
+ * The MegaMek organization is not affiliated with The Topps Company, Inc.
+ * or Catalyst Game Labs.
  */
 
 
@@ -30,7 +34,7 @@ import java.util.*;
  * Represents the quality of a Part. Quality is a scale that ranges from A to F. By the book, A
  * is bad and F is good, but there is an option that inverts this scale, hence the 'reverse'
  * options on the various functions available here.
- * 
+ *
  * Internally quality is represented by a number 0 to 5, bad to good.
  */
 public enum PartQuality {
@@ -84,7 +88,7 @@ public enum PartQuality {
                 case QUALITY_D -> "D";
                 case QUALITY_E -> "E";
                 case QUALITY_F -> "F";
-            };  
+            };
         } else {
             return switch(this) {
                 case QUALITY_B -> "E";
@@ -150,7 +154,7 @@ public enum PartQuality {
             case QUALITY_A, QUALITY_B -> MekHQ.getMHQOptions().getFontColorNegativeHexColor();
             case QUALITY_C, QUALITY_D -> MekHQ.getMHQOptions().getFontColorWarningHexColor();
             case QUALITY_E, QUALITY_F -> MekHQ.getMHQOptions().getFontColorPositiveHexColor();
-            
+
         };
     }
 
