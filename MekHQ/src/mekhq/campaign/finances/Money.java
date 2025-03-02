@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2019 - Vicente Cartas Espinel (vicente.cartas at outlook.com). All Rights Reserved.
- * Copyright (C) 2020-2025 The MegaMek Team
+ * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *

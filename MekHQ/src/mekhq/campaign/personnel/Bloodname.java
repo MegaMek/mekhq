@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 - Carl Spain. All Rights Reserved.
- * Copyright (C) 2020-2025 The MegaMek Team
+ * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
