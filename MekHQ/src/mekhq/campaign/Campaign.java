@@ -117,8 +117,6 @@ import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.*;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.universe.*;
-import mekhq.campaign.universe.Planet.PlanetaryEvent;
-import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
@@ -4325,6 +4323,7 @@ public class Campaign implements ITechManager {
                 rating.reInitialize();
             }
 
+            boolean hasHadResupply = false;
             for (AtBContract contract : getActiveAtBContracts()) {
                 AtBMoraleLevel oldMorale = contract.getMoraleLevel();
 
@@ -4348,8 +4347,13 @@ public class Campaign implements ITechManager {
                     boolean inLocation = location.isOnPlanet()
                         && location.getCurrentSystem().equals(contract.getSystem());
 
+                    if (contract.isSubcontract() || hasHadResupply) {
+                        continue;
+                    }
+
                     if (inLocation) {
                         processResupply(contract);
+                        hasHadResupply = true;
                     }
                 }
             }
