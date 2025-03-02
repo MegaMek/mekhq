@@ -58,6 +58,26 @@ MEKHQ VERSION HISTORY:
 + PR #6075: Pintle turret and flags (MML #1741)
 + PR #6076: Added Reputation Sanity Options to Campaign Settings
 + PR #6077: When advancing day set cursor to wait cursor
++ PR #6083: Adjusted Prisoner Capacity Calculations and Event Logic
++ Fix #5719: Add setting for minimum daily repair time to MRMS
++ PR # #5998: Personality Revamp
++ PR #6086: Adjusted Reinforcement Arrival Time Scaling, Target Number, and Leadership Budget Logic
++ Fix #6084: Clear leadership units when setting a new scenario
++ Fix #4364: Add campaign option to allow duplicate portraits
++ PR #6095: Null Check for Random Dependents
++ Fix #6069: Updated Academy Training Types in Unit Education.xml
++ PR #6098: Corrected Glossary Links For Fatigue
++ Fix #6094: Fixed Prisoner Capture And Processing Logic #6099
++ Fix #6089: Refactored Unsupported Unit Handling
++ Fix #6088: Simplified Enum References And Removed Legacy Scenarios
++ Fix #6079: Fixed Incorrect Seed Force in Resupply Interceptions
++ Fix #6078: Added Fatigue Gain Mechanism for Training Combat Teams
++ Fix #6104: Fixed NullPointerException In RandomizeAroundSpecifiedPlanet
++ Fix #6063: Refactored StratCon Scenario Retrieval And Table Rendering
++ Fix #6055: Updated Scenario Briefings and Objectives
++ Fix #6107: Fixed Maternity Leave Activation Logic
+
+Fixes #6084
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment

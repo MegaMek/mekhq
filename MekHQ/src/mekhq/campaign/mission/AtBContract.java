@@ -922,6 +922,8 @@ public class AtBContract extends Contract {
             nextWeekBattleTypeMod = 0;
         }
 
+        boolean isUseStratCon = campaign.getCampaignOptions().isUseStratCon();
+
         if (campaign.getLocalDate().getDayOfMonth() == 1) {
             if (priorLogisticsFailure) {
                 partsAvailabilityLevel++;
@@ -948,8 +950,12 @@ public class AtBContract extends Contract {
                     break;
                 case REBELLION:
                     campaign.addReport("<b>Special Event:</b> Rebellion<br />+2 to next enemy morale roll");
-                    specialEventScenarioDate = getRandomDayOfMonth(campaign.getLocalDate());
-                    specialEventScenarioType = AtBScenario.CIVILIANRIOT;
+                    moraleMod += 2;
+
+                    if (!isUseStratCon) {
+                        specialEventScenarioDate = getRandomDayOfMonth(campaign.getLocalDate());
+                        specialEventScenarioType = AtBScenario.CIVILIANRIOT;
+                    }
                     break;
                 case BETRAYAL:
                     String text = "<b>Special Event:</b> Betrayal (employer minor breach)<br />";
@@ -1004,7 +1010,7 @@ public class AtBContract extends Contract {
                             break;
                         case 2:
                             text += "Internal Dissension";
-                            if (!campaign.getCampaignOptions().isUseStratCon()) {
+                            if (!isUseStratCon) {
                                 specialEventScenarioDate = getRandomDayOfMonth(campaign.getLocalDate());
                                 specialEventScenarioType = AtBScenario.AMBUSH;
                             } else {

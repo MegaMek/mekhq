@@ -7461,7 +7461,8 @@ public class Campaign implements ITechManager {
      * @param person The {@link Person} who should receive a randomized portrait.
      */
     public void assignRandomPortraitFor(final Person person) {
-        final Portrait portrait = RandomPortraitGenerator.generate(getPersonnel(), person);
+        final Boolean allowDuplicatePortraits = getCampaignOptions().isAllowDuplicatePortraits();
+        final Portrait portrait = RandomPortraitGenerator.generate(getPersonnel(), person, allowDuplicatePortraits);
         if (!portrait.isDefault()) {
             person.setPortrait(portrait);
         }

@@ -73,7 +73,7 @@
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
-                <forceMultiplier>1.0</forceMultiplier>
+                <forceMultiplier>0.5</forceMultiplier>
                 <forceName>OpFor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
@@ -87,8 +87,6 @@
                 <useArtillery>false</useArtillery>
                 <roleChoices>
                     <forceRole>RECON</forceRole>
-                    <forceRole>RAIDER</forceRole>
-                    <forceRole>CAVALRY</forceRole>
                 </roleChoices>
             </value>
         </entry>
@@ -114,40 +112,12 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
+            <description>Destroy 95% of the following force. +1 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
-            <percentage>50</percentage>
+            <objectiveCriterion>Destroy</objectiveCriterion>
+            <percentage>95</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Player</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>50</percentage>
-            <timeLimitAtMost>false</timeLimitAtMost>
-            <timeLimitScaleFactor>1</timeLimitScaleFactor>
-            <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
         </scenarioObjective>
     </scenarioObjectives>
 </ScenarioTemplate>
