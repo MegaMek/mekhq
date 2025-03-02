@@ -117,8 +117,6 @@ import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.*;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.universe.*;
-import mekhq.campaign.universe.Planet.PlanetaryEvent;
-import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
@@ -7004,7 +7002,7 @@ public class Campaign implements ITechManager {
         }
 
 
-        if (isGrayMonday(this)) {
+        if (isGrayMonday(currentDay, campaignOptions.isSimulateGrayMonday())) {
             target.addModifier(4, "Gray Monday");
         }
 

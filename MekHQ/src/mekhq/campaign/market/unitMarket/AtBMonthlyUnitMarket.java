@@ -214,7 +214,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
     private int getMarketItemCount(Campaign campaign, UnitMarketRarity rarity, int rarityModifier) {
         int totalRarity = rarity.ordinal() + rarityModifier;
 
-        if (isGrayMonday(campaign)) {
+        if (isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().isSimulateGrayMonday())) {
             totalRarity -= 4;
         }
 

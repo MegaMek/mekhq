@@ -68,7 +68,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     @Override
     public void generateContractOffers(Campaign campaign, boolean newCampaign) {
-        boolean isGrayMonday = isGrayMonday(campaign);
+        boolean isGrayMonday = isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().isSimulateGrayMonday());
 
         if (!(campaign.getLocalDate().getDayOfMonth() == 1) && !newCampaign) {
             return;
