@@ -1,7 +1,7 @@
 /*
  * Accountant.java
  *
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,23 +38,14 @@ import java.util.UUID;
 /**
  * Provides accounting for a Campaign.
  */
-public class Accountant {
-    private final Campaign campaign;
-
-    public Accountant(Campaign campaign) {
-        this.campaign = campaign;
-    }
-
-    public Campaign getCampaign() {
-        return campaign;
-    }
+public record Accountant(Campaign campaign) {
 
     public CampaignOptions getCampaignOptions() {
-        return getCampaign().getCampaignOptions();
+        return campaign().getCampaignOptions();
     }
 
     public Hangar getHangar() {
-        return getCampaign().getHangar();
+        return campaign().getHangar();
     }
 
     public Money getPayRoll() {
@@ -71,38 +62,29 @@ public class Accountant {
 
     private Money getTheoreticalPayroll(boolean noInfantry) {
         Money salaries = Money.zero();
-        for (Person p : getCampaign().getActivePersonnel()) {
+        for (Person p : campaign().getActivePersonnel()) {
             // Optionized infantry (Unofficial)
             if (!(noInfantry && p.getPrimaryRole().isSoldier())) {
-                salaries = salaries.plus(p.getSalary(getCampaign()));
+                salaries = salaries.plus(p.getSalary(campaign()));
             }
         }
 
         // And pay our pool
-        salaries = salaries.plus(getCampaign().getCampaignOptions()
-                .getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount().doubleValue()
-                * getCampaign().getAstechPool());
-        salaries = salaries.plus(getCampaign().getCampaignOptions()
-                .getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue()
-                * getCampaign().getMedicPool());
+        salaries = salaries.plus(campaign().getCampaignOptions().getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount().doubleValue() * campaign().getAstechPool());
+        salaries = salaries.plus(campaign().getCampaignOptions().getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() * campaign().getMedicPool());
 
         return salaries;
     }
 
     public Money getMaintenanceCosts() {
         if (getCampaignOptions().isPayForMaintain()) {
-            return getHangar().getUnitsStream()
-                .filter(u -> u.requiresMaintenance() && (null != u.getTech()))
-                .map(Unit::getMaintenanceCost)
-                .reduce(Money.zero(), Money::plus);
+            return getHangar().getUnitsStream().filter(u -> u.requiresMaintenance() && (null != u.getTech())).map(Unit::getMaintenanceCost).reduce(Money.zero(), Money::plus);
         }
         return Money.zero();
     }
 
     public Money getWeeklyMaintenanceCosts() {
-        return getHangar().getUnitsStream()
-            .map(Unit::getWeeklyMaintenanceCost)
-            .reduce(Money.zero(), Money::plus);
+        return getHangar().getUnitsStream().map(Unit::getWeeklyMaintenanceCost).reduce(Money.zero(), Money::plus);
     }
 
     public Money getOverheadExpenses() {
@@ -115,6 +97,7 @@ public class Accountant {
 
     /**
      * Gets peacetime costs including salaries.
+     *
      * @return The peacetime costs of the campaign including salaries.
      */
     public Money getPeacetimeCost() {
@@ -123,7 +106,7 @@ public class Accountant {
 
     /**
      * Gets peacetime costs, optionally including salaries.
-     *
+     * <p>
      * This can be used to ensure salaries are not double counted.
      *
      * @param includeSalaries A value indicating whether or not salaries
@@ -131,10 +114,7 @@ public class Accountant {
      * @return The peacetime costs of the campaign, optionally including salaries.
      */
     public Money getPeacetimeCost(boolean includeSalaries) {
-        Money peaceTimeCosts = Money.zero()
-                                .plus(getMonthlySpareParts())
-                                .plus(getMonthlyFuel())
-                                .plus(getMonthlyAmmo());
+        Money peaceTimeCosts = Money.zero().plus(getMonthlySpareParts()).plus(getMonthlyFuel()).plus(getMonthlyAmmo());
         if (includeSalaries) {
             peaceTimeCosts = peaceTimeCosts.plus(getPayRoll(getCampaignOptions().isInfantryDontCount()));
         }
@@ -166,26 +146,23 @@ public class Accountant {
      * <p>The value of each unit is based on the {@code useEquipmentSaleValue} flag, which
      * determines whether to use the equipment's sale value during the calculation.</p>
      *
-     * @param excludeInfantry        A {@code boolean} flag specifying whether conventional
-     *                               infantry units (non-Battle Armor) should be excluded.
+     * @param excludeInfantry         A {@code boolean} flag specifying whether conventional
+     *                                infantry units (non-Battle Armor) should be excluded.
      * @param dropShipContractPercent The percentage adjustment applied specifically to DropShips.
      *                                If set to {@code 0}, DropShips are excluded from the calculation.
      * @param warShipContractPercent  The percentage adjustment applied specifically to WarShips.
      *                                If set to {@code 0}, WarShips are excluded from the calculation.
      * @param jumpShipContractPercent The percentage adjustment applied specifically to JumpShips
      *                                and Space Stations. If set to {@code 0}, these units are excluded.
-     * @param useEquipmentSaleValue  A {@code boolean} flag that determines whether to use the
-     *                               equipment's sale value in the calculation.
-     *
+     * @param useEquipmentSaleValue   A {@code boolean} flag that determines whether to use the
+     *                                equipment's sale value in the calculation.
      * @return A {@link Money} object representing the total force value of the campaign's units
-     *         after applying the provided rules and percentages.
+     * after applying the provided rules and percentages.
      */
-    public Money getForceValue(boolean excludeInfantry, double dropShipContractPercent,
-                               double warShipContractPercent, double jumpShipContractPercent,
-                               boolean useEquipmentSaleValue) {
+    public Money getForceValue(boolean excludeInfantry, double dropShipContractPercent, double warShipContractPercent, double jumpShipContractPercent, boolean useEquipmentSaleValue) {
         Money value = Money.zero();
 
-        for (UUID uuid : getCampaign().getForces().getAllUnits(true)) {
+        for (UUID uuid : campaign().getForces().getAllUnits(true)) {
             Unit unit = getHangar().getUnit(uuid);
 
             if (unit == null) {
@@ -240,8 +217,7 @@ public class Accountant {
 
     public Money getTotalEquipmentValue() {
         Money unitsSellValue = getHangar().getUnitCosts(Unit::getSellValue);
-        return getCampaign().getWarehouse().streamSpareParts().map(Part::getActualValue)
-            .reduce(unitsSellValue, Money::plus);
+        return campaign().getWarehouse().streamSpareParts().map(Part::getActualValue).reduce(unitsSellValue, Money::plus);
     }
 
     public Money getEquipmentContractValue(Unit u, boolean useSaleValue) {
@@ -279,7 +255,7 @@ public class Accountant {
      * sale value in the calculations.</p>
      *
      * @return A {@link Money} object representing the calculated base contract value, adjusted
-     *         according to the campaign's configuration.
+     * according to the campaign's configuration.
      */
     public Money getContractBase() {
         final CampaignOptions options = getCampaignOptions();
@@ -291,17 +267,13 @@ public class Accountant {
         final boolean useEquipmentSalveValue = options.isEquipmentContractSaleValue();
 
         if (getCampaignOptions().isUsePeacetimeCost()) {
-            final Money forceValue = getForceValue(excludeInfantry, dropShipContractPercent,
-                warShipContractPercent, jumpShipContractPercent, useEquipmentSalveValue);
+            final Money forceValue = getForceValue(excludeInfantry, dropShipContractPercent, warShipContractPercent, jumpShipContractPercent, useEquipmentSalveValue);
 
-            return getPeacetimeCost()
-                    .multipliedBy(0.75)
-                    .plus(forceValue);
+            return getPeacetimeCost().multipliedBy(0.75).plus(forceValue);
         }
 
         if (getCampaignOptions().isEquipmentContractBase()) {
-            return getForceValue(excludeInfantry, dropShipContractPercent,
-                warShipContractPercent, jumpShipContractPercent, useEquipmentSalveValue);
+            return getForceValue(excludeInfantry, dropShipContractPercent, warShipContractPercent, jumpShipContractPercent, useEquipmentSalveValue);
         }
 
         return getTheoreticalPayroll(getCampaignOptions().isInfantryDontCount());
@@ -310,22 +282,16 @@ public class Accountant {
     /**
      * Returns a map of every Person and their salary.
      *
-     * @see Finances#debit(TransactionType, LocalDate, Money, String, Map, boolean)
      * @return map of personnel to their pay, including pool as a null key
+     * @see Finances#debit(TransactionType, LocalDate, Money, String, Map, boolean)
      */
     public Map<Person, Money> getPayRollSummary() {
         Map<Person, Money> payRollSummary = new HashMap<>();
-        for (Person p : getCampaign().getActivePersonnel()) {
-                payRollSummary.put(p, p.getSalary(getCampaign()));
-            }
+        for (Person p : campaign().getActivePersonnel()) {
+            payRollSummary.put(p, p.getSalary(campaign()));
+        }
         // And pay our pool
-        payRollSummary.put(null, Money.of(
-            (getCampaign().getCampaignOptions().getRoleBaseSalaries()
-                [PersonnelRole.ASTECH.ordinal()].getAmount().doubleValue()
-                * getCampaign().getAstechPool())
-            + (getCampaign().getCampaignOptions().getRoleBaseSalaries()
-                [PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue()
-                * getCampaign().getMedicPool())));
+        payRollSummary.put(null, Money.of((campaign().getCampaignOptions().getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount().doubleValue() * campaign().getAstechPool()) + (campaign().getCampaignOptions().getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() * campaign().getMedicPool())));
 
         return payRollSummary;
     }
