@@ -73,10 +73,7 @@ import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
-import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.equipment.HeatSink;
-import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.RandomDeath;
@@ -117,8 +114,6 @@ import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.*;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.universe.*;
-import mekhq.campaign.universe.Planet.PlanetaryEvent;
-import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
@@ -2593,6 +2588,12 @@ public class Campaign implements ITechManager {
             return campaignOptions.getAutoLogisticsAmmunition();
         } else if (part instanceof Armor ) {
             return campaignOptions.getAutoLogisticsArmor();
+        } else if (part instanceof MekActuator) {
+            return campaignOptions.getAutoLogisticsActuators();
+        } else if (part instanceof JumpJet) {
+            return campaignOptions.getAutoLogisticsJumpJets();
+        } else if (part instanceof EnginePart) {
+            return campaignOptions.getAutoLogisticsEngines();
         }
 
         return campaignOptions.getAutoLogisticsOther();
