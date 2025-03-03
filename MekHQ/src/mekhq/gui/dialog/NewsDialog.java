@@ -56,7 +56,7 @@ public class NewsDialog extends MHQDialogImmersive {
      */
     public NewsDialog(Campaign campaign, NewsItem news) {
         super(campaign, new Person(campaign), null, news.getFullDescription(),
-            createButtons(), null, UIUtil.scaleForGUI(400));
+            createButtons(), null, UIUtil.scaleForGUI(400), false);
     }
 
     /**
