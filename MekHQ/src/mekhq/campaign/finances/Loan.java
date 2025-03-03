@@ -2,7 +2,7 @@
  * Loan.java
  *
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,6 +32,8 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.Objects;
+
+import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 /**
  * TODO : Update loan baseline based on latest Campaign Operations Rules
@@ -216,9 +218,38 @@ public class Loan {
                 || (today.isAfter(getNextPayment())) && (getRemainingPayments() > 0);
     }
 
-    public static Loan getBaseLoan(final int rating, final LocalDate date) {
+    /**
+     * Computes and returns a base loan object based on the player's rating, the current date,
+     * and campaign-specific conditions such as the Gray Monday event.
+     *
+     * <p>This method determines the loan terms that the player is eligible for based on their
+     * performance rating and whether the game is simulating the Gray Monday event. If the
+     * Gray Monday event is active, a special predatory loan with significantly higher interest
+     * rates and penalties is offered. Otherwise, the loan terms are progressively better
+     * as the player's rating improves.</p>
+     *
+     * <p>The returned {@link Loan} object contains all relevant terms such as the principal,
+     * interest rate, repayment duration, financial term, and associated penalty.</p>
+     *
+     * @param rating             The player's performance rating as an integer. Defaults to higher
+     *                           loan penalties and stricter terms for lower ratings.
+     * @param simulateGrayMonday A {@code boolean} flag that indicates whether the Gray Monday
+     *                           event is active, which impacts loan terms significantly.
+     * @param date               The current in-game date as a {@link LocalDate} object, used
+     *                           to determine if Gray Monday conditions apply.
+     *
+     * @return A {@link Loan} object representing the player's base loan terms based on
+     *         their rating and event conditions.
+     */
+    public static Loan getBaseLoan(final int rating, boolean simulateGrayMonday, final LocalDate date) {
         // we are going to treat the score from StellarOps the same as dragoons score
         // TODO: pirates and government forces
+
+        if (isGrayMonday(date, simulateGrayMonday)) {
+            // This simulates the player taking out a predatory loan
+            return new Loan(10000000, 70, 1, FinancialTerm.MONTHLY, 100, date);
+        }
+
         if (rating <= 0) {
             return new Loan(10000000, 35, 1, FinancialTerm.MONTHLY, 80, date);
         } else if (rating < 5) {

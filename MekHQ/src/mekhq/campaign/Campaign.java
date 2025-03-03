@@ -7018,7 +7018,7 @@ public class Campaign implements ITechManager {
         }
 
 
-        if (isGrayMonday(this)) {
+        if (isGrayMonday(currentDay, campaignOptions.isSimulateGrayMonday())) {
             target.addModifier(4, "Gray Monday");
         }
 
