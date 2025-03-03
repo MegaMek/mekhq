@@ -4104,7 +4104,7 @@ public class Campaign implements ITechManager {
 
                 for (UUID unitId : unitsInForce) {
                     Unit unit = getUnit(unitId);
-                    if (unit != null && unit.isFullyCrewed() && unit.isSalvage()) {
+                    if (unit != null && unit.isFullyCrewed() && !unit.isSalvage()) {
                         unitCount++;
                     }
                 }
