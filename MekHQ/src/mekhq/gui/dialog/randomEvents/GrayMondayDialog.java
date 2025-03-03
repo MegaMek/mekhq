@@ -41,7 +41,7 @@ public class GrayMondayDialog extends MHQDialogImmersive {
     public GrayMondayDialog(Campaign campaign, Person speaker, boolean isClarionNote, int eventIndex) {
         super(campaign, speaker, null,
             createInCharacterMessage(campaign, isClarionNote, eventIndex),
-            createButtons(), createOutOfCharacterMessage(), null);
+            createButtons(), createOutOfCharacterMessage(), null, false);
     }
 
     /**

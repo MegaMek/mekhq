@@ -584,6 +584,11 @@ public class ResolveScenarioTracker {
                         }
                     }
                 }
+                // No crew? All's good, no personnel, next.
+                if (u.isUnmannedTrailer()) {
+                    continue;
+                }
+
                 // check for an ejected entity and if we find one then assign it instead to
                 // switch vees
                 // over to infantry checks for casualties

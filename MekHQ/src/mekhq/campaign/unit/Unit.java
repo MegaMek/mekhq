@@ -25,6 +25,7 @@ import megamek.Version;
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.*;
+import megamek.common.CrewType;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.ArmorType;
@@ -73,7 +74,6 @@ import java.awt.*;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
@@ -1121,7 +1121,7 @@ public class Unit implements ITechnology {
         if (!isFunctional()) {
             return "unit is not functional";
         }
-        if (isUnmanned()) {
+        if (isUnmanned() && !(isUnmannedTrailer())) {
             return "unit has no pilot";
         }
         if (isRefitting()) {
@@ -5282,6 +5282,19 @@ public class Unit implements ITechnology {
 
     public boolean isUnmanned() {
         return (null == getCommander());
+    }
+
+    /**
+     * A trailer with no engine or weapons doesn't ened any crew.
+     * @return true if this Unit is an unmanned trailer, false if it isn't a trailer or has a crew
+     */
+    public boolean isUnmannedTrailer() {
+        if (getEntity() instanceof Tank tank) {
+            if (tank.isTrailer() && (tank.defaultCrewType().equals(CrewType.NONE))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getForceId() {

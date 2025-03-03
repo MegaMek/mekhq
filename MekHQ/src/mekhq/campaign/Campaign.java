@@ -73,10 +73,7 @@ import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
-import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.equipment.HeatSink;
-import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.RandomDeath;
@@ -2591,6 +2588,12 @@ public class Campaign implements ITechManager {
             return campaignOptions.getAutoLogisticsAmmunition();
         } else if (part instanceof Armor ) {
             return campaignOptions.getAutoLogisticsArmor();
+        } else if (part instanceof MekActuator) {
+            return campaignOptions.getAutoLogisticsActuators();
+        } else if (part instanceof JumpJet) {
+            return campaignOptions.getAutoLogisticsJumpJets();
+        } else if (part instanceof EnginePart) {
+            return campaignOptions.getAutoLogisticsEngines();
         }
 
         return campaignOptions.getAutoLogisticsOther();
@@ -4094,13 +4097,20 @@ public class Campaign implements ITechManager {
         for (CombatTeam combatTeam : combatTeams.values()) {
             CombatRole combatRole = combatTeam.getRole();
 
-            Force force = null;
+            Force force;
             int unitCount = 0;
             try {
                 int forceId = combatTeam.getForceId();
                 force = getForce(forceId);
 
-                unitCount += force.getAllUnits(true).size();
+                Vector<UUID> unitsInForce = force.getAllUnits(true);
+
+                for (UUID unitId : unitsInForce) {
+                    Unit unit = getUnit(unitId);
+                    if (unit != null && unit.isFullyCrewed() && !unit.isSalvage()) {
+                        unitCount++;
+                    }
+                }
             } catch (Exception ignored) {
                 continue;
             }
@@ -4323,6 +4333,7 @@ public class Campaign implements ITechManager {
                 rating.reInitialize();
             }
 
+            boolean hasHadResupply = false;
             for (AtBContract contract : getActiveAtBContracts()) {
                 AtBMoraleLevel oldMorale = contract.getMoraleLevel();
 
@@ -4346,8 +4357,13 @@ public class Campaign implements ITechManager {
                     boolean inLocation = location.isOnPlanet()
                         && location.getCurrentSystem().equals(contract.getSystem());
 
+                    if (contract.isSubcontract() || hasHadResupply) {
+                        continue;
+                    }
+
                     if (inLocation) {
                         processResupply(contract);
+                        hasHadResupply = true;
                     }
                 }
             }

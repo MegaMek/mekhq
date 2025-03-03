@@ -18,17 +18,16 @@
  */
 package mekhq;
 
-import java.awt.Color;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
-import javax.swing.UIManager;
-
 import megamek.SuiteOptions;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
+
+import javax.swing.*;
+import java.awt.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public final class MHQOptions extends SuiteOptions {
     // region Display Tab
@@ -759,7 +758,7 @@ public final class MHQOptions extends SuiteOptions {
 
     public boolean getAutosaveBeforeMissionsValue() {
         return userPreferences.node(MHQConstants.AUTOSAVE_NODE).getBoolean(MHQConstants.SAVE_BEFORE_MISSIONS_KEY,
-                false);
+                true);
     }
 
     public void setAutosaveBeforeMissionsValue(boolean value) {

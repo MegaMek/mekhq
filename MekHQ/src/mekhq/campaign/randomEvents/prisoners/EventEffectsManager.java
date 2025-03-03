@@ -1010,15 +1010,13 @@ public class EventEffectsManager {
 
         final int magnitude = result.magnitude();
 
-        List<Person> potentialTargets = campaign.getActivePersonnel(true);
+        List<Person> potentialTargets = campaign.getActivePersonnel(false);
 
         if (potentialTargets.isEmpty()) {
             return "";
         }
 
-        double percentage = 0.1;
-
-        int targetCount = (int) max(1, potentialTargets.size() * percentage);
+        int targetCount = potentialTargets.size();
 
         for (int i = 0; i < targetCount; i++) {
             Person target = getRandomItem(potentialTargets);
