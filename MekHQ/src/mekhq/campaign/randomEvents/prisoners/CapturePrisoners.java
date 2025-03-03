@@ -398,7 +398,7 @@ public class CapturePrisoners {
      * @param newStatus  The resulting {@link PrisonerStatus} of the prisoner post-capture.
      */
     private void handlePostCapture(Person prisoner, PrisonerStatus newStatus) {
-        final String RESOURCE_BUNDLE = "mekhq.resources.DefectionOffer";
+        final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
         // non-clan prisoners should generate with lower than average loyalty, so drop the highest roll
         if (!newStatus.isBecomingBondsman()) {
