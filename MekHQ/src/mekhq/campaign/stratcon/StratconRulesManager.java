@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.stratcon;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Minefield;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
@@ -244,10 +245,6 @@ public class StratconRulesManager {
                     continue;
                 }
 
-                if (force.isDeployed()) {
-                    continue;
-                }
-
                 int operationalStatus = 0;
                 int unitCount = 0;
 
@@ -305,18 +302,17 @@ public class StratconRulesManager {
                     track.getAssignedCoordForces().get(scenarioCoords), contract, campaign, track);
             // otherwise, pick a random force from the avail
             } else {
-                int randomForceIndex = randomInt(availableForceIDs.size());
-                int randomForceID = availableForceIDs.get(randomForceIndex);
+                int randomForceID = ObjectUtility.getRandomItem(availableForceIDs);
 
                 // remove the force from the available lists, so we don't designate it as primary
                 // twice
                 if (autoAssignLances) {
-                    availableForceIDs.removeIf(id -> id.equals(randomForceIndex));
+                    availableForceIDs.removeIf(forceId -> forceId == randomForceID);
 
-                    // we want to remove the actual int with the value, not the value at the index
-                    sortedAvailableForceIDs.get(AllGroundTerrain).removeIf(id -> id.equals(randomForceID));
-                    sortedAvailableForceIDs.get(LowAtmosphere).removeIf(id -> id.equals(randomForceID));
-                    sortedAvailableForceIDs.get(Space).removeIf(id -> id.equals(randomForceID));
+                    // Safely check and remove IDs in specific lists
+                    sortedAvailableForceIDs.get(AllGroundTerrain).removeIf(forceId -> forceId == randomForceID);
+                    sortedAvailableForceIDs.get(LowAtmosphere).removeIf(forceId -> forceId == randomForceID);
+                    sortedAvailableForceIDs.get(Space).removeIf(forceId -> forceId == randomForceID);
                 }
 
                 // two scenarios on the same coordinates wind up increasing in size
@@ -2161,7 +2157,18 @@ public class StratconRulesManager {
         List<Integer> suitableForces = new ArrayList<>();
         for (CombatTeam combatTeam : combatTeams) {
             // If the combat team isn't assigned to the current contract, it isn't eligible to be deployed
-            if (!Objects.equals(contract, combatTeam.getContract(campaign))) {
+            if (!contract.equals(combatTeam.getContract(campaign))) {
+                continue;
+            }
+
+            // If the combat team doesn't have a valid force (somehow) skip it.
+            Force force = combatTeam.getForce(campaign);
+            if (force == null) {
+                continue;
+            }
+
+            // Skip any that are already assigned to a scenario.
+            if (force.isDeployed()) {
                 continue;
             }
 
