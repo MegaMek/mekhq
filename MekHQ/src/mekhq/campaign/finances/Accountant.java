@@ -70,15 +70,20 @@ public record Accountant(Campaign campaign) {
         }
 
         // And pay our pool
-        salaries = salaries.plus(campaign().getCampaignOptions().getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount().doubleValue() * campaign().getAstechPool());
-        salaries = salaries.plus(campaign().getCampaignOptions().getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() * campaign().getMedicPool());
+        salaries = salaries.plus(campaign().getCampaignOptions().getRoleBaseSalaries()
+            [PersonnelRole.ASTECH.ordinal()].getAmount().doubleValue()
+            * campaign().getAstechPool());
+        salaries = salaries.plus(campaign().getCampaignOptions().getRoleBaseSalaries()
+            [PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue()
+            * campaign().getMedicPool());
 
         return salaries;
     }
 
     public Money getMaintenanceCosts() {
         if (getCampaignOptions().isPayForMaintain()) {
-            return getHangar().getUnitsStream().filter(u -> u.requiresMaintenance() && (null != u.getTech())).map(Unit::getMaintenanceCost).reduce(Money.zero(), Money::plus);
+            return getHangar().getUnitsStream().filter(u -> u.requiresMaintenance()
+                && (null != u.getTech())).map(Unit::getMaintenanceCost).reduce(Money.zero(), Money::plus);
         }
         return Money.zero();
     }
@@ -114,7 +119,10 @@ public record Accountant(Campaign campaign) {
      * @return The peacetime costs of the campaign, optionally including salaries.
      */
     public Money getPeacetimeCost(boolean includeSalaries) {
-        Money peaceTimeCosts = Money.zero().plus(getMonthlySpareParts()).plus(getMonthlyFuel()).plus(getMonthlyAmmo());
+        Money peaceTimeCosts = Money.zero()
+            .plus(getMonthlySpareParts())
+            .plus(getMonthlyFuel())
+            .plus(getMonthlyAmmo());
         if (includeSalaries) {
             peaceTimeCosts = peaceTimeCosts.plus(getPayRoll(getCampaignOptions().isInfantryDontCount()));
         }
@@ -159,7 +167,9 @@ public record Accountant(Campaign campaign) {
      * @return A {@link Money} object representing the total force value of the campaign's units
      * after applying the provided rules and percentages.
      */
-    public Money getForceValue(boolean excludeInfantry, double dropShipContractPercent, double warShipContractPercent, double jumpShipContractPercent, boolean useEquipmentSaleValue) {
+    public Money getForceValue(boolean excludeInfantry, double dropShipContractPercent,
+                               double warShipContractPercent, double jumpShipContractPercent,
+                               boolean useEquipmentSaleValue) {
         Money value = Money.zero();
 
         for (UUID uuid : campaign().getForces().getAllUnits(true)) {
@@ -217,7 +227,8 @@ public record Accountant(Campaign campaign) {
 
     public Money getTotalEquipmentValue() {
         Money unitsSellValue = getHangar().getUnitCosts(Unit::getSellValue);
-        return campaign().getWarehouse().streamSpareParts().map(Part::getActualValue).reduce(unitsSellValue, Money::plus);
+        return campaign().getWarehouse().streamSpareParts().map(Part::getActualValue)
+            .reduce(unitsSellValue, Money::plus);
     }
 
     public Money getEquipmentContractValue(Unit u, boolean useSaleValue) {
@@ -231,13 +242,17 @@ public record Accountant(Campaign campaign) {
         }
 
         if (u.getEntity().hasETypeFlag(Entity.ETYPE_DROPSHIP)) {
-            percentValue = value.multipliedBy(getCampaignOptions().getDropShipContractPercent()).dividedBy(100);
+            percentValue = value.multipliedBy(getCampaignOptions().getDropShipContractPercent())
+                .dividedBy(100);
         } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_WARSHIP)) {
-            percentValue = value.multipliedBy(getCampaignOptions().getWarShipContractPercent()).dividedBy(100);
+            percentValue = value.multipliedBy(getCampaignOptions().getWarShipContractPercent())
+                .dividedBy(100);
         } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP) || u.getEntity().hasETypeFlag(Entity.ETYPE_SPACE_STATION)) {
-            percentValue = value.multipliedBy(getCampaignOptions().getJumpShipContractPercent()).dividedBy(100);
+            percentValue = value.multipliedBy(getCampaignOptions().getJumpShipContractPercent())
+                .dividedBy(100);
         } else {
-            percentValue = value.multipliedBy(getCampaignOptions().getEquipmentContractPercent()).dividedBy(100);
+            percentValue = value.multipliedBy(getCampaignOptions().getEquipmentContractPercent())
+                .dividedBy(100);
         }
 
         return percentValue;
@@ -267,13 +282,15 @@ public record Accountant(Campaign campaign) {
         final boolean useEquipmentSalveValue = options.isEquipmentContractSaleValue();
 
         if (getCampaignOptions().isUsePeacetimeCost()) {
-            final Money forceValue = getForceValue(excludeInfantry, dropShipContractPercent, warShipContractPercent, jumpShipContractPercent, useEquipmentSalveValue);
+            final Money forceValue = getForceValue(excludeInfantry, dropShipContractPercent,
+                warShipContractPercent, jumpShipContractPercent, useEquipmentSalveValue);
 
             return getPeacetimeCost().multipliedBy(0.75).plus(forceValue);
         }
 
         if (getCampaignOptions().isEquipmentContractBase()) {
-            return getForceValue(excludeInfantry, dropShipContractPercent, warShipContractPercent, jumpShipContractPercent, useEquipmentSalveValue);
+            return getForceValue(excludeInfantry, dropShipContractPercent, warShipContractPercent,
+                jumpShipContractPercent, useEquipmentSalveValue);
         }
 
         return getTheoreticalPayroll(getCampaignOptions().isInfantryDontCount());
@@ -291,7 +308,13 @@ public record Accountant(Campaign campaign) {
             payRollSummary.put(person, person.getSalary(campaign()));
         }
         // And pay our pool
-        payRollSummary.put(null, Money.of((campaign().getCampaignOptions().getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount().doubleValue() * campaign().getAstechPool()) + (campaign().getCampaignOptions().getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() * campaign().getMedicPool())));
+        payRollSummary.put(null, Money.of((
+            campaign().getCampaignOptions().getRoleBaseSalaries()
+                [PersonnelRole.ASTECH.ordinal()].getAmount().doubleValue()
+                * campaign().getAstechPool())
+            + (campaign().getCampaignOptions().getRoleBaseSalaries()
+            [PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue()
+            * campaign().getMedicPool())));
 
         return payRollSummary;
     }
