@@ -1,5 +1,5 @@
 /*
-* MegaMek - Copyright (C) 2020-2024 - The MegaMek Team. All Rights Reserved.
+* MegaMek - Copyright (C) 2020-2024 - The MegaMek Team
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU General Public License as published by the Free Software
