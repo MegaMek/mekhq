@@ -2600,23 +2600,41 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Add data from an actual part to a PartInUse data element
-     * @param partInUse part in use record to update
-     * @param incomingPart new part that needs to be added to this record
-     * @param ignoreMothballedUnits don't count parts in mothballed units
-     * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
+     * Updates a {@link PartInUse} record with data from an incoming {@link Part}.
+     *
+     * <p>This method processes the incoming part to update the usage, storage, or transfer count
+     * of the specified part in use, based on the type, quality, and associated unit of the
+     * incoming part. Certain parts are ignored based on their state or configuration, such as
+     * being part of conventional infantry, salvage, or mothballed units.</p>
+     *
+     * @param partInUse the {@link PartInUse} record to update.
+     * @param incomingPart the new {@link Part} that is being processed for this record.
+     * @param ignoreMothballedUnits if {@code true}, parts belonging to mothballed units are excluded.
+     * @param ignoreSparesUnderQuality spares with a quality lower than this threshold are excluded from counting.
      */
     private void updatePartInUseData(PartInUse partInUse, Part incomingPart,
                                      boolean ignoreMothballedUnits, PartQuality ignoreSparesUnderQuality) {
-        // Ignore parts if they are from mothballed units and the flag is set
-        if (ignoreMothballedUnits
-            && incomingPart.getUnit() != null
-            && incomingPart.getUnit().isMothballed()) {
-            return;
+        Unit unit = incomingPart.getUnit();
+        if (unit != null) {
+            // Ignore conventional infantry
+            if (unit.isConventionalInfantry()) {
+                return;
+            }
+
+            // Ignore parts if they are from mothballed units and the flag is set
+            if (ignoreMothballedUnits && incomingPart.getUnit() != null
+                && incomingPart.getUnit().isMothballed()) {
+                return;
+            }
+
+            // Ignore units set to salvage
+            if (unit.isSalvage()) {
+                return;
+            }
         }
 
         // Case 1: Part is associated with a unit or is a MissingPart
-        if ((incomingPart.getUnit() != null) || (incomingPart instanceof MissingPart)) {
+        if ((unit != null) || (incomingPart instanceof MissingPart)) {
             partInUse.setUseCount(partInUse.getUseCount() + getQuantity(incomingPart));
             return;
         }
