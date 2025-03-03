@@ -117,8 +117,6 @@ import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.*;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.universe.*;
-import mekhq.campaign.universe.Planet.PlanetaryEvent;
-import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
@@ -4096,13 +4094,20 @@ public class Campaign implements ITechManager {
         for (CombatTeam combatTeam : combatTeams.values()) {
             CombatRole combatRole = combatTeam.getRole();
 
-            Force force = null;
+            Force force;
             int unitCount = 0;
             try {
                 int forceId = combatTeam.getForceId();
                 force = getForce(forceId);
 
-                unitCount += force.getAllUnits(true).size();
+                Vector<UUID> unitsInForce = force.getAllUnits(true);
+
+                for (UUID unitId : unitsInForce) {
+                    Unit unit = getUnit(unitId);
+                    if (unit != null && unit.isFullyCrewed()) {
+                        unitCount++;
+                    }
+                }
             } catch (Exception ignored) {
                 continue;
             }
