@@ -34,6 +34,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
+import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
@@ -77,6 +78,7 @@ public class GeneralTab {
     private final JFrame frame;
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
+    private final CampaignOptionsDialogMode mode;
 
     private JLabel lblName;
     private JTextField txtName;
@@ -105,8 +107,10 @@ public class GeneralTab {
      *
      * @param campaign The {@link Campaign} associated with this tab, which contains the core game data.
      * @param frame    The parent {@link JFrame} used to display this tab.
+     * @param mode     The {@link CampaignOptionsDialogMode} enum determining what state caused the
+     *                dialog to be triggered.
      */
-    public GeneralTab(Campaign campaign, JFrame frame) {
+    public GeneralTab(Campaign campaign, JFrame frame, CampaignOptionsDialogMode mode) {
         // region Variable Declarations
         this.frame = frame;
         this.campaign = campaign;
@@ -114,6 +118,7 @@ public class GeneralTab {
         this.date = campaign.getLocalDate();
         this.camouflage = campaign.getCamouflage();
         this.unitIcon = campaign.getUnitIcon();
+        this.mode = mode;
 
         initialize();
     }
@@ -168,6 +173,12 @@ public class GeneralTab {
         btnDate = new CampaignOptionsButton("Date");
         btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         btnDate.addActionListener(this::btnDateActionPerformed);
+
+        if (mode != CampaignOptionsDialogMode.STARTUP
+            && mode != CampaignOptionsDialogMode.STARTUP_ABRIDGED) {
+            lblDate.setEnabled(false);
+            btnDate.setEnabled(false);
+        }
 
         // Camouflage
         lblCamo = new CampaignOptionsLabel("Camo");

@@ -121,7 +121,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         } catch (Exception ignored) {}
 
         addTab(String.format("<html><font size=%s><b>%s</b></font></html>", round(HEADER_FONT_SIZE * uiScale),
-            resources.getString("generalPanel.title")), createGeneralTab());
+            resources.getString("generalPanel.title")), createGeneralTab(mode));
 
         JTabbedPane humanResourcesParentTab = createHumanResourcesParentTab();
         createTab("humanResourcesParentTab", humanResourcesParentTab);
@@ -169,10 +169,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * Creates the panel for general campaign options. Loads settings for general preferences
      * and initializes it with current campaign options.
      *
+     * @param mode the state in which the dialog was triggered.
+     *
      * @return a {@link JScrollPane} containing the general tab panel
      */
-    private JScrollPane createGeneralTab() {
-        generalTab = new GeneralTab(campaign, getFrame());
+    private JScrollPane createGeneralTab(CampaignOptionsDialogMode mode) {
+        generalTab = new GeneralTab(campaign, getFrame(), mode);
         JPanel createdGeneralTab = generalTab.createGeneralTab();
         generalTab.loadValuesFromCampaignOptions();
 
