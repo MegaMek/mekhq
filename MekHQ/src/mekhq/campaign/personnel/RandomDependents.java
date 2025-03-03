@@ -94,8 +94,8 @@ public class RandomDependents {
      * <p>This method manages both the removal and addition of dependents for the campaign within
      * the given constraints. The process consists of two phases:</p>
      * <ul>
-     *   <li>Random removal of dependents, if enabled in campaign options.</li>
      *   <li>Random addition of new dependents, if enabled in campaign options.</li>
+     *   <li>Random removal of dependents, if enabled in campaign options.</li>
      * </ul>
      * The count of dependents is adjusted after the removal phase, and the method ensures the
      * total number of dependents does not exceed the allowed capacity.
@@ -103,14 +103,14 @@ public class RandomDependents {
     public void processMonthlyRemovalAndAddition() {
         int dependentCount = activeDependents.size();
 
-        // roll for random removal
-        if (campaignOptions.isUseRandomDependentRemoval()) {
-            dependentCount = dependentsRollForRemoval();
-        }
-
         // then roll for random addition
         if (campaignOptions.isUseRandomDependentAddition()) {
             dependentsAddNew(dependentCount);
+        }
+
+        // roll for random removal
+        if (campaignOptions.isUseRandomDependentRemoval()) {
+            dependentsRollForRemoval();
         }
     }
 
