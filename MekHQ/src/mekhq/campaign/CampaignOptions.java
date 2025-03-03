@@ -154,6 +154,9 @@ public class CampaignOptions {
     private int autoLogisticsNonRepairableLocation;
     private int autoLogisticsArmor;
     private int autoLogisticsAmmunition;
+    private int autoLogisticsActuators;
+    private int autoLogisticsJumpJets;
+    private int autoLogisticsEngines;
     private int autoLogisticsOther;
 
     // Delivery
@@ -659,13 +662,16 @@ public class CampaignOptions {
         maxAcquisitions = 0;
 
         // autoLogistics
-        autoLogisticsHeatSink = 250;
-        autoLogisticsMekHead = 200;
-        autoLogisticsMekLocation = 100;
+        autoLogisticsHeatSink = 50;
+        autoLogisticsMekHead = 40;
+        autoLogisticsMekLocation = 25;
         autoLogisticsNonRepairableLocation = 0;
-        autoLogisticsArmor = 500;
-        autoLogisticsAmmunition = 500;
-        autoLogisticsOther = 50;
+        autoLogisticsArmor = 100;
+        autoLogisticsAmmunition = 100;
+        autoLogisticsActuators = 100;
+        autoLogisticsJumpJets = 50;
+        autoLogisticsEngines = 0;
+        autoLogisticsOther = 0;
 
         // Delivery
         unitTransitTime = TRANSIT_UNIT_MONTH;
@@ -4150,6 +4156,30 @@ public class CampaignOptions {
         this.autoLogisticsAmmunition = autoLogisticsAmmunition;
     }
 
+    public int getAutoLogisticsActuators() {
+        return autoLogisticsActuators;
+    }
+
+    public void setAutoLogisticsActuators(int autoLogisticsActuators) {
+        this.autoLogisticsActuators = autoLogisticsActuators;
+    }
+
+    public int getAutoLogisticsJumpJets() {
+        return autoLogisticsJumpJets;
+    }
+
+    public void setAutoLogisticsJumpJets(int autoLogisticsJumpJets) {
+        this.autoLogisticsJumpJets = autoLogisticsJumpJets;
+    }
+
+    public int getAutoLogisticsEngines() {
+        return autoLogisticsEngines;
+    }
+
+    public void setAutoLogisticsEngines(int autoLogisticsEngines) {
+        this.autoLogisticsEngines = autoLogisticsEngines;
+    }
+
     public int getAutoLogisticsOther() {
         return autoLogisticsOther;
     }
@@ -4688,6 +4718,9 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsNonRepairableLocation", autoLogisticsNonRepairableLocation);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsArmor", autoLogisticsArmor);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsAmmunition", autoLogisticsAmmunition);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsActuators", autoLogisticsActuators);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsJumpJets", autoLogisticsJumpJets);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsEngines", autoLogisticsEngines);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsOther", autoLogisticsOther);
 
         // region Personnel Tab
@@ -5350,6 +5383,12 @@ public class CampaignOptions {
                     retVal.autoLogisticsArmor = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsAmmunition")) {
                     retVal.autoLogisticsAmmunition = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsActuators")) {
+                    retVal.autoLogisticsActuators = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsJumpJets")) {
+                    retVal.autoLogisticsJumpJets = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsEngines")) {
+                    retVal.autoLogisticsEngines = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsOther")) {
                     retVal.autoLogisticsOther = Integer.parseInt(wn2.getTextContent().trim());
 

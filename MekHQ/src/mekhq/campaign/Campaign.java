@@ -73,10 +73,7 @@ import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
-import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.equipment.HeatSink;
-import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.RandomDeath;
@@ -2591,6 +2588,12 @@ public class Campaign implements ITechManager {
             return campaignOptions.getAutoLogisticsAmmunition();
         } else if (part instanceof Armor ) {
             return campaignOptions.getAutoLogisticsArmor();
+        } else if (part instanceof MekActuator) {
+            return campaignOptions.getAutoLogisticsActuators();
+        } else if (part instanceof JumpJet) {
+            return campaignOptions.getAutoLogisticsJumpJets();
+        } else if (part instanceof EnginePart) {
+            return campaignOptions.getAutoLogisticsEngines();
         }
 
         return campaignOptions.getAutoLogisticsOther();
