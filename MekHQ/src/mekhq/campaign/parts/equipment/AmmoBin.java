@@ -330,8 +330,17 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
      */
     protected int requisitionAmmo(AmmoType ammoType, int shotsNeeded) {
         Objects.requireNonNull(ammoType);
+        int shotsLoaded = 0;
+        while (shotsLoaded < shotsNeeded) {
+            int shots = campaign.getQuartermaster().removeAmmo(ammoType, shotsNeeded - shotsLoaded);
+            if (shots < 1) {
+                return shotsLoaded;
+            } else {
+                shotsLoaded += shots;
+            }
+        }
 
-        return campaign.getQuartermaster().removeAmmo(ammoType, shotsNeeded);
+        return shotsLoaded;
     }
 
     /**

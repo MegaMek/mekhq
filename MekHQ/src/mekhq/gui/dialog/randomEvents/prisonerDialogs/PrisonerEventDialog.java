@@ -49,7 +49,6 @@ public class PrisonerEventDialog extends MHQDialogImmersive {
     static final String OPTION_INDEX_1 = "1.";
     static final String OPTION_INDEX_2 = "2.";
     static final String SUFFIX_BUTTON = ".button";
-    static final String SUFFIX_TOOLTIP = ".tooltip";
 
     /**
      * Creates a dialog to ask the player how they would like to respond to a prisoner event.
@@ -61,7 +60,7 @@ public class PrisonerEventDialog extends MHQDialogImmersive {
      */
     public PrisonerEventDialog(Campaign campaign, @Nullable Person speaker, PrisonerEvent event) {
         super(campaign, speaker, null, createInCharacterMessage(campaign, event),
-            createButtons(event), createOutOfCharacterMessage(), null);
+            createButtons(event), createOutOfCharacterMessage(), null, true);
     }
 
     /**
@@ -79,18 +78,18 @@ public class PrisonerEventDialog extends MHQDialogImmersive {
         List<ButtonLabelTooltipPair> buttons = new ArrayList<>();
 
         ButtonLabelTooltipPair btnResponseA = new ButtonLabelTooltipPair(
-            getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_0 + event.name() + SUFFIX_BUTTON),
-            getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_0 + event.name() + SUFFIX_TOOLTIP));
+            null,
+            getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_0 + event.name() + SUFFIX_BUTTON));
         buttons.add(btnResponseA);
 
         ButtonLabelTooltipPair btnResponseB = new ButtonLabelTooltipPair(
-            getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_1 + event.name() + SUFFIX_BUTTON),
-            getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_1 + event.name() + SUFFIX_TOOLTIP));
+            null,
+            getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_1 + event.name() + SUFFIX_BUTTON));
         buttons.add(btnResponseB);
 
         ButtonLabelTooltipPair btnResponseC = new ButtonLabelTooltipPair(
-            getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_2 + event.name() + SUFFIX_BUTTON),
-            getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_2 + event.name() + SUFFIX_TOOLTIP));
+            null,
+            getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + OPTION_INDEX_2 + event.name() + SUFFIX_BUTTON));
         buttons.add(btnResponseC);
 
         return buttons;

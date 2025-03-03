@@ -89,6 +89,12 @@ public class EquipmentAndSuppliesTab {
     private JSpinner spnAutoLogisticsArmor;
     private JLabel lblAutoLogisticsAmmunition;
     private JSpinner spnAutoLogisticsAmmunition;
+    private JLabel lblAutoLogisticsActuators;
+    private JSpinner spnAutoLogisticsActuators;
+    private JLabel lblAutoLogisticsJumpJets;
+    private JSpinner spnAutoLogisticsJumpJets;
+    private JLabel lblAutoLogisticsEngines;
+    private JSpinner spnAutoLogisticsEngines;
     private JLabel lblAutoLogisticsOther;
     private JSpinner spnAutoLogisticsOther;
     //end autoLogistics Tab
@@ -272,6 +278,12 @@ public class EquipmentAndSuppliesTab {
         spnAutoLogisticsArmor = new JSpinner();
         lblAutoLogisticsAmmunition = new JLabel();
         spnAutoLogisticsAmmunition = new JSpinner();
+        lblAutoLogisticsActuators = new JLabel();
+        spnAutoLogisticsActuators = new JSpinner();
+        lblAutoLogisticsJumpJets = new JLabel();
+        spnAutoLogisticsJumpJets = new JSpinner();
+        lblAutoLogisticsEngines = new JLabel();
+        spnAutoLogisticsEngines = new JSpinner();
         lblAutoLogisticsOther = new JLabel();
         spnAutoLogisticsOther = new JSpinner();
     }
@@ -445,6 +457,18 @@ public class EquipmentAndSuppliesTab {
         spnAutoLogisticsHeatSink = new CampaignOptionsSpinner("AutoLogisticsHeatSink",
             250, 0, 10000, 1);
 
+        lblAutoLogisticsActuators = new CampaignOptionsLabel("AutoLogisticsActuators");
+        spnAutoLogisticsActuators = new CampaignOptionsSpinner("AutoLogisticsActuators",
+            250, 0, 10000, 1);
+
+        lblAutoLogisticsJumpJets = new CampaignOptionsLabel("AutoLogisticsJumpJets");
+        spnAutoLogisticsJumpJets = new CampaignOptionsSpinner("AutoLogisticsJumpJets",
+            250, 0, 10000, 1);
+
+        lblAutoLogisticsEngines = new CampaignOptionsLabel("AutoLogisticsEngines");
+        spnAutoLogisticsEngines = new CampaignOptionsSpinner("AutoLogisticsEngines",
+            250, 0, 10000, 1);
+
         lblAutoLogisticsOther = new CampaignOptionsLabel("AutoLogisticsOther");
         spnAutoLogisticsOther = new CampaignOptionsSpinner("AutoLogisticsOther",
             50, 0, 10000, 1);
@@ -490,6 +514,24 @@ public class EquipmentAndSuppliesTab {
         panel.add(lblAutoLogisticsAmmunition, layout);
         layout.gridx++;
         panel.add(spnAutoLogisticsAmmunition, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblAutoLogisticsActuators, layout);
+        layout.gridx++;
+        panel.add(spnAutoLogisticsActuators, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblAutoLogisticsJumpJets, layout);
+        layout.gridx++;
+        panel.add(spnAutoLogisticsJumpJets, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblAutoLogisticsEngines, layout);
+        layout.gridx++;
+        panel.add(spnAutoLogisticsEngines, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -1014,6 +1056,9 @@ public class EquipmentAndSuppliesTab {
         options.setAutoLogisticsNonRepairableLocation((int) spnAutoLogisticsNonRepairableLocation.getValue());
         options.setAutoLogisticsArmor((int) spnAutoLogisticsArmor.getValue());
         options.setAutoLogisticsAmmunition((int) spnAutoLogisticsAmmunition.getValue());
+        options.setAutoLogisticsActuators((int) spnAutoLogisticsActuators.getValue());
+        options.setAutoLogisticsJumpJets((int) spnAutoLogisticsJumpJets.getValue());
+        options.setAutoLogisticsEngines((int) spnAutoLogisticsEngines.getValue());
         options.setAutoLogisticsHeatSink((int) spnAutoLogisticsHeatSink.getValue());
         options.setAutoLogisticsOther((int) spnAutoLogisticsOther.getValue());
 
@@ -1087,6 +1132,9 @@ public class EquipmentAndSuppliesTab {
         spnAutoLogisticsNonRepairableLocation.setValue(options.getAutoLogisticsNonRepairableLocation());
         spnAutoLogisticsArmor.setValue(options.getAutoLogisticsArmor());
         spnAutoLogisticsAmmunition.setValue(options.getAutoLogisticsAmmunition());
+        spnAutoLogisticsActuators.setValue(options.getAutoLogisticsActuators());
+        spnAutoLogisticsJumpJets.setValue(options.getAutoLogisticsJumpJets());
+        spnAutoLogisticsEngines.setValue(options.getAutoLogisticsEngines());
         spnAutoLogisticsHeatSink.setValue(options.getAutoLogisticsHeatSink());
         spnAutoLogisticsOther.setValue(options.getAutoLogisticsOther());
 

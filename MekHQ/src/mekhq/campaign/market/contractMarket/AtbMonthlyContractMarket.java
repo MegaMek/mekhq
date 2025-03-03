@@ -82,7 +82,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
     @Override
     public void generateContractOffers(Campaign campaign, boolean newCampaign) {
-        boolean isGrayMonday = isGrayMonday(campaign);
+        boolean isGrayMonday = isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().isSimulateGrayMonday());
+        boolean hasActiveContract = campaign.hasActiveContract() || campaign.hasActiveAtBContract(true);
 
         if (((campaign.getLocalDate().getDayOfMonth() == 1)) || newCampaign) {
             // need to copy to prevent concurrent modification errors
@@ -92,6 +93,16 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
             for (AtBContract contract : campaign.getActiveAtBContracts()) {
                 checkForSubcontracts(campaign, contract, unitRatingMod);
+
+                if (!contracts.isEmpty() && hasActiveContract) {
+                    updateReport(campaign);
+                }
+            }
+
+            // If the player has an active contract, they will not be offered new contracts,
+            // as MekHQ doesn't support multiple contracts (outside of subcontracts).
+            if (hasActiveContract) {
+                return;
             }
 
             int numContracts = d6() - 4 + unitRatingMod;
@@ -553,7 +564,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
 
         // This should always be last
-        if (isGrayMonday(campaign)) {
+        if (isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().isSimulateGrayMonday())) {
             multiplier *= 0.25;
         }
 

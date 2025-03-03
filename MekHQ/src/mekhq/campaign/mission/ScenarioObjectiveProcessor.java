@@ -418,7 +418,8 @@ public class ScenarioObjectiveProcessor {
                 if (tracker.getMission() instanceof AtBContract contract) {
                     Resupply resupply = new Resupply(campaign, contract, RESUPPLY_LOOT);
 
-                    int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
+                    // This scaling means users will need to have at least 10 qualifying units before they get a Resupply.
+                    int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : (int) (scaleFactor * 0.1);
                     int size = effect.howMuch * effectMultiplier;
 
                     if (dryRun) {

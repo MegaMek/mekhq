@@ -78,11 +78,20 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     @Override
     public void generateContractOffers(Campaign campaign, boolean newCampaign) {
-        boolean isGrayMonday = isGrayMonday(campaign);
+        boolean isGrayMonday = isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().isSimulateGrayMonday());
+        boolean hasActiveContract = campaign.hasActiveContract()
+            || campaign.hasActiveAtBContract(true);
 
         if (!(campaign.getLocalDate().getDayOfMonth() == 1) && !newCampaign) {
             return;
         }
+
+        // If the player has an active contract, they will not be offered new contracts,
+        // as MekHQ doesn't support multiple contracts (outside of subcontracts).
+        if (hasActiveContract) {
+            return;
+        }
+
         new ArrayList<>(contracts).forEach(this::removeContract);
         // TODO: Allow subcontracts?
         //for (AtBContract contract : campaign.getActiveAtBContracts()) {
@@ -116,7 +125,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     @Override
     public double calculatePaymentMultiplier(Campaign campaign, AtBContract contract) {
-        int reputationFactor = campaign.getReputation().getReputationFactor();
+        double reputationFactor = campaign.getReputation().getReputationFactor();
         ContractTerms terms = getContractTerms(campaign, contract);
         return terms.getEmploymentMultiplier() * terms.getOperationsTempoMultiplier() * reputationFactor;
     }

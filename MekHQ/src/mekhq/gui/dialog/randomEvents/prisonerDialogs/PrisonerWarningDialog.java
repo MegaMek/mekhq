@@ -57,7 +57,7 @@ public class PrisonerWarningDialog extends MHQDialogImmersive {
     public PrisonerWarningDialog(Campaign campaign, @Nullable Person speaker, int executeCount, int freeCount) {
         super(campaign, speaker, null, createInCharacterMessage(campaign),
             createButtons( executeCount, freeCount), createOutOfCharacterMessage(),
-            null);
+            null, true);
     }
 
     /**
@@ -79,14 +79,11 @@ public class PrisonerWarningDialog extends MHQDialogImmersive {
      */
     private static List<ButtonLabelTooltipPair> createButtons(int executeCount, int freeCount) {
         ButtonLabelTooltipPair btnDoNothing = new ButtonLabelTooltipPair(
-            getFormattedTextAt(RESOURCE_BUNDLE, "btnDoNothing.button"),
-            getFormattedTextAt(RESOURCE_BUNDLE, "btnDoNothing.tooltip"));
+            getFormattedTextAt(RESOURCE_BUNDLE, "btnDoNothing.button"), null);
         ButtonLabelTooltipPair btnFree = new ButtonLabelTooltipPair(
-            getFormattedTextAt(RESOURCE_BUNDLE, "free.button", freeCount),
-            getFormattedTextAt(RESOURCE_BUNDLE, "free.tooltip"));
+            getFormattedTextAt(RESOURCE_BUNDLE, "free.button", freeCount), null);
         ButtonLabelTooltipPair btnExecute = new ButtonLabelTooltipPair(
-            getFormattedTextAt(RESOURCE_BUNDLE, "execute.button", executeCount),
-            getFormattedTextAt(RESOURCE_BUNDLE, "execute.tooltip"));
+            getFormattedTextAt(RESOURCE_BUNDLE, "execute.button", executeCount), null);
 
         return List.of(btnDoNothing, btnFree, btnExecute);
     }

@@ -142,25 +142,35 @@ public class BattleArmorAmmoBin extends AmmoBin {
         }
     }
 
+    /**
+     * Requisition ammo for this bin and remove it
+     * from the warehouse.
+     * Only allow Battle Armor Ammo bins to be loaded
+     * in <code>getNumTroopers()</code> bins at a time.
+     * @see #getNumTroopers()
+     */
     @Override
     public void loadBin() {
         AmmoMounted mounted = (AmmoMounted) getMounted();
         if (mounted != null) {
+
             // Calculate the actual shots needed
             int shotsPerTrooper = shotsNeeded / getNumTroopers();
-            int shots = requisitionAmmo(getType(), shotsPerTrooper * getNumTroopers());
+            int shotsToReload = Math.min(shotsPerTrooper, (int) Math.floor( (double) getAmountAvailable() / getNumTroopers()));
+            for (int shotsPerSuitLoaded = 0; shotsPerSuitLoaded < shotsToReload; shotsPerSuitLoaded++ ) {
+                int shots = requisitionAmmo(getType(), getNumTroopers());
+                shotsNeeded -= shots;
+            }
 
             if (!ammoTypeChanged()) {
                 // Just a simple reload
-                mounted.setShotsLeft(mounted.getBaseShotsLeft() + shotsPerTrooper);
+                mounted.setShotsLeft(mounted.getBaseShotsLeft() + shotsToReload);
             } else {
                 // Loading a new type of ammo
                 unload();
                 mounted.changeAmmoType(getType());
-                mounted.setShotsLeft(shotsPerTrooper);
+                mounted.setShotsLeft(mounted.getBaseShotsLeft() + shotsToReload);
             }
-
-            shotsNeeded -= shots;
         }
     }
 

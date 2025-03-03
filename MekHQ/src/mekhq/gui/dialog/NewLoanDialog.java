@@ -2,6 +2,7 @@
  * NewLoanDialog.java
  *
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (c) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -103,7 +104,7 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
         this.numberFormatter = new NumberFormatter(NumberFormat.getInstance());
 
         rating = campaign.getAtBUnitRatingMod();
-        loan = Loan.getBaseLoan(rating, this.campaign.getLocalDate());
+        loan = Loan.getBaseLoan(rating, this.campaign.getCampaignOptions().isSimulateGrayMonday(), this.campaign.getLocalDate());
         maxCollateralValue = this.campaign.getFinances().getMaxCollateral(this.campaign);
         initComponents();
         setLocationRelativeTo(frame);

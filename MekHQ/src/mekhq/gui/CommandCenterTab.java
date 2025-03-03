@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -642,25 +642,12 @@ public final class CommandCenterTab extends CampaignGuiTab {
                     model.addElement(String.format("<html><b>" + mission.getName() + "</b></html>"));
 
                     for (Scenario scenario : scenarios) {
-
                         if (scenario.getStatus().isCurrent()) {
                             // StratCon facility contacts that haven't yet been discovered are stored as scenarios with null start dates
                             if (scenario.getDate() != null) {
                                 model.addElement(String.format("<html><b>" + scenario.getName() + ":</b> "
                                         + "<font color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
                                         + ChronoUnit.DAYS.between(getCampaign().getLocalDate(), scenario.getDate())) + " days</font</html>");
-                            }
-                        } else {
-                            if (scenario.getStatus().isOverallVictory()) {
-                                model.addElement(String.format("<html><b>" + scenario.getName() + ":</b> "
-                                        + "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                                        + scenario.getStatus().toString()
-                                        + "</font></html>"));
-                            } else {
-                                model.addElement(String.format("<html><b>" + scenario.getName() + ":</b> "
-                                        + "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                                        + scenario.getStatus().toString()
-                                        + "</font></html>"));
                             }
                         }
                     }

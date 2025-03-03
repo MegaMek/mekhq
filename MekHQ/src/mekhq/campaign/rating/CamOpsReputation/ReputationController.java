@@ -115,8 +115,8 @@ public class ReputationController {
         return this.reputationRating;
     }
 
-    public int getReputationFactor() {
-        return (int) (getReputationModifier() * 0.2 + 0.5);
+    public double getReputationFactor() {
+        return getReputationModifier() * 0.2 + 0.5;
     }
     // endregion Getters and Setters
 

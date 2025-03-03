@@ -102,6 +102,9 @@ public class GrayMonday {
                     contract.setStraightSupport(0);
                     contract.setTransportComp(0);
                     contract.setTransitAmount(Money.of(0));
+                    contract.calculateContract(campaign);
+
+                    contract.setSalvagePct(100);
                 }
             }
 
@@ -124,24 +127,20 @@ public class GrayMonday {
     }
 
     /**
-     * Determines whether it is within the Gray Monday event period.
+     * Determines whether the current date falls within the Gray Monday event period.
      *
-     * <p>This method checks if the campaign is configured to simulate the Gray Monday event
-     * and whether the current in-game date falls within a certain period around the
-     * predefined Gray Monday date. Specifically, it verifies that today is after one day
-     * prior to the Gray Monday event date and before three months after the event date.</p>
+     * <p>This method checks if the Gray Monday event is enabled and whether the given date
+     * falls within the defined period of the Gray Monday event.
      *
-     * @param campaign the {@link Campaign} object containing the campaign data, including
-     *                 the current date and campaign options
-     * @return {@code true} if the Gray Monday event should be active based on the campaign
-     *         configuration and current date, {@code false} otherwise
+     * @param today           The current date as a {@link LocalDate} object.
+     * @param isUseGrayMonday A {@code boolean} flag indicating whether the campaign is tracking
+     *                       Gray Monday.
+     * @return {@code true} if Gray Monday is active for the given date and campaign configuration,
+     * {@code false} otherwise.
      */
-    public static boolean isGrayMonday(Campaign campaign) {
-        LocalDate today = campaign.getLocalDate();
-        boolean isGrayMonday = campaign.getCampaignOptions().isSimulateGrayMonday();
-        isGrayMonday = isGrayMonday
+    public static boolean isGrayMonday(LocalDate today, boolean isUseGrayMonday) {
+        return isUseGrayMonday
             && today.isAfter(EVENT_DATE_GRAY_MONDAY.minusDays(1))
             && EVENT_DATE_GRAY_MONDAY.isBefore(today.plusMonths(12));
-        return isGrayMonday;
     }
 }
