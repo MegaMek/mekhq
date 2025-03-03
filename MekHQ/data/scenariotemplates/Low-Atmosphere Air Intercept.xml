@@ -7,6 +7,7 @@
 Expect high-speed engagements, aggressive maneuvers, and coordinated enemy tactics. Control the airspace, dictate the terms of engagement, and eliminate their ability to regroup. Do not allow them to disengage intact—press the attack and ensure their losses are irreversible.
 
 The victor will control the battlefield at the end of the engagement, securing dominance over the skies and denying the enemy future operational capabilities in this region. Strike fast, strike hard, and establish air superiority.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>

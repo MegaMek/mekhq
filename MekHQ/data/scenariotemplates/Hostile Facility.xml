@@ -7,6 +7,7 @@
 The priority is destruction, not capture. Do not concern yourself with securing the facility unless it becomes strategically viable after the defenders are wiped out. The enemy will fight to protect this installation, but their defenses will crumble under sustained pressure. Crush their forces, level their defenses, and ensure that when this battle is over, the facility is either in our hands or of no use to anyone.
 
 The victor will control the battlefield at the end of the engagement. If the facility remains salvageable after the assault, we will claim it. If not, the enemy will be left with nothing but ruins. Execute with overwhelming force and leave no doubt who owns this battlefield.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <isHostileFacility>true</isHostileFacility>
     <mapParameters>
         <allowedTerrainTypes>

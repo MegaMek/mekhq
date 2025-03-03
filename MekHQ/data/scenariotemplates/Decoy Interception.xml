@@ -9,6 +9,7 @@ This battle is about control and endurance. The longer you keep the enemy occupi
 Should you succeed in routing 75% of their forces, we will seize control of the battlefield at the end of the engagement. This will allow us to recover any remaining assets and deny the enemy any chance of regrouping. Whether by sheer endurance or decisive firepower, your success here will determine the outcome of operations across the sector.
 
 Stand firm, draw them in, and ensure they never reach their goal. If they break, the field is ours.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>

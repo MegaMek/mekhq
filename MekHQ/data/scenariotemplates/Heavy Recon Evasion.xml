@@ -7,6 +7,7 @@
 If you are compromised, expect a swift and overwhelming response. Avoid unnecessary confrontations and prioritize evasion over combat. At least one of your units must survive.
 
 The enemy will control the field at the end of the engagement, meaning there will be no reinforcements or recovery options. Get in, gather intel, and get out—undetected and alive.</detailedBriefing>
+    <battlefieldControl>ENEMY</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>

@@ -7,6 +7,7 @@
 The enemy may attempt an emergency extraction or stall for reinforcements. Do not let them escape. Strike hard, eliminate the target, and ensure their escort is crippled beyond recovery. If the enemy attempts to dig in, break their defensive perimeter and neutralize them with overwhelming force.
 
 The victor will control the battlefield at the end of the engagement, securing any salvage and eliminating remaining resistance. This is a chance to change the course of the conflict—do not let it slip away.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>

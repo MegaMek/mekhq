@@ -7,6 +7,7 @@
 Expect aggressive aerial engagements, fast-moving strike craft, and possible long-range missile attacks. Use superior positioning, coordinated fire, and defensive tactics to neutralize threats before they can bring down our DropShip. Every enemy unit destroyed increases the DropShip’s chance of survival—hit them hard and make them pay for their assault.
 
 The victor will control the battlefield at the end of the engagement, ensuring we hold the airspace and any remaining salvage. Defend the DropShip, eliminate the threat, and dominate the skies.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
