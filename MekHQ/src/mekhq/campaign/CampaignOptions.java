@@ -528,6 +528,7 @@ public class CampaignOptions {
     private int unitMarketSpecialUnitChance;
     private int unitMarketRarityModifier;
     private boolean instantUnitMarketDelivery;
+    private boolean mothballUnitMarketDeliveries;
     private boolean unitMarketReportRefresh;
 
     // Contract Market
@@ -3468,6 +3469,14 @@ public class CampaignOptions {
         this.instantUnitMarketDelivery = instantUnitMarketDelivery;
     }
 
+    public boolean isMothballUnitMarketDeliveries() {
+        return mothballUnitMarketDeliveries;
+    }
+
+    public void setMothballUnitMarketDeliveries(final boolean mothballUnitMarketDeliveries) {
+        this.mothballUnitMarketDeliveries = mothballUnitMarketDeliveries;
+    }
+
     public boolean isUnitMarketReportRefresh() {
         return unitMarketReportRefresh;
     }
@@ -5065,6 +5074,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketSpecialUnitChance", getUnitMarketSpecialUnitChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketRarityModifier", getUnitMarketRarityModifier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "instantUnitMarketDelivery", isInstantUnitMarketDelivery());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mothballUnitMarketDeliveries", isMothballUnitMarketDeliveries());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketReportRefresh", isUnitMarketReportRefresh());
         // endregion Unit Market
 
@@ -5995,6 +6005,8 @@ public class CampaignOptions {
                     retVal.setUnitMarketRarityModifier(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("instantUnitMarketDelivery")) {
                     retVal.setInstantUnitMarketDelivery(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mothballUnitMarketDeliveries")) {
+                    retVal.setMothballUnitMarketDeliveries(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketReportRefresh")) {
                     retVal.setUnitMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     // endregion Unit Market

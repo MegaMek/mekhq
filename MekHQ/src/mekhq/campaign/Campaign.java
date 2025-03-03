@@ -66,8 +66,8 @@ import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.*;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.mod.am.InjuryUtil;
@@ -110,8 +110,8 @@ import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.*;
+import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.HiringHallLevel;
@@ -1580,6 +1580,10 @@ public class Campaign implements ITechManager {
         }
 
         unit.setDaysToArrival(days);
+
+        if (days > 0) {
+            unit.setMothballed(campaignOptions.isMothballUnitMarketDeliveries());
+        }
 
         if (allowNewPilots) {
             Map<CrewType, Collection<Person>> newCrew = Utilities

@@ -74,8 +74,8 @@ import java.awt.*;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -242,7 +242,15 @@ public class Unit implements ITechnology {
                 return "Mothballing (" + getMothballTime() + "m)";
             }
         } else if (isMothballed()) {
-            return "Mothballed";
+            int arrivalTime = getDaysToArrival();
+
+            // This means that, while the item is mothballed, it actually hasn't arrived yet, so we
+            // treat it as if had a status of 'in transit')
+            if (arrivalTime > 0) {
+                return "In transit (" + getDaysToArrival() + " days)";
+            } else {
+                return "Mothballed";
+            }
         } else if (isDeployed()) {
             return "Deployed";
         } else if (!isPresent()) {
