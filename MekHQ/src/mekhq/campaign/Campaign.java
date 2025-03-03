@@ -4097,13 +4097,20 @@ public class Campaign implements ITechManager {
         for (CombatTeam combatTeam : combatTeams.values()) {
             CombatRole combatRole = combatTeam.getRole();
 
-            Force force = null;
+            Force force;
             int unitCount = 0;
             try {
                 int forceId = combatTeam.getForceId();
                 force = getForce(forceId);
 
-                unitCount += force.getAllUnits(true).size();
+                Vector<UUID> unitsInForce = force.getAllUnits(true);
+
+                for (UUID unitId : unitsInForce) {
+                    Unit unit = getUnit(unitId);
+                    if (unit != null && unit.isFullyCrewed() && !unit.isSalvage()) {
+                        unitCount++;
+                    }
+                }
             } catch (Exception ignored) {
                 continue;
             }
