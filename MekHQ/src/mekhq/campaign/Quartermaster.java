@@ -345,10 +345,22 @@ public class Quartermaster {
         Objects.requireNonNull(ammoType);
 
         if (!getCampaignOptions().isUseAmmoByType()) {
-            // PERF: if we're not using ammo by type, we can use
-            //       a MUCH faster lookup for spare ammo.
-            AmmoStorage spare = findSpareAmmo(ammoType);
-            return (spare != null) ? spare.getShots() : 0;
+            // We can't just use findSpareAmmo, that will return the first
+            // matching ammo. There may be multiple instances of matching
+            // ammo that have different qualities, so we should return
+            // all of those counts as viable and not just the first we find.
+            return getWarehouse()
+                .streamSpareParts()
+                .filter(Quartermaster::isAvailableAsSpareAmmo)
+                .mapToInt(part -> {
+                    AmmoStorage spare = (AmmoStorage) part;
+                    if (spare.isSameAmmoType(ammoType)) {
+                        return spare.getShots();
+                    }
+                    return 0;
+                })
+                .sum();
+
         } else {
             // If we're using ammo by type, stream through all of
             // the ammo that matches strictly or is compatible.

@@ -55,7 +55,7 @@ public class VocationalExperienceAwardDialog extends MHQDialogImmersive {
      */
     public VocationalExperienceAwardDialog(Campaign campaign) {
         super(campaign, getSpeaker(campaign), null, createInCharacterMessage(campaign),
-            createButtons(), createOutOfCharacterMessage(campaign), null);
+            createButtons(), createOutOfCharacterMessage(campaign), null, false);
 
         setModal(false);
         setAlwaysOnTop(true);

@@ -38,7 +38,7 @@ public class ContractTerms {
     private int supportModifier;
     private int transportModifier;
 
-    public ContractTerms(AtBContractType mission, Faction employer, int reputationFactor, LocalDate date) {
+    public ContractTerms(AtBContractType mission, Faction employer, double reputationFactor, LocalDate date) {
         operationsTempoMultiplier = mission.getOperationsTempoMultiplier();
         baseLength = mission.getConstantLength();
         addMissionTypeModifiers(mission);
@@ -296,30 +296,32 @@ public class ContractTerms {
         }
     }
 
-    private void addUnitReputationModifiers(int reputationFactor) {
-        switch(MathUtility.clamp(reputationFactor, 0, 10)) {
+    private void addUnitReputationModifiers(double reputationFactor) {
+        int flooredReputationFactor = (int) Math.floor(reputationFactor);
+
+        switch(MathUtility.clamp(flooredReputationFactor, 0, 10)) {
             case 0:
-                commandModifier += -2;
-                salvageModifier += -1;
-                supportModifier += -1;
-                transportModifier += -3;
+                commandModifier -= 2;
+                salvageModifier -= 1;
+                supportModifier -= 1;
+                transportModifier -= 3;
                 break;
             case 1:
-                commandModifier += -1;
-                salvageModifier += -1;
-                supportModifier += -1;
-                transportModifier += -2;
+                commandModifier -= 1;
+                salvageModifier -= 1;
+                supportModifier -= 1;
+                transportModifier -= 2;
                 break;
             case 2:
-                commandModifier += -1;
-                transportModifier += -2;
+                commandModifier -= 1;
+                transportModifier -= 2;
                 break;
             case 3:
-                commandModifier += -1;
-                transportModifier += -1;
+                commandModifier -= 1;
+                transportModifier -= 1;
                 break;
             case 4:
-                transportModifier += -1;
+                transportModifier -= 1;
                 break;
             case 6:
             case 7:

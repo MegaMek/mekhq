@@ -862,7 +862,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 index++;
                 if (unit.getEntity() instanceof GunEmplacement) {
                     assignModel.addElement("AutoTurret, " + unit.getName());
-                } else {
+                } else if (unit.hasCommander()) {
+                    // If there's no commander we don't need to show anything because we only credit kills to personnel.
                     assignModel.addElement(unit.getCommander().getFullTitle() + ", " + unit.getName());
                 }
 
