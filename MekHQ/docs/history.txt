@@ -76,8 +76,23 @@ MEKHQ VERSION HISTORY:
 + Fix #6063: Refactored StratCon Scenario Retrieval And Table Rendering
 + Fix #6055: Updated Scenario Briefings and Objectives
 + Fix #6107: Fixed Maternity Leave Activation Logic
-
-Fixes #6084
++ Fix #6010:  Fix incorrect term in autosave settings
++ Fix #3655: Fix vehicle crew requirements for trailers
++ Fix #6112: Fix BA Ammo Issues
++ PR #6124: Multiple Immersive Dialog Improvements
++ Fix #6121: Improved Effective Fatigue Handling and Fixed Target Selection in POISON Event Effects
++ Fix #6120: Fixed Duplicate Resupply Processing for Active AtB Contracts
++ Fix #6127: Adjusted Resupply Scaling Logic
++ Fix #6119: Removed Non-Current Scenario Status Handling In CommandCenterTab.java
++ PR #6129: Prevented New Contract Offers When an Active Contract Exists
++ Fix #6117: Refactored ReputationFactor To Use Double Instead Of Integer
++ Fix #6131: Enabled Autosave Before Missions By Default
++ Fix #6113: Added Age Calculation In Personnel Table Column
++ Fix #6111: Adjusted Scenario Templates for Arrival Turn and Objectives
++ Fix #6027: Refactored Campaign Force Value Calculation
++ Fix #6023: Added Auto-Logistics Support For Actuators, Jump Jets, And Engines
++ Fix #6017 Fixed Multiple Gray Monday Bugs
++ Fix #6002 Updated Unit Count Logic When Determining if There is a Force Deployment Deficit
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment
