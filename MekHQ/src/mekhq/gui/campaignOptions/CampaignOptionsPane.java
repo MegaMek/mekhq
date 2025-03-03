@@ -40,6 +40,7 @@ import java.util.ResourceBundle;
 import static java.lang.Math.round;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createSubTabs;
 
 /**
@@ -156,7 +157,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             uiScale = Double.parseDouble(System.getProperty("flatlaf.uiScale"));
         } catch (Exception ignored) {}
 
-        if (mode != ABRIDGED) {
+        if (mode != ABRIDGED && mode != STARTUP_ABRIDGED) {
             addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
                 round(HEADER_FONT_SIZE * uiScale),
                 resources.getString(resourceName + ".title")),

@@ -66,8 +66,8 @@ import java.util.Collection;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
 import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CUSTOMIZE;
 import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_SELECT;
@@ -332,7 +332,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
                 campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
 
-                CampaignOptionsDialogMode mode = isSelect ? ABRIDGED : STARTUP;
+                CampaignOptionsDialogMode mode = isSelect ? STARTUP_ABRIDGED : STARTUP;
                 CampaignOptionsDialog optionsDialog =
                     new CampaignOptionsDialog(getFrame(), campaign, preset, mode);
                 setVisible(false); // cede visibility to `optionsDialog`

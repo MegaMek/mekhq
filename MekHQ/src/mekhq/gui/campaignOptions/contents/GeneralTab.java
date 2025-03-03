@@ -23,7 +23,6 @@ import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
-import megamek.common.options.OptionsConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -35,7 +34,14 @@ import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
-import mekhq.gui.campaignOptions.components.*;
+import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
+import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
+import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
+import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsTextField;
 import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.dialog.iconDialogs.UnitIconDialog;
 import mekhq.gui.displayWrappers.FactionDisplay;
@@ -48,6 +54,7 @@ import java.time.LocalDate;
 import java.util.ResourceBundle;
 
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.common.options.OptionsConstants.ALLOWED_YEAR;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
 
 /**
@@ -546,15 +553,15 @@ public class GeneralTab {
 
             if (isStartUp) {
                 campaign.getForces().setName(campaign.getName());
+                campaign.setLocalDate(date);
             }
-            campaign.setLocalDate(date);
 
             if ((campaign.getCampaignStartDate() == null)
                 || (campaign.getCampaignStartDate().isAfter(campaign.getLocalDate()))) {
                 campaign.setCampaignStartDate(date);
             }
             // Ensure that the MegaMek year GameOption matches the campaign year
-            campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
+            campaign.getGameOptions().getOption(ALLOWED_YEAR).setValue(campaign.getGameYear());
 
             // Null state handled during validation
             FactionDisplay newFaction = comboFaction.getSelectedItem();
