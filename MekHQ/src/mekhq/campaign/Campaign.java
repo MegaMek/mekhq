@@ -66,8 +66,8 @@ import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.*;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.mod.am.InjuryUtil;
@@ -110,8 +110,8 @@ import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.*;
+import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.HiringHallLevel;
@@ -406,7 +406,7 @@ public class Campaign implements ITechManager {
         automatedMothballUnits = new ArrayList<>();
         temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
         topUpWeekly = false;
-        ignoreMothballed =  false;
+        ignoreMothballed =  true;
         ignoreSparesUnderQuality = QUALITY_A;
 
         // Library initialization
@@ -2607,22 +2607,31 @@ public class Campaign implements ITechManager {
      * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
      */
     private void updatePartInUseData(PartInUse partInUse, Part incomingPart,
-            boolean ignoreMothballedUnits, PartQuality ignoreSparesUnderQuality) {
-
-        if (ignoreMothballedUnits && (null != incomingPart.getUnit()) && incomingPart.getUnit().isMothballed()) {
-        } else if ((incomingPart.getUnit() != null) || (incomingPart instanceof MissingPart)) {
-            partInUse.setUseCount(partInUse.getUseCount() + getQuantity(incomingPart));
-        } else {
-            if (incomingPart.isPresent()) {
-                if (incomingPart.getQuality().toNumeric() < ignoreSparesUnderQuality.toNumeric()) {
-                } else {
-                    partInUse.setStoreCount(partInUse.getStoreCount() + getQuantity(incomingPart));
-                    partInUse.addSpare(incomingPart);
-                }
-            } else {
-                partInUse.setTransferCount(partInUse.getTransferCount() + getQuantity(incomingPart));
-            }
+                                     boolean ignoreMothballedUnits, PartQuality ignoreSparesUnderQuality) {
+        // Ignore parts if they are from mothballed units and the flag is set
+        if (ignoreMothballedUnits
+            && incomingPart.getUnit() != null
+            && incomingPart.getUnit().isMothballed()) {
+            return;
         }
+
+        // Case 1: Part is associated with a unit or is a MissingPart
+        if ((incomingPart.getUnit() != null) || (incomingPart instanceof MissingPart)) {
+            partInUse.setUseCount(partInUse.getUseCount() + getQuantity(incomingPart));
+            return;
+        }
+
+        // Case 2: Part is present and meets quality requirements
+        if (incomingPart.isPresent()) {
+            if (incomingPart.getQuality().toNumeric() >= ignoreSparesUnderQuality.toNumeric()) {
+                partInUse.setStoreCount(partInUse.getStoreCount() + getQuantity(incomingPart));
+                partInUse.addSpare(incomingPart);
+            }
+            return;
+        }
+
+        // Case 3: Part is not present, update transfer count
+        partInUse.setTransferCount(partInUse.getTransferCount() + getQuantity(incomingPart));
     }
 
     /**
