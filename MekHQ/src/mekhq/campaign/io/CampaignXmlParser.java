@@ -23,8 +23,8 @@ import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.Entity;
 import megamek.common.*;
+import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.weapons.bayweapons.BayWeapon;
@@ -64,9 +64,6 @@ import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
-import mekhq.campaign.universe.Planet.PlanetaryEvent;
-import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
-import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.module.atb.AtBEventProcessor;
@@ -81,6 +78,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
+import static mekhq.campaign.force.Force.FORCE_NONE;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
 
@@ -417,7 +415,7 @@ public class CampaignXmlParser {
             // lets make sure the force id set actually corresponds to a force
             // TODO: we have some reports of force id relics - need to fix
             if ((unit.getForceId() > 0) && (retVal.getForce(unit.getForceId()) == null)) {
-                unit.setForceId(-1);
+                unit.setForceId(FORCE_NONE);
             }
 
             // It's annoying to have to do this, but this helps to ensure
