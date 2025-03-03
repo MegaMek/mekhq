@@ -2212,8 +2212,11 @@ public class StratconRulesManager {
      *                      state for further filtering of eligible forces.
      * @return a {@link List} of unique force IDs that meet all deployment criteria.
      */
-    public static List<Integer> getAvailableForceIDs(int unitType, Campaign campaign, StratconTrackState currentTrack,
-            boolean reinforcements, @Nullable StratconScenario currentScenario, StratconCampaignState campaignState) {
+    public static List<Integer> getAvailableForceIDsForManualDeployment(int unitType, Campaign campaign,
+                                                                        StratconTrackState currentTrack,
+                                                                        boolean reinforcements,
+                                                                        @Nullable StratconScenario currentScenario,
+                                                                        StratconCampaignState campaignState) {
         List<Integer> retVal = new ArrayList<>();
 
         // assemble a set of all force IDs that are currently assigned to tracks that are not this one
