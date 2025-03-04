@@ -73,6 +73,10 @@ public class ScenarioTemplate implements Cloneable {
     public boolean isHostileFacility;
     public boolean isAlliedFacility;
 
+    @XmlElement(name = "battlefieldControl")
+    @XmlJavaTypeAdapter(value = BattlefieldControlTypeAdapter.class)
+    public BattlefieldControlType battlefieldControl = BattlefieldControlType.VICTOR;
+
     public ScenarioMapParameters mapParameters = new ScenarioMapParameters();
     public List<String> scenarioModifiers = new ArrayList<>();
 
@@ -81,6 +85,26 @@ public class ScenarioTemplate implements Cloneable {
     @XmlElementWrapper(name = "scenarioObjectives")
     @XmlElement(name = "scenarioObjective")
     public List<ScenarioObjective> scenarioObjectives = new ArrayList<>();
+
+    /**
+     * Enum representing the different types of battlefield control during a scenario.
+     */
+    public enum BattlefieldControlType {
+        /**
+         * Indicates the victor controls the field.
+         */
+        VICTOR,
+
+        /**
+         * Battlefield control is always assigned to the player.
+         */
+        PLAYER,
+
+        /**
+         * Battlefield control is always assigned to the enemy.
+         */
+        ENEMY
+    }
 
     @Override
     public ScenarioTemplate clone() {
@@ -91,6 +115,7 @@ public class ScenarioTemplate implements Cloneable {
         template.detailedBriefing = this.detailedBriefing;
         template.isHostileFacility = this.isHostileFacility;
         template.isAlliedFacility = this.isAlliedFacility;
+        template.battlefieldControl = this.battlefieldControl;
         for (ScenarioForceTemplate sft : scenarioForces.values()) {
             template.scenarioForces.put(sft.getForceName(), sft.clone());
         }
@@ -155,6 +180,10 @@ public class ScenarioTemplate implements Cloneable {
 
     public boolean isFacilityScenario() {
         return isHostileFacility || isAlliedFacility;
+    }
+
+    public BattlefieldControlType getBattlefieldControl() {
+        return battlefieldControl;
     }
 
     public List<ScenarioForceTemplate> getAllBotControlledAllies() {
@@ -334,6 +363,29 @@ public class ScenarioTemplate implements Cloneable {
         public String marshal(ScenarioType scenarioType) {
             // Converts Enum back to String for XML
             return String.valueOf(scenarioType);
+        }
+    }
+
+    /**
+     * Adapter for converting between String and BattlefieldControlType during XML (un)marshalling.
+     */
+    public static class BattlefieldControlTypeAdapter extends XmlAdapter<String, BattlefieldControlType> {
+
+        @Override
+        public BattlefieldControlType unmarshal(String value) throws Exception {
+            try {
+                // Convert the string value to a BattlefieldControlType enum
+                return BattlefieldControlType.valueOf(value.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // If the string does not match any enum, handle it gracefully (e.g., return a default value)
+                return BattlefieldControlType.VICTOR;
+            }
+        }
+
+        @Override
+        public String marshal(BattlefieldControlType value) throws Exception {
+            // Convert the BattlefieldControlType enum back to its string representation
+            return value.name();
         }
     }
 }

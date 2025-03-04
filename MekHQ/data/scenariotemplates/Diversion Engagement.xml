@@ -7,6 +7,7 @@
 Victory can be achieved in one of two ways. Ensure at least 50% of your forces reach the far edge of the engagement zone, bypassing the enemy’s attempt to hold you in place. Alternatively, if they commit too heavily to blocking your path, destroy at least 75% of their forces, breaking their ability to resist and forcing them to withdraw.
 
 Be advised: the enemy will control the field at the end of the engagement. There will be no time for salvage or securing the area. Speed and decisive action are key—either break through or break them entirely, but do not allow them to stall our momentum.</detailedBriefing>
+    <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>

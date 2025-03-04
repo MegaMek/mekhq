@@ -9,6 +9,7 @@ The enemy is unaware of our presence, but if discovered, they will respond with 
 The enemy will control the field at the end of the engagement, meaning there will be no opportunity for salvage or reinforcement. This is about intelligence, not confrontation—stay hidden, gather what we need, and withdraw before they know you were ever there. At least one of your units must survive.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
+    <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>

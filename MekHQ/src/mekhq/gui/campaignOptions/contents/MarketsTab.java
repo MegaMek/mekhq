@@ -90,6 +90,7 @@ public class MarketsTab {
     private JLabel lblUnitMarketRarityModifier;
     private JSpinner spnUnitMarketRarityModifier;
     private JCheckBox chkInstantUnitMarketDelivery;
+    private JCheckBox chkMothballUnitMarketDeliveries;
     private JCheckBox chkUnitMarketReportRefresh;
     //end Unit Market
 
@@ -366,6 +367,7 @@ public class MarketsTab {
         lblUnitMarketRarityModifier = new JLabel();
         spnUnitMarketRarityModifier = new JSpinner();
         chkInstantUnitMarketDelivery = new JCheckBox();
+        chkMothballUnitMarketDeliveries = new JCheckBox();
         chkUnitMarketReportRefresh = new JCheckBox();
     }
 
@@ -397,6 +399,8 @@ public class MarketsTab {
             0, -10, 10, 1);
 
         chkInstantUnitMarketDelivery = new CampaignOptionsCheckBox("InstantUnitMarketDelivery");
+
+        chkMothballUnitMarketDeliveries = new CampaignOptionsCheckBox("MothballUnitMarketDeliveries");
 
         chkUnitMarketReportRefresh = new CampaignOptionsCheckBox("UnitMarketReportRefresh");
 
@@ -437,6 +441,9 @@ public class MarketsTab {
         layout.gridy++;
         layout.gridwidth = 2;
         panel.add(chkInstantUnitMarketDelivery, layout);
+
+        layout.gridy++;
+        panel.add(chkMothballUnitMarketDeliveries, layout);
 
         layout.gridy++;
         panel.add(chkUnitMarketReportRefresh, layout);
@@ -742,6 +749,7 @@ public class MarketsTab {
         spnUnitMarketSpecialUnitChance.setValue(options.getUnitMarketSpecialUnitChance());
         spnUnitMarketRarityModifier.setValue(options.getUnitMarketRarityModifier());
         chkInstantUnitMarketDelivery.setSelected(options.isInstantUnitMarketDelivery());
+        chkMothballUnitMarketDeliveries.setSelected(options.isMothballUnitMarketDeliveries());
         chkUnitMarketReportRefresh.setSelected(options.isContractMarketReportRefresh());
 
         // Contract Market
@@ -793,6 +801,7 @@ public class MarketsTab {
         options.setUnitMarketSpecialUnitChance((int) spnUnitMarketSpecialUnitChance.getValue());
         options.setUnitMarketRarityModifier((int) spnUnitMarketRarityModifier.getValue());
         options.setInstantUnitMarketDelivery(chkInstantUnitMarketDelivery.isSelected());
+        options.setMothballUnitMarketDeliveries(chkMothballUnitMarketDeliveries.isSelected());
         options.setUnitMarketReportRefresh(chkUnitMarketReportRefresh.isSelected());
 
         // Contract Market

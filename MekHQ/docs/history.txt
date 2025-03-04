@@ -102,6 +102,16 @@ MEKHQ VERSION HISTORY:
 + PR #6156: Added New Academies To Prestigious Academies Dataset 
 + PR #6161: Adjusted Planetary Acquisitions to use the campaign option for Delivery Scale to make deliveries optionally slower
 + PR #6162: Updated Manual Unit Rating Modifier Range 
++ Fix #5639: Disabled Time Traveling in Campaign Options; Fixed Campaign Options Start Up in Abridged Mode
++ Fix #5734: Added Mothball Option for Unit Market Deliveries
++ Fix #5973, #6036: Parts in Use Now Ignores Salvage or Mothballed Units
++ Fix #5974: Fixed Duplicate StratCon Deployments
++ PR #6139: Enforced Skill Value Boundaries
++ Fix #6144: Refactored Prisoner Context Menu Behavior
++ PR #6157: Updated Battlefield Control Logic in Scenarios
++ PR #6159: Renamed `getAvailableForceIDs` Method to `getAvailableForceIDsForManualDeployment` For Improved Clarity
++ PR #6160: Replaced Magic Numbers With Constants For Scenario IDs
+
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment

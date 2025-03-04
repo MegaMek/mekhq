@@ -7,6 +7,7 @@
 At the same time, this is not just about survival. You are to destroy at least 50% of enemy forces before the battle concludes.
 
 The victor will control the field when this is over. Ensure that it is us.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>true</isAlliedFacility>
     <mapParameters>

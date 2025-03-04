@@ -7,6 +7,7 @@
 If the enemy resistance proves too strong, you have an alternative path to victory: destroy at least 50% of enemy forces to force them into disarray and open the way.
 
 Be advised: the enemy will control the field when this is over. Move fast, strike hard, and don’t look back.</detailedBriefing>
+    <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>true</allowRotation>

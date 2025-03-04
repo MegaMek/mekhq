@@ -8,6 +8,7 @@
 This enemy assault is a direct attempt to cripple our supply chain. If they are not stopped here, they will continue to strike at our convoys, causing immeasurable damage to our war effort. The convoy is a priority, but if ensuring the destruction of the enemy requires sacrificing the supplies, do not hesitate. Breaking their offensive strength is the ultimate objective.
 
 We will control the battlefield at the end of this engagement, allowing us to recover whatever remains and prevent further incursions. Ensure the convoy escapes if possible, but above all, crush the enemy’s ability to wage war in our territory. This ends here.</detailedBriefing>
+    <battlefieldControl>PLAYER</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>

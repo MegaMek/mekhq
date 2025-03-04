@@ -8,6 +8,7 @@
 The enemy is built for speed and pursuit, meaning direct engagements may not always be favorable. Use ambush tactics, force them into unfavorable terrain, and disrupt their ability to maneuver. They rely on overwhelming pursuit capabilities—deny them the chance to use it effectively. If the convoy can be safely extracted, do so, but not at the expense of allowing the enemy to regroup for future strikes.
 
 We will control the battlefield at the conclusion of this engagement, ensuring that any remaining salvage remains in our possession. Turn the hunters into the hunted, cripple their forces, and make certain they never threaten our supply lines again.</detailedBriefing>
+    <battlefieldControl>PLAYER</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>

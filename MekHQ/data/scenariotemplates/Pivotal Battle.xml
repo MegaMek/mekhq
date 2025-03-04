@@ -7,6 +7,7 @@
 The enemy is relying on overwhelming numbers, expecting to steamroll our defenses. Target high-value units, disrupt their formations, and make them bleed for every inch of ground. If they hesitate or falter, their offensive will collapse before it can reach full strength.
 
 The victor will control the battlefield at the end of the engagement, ensuring we hold the ground and any remaining salvage. Stand firm, inflict maximum damage, and break their momentum before it’s too late.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
