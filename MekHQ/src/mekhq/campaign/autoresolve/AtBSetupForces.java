@@ -16,6 +16,7 @@
 package mekhq.campaign.autoresolve;
 
 import io.sentry.Sentry;
+import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.*;
 import megamek.common.alphaStrike.conversion.ASConverter;
 import megamek.common.autoresolve.acar.SimulationContext;
@@ -152,6 +153,7 @@ public class AtBSetupForces extends SetupForces {
      * @param game The game object to setup the bots in
      */
     private void setupBots(SimulationContext game) {
+        var forbiddenColor = game.getPlayer(0).getColour();
         var enemySkill = (scenario.getContract(campaign)).getEnemySkill();
         var allySkill = (scenario.getContract(campaign)).getAllySkill();
         var localBots = new HashMap<String, Player>();
@@ -168,8 +170,9 @@ public class AtBSetupForces extends SetupForces {
             var highestPlayerId = game.getPlayersList().stream().mapToInt(Player::getId).max().orElse(0);
             Player bot = new Player(highestPlayerId + 1, name);
             bot.setTeam(bf.getTeam());
+
             localBots.put(name, bot);
-            configureBot(bot, bf);
+            configureBot(bot, bf, forbiddenColor);
             game.addPlayer(bot.getId(), bot);
             if (bot.isEnemyOf(campaign.getPlayer())) {
                 game.setPlayerSkillLevel(bot.getId(), enemySkill);
@@ -363,13 +366,25 @@ public class AtBSetupForces extends SetupForces {
         return mapSettings;
     }
 
+    public PlayerColour getNextColor(PlayerColour playerColour) {
+        PlayerColour[] playerColours = PlayerColour.values();
+        int index = (playerColour.ordinal() + 1) % playerColours.length;
+        return playerColours[index];
+    }
+
     /**
      * Configure the bot player object with the bot force data
      * @param bot The bot player object
      * @param botForce The bot force data
      */
-    private void configureBot(Player bot, BotForce botForce) {
+    private void configureBot(Player bot, BotForce botForce, PlayerColour forbiddenColor) {
+        // set camo
+        bot.setCamouflage(botForce.getCamouflage().clone());
+        boolean isSameColorAsForbidden = botForce.getColour().equals(forbiddenColor);
+        var color = isSameColorAsForbidden? getNextColor(botForce.getColour()) : botForce.getColour();
+        bot.setColour(color);
         bot.setTeam(botForce.getTeam());
+
         // set deployment
         bot.setStartingPos(botForce.getStartingPos());
         bot.setStartOffset(botForce.getStartOffset());
@@ -379,9 +394,6 @@ public class AtBSetupForces extends SetupForces {
         bot.setStartingAnySEx(botForce.getStartingAnySEx());
         bot.setStartingAnySEy(botForce.getStartingAnySEy());
 
-        // set camo
-        bot.setCamouflage(botForce.getCamouflage().clone());
-        bot.setColour(botForce.getColour());
     }
 
     /**
