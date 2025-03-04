@@ -543,15 +543,15 @@ public class AtBGameThread extends GameThread {
                         botClient.sendDone(true);
                     }
                     Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
-                    if (swingGui != null && swingGui instanceof CommanderGUI commanderGUI) {
-                        commanderGUI.enableReady();
-                        commanderGUI.getLocalBots().put(bot.getName(), bot);
-                    }
                     if (swingGui instanceof ILocalBots iLocalBots) {
                         iLocalBots.getLocalBots().put(bot.getName(), bot);
                     }
-                    client.getLocalPlayer().setDone(true);
-                    client.sendDone(true);
+                    if (swingGui instanceof CommanderGUI commanderGUI) {
+                        commanderGUI.enableReady();
+                        commanderGUI.getLocalBots().put(bot.getName(), bot);
+                        client.getLocalPlayer().setDone(true);
+                        client.sendDone(true);
+                    }
                 }
             }
 
