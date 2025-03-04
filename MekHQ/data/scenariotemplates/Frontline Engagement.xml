@@ -7,6 +7,7 @@
 Expect a determined enemy response. They will not withdraw easily and may attempt to reinforce their position as losses mount. Strike hard, exploit weaknesses, and maintain battlefield control. This is not a delaying action—this is a battle for dominance.
 
 The victor will control the battlefield at the end of the engagement, securing salvage and eliminating any remaining resistance. Ensure that when the dust settles, it is our forces standing over the wreckage. Crush them and claim the field.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>

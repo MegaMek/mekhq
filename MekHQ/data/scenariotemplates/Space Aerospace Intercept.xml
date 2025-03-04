@@ -7,6 +7,7 @@
 Expect high-speed engagements with agile enemy fighters and possible bomber or support craft in formation. Control the skies, dictate the terms of engagement, and press the attack until the enemy is forced to retreat or is completely neutralized. Do not allow them to escape unscathed—this is an opportunity to cripple their airpower.
 
 The victor will control the battlefield at the end of the engagement, securing dominance over the airspace and ensuring enemy forces are unable to reestablish a foothold. Strike hard, eliminate the threat, and claim the skies as our own.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>

@@ -7,6 +7,7 @@
 There is no need to concern yourself with minimizing damage or securing the spoils. We do not have the luxury of holding the field, and enemy reinforcements will arrive quickly. Do not waste time engaging the escorts unless necessary—focus all efforts on neutralizing the convoy itself. Once the job is done, withdraw immediately.
 
 No distractions. No delays. No mercy. Execute the raid, cripple their supply line, and get out before the enemy can mount a counterattack.</detailedBriefing>
+    <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>

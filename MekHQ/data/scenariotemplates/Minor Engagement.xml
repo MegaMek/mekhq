@@ -7,6 +7,7 @@
 This is a show of strength—hit them hard, make them bleed, and leave no doubt that further resistance is futile. They may attempt a counteroffensive, but once their losses mount, they will have no choice but to retreat.
 
 The victor will control the battlefield at the end of the engagement, securing the area and denying the enemy any future foothold here. Send a message—this ground belongs to us.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>

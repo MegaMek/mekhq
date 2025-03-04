@@ -7,6 +7,7 @@
 Expect a relentless assault from multiple directions, with enemy units prioritizing disabling the DropShip before it can launch. They may attempt to immobilize it, breach its hull, or delay its departure long enough for reinforcements to arrive. You must hold the line, intercept high-threat targets, and keep the DropShip secure until it achieves liftoff. If the situation demands it, eliminating half of the enemy force will force them to retreat, buying the DropShip a chance to escape.
 
 The enemy will control the field at the end of the engagement, meaning no salvage or recovery will be possible. This is a battle of survival—ensure the DropShip gets out or cripple the enemy so thoroughly that they can no longer threaten it.</detailedBriefing>
+    <battlefieldControl>ENEMY</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>

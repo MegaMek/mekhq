@@ -7,6 +7,7 @@
 Expect a mix of tactics—the insurgents will use terrain, ambushes, and guerrilla warfare, while the frontline units will provide structured firepower and coordination. Do not underestimate either force. Eliminate them with precision, break their ability to fight, and ensure this sector is pacified.
 
 The victor will control the battlefield at the end of the engagement, securing any remaining assets and preventing further insurgent activity. This is a mission of suppression and dominance—strike hard, eliminate resistance, and leave no doubt who commands this region.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>

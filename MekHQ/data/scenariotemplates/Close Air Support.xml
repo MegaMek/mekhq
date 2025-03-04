@@ -7,6 +7,7 @@
 Your primary objective is to preserve at least 50% of allied forces. Their survival is paramount to maintaining battlefield cohesion. Simultaneously, you must destroy or route at least 50% of the enemy forces. This engagement is about turning the tide, forcing them to break, and ensuring our ground forces can hold firm.
 
 The winner of this battle will control the field when the engagement is over. You must ensure that victory belongs to us. Strike hard, strike true, and do not let the enemy dictate the pace of battle. Your firepower will decide the outcome.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
