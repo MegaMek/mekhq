@@ -26,10 +26,14 @@ import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.util.ArrayList;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
 /**
  * A table model for displaying parts
  */
 public class PartsTableModel extends DataTableModel {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources." + PartsTableModel.class.getSimpleName();
+
     public final static int COL_QUANTITY = 0;
     public final static int COL_NAME = 1;
     public final static int COL_DETAIL = 2;
@@ -58,30 +62,19 @@ public class PartsTableModel extends DataTableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch (column) {
-            case COL_NAME:
-                return "Name";
-            case COL_COST:
-                return "Value per Unit";
-            case COL_TOTAL_COST:
-                return "Total Value";
-            case COL_QUANTITY:
-                return "#";
-            case COL_QUALITY:
-                return "Quality";
-            case COL_TON:
-                return "Tonnage";
-            case COL_STATUS:
-                return "Status";
-            case COL_DETAIL:
-                return "Detail";
-            case COL_TECH_BASE:
-                return "Tech Base";
-            case COL_REPAIR:
-                return "Repair Details";
-            default:
-                return "?";
-        }
+        return switch (column) {
+            case COL_NAME -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_NAME");
+            case COL_COST -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_COST");
+            case COL_TOTAL_COST -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_TOTAL_COST");
+            case COL_QUANTITY -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_QUANTITY");
+            case COL_QUALITY -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_QUALITY");
+            case COL_TON -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_TON");
+            case COL_STATUS -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_STATUS");
+            case COL_DETAIL -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_DETAIL");
+            case COL_TECH_BASE -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_TECH_BASE");
+            case COL_REPAIR -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_REPAIR");
+            default -> "?";
+        };
     }
 
     @Override
@@ -109,12 +102,14 @@ public class PartsTableModel extends DataTableModel {
             return part.getQuantity();
         }
         if (col == COL_QUALITY) {
-            String appendum = "";
+            String appendum;
 
             if (part.isBrandNew()) {
-                appendum = " (Brand New)";
+                appendum = getFormattedTextAt(RESOURCE_BUNDLE, "addendum.brandNew");
+            } else {
+                appendum = getFormattedTextAt(RESOURCE_BUNDLE, "addendum.used");
             }
-            return part.getQualityName() + appendum;
+            return part.getQualityName() + " (" + appendum + ')';
         }
         if (col == COL_TON) {
             return Math.round(part.getTonnage() * 100) / 100.0;
