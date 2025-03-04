@@ -1581,6 +1581,10 @@ public class Campaign implements ITechManager {
 
         unit.setDaysToArrival(days);
 
+        if (days > 0) {
+            unit.setMothballed(campaignOptions.isMothballUnitMarketDeliveries());
+        }
+
         if (allowNewPilots) {
             Map<CrewType, Collection<Person>> newCrew = Utilities
                     .genRandomCrewWithCombinedSkill(this, unit, getFactionCode());
