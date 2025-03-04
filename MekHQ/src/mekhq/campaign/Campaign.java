@@ -163,9 +163,7 @@ import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomM
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
-import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_CLARION_NOTE;
-import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
-import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+import static mekhq.campaign.randomEvents.GrayMonday.*;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMAN;
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
@@ -8027,7 +8025,15 @@ public class Campaign implements ITechManager {
         // if you are delivering from the same planet then no transit times
         int currentTransitTime = (distance > 0) ? (int) Math.ceil(getCurrentSystem().getTimeToJumpPoint(1.0)) : 0;
         int originTransitTime = (distance > 0) ? (int) Math.ceil(system.getTimeToJumpPoint(1.0)) : 0;
-        int amazonFreeShipping = d6(1 + jumps);
+
+        // CO 51 (latest) has much longer average part times. Let's adjust amazonFreeShipping
+        // based on what getUnitTransitTime is set in the options in an attempt to get some
+        // delivery times more in line with RAW's one-month minimum. Default is TRANSIT_UNIT_MONTH
+        int amazonFreeShipping = switch (campaignOptions.getUnitTransitTime()) {
+            case TRANSIT_UNIT_MONTH -> 7 + (d6(7 * (1 + jumps)));
+            case TRANSIT_UNIT_WEEK -> 2 + (d6(2 * (1 + jumps)));
+            default -> d6(1 + jumps);
+        };
         return (recharges * 7) + currentTransitTime + originTransitTime + amazonFreeShipping;
     }
 
@@ -8050,6 +8056,9 @@ public class Campaign implements ITechManager {
      * calculated transit time.
      */
     public int calculatePartTransitTime(int availability) {
+        // This is accurate as of the latest rules. It was
+        // (BASE_MODIFIER - (roll + availability) / 4 months
+        // in the older version.
         final int BASE_MODIFIER = 7; // CamOps p51
         final int roll = d6(1);
         final int total = max(1, (BASE_MODIFIER + roll + availability) / 4); // CamOps p51
