@@ -111,6 +111,8 @@ MEKHQ VERSION HISTORY:
 + PR #6157: Updated Battlefield Control Logic in Scenarios
 + PR #6159: Renamed `getAvailableForceIDs` Method to `getAvailableForceIDsForManualDeployment` For Improved Clarity
 + PR #6160: Replaced Magic Numbers With Constants For Scenario IDs
++ FIX #5829: ACAR - automatically change the color of the bot for another color if there is a collision
++ FIX #6059: PACAR auto-start only when using CommanderGUI
 
 
 0.50.03 (2025-02-02 2030 UTC)
