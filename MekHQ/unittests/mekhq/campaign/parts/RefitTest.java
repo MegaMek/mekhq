@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -94,7 +94,7 @@ public class RefitTest {
             lenient().when(mockCampaignOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1d);
             lenient().when(mockCampaignOptions.getInnerSpherePartPriceMultiplier()).thenReturn(1d);
             double[] usedPartMultipliers = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
-            when(mockCampaignOptions.getUsedPartPriceMultipliers()).thenReturn(usedPartMultipliers);
+            lenient().when(mockCampaignOptions.getUsedPartPriceMultipliers()).thenReturn(usedPartMultipliers);
 
             lenient().when(mockCampaign.getGame()).thenReturn(mockGame);
             lenient().when(mockGame.getBoard()).thenReturn(mockBoard);
