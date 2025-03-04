@@ -60,8 +60,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.List;
 import java.util.*;
+import java.util.List;
+
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static mekhq.campaign.personnel.Skill.getCountDownMaxValue;
+import static mekhq.campaign.personnel.Skill.getCountUpMaxValue;
 
 /**
  * This dialog is used to both hire new pilots and to edit existing ones
@@ -1498,14 +1503,16 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             skillValues.get(type).setText("-");
             return;
         }
-        SkillType stype = SkillType.getType(type);
-        int lvl = (Integer) skillLvls.get(type).getModel().getValue();
-        int b = (Integer) skillBonus.get(type).getModel().getValue();
-        int target = stype.getTarget() - lvl - b;
-        if (stype.countUp()) {
-            target = stype.getTarget() + lvl + b;
+        SkillType skillType = SkillType.getType(type);
+
+        int level = (Integer) skillLvls.get(type).getModel().getValue();
+        int bonus = (Integer) skillBonus.get(type).getModel().getValue();
+
+        if (skillType.countUp()) {
+            int target = min(getCountUpMaxValue(), skillType.getTarget() + level + bonus);
             skillValues.get(type).setText("+" + target);
         } else {
+            int target = max(getCountDownMaxValue(), skillType.getTarget() - level - bonus);
             skillValues.get(type).setText(target + "+");
         }
     }

@@ -7,6 +7,7 @@
 This battle will determine control of the battlefield. The victor will hold the field at the end of the engagement, securing any salvage and denying the enemy any chance of recovery. Every enemy unit destroyed weakens their ability to wage war—make sure they do not leave this battlefield intact.
 
 Strike hard, eliminate the opposition, and take control. Victory is absolute, or it is meaningless.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>

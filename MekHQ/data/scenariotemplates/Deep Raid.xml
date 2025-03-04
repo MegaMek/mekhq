@@ -7,6 +7,7 @@
 Expect rapid enemy response forces as the enemy scrambles to defend their asset. They will attempt to delay and stall you long enough for the DropShip to achieve liftoff. Speed is critical—push through their defenses, disable or destroy the DropShip, and exfiltrate before enemy reinforcements overwhelm your position.
 
 This engagement takes place in enemy territory, meaning we will not control the field at the end. There will be no opportunity for salvage or recovery, so focus solely on mission success. Strike fast, eliminate the target, and get out before the enemy locks down the area.</detailedBriefing>
+    <battlefieldControl>ENEMY</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>

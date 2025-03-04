@@ -7,6 +7,7 @@
 The enemy will press hard to keep you contained, using aggressive maneuvers and potentially overwhelming numbers to delay your advance. Do not get bogged down in a prolonged engagement—focus fire, break their cohesion, and force them into retreat. Once their losses become unsustainable, the path forward will be clear.
 
 There will be no time to secure the battlefield at the end of the engagement, meaning any salvage will be lost. Speed is essential—eliminate the enemy and move out before reinforcements arrive.</detailedBriefing>
+    <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>

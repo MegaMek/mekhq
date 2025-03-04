@@ -7,6 +7,7 @@
 Expect the enemy to deploy defensive escorts and countermeasures to protect their vessel. They may attempt evasive maneuvers or a high-speed burn to reach the upper atmosphere. You must strike decisively and disable or destroy the DropShip before it leaves your engagement range.
 
 We will control the field at the end of the engagement, ensuring that any wreckage or surviving assets remain in our hands. This is a one-shot opportunity—do not let them escape.</detailedBriefing>
+    <battlefieldControl>PLAYER</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>

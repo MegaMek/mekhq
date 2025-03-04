@@ -8,6 +8,7 @@
 The enemy is executing a relentless pursuit, attempting to isolate and destroy the convoy before it can escape. If they are not routed here, they will continue striking at our logistics, inflicting immeasurable damage over time. Prioritize extracting the convoy, but if necessary, sacrificing the supplies is acceptable if it means crushing the enemy force beyond recovery.
 
 We will control the battlefield at the end of the engagement, ensuring that any remaining salvage or assets fall into our hands. This battle is about more than just one convoy—it is about securing the future of our supply lines. Break through, break them, and ensure they never threaten our logistics again.</detailedBriefing>
+    <battlefieldControl>PLAYER</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
