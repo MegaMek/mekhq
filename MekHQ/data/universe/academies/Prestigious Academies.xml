@@ -4557,6 +4557,81 @@
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
+        <name>New Avalon Institute of Science</name>
+        <type>University</type>
+        <description>Following his successful raid on the Draconis Combine's Halstead Station and the subsequent capture of a treasure trove of Star League era knowledge, Prince Ian Davion allocated extensive resources into the founding of a new university dedicated towards studying and developing the reclaimed data. In 3016, this initiative resulted in the opening of the New Avalon Institute of Science, a premier center of learning and leader of the effort to revive LosTech innovations.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>New Avalon</locationSystem>
+        <constructionYear>3016</constructionYear>
+        <destructionYear>3067</destructionYear>
+        <tuition>7500</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>Doctorate</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>The College of Biology/Medicine</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>The College of Engineering (BattleMech)</qualification>
+        <curriculum>Tech/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>The College of Engineering (Mechanics)</qualification>
+        <curriculum>Tech/Mechanic</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>The College of Engineering (Aerospace)</qualification>
+        <curriculum>Tech/Aero</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>The College of engineering (BA)</qualification>
+        <curriculum>Tech/BA</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>The College of Engineering (Vessels)</qualification>
+        <curriculum>Tech/Vessel</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>The College of Finance</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>New Avalon Institute of Science [3079]</name>
+        <type>University</type>
+        <description>Founded in 3016 by Prince Ian Davion, the NAIS reached prominence as a leading institute of learning and developer of LosTech. As the technological renaissance of the Inner Sphere continued, NAIS continued its mission to remain at the cutting edge of innovation and research.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>New Avalon</locationSystem>
+        <constructionYear>3079</constructionYear>
+        <tuition>7500</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>Doctorate</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>The College of Biology/Medicine</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>The College of Engineering (BattleMech)</qualification>
+        <curriculum>Tech/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>The College of Engineering (Mechanics)</qualification>
+        <curriculum>Tech/Mechanic</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>The College of Engineering (Aerospace)</qualification>
+        <curriculum>Tech/Aero</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>The College of engineering (BA)</qualification>
+        <curriculum>Tech/BA</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>The College of Engineering (Vessels)</qualification>
+        <curriculum>Tech/Vessel</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>The College of Finance</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
         <name>New Vandenberg Taurian Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
@@ -8038,6 +8113,75 @@
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Terra</locationSystem>
         <destructionYear>3085</destructionYear>
+        <tuition>11426</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MekWarrior Command Graduate</qualification>
+        <curriculum>Piloting/Mek, Gunnery/Mek, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Cavalry Command Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Air Cavalry Command Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Command Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Fighter Command Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Armored Infantry Command Graduate</qualification>
+        <curriculum>Gunnery/BattleArmor, Anti-Mek, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2935</qualificationStartYear>
+        <qualification>Advanced Infantry Command Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mek, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Aerospace Command Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>DropShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>JumpShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>WarShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>Senior Medical Technician</qualification>
+        <curriculum>Doctor, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Senior BattleMek Technician</qualification>
+        <curriculum>Tech/Mek, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Senior Advanced Vehicle Technician</qualification>
+        <curriculum>Tech/Mechanic, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Senior Aerospace Technician</qualification>
+        <curriculum>Tech/Aero, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Senior Armored Infantry Technician</qualification>
+        <curriculum>Tech/BattleArmor, Leadership</curriculum>
+        <qualificationStartYear>2935</qualificationStartYear>
+        <qualification>Senior Advanced Vessel Technician</qualification>
+        <curriculum>Tech/Vessel, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>War Academy of Mars [3135]</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The War Academy of Mars is part of the "War Triad" alongside Sandhurst Royal Military College and the Military Academy of Aphros. Located near Olympus Mons, the academy specializes in strategic training for officer cadets. It was destroyed during Operation SCOUR, but has since been reopened.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>3135</constructionYear>
+        <destructionYear>3151</destructionYear>
         <tuition>11426</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
