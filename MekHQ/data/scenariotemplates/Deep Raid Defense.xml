@@ -2,7 +2,12 @@
 <ScenarioTemplate>
     <name>Deep Raid Defense</name>
     <shortBriefing>Defend grounded DropShip from raid.</shortBriefing>
-    <detailedBriefing>An enemy raid deep behind friendly lines is targeting a grounded DropShip. Protect it until liftoff, ensuring it does not become crippled. Defeat at least 50% of the enemy raiders while preserving 50% of your forces during the defense.</detailedBriefing>
+    <detailedBriefing>The enemy has launched a deep strike behind our lines, targeting one of our DropShips before it can take off. This is a calculated assault meant to cripple our logistics and deny us critical mobility. Your mission is to defend the DropShip until it can launch or eliminate at least 50% of the attacking force to force their retreat.
+
+Expect long-range bombardment. The enemy is likely to deploy artillery strikes to weaken our defenses before engaging directly. You must counter their firepower while maintaining a strong perimeter around the DropShip. Close the distance where possible, neutralize their artillery assets, and prevent them from overwhelming our position before liftoff.
+
+We will control the battlefield at the end of the engagement, ensuring access to salvage and preventing any lingering enemy forces from regrouping. Hold the line, protect the DropShip, and make the enemy pay dearly for their incursion.</detailedBriefing>
+    <battlefieldControl>PLAYER</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
@@ -15,92 +20,6 @@
         <useStandardAtBSizing>true</useStandardAtBSizing>
         <widthScalingIncrement>5</widthScalingIncrement>
     </mapParameters>
-    <scenarioObjectives>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>DropShip</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails>
-                <additionalDetail>If the DropShip cannot be deployed, this objective may be ignored.</additionalDetail>
-            </additionalDetails>
-            <description>Protect the following units:</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>100</percentage>
-            <timeLimitAtMost>false</timeLimitAtMost>
-            <timeLimitScaleFactor>2</timeLimitScaleFactor>
-            <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>OpFor</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>Destroy, cripple or force to withdraw 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
-            <percentage>50</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Player</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>50</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-    </scenarioObjectives>
     <scenarioForces>
         <entry>
             <key>Player</key>
@@ -108,7 +27,7 @@
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
                 <allowedUnitType>-2</allowedUnitType>
-                <arrivalTurn>0</arrivalTurn>
+                <arrivalTurn>-3</arrivalTurn>
                 <canReinforceLinked>true</canReinforceLinked>
                 <contributesToBV>true</contributesToBV>
                 <contributesToMapSize>true</contributesToMapSize>
@@ -147,7 +66,7 @@
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
                 <allowedUnitType>-2</allowedUnitType>
-                <arrivalTurn>0</arrivalTurn>
+                <arrivalTurn>1</arrivalTurn>
                 <canReinforceLinked>true</canReinforceLinked>
                 <contributesToBV>false</contributesToBV>
                 <contributesToMapSize>true</contributesToMapSize>
@@ -234,4 +153,63 @@
             </value>
         </entry>
     </scenarioForces>
+    <scenarioObjectives>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>DropShip</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs />
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>2</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>2</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails>
+                <additionalDetail>If the DropShip cannot be deployed regenerate the map within MegaMek.</additionalDetail>
+            </additionalDetails>
+            <description>Protect the following forces. +2 SVP if succeeded, -2 SVP if failed.</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>Preserve</objectiveCriterion>
+            <percentage>100</percentage>
+            <timeLimitAtMost>false</timeLimitAtMost>
+            <timeLimitScaleFactor>2</timeLimitScaleFactor>
+            <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
+        </scenarioObjective>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>OpFor</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs />
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails />
+            <description>Destroy, cripple or force to withdraw 50% of the following forces. +1 SVP if succeeded, -1 SVP if failed.</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+            <percentage>50</percentage>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+    </scenarioObjectives>
 </ScenarioTemplate>

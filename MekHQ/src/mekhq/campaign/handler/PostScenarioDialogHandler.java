@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
  *
  *  This file is part of MekHQ.
  *
@@ -25,12 +25,12 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 
@@ -46,15 +46,40 @@ import java.util.stream.Stream;
 public class PostScenarioDialogHandler {
 
     /**
-     * Post game resolution checks, dialogs and actions.
-     * @param tracker The tracker that contains all the information about the scenario resolution.
-     * @param control Whether the player controlled the battlefield at the end of the scenario.
+     * Handles post-game resolution checks, dialogs, and actions after a scenario is completed.
+     *
+     * <p>
+     * This method is responsible for performing several post-combat processes, including retirement checks,
+     * automatic application of awards, restarting campaign operations, and cleaning up temporary files.
+     * Additionally, it triggers a {@link ScenarioResolvedEvent} to indicate the resolution of the current scenario.
+     * </p>
+     *
+     * <b>Steps Performed:</b>
+     * <ul>
+     *   <li>Performs post-combat retirement checks on units and personnel within the campaign.</li>
+     *   <li>Automatically applies any awards or bonuses based on the scenario results using the tracker.</li>
+     *   <li>Restarts "rats" (any required campaign activities or background processes).</li>
+     *   <li>Cleans up temporary image files generated during the scenario.</li>
+     *   <li>Triggers a {@link ScenarioResolvedEvent} to notify the system about the scenario resolution.</li>
+     * </ul>
+     *
+     * <p>
+     * It is important to note that the {@code ScenarioResolvedEvent} is triggered before stopping any
+     * background threads to ensure that the {@code currentScenario} is still accessible at the time of the event.
+     * </p>
+     *
+     * @param campaignGUI The {@link CampaignGUI} instance used to manage UI interactions and
+     *                   display any necessary dialogs.
+     * @param campaign The {@link Campaign} instance containing the current state of the campaign
+     *                and its personnel.
+     * @param currentScenario The {@link Scenario} that has just been resolved.
+     * @param tracker The {@link ResolveScenarioTracker} containing the results and details of the
+     *               scenario resolution.
      */
     public static void handle(CampaignGUI campaignGUI, Campaign campaign, Scenario currentScenario,
-                              ResolveScenarioTracker tracker, boolean control) {
+                              ResolveScenarioTracker tracker) {
         postCombatRetirementCheck(campaignGUI, campaign, currentScenario);
         postCombatAutoApplyAward(campaign, tracker);
-        postCombatMissingInActionToPrisonerOfWarStatus(campaign, tracker, control);
         restartRats(campaign);
         cleanupTempImageFiles();
         // we need to trigger ScenarioResolvedEvent before stopping the thread or
@@ -102,7 +127,7 @@ public class PostScenarioDialogHandler {
 
             for (UUID personId : tracker.getPeopleStatus().keySet()) {
                 Person person = campaign.getPerson(personId);
-                ResolveScenarioTracker.PersonStatus status = tracker.getPeopleStatus().get(personId);
+                PersonStatus status = tracker.getPeopleStatus().get(personId);
                 int injuryCount = 0;
 
                 if (!person.getStatus().isDead() || campaign.getCampaignOptions().isIssuePosthumousAwards()) {
@@ -123,16 +148,6 @@ public class PostScenarioDialogHandler {
 
             AutoAwardsController autoAwardsController = new AutoAwardsController();
             autoAwardsController.PostScenarioController(campaign, personnel, scenarioKills, isCivilianHelp);
-        }
-    }
-
-    private static void postCombatMissingInActionToPrisonerOfWarStatus(Campaign campaign, ResolveScenarioTracker tracker, boolean control) {
-        for (UUID personId : tracker.getPeopleStatus().keySet()) {
-            Person person = campaign.getPerson(personId);
-
-            if (person.getStatus() == PersonnelStatus.MIA && !control) {
-                person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.POW);
-            }
         }
     }
 }

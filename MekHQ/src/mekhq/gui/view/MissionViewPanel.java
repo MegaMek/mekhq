@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2009-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -1000,7 +1000,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(lblCargoRequirement, gridBagConstraints);
 
             txtCargoRequirement.setName("txtCargoRequirement");
-            txtCargoRequirement.setText(estimateCargoRequirements(campaign, contract) + "t+");
+            txtCargoRequirement.setText("~" + estimateCargoRequirements(campaign, contract) + 't');
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y++;

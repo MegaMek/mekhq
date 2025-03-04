@@ -29,9 +29,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ResourceBundle;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
-import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.NORMAL;
-import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
 
 /**
@@ -66,6 +63,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     public enum CampaignOptionsDialogMode {
         NORMAL,
         STARTUP,
+        STARTUP_ABRIDGED,
         ABRIDGED
     }
 
@@ -79,8 +77,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     public CampaignOptionsDialog(final JFrame frame, final Campaign campaign) {
         super(frame, true, resources, "CampaignOptionsDialog", "campaignOptions.title");
         this.campaign = campaign;
-        this.campaignOptionsPane = new CampaignOptionsPane(frame, campaign, NORMAL);
-        this.mode = NORMAL;
+        this.campaignOptionsPane = new CampaignOptionsPane(frame, campaign, CampaignOptionsDialogMode.NORMAL);
+        this.mode = CampaignOptionsDialogMode.NORMAL;
         initialize();
 
         setLocationRelativeTo(frame);
@@ -146,7 +144,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         JButton btnApplySettings = new CampaignOptionsButton("ApplySettings");
         btnApplySettings.addActionListener(evt -> {
             wasCanceled = false;
-            campaignOptionsPane.applyCampaignOptionsToCampaign(null, mode == STARTUP,
+            campaignOptionsPane.applyCampaignOptionsToCampaign(null,
+                mode == CampaignOptionsDialogMode.STARTUP || mode == CampaignOptionsDialogMode.STARTUP_ABRIDGED,
                 false);
             dispose();
             showStratConNotice();
@@ -154,7 +153,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         pnlButtons.add(btnApplySettings);
 
         // Save Preset
-        if (mode != ABRIDGED) {
+        if (mode != CampaignOptionsDialogMode.ABRIDGED && mode != CampaignOptionsDialogMode.STARTUP_ABRIDGED) {
             JButton btnSavePreset = new CampaignOptionsButton("SavePreset");
             btnSavePreset.addActionListener(evt -> btnSaveActionPerformed());
             pnlButtons.add(btnSavePreset);
@@ -190,7 +189,9 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             return;
         }
 
-        campaignOptionsPane.applyCampaignOptionsToCampaign(preset, mode == STARTUP, true);
+        campaignOptionsPane.applyCampaignOptionsToCampaign(preset,
+            mode == CampaignOptionsDialogMode.STARTUP || mode == CampaignOptionsDialogMode.STARTUP_ABRIDGED,
+            true);
 
         preset.writeToFile(null,
             FileDialogs.saveCampaignPreset(null, preset).orElse(null));

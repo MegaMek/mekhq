@@ -40,7 +40,7 @@ import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.*;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.service.mrms.MRMSOption;
 import mekhq.utilities.MHQXMLUtility;
@@ -79,6 +79,8 @@ public class CampaignOptions {
     public static final double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
     public static final double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
 
+    public static final int REPUTATION_PERFORMANCE_CUT_OFF_YEARS = 10;
+
     public static String getTechLevelName(final int techLevel) {
         return switch (techLevel) {
             case TECH_INTRO -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_INTRO];
@@ -95,6 +97,9 @@ public class CampaignOptions {
     // region General Tab
     private UnitRatingMethod unitRatingMethod;
     private int manualUnitRatingModifier;
+    private boolean clampReputationPayMultiplier;
+    private boolean reduceReputationPerformanceModifier;
+    private boolean reputationPerformanceModifierCutOff;
     // endregion General Tab
 
     // region Repair and Maintenance Tab
@@ -149,6 +154,9 @@ public class CampaignOptions {
     private int autoLogisticsNonRepairableLocation;
     private int autoLogisticsArmor;
     private int autoLogisticsAmmunition;
+    private int autoLogisticsActuators;
+    private int autoLogisticsJumpJets;
+    private int autoLogisticsEngines;
     private int autoLogisticsOther;
 
     // Delivery
@@ -227,10 +235,6 @@ public class CampaignOptions {
 
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
-    private PrisonerStatus defaultPrisonerStatus;
-    private boolean prisonerBabyStatus;
-    private boolean useAtBPrisonerDefection;
-    private boolean useAtBPrisonerRansom;
 
     // Dependent
     private boolean useRandomDependentAddition;
@@ -507,6 +511,7 @@ public class CampaignOptions {
     private boolean useOriginFactionForNames;
     private final boolean[] usePortraitForRole;
     private boolean assignPortraitOnRoleChange;
+    private boolean allowDuplicatePortraits;
     // endregion Name and Portrait Generation
 
     // region Markets Tab
@@ -523,6 +528,7 @@ public class CampaignOptions {
     private int unitMarketSpecialUnitChance;
     private int unitMarketRarityModifier;
     private boolean instantUnitMarketDelivery;
+    private boolean mothballUnitMarketDeliveries;
     private boolean unitMarketReportRefresh;
 
     // Contract Market
@@ -603,6 +609,9 @@ public class CampaignOptions {
         // region General Tab
         unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
         manualUnitRatingModifier = 0;
+        clampReputationPayMultiplier = false;
+        reduceReputationPerformanceModifier = false;
+        reputationPerformanceModifierCutOff = false;
         // endregion General Tab
 
         // region Repair and Maintenance Tab
@@ -654,13 +663,16 @@ public class CampaignOptions {
         maxAcquisitions = 0;
 
         // autoLogistics
-        autoLogisticsHeatSink = 250;
-        autoLogisticsMekHead = 200;
-        autoLogisticsMekLocation = 100;
+        autoLogisticsHeatSink = 50;
+        autoLogisticsMekHead = 40;
+        autoLogisticsMekLocation = 25;
         autoLogisticsNonRepairableLocation = 0;
-        autoLogisticsArmor = 500;
-        autoLogisticsAmmunition = 500;
-        autoLogisticsOther = 50;
+        autoLogisticsArmor = 100;
+        autoLogisticsAmmunition = 100;
+        autoLogisticsActuators = 100;
+        autoLogisticsJumpJets = 50;
+        autoLogisticsEngines = 0;
+        autoLogisticsOther = 0;
 
         // Delivery
         unitTransitTime = TRANSIT_UNIT_MONTH;
@@ -756,11 +768,7 @@ public class CampaignOptions {
         setMaximumPatients(25);
 
         // Prisoners
-        setPrisonerCaptureStyle(PrisonerCaptureStyle.TAHARQA);
-        setDefaultPrisonerStatus(PrisonerStatus.PRISONER);
-        setPrisonerBabyStatus(true);
-        setUseAtBPrisonerDefection(false);
-        setUseAtBPrisonerRansom(false);
+        setPrisonerCaptureStyle(PrisonerCaptureStyle.NONE);
 
         // Dependent
         setUseRandomDependentAddition(false);
@@ -1103,6 +1111,7 @@ public class CampaignOptions {
         Arrays.fill(usePortraitForRole, false);
         usePortraitForRole[PersonnelRole.MEKWARRIOR.ordinal()] = true;
         assignPortraitOnRoleChange = false;
+        allowDuplicatePortraits = true;
         // endregion Name and Portrait Generation Tab
 
         // region Markets Tab
@@ -1224,6 +1233,30 @@ public class CampaignOptions {
 
     public void setManualUnitRatingModifier(final int manualUnitRatingModifier) {
         this.manualUnitRatingModifier = manualUnitRatingModifier;
+    }
+
+    public boolean isClampReputationPayMultiplier() {
+        return clampReputationPayMultiplier;
+    }
+
+    public void setClampReputationPayMultiplier(final boolean clampReputationPayMultiplier) {
+        this.clampReputationPayMultiplier = clampReputationPayMultiplier;
+    }
+
+    public boolean isReduceReputationPerformanceModifier() {
+        return reduceReputationPerformanceModifier;
+    }
+
+    public void setReduceReputationPerformanceModifier(final boolean reduceReputationPerformanceModifier) {
+        this.reduceReputationPerformanceModifier = reduceReputationPerformanceModifier;
+    }
+
+    public boolean isReputationPerformanceModifierCutOff() {
+        return reputationPerformanceModifierCutOff;
+    }
+
+    public void setReputationPerformanceModifierCutOff(final boolean reputationPerformanceModifierCutOff) {
+        this.reputationPerformanceModifierCutOff = reputationPerformanceModifierCutOff;
     }
     // endregion General Tab
 
@@ -1813,38 +1846,6 @@ public class CampaignOptions {
 
     public void setPrisonerCaptureStyle(final PrisonerCaptureStyle prisonerCaptureStyle) {
         this.prisonerCaptureStyle = prisonerCaptureStyle;
-    }
-
-    public PrisonerStatus getDefaultPrisonerStatus() {
-        return defaultPrisonerStatus;
-    }
-
-    public void setDefaultPrisonerStatus(final PrisonerStatus defaultPrisonerStatus) {
-        this.defaultPrisonerStatus = defaultPrisonerStatus;
-    }
-
-    public boolean isPrisonerBabyStatus() {
-        return prisonerBabyStatus;
-    }
-
-    public void setPrisonerBabyStatus(final boolean prisonerBabyStatus) {
-        this.prisonerBabyStatus = prisonerBabyStatus;
-    }
-
-    public boolean isUseAtBPrisonerDefection() {
-        return useAtBPrisonerDefection;
-    }
-
-    public void setUseAtBPrisonerDefection(final boolean useAtBPrisonerDefection) {
-        this.useAtBPrisonerDefection = useAtBPrisonerDefection;
-    }
-
-    public boolean isUseAtBPrisonerRansom() {
-        return useAtBPrisonerRansom;
-    }
-
-    public void setUseAtBPrisonerRansom(final boolean useAtBPrisonerRansom) {
-        this.useAtBPrisonerRansom = useAtBPrisonerRansom;
     }
     // endregion Prisoners
 
@@ -3468,6 +3469,14 @@ public class CampaignOptions {
         this.instantUnitMarketDelivery = instantUnitMarketDelivery;
     }
 
+    public boolean isMothballUnitMarketDeliveries() {
+        return mothballUnitMarketDeliveries;
+    }
+
+    public void setMothballUnitMarketDeliveries(final boolean mothballUnitMarketDeliveries) {
+        this.mothballUnitMarketDeliveries = mothballUnitMarketDeliveries;
+    }
+
     public boolean isUnitMarketReportRefresh() {
         return unitMarketReportRefresh;
     }
@@ -3776,6 +3785,14 @@ public class CampaignOptions {
 
     public void setAssignPortraitOnRoleChange(final boolean assignPortraitOnRoleChange) {
         this.assignPortraitOnRoleChange = assignPortraitOnRoleChange;
+    }
+
+    public boolean isAllowDuplicatePortraits() {
+        return allowDuplicatePortraits;
+    }
+
+    public void setAllowDuplicatePortraits(final boolean allowDuplicatePortraits) {
+        this.allowDuplicatePortraits = allowDuplicatePortraits;
     }
 
     public int getVocationalXP() {
@@ -4146,6 +4163,30 @@ public class CampaignOptions {
 
     public void setAutoLogisticsAmmunition(int autoLogisticsAmmunition) {
         this.autoLogisticsAmmunition = autoLogisticsAmmunition;
+    }
+
+    public int getAutoLogisticsActuators() {
+        return autoLogisticsActuators;
+    }
+
+    public void setAutoLogisticsActuators(int autoLogisticsActuators) {
+        this.autoLogisticsActuators = autoLogisticsActuators;
+    }
+
+    public int getAutoLogisticsJumpJets() {
+        return autoLogisticsJumpJets;
+    }
+
+    public void setAutoLogisticsJumpJets(int autoLogisticsJumpJets) {
+        this.autoLogisticsJumpJets = autoLogisticsJumpJets;
+    }
+
+    public int getAutoLogisticsEngines() {
+        return autoLogisticsEngines;
+    }
+
+    public void setAutoLogisticsEngines(int autoLogisticsEngines) {
+        this.autoLogisticsEngines = autoLogisticsEngines;
     }
 
     public int getAutoLogisticsOther() {
@@ -4579,6 +4620,9 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "campaignOptions");
         // region General Tab
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "manualUnitRatingModifier", getManualUnitRatingModifier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clampReputationPayMultiplier", isClampReputationPayMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reduceReputationPerformanceModifier", isReduceReputationPerformanceModifier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reputationPerformanceModifierCutOff", isReputationPerformanceModifierCutOff());
         // endregion General Tab
 
         // region Repair and Maintenance Tab
@@ -4683,6 +4727,9 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsNonRepairableLocation", autoLogisticsNonRepairableLocation);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsArmor", autoLogisticsArmor);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsAmmunition", autoLogisticsAmmunition);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsActuators", autoLogisticsActuators);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsJumpJets", autoLogisticsJumpJets);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsEngines", autoLogisticsEngines);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsOther", autoLogisticsOther);
 
         // region Personnel Tab
@@ -4739,10 +4786,6 @@ public class CampaignOptions {
 
         // region Prisoners
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prisonerCaptureStyle", getPrisonerCaptureStyle().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "defaultPrisonerStatus", getDefaultPrisonerStatus().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prisonerBabyStatus", isPrisonerBabyStatus());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAtBPrisonerDefection", isUseAtBPrisonerDefection());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAtBPrisonerRansom", isUseAtBPrisonerRansom());
         // endregion Prisoners
 
         //region Dependent
@@ -4958,10 +5001,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "enabledRandomDeathAgeGroups");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDeathSuicideCause", isUseRandomDeathSuicideCause());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDeathMultiplier", getRandomDeathMultiplier());
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "ageRangeRandomDeathMaleValues");
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "ageRangeRandomDeathMaleValues");
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "ageRangeRandomDeathFemaleValues");
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "ageRangeRandomDeathFemaleValues");
         // endregion Death
         // endregion Life Paths Tab
 
@@ -5035,6 +5074,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketSpecialUnitChance", getUnitMarketSpecialUnitChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketRarityModifier", getUnitMarketRarityModifier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "instantUnitMarketDelivery", isInstantUnitMarketDelivery());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mothballUnitMarketDeliveries", isMothballUnitMarketDeliveries());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketReportRefresh", isUnitMarketReportRefresh());
         // endregion Unit Market
 
@@ -5094,6 +5134,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceWeight", limitLanceWeight);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceNumUnits", limitLanceNumUnits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignPortraitOnRoleChange", assignPortraitOnRoleChange);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowDuplicatePortraits", allowDuplicatePortraits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowOpForAeros", isAllowOpForAeros());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowOpForLocalUnits", isAllowOpForLocalUnits());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForAeroChance", getOpForAeroChance());
@@ -5313,6 +5354,12 @@ public class CampaignOptions {
                     retVal.setUnitRatingMethod(UnitRatingMethod.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("manualUnitRatingModifier")) {
                     retVal.setManualUnitRatingModifier(Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("clampReputationPayMultiplier")) {
+                    retVal.setClampReputationPayMultiplier(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("reduceReputationPerformanceModifier")) {
+                    retVal.setReduceReputationPerformanceModifier(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("reputationPerformanceModifierCutOff")) {
+                    retVal.setReputationPerformanceModifierCutOff(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("usePortraitForType")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
@@ -5320,6 +5367,8 @@ public class CampaignOptions {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("assignPortraitOnRoleChange")) {
                     retVal.assignPortraitOnRoleChange = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("allowDuplicatePortraits")) {
+                    retVal.allowDuplicatePortraits = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("destroyByMargin")) {
                     retVal.destroyByMargin = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("destroyMargin")) {
@@ -5344,6 +5393,12 @@ public class CampaignOptions {
                     retVal.autoLogisticsArmor = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsAmmunition")) {
                     retVal.autoLogisticsAmmunition = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsActuators")) {
+                    retVal.autoLogisticsActuators = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsJumpJets")) {
+                    retVal.autoLogisticsJumpJets = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsEngines")) {
+                    retVal.autoLogisticsEngines = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsOther")) {
                     retVal.autoLogisticsOther = Integer.parseInt(wn2.getTextContent().trim());
 
@@ -5432,23 +5487,6 @@ public class CampaignOptions {
                     // region Prisoners
                 } else if (wn2.getNodeName().equalsIgnoreCase("prisonerCaptureStyle")) {
                     retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.valueOf(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
-                    // Most of this is legacy handlers - 0.47.X Removal
-                    String prisonerStatus = wn2.getTextContent().trim();
-
-                    try {
-                        prisonerStatus = String.valueOf(Integer.parseInt(prisonerStatus) + 1);
-                    } catch (Exception ignored) {
-
-                    }
-
-                    retVal.setDefaultPrisonerStatus(PrisonerStatus.parseFromString(prisonerStatus));
-                } else if (wn2.getNodeName().equalsIgnoreCase("prisonerBabyStatus")) {
-                    retVal.setPrisonerBabyStatus(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useAtBPrisonerDefection")) {
-                    retVal.setUseAtBPrisonerDefection(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useAtBPrisonerRansom")) {
-                    retVal.setUseAtBPrisonerRansom(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     // endregion Prisoners
 
                     //region Dependent
@@ -5967,6 +6005,8 @@ public class CampaignOptions {
                     retVal.setUnitMarketRarityModifier(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("instantUnitMarketDelivery")) {
                     retVal.setInstantUnitMarketDelivery(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mothballUnitMarketDeliveries")) {
+                    retVal.setMothballUnitMarketDeliveries(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketReportRefresh")) {
                     retVal.setUnitMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     // endregion Unit Market
@@ -6185,12 +6225,6 @@ public class CampaignOptions {
                     // Removed in 0.47.*
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
                     retVal.setPersonnelMarketName(PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim())));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useAtBCapture")) { // Legacy
-                    if (Boolean.parseBoolean(wn2.getTextContent().trim())) {
-                        retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.ATB);
-                        retVal.setUseAtBPrisonerDefection(true);
-                        retVal.setUseAtBPrisonerRansom(true);
-                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) { // Legacy
                     double intensity = Double.parseDouble(wn2.getTextContent().trim());
 
@@ -6200,9 +6234,6 @@ public class CampaignOptions {
                     retVal.atbBattleChance[CombatRole.TRAINING.ordinal()] = (int) Math.round(((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5);
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
                     retVal.personnelMarketName = PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) { // Legacy
-                    retVal.setPrisonerCaptureStyle(Boolean.parseBoolean(wn2.getTextContent().trim())
-                            ? PrisonerCaptureStyle.TAHARQA : PrisonerCaptureStyle.NONE);
                 } else if (wn2.getNodeName().equalsIgnoreCase("startGameDelay")) { // Legacy
                     MekHQ.getMHQOptions().setStartGameDelay(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("historicalDailyLog")) { // Legacy

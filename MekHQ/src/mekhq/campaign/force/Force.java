@@ -72,6 +72,8 @@ public class Force {
     public static final int COMBAT_TEAM_OVERRIDE_FALSE = 0;
     public static final int COMBAT_TEAM_OVERRIDE_TRUE = 1;
 
+    public static final int NO_ASSIGNED_SCENARIO = -1;
+
     private String name;
     private StandardForceIcon forceIcon;
     private Camouflage camouflage;
@@ -107,7 +109,7 @@ public class Force {
         this.parentForce = null;
         this.subForces = new Vector<>();
         this.units = new Vector<>();
-        this.scenarioId = -1;
+        this.scenarioId = NO_ASSIGNED_SCENARIO;
     }
     // endregion Constructors
 
@@ -263,7 +265,7 @@ public class Force {
         if ((null != parentForce) && parentForce.isDeployed()) {
             return true;
         }
-        return scenarioId != -1;
+        return scenarioId != NO_ASSIGNED_SCENARIO;
     }
 
     public @Nullable Force getParentForce() {
@@ -521,7 +523,7 @@ public class Force {
                 c.getScenario(getScenarioId()).addUnit(uid);
             }
         }
-        setScenarioId(-1,c);
+        setScenarioId(NO_ASSIGNED_SCENARIO,c);
     }
 
     public int getId() {

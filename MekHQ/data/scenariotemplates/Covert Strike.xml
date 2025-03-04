@@ -2,7 +2,12 @@
 <ScenarioTemplate>
     <name>Covert Strike</name>
     <shortBriefing>Eliminate VIP behind enemy lines.</shortBriefing>
-    <detailedBriefing>A high-value enemy target, heavily guarded by an elite escort, has been identified deep behind enemy lines. The objective is to break through their defenses and eliminate the VIP before they escape. Expect strong resistance, and ensure 50% of your forces survive to complete the mission.</detailedBriefing>
+    <detailedBriefing>Your mission is simple but dangerous—eliminate a high-value target deep behind enemy lines. The VIP is heavily guarded by a formidable escort. The objective is singular and absolute: kill the VIP by any means necessary.
+
+The enemy will not allow this to happen easily. Expect heavy resistance, tight security, and potential countermeasures to obscure or protect the target. Do not waste time engaging unnecessary forces—strike fast, neutralize the VIP, and disengage before the enemy can fully react.
+
+Be advised, the enemy will control the field at the end of the engagement. You will not be able to hold ground or claim battlefield salvage. This is an execution, not a siege. Kill the target and get out—nothing else matters.</detailedBriefing>
+    <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
@@ -135,37 +140,10 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy the following force(s) and unit(s):</description>
+            <description>Destroy the following forces. +1 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Destroy</objectiveCriterion>
             <percentage>100</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Player</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
         </scenarioObjective>

@@ -2,7 +2,12 @@
 <ScenarioTemplate>
     <name>Low-Atmosphere DropShip Escort</name>
     <shortBriefing>Escort DropShip, defeat enemy forces.</shortBriefing>
-    <detailedBriefing>Escort the designated DropShip to its destination through low atmosphere. Ensure the DropShip survives while defeating at least 50% of enemy forces. Preserve 50% of your own forces to secure mission success.</detailedBriefing>
+    <detailedBriefing>An allied DropShip is under threat, with enemy air assets moving to intercept before it can reach safety. This vessel is critical to our operations, and its loss is not an option. Your mission is to protect the DropShip and destroy at least 50% of the attacking enemy forces.
+
+Expect aggressive aerial engagements, fast-moving strike craft, and possible long-range missile attacks. Use superior positioning, coordinated fire, and defensive tactics to neutralize threats before they can bring down our DropShip. Every enemy unit destroyed increases the DropShip’s chance of survival—hit them hard and make them pay for their assault.
+
+The victor will control the battlefield at the end of the engagement, ensuring we hold the airspace and any remaining salvage. Defend the DropShip, eliminate the threat, and dominate the skies.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
@@ -15,96 +20,6 @@
         <useStandardAtBSizing>false</useStandardAtBSizing>
         <widthScalingIncrement>5</widthScalingIncrement>
     </mapParameters>
-    <scenarioObjectives>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>OpFor</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
-            <percentage>50</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>DropShip</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
-                </successEffect>
-                <successEffect>
-                    <effectType>SupportPointUpdate</effectType>
-                    <effectScaling>Linear</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails>
-                <additionalDetail>Crippled units do not count towards this objective.</additionalDetail>
-            </additionalDetails>
-            <description>Allow the designated force(s) or unit(s) to reach their destination:</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>ReachMapEdge</objectiveCriterion>
-            <percentage>100</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Player</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>50</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-    </scenarioObjectives>
     <scenarioForces>
         <entry>
             <key>Player</key>
@@ -119,10 +34,7 @@
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>2</deploymentZone>
-                    <deploymentZone>4</deploymentZone>
                     <deploymentZone>6</deploymentZone>
-                    <deploymentZone>8</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
@@ -186,7 +98,7 @@
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones />
-                <destinationZone>6</destinationZone>
+                <destinationZone>2</destinationZone>
                 <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>1</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -213,4 +125,62 @@
             </value>
         </entry>
     </scenarioForces>
+    <scenarioObjectives>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>OpFor</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs />
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails />
+            <description>Destroy or rout 50% of the following forces. +1 SVP if succeeded, -1 SVP if failed.</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+            <percentage>50</percentage>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>DropShip</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs />
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>2</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails>
+                <additionalDetail>Crippled units do not count towards this objective.</additionalDetail>
+            </additionalDetails>
+            <description>Allow the designated forces to reach their destination. +2 SVP if succeeded, -1 SVP if failed.</description>
+            <destinationEdge>NORTH</destinationEdge>
+            <objectiveCriterion>ReachMapEdge</objectiveCriterion>
+            <percentage>100</percentage>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+    </scenarioObjectives>
 </ScenarioTemplate>

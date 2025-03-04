@@ -2,7 +2,7 @@
  * MekHQ.java
  *
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -54,8 +54,11 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.autoresolve.AtBSetupForces;
 import mekhq.campaign.handler.PostScenarioDialogHandler;
 import mekhq.campaign.handler.XPHandler;
+import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.mission.ScenarioTemplate.BattlefieldControlType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.Unit;
@@ -544,8 +547,22 @@ public class MekHQ implements GameListener {
             return;
         }
         try {
-            boolean control = yourSideControlsTheBattlefieldDialogAsk(
-                MHQInternationalization.getText("ResolveDialog.control.message"),
+            String victoryMessage = MHQInternationalization.getText("ResolveDialog.control.message");
+
+            if (currentScenario instanceof AtBDynamicScenario) {
+                ScenarioTemplate template = ((AtBDynamicScenario) currentScenario).getTemplate();
+
+                if (template != null) {
+                    BattlefieldControlType battlefieldControl = template.getBattlefieldControl();
+
+                    String controlMessage = MHQInternationalization.getText("ResolveDialog.control."
+                        + battlefieldControl.name());
+
+                    victoryMessage = String.format("%s\n\n%s", controlMessage, victoryMessage);
+                }
+            }
+
+            boolean control = yourSideControlsTheBattlefieldDialogAsk(victoryMessage,
                 MHQInternationalization.getText("ResolveDialog.control.title"));
             ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, getCampaign(), control);
             tracker.setClient(gameThread.getClient());
@@ -561,7 +578,7 @@ public class MekHQ implements GameListener {
                 return;
             }
 
-            PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), currentScenario, tracker, control);
+            PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), currentScenario, tracker);
 
         } catch (Exception ex) {
             logger.error(ex, "gameVictory()");
@@ -577,8 +594,23 @@ public class MekHQ implements GameListener {
         if (null == selectedScenario) {
             return;
         }
-        boolean control = yourSideControlsTheBattlefieldDialogAsk(
-            MHQInternationalization.getText("ResolveDialog.control.message"),
+
+        String victoryMessage = MHQInternationalization.getText("ResolveDialog.control.message");
+
+        if (selectedScenario instanceof AtBDynamicScenario) {
+            ScenarioTemplate template = ((AtBDynamicScenario) selectedScenario).getTemplate();
+
+            if (template != null) {
+                BattlefieldControlType battlefieldControl = template.getBattlefieldControl();
+
+                String controlMessage = MHQInternationalization.getText("ResolveDialog.control."
+                    + battlefieldControl.name());
+
+                victoryMessage = String.format("%s\n\n%s", controlMessage, victoryMessage);
+            }
+        }
+
+        boolean control = yourSideControlsTheBattlefieldDialogAsk(victoryMessage,
             MHQInternationalization.getText("ResolveDialog.control.title"));
 
         ResolveScenarioTracker tracker = new ResolveScenarioTracker(selectedScenario, getCampaign(), control);
@@ -597,7 +629,7 @@ public class MekHQ implements GameListener {
             return;
         }
 
-        PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), selectedScenario, tracker, control);
+        PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), selectedScenario, tracker);
     }
 
     private boolean yourSideControlsTheBattlefieldDialogAsk(String message, String title) {
@@ -688,13 +720,29 @@ public class MekHQ implements GameListener {
      */
     public void autoResolveConcluded(AutoResolveConcludedEvent autoResolveConcludedEvent, AtBScenario scenario) {
         try {
-            String message = autoResolveConcludedEvent.controlledScenario() ?
+            String victoryMessage = autoResolveConcludedEvent.controlledScenario() ?
                 MHQInternationalization.getText("AutoResolveDialog.message.victory") :
                 MHQInternationalization.getText("AutoResolveDialog.message.defeat");
+
+            String decisionMessage = MHQInternationalization.getText("ResolveDialog.control.message");
+
+            if (scenario instanceof AtBDynamicScenario) {
+                ScenarioTemplate template = ((AtBDynamicScenario) scenario).getTemplate();
+
+                if (template != null) {
+                    BattlefieldControlType battlefieldControl = template.getBattlefieldControl();
+
+                    String controlMessage = MHQInternationalization.getText("ResolveDialog.control."
+                        + battlefieldControl.name());
+
+                    victoryMessage = String.format("%s\n\n%s\n\n%s", controlMessage, victoryMessage, decisionMessage);
+                }
+            }
+
             String title = autoResolveConcludedEvent.controlledScenario() ?
                 MHQInternationalization.getText("AutoResolveDialog.victory") :
                 MHQInternationalization.getText("AutoResolveDialog.defeat");
-            boolean control = yourSideControlsTheBattlefieldDialogAsk(message, title);
+            boolean control = yourSideControlsTheBattlefieldDialogAsk(victoryMessage, title);
 
             ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario, getCampaign(), control);
             tracker.setClient(new SimulatedClient(autoResolveConcludedEvent.getGame()));
@@ -712,8 +760,7 @@ public class MekHQ implements GameListener {
                 }
                 return;
             }
-            PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), scenario, tracker,
-                autoResolveConcludedEvent.controlledScenario());
+            PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), scenario, tracker);
         } catch (Exception ex) {
             logger.error("Error during auto resolve concluded", ex);
         }

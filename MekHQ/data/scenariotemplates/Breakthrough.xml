@@ -2,7 +2,12 @@
 <ScenarioTemplate>
     <name>Breakthrough</name>
     <shortBriefing>Break through or destroy enemy.</shortBriefing>
-    <detailedBriefing>The objective is to break through enemy lines and reach the opposite edge of the map. At least 50% of your forces must reach the destination, with only fully operational units counting. Alternatively, destroy at least 50% of the enemy forces to complete the mission.</detailedBriefing>
+    <detailedBriefing>Your objective is to break through enemy lines and reach the far side of the engagement zone. At least 50% of your forces must reach the destination, and only fully operational units will count.
+
+If the enemy resistance proves too strong, you have an alternative path to victory: destroy at least 50% of enemy forces to force them into disarray and open the way.
+
+Be advised: the enemy will control the field when this is over. Move fast, strike hard, and don’t look back.</detailedBriefing>
+    <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>true</allowRotation>
@@ -27,7 +32,7 @@
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>11</deploymentZone>
+                    <deploymentZone>6</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
@@ -100,8 +105,8 @@
             <additionalDetails>
                 <additionalDetail>Crippled units do not count towards this objective.</additionalDetail>
             </additionalDetails>
-            <description>Reach the destination edge with 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
+            <description>Reach the destination edge with 50% of the following forces. +2 SVP if succeeded, -1 SVP if failed.</description>
+            <destinationEdge>NORTH</destinationEdge>
             <objectiveCriterion>ReachMapEdge</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimit>0</timeLimit>
@@ -128,7 +133,7 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy or rout 50% the following force(s) and unit(s):</description>
+            <description>Destroy or rout 50% the following forces. +2 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Destroy</objectiveCriterion>
             <percentage>50</percentage>

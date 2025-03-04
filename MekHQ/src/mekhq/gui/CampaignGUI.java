@@ -91,11 +91,12 @@ import java.awt.event.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
 
+import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 
 /**
@@ -1114,9 +1115,11 @@ public class CampaignGUI extends JPanel {
 
             SwingUtilities.invokeLater(() -> {
                 try {
+                    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     getCampaignController().advanceDay();
                 } finally {
                     btnAdvanceDay.setEnabled(true);
+                    setCursor(Cursor.getDefaultCursor());
                 }
             });
         });
@@ -2387,7 +2390,7 @@ public class CampaignGUI extends JPanel {
             Force parent = f;
             int prevId = f.getId();
             while ((parent = parent.getParentForce()) != null) {
-                if (parent.getScenarioId() == -1) {
+                if (parent.getScenarioId() == NO_ASSIGNED_SCENARIO) {
                     break;
                 }
                 parent.clearScenarioIds(getCampaign(), false);

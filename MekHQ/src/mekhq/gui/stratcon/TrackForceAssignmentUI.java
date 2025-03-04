@@ -1,5 +1,5 @@
 /*
-* MegaMek - Copyright (C) 2020 - The MegaMek Team
+* MegaMek - Copyright (C) 2020-2025 - The MegaMek Team
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU General Public License as published by the Free Software
@@ -74,7 +74,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
 
         // if we're waiting to assign primary forces, we can only do so from the current track
         ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign,
-            StratconRulesManager.getAvailableForceIDs(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX,
+            StratconRulesManager.getAvailableForceIDsForManualDeployment(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX,
                 campaign, ownerPanel.getCurrentTrack(), false, null, currentCampaignState));
 
         availableForceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

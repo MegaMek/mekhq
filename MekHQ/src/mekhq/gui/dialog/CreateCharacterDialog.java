@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,8 +39,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
-import mekhq.campaign.personnel.randomEvents.PersonalityController;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.*;
+import mekhq.campaign.randomEvents.personalities.PersonalityController;
+import mekhq.campaign.randomEvents.personalities.enums.*;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Factions;
@@ -55,9 +55,14 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.Map.Entry;
+
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static mekhq.campaign.personnel.Skill.getCountDownMaxValue;
+import static mekhq.campaign.personnel.Skill.getCountUpMaxValue;
 
 /**
  * This dialog is used to create a character in story arcs from a pool of XP
@@ -1313,14 +1318,16 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             skillLvls.get(type).getModel().setValue(0);
             return;
         }
-        SkillType stype = SkillType.getType(type);
-        int lvl = (Integer) skillLvls.get(type).getModel().getValue();
-        int b = (Integer) skillBonus.get(type).getModel().getValue();
-        int target = stype.getTarget() - lvl - b;
-        if (stype.countUp()) {
-            target = stype.getTarget() + lvl + b;
+        SkillType skillType = SkillType.getType(type);
+
+        int level = (Integer) skillLvls.get(type).getModel().getValue();
+        int bonus = (Integer) skillBonus.get(type).getModel().getValue();
+
+        if (skillType.countUp()) {
+            int target = min(getCountUpMaxValue(), skillType.getTarget() + level + bonus);
             skillValues.get(type).setText("+" + target);
         } else {
+            int target = max(getCountDownMaxValue(), skillType.getTarget() - level - bonus);
             skillValues.get(type).setText(target + "+");
         }
     }
@@ -1485,7 +1492,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             person.setSocial(comboSocial.getSelectedItem());
             person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
             person.setIntelligence(comboIntelligence.getSelectedItem());
-            PersonalityController.writeDescription(person);
+            PersonalityController.writePersonalityDescription(person);
         }
 
         person.setPortrait(portrait);

@@ -2,7 +2,12 @@
 <ScenarioTemplate>
     <name>Facility Assault</name>
     <shortBriefing>Assault and weaken enemy-held facility.</shortBriefing>
-    <detailedBriefing>An enemy-controlled facility has been located, and your mission is to assault it. Destroy at least 75% of the defending forces while preserving at least 50% of your own forces to weaken the facility’s defenses and secure the area.</detailedBriefing>
+    <detailedBriefing>An enemy-controlled facility has been designated for destruction. This installation is too valuable to remain in enemy hands, and its defenders must be eliminated to ensure it is no longer operational. Your mission is to destroy at least 75% of the defending forces. This is not an occupation—this is eradication.
+
+The priority is destruction, not capture. Do not concern yourself with securing the facility unless it becomes strategically viable after the defenders are wiped out. The enemy will fight to protect this installation, but their defenses will crumble under sustained pressure. Crush their forces, level their defenses, and ensure that when this battle is over, the facility is either in our hands or of no use to anyone.
+
+The victor will control the battlefield at the end of the engagement. If the facility remains salvageable after the assault, we will claim it. If not, the enemy will be left with nothing but ruins. Execute with overwhelming force and leave no doubt who owns this battlefield.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <isHostileFacility>true</isHostileFacility>
     <mapParameters>
         <allowedTerrainTypes>
@@ -56,7 +61,7 @@
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
                 <allowedUnitType>-2</allowedUnitType>
-                <arrivalTurn>0</arrivalTurn>
+                <arrivalTurn>1</arrivalTurn>
                 <canReinforceLinked>true</canReinforceLinked>
                 <contributesToBV>true</contributesToBV>
                 <contributesToMapSize>true</contributesToMapSize>
@@ -95,7 +100,7 @@
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
                 <allowedUnitType>-2</allowedUnitType>
-                <arrivalTurn>0</arrivalTurn>
+                <arrivalTurn>1</arrivalTurn>
                 <canReinforceLinked>true</canReinforceLinked>
                 <contributesToBV>false</contributesToBV>
                 <contributesToMapSize>true</contributesToMapSize>
@@ -142,37 +147,10 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy or rout 75% of the defending force(s):</description>
+            <description>Destroy or rout 75% of the defending forces. +1 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>75</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Player</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
         </scenarioObjective>

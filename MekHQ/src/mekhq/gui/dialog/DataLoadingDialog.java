@@ -22,7 +22,6 @@ import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Entity;
-import megamek.common.GunEmplacement;
 import megamek.common.MekSummaryCache;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
@@ -63,16 +62,16 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
 import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CUSTOMIZE;
 import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_SELECT;
+import static mekhq.utilities.EntityUtilities.isUnsupportedUnitType;
 
 public class DataLoadingDialog extends AbstractMHQDialogBasic implements PropertyChangeListener {
     private static final MMLogger logger = MMLogger.create(DataLoadingDialog.class);
@@ -333,7 +332,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
                 campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
 
-                CampaignOptionsDialogMode mode = isSelect ? ABRIDGED : STARTUP;
+                CampaignOptionsDialogMode mode = isSelect ? STARTUP_ABRIDGED : STARTUP;
                 CampaignOptionsDialog optionsDialog =
                     new CampaignOptionsDialog(getFrame(), campaign, preset, mode);
                 setVisible(false); // cede visibility to `optionsDialog`
@@ -415,56 +414,36 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                     campaign.setReputation(reputationController);
                 }
 
-                sellUnsupportedUnits(campaign);
+                unassignCrewFromUnsupportedUnits(campaign.getUnits());
                 // endregion Progress 7
             }
             campaign.setApp(getApplication());
             return campaign;
         }
 
-
-
         /**
-         * Sells unsupported units.
-         * <p>
-         * This method checks all units in the specified campaign and determines if they are unsupported.
-         * Currently, only gun emplacements are identified as unsupported and are sold upon campaign load.
-         * If unsupported units are sold, a notification is displayed to the user detailing the sold units,
-         * including their names and IDs. Additionally, personnel assigned to these units are
-         * automatically unassigned.
-         * </p>
+         * Unassigns the crew from unsupported units in the given collection of units.
          *
-         * @param retVal The campaign being checked for unsupported units. This includes the unit list
-         *              and the quartermaster who handles the selling process.
+         * <p>This method iterates through the provided {@link Collection} of {@link Unit} objects
+         * and checks if each unit's associated {@link Entity} is of an unsupported type.
+         *
+         * <p>If the entity is {@code null}, it is skipped. For unsupported unit types, the unit's
+         * crew is cleared using {@link Unit#clearCrew()}.</p>
+         *
+         * @param units The {@link Collection} of {@link Unit} instances to process.
+         *              Must not be {@code null}.
          */
-        private void sellUnsupportedUnits(Campaign retVal) {
-            List<Unit> soldUnits = new ArrayList<>();
-            for (Unit unit : retVal.getUnits()) {
+        private void unassignCrewFromUnsupportedUnits(Collection<Unit> units) {
+            for (Unit unit : units) {
                 Entity entity = unit.getEntity();
 
                 if (entity == null) {
                     continue;
                 }
 
-                // We don't support Gun Emplacements in mhq.
-                // If the user has somehow acquired one, it is sold on load.
-                if (entity instanceof GunEmplacement) {
-                    soldUnits.add(unit);
+                if (isUnsupportedUnitType(entity.getUnitType())) {
+                    unit.clearCrew();
                 }
-            }
-
-            if (!soldUnits.isEmpty()) {
-                StringBuilder message = new StringBuilder(resources.getString("unsupportedUnits.body"));
-
-                for (Unit soldUnit : soldUnits) {
-                    retVal.getQuartermaster().sellUnit(soldUnit);
-                    message.append("- ").append(soldUnit.getName()).append("<br>");
-                }
-
-                JOptionPane.showMessageDialog(null,
-                    String.format("<html>%s</html>", message),
-                    resources.getString("unsupportedUnits.title"),
-                    JOptionPane.WARNING_MESSAGE);
             }
         }
 

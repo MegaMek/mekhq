@@ -1599,7 +1599,8 @@ public class PersonViewPanel extends JScrollablePanel {
             firsty++;
         }
 
-        if ((campaign.getCampaignOptions().isUseFatigue()) && (person.getEffectiveFatigue(campaign) > 0)) {
+        int fatigue = person.getFatigue();
+        if (campaign.getCampaignOptions().isUseFatigue() && fatigue > 0) {
             lblFatigue1.setName("lblFatigue1");
             lblFatigue1.setText(resourceMap.getString("lblFatigue1.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -1609,16 +1610,23 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSkills.add(lblFatigue1, gridBagConstraints);
 
-            StringBuilder fatigueDisplay = new StringBuilder();
+            StringBuilder fatigueDisplay = new StringBuilder("<html>");
 
             int effectiveFatigue = person.getEffectiveFatigue(campaign);
             int fatigueTurnoverModifier = MathUtility.clamp(((person.getEffectiveFatigue(campaign) - 1) / 4) - 1, 0, 3);
 
-            fatigueDisplay.append(effectiveFatigue);
+            if (effectiveFatigue != fatigue) {
+                fatigueDisplay.append("<s><font color='gray'>").append(fatigue).append("</font></s> ")
+                    .append(effectiveFatigue);
+            } else {
+                fatigueDisplay.append("<font color='gray'>").append(effectiveFatigue).append("</font>");
+            }
 
             if (fatigueTurnoverModifier > 0) {
                 fatigueDisplay.append(" (-").append(fatigueTurnoverModifier).append(')');
             }
+
+            fatigueDisplay.append("</html>");
 
             lblFatigue2.setName("lblFatigue2");
             lblFatigue2.setText(fatigueDisplay.toString());

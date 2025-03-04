@@ -2,7 +2,12 @@
 <ScenarioTemplate>
     <name>Pivotal Engagement</name>
     <shortBriefing>Decisive battle—defeat enemy forces.</shortBriefing>
-    <detailedBriefing>This is a pivotal battle. The objective is to defeat 75% of enemy units while keeping at least 25% of your forces operational. Success in this critical engagement is essential for the overall campaign.</detailedBriefing>
+    <detailedBriefing>A massive enemy force has taken to the field, and if they are allowed to gain momentum, they will become an unstoppable threat. Your mission is to blunt their advance by destroying at least 25% of their forces, forcing them to slow their assault and reconsider their position.
+
+The enemy is relying on overwhelming numbers, expecting to steamroll our defenses. Target high-value units, disrupt their formations, and make them bleed for every inch of ground. If they hesitate or falter, their offensive will collapse before it can reach full strength.
+
+The victor will control the battlefield at the end of the engagement, ensuring we hold the ground and any remaining salvage. Stand firm, inflict maximum damage, and break their momentum before it’s too late.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
@@ -70,7 +75,7 @@
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
-                <forceMultiplier>1.0</forceMultiplier>
+                <forceMultiplier>3.0</forceMultiplier>
                 <forceName>OpFor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
@@ -105,36 +110,9 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy or rout 75% of the following force(s) and unit(s):</description>
+            <description>Destroy or rout 25% of the following forces. +1 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
-            <percentage>75</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Player</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>Preserve 25% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>25</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>

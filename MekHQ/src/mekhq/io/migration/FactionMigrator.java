@@ -24,6 +24,7 @@ import mekhq.campaign.mission.BotForce;
 
 import java.util.Objects;
 
+@Deprecated
 public class FactionMigrator {
 
     /**

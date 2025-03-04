@@ -20,6 +20,7 @@ package mekhq.campaign.universe;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import mekhq.gui.baseComponents.SourceableValueLabel;
 
 /**
  * This is an object for landMasses of a planet
@@ -34,15 +35,11 @@ public class LandMass {
     @JsonProperty("capital")
     private SourceableValue<String> capital;
 
-    public String getDescription() {
-        if(null != capital && null != name) {
-            return name.getValue() + " (" + capital.getValue() + ")";
-        } else if (null != capital) {
-            return "(" + capital.getValue() + ")";
-        } else if (null != name) {
-            return name.getValue();
-        }
+    public SourceableValue<String> getSourcedName() {
+        return name;
+    }
 
-        return "Unknown";
+    public SourceableValue<String> getSourcedCapital() {
+        return capital;
     }
 }

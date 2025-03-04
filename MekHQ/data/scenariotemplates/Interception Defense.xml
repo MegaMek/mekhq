@@ -2,7 +2,12 @@
 <ScenarioTemplate>
     <name>Interception Defense</name>
     <shortBriefing>Stop enemy from reaching the edge.</shortBriefing>
-    <detailedBriefing>Prevent enemy units from crossing the far edge of the map. Destroy at least 50% of their forces before they can reach the target board edge. Preserve 50% of your own forces to ensure a successful defense.</detailedBriefing>
+    <detailedBriefing>Enemy forces are on the move, heading toward an unknown objective, and we cannot allow them to reach their destination. Their intent remains unclear, but their movement suggests a high-value mission. Your objective is to intercept and engage the enemy, destroying at least 50% of their forces before they can escape via the opposite edge of the engagement zone.
+
+Expect the enemy to favor speed and mobility, avoiding prolonged engagements as they push toward their objective. Deny them their escape route, break their formation, and ensure they do not reach their goal intact. They may attempt to punch through with concentrated force or use diversionary tactics to slip past your defenses—anticipate their maneuvers and shut them down.
+
+We will control the battlefield at the end of the engagement, securing any remaining assets and preventing any further movement from enemy reinforcements. This mission is about disruption and dominance—cripple their forces, seize the field, and ensure that whatever they were planning never comes to pass.</detailedBriefing>
+    <battlefieldControl>PLAYER</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
@@ -60,9 +65,9 @@
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>11</deploymentZone>
+                    <deploymentZone>6</deploymentZone>
                 </deploymentZones>
-                <destinationZone>6</destinationZone>
+                <destinationZone>2</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.5</forceMultiplier>
@@ -130,38 +135,11 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy 50% of the following force(s) and unit(s) before they can reach the destination edge:</description>
+            <description>Destroy 50% of the following forces before they can reach the destination edge. +1 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Destroy</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimit>0</timeLimit>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Player</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
         </scenarioObjective>

@@ -41,22 +41,25 @@ public class MRMSOption {
     private int skillMax;
     private int bthMin;
     private int bthMax;
+    private int dailyTimeMin;
 
     private static final int DEFAULT_BTH = 4;
+    private static final int MIN_DAILY_TIME = 0;
     // endregion Variable Declarations
 
     // region Constructors
     public MRMSOption(PartRepairType type) {
-        this(type, false, SkillType.EXP_ULTRA_GREEN, SkillType.EXP_ELITE, DEFAULT_BTH, DEFAULT_BTH);
+        this(type, false, SkillType.EXP_ULTRA_GREEN, SkillType.EXP_ELITE, DEFAULT_BTH, DEFAULT_BTH, MIN_DAILY_TIME);
     }
 
-    public MRMSOption(PartRepairType type, boolean active, int skillMin, int skillMax, int bthMin, int bthMax) {
+    public MRMSOption(PartRepairType type, boolean active, int skillMin, int skillMax, int bthMin, int bthMax, int dailyTimeMin) {
         this.type = type;
         this.active = active;
         this.skillMin = skillMin;
         this.skillMax = skillMax;
         this.bthMin = bthMin;
         this.bthMax = bthMax;
+        this.dailyTimeMin = dailyTimeMin;
     }
     // endregion Constructors
 
@@ -108,6 +111,14 @@ public class MRMSOption {
     public void setBthMax(int bthMax) {
         this.bthMax = bthMax;
     }
+
+    public int getDailyTimeMin() {
+        return dailyTimeMin;
+    }
+
+    public void setDailyTimeMin(int minDailyTime) {
+        this.dailyTimeMin = minDailyTime;
+    }
     // endregion Getters/Setters
 
     // region File I/O
@@ -119,6 +130,7 @@ public class MRMSOption {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillMax", getSkillMax());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "btnMin", getBthMin());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "btnMax", getBthMax());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dailyTimeMin", getDailyTimeMin());
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "mrmsOption");
     }
 
@@ -181,6 +193,8 @@ public class MRMSOption {
                     mrmsOption.setBthMin(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("btnMax")) {
                     mrmsOption.setBthMax(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("dailyTimeMin")) {
+                    mrmsOption.setDailyTimeMin(Integer.parseInt(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
                 logger.error("", e);

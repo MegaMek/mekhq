@@ -51,6 +51,7 @@ import mekhq.campaign.finances.*;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.ForceType;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.log.HistoricalLogEntry;
@@ -65,19 +66,14 @@ import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.*;
 import mekhq.campaign.mission.enums.CombatRole;
-import mekhq.campaign.mission.enums.MissionStatus;
-import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
-import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.equipment.HeatSink;
-import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.RandomDeath;
@@ -101,6 +97,9 @@ import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.GrayMonday;
+import mekhq.campaign.randomEvents.RandomEventLibraries;
+import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
+import mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
@@ -111,12 +110,10 @@ import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.*;
+import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.universe.*;
-import mekhq.campaign.universe.Planet.PlanetaryEvent;
-import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
@@ -156,6 +153,8 @@ import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_MONTH;
 import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_WEEK;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
+import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
@@ -166,9 +165,9 @@ import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomM
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
-import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_CLARION_NOTE;
-import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
-import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+import static mekhq.campaign.randomEvents.GrayMonday.*;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMAN;
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
@@ -309,11 +308,18 @@ public class Campaign implements ITechManager {
     private final FameAndInfamyController fameAndInfamy;
     private BehaviorSettings autoResolveBehaviorSettings;
     private List<Unit> automatedMothballUnits;
+    private int temporaryPrisonerCapacity;
 
     //options relating to parts in use and restock
     private boolean ignoreMothballed;
     private boolean topUpWeekly;
     private PartQuality ignoreSparesUnderQuality;
+
+    // Libraries
+    // We deliberately don't write this data to the save file as we want it rebuilt every time the
+    // campaign loads. This ensures updates can be applied and there is no risk of bugs being
+    // permanently locked into the campaign file.
+    RandomEventLibraries randomEventLibraries;
 
     /**
      * Represents the different types of administrative specializations.
@@ -398,9 +404,13 @@ public class Campaign implements ITechManager {
         fameAndInfamy = new FameAndInfamyController();
         autoResolveBehaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
         automatedMothballUnits = new ArrayList<>();
+        temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
         topUpWeekly = false;
-        ignoreMothballed =  false;
+        ignoreMothballed =  true;
         ignoreSparesUnderQuality = QUALITY_A;
+
+        // Library initialization
+        randomEventLibraries = new RandomEventLibraries();
 
     }
 
@@ -1571,6 +1581,10 @@ public class Campaign implements ITechManager {
 
         unit.setDaysToArrival(days);
 
+        if (days > 0) {
+            unit.setMothballed(campaignOptions.isMothballUnitMarketDeliveries());
+        }
+
         if (allowNewPilots) {
             Map<CrewType, Collection<Person>> newCrew = Utilities
                     .genRandomCrewWithCombinedSkill(this, unit, getFactionCode());
@@ -2296,7 +2310,7 @@ public class Campaign implements ITechManager {
      * @return a {@link List} of {@link Person} objects representing combat-capable personnel
      */
     public List<Person> getActiveCombatPersonnel() {
-        return getActivePersonnel().stream()
+        return getActivePersonnel(true).stream()
             .filter(p -> p.getPrimaryRole().isCombat() || p.getSecondaryRole().isCombat())
             .collect(Collectors.toList());
     }
@@ -2320,6 +2334,17 @@ public class Campaign implements ITechManager {
     public List<Person> getCurrentPrisoners() {
         return getActivePersonnel().stream()
             .filter(person -> person.getPrisonerStatus().isCurrentPrisoner())
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Provides a filtered list of personnel including only active prisoners who are willing to defect.
+     *
+     * @return a {@link Person} <code>List</code> containing all active personnel
+     */
+    public List<Person> getPrisonerDefectors() {
+        return getActivePersonnel(false).stream()
+            .filter(person -> person.getPrisonerStatus().isPrisonerDefector())
             .collect(Collectors.toList());
     }
 
@@ -2567,35 +2592,68 @@ public class Campaign implements ITechManager {
             return campaignOptions.getAutoLogisticsAmmunition();
         } else if (part instanceof Armor ) {
             return campaignOptions.getAutoLogisticsArmor();
+        } else if (part instanceof MekActuator) {
+            return campaignOptions.getAutoLogisticsActuators();
+        } else if (part instanceof JumpJet) {
+            return campaignOptions.getAutoLogisticsJumpJets();
+        } else if (part instanceof EnginePart) {
+            return campaignOptions.getAutoLogisticsEngines();
         }
 
         return campaignOptions.getAutoLogisticsOther();
     }
 
     /**
-     * Add data from an actual part to a PartInUse data element
-     * @param partInUse part in use record to update
-     * @param incomingPart new part that needs to be added to this record
-     * @param ignoreMothballedUnits don't count parts in mothballed units
-     * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
+     * Updates a {@link PartInUse} record with data from an incoming {@link Part}.
+     *
+     * <p>This method processes the incoming part to update the usage, storage, or transfer count
+     * of the specified part in use, based on the type, quality, and associated unit of the
+     * incoming part. Certain parts are ignored based on their state or configuration, such as
+     * being part of conventional infantry, salvage, or mothballed units.</p>
+     *
+     * @param partInUse the {@link PartInUse} record to update.
+     * @param incomingPart the new {@link Part} that is being processed for this record.
+     * @param ignoreMothballedUnits if {@code true}, parts belonging to mothballed units are excluded.
+     * @param ignoreSparesUnderQuality spares with a quality lower than this threshold are excluded from counting.
      */
     private void updatePartInUseData(PartInUse partInUse, Part incomingPart,
-            boolean ignoreMothballedUnits, PartQuality ignoreSparesUnderQuality) {
+                                     boolean ignoreMothballedUnits, PartQuality ignoreSparesUnderQuality) {
+        Unit unit = incomingPart.getUnit();
+        if (unit != null) {
+            // Ignore conventional infantry
+            if (unit.isConventionalInfantry()) {
+                return;
+            }
 
-        if (ignoreMothballedUnits && (null != incomingPart.getUnit()) && incomingPart.getUnit().isMothballed()) {
-        } else if ((incomingPart.getUnit() != null) || (incomingPart instanceof MissingPart)) {
-            partInUse.setUseCount(partInUse.getUseCount() + getQuantity(incomingPart));
-        } else {
-            if (incomingPart.isPresent()) {
-                if (incomingPart.getQuality().toNumeric() < ignoreSparesUnderQuality.toNumeric()) {
-                } else {
-                    partInUse.setStoreCount(partInUse.getStoreCount() + getQuantity(incomingPart));
-                    partInUse.addSpare(incomingPart);
-                }
-            } else {
-                partInUse.setTransferCount(partInUse.getTransferCount() + getQuantity(incomingPart));
+            // Ignore parts if they are from mothballed units and the flag is set
+            if (ignoreMothballedUnits && incomingPart.getUnit() != null
+                && incomingPart.getUnit().isMothballed()) {
+                return;
+            }
+
+            // Ignore units set to salvage
+            if (unit.isSalvage()) {
+                return;
             }
         }
+
+        // Case 1: Part is associated with a unit or is a MissingPart
+        if ((unit != null) || (incomingPart instanceof MissingPart)) {
+            partInUse.setUseCount(partInUse.getUseCount() + getQuantity(incomingPart));
+            return;
+        }
+
+        // Case 2: Part is present and meets quality requirements
+        if (incomingPart.isPresent()) {
+            if (incomingPart.getQuality().toNumeric() >= ignoreSparesUnderQuality.toNumeric()) {
+                partInUse.setStoreCount(partInUse.getStoreCount() + getQuantity(incomingPart));
+                partInUse.addSpare(incomingPart);
+            }
+            return;
+        }
+
+        // Case 3: Part is not present, update transfer count
+        partInUse.setTransferCount(partInUse.getTransferCount() + getQuantity(incomingPart));
     }
 
     /**
@@ -4070,13 +4128,20 @@ public class Campaign implements ITechManager {
         for (CombatTeam combatTeam : combatTeams.values()) {
             CombatRole combatRole = combatTeam.getRole();
 
-            Force force = null;
+            Force force;
             int unitCount = 0;
             try {
                 int forceId = combatTeam.getForceId();
                 force = getForce(forceId);
 
-                unitCount += force.getAllUnits(true).size();
+                Vector<UUID> unitsInForce = force.getAllUnits(true);
+
+                for (UUID unitId : unitsInForce) {
+                    Unit unit = getUnit(unitId);
+                    if (unit != null && unit.isFullyCrewed() && !unit.isSalvage()) {
+                        unitCount++;
+                    }
+                }
             } catch (Exception ignored) {
                 continue;
             }
@@ -4182,8 +4247,14 @@ public class Campaign implements ITechManager {
                                 (AtBDynamicScenario) scenario, contract.getStratconCampaignState());
 
                         if (stub) {
-                            if (scenario.getStratConScenarioType().isResupply()) {
+                            ScenarioType scenarioType = scenario.getStratConScenarioType();
+                            if (scenarioType.isResupply()) {
                                 processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
+                            }
+
+                            if (scenarioType.isJailBreak()) {
+                                StratconCampaignState campaignState = contract.getStratconCampaignState();
+                                campaignState.changeSupportPoints(-1);
                             }
 
                             scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
@@ -4293,6 +4364,7 @@ public class Campaign implements ITechManager {
                 rating.reInitialize();
             }
 
+            boolean hasHadResupply = false;
             for (AtBContract contract : getActiveAtBContracts()) {
                 AtBMoraleLevel oldMorale = contract.getMoraleLevel();
 
@@ -4316,8 +4388,13 @@ public class Campaign implements ITechManager {
                     boolean inLocation = location.isOnPlanet()
                         && location.getCurrentSystem().equals(contract.getSystem());
 
+                    if (contract.isSubcontract() || hasHadResupply) {
+                        continue;
+                    }
+
                     if (inLocation) {
                         processResupply(contract);
+                        hasHadResupply = true;
                     }
                 }
             }
@@ -4396,6 +4473,8 @@ public class Campaign implements ITechManager {
      * @see #getPersonnelFilteringOutDeparted() Filters out departed personnel before daily processing
      */
     public void processNewDayPersonnel() {
+        RecoverMIAPersonnel recovery = new RecoverMIAPersonnel(this, faction, getAtBUnitRatingMod());
+
         // This list ensures we don't hit a concurrent modification error
         List<Person> personnel = getPersonnelFilteringOutDeparted();
 
@@ -4421,6 +4500,22 @@ public class Campaign implements ITechManager {
             }
 
             // Daily events
+            if (person.getStatus().isMIA()) {
+                recovery.attemptRescueOfPlayerCharacter(person);
+            }
+
+            if (person.getPrisonerStatus().isBecomingBondsman()) {
+                // We use 'isAfter' to avoid situations where we somehow manage to miss the date.
+                // This shouldn't be necessary, but a safety net never hurt
+                if (currentDay.isAfter(person.getBecomingBondsmanEndDate().minusDays(1))) {
+                    person.setPrisonerStatus(this, BONDSMAN, true);
+                    addReport(String.format(resources.getString("becomeBondsman.text"),
+                        person.getHyperlinkedName(),
+                        spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                        CLOSING_SPAN_TAG));
+                }
+            }
+
             person.resetMinutesLeft();
             person.setAcquisition(0);
 
@@ -4881,6 +4976,11 @@ public class Campaign implements ITechManager {
             randomDependents.processMonthlyRemovalAndAddition();
         }
 
+        // Prisoner events can occur on Monday or the 1st of the month depending on the type of event
+        if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY || currentDay.getDayOfMonth() == 1) {
+            new PrisonerEventManager(this);
+        }
+
         resetAstechMinutes();
 
         processNewDayUnits();
@@ -5318,9 +5418,9 @@ public class Campaign implements ITechManager {
                 continue;
             }
             if (u.getForceId() == fid) {
-                u.setForceId(-1);
+                u.setForceId(FORCE_NONE);
                 if (force.isDeployed()) {
-                    u.setScenarioId(-1);
+                    u.setScenarioId(NO_ASSIGNED_SCENARIO);
                 }
             }
         }
@@ -5354,7 +5454,7 @@ public class Campaign implements ITechManager {
         if (null != force) {
             force.removeUnit(this, u.getId(), true);
             u.setForceId(Force.FORCE_NONE);
-            u.setScenarioId(-1);
+            u.setScenarioId(NO_ASSIGNED_SCENARIO);
             if (u.getEntity().hasNavalC3()
                     && u.getEntity().calculateFreeC3Nodes() < 5) {
                 Vector<Unit> removedUnits = new Vector<>();
@@ -5615,7 +5715,7 @@ public class Campaign implements ITechManager {
         return crimeRating + crimePirateModifier;
     }
 
-    public LocalDate getDateOfLastCrime() {
+    public @Nullable LocalDate getDateOfLastCrime() {
         return dateOfLastCrime;
     }
 
@@ -5821,6 +5921,18 @@ public class Campaign implements ITechManager {
         this.automatedMothballUnits = automatedMothballUnits;
     }
 
+    public int getTemporaryPrisonerCapacity() {
+        return temporaryPrisonerCapacity;
+    }
+
+    public void setTemporaryPrisonerCapacity(int temporaryPrisonerCapacity) {
+        this.temporaryPrisonerCapacity = temporaryPrisonerCapacity;
+    }
+
+    public RandomEventLibraries getRandomEventLibraries() {
+        return randomEventLibraries;
+    }
+
     public void writeToXML(final PrintWriter pw) {
         int indent = 0;
 
@@ -6021,6 +6133,7 @@ public class Campaign implements ITechManager {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mothballedUnit", unit.getId());
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "automatedMothballUnits");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "temporaryPrisonerCapacity", temporaryPrisonerCapacity);
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, ++indent, "partsInUse");
         writePartInUseToXML(pw, indent);
@@ -6936,7 +7049,7 @@ public class Campaign implements ITechManager {
         }
 
 
-        if (isGrayMonday(this)) {
+        if (isGrayMonday(currentDay, campaignOptions.isSimulateGrayMonday())) {
             target.addModifier(4, "Gray Monday");
         }
 
@@ -7389,7 +7502,8 @@ public class Campaign implements ITechManager {
      * @param person The {@link Person} who should receive a randomized portrait.
      */
     public void assignRandomPortraitFor(final Person person) {
-        final Portrait portrait = RandomPortraitGenerator.generate(getPersonnel(), person);
+        final Boolean allowDuplicatePortraits = getCampaignOptions().isAllowDuplicatePortraits();
+        final Portrait portrait = RandomPortraitGenerator.generate(getPersonnel(), person, allowDuplicatePortraits);
         if (!portrait.isDefault()) {
             person.setPortrait(portrait);
         }
@@ -7944,7 +8058,15 @@ public class Campaign implements ITechManager {
         // if you are delivering from the same planet then no transit times
         int currentTransitTime = (distance > 0) ? (int) Math.ceil(getCurrentSystem().getTimeToJumpPoint(1.0)) : 0;
         int originTransitTime = (distance > 0) ? (int) Math.ceil(system.getTimeToJumpPoint(1.0)) : 0;
-        int amazonFreeShipping = d6(1 + jumps);
+
+        // CO 51 (latest) has much longer average part times. Let's adjust amazonFreeShipping
+        // based on what getUnitTransitTime is set in the options in an attempt to get some
+        // delivery times more in line with RAW's one-month minimum. Default is TRANSIT_UNIT_MONTH
+        int amazonFreeShipping = switch (campaignOptions.getUnitTransitTime()) {
+            case TRANSIT_UNIT_MONTH -> 7 + (d6(7 * (1 + jumps)));
+            case TRANSIT_UNIT_WEEK -> 2 + (d6(2 * (1 + jumps)));
+            default -> d6(1 + jumps);
+        };
         return (recharges * 7) + currentTransitTime + originTransitTime + amazonFreeShipping;
     }
 
@@ -7967,6 +8089,9 @@ public class Campaign implements ITechManager {
      * calculated transit time.
      */
     public int calculatePartTransitTime(int availability) {
+        // This is accurate as of the latest rules. It was
+        // (BASE_MODIFIER - (roll + availability) / 4 months
+        // in the older version.
         final int BASE_MODIFIER = 7; // CamOps p51
         final int roll = d6(1);
         final int total = max(1, (BASE_MODIFIER + roll + availability) / 4); // CamOps p51
@@ -8961,5 +9086,23 @@ public class Campaign implements ITechManager {
             }
         }
         return false;
+    }
+
+    /**
+     * Returns a list of entities (units) from all combat forces.
+     *
+     * @return a list of entities representing all combat units in the player force
+     */
+    public List<Entity> getAllCombatEntities() {
+        List<Entity> units = new ArrayList<>();
+        for (Force force : getAllForces()) {
+            if (!force.isForceType(ForceType.STANDARD)) {
+                continue;
+            }
+            for (UUID unitID : force.getUnits()) {
+                units.add(getUnit(unitID).getEntity());
+            }
+        }
+        return units;
     }
 }

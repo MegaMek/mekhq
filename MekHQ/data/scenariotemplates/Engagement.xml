@@ -2,7 +2,12 @@
 <ScenarioTemplate>
     <name>Engagement</name>
     <shortBriefing>Engage and destroy enemy at the front.</shortBriefing>
-    <detailedBriefing>Enemy forces are advancing towards a key landmark. The objective is to either destroy or force them to retreat. At least 50% of the enemy must be neutralized, while maintaining 50% of friendly forces to hold the line and secure the frontline position.</detailedBriefing>
+    <detailedBriefing>Your orders are simple—engage and destroy at least 50% of enemy forces. This is not a hit-and-run operation or a delaying action. You are to commit fully to the engagement and break their strength through superior firepower and tactical positioning.
+
+This battle will determine control of the battlefield. The victor will hold the field at the end of the engagement, securing any salvage and denying the enemy any chance of recovery. Every enemy unit destroyed weakens their ability to wage war—make sure they do not leave this battlefield intact.
+
+Strike hard, eliminate the opposition, and take control. Victory is absolute, or it is meaningless.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
@@ -105,36 +110,9 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
+            <description>Destroy or rout 50% of the following forces. +1 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
-            <percentage>50</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Player</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>

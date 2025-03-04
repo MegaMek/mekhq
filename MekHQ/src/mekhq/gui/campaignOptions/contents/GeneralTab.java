@@ -23,7 +23,6 @@ import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
-import megamek.common.options.OptionsConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -35,7 +34,15 @@ import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
-import mekhq.gui.campaignOptions.components.*;
+import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
+import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
+import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
+import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
+import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsTextField;
 import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.dialog.iconDialogs.UnitIconDialog;
 import mekhq.gui.displayWrappers.FactionDisplay;
@@ -48,6 +55,7 @@ import java.time.LocalDate;
 import java.util.ResourceBundle;
 
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.common.options.OptionsConstants.ALLOWED_YEAR;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
 
 /**
@@ -70,6 +78,7 @@ public class GeneralTab {
     private final JFrame frame;
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
+    private final CampaignOptionsDialogMode mode;
 
     private JLabel lblName;
     private JTextField txtName;
@@ -80,6 +89,9 @@ public class GeneralTab {
     private MMComboBox<UnitRatingMethod> unitRatingMethodCombo;
     private JLabel lblManualUnitRatingModifier;
     private JSpinner manualUnitRatingModifier;
+    private JCheckBox chkClampReputationPayMultiplier;
+    private JCheckBox chkReduceReputationPerformanceModifier;
+    private JCheckBox chkReputationPerformanceModifierCutOff;
     private JLabel lblDate;
     private JButton btnDate;
     private LocalDate date;
@@ -95,8 +107,10 @@ public class GeneralTab {
      *
      * @param campaign The {@link Campaign} associated with this tab, which contains the core game data.
      * @param frame    The parent {@link JFrame} used to display this tab.
+     * @param mode     The {@link CampaignOptionsDialogMode} enum determining what state caused the
+     *                dialog to be triggered.
      */
-    public GeneralTab(Campaign campaign, JFrame frame) {
+    public GeneralTab(Campaign campaign, JFrame frame, CampaignOptionsDialogMode mode) {
         // region Variable Declarations
         this.frame = frame;
         this.campaign = campaign;
@@ -104,6 +118,7 @@ public class GeneralTab {
         this.date = campaign.getLocalDate();
         this.camouflage = campaign.getCamouflage();
         this.unitIcon = campaign.getUnitIcon();
+        this.mode = mode;
 
         initialize();
     }
@@ -148,13 +163,22 @@ public class GeneralTab {
             resources.getString("lblReputation.tooltip")));
         lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
         manualUnitRatingModifier = new CampaignOptionsSpinner("ManualUnitRatingModifier",
-            0, -200, 200, 1);
+            0, -1000, 1000, 1);
+        chkClampReputationPayMultiplier = new CampaignOptionsCheckBox("ClampReputationPayMultiplier");
+        chkReduceReputationPerformanceModifier = new CampaignOptionsCheckBox("ReduceReputationPerformanceModifier");
+        chkReputationPerformanceModifierCutOff = new CampaignOptionsCheckBox("ReputationPerformanceModifierCutOff");
 
         // Date
         lblDate = new CampaignOptionsLabel("Date");
         btnDate = new CampaignOptionsButton("Date");
         btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         btnDate.addActionListener(this::btnDateActionPerformed);
+
+        if (mode != CampaignOptionsDialogMode.STARTUP
+            && mode != CampaignOptionsDialogMode.STARTUP_ABRIDGED) {
+            lblDate.setEnabled(false);
+            btnDate.setEnabled(false);
+        }
 
         // Camouflage
         lblCamo = new CampaignOptionsLabel("Camo");
@@ -213,6 +237,13 @@ public class GeneralTab {
         layout.gridy++;
         panel.add(lblManualUnitRatingModifier, layout);
         panel.add(manualUnitRatingModifier, layout);
+        layout.gridy++;
+        layout.gridwidth = 3;
+        panel.add(chkClampReputationPayMultiplier, layout);
+        layout.gridy++;
+        panel.add(chkReduceReputationPerformanceModifier, layout);
+        layout.gridy++;
+        panel.add(chkReputationPerformanceModifierCutOff, layout);
 
         layout.gridy++;
         layout.gridwidth = 5;
@@ -301,6 +332,10 @@ public class GeneralTab {
 
         lblManualUnitRatingModifier = new JLabel();
         manualUnitRatingModifier = new JSpinner();
+
+        chkClampReputationPayMultiplier = new JCheckBox();
+        chkReduceReputationPerformanceModifier = new JCheckBox();
+         chkReputationPerformanceModifierCutOff = new JCheckBox();
 
         lblDate = new JLabel();
         btnDate = new JButton();
@@ -498,6 +533,9 @@ public class GeneralTab {
 
         unitRatingMethodCombo.setSelectedItem(options.getUnitRatingMethod());
         manualUnitRatingModifier.setValue(options.getManualUnitRatingModifier());
+        chkClampReputationPayMultiplier.setSelected(options.isClampReputationPayMultiplier());
+        chkReduceReputationPerformanceModifier.setSelected(options.isReduceReputationPerformanceModifier());
+        chkReputationPerformanceModifierCutOff.setSelected(options.isReputationPerformanceModifierCutOff());
 
         date = campaign.getLocalDate();
         if (presetDate != null) {
@@ -526,15 +564,15 @@ public class GeneralTab {
 
             if (isStartUp) {
                 campaign.getForces().setName(campaign.getName());
+                campaign.setLocalDate(date);
             }
-            campaign.setLocalDate(date);
 
             if ((campaign.getCampaignStartDate() == null)
                 || (campaign.getCampaignStartDate().isAfter(campaign.getLocalDate()))) {
                 campaign.setCampaignStartDate(date);
             }
             // Ensure that the MegaMek year GameOption matches the campaign year
-            campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
+            campaign.getGameOptions().getOption(ALLOWED_YEAR).setValue(campaign.getGameYear());
 
             // Null state handled during validation
             FactionDisplay newFaction = comboFaction.getSelectedItem();
@@ -554,5 +592,8 @@ public class GeneralTab {
 
         options.setUnitRatingMethod(unitRatingMethodCombo.getSelectedItem());
         options.setManualUnitRatingModifier((int) manualUnitRatingModifier.getValue());
+        options.setClampReputationPayMultiplier(chkClampReputationPayMultiplier.isSelected());
+        options.setReduceReputationPerformanceModifier(chkReduceReputationPerformanceModifier.isSelected());
+        options.setReputationPerformanceModifierCutOff(chkReputationPerformanceModifierCutOff.isSelected());
     }
 }
