@@ -94,15 +94,7 @@ public class PartsTableModel extends DataTableModel {
         }
 
         if (col == COL_NAME) {
-            String openBrace = "";
-            String closeBrace = "";
-
-            if (part.isBrandNew()) {
-                openBrace = "<i>";
-                closeBrace = "</i>";
-            }
-
-            return "<html><nobr>" + openBrace + part.getName() + closeBrace + "</nobr></html>";
+            return "<html><nobr>" + part.getName() + "</nobr></html>";
         }
         if (col == COL_DETAIL) {
             return "<html><nobr>" + part.getDetails() + "</nobr></html>";
@@ -117,7 +109,12 @@ public class PartsTableModel extends DataTableModel {
             return part.getQuantity();
         }
         if (col == COL_QUALITY) {
-            return part.getQualityName();
+            String appendum = "";
+
+            if (part.isBrandNew()) {
+                appendum = " (Brand New)";
+            }
+            return part.getQualityName() + appendum;
         }
         if (col == COL_TON) {
             return Math.round(part.getTonnage() * 100) / 100.0;
