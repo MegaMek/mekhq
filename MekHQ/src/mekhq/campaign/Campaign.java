@@ -66,8 +66,8 @@ import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.*;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.mod.am.InjuryUtil;
@@ -110,8 +110,8 @@ import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.*;
+import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.HiringHallLevel;
@@ -404,7 +404,7 @@ public class Campaign implements ITechManager {
         automatedMothballUnits = new ArrayList<>();
         temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
         topUpWeekly = false;
-        ignoreMothballed =  false;
+        ignoreMothballed =  true;
         ignoreSparesUnderQuality = QUALITY_A;
 
         // Library initialization
@@ -2598,29 +2598,56 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Add data from an actual part to a PartInUse data element
-     * @param partInUse part in use record to update
-     * @param incomingPart new part that needs to be added to this record
-     * @param ignoreMothballedUnits don't count parts in mothballed units
-     * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
+     * Updates a {@link PartInUse} record with data from an incoming {@link Part}.
+     *
+     * <p>This method processes the incoming part to update the usage, storage, or transfer count
+     * of the specified part in use, based on the type, quality, and associated unit of the
+     * incoming part. Certain parts are ignored based on their state or configuration, such as
+     * being part of conventional infantry, salvage, or mothballed units.</p>
+     *
+     * @param partInUse the {@link PartInUse} record to update.
+     * @param incomingPart the new {@link Part} that is being processed for this record.
+     * @param ignoreMothballedUnits if {@code true}, parts belonging to mothballed units are excluded.
+     * @param ignoreSparesUnderQuality spares with a quality lower than this threshold are excluded from counting.
      */
     private void updatePartInUseData(PartInUse partInUse, Part incomingPart,
-            boolean ignoreMothballedUnits, PartQuality ignoreSparesUnderQuality) {
+                                     boolean ignoreMothballedUnits, PartQuality ignoreSparesUnderQuality) {
+        Unit unit = incomingPart.getUnit();
+        if (unit != null) {
+            // Ignore conventional infantry
+            if (unit.isConventionalInfantry()) {
+                return;
+            }
 
-        if (ignoreMothballedUnits && (null != incomingPart.getUnit()) && incomingPart.getUnit().isMothballed()) {
-        } else if ((incomingPart.getUnit() != null) || (incomingPart instanceof MissingPart)) {
-            partInUse.setUseCount(partInUse.getUseCount() + getQuantity(incomingPart));
-        } else {
-            if (incomingPart.isPresent()) {
-                if (incomingPart.getQuality().toNumeric() < ignoreSparesUnderQuality.toNumeric()) {
-                } else {
-                    partInUse.setStoreCount(partInUse.getStoreCount() + getQuantity(incomingPart));
-                    partInUse.addSpare(incomingPart);
-                }
-            } else {
-                partInUse.setTransferCount(partInUse.getTransferCount() + getQuantity(incomingPart));
+            // Ignore parts if they are from mothballed units and the flag is set
+            if (ignoreMothballedUnits && incomingPart.getUnit() != null
+                && incomingPart.getUnit().isMothballed()) {
+                return;
+            }
+
+            // Ignore units set to salvage
+            if (unit.isSalvage()) {
+                return;
             }
         }
+
+        // Case 1: Part is associated with a unit or is a MissingPart
+        if ((unit != null) || (incomingPart instanceof MissingPart)) {
+            partInUse.setUseCount(partInUse.getUseCount() + getQuantity(incomingPart));
+            return;
+        }
+
+        // Case 2: Part is present and meets quality requirements
+        if (incomingPart.isPresent()) {
+            if (incomingPart.getQuality().toNumeric() >= ignoreSparesUnderQuality.toNumeric()) {
+                partInUse.setStoreCount(partInUse.getStoreCount() + getQuantity(incomingPart));
+                partInUse.addSpare(incomingPart);
+            }
+            return;
+        }
+
+        // Case 3: Part is not present, update transfer count
+        partInUse.setTransferCount(partInUse.getTransferCount() + getQuantity(incomingPart));
     }
 
     /**
