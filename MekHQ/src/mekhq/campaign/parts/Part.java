@@ -196,7 +196,7 @@ public abstract class Part implements IPartWork, ITechnology {
         this.usedForRefitPlanning = false;
         this.daysToArrival = 0;
         this.campaign = c;
-        this.brandNew = true;
+        this.brandNew = false;
         this.quantity = 1;
         this.quality = PartQuality.QUALITY_D;
         this.childParts = new ArrayList<>();
@@ -610,11 +610,11 @@ public abstract class Part implements IPartWork, ITechnology {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "daysToArrival", daysToArrival);
         }
 
-        if (!brandNew) {
-            // The default value for Part.brandNew is true. Only store the tag if the value
-            // is false.
+        if (brandNew) {
+            // The default value for Part.brandNew is false. Only store the tag if the value
+            // is true.
             // The lack of tag in the save file will ALWAYS result in TRUE.
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "brandNew", false);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "brandNew", true);
         }
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quantity", quantity);
 
@@ -732,7 +732,7 @@ public abstract class Part implements IPartWork, ITechnology {
                 } else if (wn2.getNodeName().equalsIgnoreCase("isTeamSalvaging")) {
                     retVal.isTeamSalvaging = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("brandNew")) {
-                    retVal.brandNew = wn2.getTextContent().equalsIgnoreCase("true");
+                    retVal.brandNew = wn2.getTextContent().equalsIgnoreCase("false");
                 } else if (wn2.getNodeName().equalsIgnoreCase("replacementId")) {
                     retVal.replacementPart = new PartRef(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("quality")) {

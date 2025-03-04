@@ -89,6 +89,7 @@ public class AmmoStorageTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 2 * ammoType.getShots(), mockCampaign);
+        ammoStorage.setBrandNew(true);
 
         AmmoStorage clone = ammoStorage.clone();
         assertNotNull(clone);
@@ -110,10 +111,12 @@ public class AmmoStorageTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 2 * ammoType.getShots(), mockCampaign);
+        ammoStorage.setBrandNew(true);
 
         // Create a new part...
         AmmoStorage newAmmoStorage = ammoStorage.getNewPart();
         assertNotNull(newAmmoStorage);
+        newAmmoStorage.setBrandNew(true);
 
         // ... and the new part should be identical in ALMOST every way...
         assertEquals(ammoStorage.getType(), newAmmoStorage.getType());
@@ -137,10 +140,12 @@ public class AmmoStorageTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 2 * ammoType.getShots(), mockCampaign);
+        ammoStorage.setBrandNew(true);
 
         // Create a new part...
         AmmoStorage newAmmoStorage = ammoStorage.getNewEquipment();
         assertNotNull(newAmmoStorage);
+        newAmmoStorage.setBrandNew(true);
 
         // ... and the new part should be identical in ALMOST every way...
         assertEquals(ammoStorage.getType(), newAmmoStorage.getType());
@@ -164,6 +169,7 @@ public class AmmoStorageTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 2 * ammoType.getShots(), mockCampaign);
+        ammoStorage.setBrandNew(true);
 
         // Create a new acquisition work...
         IAcquisitionWork acquisitionWork = ammoStorage.getAcquisitionWork();
@@ -175,6 +181,7 @@ public class AmmoStorageTest {
         assertInstanceOf(AmmoStorage.class, newEquipment);
 
         AmmoStorage newAmmoStorage = (AmmoStorage) newEquipment;
+        newAmmoStorage.setBrandNew(true);
 
         // ... and the new part should be identical in ALMOST every way...
         assertEquals(ammoStorage.getType(), newAmmoStorage.getType());
@@ -190,6 +197,7 @@ public class AmmoStorageTest {
         assertInstanceOf(AmmoStorage.class, acquisitionPart);
 
         newAmmoStorage = (AmmoStorage) acquisitionPart;
+        newAmmoStorage.setBrandNew(true);
 
         // ... and the new part should be identical in ALMOST every way...
         assertEquals(ammoStorage.getType(), newAmmoStorage.getType());
@@ -395,6 +403,7 @@ public class AmmoStorageTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, isAC5Ammo, 0, mockCampaign);
+        ammoStorage.setBrandNew(true);
 
         // If we have no rounds of ammo, we shouldn't cost anything.
         assertEquals(Money.zero(), ammoStorage.getActualValue());
