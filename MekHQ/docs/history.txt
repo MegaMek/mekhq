@@ -91,8 +91,17 @@ MEKHQ VERSION HISTORY:
 + Fix #6111: Adjusted Scenario Templates for Arrival Turn and Objectives
 + Fix #6027: Refactored Campaign Force Value Calculation
 + Fix #6023: Added Auto-Logistics Support For Actuators, Jump Jets, And Engines
-+ Fix #6017 Fixed Multiple Gray Monday Bugs
-+ Fix #6002 Updated Unit Count Logic When Determining if There is a Force Deployment Deficit
++ Fix #6017: Fixed Multiple Gray Monday Bugs
++ Fix #6002: Updated Unit Count Logic When Determining if There is a Force Deployment Deficit
++ Fix #5928: Allow Appropriate Units to be Tactical Transported in Cargo
++ Fix #6056: Clarify Convoy Tonnage Requirement Label in Briefing Room
++ Fix #6143: Prisoner defection event failed to list names, missing resources error
++ Fix #6145: Contractual convoy pop-up fails to report cargo ton estimations
++ Fix #6146: Dependant was removed as soon as they joined
++ Fix #5983: Training and Education Docs - Officer/NCO Training Typos
++ PR #6156: Added New Academies To Prestigious Academies Dataset 
++ PR #6161: Adjusted Planetary Acquisitions to use the campaign option for Delivery Scale to make deliveries optionally slower
++ PR #6162: Updated Manual Unit Rating Modifier Range 
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment
