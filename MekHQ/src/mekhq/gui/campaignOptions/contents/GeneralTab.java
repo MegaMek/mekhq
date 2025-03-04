@@ -151,7 +151,7 @@ public class GeneralTab {
             resources.getString("lblReputation.tooltip")));
         lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
         manualUnitRatingModifier = new CampaignOptionsSpinner("ManualUnitRatingModifier",
-            0, -200, 200, 1);
+            0, -1000, 1000, 1);
         chkClampReputationPayMultiplier = new CampaignOptionsCheckBox("ClampReputationPayMultiplier");
         chkReduceReputationPerformanceModifier = new CampaignOptionsCheckBox("ReduceReputationPerformanceModifier");
         chkReputationPerformanceModifierCutOff = new CampaignOptionsCheckBox("ReputationPerformanceModifierCutOff");
