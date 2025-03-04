@@ -2,7 +2,7 @@
  * Part.java
  *
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -29,8 +29,8 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
@@ -1269,19 +1269,39 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     /**
-     * Increments the number of parts in stock by one.
+     * Adjusts the quantity of parts in stock by a specified delta value. The new quantity is
+     * calculated by adding the given delta to the current quantity. The part will be removed if
+     * the final quantity is less than 1.
+     *
+     * @param delta The value by which to change the quantity. A positive value increases the
+     *             stock, while a negative value decreases it.
      */
-    public void incrementQuantity() {
-        setQuantity(getQuantity() + 1);
+    public void changeQuantity(int delta) {
+        setQuantity(quantity + delta);
     }
 
     /**
-     * Decrements the number of parts in stock by one,
-     * and removes the part from the campaign if it
-     * reaches zero.
+     * Increases the stock quantity of the part by one. The method calls {@link #changeQuantity(int)}
+     * with a delta of {@code 1}. The part will be removed if the final quantity is less than 1.
+     *
+     * @deprecated Use {@link #changeQuantity(int)} directly with a delta of {@code 1} for more
+     * explicit control over quantity adjustments.
      */
+    @Deprecated
+    public void incrementQuantity() {
+        changeQuantity(1);
+    }
+
+    /**
+     * Decreases the stock quantity of the part by one. The method calls {@link #changeQuantity(int)}
+     * with a delta of {@code -1}. The part will be removed if the final quantity is less than 1.
+     *
+     * @deprecated Use {@link #changeQuantity(int)} directly with a delta of {@code -1} for more
+     * explicit control over quantity adjustments.
+     */
+    @Deprecated
     public void decrementQuantity() {
-        setQuantity(getQuantity() - 1);
+        changeQuantity(-1);
     }
 
     /**

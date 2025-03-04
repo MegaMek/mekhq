@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -194,34 +194,48 @@ public class Warehouse {
     }
 
     /**
-     * Merges a part with an existing part, if possible.
-     * @param part The part to try and merge with an existing part.
-     * @return The part itself, or the spare part the part was merged with.
+     * Attempts to merge a given part with an existing spare part in stock. The merge
+     * is only possible if a compatible spare part is found, and both parts have the
+     * same "brand new" state.
+     *
+     * <p>The merge process follows these steps:</p>
+     * <ul>
+     *   <li>If the part has no associated unit, no parent part, and is not reserved for replacement,
+     *       the method searches for an existing spare part to merge with.</li>
+     *   <li>A merge can only occur if the spare part exists and the {@code isBrandNew}
+     *       property matches for both the part and the spare.</li>
+     *   <li>Specific handling is applied based on the type of the part:
+     *     <ul>
+     *       <li>If the part is of type {@code Armor}, the quantities are added together.</li>
+     *       <li>If the part is of type {@code AmmoStorage}, the shot counts are updated.</li>
+     *       <li>For other part types, the quantities are incremented.</li>
+     *     </ul>
+     *   </li>
+     * </ul>
+     *
+     * @param part The part to attempt to merge with an existing spare part. Cannot be {@code null}.
+     * @return The original part if no merge occurs, or the existing spare part if the parts are merged.
+     * @throws NullPointerException If the {@code part} parameter is {@code null}.
      */
     private Part mergePartWithExisting(Part part) {
         Objects.requireNonNull(part);
 
-        if ((null == part.getUnit()) && !part.hasParentPart()
-                && !part.isReservedForReplacement()) {
+        // Check if the part has no unit, no parent part, and is not reserved for replacement
+        if ((null == part.getUnit()) && !part.hasParentPart() && !part.isReservedForReplacement()) {
             Part spare = checkForExistingSparePart(part);
-            if (null != spare) {
-                if (part instanceof Armor) {
-                    if (spare instanceof Armor) {
-                        ((Armor) spare).setAmount(((Armor) spare).getAmount()
-                                + ((Armor) part).getAmount());
-                        return spare;
-                    }
-                } else if (part instanceof AmmoStorage) {
-                    if (spare instanceof AmmoStorage) {
-                        ((AmmoStorage) spare).changeShots(((AmmoStorage) part)
-                                .getShots());
-                        return spare;
-                    }
+
+            // Ensure a matching spare exists and both parts share the same isBrandNew state
+            if (spare != null && part.isBrandNew() == spare.isBrandNew()) {
+                // Handle specific part types
+                if (part instanceof Armor && spare instanceof Armor) {
+                    ((Armor) spare).setAmount(((Armor) spare).getAmount() + ((Armor) part).getAmount());
+                    return spare;
+                } else if (part instanceof AmmoStorage && spare instanceof AmmoStorage) {
+                    ((AmmoStorage) spare).changeShots(((AmmoStorage) part).getShots());
+                    return spare;
                 } else {
-                    // Add more spare parts
-                    for (int count = 0; count < part.getQuantity(); ++count) {
-                        spare.incrementQuantity();
-                    }
+                    // Handle generic parts by incrementing the quantity
+                    spare.changeQuantity(part.getQuantity());
                     return spare;
                 }
             }
