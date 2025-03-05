@@ -1287,7 +1287,7 @@ public abstract class Part implements IPartWork, ITechnology {
      * @deprecated Use {@link #changeQuantity(int)} directly with a delta of {@code 1} for more
      * explicit control over quantity adjustments.
      */
-    @Deprecated
+    @Deprecated (since="0.50.04")
     public void incrementQuantity() {
         changeQuantity(1);
     }
@@ -1299,7 +1299,7 @@ public abstract class Part implements IPartWork, ITechnology {
      * @deprecated Use {@link #changeQuantity(int)} directly with a delta of {@code -1} for more
      * explicit control over quantity adjustments.
      */
-    @Deprecated
+    @Deprecated (since="0.50.04")
     public void decrementQuantity() {
         changeQuantity(-1);
     }
