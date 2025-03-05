@@ -28,6 +28,9 @@ import java.util.List;
 
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.personnel.enums.GenderDescriptors.HE_SHE_THEY;
+import static mekhq.campaign.personnel.enums.GenderDescriptors.HIM_HER_THEM;
+import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
 import static mekhq.campaign.randomEvents.personalities.enums.Intelligence.*;
 
 /**
@@ -414,5 +417,30 @@ public class PersonalityController {
         }
 
         return personalityValue;
+    }
+
+    /**
+     * A record to encapsulate pronoun information and associated data based on a given gender.
+     */
+    public record PronounData(String subjectPronoun, String subjectPronounLowerCase, String objectPronoun,
+                              String objectPronounLowerCase, String possessivePronoun, String possessivePronounLowerCase,
+                              int pluralizer) {
+
+        /**
+         * Constructs a new {@code PronounData} record based on the specified gender.
+         *
+         * @param gender The gender used to determine the pronouns and pluralizer.
+         */
+        public PronounData(Gender gender) {
+            this(
+                HE_SHE_THEY.getDescriptorCapitalized(gender),
+                HE_SHE_THEY.getDescriptorCapitalized(gender).toLowerCase(),
+                HIM_HER_THEM.getDescriptorCapitalized(gender),
+                HIM_HER_THEM.getDescriptorCapitalized(gender).toLowerCase(),
+                HIS_HER_THEIR.getDescriptorCapitalized(gender),
+                HIS_HER_THEIR.getDescriptorCapitalized(gender).toLowerCase(),
+                gender.isGenderNeutral() ? 0 : 1 // Used to determine whether to use a plural case
+            );
+        }
     }
 }
