@@ -55,9 +55,9 @@ public class EntityUtilities {
     /**
      * Checks if the given entity is unsupported in MekHQ.
      *
-     * <p>This method evaluates whether the specified unit type is considered unsupported.
+     * <p>This method evaluates whether the specified entity is considered unsupported.
      * Currently, it checks if the unit type matches {@link UnitType#GUN_EMPLACEMENT} or
-     * uses drone OS {@link Entity#hasDroneOs()}.
+     * if the entity uses drone OS {@link Entity#hasDroneOs()}.
      *
      * @param entity The entity to be checked
      * @return {@code true} if the entity is unsupported (e.g., a {@link UnitType#GUN_EMPLACEMENT}),
