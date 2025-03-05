@@ -22,10 +22,10 @@ jobs:
         with:
           path: MekHQ
 
-      - name: "Check out MegaMek Lab"
+      - name: "Check out MegaMekLab"
         uses: actions/checkout@v4
         with:
-          repository: MegaMek/megamek
+          repository: MegaMek/megameklab
           ref: master
           path: megameklab
 
