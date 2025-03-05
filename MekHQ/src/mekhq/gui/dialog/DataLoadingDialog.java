@@ -68,10 +68,8 @@ import java.util.concurrent.ExecutionException;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
-import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
-import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CUSTOMIZE;
-import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_SELECT;
-import static mekhq.utilities.EntityUtilities.isUnsupportedUnitType;
+import static mekhq.gui.campaignOptions.SelectPresetDialog.*;
+import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
 
 public class DataLoadingDialog extends AbstractMHQDialogBasic implements PropertyChangeListener {
     private static final MMLogger logger = MMLogger.create(DataLoadingDialog.class);
@@ -441,7 +439,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                     continue;
                 }
 
-                if (isUnsupportedUnitType(entity.getUnitType())) {
+                if (isUnsupportedEntity(entity)) {
                     unit.clearCrew();
                 }
             }
