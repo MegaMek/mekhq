@@ -2465,7 +2465,7 @@ public class StratconRulesManager {
                 return ReinforcementEligibilityType.NONE;
             }
 
-            if (campaignState.getSupportPoints() > 0) {
+            if (campaignState.getSupportPoints() > 0 || campaign.isGM()) {
                 if (formation.getRole().isManeuver() || formation.getRole().isAuxiliary()) {
                     return AUXILIARY;
                 } else {

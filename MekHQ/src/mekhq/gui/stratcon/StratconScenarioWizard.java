@@ -673,7 +673,6 @@ public class StratconScenarioWizard extends JDialog {
                 null, false));
         } else {
             btnCommit.addActionListener(evt -> reinforcementConfirmDialog());
-            btnCommit.setEnabled(currentCampaignState.getSupportPoints() > 0);
         }
 
         btnCancel = new JButton(MHQInternationalization.getTextAt(resourcePath, "leadershipCancel.text"));
@@ -861,6 +860,7 @@ public class StratconScenarioWizard extends JDialog {
             btnCommitClicked(evt, finalTargetNumber, false);
             dialog.dispose();
         });
+        reinforceButton.setEnabled(availableSupportPoints > 0);
 
         JButton reinforceButtonGM = new JButton(resources.getString("reinforcementConfirmation.confirmButton.gm"));
         reinforceButtonGM.setToolTipText(resources.getString("reinforcementConfirmation.confirmButton.gm.tooltip"));
