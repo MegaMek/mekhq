@@ -23,6 +23,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.Test;
 
+import static mekhq.campaign.randomEvents.personalities.enums.Aggression.ASSERTIVE;
 import static mekhq.campaign.randomEvents.personalities.enums.Aggression.DECISIVE;
 import static mekhq.campaign.randomEvents.personalities.enums.Aggression.MAXIMUM_VARIATIONS;
 import static mekhq.campaign.randomEvents.personalities.enums.Aggression.NONE;
@@ -57,6 +58,13 @@ public class AggressionTest {
         Aggression status = Aggression.fromString("");
 
         assertEquals(NONE, status);
+    }
+
+    @Test
+    public void testFromString_FromOrdinal() {
+        Aggression status = Aggression.fromString(ASSERTIVE.ordinal() + "");
+
+        assertEquals(ASSERTIVE, status);
     }
 
     @Test
