@@ -20,8 +20,9 @@ package mekhq.campaign.personnel.enums;
 
 import org.junit.jupiter.api.Test;
 
-import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
-import static mekhq.campaign.personnel.enums.PersonnelStatus.STUDENT;
+import java.util.List;
+
+import static mekhq.campaign.personnel.enums.PersonnelStatus.*;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -90,6 +91,59 @@ public class PersonnelStatusTest {
         for (PersonnelStatus status : PersonnelStatus.values()) {
             String logText = status.getLogText();
             assertTrue(isResourceKeyValid(logText));
+        }
+    }
+
+    @Test
+    public void testIsAbsent() {
+        List<PersonnelStatus> validStatuses = List.of(MIA, POW, ENEMY_BONDSMAN, ON_LEAVE,
+            ON_MATERNITY_LEAVE, AWOL, STUDENT, MISSING);
+
+        for (PersonnelStatus status : PersonnelStatus.values()) {
+            boolean isAbsent = validStatuses.contains(status);
+
+            assertEquals(status.isAbsent(), isAbsent);
+        }
+    }
+
+    @Test
+    public void testIsDepartedUnit() {
+        List<PersonnelStatus> deadStatuses = List.of(KIA, HOMICIDE, WOUNDS, DISEASE, ACCIDENTAL,
+            NATURAL_CAUSES, OLD_AGE, MEDICAL_COMPLICATIONS, PREGNANCY_COMPLICATIONS, UNDETERMINED,
+            SUICIDE, BONDSREF);
+        List<PersonnelStatus> validStatuses = List.of(RETIRED, RESIGNED, SACKED, DESERTED,
+            DEFECTED, MISSING, LEFT, ENEMY_BONDSMAN);
+
+        for (PersonnelStatus status : PersonnelStatus.values()) {
+            boolean hasDepartedUnit = validStatuses.contains(status) || deadStatuses.contains(status);
+
+            assertEquals(status.isDepartedUnit(), hasDepartedUnit);
+        }
+    }
+
+    @Test
+    public void testIsDead() {
+        List<PersonnelStatus> validStatuses = List.of(KIA, HOMICIDE, WOUNDS, DISEASE, ACCIDENTAL,
+            NATURAL_CAUSES, OLD_AGE, MEDICAL_COMPLICATIONS, PREGNANCY_COMPLICATIONS, UNDETERMINED,
+            SUICIDE, BONDSREF);
+
+        for (PersonnelStatus status : PersonnelStatus.values()) {
+            boolean isDead = validStatuses.contains(status);
+
+            assertEquals(status.isDead(), isDead);
+        }
+    }
+
+    @Test
+    public void testIsDeadOrMIA() {
+        List<PersonnelStatus> validStatuses = List.of(KIA, HOMICIDE, WOUNDS, DISEASE, ACCIDENTAL,
+            NATURAL_CAUSES, OLD_AGE, MEDICAL_COMPLICATIONS, PREGNANCY_COMPLICATIONS, UNDETERMINED,
+            SUICIDE, BONDSREF, MIA);
+
+        for (PersonnelStatus status : PersonnelStatus.values()) {
+            boolean isDeadOrMIA = validStatuses.contains(status);
+
+            assertEquals(status.isDeadOrMIA(), isDeadOrMIA);
         }
     }
 }
