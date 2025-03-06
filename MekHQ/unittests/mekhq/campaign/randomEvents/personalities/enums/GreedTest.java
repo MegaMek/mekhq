@@ -24,6 +24,7 @@ import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.Test;
 
 import static mekhq.campaign.randomEvents.personalities.enums.Greed.FRAUDULENT;
+import static mekhq.campaign.randomEvents.personalities.enums.Greed.INSATIABLE;
 import static mekhq.campaign.randomEvents.personalities.enums.Greed.MAXIMUM_VARIATIONS;
 import static mekhq.campaign.randomEvents.personalities.enums.Greed.NONE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
@@ -57,6 +58,13 @@ public class GreedTest {
         Greed status = Greed.fromString("");
 
         assertEquals(NONE, status);
+    }
+
+    @Test
+    public void testFromString_FromOrdinal() {
+        Greed status = Greed.fromString(INSATIABLE.ordinal() + "");
+
+        assertEquals(INSATIABLE, status);
     }
 
     @Test
