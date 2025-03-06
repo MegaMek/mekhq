@@ -189,7 +189,7 @@ public enum Greed {
     // region File I/O
     public static Greed fromString(String text) {
         try {
-            return Greed.valueOf(text);
+            return Greed.valueOf(text.toUpperCase().replace(" ", "_"));
         } catch (Exception ignored) {}
 
         try {

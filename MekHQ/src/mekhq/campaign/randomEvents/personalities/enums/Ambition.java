@@ -189,7 +189,7 @@ public enum Ambition {
     // region File I/O
     public static Ambition fromString(String text) {
         try {
-            return Ambition.valueOf(text);
+            return Ambition.valueOf(text.toUpperCase().replace(" ", "_"));
         } catch (Exception ignored) {}
 
         try {

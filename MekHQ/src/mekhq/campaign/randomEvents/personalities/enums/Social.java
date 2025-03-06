@@ -20,11 +20,9 @@ package mekhq.campaign.randomEvents.personalities.enums;
 
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
+import mekhq.campaign.randomEvents.personalities.PersonalityController.PronounData;
 
 import static megamek.codeUtilities.MathUtility.clamp;
-import static mekhq.campaign.personnel.enums.GenderDescriptors.HE_SHE_THEY;
-import static mekhq.campaign.personnel.enums.GenderDescriptors.HIM_HER_THEM;
-import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
@@ -92,7 +90,7 @@ public enum Social {
     /**
      * Defines the number of individual description variants available for each trait.
      */
-    public final static int MAXIMUM_VARIATIONS = 3;
+    public final static int MAXIMUM_VARIATIONS = 6;
 
     /**
      * The index at which major traits begin within the enumeration.
@@ -133,21 +131,25 @@ public enum Social {
      * @return                           a formatted description string based on the enum,
      *                                   the individual's gender, name, and aggression description index.
      */
-    public String getDescription(int socialDescriptionIndex, final Gender gender, final String givenName) {
+    public String getDescription(int socialDescriptionIndex, final Gender gender,
+                                 final String givenName) {
         socialDescriptionIndex = clamp(socialDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
 
         final String RESOURCE_KEY = name() + ".description." + socialDescriptionIndex;
+        final PronounData pronounDate = new PronounData(gender);
 
-        String subjectPronoun = HE_SHE_THEY.getDescriptorCapitalized(gender);
-        String subjectPronounLowerCase = HE_SHE_THEY.getDescriptor(gender);
-        String objectPronoun = HIM_HER_THEM.getDescriptorCapitalized(gender);
-        String objectPronounLowerCase = HIM_HER_THEM.getDescriptor(gender);
-        String possessivePronoun = HIS_HER_THEIR.getDescriptorCapitalized(gender);
-        String possessivePronounLowerCase = HIS_HER_THEIR.getDescriptor(gender);
+        // {0} = givenName
+        // {1} = He/She/They
+        // {2} = he/she/they
+        // {3} = Him/Her/Them
+        // {4} = him/her/them
+        // {5} = His/Her/Their
+        // {6} = his/her/their
+        // {7} = Gender Neutral = 0, Otherwise 1 (used to determine whether to use plural case)
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, givenName, subjectPronoun,
-            subjectPronounLowerCase, objectPronoun, objectPronounLowerCase, possessivePronoun,
-            possessivePronounLowerCase);
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, givenName, pronounDate.subjectPronoun(),
+            pronounDate.subjectPronounLowerCase(), pronounDate.objectPronoun(), pronounDate.objectPronounLowerCase(),
+            pronounDate.possessivePronoun(), pronounDate.possessivePronounLowerCase(), pronounDate.pluralizer());
     }
 
     /**
@@ -187,7 +189,7 @@ public enum Social {
     // region File I/O
     public static Social fromString(String text) {
         try {
-            return Social.valueOf(text);
+            return Social.valueOf(text.toUpperCase().replace(" ", "_"));
         } catch (Exception ignored) {}
 
         try {

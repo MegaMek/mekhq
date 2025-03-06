@@ -193,7 +193,7 @@ public enum Aggression {
      */
     public static Aggression fromString(String text) {
         try {
-            return Aggression.valueOf(text);
+            return Aggression.valueOf(text.toUpperCase().replace(" ", "_"));
         } catch (Exception ignored) {}
 
         try {
