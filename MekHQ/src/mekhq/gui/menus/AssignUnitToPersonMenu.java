@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static mekhq.utilities.EntityUtilities.isUnsupportedUnitType;
+import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
 
 /**
  * This is a standard menu that takes either a unit or multiple units that
@@ -64,7 +64,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         for (Unit unit : units) {
             Entity entity = unit.getEntity();
 
-            if (entity == null || isUnsupportedUnitType(entity.getUnitType())) {
+            if (entity == null || isUnsupportedEntity(entity)) {
                 return;
             }
         }
