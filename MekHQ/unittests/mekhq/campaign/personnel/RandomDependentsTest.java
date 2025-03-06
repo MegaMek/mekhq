@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
 
 class RandomDependentsTest {
     @Test
-    void testGetActiveNonDependents() {
+    void testPrepareData() {
         final int NUMBER_OF_NON_DEPENDENTS = 20;
         final int NUMBER_OF_DEPENDENTS = 5;
 
@@ -67,11 +67,11 @@ class RandomDependentsTest {
             activeNonDependent.add(nonDependent);
         }
         activeNonDependent.addAll(activeDependents);
-        when(mockCampaign.getActivePersonnel()).thenReturn(activeNonDependent);
+        when(mockCampaign.getActivePersonnel(false)).thenReturn(activeNonDependent);
 
         // Act
         RandomDependents randomDependents = new RandomDependents(mockCampaign);
-        int actualValue = randomDependents.getActiveNonDependents();
+        int actualValue = randomDependents.prepareData();
         int expectedValue = NUMBER_OF_NON_DEPENDENTS;
 
         // Assert
