@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2014-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -194,6 +194,30 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         return success;
     }
 
+    /**
+     * Processes the acquisition of a single item, adding it to the campaign as either a part or a unit,
+     * or logging an error if the acquisition type is unrecognized.
+     *
+     * <p>The method performs the following steps:</p>
+     * <ul>
+     *   <li>Checks if the acquisition's quantity is greater than zero. If not, it logs an informational
+     *       message and exits without processing.</li>
+     *   <li>Determines the type of equipment being acquired:
+     *     <ul>
+     *       <li>If the equipment is a {@code Part}, it adds the part to the quartermaster's inventory.</li>
+     *       <li>If the equipment is an {@code Entity}, it adds a new unit to the campaign. The unit's quality
+     *           is determined randomly if the campaign option enables it, otherwise a default quality of
+     *           {@code QUALITY_D} is used.</li>
+     *       <li>If the equipment type is unrecognized, it logs an error indicating the acquisition's name.</li>
+     *     </ul>
+     *   </li>
+     *   <li>Adds a report to the campaign log indicating successful GM addition of the item.</li>
+     *   <li>Decrements the acquisition's remaining quantity after the item is added.</li>
+     * </ul>
+     *
+     * @param acquisition The acquisition work containing the item and metadata to process. Must not be {@code null}.
+     * @throws NullPointerException If {@code acquisition} is {@code null}.
+     */
     private void addOneItem(final IAcquisitionWork acquisition) {
         if (acquisition.getQuantity() <= 0) {
             logger.info("Attempted to add item with no quantity remaining, ignoring the attempt.");
@@ -202,7 +226,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
 
         final Object equipment = acquisition.getNewEquipment();
         if (equipment instanceof Part) {
-            gui.getCampaign().getQuartermaster().addPart((Part) equipment, 0);
+            gui.getCampaign().getQuartermaster().addPart((Part) equipment, 0, true);
         } else if (equipment instanceof Entity) {
             PartQuality quality;
 
