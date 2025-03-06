@@ -20,126 +20,182 @@ package mekhq.campaign.personnel.enums;
 
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.personnel.Person;
 
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
 /**
- * Enum class representing personnel status.
+ * Represents the various statuses that a {@link Person} can have within MekHQ.
+ *
+ * <p>This class is implemented as an {@code enum}, providing a predefined set of constants
+ * representing specific personnel statuses (e.g., ACTIVE, MIA, KIA, SUICIDE, etc.). Each status
+ * is associated with a {@link NotificationSeverity} that indicates the severity level or category
+ * of the condition, such as {@code POSITIVE}, {@code WARNING}, or {@code NEGATIVE}. This helps
+ * color-code messages or reports for better visual communication.</p>
+ *
+ * <p>Additional features include methods to retrieve localized labels, tooltips, report texts,
+ * and log texts for each status. These utilize resource bundles for localization, enabling
+ * multi-language support. There are also utility methods for checking whether a status belongs
+ * to certain predefined categories like "absent," "dead," or "departed from the unit."</p>
  */
 public enum PersonnelStatus {
     // region Enum Declarations
-    ACTIVE("PersonnelStatus.ACTIVE.text", "PersonnelStatus.ACTIVE.toolTipText",
-        "PersonnelStatus.ACTIVE.reportText", "PersonnelStatus.ACTIVE.logText"),
-    MIA("PersonnelStatus.MIA.text", "PersonnelStatus.MIA.toolTipText",
-        "PersonnelStatus.MIA.reportText", "PersonnelStatus.MIA.logText"),
-    POW("PersonnelStatus.POW.text", "PersonnelStatus.POW.toolTipText",
-        "PersonnelStatus.POW.reportText", "PersonnelStatus.POW.logText"),
-    ON_LEAVE("PersonnelStatus.ON_LEAVE.text", "PersonnelStatus.ON_LEAVE.toolTipText",
-            "PersonnelStatus.ON_LEAVE.reportText", "PersonnelStatus.ON_LEAVE.logText"),
-    ON_MATERNITY_LEAVE("PersonnelStatus.ON_MATERNITY_LEAVE.text", "PersonnelStatus.ON_MATERNITY_LEAVE.toolTipText",
-            "PersonnelStatus.ON_MATERNITY_LEAVE.reportText", "PersonnelStatus.ON_MATERNITY_LEAVE.logText"),
-    AWOL("PersonnelStatus.AWOL.text", "PersonnelStatus.AWOL.toolTipText",
-        "PersonnelStatus.AWOL.reportText", "PersonnelStatus.AWOL.logText"),
-    RETIRED("PersonnelStatus.RETIRED.text", "PersonnelStatus.RETIRED.toolTipText",
-        "PersonnelStatus.RETIRED.reportText", "PersonnelStatus.RETIRED.logText"),
-    RESIGNED("PersonnelStatus.RESIGNED.text", "PersonnelStatus.RESIGNED.toolTipText",
-            "PersonnelStatus.RESIGNED.reportText", "PersonnelStatus.RESIGNED.logText"),
-    SACKED("PersonnelStatus.SACKED.text", "PersonnelStatus.SACKED.toolTipText",
-        "PersonnelStatus.SACKED.reportText", "PersonnelStatus.SACKED.logText"),
-    LEFT("PersonnelStatus.LEFT.text", "PersonnelStatus.LEFT.toolTipText",
-        "PersonnelStatus.LEFT.reportText", "PersonnelStatus.LEFT.logText"),
-    DESERTED("PersonnelStatus.DESERTED.text", "PersonnelStatus.DESERTED.toolTipText",
-            "PersonnelStatus.DESERTED.reportText", "PersonnelStatus.DESERTED.logText"),
-    DEFECTED("PersonnelStatus.DEFECTED.text", "PersonnelStatus.DEFECTED.toolTipText",
-            "PersonnelStatus.DEFECTED.reportText", "PersonnelStatus.DEFECTED.logText"),
-    STUDENT("PersonnelStatus.STUDENT.text", "PersonnelStatus.STUDENT.toolTipText",
-        "PersonnelStatus.STUDENT.reportText", "PersonnelStatus.STUDENT.logText"),
-    MISSING("PersonnelStatus.MISSING.text", "PersonnelStatus.MISSING.toolTipText",
-        "PersonnelStatus.MISSING.reportText", "PersonnelStatus.MISSING.logText"),
-    KIA("PersonnelStatus.KIA.text", "PersonnelStatus.KIA.toolTipText",
-        "PersonnelStatus.KIA.reportText", "PersonnelStatus.KIA.logText"),
-    HOMICIDE("PersonnelStatus.HOMICIDE.text", "PersonnelStatus.HOMICIDE.toolTipText",
-            "PersonnelStatus.HOMICIDE.reportText", "PersonnelStatus.HOMICIDE.logText"),
-    WOUNDS("PersonnelStatus.WOUNDS.text", "PersonnelStatus.WOUNDS.toolTipText",
-        "PersonnelStatus.WOUNDS.reportText", "PersonnelStatus.WOUNDS.logText"),
-    DISEASE("PersonnelStatus.DISEASE.text", "PersonnelStatus.DISEASE.toolTipText",
-        "PersonnelStatus.DISEASE.reportText", "PersonnelStatus.DISEASE.logText"),
-    ACCIDENTAL("PersonnelStatus.ACCIDENTAL.text", "PersonnelStatus.ACCIDENTAL.toolTipText",
-            "PersonnelStatus.ACCIDENTAL.reportText", "PersonnelStatus.ACCIDENTAL.logText"),
-    NATURAL_CAUSES("PersonnelStatus.NATURAL_CAUSES.text", "PersonnelStatus.NATURAL_CAUSES.toolTipText",
-            "PersonnelStatus.NATURAL_CAUSES.reportText", "PersonnelStatus.NATURAL_CAUSES.logText"),
-    OLD_AGE("PersonnelStatus.OLD_AGE.text", "PersonnelStatus.OLD_AGE.toolTipText",
-        "PersonnelStatus.OLD_AGE.reportText", "PersonnelStatus.OLD_AGE.logText"),
-    MEDICAL_COMPLICATIONS("PersonnelStatus.MEDICAL_COMPLICATIONS.text", "PersonnelStatus.MEDICAL_COMPLICATIONS.toolTipText",
-        "PersonnelStatus.MEDICAL_COMPLICATIONS.reportText", "PersonnelStatus.MEDICAL_COMPLICATIONS.logText"),
-    PREGNANCY_COMPLICATIONS("PersonnelStatus.PREGNANCY_COMPLICATIONS.text", "PersonnelStatus.PREGNANCY_COMPLICATIONS.toolTipText",
-        "PersonnelStatus.PREGNANCY_COMPLICATIONS.reportText", "PersonnelStatus.PREGNANCY_COMPLICATIONS.logText"),
-    UNDETERMINED("PersonnelStatus.UNDETERMINED.text", "PersonnelStatus.UNDETERMINED.toolTipText",
-            "PersonnelStatus.UNDETERMINED.reportText", "PersonnelStatus.UNDETERMINED.logText"),
-    SUICIDE("PersonnelStatus.SUICIDE.text", "PersonnelStatus.SUICIDE.toolTipText",
-        "PersonnelStatus.SUICIDE.reportText", "PersonnelStatus.SUICIDE.logText"),
-    ENEMY_BONDSMAN("PersonnelStatus.ENEMY_BONDSMAN.text", "PersonnelStatus.ENEMY_BONDSMAN.toolTipText",
-                     "PersonnelStatus.ENEMY_BONDSMAN.reportText", "PersonnelStatus.ENEMY_BONDSMAN.logText"),
-    BONDSREF("PersonnelStatus.BONDSREF.text", "PersonnelStatus.BONDSREF.toolTipText",
-                     "PersonnelStatus.BONDSREF.reportText", "PersonnelStatus.BONDSREF.logText");
+    ACTIVE(NotificationSeverity.WARNING),
+    MIA(NotificationSeverity.WARNING),
+    POW(NotificationSeverity.WARNING),
+    ON_LEAVE(NotificationSeverity.WARNING),
+    ON_MATERNITY_LEAVE(NotificationSeverity.WARNING),
+    AWOL(NotificationSeverity.WARNING),
+    RETIRED(NotificationSeverity.NEGATIVE),
+    RESIGNED(NotificationSeverity.NEGATIVE),
+    SACKED(NotificationSeverity.WARNING),
+    LEFT(NotificationSeverity.NEGATIVE),
+    DESERTED(NotificationSeverity.NEGATIVE),
+    DEFECTED(NotificationSeverity.NEGATIVE),
+    STUDENT(NotificationSeverity.POSITIVE),
+    MISSING(NotificationSeverity.NEGATIVE),
+    KIA(NotificationSeverity.NEGATIVE),
+    HOMICIDE(NotificationSeverity.NEGATIVE),
+    WOUNDS(NotificationSeverity.NEGATIVE),
+    DISEASE(NotificationSeverity.NEGATIVE),
+    ACCIDENTAL(NotificationSeverity.NEGATIVE),
+    NATURAL_CAUSES(NotificationSeverity.NEGATIVE),
+    OLD_AGE(NotificationSeverity.NEGATIVE),
+    MEDICAL_COMPLICATIONS(NotificationSeverity.NEGATIVE),
+    PREGNANCY_COMPLICATIONS(NotificationSeverity.NEGATIVE),
+    UNDETERMINED(NotificationSeverity.NEGATIVE),
+    SUICIDE(NotificationSeverity.NEGATIVE),
+    ENEMY_BONDSMAN(NotificationSeverity.NEGATIVE),
+    BONDSREF(NotificationSeverity.NEGATIVE);
+
+    /**
+     * Represents the severity levels of a status.
+     */
+    public enum NotificationSeverity {
+        /**
+         * Indicates a critical or negative status.
+         *
+         * <p>Defaults to {@code RED}</p>
+         */
+        NEGATIVE,
+
+        /**
+         * Indicates a cautionary status that requires attention.
+         *
+         * <p>Defaults to {@code YELLOW}</p>
+         */
+        WARNING,
+
+        /**
+         * Indicates no severity or a neutral status.
+         *
+         * <p>Defaults to {@code Theme Default Text Color}</p>
+         */
+        NEUTRAL,
+
+        /**
+         * Indicates a positive status.
+         *
+         * <p>Defaults to {@code GREEN}</p>
+         */
+        POSITIVE
+    }
     // endregion Enum Declarations
 
+    final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
+
     // region Variable Declarations
-    private final String name;
-    private final String toolTipText;
-    private final String reportText;
-    private final String logText;
+    private final NotificationSeverity severity;
     // endregion Variable Declarations
 
     // region Constructors
     /**
-     * Initializes a new instance of the {@link PersonnelStatus} class with the given parameters.
+     * Initializes a new instance of the {@link PersonnelStatus} class with the specified severity level.
      *
-     * @param name        the name of the personnel status
-     * @param toolTipText the tooltip text for the personnel status
-     * @param reportText  the report text for the personnel status
-     * @param logText     the log text for the personnel status
+     * @param severity the severity level of the personnel status, represented by {@link NotificationSeverity}
      */
-    PersonnelStatus(final String name, final String toolTipText, final String reportText,
-            final String logText) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
-        this.name = resources.getString(name);
-        this.toolTipText = resources.getString(toolTipText);
-        this.reportText = resources.getString(reportText);
-        this.logText = resources.getString(logText);
+    PersonnelStatus(final NotificationSeverity severity) {
+        this.severity = severity;
     }
     // endregion Constructors
-
     /**
-     * Retrieves the tooltip text for a given component.
+     * Retrieves the severity level of this status.
      *
-     * @return The tooltip text of the component, or null if no tooltip text is set.
+     * @return the severity level, represented by {@link NotificationSeverity}
      */
-    // region Getters
-    public String getToolTipText() {
-        return toolTipText;
+    public NotificationSeverity getSeverity() {
+        return severity;
     }
 
     /**
-     * Retrieves the report text.
+     * Retrieves the label text associated with this status.
      *
-     * @return The report text as a string.
+     * <p>The label text is retrieved from the resource bundle using the key
+     * formed by appending <code>".label"</code> to the name of this status.</p>
+     *
+     * @return the localized label text
+     */
+    public String getLabel() {
+        final String RESOURCE_KEY = name() + ".label";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+    }
+
+    /**
+     * Retrieves the tooltip text associated with this status.
+     *
+     * <p>The tooltip text is retrieved from the resource bundle using the key
+     * formed by appending <code>".tooltip"</code> to the name of this status.</p>
+     *
+     * @return the localized tooltip text
+     */
+    public String getToolTipText() {
+        final String RESOURCE_KEY = name() + ".tooltip";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+    }
+
+    /**
+     * Retrieves the report text associated with this status.
+     *
+     * <p>The report text is retrieved from the resource bundle using the key
+     * formed by appending <code>".report"</code> to the name of this status.</p>
+     *
+     * @return the localized report text
      */
     public String getReportText() {
-        return reportText;
+        final String RESOURCE_KEY = name() + ".report";
+
+        String OPENING_SPAN_TEXT = switch (severity) {
+            case NEGATIVE -> spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
+            case WARNING -> spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+            case NEUTRAL -> "";
+            case POSITIVE -> spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+        };
+
+        String CLOSING_SPAN_TEXT = OPENING_SPAN_TEXT.isBlank() ? "" : CLOSING_SPAN_TAG;
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, OPENING_SPAN_TEXT, CLOSING_SPAN_TEXT);
     }
 
     /**
-     * Retrieves the log text.
+     * Retrieves the log text associated with this status.
      *
-     * @return The log text.
+     * <p>The log text is retrieved from the resource bundle using the key
+     * formed by appending <code>".log"</code> to the name of this status.</p>
+     *
+     * @return the localized log text
      */
     public String getLogText() {
-        return logText;
+        final String RESOURCE_KEY = name() + ".log";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
     // endregion Getters
 
@@ -458,84 +514,35 @@ public enum PersonnelStatus {
 
     // region File I/O
     /**
-     * Parses a string representation of {@link PersonnelStatus} into a {@link PersonnelStatus} object.
-     * If the string representation cannot be parsed, it returns the default {@code PersonnelStatus.ACTIVE}.
+     * Converts a given string to its corresponding {@code PersonnelStatus} enumeration value. The
+     * method first attempts to parse the string as the name of an {@code PersonnelStatus} enum value.
+     * If that fails, it attempts to parse the string as an integer representing the ordinal of an
+     * {@code PersonnelStatus} enum value. If neither succeeds, it logs an error and defaults to
+     * returning {@code ACTIVE}.
      *
-     * @param text The {@link String} representation of {@link PersonnelStatus}
-     * @return The parsed {@link PersonnelStatus} object or {@code PersonnelStatus.ACTIVE} if parsing fails
+     * @param text the input string to parse, which represents either the name or the ordinal
+     *             of an {@code PersonnelStatus} enum value.
+     * @return the corresponding {@code PersonnelStatus} enum instance for the given input string,
+     *         or {@code ACTIVE} if no valid match is found.
      */
-    public static PersonnelStatus parseFromString(final String text) {
+    public static PersonnelStatus fromString(String text) {
         try {
-            return valueOf(text);
+            return PersonnelStatus.valueOf(text);
         } catch (Exception ignored) {}
 
         try {
-            switch (Integer.parseInt(text)) {
-                case 0:
-                    return ACTIVE;
-                case 1:
-                    return RETIRED;
-                case 2:
-                    return KIA;
-                case 3:
-                    return MIA;
-                case 4:
-                    return STUDENT;
-                case 5:
-                    return MISSING;
-                case 6:
-                    return POW;
-                case 7:
-                    return ON_LEAVE;
-                case 8:
-                    return AWOL;
-                case 9:
-                    return RESIGNED;
-                case 10:
-                    return DESERTED;
-                case 11:
-                    return DEFECTED;
-                case 12:
-                    return HOMICIDE;
-                case 13:
-                    return WOUNDS;
-                case 14:
-                    return DISEASE;
-                case 15:
-                    return ACCIDENTAL;
-                case 16:
-                    return NATURAL_CAUSES;
-                case 17:
-                    return OLD_AGE;
-                case 18:
-                    return MEDICAL_COMPLICATIONS;
-                case 19:
-                    return PREGNANCY_COMPLICATIONS;
-                case 20:
-                    return UNDETERMINED;
-                case 21:
-                    return SUICIDE;
-                case 22:
-                    return SACKED;
-                case 23:
-                    return ON_MATERNITY_LEAVE;
-                case 24:
-                    return ENEMY_BONDSMAN;
-                default:
-                    break;
-            }
+            return PersonnelStatus.values()[Integer.parseInt(text)];
         } catch (Exception ignored) {}
 
-        String message = String.format("Unable to parse %s into a PersonnelStatus. Returning ACTIVE.",
-                text);
+        MMLogger logger = MMLogger.create(PersonnelStatus.class);
+        logger.error("Unknown PersonnelStatus ordinal: {} - returning {}.", text, ACTIVE);
 
-        MMLogger.create(PersonnelStatus.class).error(message);
         return ACTIVE;
     }
     // endregion File I/O
 
     @Override
     public String toString() {
-        return name;
+        return getLabel();
     }
 }
