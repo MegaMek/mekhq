@@ -158,7 +158,7 @@ public enum Intelligence {
                                  final String givenName) {
         intelligenceDescriptionIndex = clamp(intelligenceDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
 
-        final String RESOURCE_KEY = name() + ".description." + intelligenceDescriptionIndex;
+        final String RESOURCE_KEY = comparison + ".description." + intelligenceDescriptionIndex;
         final PronounData pronounDate = new PronounData(gender);
 
         // {0} = givenName

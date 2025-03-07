@@ -187,8 +187,35 @@ public class PersonalityController {
      * @param person the person whose personality description will be generated and updated
      */
     public static void writePersonalityDescription(Person person) {
-        List<String> traitDescriptions = getTraitDescriptions(person);
+        Gender gender = person.getGender();
+        String givenName = person.getGivenName();
 
+        List<String> traitDescriptions = getTraitDescriptions(
+            gender, givenName, person.getAggression(), person.getAggressionDescriptionIndex(),
+            person.getAmbition(), person.getAmbitionDescriptionIndex(), person.getGreed(),
+            person.getGreedDescriptionIndex(), person.getSocial(), person.getSocialDescriptionIndex()
+        );
+
+        // Intelligence and personality quirk are handled differently to general personality traits.
+        // INTELLIGENCE
+        Intelligence intelligence = person.getIntelligence();
+        String intelligenceDescription = "";
+        if (!intelligence.isAverageType()) {
+            intelligenceDescription = intelligence.getDescription(person.getIntelligenceDescriptionIndex(),
+                gender, givenName);
+        }
+
+        // PERSONALITY QUIRK
+        PersonalityQuirk personalityQuirk = person.getPersonalityQuirk();
+        String quirkDescription = "";
+        if (!personalityQuirk.isNone()) {
+            quirkDescription = personalityQuirk.getDescription(
+                person.getPrimaryRole(), person.getPersonalityQuirkDescriptionIndex(), gender,
+                person.getOriginFaction(), givenName
+            );
+        }
+
+        // Build the description proper
         StringBuilder personalityDescription = new StringBuilder();
 
         // Append the first trait description, if exists, without wrapping in <p>
@@ -212,29 +239,65 @@ public class PersonalityController {
             }
         }
 
+        if (!intelligenceDescription.isBlank()) {
+            if (!personalityDescription.toString().isBlank()) {
+                personalityDescription.append("<p>").append(intelligenceDescription).append("</p>");
+            } else {
+                personalityDescription.append(intelligenceDescription);
+            }
+        }
+
+        if (!quirkDescription.isBlank()) {
+            if (!personalityDescription.toString().isBlank()) {
+                personalityDescription.append("<p>").append(quirkDescription).append("</p>");
+            } else {
+                personalityDescription.append(quirkDescription);
+            }
+        }
+
         person.setPersonalityDescription(personalityDescription.toString());
     }
 
     /**
-     * Retrieves the descriptions of all assigned personality traits for the given person. Each
-     * trait is processed to generate a detailed description, which is then collated into a list of
-     * strings.
+     * Retrieves the descriptions of all personality traits (other than Intelligence and Quirks) for
+     * the given person. This method processes various personality traits such as aggression, ambition,
+     * greed, and social behavior, generating descriptions based on the specified indices, gender,
+     * and given name of the person.
      *
-     * @param person the person whose personality traits will be described
-     * @return a list of strings representing the descriptions of the person's traits, excluding
-     * default values
+     * <p>Descriptions for traits that are not assigned or are empty will be excluded from the
+     * returned list. This ensures only meaningful and applicable descriptions are included.
+     *
+     * @param gender the gender of the person, used for generating gender-specific pronouns in trait
+     *               descriptions
+     * @param givenName the given name of the person, used to personalize the descriptions
+     * @param aggression the {@link Aggression} trait assigned to the person; omitted if the trait
+     *                  is set to "none"
+     * @param aggressionDescriptionIndex the index used to determine the specific {@link Aggression}
+     *                                  description
+     * @param ambition the {@link Ambition} trait assigned to the person; omitted if the trait is set
+     *                to "none"
+     * @param ambitionDescriptionIndex the index used to determine the specific {@link Ambition}
+     *                                description
+     * @param greed the {@link Greed} trait assigned to the person; omitted if the trait is set to
+     *             "none"
+     * @param greedDescriptionIndex the index used to determine the specific {@link Greed} description
+     * @param social the {@link Social} behavior trait assigned to the person; omitted if the trait
+     *              is set to "none"
+     * @param socialDescriptionIndex the index used to determine the specific {@link Social} description
+     * @return a list of strings, where each string represents a detailed description of a personality
+     *         trait assigned to the given person; traits without meaningful descriptions are excluded
      */
-    private static List<String> getTraitDescriptions(Person person) {
+    private static List<String> getTraitDescriptions(Gender gender, String givenName,
+                                                     Aggression aggression, int aggressionDescriptionIndex,
+                                                     Ambition ambition, int ambitionDescriptionIndex,
+                                                     Greed greed, int greedDescriptionIndex,
+                                                     Social social, int socialDescriptionIndex) {
         List<String> traitDescriptions = new ArrayList<>();
 
-        final Gender gender = person.getGender();
-        final String givenName = person.getGivenName();
-
         // AGGRESSION
-        Aggression aggression = person.getAggression();
         if (!aggression.isNone()) {
-            String traitDescription = aggression.getDescription(
-                person.getAggressionDescriptionIndex(), gender, givenName);
+            String traitDescription = aggression.getDescription(aggressionDescriptionIndex, gender,
+                givenName);
 
             if (!traitDescription.isBlank()) {
                 traitDescriptions.add(traitDescription);
@@ -242,10 +305,8 @@ public class PersonalityController {
         }
 
         // AMBITION
-        Ambition ambition = person.getAmbition();
         if (!ambition.isNone()) {
-            String traitDescription = ambition.getDescription(
-                person.getAmbitionDescriptionIndex(), gender, givenName);
+            String traitDescription = ambition.getDescription(ambitionDescriptionIndex, gender, givenName);
 
             if (!traitDescription.isBlank()) {
                 traitDescriptions.add(traitDescription);
@@ -253,10 +314,8 @@ public class PersonalityController {
         }
 
         // GREED
-        Greed greed = person.getGreed();
         if (!greed.isNone()) {
-            String traitDescription = greed.getDescription(
-                person.getGreedDescriptionIndex(), gender, givenName);
+            String traitDescription = greed.getDescription(greedDescriptionIndex, gender, givenName);
 
             if (!traitDescription.isBlank()) {
                 traitDescriptions.add(traitDescription);
@@ -264,34 +323,8 @@ public class PersonalityController {
         }
 
         // SOCIAL
-        Social social = person.getSocial();
         if (!social.isNone()) {
-            String traitDescription = social.getDescription(
-                person.getSocialDescriptionIndex(), gender, givenName);
-
-            if (!traitDescription.isBlank()) {
-                traitDescriptions.add(traitDescription);
-            }
-        }
-
-        // INTELLIGENCE
-        Intelligence intelligence = person.getIntelligence();
-        if (!intelligence.isAverageType()) {
-            String traitDescription = intelligence.getDescription(
-                person.getIntelligenceDescriptionIndex(), gender, givenName);
-
-            if (!traitDescription.isBlank()) {
-                traitDescriptions.add(traitDescription);
-            }
-        }
-
-        // PERSONALITY QUIRK
-        PersonalityQuirk personalityQuirk = person.getPersonalityQuirk();
-        if (!personalityQuirk.isNone()) {
-            String traitDescription = personalityQuirk.getDescription(
-                person.getPrimaryRole(), person.getPersonalityQuirkDescriptionIndex(), gender,
-                person.getOriginFaction(), givenName
-            );
+            String traitDescription = social.getDescription(socialDescriptionIndex, gender, givenName);
 
             if (!traitDescription.isBlank()) {
                 traitDescriptions.add(traitDescription);
