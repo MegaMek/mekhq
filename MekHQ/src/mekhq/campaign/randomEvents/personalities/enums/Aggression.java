@@ -139,7 +139,7 @@ public enum Aggression {
         aggressionDescriptionIndex = clamp(aggressionDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
 
         final String RESOURCE_KEY = name() + ".description." + aggressionDescriptionIndex;
-        final PronounData pronounDate = new PronounData(gender);
+        final PronounData pronounData = new PronounData(gender);
 
         // {0} = givenName
         // {1} = He/She/They
@@ -150,9 +150,9 @@ public enum Aggression {
         // {6} = his/her/their
         // {7} = Gender Neutral = 0, Otherwise 1 (used to determine whether to use plural case)
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, givenName, pronounDate.subjectPronoun(),
-            pronounDate.subjectPronounLowerCase(), pronounDate.objectPronoun(), pronounDate.objectPronounLowerCase(),
-            pronounDate.possessivePronoun(), pronounDate.possessivePronounLowerCase(), pronounDate.pluralizer());
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, givenName, pronounData.subjectPronoun(),
+            pronounData.subjectPronounLowerCase(), pronounData.objectPronoun(), pronounData.objectPronounLowerCase(),
+            pronounData.possessivePronoun(), pronounData.possessivePronounLowerCase(), pronounData.pluralizer());
     }
 
     /**
