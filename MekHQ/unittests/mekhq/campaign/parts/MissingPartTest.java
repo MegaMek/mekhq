@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -228,6 +228,7 @@ public class MissingPartTest {
                 false, false, false, false, false, mockCampaign);
         int startingQuantity = 3;
         leftArm.setQuantity(startingQuantity);
+        leftArm.setBrandNew(false);
         warehouse.addPart(leftArm);
 
         // Add a not-suitable parts to the warehouse

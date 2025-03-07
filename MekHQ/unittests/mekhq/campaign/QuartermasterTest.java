@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -1852,6 +1852,7 @@ public class QuartermasterTest {
         int originalShots = 1;
         AmmoStorage existing = new AmmoStorage(0, ammoType, originalShots, mockCampaign);
         warehouse.addPart(existing);
+        existing.setBrandNew(false);
         when(mockCampaign.getWarehouse()).thenReturn(warehouse);
 
         // And a basic quartermaster
@@ -1895,6 +1896,7 @@ public class QuartermasterTest {
         Part otherPart = new MekLocation();
         warehouse.addPart(otherPart);
         AmmoStorage existing = new AmmoStorage(0, ammoType, originalShots, mockCampaign);
+        existing.setBrandNew(false);
         warehouse.addPart(existing);
         when(mockCampaign.getWarehouse()).thenReturn(warehouse);
 
@@ -2694,6 +2696,7 @@ public class QuartermasterTest {
         Warehouse warehouse = new Warehouse();
         int originalShots = 1;
         InfantryAmmoStorage existing = new InfantryAmmoStorage(0, ammoType, originalShots, weaponType, mockCampaign);
+        existing.setBrandNew(false);
         warehouse.addPart(existing);
         when(mockCampaign.getWarehouse()).thenReturn(warehouse);
 

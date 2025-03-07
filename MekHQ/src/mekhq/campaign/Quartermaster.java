@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -79,12 +79,40 @@ public class Quartermaster {
     }
 
     /**
-     * Adds a part to the campaign, arriving in a set number of days.
-     * @param part The part to add to the campaign.
-     * @param transitDays The number of days until the part arrives, or zero
-     *                    if the part is already here.
+     * Adds a part to the campaign, arriving in a set number of days. By default, the part is treated
+     * as not brand new. This method is deprecated in favor of the overloaded method that explicitly
+     * accepts a flag to indicate whether the part is brand new.
+     *
+     * <p>This method delegates its behavior to {@link #addPart(Part, int, boolean)} with the
+     * {@code isBrandNew} flag set to {@code false}.</p>
+     *
+     * @param part        The part to add to the campaign. Cannot be {@code null}.
+     * @param transitDays The number of days until the part arrives, or zero if the part is already here.
+     * @deprecated Use {@link #addPart(Part, int, boolean)} instead to explicitly indicate whether
+     * the part is brand new.
      */
+    @Deprecated
     public void addPart(Part part, int transitDays) {
+        addPart(part, transitDays, false);
+    }
+
+    /**
+     * Adds a part to the campaign's warehouse, specifying the number of transit days for its arrival
+     * and whether the part is considered brand new. The method validates the input and decides whether
+     * to skip the addition based on specific conditions, such as test units, spare ammo bins, or
+     * missing parts without associated units.
+     *
+     * <p>Once validated, the part is marked as new or used, set to arrive in the specified number of
+     * days, processed for campaign addition, and added to the campaign's warehouse.</p>
+     *
+     * @param part        The part to add to the campaign. Cannot be {@code null}.
+     * @param transitDays The number of days until the part arrives. If the value is negative,
+     *                    it will be adjusted to zero, indicating the part is already here.
+     * @param isBrandNew  A {@code boolean} indicating whether the part is brand new.
+     *                    {@code true} if the part is new, otherwise {@code false}.
+     * @throws NullPointerException If {@code part} is {@code null}.
+     */
+    public void addPart(Part part, int transitDays, boolean isBrandNew) {
         Objects.requireNonNull(part);
 
         if (part.getUnit() instanceof TestUnit) {
@@ -103,6 +131,8 @@ public class Quartermaster {
         }
 
         part.setDaysToArrival(Math.max(transitDays, 0));
+
+        part.setBrandNew(isBrandNew);
 
         // be careful in using this next line
         part.postProcessCampaignAddition();
@@ -743,7 +773,7 @@ public class Quartermaster {
                 if (part instanceof Refit) {
                     ((Refit) part).addRefitKitParts(transitDays);
                 } else {
-                    addPart(part, transitDays);
+                    addPart(part, transitDays, true);
                 }
                 return true;
             } else {
@@ -753,7 +783,7 @@ public class Quartermaster {
             if (part instanceof Refit) {
                 ((Refit) part).addRefitKitParts(transitDays);
             } else {
-                addPart(part, transitDays);
+                addPart(part, transitDays, true);
             }
             return true;
         }
