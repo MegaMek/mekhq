@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 
 import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_HR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
+import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.CHRONIC_LATENESS;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.MAXIMUM_VARIATIONS;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.NONE;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.OBJECT;
@@ -58,6 +59,13 @@ public class PersonalityQuirkTest {
         PersonalityQuirk status = PersonalityQuirk.fromString("");
 
         assertEquals(NONE, status);
+    }
+
+    @Test
+    public void testFromString_Ordinal() {
+        PersonalityQuirk status = PersonalityQuirk.fromString(CHRONIC_LATENESS.ordinal() + "");
+
+        assertEquals(CHRONIC_LATENESS, status);
     }
 
     @Test

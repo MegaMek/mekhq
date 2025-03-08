@@ -276,7 +276,11 @@ public enum PersonalityQuirk {
     NEMESIS,
     FEAR_MEKS,
     LOCAL_CONNECTOR,
-    HATRED;
+    HATRED,
+    PANTSLESS,
+    MAKES_CLOTHES,
+    DESTINY,
+    ACTS_SUSPICIOUSLY;
     // endregion Enum Declarations
 
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
@@ -363,7 +367,7 @@ public enum PersonalityQuirk {
         }
 
         String lanceLabelUppercase  = getFormattedTextAt(RESOURCE_BUNDLE,
-            formationKey + '.' + factionKey + ".uppercase");
+            formationKey + '.' + factionKey);
         String lanceLabelLowercase = lanceLabelUppercase.toLowerCase();
 
         // {0} = givenName
