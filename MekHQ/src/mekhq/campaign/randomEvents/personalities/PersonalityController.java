@@ -120,7 +120,7 @@ public class PersonalityController {
      */
     public static void generateAndApplyPersonalityQuirk(Person person) {
         // This ensures we're rolling a value between 1 and the maximum index in the enum
-        int traitRoll = 1 + randomInt(PersonalityQuirk.values().length - 1);
+        int traitRoll = randomInt(PersonalityQuirk.values().length) + 1;
         String traitIndex = String.valueOf(traitRoll);
 
         person.setPersonalityQuirk(PersonalityQuirk.fromString(traitIndex));
@@ -169,7 +169,7 @@ public class PersonalityController {
      */
     private static String getTraitIndex(final int majorTraitsStartIndex) {
         // This gives us a random number between 1 and the start of the major traits
-        int traitRoll = randomInt(majorTraitsStartIndex + 1);
+        int traitRoll = randomInt(majorTraitsStartIndex) + 1;
 
         if (traitRoll == majorTraitsStartIndex) {
             // We're deliberately not using d6() here as we want 0 to be a possibility

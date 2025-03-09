@@ -84,7 +84,9 @@ public class PersonalityQuirkTest {
         Faction originFaction = Factions.getInstance().getFaction("MERC");
         for (PersonalityQuirk trait : PersonalityQuirk.values()) {
             for (int i = 0; i < 3; i++) {
-                String description = trait.getDescription(ADMINISTRATOR_HR, i, Gender.MALE, originFaction, "Barry");
+                String description = trait.getDescription(ADMINISTRATOR_HR, i, Gender.MALE, originFaction,
+                    "Barry");
+
                 assertTrue(isResourceKeyValid(description));
             }
         }
@@ -94,7 +96,9 @@ public class PersonalityQuirkTest {
     public void testGetDescription_InvalidDescriptionIndex() {
         Faction originFaction = Factions.getInstance().getFaction("MERC");
 
-        String description = NONE.getDescription(MEKWARRIOR, MAXIMUM_VARIATIONS, Gender.MALE, originFaction, "Barry");
+        String description = NONE.getDescription(MEKWARRIOR, MAXIMUM_VARIATIONS, Gender.MALE, originFaction,
+            "Barry");
+
         assertTrue(isResourceKeyValid(description));
     }
 }

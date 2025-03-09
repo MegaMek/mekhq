@@ -279,8 +279,18 @@ public enum PersonalityQuirk {
     HATRED,
     PANTSLESS,
     MAKES_CLOTHES,
-    DESTINY,
-    ACTS_SUSPICIOUSLY;
+    ACTS_SUSPICIOUSLY,
+    NIGHTMARES,
+    FREEZES,
+    TRAUMATIZED,
+    HAUNTED,
+    BROKEN,
+    REGRETS,
+    DARK_SECRET,
+    ANTHROPOMORPHIC,
+    CLUMSY,
+    JUSTIFIES,
+    ENJOYS_DRAMA;
     // endregion Enum Declarations
 
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
