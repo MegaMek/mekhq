@@ -1,16 +1,29 @@
 /*
- * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option)
- * any later version.
+ * This file is part of MekHQ.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 
 package mekhq.campaign.autoresolve;
@@ -80,12 +93,14 @@ public class OrderFactory {
             default:
                 // do nothing for custom bc what can be done?
                 break;
-        };
+        }
+        ;
     }
+
     // Make the enemy withdraw
     private void createForceWithdrawOrder(int ownerId, ScenarioObjective objective) {
         var orderBuilder = Order.OrderBuilder.anOrder(ownerId, OrderType.ATTACK_TARGET_NOT_WITHDRAWING)
-            .withCondition(Condition.alwaysTrue());
+                .withCondition(Condition.alwaysTrue());
         if (objective.getTimeLimitType() != ScenarioObjective.TimeLimitType.None) {
             orderBuilder.withCondition(context -> context.getCurrentRound() <= objective.getTimeLimit());
         }
@@ -95,20 +110,22 @@ public class OrderFactory {
     private void createReachMapEdgeOrder(int ownerId, ScenarioObjective objective) {
         if (objective.getDestinationEdge() != null && objective.getDestinationEdge() != OffBoardDirection.NONE) {
             var northSide = Set.of(OffBoardDirection.NORTH, OffBoardDirection.EAST);
-            var orderType = northSide.contains(objective.getDestinationEdge()) ? OrderType.FLEE_NORTH : OrderType.FLEE_SOUTH;
+            var orderType = northSide.contains(objective.getDestinationEdge()) ? OrderType.FLEE_NORTH
+                    : OrderType.FLEE_SOUTH;
             var orderBuilder = Order.OrderBuilder.anOrder(ownerId, orderType)
-                .withCondition(Condition.alwaysTrue());
+                    .withCondition(Condition.alwaysTrue());
             orders.add(orderBuilder.build());
         } else {
-            var orderBuilder = Order.OrderBuilder.anOrder(ownerId, scenario.getStartingPos() > 4 ? OrderType.FLEE_NORTH : OrderType.FLEE_SOUTH)
-                .withCondition(Condition.alwaysTrue());
+            var orderBuilder = Order.OrderBuilder
+                    .anOrder(ownerId, scenario.getStartingPos() > 4 ? OrderType.FLEE_NORTH : OrderType.FLEE_SOUTH)
+                    .withCondition(Condition.alwaysTrue());
             addOrder(orderBuilder.build());
         }
     }
 
     private void createPreventReachMapEdgeOrder(int ownerId, ScenarioObjective objective) {
         var orderBuilder = Order.OrderBuilder.anOrder(ownerId, OrderType.ATTACK_TARGET_WITHDRAWING)
-            .withCondition(Condition.alwaysTrue());
+                .withCondition(Condition.alwaysTrue());
         if (objective.getTimeLimitType() != ScenarioObjective.TimeLimitType.None) {
             orderBuilder.withCondition(context -> context.getCurrentRound() <= objective.getTimeLimit());
         }
@@ -128,79 +145,85 @@ public class OrderFactory {
 
     private Order createOrderForPreserveAssociatedForces(int ownerId, ScenarioObjective objective) {
         var orderBuilder = Order.OrderBuilder.anOrder(ownerId, OrderType.WITHDRAW_IF_CONDITION_IS_MET)
-            .withCondition(context -> {
-                var attackTypeOrders = Set.of(OrderType.ATTACK_TARGET, OrderType.ATTACK_TARGET_NOT_WITHDRAWING, OrderType.ATTACK_TARGET_WITHDRAWING);
-                var hasOutstandingAttackOrders = context.getOrders().getOrders(ownerId).stream()
-                    .filter(o -> attackTypeOrders.contains(o.getOrderType())).anyMatch(order -> order.isEligible(context));
-                int totalUnits = 0;
-                var currentUnits = 0;
-                for (var forceName : objective.getAssociatedForceNames()) {
-                    for (var force : context.getForces().getTopLevelForces()) {
-                        if (force.getName().equals(forceName)) {
-                            totalUnits += force.getEntities().size();
-                            for (var entityId : force.getEntities()) {
-                                currentUnits += context.getSelectedEntityCount(entity -> entity.getId() == entityId);
+                .withCondition(context -> {
+                    var attackTypeOrders = Set.of(OrderType.ATTACK_TARGET, OrderType.ATTACK_TARGET_NOT_WITHDRAWING,
+                            OrderType.ATTACK_TARGET_WITHDRAWING);
+                    var hasOutstandingAttackOrders = context.getOrders().getOrders(ownerId).stream()
+                            .filter(o -> attackTypeOrders.contains(o.getOrderType()))
+                            .anyMatch(order -> order.isEligible(context));
+                    int totalUnits = 0;
+                    var currentUnits = 0;
+                    for (var forceName : objective.getAssociatedForceNames()) {
+                        for (var force : context.getForces().getTopLevelForces()) {
+                            if (force.getName().equals(forceName)) {
+                                totalUnits += force.getEntities().size();
+                                for (var entityId : force.getEntities()) {
+                                    currentUnits += context
+                                            .getSelectedEntityCount(entity -> entity.getId() == entityId);
+                                }
                             }
                         }
                     }
-                }
 
-                if (totalUnits == 0) {
-                    return true;
-                } else {
-
-                    var timeLimit = false;
-                    if (objective.getTimeLimitType() != ScenarioObjective.TimeLimitType.None && objective.isTimeLimitAtMost()) {
-                        timeLimit = context.getCurrentRound() >= objective.getTimeLimit();
-                    }
-                    if (!hasOutstandingAttackOrders) {
-                        if (objective.getAmountType().equals(ScenarioObjective.ObjectiveAmountType.Fixed)) {
-                            return currentUnits < objective.getFixedAmount() || timeLimit;
-                        } else {
-                            int percent = (int) ((totalUnits / (double) currentUnits) * 100);
-                            return percent < objective.getPercentage() || timeLimit;
-                        }
+                    if (totalUnits == 0) {
+                        return true;
                     } else {
-                        if (timeLimit) {
-                            return context.getCurrentRound() >= objective.getTimeLimit();
+
+                        var timeLimit = false;
+                        if (objective.getTimeLimitType() != ScenarioObjective.TimeLimitType.None
+                                && objective.isTimeLimitAtMost()) {
+                            timeLimit = context.getCurrentRound() >= objective.getTimeLimit();
+                        }
+                        if (!hasOutstandingAttackOrders) {
+                            if (objective.getAmountType().equals(ScenarioObjective.ObjectiveAmountType.Fixed)) {
+                                return currentUnits < objective.getFixedAmount() || timeLimit;
+                            } else {
+                                int percent = (int) ((totalUnits / (double) currentUnits) * 100);
+                                return percent < objective.getPercentage() || timeLimit;
+                            }
                         } else {
-                            return true;
+                            if (timeLimit) {
+                                return context.getCurrentRound() >= objective.getTimeLimit();
+                            } else {
+                                return true;
+                            }
                         }
                     }
-                }
-            });
+                });
 
         return orderBuilder.build();
     }
 
     private Order createOrderForPreserveAssociatedUnits(int ownerId, ScenarioObjective objective) {
         var orderBuilder = Order.OrderBuilder.anOrder(ownerId, OrderType.WITHDRAW_IF_CONDITION_IS_MET)
-            .withCondition(context -> {
-                var inGameObjects = context.getInGameObjects();
-                var unitIds = objective.getAssociatedUnitIDs();
-                var entitiesOfInterest = inGameObjects.stream().filter(Entity.class::isInstance).map(Entity.class::cast)
-                    .filter(e -> e.getOwnerId() == ownerId).toList();
-                var currentUnits = 0;
-                var totalUnits = unitIds.size();
-                if (totalUnits == 0) {
-                    return true;
-                }
-                for (var unit : entitiesOfInterest) {
-                    if (unitIds.contains(unit.getExternalIdAsString())) {
-                        currentUnits++;
+                .withCondition(context -> {
+                    var inGameObjects = context.getInGameObjects();
+                    var unitIds = objective.getAssociatedUnitIDs();
+                    var entitiesOfInterest = inGameObjects.stream().filter(Entity.class::isInstance)
+                            .map(Entity.class::cast)
+                            .filter(e -> e.getOwnerId() == ownerId).toList();
+                    var currentUnits = 0;
+                    var totalUnits = unitIds.size();
+                    if (totalUnits == 0) {
+                        return true;
                     }
-                }
-                var timeLimit = false;
-                if (objective.getTimeLimitType() != ScenarioObjective.TimeLimitType.None && objective.isTimeLimitAtMost()) {
-                    timeLimit = context.getCurrentRound() >= objective.getTimeLimit();
-                }
-                if (objective.getAmountType().equals(ScenarioObjective.ObjectiveAmountType.Fixed)) {
-                    return currentUnits < objective.getFixedAmount() || timeLimit;
-                } else {
-                    int percent = (int) ((totalUnits / (double) currentUnits) * 100);
-                    return percent < objective.getPercentage() || timeLimit;
-                }
-            });
+                    for (var unit : entitiesOfInterest) {
+                        if (unitIds.contains(unit.getExternalIdAsString())) {
+                            currentUnits++;
+                        }
+                    }
+                    var timeLimit = false;
+                    if (objective.getTimeLimitType() != ScenarioObjective.TimeLimitType.None
+                            && objective.isTimeLimitAtMost()) {
+                        timeLimit = context.getCurrentRound() >= objective.getTimeLimit();
+                    }
+                    if (objective.getAmountType().equals(ScenarioObjective.ObjectiveAmountType.Fixed)) {
+                        return currentUnits < objective.getFixedAmount() || timeLimit;
+                    } else {
+                        int percent = (int) ((totalUnits / (double) currentUnits) * 100);
+                        return percent < objective.getPercentage() || timeLimit;
+                    }
+                });
         return orderBuilder.build();
     }
 
@@ -210,10 +233,11 @@ public class OrderFactory {
             orderBuilder.withCondition(Condition.alwaysTrue());
         } else {
             orderBuilder.withCondition(context -> {
-                var enemyPlayers = context.getPlayersList().stream().filter(p -> p.isEnemyOf(campaign.getPlayer())).toList();
+                var enemyPlayers = context.getPlayersList().stream().filter(p -> p.isEnemyOf(campaign.getPlayer()))
+                        .toList();
                 var totalUnits = 0;
                 var currentUnits = 0;
-                for (var player: enemyPlayers) {
+                for (var player : enemyPlayers) {
                     totalUnits += context.getStartingNumberOfUnits(player.getId());
                     currentUnits += context.getActiveFormations(player).size();
                 }

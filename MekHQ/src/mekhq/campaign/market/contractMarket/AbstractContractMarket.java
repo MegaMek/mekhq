@@ -1,3 +1,30 @@
+/*
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ */
 package mekhq.campaign.market.contractMarket;
 
 import megamek.Version;
@@ -56,7 +83,7 @@ public abstract class AbstractContractMarket {
     /**
      * An arbitrary maximum number of attempts to generate a contract.
      */
-    protected final static int MAXIMUM_GENERATION_RETRIES = 3;
+    protected static final int MAXIMUM_GENERATION_RETRIES = 3;
 
     /* It is possible to call addFollowup more than once for the
      * same contract by canceling the dialog and running it again;
@@ -71,7 +98,7 @@ public abstract class AbstractContractMarket {
      * An arbitrary maximum number of attempts to find a random employer faction that
      * is not a Mercenary.
      */
-    protected final static int MAXIMUM_ATTEMPTS_TO_FIND_NON_MERC_EMPLOYER = 20;
+    protected static final int MAXIMUM_ATTEMPTS_TO_FIND_NON_MERC_EMPLOYER = 20;
 
     private final ContractMarketMethod method;
     private static final MMLogger logger = MMLogger.create(AbstractContractMarket.class);
@@ -82,14 +109,14 @@ public abstract class AbstractContractMarket {
      * @param campaign
      * @return The newly generated contract
      */
-    abstract public AtBContract addAtBContract(Campaign campaign);
+    public abstract AtBContract addAtBContract(Campaign campaign);
 
     /**
      * Generate available contract offers for the player's force.
      * @param campaign
      * @param newCampaign Boolean indicating whether this is a fresh campaign.
      */
-    abstract public void generateContractOffers(Campaign campaign, boolean newCampaign);
+    public abstract void generateContractOffers(Campaign campaign, boolean newCampaign);
 
     /**
      * Generate followup contracts and add them to the market if the currently selected market type
@@ -98,7 +125,7 @@ public abstract class AbstractContractMarket {
      * @param campaign The current campaign.
      * @param contract The AtBContract being completed and used as a basis for followup missions
      */
-    abstract public void checkForFollowup(Campaign campaign, AtBContract contract);
+    public abstract void checkForFollowup(Campaign campaign, AtBContract contract);
 
     /**
      * Calculate the total payment modifier for the contract based on the configured market method
@@ -107,7 +134,7 @@ public abstract class AbstractContractMarket {
      * @param contract
      * @return a double representing the total payment multiplier.
      */
-    abstract public double calculatePaymentMultiplier(Campaign campaign, AtBContract contract);
+    public abstract double calculatePaymentMultiplier(Campaign campaign, AtBContract contract);
 
     protected AbstractContractMarket(final ContractMarketMethod method) {
         this.method = method;

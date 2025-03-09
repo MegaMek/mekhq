@@ -1,7 +1,7 @@
 /*
  * ChangePersonStoryTrigger.java
  *
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved
+ * Copyright (c) 2021-2025 - The MegaMek Team. All Rights Reserved
  *
  * This file is part of MekHQ.
  *
@@ -20,13 +20,6 @@
  */
 package mekhq.campaign.storyarc.storytrigger;
 
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.util.UUID;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -35,6 +28,12 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.storyarc.StoryTrigger;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.util.UUID;
 
 /**
  * A StoryTrigger that can change various characteristics of a Person
@@ -162,13 +161,13 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
                 if (wn2.getNodeName().equalsIgnoreCase("personId")) {
                     personId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
-                    status = PersonnelStatus.parseFromString(wn2.getTextContent().trim());
+                    status = PersonnelStatus.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("takeUnit")) {
                     takeUnit = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("addHits")) {
                     addHits = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("deathStatusHits")) {
-                    deathStatusHits = PersonnelStatus.parseFromString(wn2.getTextContent().trim());
+                    deathStatusHits = PersonnelStatus.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("healHits")) {
                     healHits = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {

@@ -111,6 +111,15 @@ MEKHQ VERSION HISTORY:
 + PR #6157: Updated Battlefield Control Logic in Scenarios
 + PR #6159: Renamed `getAvailableForceIDs` Method to `getAvailableForceIDsForManualDeployment` For Improved Clarity
 + PR #6160: Replaced Magic Numbers With Constants For Scenario IDs
++ FIX #5829: ACAR - automatically change the color of the bot for another color if there is a collision
++ FIX #6059: PACAR auto-start only when using CommanderGUI
++ PR #6169: Updated Warehouse Parts Table To Better Indicate Brand-New Status in Quality Column
++ RFE #5919: Make Daily Log Killed in Action Text Show up in Red
++ Fix #6166: Corrected Resupply Interception Placeholder Messages
++ Fix #6169: Updated Reinforcement Logic to Better Support GM Overrides
++ PR #6173: Corrected Support Points Removal Logic
++ Fix #6174: Fixed new dependants claiming own name as job title in daily report
++ PR #6177: Drones are marked as unsupported units in MekHQ until they can be implemented in MegaMek
 
 
 0.50.03 (2025-02-02 2030 UTC)
