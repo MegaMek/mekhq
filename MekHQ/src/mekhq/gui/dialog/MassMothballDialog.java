@@ -1,22 +1,29 @@
 /*
- * MassMothballDialog.java
- *
- * Copyright (c) 2018 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.dialog;
 
@@ -53,7 +60,7 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * This class handles the display of the Mass Mothball/Reactivate dialog
- * 
+ *
  * @author NickAragua
  */
 public class MassMothballDialog extends JDialog implements ActionListener, ListSelectionListener {
@@ -71,7 +78,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
 
     /**
      * Constructor
-     * 
+     *
      * @param frame    MekHQ frame
      * @param units    An array of unit IDs to mothball/activate
      * @param campaign Campaign with which we're working
@@ -131,7 +138,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
 
     /**
      * Adds the table headers to the content pane
-     * 
+     *
      * @param gbc the input gridBagConstraints to use
      */
     private void addTableHeaders(GridBagConstraints gbc) {
@@ -158,7 +165,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
 
     /**
      * Adds a row of units, techs and time summary to the content pane
-     * 
+     *
      * @param unitType the unit's type, as an int
      * @param gbc      the input gridBagConstraints to use
      */
@@ -217,7 +224,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
 
     /**
      * Renders the mothball/activate button on the content pane
-     * 
+     *
      * @param activate true to activate, otherwise false for mothball
      * @param gbc      the input gridBagConstraints to use
      */
@@ -249,7 +256,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
     /**
      * Worker function that sorts out the passed-in units by unit type and stores
      * them in the local dictionary.
-     * 
+     *
      * @param units Units to sort
      */
     private void sortUnitsByType(Unit[] units) {
@@ -339,7 +346,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
     /**
      * Worker function that determines the "completion time" text based on the
      * passed-in number.
-     * 
+     *
      * @param completionTime How many minutes to complete the work.
      * @return Displayable text.
      */
@@ -355,7 +362,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
     /**
      * Custom list cell renderer that displays a * next to the name of a person
      * who's maintaining units.
-     * 
+     *
      * @author NickAragua
      */
     private static class TechListCellRenderer extends DefaultListCellRenderer {

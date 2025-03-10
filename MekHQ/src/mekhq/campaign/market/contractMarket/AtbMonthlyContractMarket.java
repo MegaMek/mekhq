@@ -4,12 +4,12 @@
  *
  * This file is part of MekHQ.
  *
- * MegaMek is free software: you can redistribute it and/or modify
+ * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License (GPL),
  * version 3 or (at your option) any later version,
  * as published by the Free Software Foundation.
  *
- * MegaMek is distributed in the hope that it will be useful,
+ * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
@@ -351,6 +351,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                         .withLocale(MekHQ.getMHQOptions().getDateLocale())), employer,
                         contract.getSystem().getName(contract.getStartDate()), contract.getContractType()));
 
+        contract.clanTechSalvageOverride();
+
         return contract;
     }
 
@@ -442,6 +444,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                         .withLocale(MekHQ.getMHQOptions().getDateLocale())), contract.getEmployer(),
                 contract.getSystem().getName(parent.getStartDate()), contract.getContractType()));
 
+        contract.clanTechSalvageOverride();
+
         return contract;
     }
 
@@ -507,6 +511,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         followup.setPartsAvailabilityLevel(followup.getContractType().calculatePartsAvailabilityLevel());
         followup.initContractDetails(campaign);
         followup.calculateContract(campaign);
+
+        contract.clanTechSalvageOverride();
 
         contracts.add(followup);
         followupContracts.put(followup.getId(), contract.getId());

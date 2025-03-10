@@ -3,12 +3,12 @@
  *
  * This file is part of MekHQ.
  *
- * MegaMek is free software: you can redistribute it and/or modify
+ * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License (GPL),
  * version 3 or (at your option) any later version,
  * as published by the Free Software Foundation.
  *
- * MegaMek is distributed in the hope that it will be useful,
+ * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
@@ -252,6 +252,8 @@ public class CamOpsContractMarket extends AbstractContractMarket {
             contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")
                 .withLocale(MekHQ.getMHQOptions().getDateLocale())), contract.getEmployer(),
             contract.getSystem().getName(contract.getStartDate()), contract.getContractType()));
+
+        contract.clanTechSalvageOverride();
 
         return Optional.of(contract);
     }

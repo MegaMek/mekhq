@@ -120,6 +120,13 @@ MEKHQ VERSION HISTORY:
 + PR #6173: Corrected Support Points Removal Logic
 + Fix #6174: Fixed new dependants claiming own name as job title in daily report
 + PR #6177: Drones are marked as unsupported units in MekHQ until they can be implemented in MegaMek
++ Fix #6180: Fixed Parts in Use Dialog selling wrong number of parts
++ PR #6190: Enforced Exchange Salvage for Contracts vs. Clan Factions Prior to Tukkayid
++ PR #6195: Added null Protection During Prisoner Capture to Avoid Lockup in Non-AtB Campaigns
++ PR #6202: Fixed Non-Binary Pronoun Support for Personality Generator; Added Additional Quirks; Expanded Characteristic Variants; Fixed Personality Generator
++ PR #6203: Added Suppress Inspection Annotations To PrisonerEvents.properties
++ PR #6204: Added Suppression Of UnusedProperty Inspection Comment to CampaignOptionsDialog.properties
++ PR #6205: Added Suppression Of UnusedProperty Inspection Comment to Resupply.properties
 
 
 0.50.03 (2025-02-02 2030 UTC)
