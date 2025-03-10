@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2018-2022 - The MegaMek Team. All Rights Reserved.
- * 
+ * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ *
  * This file is part of MekHQ.
- * 
- * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.universe;
 
@@ -33,7 +42,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class RegionPerimeterTest {
-    
+
     private PlanetarySystem createMockSystem(final double x, final double y) {
         PlanetarySystem mockSystem = mock(PlanetarySystem.class);
         when(mockSystem.getX()).thenReturn(x);
@@ -41,27 +50,27 @@ public class RegionPerimeterTest {
         when(mockSystem.getId()).thenReturn(x + "," + y);
         return mockSystem;
     }
-    
+
     @Test
     public void testLeastYSorter() {
         List<Point> list = new ArrayList<>();
         list.add(new Point(-1, 3));
         list.add(new Point(2, -1));
         list.add(new Point(-1, -1));
-        
+
         list.sort(RegionPerimeter.leastYSorter);
-        
+
         assertEquals(list.get(0).getY(), -1, RegionPerimeter.EPSILON);
         assertEquals(list.get(0).getX(), -1, RegionPerimeter.EPSILON);
         assertEquals(list.get(1).getX(), 2, RegionPerimeter.EPSILON);
     }
-    
+
     @Test
     public void testVectorCrossProductSameQuadrant() {
         Point origin = new Point(0, 0);
         Point p1 = new Point(1, 1);
         Point p2 = new Point(1, 2);
-        
+
         assertTrue(RegionPerimeter.vectorCrossProduct(origin, p1, p2) > 0);
         assertTrue(RegionPerimeter.vectorCrossProduct(origin, p2, p1) < 0);
     }
@@ -71,7 +80,7 @@ public class RegionPerimeterTest {
         Point origin = new Point(0, 0);
         Point p1 = new Point(1, 1);
         Point p2 = new Point(-1, 2);
-        
+
         assertTrue(RegionPerimeter.vectorCrossProduct(origin, p1, p2) > 0);
         assertTrue(RegionPerimeter.vectorCrossProduct(origin, p2, p1) < 0);
     }
@@ -81,7 +90,7 @@ public class RegionPerimeterTest {
         Point origin = new Point(0, 0);
         Point p1 = new Point(1, 1);
         Point p2 = new Point(2, 2);
-        
+
         assertEquals(RegionPerimeter.vectorCrossProduct(origin, p1, p2), 0, RegionPerimeter.EPSILON);
     }
 
@@ -99,15 +108,15 @@ public class RegionPerimeterTest {
         list.add(points[3]);
         list.add(points[0]);
         list.add(points[2]);
-        
+
         list.sort(sorter);
-        
+
         for (int i = 0; i < list.size(); i++) {
             assertEquals(list.get(i).getX(), points[i].getX(), RegionPerimeter.EPSILON);
             assertEquals(list.get(i).getY(), points[i].getY(), RegionPerimeter.EPSILON);
         }
     }
-    
+
     @Test
     public void testFindBorderOf3x3Grid() {
         List<PlanetarySystem> list = new ArrayList<>();
@@ -116,14 +125,14 @@ public class RegionPerimeterTest {
                 list.add(createMockSystem(x, y));
             }
         }
-        
+
         RegionPerimeter border = new RegionPerimeter(list);
-        
+
         for (Point p : border.getVertices()) {
             assertTrue((Math.abs(p.getX()) == 1) || (Math.abs(p.getY()) == 1));
         }
     }
-    
+
     @Test
     public void testIsInsideRegion() {
         List<PlanetarySystem> hexagon = new ArrayList<>();
@@ -143,7 +152,7 @@ public class RegionPerimeterTest {
         assertFalse(border.isInsideRegion(new Point(-3, 0)));
         assertFalse(border.isInsideRegion(new Point(3, 0)));
     }
-    
+
     @Test
     public void testIntersectionTriangleClippedByRectangle() {
         List<Point> triangle = new ArrayList<>();
@@ -155,16 +164,16 @@ public class RegionPerimeterTest {
         rectangle.add(new Point(3, 0));
         rectangle.add(new Point(3, 4));
         rectangle.add(new Point(-3, 4));
-        
+
         List<Point> intersection = RegionPerimeter.intersection(triangle, rectangle);
-        
+
         assertTrue(intersection.contains(triangle.get(0)));
         assertFalse(intersection.contains(triangle.get(1)));
         assertFalse(intersection.contains(triangle.get(2)));
         assertTrue(intersection.contains(new Point(-1, 0)));
         assertTrue(intersection.contains(new Point(1, 0)));
     }
-    
+
     @Test
     public void testIntersectionNonOverlappingRegions() {
         List<Point> region1 = new ArrayList<>();
@@ -175,12 +184,12 @@ public class RegionPerimeterTest {
         region2.add(new Point(-3, 2));
         region2.add(new Point(-1, -2));
         region2.add(new Point(-5, -2));
-        
+
         List<Point> intersection = RegionPerimeter.intersection(region1, region2);
-        
+
         assertTrue(intersection.isEmpty());
     }
-    
+
     @Test
     public void testScaledIntersection() {
         List<PlanetarySystem> list = new ArrayList<>();
@@ -195,9 +204,9 @@ public class RegionPerimeterTest {
         list.add(createMockSystem(0, 2));
         list.add(createMockSystem(2, 2));
         RegionPerimeter r2 = new RegionPerimeter(list);
-        
+
         List<Point> intersection = r1.intersection(r2, 1.0);
-        
+
         assertEquals(intersection.size(), 4);
         assertTrue(intersection.contains(new Point(-1, -3)));
         assertTrue(intersection.contains(new Point(1, -3)));
