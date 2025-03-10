@@ -200,13 +200,14 @@ public class PartsReportDialog extends JDialog {
                 int i = 0;
                 while (sellQty > 0 && i < spares.size()) {
                     Part spare = spares.get(i);
-                    if (spare.getSellableQuantity() >= sellQty) {
+                    int spareQuantity = spare.getSellableQuantity();
+                    if (spareQuantity >= sellQty) {
                         quartermaster.sellPart(spare, sellQty);
                         break;
                     } else {
                         // Not enough quantity in this spare, so sell them all and move onto the next one
-                        quartermaster.sellPart(spare, spare.getQuantity());
-                        sellQty -= spare.getSellableQuantity();
+                        quartermaster.sellPart(spare, spareQuantity);
+                        sellQty -= spareQuantity;
                     }
                     i++;
                 }
