@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2013-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.model;
 
@@ -39,28 +48,28 @@ import java.util.ArrayList;
  */
 public class UnitTableModel extends DataTableModel {
     //region Variable Declarations
-    public final static int COL_NAME    =    0;
-    public final static int COL_TYPE    =    1;
-    public final static int COL_WCLASS    =  2;
-    public final static int COL_TECH     =   3;
-    public final static int COL_WEIGHT =     4;
-    public final static int COL_COST    =    5;
-    public final static int COL_STATUS   =   6;
-    public final static int COL_CONDITION  = 7;
-    public final static int COL_CREW_STATE = 8;
-    public final static int COL_QUALITY  =   9;
-    public final static int COL_PILOT    =   10;
-    public final static int COL_FORCE    =   11;
-    public final static int COL_CREW     =   12;
-    public final static int COL_TECH_CRW =   13;
-    public final static int COL_MAINTAIN  =  14;
-    public final static int COL_BV        =  15;
-    public final static int COL_REPAIR  =    16;
-    public final static int COL_PARTS    =   17;
-    public final static int COL_SITE     =   18;
-    public final static int COL_QUIRKS   =   19;
-    public final static int COL_RSTATUS   =  20;
-    public final static int N_COL =          21;
+    public static final int COL_NAME    =    0;
+    public static final int COL_TYPE    =    1;
+    public static final int COL_WCLASS    =  2;
+    public static final int COL_TECH     =   3;
+    public static final int COL_WEIGHT =     4;
+    public static final int COL_COST    =    5;
+    public static final int COL_STATUS   =   6;
+    public static final int COL_CONDITION  = 7;
+    public static final int COL_CREW_STATE = 8;
+    public static final int COL_QUALITY  =   9;
+    public static final int COL_PILOT    =   10;
+    public static final int COL_FORCE    =   11;
+    public static final int COL_CREW     =   12;
+    public static final int COL_TECH_CRW =   13;
+    public static final int COL_MAINTAIN  =  14;
+    public static final int COL_BV        =  15;
+    public static final int COL_REPAIR  =    16;
+    public static final int COL_PARTS    =   17;
+    public static final int COL_SITE     =   18;
+    public static final int COL_QUIRKS   =   19;
+    public static final int COL_RSTATUS   =  20;
+    public static final int N_COL =          21;
 
     private Campaign campaign;
     //endregion Variable Declarations
