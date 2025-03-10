@@ -3,12 +3,12 @@
  *
  * This file is part of MekHQ.
  *
- * MegaMek is free software: you can redistribute it and/or modify
+ * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License (GPL),
  * version 3 or (at your option) any later version,
  * as published by the Free Software Foundation.
  *
- * MegaMek is distributed in the hope that it will be useful,
+ * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
@@ -38,7 +38,7 @@ import mekhq.campaign.unit.enums.TransporterType;
  * assigned a transport (another unit).
  * The different transport types primarily differ
  * in the Transporters they allow.
- * 
+ *
  * @see Unit
  * @see TransporterType
  */
@@ -53,7 +53,7 @@ public enum CampaignTransportType {
      * Ship transports are intended to be used for long-term travel or space combat
      * and only allow units to be transported in long-term Transporters like Bays or
      * Docking Collars.
-     * 
+     *
      * @see Bay
      * @see DockingCollar
      */
@@ -66,7 +66,7 @@ public enum CampaignTransportType {
      * an Infantry compartment, or Battle Armor on Battle Armor Handles. It still
      * allows
      * units to be loaded into bays though for tactical Dropship assaults.
-     * 
+     *
      * @see InfantryCompartment
      * @see BattleArmorHandles
      */
@@ -97,7 +97,7 @@ public enum CampaignTransportType {
 
     /**
      * Is this a Ship Transport?
-     * 
+     *
      * @return true if this is a SHIP_TRANSPORT
      */
     public boolean isShipTransport() {
@@ -106,7 +106,7 @@ public enum CampaignTransportType {
 
     /**
      * Is this a Tactical Transport?
-     * 
+     *
      * @return true if this is a TACTICAL_TRANSPORT
      */
     public boolean isTacticalTransport() {
@@ -115,7 +115,7 @@ public enum CampaignTransportType {
 
     /**
      * Is this a Tow Transport?
-     * 
+     *
      * @return true if this is a TOW_TRANSPORT
      */
     public boolean isTowTransport() {
@@ -127,7 +127,7 @@ public enum CampaignTransportType {
 
     /**
      * Different Transport Types use different transport assignments.
-     * 
+     *
      * @return Transport Assignment class used by this transport type
      */
     public Class<? extends ITransportAssignment> getTransportAssignmentType() {
@@ -136,7 +136,7 @@ public enum CampaignTransportType {
 
     /**
      * Different Transport Types use different transported units summaries.
-     * 
+     *
      * @return Transported Unit Summary used by this transport type
      */
     public Class<? extends AbstractTransportedUnitsSummary> getTransportedUnitsSummaryType() {

@@ -1,30 +1,37 @@
 /*
- * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.randomEvents.personalities.enums;
 
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
+import mekhq.campaign.randomEvents.personalities.PersonalityController.PronounData;
 
 import static megamek.codeUtilities.MathUtility.clamp;
-import static mekhq.campaign.personnel.enums.GenderDescriptors.HE_SHE_THEY;
-import static mekhq.campaign.personnel.enums.GenderDescriptors.HIM_HER_THEM;
-import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
@@ -92,7 +99,7 @@ public enum Social {
     /**
      * Defines the number of individual description variants available for each trait.
      */
-    public final static int MAXIMUM_VARIATIONS = 3;
+    public final static int MAXIMUM_VARIATIONS = 6;
 
     /**
      * The index at which major traits begin within the enumeration.
@@ -133,21 +140,25 @@ public enum Social {
      * @return                           a formatted description string based on the enum,
      *                                   the individual's gender, name, and aggression description index.
      */
-    public String getDescription(int socialDescriptionIndex, final Gender gender, final String givenName) {
+    public String getDescription(int socialDescriptionIndex, final Gender gender,
+                                 final String givenName) {
         socialDescriptionIndex = clamp(socialDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
 
         final String RESOURCE_KEY = name() + ".description." + socialDescriptionIndex;
+        final PronounData pronounData = new PronounData(gender);
 
-        String subjectPronoun = HE_SHE_THEY.getDescriptorCapitalized(gender);
-        String subjectPronounLowerCase = HE_SHE_THEY.getDescriptor(gender);
-        String objectPronoun = HIM_HER_THEM.getDescriptorCapitalized(gender);
-        String objectPronounLowerCase = HIM_HER_THEM.getDescriptor(gender);
-        String possessivePronoun = HIS_HER_THEIR.getDescriptorCapitalized(gender);
-        String possessivePronounLowerCase = HIS_HER_THEIR.getDescriptor(gender);
+        // {0} = givenName
+        // {1} = He/She/They
+        // {2} = he/she/they
+        // {3} = Him/Her/Them
+        // {4} = him/her/them
+        // {5} = His/Her/Their
+        // {6} = his/her/their
+        // {7} = Gender Neutral = 0, Otherwise 1 (used to determine whether to use plural case)
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, givenName, subjectPronoun,
-            subjectPronounLowerCase, objectPronoun, objectPronounLowerCase, possessivePronoun,
-            possessivePronounLowerCase);
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, givenName, pronounData.subjectPronoun(),
+            pronounData.subjectPronounLowerCase(), pronounData.objectPronoun(), pronounData.objectPronounLowerCase(),
+            pronounData.possessivePronoun(), pronounData.possessivePronounLowerCase(), pronounData.pluralizer());
     }
 
     /**
@@ -187,7 +198,7 @@ public enum Social {
     // region File I/O
     public static Social fromString(String text) {
         try {
-            return Social.valueOf(text);
+            return Social.valueOf(text.toUpperCase().replace(" ", "_"));
         } catch (Exception ignored) {}
 
         try {

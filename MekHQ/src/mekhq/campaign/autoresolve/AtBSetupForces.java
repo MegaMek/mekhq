@@ -3,12 +3,12 @@
  *
  * This file is part of MekHQ.
  *
- * MegaMek is free software: you can redistribute it and/or modify
+ * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License (GPL),
  * version 3 or (at your option) any later version,
  * as published by the Free Software Foundation.
  *
- * MegaMek is distributed in the hope that it will be useful,
+ * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
@@ -98,7 +98,7 @@ public class AtBSetupForces extends SetupForces {
 
     /**
      * Create the forces for the game object, using the campaign, units and scenario
-     * 
+     *
      * @param game The game object to setup the forces in
      */
     public void createForcesOnSimulation(SimulationContext game) {
@@ -133,7 +133,7 @@ public class AtBSetupForces extends SetupForces {
      * it converts every top level force into a single formation, and those
      * formations are then added to the game
      * and used in the auto resolve in place of the original entities
-     * 
+     *
      * @param game The game object to convert the forces in
      */
     private void convertForcesIntoFormations(SimulationContext game) {
@@ -157,7 +157,7 @@ public class AtBSetupForces extends SetupForces {
     /**
      * Setup the player, its forces and entities in the game, it also sets the
      * player skill level.
-     * 
+     *
      * @param game The game object to setup the player in
      */
     private void setupPlayer(SimulationContext game) {
@@ -172,7 +172,7 @@ public class AtBSetupForces extends SetupForces {
     /**
      * Setup the bots, their forces and entities in the game, it also sets the
      * player skill level.
-     * 
+     *
      * @param game The game object to setup the bots in
      */
     private void setupBots(SimulationContext game) {
@@ -212,7 +212,7 @@ public class AtBSetupForces extends SetupForces {
     /**
      * Create a player object from the campaign and scenario wichi doesnt have a
      * reference to the original player
-     * 
+     *
      * @return The clean player object
      */
     private Player getCleanPlayer() {
@@ -238,7 +238,7 @@ public class AtBSetupForces extends SetupForces {
 
     /**
      * Setup the player forces and entities for the game
-     * 
+     *
      * @param player The player object to setup the forces for
      * @return A list of entities for the player
      */
@@ -348,7 +348,7 @@ public class AtBSetupForces extends SetupForces {
     /**
      * Setup the map settings for the game, not relevant at the moment, as the map
      * settings are not used in the autoresolve currently
-     * 
+     *
      * @return The map settings object
      */
     private MapSettings setupMapSettings() {
@@ -402,7 +402,7 @@ public class AtBSetupForces extends SetupForces {
 
     /**
      * Configure the bot player object with the bot force data
-     * 
+     *
      * @param bot      The bot player object
      * @param botForce The bot force data
      */
@@ -427,7 +427,7 @@ public class AtBSetupForces extends SetupForces {
 
     /**
      * Setup the bot entities for the game
-     * 
+     *
      * @param bot              The bot player object
      * @param originalEntities The original entities for the bot
      * @param deployRound      The deployment round for the bot
@@ -462,7 +462,7 @@ public class AtBSetupForces extends SetupForces {
     /**
      * Get the planetary conditions for the game, not used at the moment in the auto
      * resolve, but planed for the future
-     * 
+     *
      * @return The planetary conditions object
      */
     private PlanetaryConditions getPlanetaryConditions() {
@@ -487,7 +487,7 @@ public class AtBSetupForces extends SetupForces {
 
     /**
      * Send the entities to the game object
-     * 
+     *
      * @param entities The entities to send
      * @param game     the game object to send the entities to
      */
