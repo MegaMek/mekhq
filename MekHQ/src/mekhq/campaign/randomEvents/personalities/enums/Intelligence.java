@@ -3,12 +3,12 @@
  *
  * This file is part of MekHQ.
  *
- * MegaMek is free software: you can redistribute it and/or modify
+ * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License (GPL),
  * version 3 or (at your option) any later version,
  * as published by the Free Software Foundation.
  *
- * MegaMek is distributed in the hope that it will be useful,
+ * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
@@ -29,11 +29,9 @@ package mekhq.campaign.randomEvents.personalities.enums;
 
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
+import mekhq.campaign.randomEvents.personalities.PersonalityController.PronounData;
 
 import static megamek.codeUtilities.MathUtility.clamp;
-import static mekhq.campaign.personnel.enums.GenderDescriptors.HE_SHE_THEY;
-import static mekhq.campaign.personnel.enums.GenderDescriptors.HIM_HER_THEM;
-import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
@@ -165,21 +163,25 @@ public enum Intelligence {
      * @return                           a formatted description string based on the enum,
      *                                   the individual's gender, name, and aggression description index.
      */
-    public String getDescription(int intelligenceDescriptionIndex, final Gender gender, final String givenName) {
-        final int descriptionIndex = clamp(intelligenceDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
+    public String getDescription(int intelligenceDescriptionIndex, final Gender gender,
+                                 final String givenName) {
+        intelligenceDescriptionIndex = clamp(intelligenceDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
 
-        final String RESOURCE_KEY = this.getComparison().name() + ".description." + descriptionIndex;
+        final String RESOURCE_KEY = comparison + ".description." + intelligenceDescriptionIndex;
+        final PronounData pronounData = new PronounData(gender);
 
-        String subjectPronoun = HE_SHE_THEY.getDescriptorCapitalized(gender);
-        String subjectPronounLowerCase = HE_SHE_THEY.getDescriptor(gender);
-        String objectPronoun = HIM_HER_THEM.getDescriptorCapitalized(gender);
-        String objectPronounLowerCase = HIM_HER_THEM.getDescriptor(gender);
-        String possessivePronoun = HIS_HER_THEIR.getDescriptorCapitalized(gender);
-        String possessivePronounLowerCase = HIS_HER_THEIR.getDescriptor(gender);
+        // {0} = givenName
+        // {1} = He/She/They
+        // {2} = he/she/they
+        // {3} = Him/Her/Them
+        // {4} = him/her/them
+        // {5} = His/Her/Their
+        // {6} = his/her/their
+        // {7} = Gender Neutral = 0, Otherwise 1 (used to determine whether to use plural case)
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, givenName, subjectPronoun,
-            subjectPronounLowerCase, objectPronoun, objectPronounLowerCase, possessivePronoun,
-            possessivePronounLowerCase);
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, givenName, pronounData.subjectPronoun(),
+            pronounData.subjectPronounLowerCase(), pronounData.objectPronoun(), pronounData.objectPronounLowerCase(),
+            pronounData.possessivePronoun(), pronounData.possessivePronounLowerCase(), pronounData.pluralizer());
     }
 
     // region Boolean Comparison Methods
@@ -216,7 +218,7 @@ public enum Intelligence {
         } catch (Exception ignored) {}
 
 
-        MMLogger logger = MMLogger.create(Greed.class);
+        MMLogger logger = MMLogger.create(Intelligence.class);
         logger.error("Unknown Intelligence ordinal: {} - returning {}.", text, AVERAGE);
 
         return AVERAGE;
