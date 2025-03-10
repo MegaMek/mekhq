@@ -3,12 +3,12 @@
  *
  * This file is part of MekHQ.
  *
- * MegaMek is free software: you can redistribute it and/or modify
+ * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License (GPL),
  * version 3 or (at your option) any later version,
  * as published by the Free Software Foundation.
  *
- * MegaMek is distributed in the hope that it will be useful,
+ * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
@@ -74,7 +74,7 @@ import java.util.stream.Collectors;
  * @author Justin "Windchild" Bowen
  */
 public class CampaignPreset {
-    static final private Version LAST_COMPATIBLE_VERSION = new Version("0.50.02");
+    private static final Version LAST_COMPATIBLE_VERSION = new Version("0.50.02");
 
     private static final MMLogger logger = MMLogger.create(CampaignPreset.class);
 

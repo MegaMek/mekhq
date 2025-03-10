@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
- * MegaMek is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
- * MegaMek is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.model;
 
@@ -39,7 +48,6 @@ import javax.swing.border.Border;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
-import javax.swing.event.*;
 
 import mekhq.MekHQ;
 import mekhq.campaign.parts.PartInUse;
@@ -52,19 +60,19 @@ public class PartsInUseTableModel extends DataTableModel {
     }
     private static final String EMPTY_CELL = "";
 
-    public final static int COL_PART = 0;
-    public final static int COL_IN_USE = 1;
-    public final static int COL_STORED = 2;
-    public final static int COL_TONNAGE = 3;
-    public final static int COL_REQUSTED_STOCK = 4;
-    public final static int COL_IN_TRANSFER = 5;
-    public final static int COL_COST = 6;
-    public final static int COL_BUTTON_BUY  = 7;
-    public final static int COL_BUTTON_BUY_BULK  = 8;
-    public final static int COL_BUTTON_SELL = 9;
-    public final static int COL_BUTTON_SELL_BULK = 10;
-    public final static int COL_BUTTON_GMADD  = 11;
-    public final static int COL_BUTTON_GMADD_BULK  = 12;
+    public static final int COL_PART = 0;
+    public static final int COL_IN_USE = 1;
+    public static final int COL_STORED = 2;
+    public static final int COL_TONNAGE = 3;
+    public static final int COL_REQUSTED_STOCK = 4;
+    public static final int COL_IN_TRANSFER = 5;
+    public static final int COL_COST = 6;
+    public static final int COL_BUTTON_BUY  = 7;
+    public static final int COL_BUTTON_BUY_BULK  = 8;
+    public static final int COL_BUTTON_SELL = 9;
+    public static final int COL_BUTTON_SELL_BULK = 10;
+    public static final int COL_BUTTON_GMADD  = 11;
+    public static final int COL_BUTTON_GMADD_BULK  = 12;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsInUseTableModel",
             MekHQ.getMHQOptions().getLocale());
@@ -422,7 +430,7 @@ public class PartsInUseTableModel extends DataTableModel {
                     fireTableCellUpdated(rowIndex, columnIndex);
                 }
             } catch (NumberFormatException e) {
-                
+
             }
         } else {
             super.setValueAt(value, rowIndex, columnIndex);
