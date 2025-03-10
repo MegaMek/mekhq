@@ -50,13 +50,22 @@ public enum ScenarioType {
     NONE,
     SPECIAL_LOSTECH,
     SPECIAL_RESUPPLY,
-    SPECIAL_JAIL_BREAK;
+    SPECIAL_JAIL_BREAK,
+    CONVOY;
 
     /**
      * @return {@code true} if the scenario is considered a LosTech scenario, {@code false} otherwise.
      */
     public boolean isLosTech() {
         return this == SPECIAL_LOSTECH;
+    }
+
+    /**
+     * @return {@code true} if the scenario is considered a convoy scenario, {@code false} otherwise. Convoy scenarios involve the
+     * defense or interception of a convoys with supplies, VIPs, or resupplies.
+     */
+    public boolean isConvoy() {
+        return this == SPECIAL_RESUPPLY || this == CONVOY;
     }
 
     /**
@@ -110,7 +119,7 @@ public enum ScenarioType {
         } catch (Exception ignored) {}
 
         MMLogger.create(ScenarioType.class)
-            .error("Unable to parse " + text + " into an ScenarioType. Returning NONE.");
+            .warn("Unable to parse {} into an ScenarioType. Returning NONE.", text);
 
         return NONE;
     }
