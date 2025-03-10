@@ -617,12 +617,7 @@ public abstract class Part implements IPartWork, ITechnology {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "daysToArrival", daysToArrival);
         }
 
-        if (!brandNew) {
-            // The default value for Part.brandNew is true. Only store the tag if the value
-            // is false.
-            // The lack of tag in the save file will ALWAYS result in TRUE.
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "brandNew", false);
-        }
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "brandNew", brandNew);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quantity", quantity);
 
         if (daysToWait > 0) {
@@ -739,7 +734,7 @@ public abstract class Part implements IPartWork, ITechnology {
                 } else if (wn2.getNodeName().equalsIgnoreCase("isTeamSalvaging")) {
                     retVal.isTeamSalvaging = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("brandNew")) {
-                    retVal.brandNew = wn2.getTextContent().equalsIgnoreCase("true");
+                    retVal.brandNew = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("replacementId")) {
                     retVal.replacementPart = new PartRef(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("quality")) {
