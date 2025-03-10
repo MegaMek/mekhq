@@ -253,6 +253,8 @@ public class CamOpsContractMarket extends AbstractContractMarket {
                 .withLocale(MekHQ.getMHQOptions().getDateLocale())), contract.getEmployer(),
             contract.getSystem().getName(contract.getStartDate()), contract.getContractType()));
 
+        contract.clanTechSalvageOverride();
+
         return Optional.of(contract);
     }
 

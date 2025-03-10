@@ -160,22 +160,33 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * Rerolls a specific clause in a contract, usually via negotiation.
-     * @param c the contract being negotiated
-     * @param clause ID representing the type of clause.
-     * @param campaign
+     * Rerolls a specific clause in a contract, typically as part of a negotiation process.
+     * This method adjusts the clause based on the provided clause type and associated modifiers,
+     * ensuring the contract reflects updated terms.
+     *
+     * <p>The recalculated clause values can affect aspects such as command, salvage, transport,
+     * or support terms. Special rules, such as overrides for Clan technology salvage, may also be
+     * applied when rerolling specific clauses.
+     *
+     * @param contract the contract being negotiated, which will have its terms modified
+     * @param clause the type of clause to be rerolled (e.g., command, salvage, transport, or support)
+     * @param campaign the active campaign context, used to access campaign-specific options and rules
      */
-    public void rerollClause(AtBContract c, int clause, Campaign campaign) {
-        if (null != clauseMods.get(c.getId())) {
+    public void rerollClause(AtBContract contract, int clause, Campaign campaign) {
+        if (null != clauseMods.get(contract.getId())) {
             switch (clause) {
-                case CLAUSE_COMMAND -> rollCommandClause(c, clauseMods.get(c.getId()).mods[clause]);
-                case CLAUSE_SALVAGE ->
-                    rollSalvageClause(c, clauseMods.get(c.getId()).mods[clause], campaign.getCampaignOptions().getContractMaxSalvagePercentage());
-                case CLAUSE_TRANSPORT -> rollTransportClause(c, clauseMods.get(c.getId()).mods[clause]);
-                case CLAUSE_SUPPORT -> rollSupportClause(c, clauseMods.get(c.getId()).mods[clause]);
+                case CLAUSE_COMMAND -> rollCommandClause(contract, clauseMods.get(contract.getId()).mods[clause]);
+                case CLAUSE_SALVAGE -> {
+                    rollSalvageClause(contract, clauseMods.get(contract.getId()).mods[clause],
+                        campaign.getCampaignOptions().getContractMaxSalvagePercentage());
+
+                    contract.clanTechSalvageOverride();
+                }
+                case CLAUSE_TRANSPORT -> rollTransportClause(contract, clauseMods.get(contract.getId()).mods[clause]);
+                case CLAUSE_SUPPORT -> rollSupportClause(contract, clauseMods.get(contract.getId()).mods[clause]);
             }
-            clauseMods.get(c.getId()).rerollsUsed[clause]++;
-            c.calculateContract(campaign);
+            clauseMods.get(contract.getId()).rerollsUsed[clause]++;
+            contract.calculateContract(campaign);
         }
     }
 

@@ -351,6 +351,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                         .withLocale(MekHQ.getMHQOptions().getDateLocale())), employer,
                         contract.getSystem().getName(contract.getStartDate()), contract.getContractType()));
 
+        contract.clanTechSalvageOverride();
+
         return contract;
     }
 
@@ -442,6 +444,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                         .withLocale(MekHQ.getMHQOptions().getDateLocale())), contract.getEmployer(),
                 contract.getSystem().getName(parent.getStartDate()), contract.getContractType()));
 
+        contract.clanTechSalvageOverride();
+
         return contract;
     }
 
@@ -507,6 +511,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         followup.setPartsAvailabilityLevel(followup.getContractType().calculatePartsAvailabilityLevel());
         followup.initContractDetails(campaign);
         followup.calculateContract(campaign);
+
+        contract.clanTechSalvageOverride();
 
         contracts.add(followup);
         followupContracts.put(followup.getId(), contract.getId());
