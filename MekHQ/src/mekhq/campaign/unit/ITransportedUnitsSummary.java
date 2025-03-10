@@ -28,9 +28,6 @@
 
 package mekhq.campaign.unit;
 
-import megamek.common.Entity;
-import megamek.common.Infantry;
-import megamek.common.InfantryBay;
 import megamek.common.Transporter;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.enums.TransporterType;
