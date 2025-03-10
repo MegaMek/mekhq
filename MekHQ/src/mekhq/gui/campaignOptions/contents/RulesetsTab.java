@@ -34,12 +34,10 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.io.File;
 import java.util.ResourceBundle;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
-import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
 /**
  * Represents a tab in the campaign options UI for managing ruleset configurations in campaigns.
@@ -123,6 +121,7 @@ public class RulesetsTab {
     private MMComboBox<AutoResolveMethod> comboAutoResolveMethod;
     private MMComboBox<String> minimapThemeSelector;
     private JCheckBox chkAutoResolveVictoryChanceEnabled;
+    private JLabel lblMinimapTheme;
     private JCheckBox chkAutoResolveExperimentalPacarGuiEnabled;
     private JLabel lblAutoResolveNumberOfScenarios;
     private JSpinner spnAutoResolveNumberOfScenarios;
@@ -258,6 +257,7 @@ public class RulesetsTab {
         chkAutoResolveVictoryChanceEnabled = new JCheckBox();
         lblAutoResolveNumberOfScenarios = new JLabel();
         spnAutoResolveNumberOfScenarios = new JSpinner();
+        lblMinimapTheme = new JLabel();
         chkAutoResolveExperimentalPacarGuiEnabled = new JCheckBox();
         // Here we set up the options, so they can be used across both the AtB and StratCon tabs
         substantializeUniversalOptions();
@@ -392,7 +392,7 @@ public class RulesetsTab {
         spnAutoResolveNumberOfScenarios = new CampaignOptionsSpinner("AutoResolveNumberOfScenarios",
                 250, 10, 1000, 10);
         chkAutoResolveVictoryChanceEnabled = new CampaignOptionsCheckBox("AutoResolveVictoryChanceEnabled");
-        var lblMinimapTheme = new CampaignOptionsLabel("MinimapTheme");
+        lblMinimapTheme = new CampaignOptionsLabel("MinimapTheme");
         chkAutoResolveExperimentalPacarGuiEnabled = new CampaignOptionsCheckBox("AutoResolveExperimentalPacarGuiEnabled");
 
         // Layout the panel
@@ -410,7 +410,7 @@ public class RulesetsTab {
         layout.gridwidth = 1;
         panel.add(chkAutoResolveVictoryChanceEnabled, layout);
         layout.gridx++;
-        layout.gridwidth = 1;
+        layout.gridwidth = 2;
         panel.add(chkAutoResolveExperimentalPacarGuiEnabled, layout);
 
         layout.gridx = 0;
@@ -419,7 +419,6 @@ public class RulesetsTab {
         panel.add(lblMinimapTheme, layout);
         layout.gridx++;
         panel.add(minimapThemeSelector, layout);
-        layout.gridx++;
         layout.gridx++;
         panel.add(lblAutoResolveNumberOfScenarios, layout);
         layout.gridx++;
