@@ -63,6 +63,7 @@ import org.apache.commons.math3.util.Pair;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.max;
@@ -781,78 +782,148 @@ public class StratconRulesManager {
     }
 
     /**
-     * Worker function that looks through the scenario's templates and swaps in
-     * player units for "player or allied force" templates.
+     * Worker function that swaps in player units for "player or allied force" templates in a
+     * scenario. Looks through the scenario's templates and replaces bot units with player units
+     * based on the provided force information and validation rules.
+     *
+     * @param scenario       The scenario in which player units are to be swapped.
+     * @param campaign       The player's campaign containing available units and forces.
+     * @param explicitForceID The ID of an explicitly selected force. If {@code FORCE_NONE}, all
+     *                       units in the campaign's TO&E are considered.
      */
     private static void swapInPlayerUnits(StratconScenario scenario, Campaign campaign, int explicitForceID) {
-        for (ScenarioForceTemplate sft : scenario.getScenarioTemplate().getAllScenarioForces()) {
-            if (sft.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal()) {
-                int unitCount = (int) scenario.getBackingScenario().getBotUnitTemplates().values().stream()
-                        .filter(template -> template.getForceName().equals(sft.getForceName()))
-                        .count();
+        for (ScenarioForceTemplate scenarioForceTemplate : scenario.getScenarioTemplate().getAllScenarioForces()) {
+            if (scenarioForceTemplate.getGenerationMethod() != ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal()) {
+                continue;
+            }
 
-                // get all the units that have been generated for this template
+            // Calculate unit count based on bot unit templates and bot force templates
+            int unitCount = calculateUnitCount(scenario, campaign, scenarioForceTemplate);
 
-                // or the units embedded in bot forces
-                unitCount += scenario.getBackingScenario().getBotForceTemplates().entrySet().stream()
-                        .filter(tuple -> tuple.getValue().getForceName().equals(sft.getForceName()))
-                        .mapToInt(tuple -> tuple.getKey().getFullEntityList(campaign).size())
-                        .sum();
+            // Skip if there are no units to substitute
+            if (unitCount == 0) {
+                continue;
+            }
 
-                // now we have a unit count. Don't bother with the next step if we don't have
-                // any substitutions to make
-                if (unitCount == 0) {
-                    continue;
-                }
+            // Find potential units to substitute based on the explicitForceID
+            Collection<Unit> potentialUnits = findPotentialUnits(campaign, explicitForceID);
 
-                Collection<Unit> potentialUnits = new HashSet<>();
+            // Iterate through the potential units and substitute up to `unitCount` units
+            for (Unit unit : potentialUnits) {
+                if (isValidUnitForScenario(unit, scenarioForceTemplate, campaign.getCampaignOptions().isUseDropShips())) {
+                    scenario.addUnit(unit, scenarioForceTemplate.getForceName(), false);
+                    AtBDynamicScenarioFactory.benchAllyUnit(unit.getId(), scenarioForceTemplate.getForceName(), scenario.getBackingScenario());
+                    unitCount--;
 
-                // find units in player's campaign by default, all units in the TO&E are eligible
-                if (explicitForceID == FORCE_NONE) {
-                    for (UUID unitId : campaign.getForces().getUnits()) {
-                        try {
-                            potentialUnits.add(campaign.getUnit(unitId));
-                        } catch (Exception exception) {
-                            logger.error(String.format("Error retrieving unit (%s): %s",
-                                unitId, exception.getMessage()));
-                        }
-                    }
-                // if we're using a seed force, then units transporting this force are eligible
-                } else {
-                    Force force = campaign.getForce(explicitForceID);
-                    for (UUID unitID : force.getUnits()) {
-                        Unit unit = campaign.getUnit(unitID);
-                        if (unit.getTransportShipAssignment() != null) {
-                            potentialUnits.add(unit.getTransportShipAssignment().getTransportShip());
-                        }
-                    }
-                }
 
-                for (Unit unit : potentialUnits) {
-                    if ((sft.getAllowedUnitType() == 11) && (!campaign.getCampaignOptions().isUseDropShips())) {
-                        continue;
-                    }
-
-                    // if it's the right type of unit and is around
-                    if (forceCompositionMatchesDeclaredUnitType(unit.getEntity().getUnitType(),
-                            sft.getAllowedUnitType()) &&
-                            unit.isAvailable() && unit.isFunctional()) {
-
-                        // add the unit to the scenario and bench the appropriate bot unit if one is
-                        // present
-                        scenario.addUnit(unit, sft.getForceName(), false);
-                        AtBDynamicScenarioFactory.benchAllyUnit(unit.getId(), sft.getForceName(),
-                                scenario.getBackingScenario());
-                        unitCount--;
-
-                        // once we've supplied enough units, end the process
-                        if (unitCount == 0) {
-                            break;
-                        }
+                    if (unitCount == 0) {
+                        break; // Stop once enough units have been substituted
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Calculates the total unit count for a given scenario force template. This includes counting
+     * bots generated via unit templates and bot forces that are linked to the specific template.
+     *
+     * @param scenario       The scenario containing the bot data and force templates.
+     * @param campaign       The player's campaign, used to access bot unit details.
+     * @param scenarioForceTemplate The template for which the unit count is being calculated.
+     * @return The total count of units (both bot and custom bot forces) linked to the template.
+     */
+    private static int calculateUnitCount(StratconScenario scenario, Campaign campaign,
+                                          ScenarioForceTemplate scenarioForceTemplate) {
+        int unitCount = 0;
+
+        // Count bot unit templates that match the force name
+        for (ScenarioForceTemplate template : scenario.getBackingScenario().getBotUnitTemplates().values()) {
+            if (template.getForceName().equals(scenarioForceTemplate.getForceName())) {
+                unitCount++;
+            }
+        }
+
+        // Add bot force units that match the force name
+        for (Entry<BotForce, ScenarioForceTemplate> entry : scenario.getBackingScenario().getBotForceTemplates().entrySet()) {
+            BotForce key = entry.getKey();
+            ScenarioForceTemplate value = entry.getValue();
+
+            if (value.getForceName().equals(scenarioForceTemplate.getForceName())) {
+                unitCount += key.getFullEntityList(campaign).size();
+            }
+        }
+
+        return unitCount;
+    }
+
+    /**
+     * Retrieves a collection of potential units from the player's campaign for use in substitution.
+     * If {@code explicitForceID} is {@code FORCE_NONE}, all units from the campaign's TO&E
+     * are considered. Otherwise, the units in the specified force's transport ships are included.
+     *
+     * @param campaign       The player's campaign containing potential units for substitution.
+     * @param explicitForceID The ID of the force the player is explicitly using for substitution.
+     *                        If {@code FORCE_NONE}, the entire TO&E is considered.
+     * @return A collection of units that are eligible for substitution into the scenario.
+     */
+    private static Collection<Unit> findPotentialUnits(Campaign campaign, int explicitForceID) {
+        Collection<Unit> potentialUnits = new HashSet<>();
+
+        if (explicitForceID == FORCE_NONE) {
+            // Include all units in the campaign's TO&E
+            for (UUID unitId : campaign.getForces().getAllUnits(false)) {
+                try {
+                    potentialUnits.add(campaign.getUnit(unitId));
+                } catch (Exception exception) {
+                    logger.error(String.format("Error retrieving unit (%s): %s", unitId, exception.getMessage()));
+                }
+            }
+        } else {
+            // Include only those units transporting the seed force
+            Force force = campaign.getForce(explicitForceID);
+
+            if (force == null) {
+                return Collections.emptyList();
+            }
+
+            for (UUID unitID : force.getUnits()) {
+                Unit unit = campaign.getUnit(unitID);
+
+                if (unit == null) {
+                    continue;
+                }
+
+                if (unit.getTransportShipAssignment() != null) {
+                    potentialUnits.add(unit.getTransportShipAssignment().getTransportShip());
+                }
+            }
+        }
+
+        return potentialUnits;
+    }
+
+    /**
+     * Validates if a given unit can be included in the scenario based on the template's rules and
+     * restrictions. It checks unit type, availability, functionality, and specific conditions such
+     * as DropShip usage.
+     *
+     * @param unit                   The unit to validate.
+     * @param scenarioForceTemplate  The force template containing the rules for unit validation.
+     * @param isUsePlayerDropShips   Indicates if DropShips are allowed based on campaign options.
+     * @return {@code true} if the unit matches the template's requirements and can be included in
+     * the scenario, {@code false} otherwise.
+     */
+    private static boolean isValidUnitForScenario(Unit unit, ScenarioForceTemplate scenarioForceTemplate,
+                                                  boolean isUsePlayerDropShips) {
+        // Check if DropShips are allowed and the correct unit type matches
+        if (scenarioForceTemplate.getAllowedUnitType() == 11 && !isUsePlayerDropShips) {
+            return false;
+        }
+
+        // Validate the unit type, availability, and functionality
+        return forceCompositionMatchesDeclaredUnitType(unit.getEntity().getUnitType(), scenarioForceTemplate.getAllowedUnitType()) &&
+              unit.isAvailable() && unit.isFunctional();
     }
 
     /**
