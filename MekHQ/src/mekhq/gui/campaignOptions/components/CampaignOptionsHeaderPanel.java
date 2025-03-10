@@ -33,8 +33,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ResourceBundle;
 
-import static java.lang.Math.round;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
 /**
  * A specialized {@link JPanel} designed for headers in the campaign options dialog.
@@ -87,11 +87,7 @@ public class CampaignOptionsHeaderPanel extends JPanel {
     public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText) {
         // Load and scale the image using the provided file path
         ImageIcon imageIcon = new ImageIcon(imageAddress);
-        int width = (int) UIUtil.scaleForGUI(round(imageIcon.getIconWidth() * 0.75));
-        int height = (int) UIUtil.scaleForGUI(round(imageIcon.getIconHeight() * 0.75));
-        Image image = imageIcon.getImage();
-        Image scaledImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-        imageIcon = new ImageIcon(scaledImage);
+        imageIcon = scaleImageIconToWidth(imageIcon, UIUtil.scaleForGUI(100));
 
         // Create a JLabel to display the image in the panel
         JLabel lblImage = new JLabel(imageIcon);

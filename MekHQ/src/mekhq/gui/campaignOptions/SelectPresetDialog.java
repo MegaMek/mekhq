@@ -40,6 +40,7 @@ import java.awt.*;
 import java.util.ResourceBundle;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
+import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
 /**
  * A dialog for selecting campaign presets. Extends {@link JDialog}.
@@ -94,14 +95,8 @@ public class SelectPresetDialog extends JDialog {
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
         ImageIcon imageIcon = new ImageIcon("data/images/misc/megamek-splash.png");
+        imageIcon = scaleImageIconToWidth(imageIcon, UIUtil.scaleForGUI(400));
 
-        int width = UIUtil.scaleForGUI(imageIcon.getIconWidth());
-        int height = UIUtil.scaleForGUI(imageIcon.getIconHeight());
-
-        Image image = imageIcon.getImage();
-        Image scaledImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-
-        imageIcon = new ImageIcon(scaledImage);
         JLabel imageLabel = new JLabel(imageIcon);
         add(imageLabel, BorderLayout.NORTH);
 
