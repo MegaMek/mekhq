@@ -1,21 +1,35 @@
 /*
- * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option)
- * any later version.
+ * This file is part of MekHQ.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 
 package mekhq.campaign.autoresolve;
 
 import io.sentry.Sentry;
+import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.*;
 import megamek.common.alphaStrike.conversion.ASConverter;
 import megamek.common.autoresolve.acar.SimulationContext;
@@ -57,11 +71,13 @@ public class AtBSetupForces extends SetupForces {
         this(campaign, units, scenario, new SingletonForces(), new OrderFactory(campaign, scenario));
     }
 
-    public AtBSetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario, ForceConsolidation forceConsolidationMethod) {
+    public AtBSetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario,
+            ForceConsolidation forceConsolidationMethod) {
         this(campaign, units, scenario, forceConsolidationMethod, new OrderFactory(campaign, scenario));
     }
 
-    public AtBSetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario, ForceConsolidation forceConsolidationMethod, OrderFactory orderFactory) {
+    public AtBSetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario,
+            ForceConsolidation forceConsolidationMethod, OrderFactory orderFactory) {
         this.campaign = campaign;
         this.units = units;
         this.scenario = scenario;
@@ -82,6 +98,7 @@ public class AtBSetupForces extends SetupForces {
 
     /**
      * Create the forces for the game object, using the campaign, units and scenario
+     * 
      * @param game The game object to setup the forces in
      */
     public void createForcesOnSimulation(SimulationContext game) {
@@ -111,13 +128,16 @@ public class AtBSetupForces extends SetupForces {
     }
 
     /**
-     * Convert the forces in the game to formations, this is the most important step in the setup of the game,
-     * it converts every top level force into a single formation, and those formations are then added to the game
+     * Convert the forces in the game to formations, this is the most important step
+     * in the setup of the game,
+     * it converts every top level force into a single formation, and those
+     * formations are then added to the game
      * and used in the auto resolve in place of the original entities
+     * 
      * @param game The game object to convert the forces in
      */
     private void convertForcesIntoFormations(SimulationContext game) {
-        for(var force : game.getForces().getTopLevelForces()) {
+        for (var force : game.getForces().getTopLevelForces()) {
             try {
                 var formation = new EntityAsUnit(force, game).convert();
                 formation.setTargetFormationId(Entity.NONE);
@@ -127,7 +147,7 @@ public class AtBSetupForces extends SetupForces {
             } catch (Exception e) {
                 Sentry.captureException(e);
                 var entities = game.getForces().getFullEntities(force).stream().filter(Entity.class::isInstance)
-                    .map(Entity.class::cast).toList();
+                        .map(Entity.class::cast).toList();
                 logger.error("Error converting force to formation {} - {}", force, entities, e);
                 throw new FailedToConvertForceToFormationException(e);
             }
@@ -135,7 +155,9 @@ public class AtBSetupForces extends SetupForces {
     }
 
     /**
-     * Setup the player, its forces and entities in the game, it also sets the player skill level.
+     * Setup the player, its forces and entities in the game, it also sets the
+     * player skill level.
+     * 
      * @param game The game object to setup the player in
      */
     private void setupPlayer(SimulationContext game) {
@@ -148,10 +170,13 @@ public class AtBSetupForces extends SetupForces {
     }
 
     /**
-     * Setup the bots, their forces and entities in the game, it also sets the player skill level.
+     * Setup the bots, their forces and entities in the game, it also sets the
+     * player skill level.
+     * 
      * @param game The game object to setup the bots in
      */
     private void setupBots(SimulationContext game) {
+        var forbiddenColor = game.getPlayer(0).getColour();
         var enemySkill = (scenario.getContract(campaign)).getEnemySkill();
         var allySkill = (scenario.getContract(campaign)).getAllySkill();
         var localBots = new HashMap<String, Player>();
@@ -168,8 +193,9 @@ public class AtBSetupForces extends SetupForces {
             var highestPlayerId = game.getPlayersList().stream().mapToInt(Player::getId).max().orElse(0);
             Player bot = new Player(highestPlayerId + 1, name);
             bot.setTeam(bf.getTeam());
+
             localBots.put(name, bot);
-            configureBot(bot, bf);
+            configureBot(bot, bf, forbiddenColor);
             game.addPlayer(bot.getId(), bot);
             if (bot.isEnemyOf(campaign.getPlayer())) {
                 game.setPlayerSkillLevel(bot.getId(), enemySkill);
@@ -184,7 +210,9 @@ public class AtBSetupForces extends SetupForces {
     }
 
     /**
-     * Create a player object from the campaign and scenario wichi doesnt have a reference to the original player
+     * Create a player object from the campaign and scenario wichi doesnt have a
+     * reference to the original player
+     * 
      * @return The clean player object
      */
     private Player getCleanPlayer() {
@@ -210,6 +238,7 @@ public class AtBSetupForces extends SetupForces {
 
     /**
      * Setup the player forces and entities for the game
+     * 
      * @param player The player object to setup the forces for
      * @return A list of entities for the player
      */
@@ -265,9 +294,9 @@ public class AtBSetupForces extends SetupForces {
                 deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
                 // Lances deployed in scout roles always deploy units in 6-walking speed turns
                 if (scenario.getCombatRole().isPatrol()
-                    && (scenario.getCombatTeamById(campaign) != null)
-                    && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())
-                    && !useDropship) {
+                        && (scenario.getCombatTeamById(campaign) != null)
+                        && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())
+                        && !useDropship) {
                     deploymentRound = Math.max(deploymentRound, 6 - speed);
                 }
             }
@@ -302,9 +331,9 @@ public class AtBSetupForces extends SetupForces {
                 }
                 deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
                 if (!useDropship
-                    && scenario.getCombatRole().isPatrol()
-                    && (scenario.getCombatTeamById(campaign) != null)
-                    && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())) {
+                        && scenario.getCombatRole().isPatrol()
+                        && (scenario.getCombatTeamById(campaign) != null)
+                        && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())) {
                     deploymentRound = Math.max(deploymentRound, 6 - speed);
                 }
             }
@@ -317,7 +346,9 @@ public class AtBSetupForces extends SetupForces {
     }
 
     /**
-     * Setup the map settings for the game, not relevant at the moment, as the map settings are not used in the autoresolve currently
+     * Setup the map settings for the game, not relevant at the moment, as the map
+     * settings are not used in the autoresolve currently
+     * 
      * @return The map settings object
      */
     private MapSettings setupMapSettings() {
@@ -328,7 +359,7 @@ public class AtBSetupForces extends SetupForces {
 
         // if the scenario is taking place in space, do space settings instead
         if (scenario.getBoardType() == Scenario.T_SPACE
-            || scenario.getTerrainType().equals("Space")) {
+                || scenario.getTerrainType().equals("Space")) {
             mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
             mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
         } else if (scenario.isUsingFixedMap()) {
@@ -346,8 +377,8 @@ public class AtBSetupForces extends SetupForces {
             } catch (IOException ex) {
                 Sentry.captureException(ex);
                 logger.error(
-                    String.format("Could not load map file data/mapgen/%s.xml", scenario.getMap()),
-                    ex);
+                        String.format("Could not load map file data/mapgen/%s.xml", scenario.getMap()),
+                        ex);
             }
 
             if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
@@ -363,13 +394,26 @@ public class AtBSetupForces extends SetupForces {
         return mapSettings;
     }
 
+    public PlayerColour getNextColor(PlayerColour playerColour) {
+        PlayerColour[] playerColours = PlayerColour.values();
+        int index = (playerColour.ordinal() + 1) % playerColours.length;
+        return playerColours[index];
+    }
+
     /**
      * Configure the bot player object with the bot force data
-     * @param bot The bot player object
+     * 
+     * @param bot      The bot player object
      * @param botForce The bot force data
      */
-    private void configureBot(Player bot, BotForce botForce) {
+    private void configureBot(Player bot, BotForce botForce, PlayerColour forbiddenColor) {
+        // set camo
+        bot.setCamouflage(botForce.getCamouflage().clone());
+        boolean isSameColorAsForbidden = botForce.getColour().equals(forbiddenColor);
+        var color = isSameColorAsForbidden ? getNextColor(botForce.getColour()) : botForce.getColour();
+        bot.setColour(color);
         bot.setTeam(botForce.getTeam());
+
         // set deployment
         bot.setStartingPos(botForce.getStartingPos());
         bot.setStartOffset(botForce.getStartOffset());
@@ -379,16 +423,14 @@ public class AtBSetupForces extends SetupForces {
         bot.setStartingAnySEx(botForce.getStartingAnySEx());
         bot.setStartingAnySEy(botForce.getStartingAnySEy());
 
-        // set camo
-        bot.setCamouflage(botForce.getCamouflage().clone());
-        bot.setColour(botForce.getColour());
     }
 
     /**
      * Setup the bot entities for the game
-     * @param bot The bot player object
+     * 
+     * @param bot              The bot player object
      * @param originalEntities The original entities for the bot
-     * @param deployRound The deployment round for the bot
+     * @param deployRound      The deployment round for the bot
      * @return A list of entities for the bot
      */
     private List<Entity> setupBotEntities(Player bot, List<Entity> originalEntities, int deployRound) {
@@ -418,7 +460,9 @@ public class AtBSetupForces extends SetupForces {
     }
 
     /**
-     * Get the planetary conditions for the game, not used at the moment in the auto resolve, but planed for the future
+     * Get the planetary conditions for the game, not used at the moment in the auto
+     * resolve, but planed for the future
+     * 
      * @return The planetary conditions object
      */
     private PlanetaryConditions getPlanetaryConditions() {
@@ -443,8 +487,9 @@ public class AtBSetupForces extends SetupForces {
 
     /**
      * Send the entities to the game object
+     * 
      * @param entities The entities to send
-     * @param game the game object to send the entities to
+     * @param game     the game object to send the entities to
      */
     private void sendEntities(List<Entity> entities, SimulationContext game) {
         Map<Integer, Integer> forceMapping = new HashMap<>();
@@ -485,6 +530,7 @@ public class AtBSetupForces extends SetupForces {
         if (entity instanceof ProtoMek) {
             int numPlayerProtos = game.getSelectedEntityCount(new EntitySelector() {
                 private final int ownerId = entity.getOwnerId();
+
                 @Override
                 public boolean accept(Entity entity) {
                     return (entity instanceof ProtoMek) && (ownerId == entity.getOwnerId());
@@ -500,6 +546,6 @@ public class AtBSetupForces extends SetupForces {
 
         // Give the unit a spotlight, if it has the spotlight quirk
         entity.setExternalSearchlight(entity.hasExternalSearchlight()
-            || entity.hasQuirk(OptionsConstants.QUIRK_POS_SEARCHLIGHT));
+                || entity.hasQuirk(OptionsConstants.QUIRK_POS_SEARCHLIGHT));
     }
 }

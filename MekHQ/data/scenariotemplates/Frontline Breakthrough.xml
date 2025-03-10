@@ -7,6 +7,7 @@
 Expect heavy resistance, as the enemy will not yield ground easily. Their forces are well-positioned to block your advance, and delaying tactics may be used to slow you down. Speed, decisive strikes, and tactical maneuvering will be key to achieving your objective. If you can break their formation or force them into disarray, the path forward will open.
 
 The enemy will control the battlefield once the engagement concludes, preventing any opportunity for salvage or recovery. This is a mission of mobility and force—break through, or break them. There is no room for hesitation.</detailedBriefing>
+    <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>true</allowRotation>

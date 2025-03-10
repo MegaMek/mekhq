@@ -8,6 +8,7 @@
 Should the enemy resistance prove too strong for a full escort, you have an alternative means to secure victory. If at least 50% of the convoy survives while you destroy or route 50% of the enemy forces, the mission will be considered a success. Breaking the enemy’s will to fight will give the convoy a clear path forward.
 
 We will control the field at the conclusion of the battle. This means you have full authority to dictate the engagement on your terms. Use the terrain, control the tempo, and eliminate threats efficiently. Hold the line, protect the convoy, and ensure that these supplies reach their destination.</detailedBriefing>
+    <battlefieldControl>PLAYER</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>

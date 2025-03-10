@@ -8,6 +8,7 @@
 The enemy will come in force, but their attack is not unstoppable. If a full escort proves untenable, you have an alternative path to victory. Should at least 50% of the convoy survive while you destroy or route 50% of the attacking enemy force, the mission will be considered a success. Breaking their offensive will allow our convoy to continue forward without further resistance.
 
 We will control the field at the end of the battle, giving you full authority to dictate the engagement on our terms. Use the terrain, stagger your defenses, and counter their assault with precision. Hold the line, protect the convoy, and ensure these supplies reach their destination. Victory here will secure our war effort in this sector.</detailedBriefing>
+    <battlefieldControl>PLAYER</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>

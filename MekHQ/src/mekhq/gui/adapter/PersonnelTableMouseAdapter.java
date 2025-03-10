@@ -75,8 +75,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -1448,24 +1448,30 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
         popup.add(menu);
 
-        if (gui.getCampaign().getLocation().isOnPlanet()) {
-            popup.add(newMenuItem(resources.getString("free.text"), CMD_FREE));
-            popup.add(newMenuItem(resources.getString("execute.text"), CMD_EXECUTE));
-        } else {
-            popup.add(newMenuItem(resources.getString("jettison.text"), CMD_JETTISON));
+
+        if (StaticChecks.areAllPrisoners(selected)) {
+            if (gui.getCampaign().getLocation().isOnPlanet()) {
+                popup.add(newMenuItem(resources.getString("free.text"), CMD_FREE));
+                popup.add(newMenuItem(resources.getString("execute.text"), CMD_EXECUTE));
+            } else {
+                popup.add(newMenuItem(resources.getString("jettison.text"), CMD_JETTISON));
+            }
+
+            if (StaticChecks.areAllPrisoners(selected) && gui.getCampaign().isGM()) {
+                popup.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM));
+            }
+
+            if (StaticChecks.areAnyWillingToDefect(selected)) {
+                popup.add(newMenuItem(resources.getString("recruit.text"), CMD_RECRUIT));
+            }
+
+            if ((gui.getCampaign().getFaction().isClan()) && (StaticChecks.areAnyBondsmen(selected))) {
+                popup.add(newMenuItem(resources.getString("abtakha.text"), CMD_ABTAKHA));
+            }
         }
 
-        if (StaticChecks.areAllPrisoners(selected) && gui.getCampaign().isGM()) {
-            popup.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM));
+        if (Stream.of(selected).allMatch(p -> p.getStatus().isPoW()) && gui.getCampaign().isGM()) {
             popup.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM_FRIENDLY));
-        }
-
-        if (StaticChecks.areAnyWillingToDefect(selected)) {
-            popup.add(newMenuItem(resources.getString("recruit.text"), CMD_RECRUIT));
-        }
-
-        if ((gui.getCampaign().getFaction().isClan()) && (StaticChecks.areAnyBondsmen(selected))) {
-            popup.add(newMenuItem(resources.getString("abtakha.text"), CMD_ABTAKHA));
         }
 
         if ((oneSelected) && (!person.isChild(gui.getCampaign().getLocalDate()))) {

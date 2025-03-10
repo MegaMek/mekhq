@@ -7,6 +7,7 @@
 The enemy will attempt to intercept, disable, or destroy the DropShip before it can escape. Expect interdiction fighters and AeroSpace superiority craft. Protect the DropShip at all costs—keep the enemy occupied, disrupt their formations, and eliminate high-threat targets before they can close in.
 
 The enemy will control the battlefield at the end of the engagement, meaning there will be no chance for salvage or recovery. Your priority is to see the DropShip through or cripple enough enemy forces to force a retreat. Ensure the mission succeeds—our strategic mobility depends on it.</detailedBriefing>
+    <battlefieldControl>ENEMY</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>

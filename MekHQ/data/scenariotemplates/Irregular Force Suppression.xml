@@ -7,6 +7,7 @@
 Expect a blend of unconventional tactics and structured military resistance. The insurgents will use ambushes, terrain familiarity, and hit-and-run attacks, while their military allies will bring firepower, coordination, and heavier assets into the fight. Dismantle their cohesion, eliminate key targets, and disrupt their ability to function as a fighting force.
 
 The victor will control the battlefield at the end of the engagement, securing any remaining assets and ensuring this region remains under our command. This mission is about eradication—strike hard, leave no room for recovery, and establish total dominance.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>

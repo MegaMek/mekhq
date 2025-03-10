@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MegaMek is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MegaMek is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 
 package mekhq.campaign.mission;
@@ -73,6 +82,10 @@ public class ScenarioTemplate implements Cloneable {
     public boolean isHostileFacility;
     public boolean isAlliedFacility;
 
+    @XmlElement(name = "battlefieldControl")
+    @XmlJavaTypeAdapter(value = BattlefieldControlTypeAdapter.class)
+    public BattlefieldControlType battlefieldControl = BattlefieldControlType.VICTOR;
+
     public ScenarioMapParameters mapParameters = new ScenarioMapParameters();
     public List<String> scenarioModifiers = new ArrayList<>();
 
@@ -81,6 +94,26 @@ public class ScenarioTemplate implements Cloneable {
     @XmlElementWrapper(name = "scenarioObjectives")
     @XmlElement(name = "scenarioObjective")
     public List<ScenarioObjective> scenarioObjectives = new ArrayList<>();
+
+    /**
+     * Enum representing the different types of battlefield control during a scenario.
+     */
+    public enum BattlefieldControlType {
+        /**
+         * Indicates the victor controls the field.
+         */
+        VICTOR,
+
+        /**
+         * Battlefield control is always assigned to the player.
+         */
+        PLAYER,
+
+        /**
+         * Battlefield control is always assigned to the enemy.
+         */
+        ENEMY
+    }
 
     @Override
     public ScenarioTemplate clone() {
@@ -91,6 +124,7 @@ public class ScenarioTemplate implements Cloneable {
         template.detailedBriefing = this.detailedBriefing;
         template.isHostileFacility = this.isHostileFacility;
         template.isAlliedFacility = this.isAlliedFacility;
+        template.battlefieldControl = this.battlefieldControl;
         for (ScenarioForceTemplate sft : scenarioForces.values()) {
             template.scenarioForces.put(sft.getForceName(), sft.clone());
         }
@@ -155,6 +189,10 @@ public class ScenarioTemplate implements Cloneable {
 
     public boolean isFacilityScenario() {
         return isHostileFacility || isAlliedFacility;
+    }
+
+    public BattlefieldControlType getBattlefieldControl() {
+        return battlefieldControl;
     }
 
     public List<ScenarioForceTemplate> getAllBotControlledAllies() {
@@ -334,6 +372,29 @@ public class ScenarioTemplate implements Cloneable {
         public String marshal(ScenarioType scenarioType) {
             // Converts Enum back to String for XML
             return String.valueOf(scenarioType);
+        }
+    }
+
+    /**
+     * Adapter for converting between String and BattlefieldControlType during XML (un)marshalling.
+     */
+    public static class BattlefieldControlTypeAdapter extends XmlAdapter<String, BattlefieldControlType> {
+
+        @Override
+        public BattlefieldControlType unmarshal(String value) throws Exception {
+            try {
+                // Convert the string value to a BattlefieldControlType enum
+                return BattlefieldControlType.valueOf(value.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // If the string does not match any enum, handle it gracefully (e.g., return a default value)
+                return BattlefieldControlType.VICTOR;
+            }
+        }
+
+        @Override
+        public String marshal(BattlefieldControlType value) throws Exception {
+            // Convert the BattlefieldControlType enum back to its string representation
+            return value.name();
         }
     }
 }

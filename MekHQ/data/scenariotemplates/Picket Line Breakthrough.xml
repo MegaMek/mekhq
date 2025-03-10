@@ -7,6 +7,7 @@
 Expect light screening forces supported by rapid response elements. The enemy will attempt to stall your advance while preparing a counterattack. Speed, decisive strikes, and maintaining momentum will be key to breaking through before they can reinforce.
 
 As you will be pushing into enemy territory, we will be unable to secure the battlefield following the engagement. Any salvage or wreckage left behind will be lost, so prioritize survival and mission success over prolonged engagements. Punch through, force them to react, and establish dominance beyond their lines.</detailedBriefing>
+    <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>true</allowRotation>

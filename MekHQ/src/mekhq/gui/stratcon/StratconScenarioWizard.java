@@ -49,8 +49,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.scaleObjectiveTimeLimits;
@@ -464,7 +464,8 @@ public class StratconScenarioWizard extends JDialog {
         JScrollPane forceListContainer = new JScrollPaneWithSpeed();
 
         ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign,
-            StratconRulesManager.getAvailableForceIDs(forceTemplate.getAllowedUnitType(), campaign, currentTrackState,
+            StratconRulesManager.getAvailableForceIDsForManualDeployment(forceTemplate.getAllowedUnitType(),
+                campaign, currentTrackState,
                 (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS),
                 currentScenario, currentCampaignState));
 
@@ -672,7 +673,6 @@ public class StratconScenarioWizard extends JDialog {
                 null, false));
         } else {
             btnCommit.addActionListener(evt -> reinforcementConfirmDialog());
-            btnCommit.setEnabled(currentCampaignState.getSupportPoints() > 0);
         }
 
         btnCancel = new JButton(MHQInternationalization.getTextAt(resourcePath, "leadershipCancel.text"));
@@ -860,6 +860,7 @@ public class StratconScenarioWizard extends JDialog {
             btnCommitClicked(evt, finalTargetNumber, false);
             dialog.dispose();
         });
+        reinforceButton.setEnabled(availableSupportPoints > 0);
 
         JButton reinforceButtonGM = new JButton(resources.getString("reinforcementConfirmation.confirmButton.gm"));
         reinforceButtonGM.setToolTipText(resources.getString("reinforcementConfirmation.confirmButton.gm.tooltip"));

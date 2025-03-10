@@ -9,6 +9,7 @@ This engagement is about endurance, misdirection, and tactical maneuvering. The 
 Should you succeed in routing 75% of the enemy force, they will lose cohesion, and we will control the battlefield at the end of the engagement. This will allow us full access to any salvageable assets left behind. Victory here will not only ensure the success of our allies but also give us a chance to recover valuable battlefield resources.
 
 Hold the line, weather the storm, and outlast them. If they break, the field is ours.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>

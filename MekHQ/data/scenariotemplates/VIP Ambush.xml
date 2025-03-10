@@ -7,6 +7,7 @@
 Expect the enemy to stall for time, deploying fast-moving elements or defensive tactics to delay your strike. Speed and precision are critical—do not allow them the time to reinforce or extract the target. If you hesitate, they will escape or be reinforced, and this opportunity will be lost.
 
 The enemy will control the battlefield at the end of the engagement, meaning there will be no chance for recovery or salvage. This is a surgical strike—neutralize the target and withdraw before the enemy locks down the area.</detailedBriefing>
+    <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>

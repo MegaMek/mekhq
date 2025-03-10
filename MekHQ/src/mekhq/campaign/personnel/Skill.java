@@ -1,34 +1,44 @@
 /*
- * Skill.java
- *
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
- * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
- * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.personnel;
-
-import java.io.PrintWriter;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 /**
  * As ov v0.1.9, we will be tracking a group of skills on the person. These
@@ -69,6 +79,9 @@ import mekhq.utilities.MHQXMLUtility;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Skill {
+    private static int COUNT_UP_MAX_VALUE = 10;
+    private static int COUNT_DOWN_MIN_VALUE = 0;
+
     private static final MMLogger logger = MMLogger.create(Skill.class);
 
     private SkillType type;
@@ -92,6 +105,20 @@ public class Skill {
         this.type = type;
         this.level = level;
         this.bonus = bonus;
+    }
+
+    /**
+     * Retrieves the maximum value that can be used for skills that count up.
+     */
+    public static int getCountUpMaxValue() {
+        return COUNT_UP_MAX_VALUE;
+    }
+
+    /**
+     * Retrieves the minimum value that can be used for skills that count down.
+     */
+    public static int getCountDownMaxValue() {
+        return COUNT_DOWN_MIN_VALUE;
     }
 
     /**
@@ -159,9 +186,9 @@ public class Skill {
 
     public int getFinalSkillValue() {
         if (type.countUp()) {
-            return type.getTarget() + level + bonus;
+            return min(COUNT_UP_MAX_VALUE, type.getTarget() + level + bonus);
         } else {
-            return type.getTarget() - level - bonus;
+            return max(COUNT_DOWN_MIN_VALUE, type.getTarget() - level - bonus);
         }
     }
 

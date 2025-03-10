@@ -10,6 +10,7 @@ The enemy will likely deploy fast-moving extraction units or specialized recover
 Failure to prevent the enemy from rescuing the prisoners will grant them valuable intelligence, jeopardizing operations in this sector (the loss of 1 CVP, StratCon only). That is not an option. The victor will control the battlefield at the end of the engagement, giving us the opportunity to secure the area and eliminate any remaining threats.
 
 Execute with precision. The enemy must leave empty-handed.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>

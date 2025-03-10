@@ -7,6 +7,7 @@
 The enemy will press the attack, seeking to pin your reinforcements down and eliminate them before they can regroup. Expect high-speed dogfights, coordinated fire from multiple vectors, and no room for retreat. Strike hard, cripple their numbers, and shatter their formation before they can overwhelm you.
 
 There will be no time to secure the battlefield after the engagement, meaning any salvage or wreckage will be lost. This is about survival and operational integrity—break free, push forward, and ensure your reinforcements reach their objective.</detailedBriefing>
+    <battlefieldControl>ENEMY</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>

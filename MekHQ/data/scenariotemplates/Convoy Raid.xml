@@ -8,6 +8,7 @@
 Your primary objective is to prevent at least 50% of the convoy from reaching the far side of the engagement zone. Disrupt their formation, destroy their transports, and force them to abandon their mission. If their escort force proves too formidable, you have an alternative route to success—destroy at least 50% of the convoy’s escorts to force the remaining defenders to surrender. With their protection shattered, the convoy will have no choice but to stand down.
 
 The more convoy units that survive, the greater the spoils. Disabling transports instead of outright destruction may increase salvage potential, but that is a secondary concern to stopping the convoy itself. However, do not linger. The enemy will respond quickly, and we will not control the field once the battle ends. Execute the raid with precision, neutralize the targets, and withdraw before the enemy's full force arrives.</detailedBriefing>
+    <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
