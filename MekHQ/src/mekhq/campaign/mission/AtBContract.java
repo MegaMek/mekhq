@@ -4,12 +4,12 @@
  *
  * This file is part of MekHQ.
  *
- * MegaMek is free software: you can redistribute it and/or modify
+ * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License (GPL),
  * version 3 or (at your option) any later version,
  * as published by the Free Software Foundation.
  *
- * MegaMek is distributed in the hope that it will be useful,
+ * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
@@ -82,8 +82,8 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 import static java.lang.Math.*;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
@@ -1669,6 +1669,26 @@ public class AtBContract extends Contract {
 
         enemyBotName = getEnemyName(currentYear);
         enemyCamouflage = pickRandomCamouflage(currentYear, enemyCode);
+
+        clanTechSalvageOverride();
+    }
+
+    /**
+     * Applies a salvage override rule for Clan technology based on the contract timeline and faction
+     * involvement. This method checks the factions of both the enemy and employer and determines
+     * if a salvage exchange should be forced based on whether the battle occurs before the Battle
+     * of Tukayyid.
+     *
+     * <p>This rule was implemented to better match canon employer behavior during this period.</p>
+     */
+    public void clanTechSalvageOverride() {
+        final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
+
+        if (getEnemy().isClan() && !getEmployerFaction().isClan()) {
+            if (getStartDate().isBefore(BATTLE_OF_TUKAYYID)) {
+                setSalvageExchange(true);
+            }
+        }
     }
 
     /**
