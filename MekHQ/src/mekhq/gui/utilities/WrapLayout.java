@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
- * MegaMek is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
- * MegaMek is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.utilities;
 
@@ -51,7 +60,7 @@ public class WrapLayout extends FlowLayout {
      * The value of the alignment argument must be one of
      * <code>WrapLayout</code>, <code>WrapLayout</code>,
      * or <code>WrapLayout</code>.
-     * 
+     *
      * @param align the alignment value
      */
     public WrapLayout(int align) {
@@ -65,7 +74,7 @@ public class WrapLayout extends FlowLayout {
      * The value of the alignment argument must be one of
      * <code>WrapLayout</code>, <code>WrapLayout</code>,
      * or <code>WrapLayout</code>.
-     * 
+     *
      * @param align the alignment value
      * @param hgap  the horizontal gap between components
      * @param vgap  the vertical gap between components
@@ -77,7 +86,7 @@ public class WrapLayout extends FlowLayout {
     /**
      * Returns the preferred dimensions for this layout given the
      * <i>visible</i> components in the specified target container.
-     * 
+     *
      * @param target the component which needs to be laid out
      * @return the preferred dimensions to lay out the
      *         subcomponents of the specified container
@@ -90,7 +99,7 @@ public class WrapLayout extends FlowLayout {
     /**
      * Returns the minimum dimensions needed to layout the <i>visible</i>
      * components contained in the specified target container.
-     * 
+     *
      * @param target the component which needs to be laid out
      * @return the minimum dimensions to lay out the
      *         subcomponents of the specified container
