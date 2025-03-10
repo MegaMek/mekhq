@@ -59,6 +59,7 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.*;
@@ -957,6 +958,16 @@ public class AtBDynamicScenarioFactory {
             // Transported units need to filter out battle armor before applying armor changes
             for (Entity curPlatoon : transportedEntities.stream().filter(i -> i.getUnitType() == INFANTRY).toList()) {
                 changeInfantryKit((Infantry) curPlatoon, isLowPressure, isTainted, scenario.getTemperature());
+            }
+        }
+
+        for (Entity entity : generatedEntities) {
+            if (campaign.getCampaignOptions().isUseAbilities()) {
+                if (faction.isClan() && !entity.isInfantry() && !entity.isProtoMek()) {
+                    if (SpecialAbility.getSpecialAbilities().containsKey("clan_pilot_training")) {
+                        entity.getCrew().getOptions().getOption("clan_pilot_training").setValue(true);
+                    }
+                }
             }
         }
 
