@@ -785,8 +785,8 @@ public class StratconScenarioWizard extends JDialog {
         JPanel rightBox = new JPanel(new BorderLayout());
         rightBox.setBorder(BorderFactory.createEtchedBorder());
 
-        TargetRoll reinforcementTargetNumber = calculateReinforcementTargetNumber(commandLiaison,
-              currentCampaignState.getContract());
+        TargetRoll reinforcementTargetNumber = calculateReinforcementTargetNumber(
+            campaign, currentScenario, commandLiaison, currentCampaignState, currentCampaignState.getContract());
         int targetNumber = reinforcementTargetNumber.getValue();
 
         StringBuilder rightDescriptionMessage = new StringBuilder();
