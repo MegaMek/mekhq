@@ -28,6 +28,7 @@
 package mekhq.campaign.stratcon;
 
 import megamek.codeUtilities.ObjectUtility;
+import megamek.common.Entity;
 import megamek.common.Minefield;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
@@ -827,6 +828,7 @@ public class StratconRulesManager {
                         }
                     }
                 }
+
                 for (Unit unit : potentialUnits) {
                     if ((sft.getAllowedUnitType() == 11) && (!campaign.getCampaignOptions().isUseDropShips())) {
                         continue;
@@ -2305,119 +2307,245 @@ public class StratconRulesManager {
     }
 
     /**
-     * Returns a list of individual units eligible for deployment in scenarios run
-     * by "Defend" lances
+     * Retrieves a list of units that are eligible for deployment in support of a Frontline force.
      *
-     * @return List of unit IDs.
+     * <p>A unit is considered eligible if:</p>
+     * <ul>
+     *   <li>It is valid (available, properly deployed, and of a suitable type i.e., conventional
+     *   infantry or battle armor).</li>
+     *   <li>The force to which it belongs is valid (not deployed, part of a combat team, and not in
+     *   reserve).</li>
+     * </ul>
+     *
+     * @param campaign        The campaign instance holding the units and forces involved.
+     * @param currentScenario
+     * @return A list of {@code Unit} objects that meet the requirements for deployment in support
+     * of a Frontline force.
      */
-    public static List<Unit> getEligibleDefensiveUnits(Campaign campaign) {
-        List<Unit> retVal = new ArrayList<>();
+    public static List<Unit> getEligibleFrontlineUnits(Campaign campaign, StratconScenario currentScenario) {
+        List<Unit> defensiveUnits = new ArrayList<>();
 
-        for (Unit u : campaign.getUnits()) {
-            // "defensive" units are infantry, battle armor and (Weisman help you) gun
-            // emplacements
-            // and also said unit should be intact/alive/etc
-            boolean isEligibleInfantry = ((u.getEntity().getUnitType() == INFANTRY)
-                    || (u.getEntity().getUnitType() == BATTLE_ARMOR)) && !u.isUnmanned();
+        // Retrieve the list of units from force 0
+        Vector<UUID> unitIDs = campaign.getForce(0).getAllUnits(true);
 
-            boolean isEligibleGunEmplacement = u.getEntity().getUnitType() == GUN_EMPLACEMENT;
+        for (UUID unitId : unitIDs) {
+            Unit unit = campaign.getUnit(unitId);
 
-            if ((isEligibleInfantry || isEligibleGunEmplacement)
-                    && !u.isDeployed()
-                    && !u.isMothballed()
-                    && (u.checkDeployment() == null)
-                    && !isUnitDeployedToStratCon(u)) {
-
-                // this is a little inefficient, but probably there aren't too many active AtB
-                // contracts at a time
-                for (AtBContract contract : campaign.getActiveAtBContracts()) {
-                    if (contract.getStratconCampaignState().isForceDeployedHere(u.getForceId())) {
-                        continue;
-                    }
-                }
-
-                retVal.add(u);
+            // Validate the unit
+            if (!isUnitValidForFrontlineDeployment(unit)) {
+                continue;
             }
+
+            // Validate the force associated with the unit
+            if (!isForceEligible(unit, campaign, currentScenario)) {
+                continue;
+            }
+
+            defensiveUnits.add(unit);
         }
 
-        return retVal;
+        return defensiveUnits;
     }
 
     /**
-     * Returns a list of individual units eligible for deployment in scenarios that
-     * result from the
-     * lance leader having a leadership score
+     * Checks if a unit is valid for deployment in support of a Frontline force.
      *
-     * @return List of unit IDs.
+     * <p>A unit is considered valid if:</p>
+     * <ul>
+     *   <li>The unit is not null.</li>
+     *   <li>The unit is available for deployment.</li>
+     *   <li>The unit's deployment checks return no errors.</li>
+     *   <li>The unit's entity is of type conventional infantry or battle armor.</li>
+     * </ul>
+     *
+     * @param unit The {@code Unit} object to validate.
+     * @return {@code true} if the unit is valid; {@code false} otherwise.
      */
-    public static List<Unit> getEligibleLeadershipUnits(Campaign campaign, ArrayList<Integer> forceIDs,
+    private static boolean isUnitValidForFrontlineDeployment(@Nullable Unit unit) {
+        if (unit == null) {
+            return false;
+        }
+
+        if (!unit.isAvailable()) {
+            return false;
+        }
+
+        if (unit.checkDeployment() != null) {
+            return false;
+        }
+
+        Entity entity = unit.getEntity();
+        return entity != null && (unit.isConventionalInfantry() || unit.isBattleArmor());
+    }
+
+    /**
+     * Checks if the force associated with a unit is eligible for deployment in support of a Frontline
+     * force.
+     *
+     * <p>A force is considered eligible if:</p>
+     * <ul>
+     *   <li>The force is not null.</li>
+     *   <li>The force has not already been deployed.</li>
+     *   <li>The force is part of a combat team.</li>
+     *   <li>The combat team is not assigned a reserve role.</li>
+     * </ul>
+     *
+     * @param unit            The {@code Unit} whose associated force is being validated.
+     * @param campaign        The {@code Campaign} object used to retrieve information about the force.
+     * @param currentScenario
+     * @return {@code true} if the associated force is eligible; {@code false} otherwise.
+     */
+    private static boolean isForceEligible(Unit unit, Campaign campaign, StratconScenario currentScenario) {
+        int forceId = unit.getForceId();
+        Force force = campaign.getForce(forceId);
+
+        // If the force is deployed, skip; added check for insurance
+        if (force == null || force.isDeployed()) {
+            return false;
+        }
+
+        // Check the associated combat team and its role
+        CombatTeam combatTeam = force.isCombatTeam() ? campaign.getCombatTeamsTable().get(forceId) : null;
+
+        if (combatTeam == null) {
+            return false;
+        }
+
+        if (combatTeam.getRole().isReserve()) {
+            return false;
+        }
+
+        AtBContract forceContract = combatTeam.getContract(campaign);
+        AtBContract scenarioContract = currentScenario.getBackingContract(campaign);
+
+        return forceContract.equals(scenarioContract);
+    }
+
+    /**
+     * Retrieves a list of units that are eligible for leadership deployment.
+     *
+     * <p>A unit is considered eligible for leadership deployment if:</p>
+     * <ul>
+     *   <li>There is sufficient leadership skill to justify leadership deployment.</li>
+     *   <li>The total leadership budget (based on leadership skill) is greater than 0.</li>
+     *   <li>The unit matches the general unit type of the primary force in the scenario.</li>
+     *   <li>The unit's battle value is within the computed budget.</li>
+     *   <li>The unit and its associated force are valid for deployment.</li>
+     * </ul>
+     *
+     * @param campaign         The campaign instance holding the units and forces involved.
+     * @param currentScenario  The current StratCon scenario being processed.
+     * @param leadershipSkill  The leadership skill value used to calculate budget.
+     * @return A list of {@code Unit} objects eligible for deployment as leadership units.
+     */
+    public static List<Unit> getEligibleLeadershipUnits(Campaign campaign, StratconScenario currentScenario,
                                                         int leadershipSkill) {
-        List<Unit> eligibleUnits = new ArrayList<>();
+        List<Integer> forceIds = currentScenario.getPrimaryForceIDs();
+        List<Unit> leadershipUnits = new ArrayList<>();
 
         // If there is no leadership skill, we shouldn't continue
         if (leadershipSkill <= 0) {
-            return eligibleUnits;
+            return leadershipUnits;
         }
 
-        // The criteria are as follows:
-        // - unit is eligible to be spawned on the scenario type
-        // - unit has a lower BV than the BV budget granted from Leadership
-        // Leadership budget is capped at 5 levels
         int totalBudget = min(BASE_LEADERSHIP_BUDGET * leadershipSkill, BASE_LEADERSHIP_BUDGET * 5);
 
-        int primaryUnitType = getPrimaryUnitType(campaign, forceIDs);
+        int primaryUnitType = getPrimaryUnitType(campaign, forceIds);
 
         // If there are no units (somehow), we've no reason to continue
         if (primaryUnitType == -1) {
-            return eligibleUnits;
+            return leadershipUnits;
         }
 
         int generalUnitType = convertSpecificUnitTypeToGeneral(primaryUnitType);
 
-        for (UUID unitId : campaign.getForce(0).getAllUnits(true)) {
+
+        // Retrieve the list of units from force 0
+        Vector<UUID> unitIDs = campaign.getForce(0).getAllUnits(true);
+
+        for (UUID unitId : unitIDs) {
             Unit unit = campaign.getUnit(unitId);
-            if (unit == null) {
+
+            // Validate the unit
+            if (!isUnitValidForLeadershipDeployment(unit, generalUnitType, totalBudget)) {
                 continue;
             }
 
-            // the general idea is that we want something that can be deployed to the scenario -
-            // e.g., no infantry on air scenarios etc.
-            boolean validUnitType = (forceCompositionMatchesDeclaredUnitType(unit.getEntity().getUnitType(),
-                        generalUnitType));
-
-            if (validUnitType
-                && !unit.isDeployed()
-                && !unit.isMothballed()
-                && (unit.getEntity().calculateBattleValue(true, true) <= totalBudget)
-                && (unit.checkDeployment() == null)
-                && !isUnitDeployedToStratCon(unit)) {
-                eligibleUnits.add(unit);
+            // Validate the force associated with the unit
+            if (!isForceEligible(unit, campaign, currentScenario)) {
+                continue;
             }
+
+            leadershipUnits.add(unit);
         }
 
-        return eligibleUnits;
+        return leadershipUnits;
+    }
+
+    /**
+     * Checks if a unit is valid for leadership deployment.
+     *
+     * <p>A unit is considered valid for leadership deployment if:</p>
+     * <ul>
+     *   <li>The unit is not null.</li>
+     *   <li>The unit is available for deployment.</li>
+     *   <li>The unit has no existing deployment records (i.e., not already deployed).</li>
+     *   <li>The unit's entity is valid and has a battle value within the provided leadership budget.</li>
+     *   <li>The unit matches the general unit type required for the deployment.</li>
+     * </ul>
+     *
+     * @param unit            The {@code Unit} object to validate for leadership deployment.
+     * @param generalUnitType The general unit type required for this deployment.
+     * @param totalBudget     The total battle value budget available for leadership deployment.
+     * @return {@code true} if the unit is valid for leadership deployment; {@code false} otherwise.
+     */
+    private static boolean isUnitValidForLeadershipDeployment(@Nullable Unit unit, int generalUnitType,
+                                                              int totalBudget) {
+        if (unit == null) {
+            return false;
+        }
+
+        if (!unit.isAvailable()) {
+            return false;
+        }
+
+        if (unit.checkDeployment() != null) {
+            return false;
+        }
+
+        Entity entity = unit.getEntity();
+
+        if (entity == null) {
+            return false;
+        }
+
+        if (entity.calculateBattleValue(true, true) > totalBudget) {
+            return false;
+        }
+
+        return forceCompositionMatchesDeclaredUnitType(entity.getUnitType(), generalUnitType);
     }
 
     /**
      * Check if the unit's force (if one exists) has been deployed to a StratCon
      * track
      */
-    public static boolean isUnitDeployedToStratCon(Unit u) {
-        if (!u.getCampaign().getCampaignOptions().isUseStratCon()) {
+    public static boolean isUnitDeployedToStratCon(Unit unit) {
+        if (!unit.getCampaign().getCampaignOptions().isUseStratCon()) {
             return false;
         }
 
         // this is a little inefficient, but probably there aren't too many active AtB
         // contracts at a time
-        return u.getCampaign().getActiveAtBContracts().stream()
+        return unit.getCampaign().getActiveAtBContracts().stream()
                 .anyMatch(contract -> (contract.getStratconCampaignState() != null) &&
-                        contract.getStratconCampaignState().isForceDeployedHere(u.getForceId()));
+                        contract.getStratconCampaignState().isForceDeployedHere(unit.getForceId()));
     }
 
     /**
      * Calculates the majority unit type for the forces given the IDs.
      */
-    private static int getPrimaryUnitType(Campaign campaign, ArrayList<Integer> forceIDs) {
+    private static int getPrimaryUnitType(Campaign campaign, List<Integer> forceIDs) {
         Map<Integer, Integer> unitTypeBuckets = new TreeMap<>();
         int biggestBucketID = -1;
         int biggestBucketCount = 0;

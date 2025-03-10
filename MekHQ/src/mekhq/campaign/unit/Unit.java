@@ -1131,8 +1131,29 @@ public class Unit implements ITechnology {
         scenarioId = -1;
     }
 
+    /**
+     * Validates the deployment readiness of the unit.
+     *
+     * <p>This method checks multiple conditions to determine whether the unit is deployable. If the
+     * unit is not deployable, a descriptive error message is returned indicating the reason for its
+     * ineligibility. If the unit passes all validations, {@code null} is returned, implying it is
+     * ready for deployment.<p>
+     *
+     * Deployment checks performed:
+     * <ul>
+     *   <li>If the unit is not functional, it cannot be deployed.</li>
+     *   <li>If the unit is unmanned and is not an unmanned trailer, it cannot be deployed.</li>
+     *   <li>If the unit is in the process of being refitted, it cannot be deployed.</li>
+     *   <li>If the unit is a tank and does not have the required crew size, it cannot be deployed.</li>
+     *   <li>If the unit is a BattleArmor unit with empty suits, it cannot be deployed until these
+     *   are filled or salvaged.</li>
+     * </ul>
+     *
+     * @return A descriptive {@code String} error message if the unit cannot be deployed, or {@code null}
+     * if the unit is deployable.
+     */
     // TODO: Add support for advanced medical
-    public String checkDeployment() {
+    public @Nullable String checkDeployment() {
         if (!isFunctional()) {
             return "unit is not functional";
         }
