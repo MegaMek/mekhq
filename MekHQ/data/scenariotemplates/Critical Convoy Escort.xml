@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
     <name>Critical Convoy Escort</name>
+    <stratConScenarioType>CONVOY</stratConScenarioType>
     <shortBriefing>Escort critical convoy or defeat attackers.</shortBriefing>
     <detailedBriefing>An allied convoy carrying critical supplies is moving through hostile territory, and a large, heavily armed enemy force is preparing to intercept. Your mission is to ensure that at least 50% of the convoy reaches the far edge of the engagement area intact. These supplies are essential to sustaining our war effort, and failure is not an option.
 

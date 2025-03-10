@@ -54,10 +54,13 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.autoresolve.AtBSetupForces;
 import mekhq.campaign.handler.PostScenarioDialogHandler;
 import mekhq.campaign.handler.XPHandler;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
+import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.ChooseMulFilesDialog;
@@ -466,8 +469,8 @@ public class MekHQ implements GameListener {
         currentScenario = scenario;
 
         // Start the game thread - also refactor this into a factory
-        if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario)) {
-            gameThread = new AtBGameThread(playerName, password, client, this, meks, (AtBScenario) scenario, autoResolveBehaviorSettings, useExperimentalPacarGui, true);
+        if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario atBScenario)) {
+            gameThread = new AtBGameThread(playerName, password, client, this, meks, atBScenario, autoResolveBehaviorSettings, useExperimentalPacarGui, true);
         } else {
             gameThread = new GameThread(playerName, password, client, this, meks, scenario);
         }
