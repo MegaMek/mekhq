@@ -271,7 +271,6 @@ public class Systems {
      * @param planetsPath     The path to the folder containing planetary XML files.
      *
      * @throws DOMException
-     * @throws IOException
      */
     public void load(String planetsPath) throws DOMException {
         // set up mapper
