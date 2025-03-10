@@ -2,90 +2,112 @@
 <abilities>
     <!-- PILOTING SPA -->
     <ability>
-        <lookupName>animal_mimic</lookupName>
-        <xpCost>5</xpCost>
+        <lookupName>env_specialist</lookupName>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
         <skillPrereq>
+            <skill>Gunnery/Mek::Regular</skill>
+            <skill>Piloting/Aircraft::Regular</skill>
+            <skill>Gunnery/Spacecraft::Regular</skill>
+            <skill>Piloting/Spacecraft::Regular</skill>
             <skill>Piloting/Mek::Regular</skill>
+            <skill>Piloting/VTOL::Regular</skill>
+            <skill>Piloting/Naval::Regular</skill>
+            <skill>Gunnery/BattleArmor::Regular</skill>
+            <skill>Gunnery/Aerospace::Regular</skill>
+            <skill>Piloting/Aerospace::Regular</skill>
             <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Anti-Mek::Regular</skill>
+            <skill>Piloting/Ground Vehicle::Regular</skill>
+            <skill>Gunnery/Aircraft::Regular</skill>
+            <skill>Gunnery/Vehicle::Regular</skill>
+        </skillPrereq>
+    </ability>
+    <ability>
+        <lookupName>animal_mimic</lookupName>
+        <xpCost>50</xpCost>
+        <weight>1</weight>
+        <skillPrereq>
+            <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Piloting/Mek::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>dodge_maneuver</lookupName>
-        <xpCost>10</xpCost>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
         <skillPrereq>
-            <skill>Piloting/Mek::Regular</skill>
             <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Piloting/Mek::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>hot_dog</lookupName>
-        <xpCost>5</xpCost>
+        <xpCost>50</xpCost>
         <weight>2</weight>
         <skillPrereq>
-            <skill>Piloting/Mek::Regular</skill>
             <skill>Piloting/Aerospace::Regular</skill>
+            <skill>Piloting/Mek::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>hopping_jack</lookupName>
-        <xpCost>5</xpCost>
+        <xpCost>50</xpCost>
         <weight>3</weight>
         <invalidAbilities>jumping_jack</invalidAbilities>
         <skillPrereq>
-            <skill>Piloting/Mek::Regular</skill>
             <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Piloting/Mek::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>jumping_jack</lookupName>
-        <xpCost>10</xpCost>
-        <!-- the extra weight on this one helps increase its likelihood if hopping
-             jack was already selected -->
+        <xpCost>150</xpCost>
+        <!-- the extra weight on this one helps increase its likelihood if hopping jack was already selected -->
         <weight>6</weight>
-        <prereqAbilities>hopping_jack</prereqAbilities>
-        <removeAbilities>hopping_jack</removeAbilities>
         <skillPrereq>
-            <skill>Piloting/Mek::Regular</skill>
             <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Piloting/Mek::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>maneuvering_ace</lookupName>
-        <xpCost>10</xpCost>
+        <xpCost>100</xpCost>
         <weight>3</weight>
         <skillPrereq>
-            <skill>Piloting/Mek::Regular</skill>
+            <skill>Piloting/Aerospace::Regular</skill>
+            <skill>Piloting/Naval::Regular</skill>
             <skill>Gunnery/ProtoMek::Regular</skill>
             <skill>Piloting/Ground Vehicle::Regular</skill>
+            <skill>Piloting/Spacecraft::Regular</skill>
             <skill>Piloting/VTOL::Regular</skill>
-            <skill>Piloting/Aerospace::Regular</skill>
             <skill>Piloting/Aircraft::Regular</skill>
-            <skill>Piloting/Naval::Regular</skill>
+            <skill>Piloting/Mek::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>melee_specialist</lookupName>
-        <xpCost>10</xpCost>
+        <xpCost>100</xpCost>
         <weight>3</weight>
         <skillPrereq>
-            <skill>Piloting/Mek::Regular</skill>
             <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Piloting/Mek::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>melee_master</lookupName>
-        <xpCost>15</xpCost>
+        <xpCost>150</xpCost>
         <weight>6</weight>
         <prereqAbilities>melee_specialist</prereqAbilities>
         <invalidAbilities>zweihander</invalidAbilities>
         <skillPrereq>
-            <skill>Piloting/Mek::Regular</skill>
             <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Piloting/Mek::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>zweihander</lookupName>
-        <xpCost>10</xpCost>
+        <xpCost>100</xpCost>
         <weight>6</weight>
         <prereqAbilities>melee_specialist</prereqAbilities>
         <invalidAbilities>melee_master</invalidAbilities>
@@ -95,153 +117,244 @@
     </ability>
     <ability>
         <lookupName>shaky_stick</lookupName>
-        <xpCost>10</xpCost>
+        <xpCost>100</xpCost>
         <weight>3</weight>
         <skillPrereq>
-            <skill>Piloting/VTOL::Regular</skill>
             <skill>Piloting/Aerospace::Regular</skill>
+            <skill>Piloting/Ground Vehicle::Regular</skill>
+            <skill>Piloting/Spacecraft::Regular</skill>
+            <skill>Piloting/VTOL::Regular</skill>
             <skill>Piloting/Aircraft::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>tm_forest_ranger</lookupName>
-        <xpCost>15</xpCost>
+        <xpCost>150</xpCost>
         <weight>3</weight>
         <skillPrereq>
-            <skill>Piloting/Mek::Veteran</skill>
+            <skill>Anti-Mek::Veteran</skill>
             <skill>Gunnery/ProtoMek::Veteran</skill>
             <skill>Piloting/Ground Vehicle::Veteran</skill>
+            <skill>Piloting/Mek::Veteran</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>tm_frogman</lookupName>
-        <xpCost>15</xpCost>
+        <xpCost>150</xpCost>
         <weight>3</weight>
         <skillPrereq>
-            <skill>Piloting/Mek::Veteran</skill>
             <skill>Gunnery/ProtoMek::Veteran</skill>
+            <skill>Piloting/Mek::Veteran</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>tm_mountaineer</lookupName>
-        <xpCost>15</xpCost>
+        <xpCost>150</xpCost>
         <weight>3</weight>
         <skillPrereq>
-            <skill>Piloting/Mek::Veteran</skill>
+            <skill>Anti-Mek::Veteran</skill>
             <skill>Gunnery/ProtoMek::Veteran</skill>
             <skill>Piloting/Ground Vehicle::Veteran</skill>
+            <skill>Piloting/Mek::Veteran</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>tm_swamp_beast</lookupName>
-        <xpCost>15</xpCost>
+        <xpCost>150</xpCost>
         <weight>3</weight>
         <skillPrereq>
-            <skill>Piloting/Mek::Veteran</skill>
+            <skill>Anti-Mek::Veteran</skill>
             <skill>Gunnery/ProtoMek::Veteran</skill>
             <skill>Piloting/Ground Vehicle::Veteran</skill>
+            <skill>Piloting/Mek::Veteran</skill>
+        </skillPrereq>
+    </ability>
+    <ability>
+        <lookupName>tm_nightwalker</lookupName>
+        <xpCost>150</xpCost>
+        <weight>1</weight>
+        <skillPrereq>
+            <skill>Anti-Mek::Veteran</skill>
+            <skill>Gunnery/ProtoMek::Veteran</skill>
+            <skill>Piloting/Ground Vehicle::Veteran</skill>
+            <skill>Piloting/Mek::Veteran</skill>
+        </skillPrereq>
+    </ability>
+    <ability>
+        <lookupName>cross_country</lookupName>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <skillPrereq>
+            <skill>Piloting/Ground Vehicle::Regular</skill>
+        </skillPrereq>
+    </ability>
+    <ability>
+        <lookupName>aptitude_piloting</lookupName>
+        <xpCost>500</xpCost>
+        <weight>1</weight>
+        <skillPrereq>
+            <skill>Piloting/Aerospace::Veteran</skill>
+            <skill>Piloting/Naval::Veteran</skill>
+            <skill>Piloting/Ground Vehicle::Veteran</skill>
+            <skill>Piloting/Spacecraft::Veteran</skill>
+            <skill>Piloting/VTOL::Veteran</skill>
+            <skill>Piloting/Aircraft::Veteran</skill>
+            <skill>Piloting/Mek::Veteran</skill>
         </skillPrereq>
     </ability>
 
     <!-- GUNNERY SPA -->
     <ability>
+        <lookupName>gunnery_ballistic</lookupName>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>weapon_specialist</invalidAbilities>
+        <invalidAbilities>specialist</invalidAbilities>
+        <skillPrereq>
+            <skill>Gunnery/Mek::Green</skill>
+            <skill>Gunnery/ProtoMek::Green</skill>
+            <skill>Gunnery/Aircraft::Green</skill>
+            <skill>Gunnery/Aerospace::Green</skill>
+            <skill>Gunnery/Spacecraft::Green</skill>
+            <skill>Gunnery/BattleArmor::Green</skill>
+            <skill>Gunnery/Vehicle::Green</skill>
+        </skillPrereq>
+    </ability>
+    <ability>
+        <lookupName>gunnery_missile</lookupName>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>weapon_specialist</invalidAbilities>
+        <invalidAbilities>specialist</invalidAbilities>
+        <skillPrereq>
+            <skill>Gunnery/Mek::Green</skill>
+            <skill>Gunnery/ProtoMek::Green</skill>
+            <skill>Gunnery/Aircraft::Green</skill>
+            <skill>Gunnery/Aerospace::Green</skill>
+            <skill>Gunnery/Spacecraft::Green</skill>
+            <skill>Gunnery/BattleArmor::Green</skill>
+            <skill>Gunnery/Vehicle::Green</skill>
+        </skillPrereq>
+    </ability>
+    <ability>
+        <lookupName>gunnery_laser</lookupName>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>weapon_specialist</invalidAbilities>
+        <invalidAbilities>specialist</invalidAbilities>
+        <skillPrereq>
+            <skill>Gunnery/Mek::Green</skill>
+            <skill>Gunnery/ProtoMek::Green</skill>
+            <skill>Gunnery/Aircraft::Green</skill>
+            <skill>Gunnery/Aerospace::Green</skill>
+            <skill>Gunnery/Spacecraft::Green</skill>
+            <skill>Gunnery/BattleArmor::Green</skill>
+            <skill>Gunnery/Vehicle::Green</skill>
+        </skillPrereq>
+    </ability>
+    <ability>
         <lookupName>cluster_hitter</lookupName>
-        <xpCost>10</xpCost>
+        <xpCost>100</xpCost>
         <weight>3</weight>
+        <invalidAbilities>oblique_attacker::sandblaster</invalidAbilities>
         <skillPrereq>
             <skill>Gunnery/Mek::Regular</skill>
-            <skill>Gunnery/Aerospace::Regular</skill>
-            <skill>Gunnery/Aircraft::Regular</skill>
-            <skill>Gunnery/Vehicle::Regular</skill>
-            <skill>Gunnery/Spacecraft::Regular</skill>
-            <skill>Gunnery/Battlesuit::Regular</skill>
             <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Gunnery/Aircraft::Regular</skill>
+            <skill>Gunnery/Spacecraft::Regular</skill>
+            <skill>Gunnery/Aerospace::Regular</skill>
+            <skill>Gunnery/BattleArmor::Regular</skill>
+            <skill>Gunnery/Vehicle::Regular</skill>
         </skillPrereq>
-        <invalidAbilities>cluster_master</invalidAbilities>
     </ability>
     <ability>
         <lookupName>cluster_master</lookupName>
+        <xpCost>50</xpCost>
         <weight>6</weight>
-        <xpCost>5</xpCost>
         <prereqAbilities>cluster_hitter</prereqAbilities>
         <removeAbilities>cluster_hitter</removeAbilities>
         <skillPrereq>
             <skill>Gunnery/Mek::Veteran</skill>
-            <skill>Gunnery/Aerospace::Veteran</skill>
-            <skill>Gunnery/Aircraft::Veteran</skill>
-            <skill>Gunnery/Vehicle::Veteran</skill>
-            <skill>Gunnery/Spacecraft::Veteran</skill>
-            <skill>Gunnery/Battlesuit::Veteran</skill>
             <skill>Gunnery/ProtoMek::Veteran</skill>
+            <skill>Gunnery/Aircraft::Veteran</skill>
+            <skill>Gunnery/BattleArmor::Veteran</skill>
+            <skill>Gunnery/Spacecraft::Veteran</skill>
+            <skill>Gunnery/Aerospace::Veteran</skill>
+            <skill>Gunnery/Vehicle::Veteran</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>golden_goose</lookupName>
+        <xpCost>100</xpCost>
         <weight>3</weight>
-        <xpCost>10</xpCost>
         <skillPrereq>
-            <skill>Gunnery/Aerospace::Regular</skill>
-            <skill>Gunnery/Aircraft::Regular</skill>
+            <skill>Piloting/Aerospace::Veteran</skill>
+            <skill>Piloting/Spacecraft::Veteran</skill>
+            <skill>Piloting/VTOL::Veteran</skill>
+            <skill>Piloting/Aircraft::Veteran</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>multi_tasker</lookupName>
-        <xpCost>5</xpCost>
+        <xpCost>50</xpCost>
         <weight>2</weight>
         <skillPrereq>
             <skill>Gunnery/Mek::Regular</skill>
-            <skill>Gunnery/Aerospace::Regular</skill>
-            <skill>Gunnery/Aircraft::Regular</skill>
-            <skill>Gunnery/Vehicle::Regular</skill>
-            <skill>Gunnery/Spacecraft::Regular</skill>
-            <skill>Gunnery/Battlesuit::Regular</skill>
             <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Gunnery/Aircraft::Regular</skill>
+            <skill>Gunnery/Spacecraft::Regular</skill>
+            <skill>Gunnery/Aerospace::Regular</skill>
+            <skill>Gunnery/BattleArmor::Regular</skill>
+            <skill>Gunnery/Vehicle::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>oblique_attacker</lookupName>
-        <xpCost>5</xpCost>
-        <weight>2</weight>
+        <xpCost>100</xpCost>
+        <weight>3</weight>
+        <invalidAbilities>oblique_attacker::sandblaster</invalidAbilities>
         <skillPrereq>
             <skill>Gunnery/Mek::Regular</skill>
-            <skill>Gunnery/Aerospace::Regular</skill>
-            <skill>Gunnery/Aircraft::Regular</skill>
-            <skill>Gunnery/Vehicle::Regular</skill>
-            <skill>Gunnery/Battlesuit::Regular</skill>
             <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Gunnery/Aircraft::Regular</skill>
+            <skill>Gunnery/Spacecraft::Regular</skill>
+            <skill>Gunnery/Aerospace::Regular</skill>
+            <skill>Gunnery/BattleArmor::Regular</skill>
+            <skill>Gunnery/Vehicle::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>oblique_artillery</lookupName>
-        <xpCost>10</xpCost>
+        <xpCost>100</xpCost>
         <weight>2</weight>
         <skillPrereq>
             <skill>Gunnery/Mek::Regular</skill>
-            <skill>Gunnery/Aerospace::Regular</skill>
-            <skill>Gunnery/Aircraft::Regular</skill>
-            <skill>Gunnery/Vehicle::Regular</skill>
-            <skill>Gunnery/Battlesuit::Regular</skill>
             <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Gunnery/Aircraft::Regular</skill>
+            <skill>Gunnery/Aerospace::Regular</skill>
+            <skill>Gunnery/Spacecraft::Regular</skill>
+            <skill>Gunnery/BattleArmor::Regular</skill>
+            <skill>Gunnery/Vehicle::Regular</skill>
             <skill>Artillery::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>range_master</lookupName>
-        <xpCost>10</xpCost>
+        <xpCost>100</xpCost>
         <weight>3</weight>
         <skillPrereq>
             <skill>Gunnery/Mek::Regular</skill>
-            <skill>Gunnery/Aerospace::Regular</skill>
-            <skill>Gunnery/Aircraft::Regular</skill>
-            <skill>Gunnery/Vehicle::Regular</skill>
-            <skill>Gunnery/Spacecraft::Regular</skill>
-            <skill>Gunnery/Battlesuit::Regular</skill>
             <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Gunnery/Aircraft::Regular</skill>
+            <skill>Gunnery/Spacecraft::Regular</skill>
+            <skill>Gunnery/Aerospace::Regular</skill>
+            <skill>Gunnery/BattleArmor::Regular</skill>
+            <skill>Gunnery/Vehicle::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>sniper</lookupName>
-        <xpCost>15</xpCost>
+        <xpCost>150</xpCost>
         <weight>1</weight>
         <skillPrereq>
             <skill>Gunnery/Mek::Veteran</skill>
@@ -255,194 +368,257 @@
     </ability>
     <ability>
         <lookupName>sandblaster</lookupName>
-        <xpCost>10</xpCost>
+        <xpCost>100</xpCost>
         <weight>3</weight>
         <invalidAbilities>cluster_hitter::cluster_master</invalidAbilities>
         <skillPrereq>
             <skill>Gunnery/Mek::Regular</skill>
-            <skill>Gunnery/Aerospace::Regular</skill>
-            <skill>Gunnery/Aircraft::Regular</skill>
-            <skill>Gunnery/Vehicle::Regular</skill>
-            <skill>Gunnery/Spacecraft::Regular</skill>
-            <skill>Gunnery/Battlesuit::Regular</skill>
             <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Gunnery/Aircraft::Regular</skill>
+            <skill>Gunnery/Spacecraft::Regular</skill>
+            <skill>Gunnery/Aerospace::Regular</skill>
+            <skill>Gunnery/BattleArmor::Regular</skill>
+            <skill>Gunnery/Vehicle::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>specialist</lookupName>
-        <xpCost>6</xpCost>
+        <xpCost>50</xpCost>
         <weight>4</weight>
         <invalidAbilities>weapon_specialist</invalidAbilities>
         <skillPrereq>
-            <skill>Gunnery/Mek::Regular</skill>
-            <skill>Gunnery/Aerospace::Regular</skill>
-            <skill>Gunnery/Aircraft::Regular</skill>
-            <skill>Gunnery/Vehicle::Regular</skill>
-            <skill>Gunnery/Spacecraft::Regular</skill>
-            <skill>Gunnery/Battlesuit::Regular</skill>
-            <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Gunnery/Mek::Green</skill>
+            <skill>Gunnery/ProtoMek::Green</skill>
+            <skill>Gunnery/Aircraft::Green</skill>
+            <skill>Gunnery/Aerospace::Green</skill>
+            <skill>Gunnery/Spacecraft::Green</skill>
+            <skill>Gunnery/BattleArmor::Green</skill>
+            <skill>Gunnery/Vehicle::Green</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>weapon_specialist</lookupName>
-        <xpCost>15</xpCost>
-        <weight>2</weight>
-        <invalidAbilities>specialist</invalidAbilities>
+        <xpCost>50</xpCost>
+        <weight>4</weight>
         <skillPrereq>
-            <skill>Gunnery/Mek::Veteran</skill>
-            <skill>Gunnery/Aerospace::Veteran</skill>
-            <skill>Gunnery/Aircraft::Veteran</skill>
-            <skill>Gunnery/Vehicle::Veteran</skill>
-            <skill>Gunnery/Spacecraft::Veteran</skill>
-            <skill>Gunnery/Battlesuit::Veteran</skill>
-            <skill>Gunnery/ProtoMek::Veteran</skill>
+            <skill>Gunnery/Mek::Green</skill>
+            <skill>Gunnery/ProtoMek::Green</skill>
+            <skill>Gunnery/Aircraft::Green</skill>
+            <skill>Gunnery/Aerospace::Green</skill>
+            <skill>Gunnery/Spacecraft::Green</skill>
+            <skill>Gunnery/BattleArmor::Green</skill>
+            <skill>Gunnery/Vehicle::Green</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>aptitude_gunnery</lookupName>
-        <xpCost>40</xpCost>
-        <weight>0</weight>
+        <xpCost>500</xpCost>
+        <weight>1</weight>
         <skillPrereq>
-            <skill>Gunnery/Mek</skill>
-            <skill>Gunnery/Aerospace</skill>
-            <skill>Gunnery/Aircraft</skill>
-            <skill>Gunnery/Vehicle</skill>
-            <skill>Gunnery/Spacecraft</skill>
-            <skill>Gunnery/Battlesuit</skill>
-            <skill>Gunnery/ProtoMek</skill>
+            <skill>Gunnery/Mek::Veteran</skill>
+            <skill>Gunnery/ProtoMek::Veteran</skill>
+            <skill>Gunnery/Aircraft::Veteran</skill>
+            <skill>Gunnery/Aerospace::Veteran</skill>
+            <skill>Gunnery/Spacecraft::Veteran</skill>
+            <skill>Gunnery/BattleArmor::Veteran</skill>
+            <skill>Gunnery/Vehicle::Veteran</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>some_like_it_hot</lookupName>
-        <xpCost>5</xpCost>
+        <xpCost>50</xpCost>
         <weight>2</weight>
         <skillPrereq>
             <skill>Gunnery/Mek::Regular</skill>
             <skill>Gunnery/Aerospace::Regular</skill>
+        </skillPrereq>
+    </ability>
+    <ability>
+        <lookupName>weapon_specialist</lookupName>
+        <xpCost>150</xpCost>
+        <weight>2</weight>
+        <invalidAbilities>specialist</invalidAbilities>
+        <skillPrereq>
+            <skill>Gunnery/Mek::Veteran</skill>
+            <skill>Gunnery/ProtoMek::Veteran</skill>
+            <skill>Gunnery/Aircraft::Veteran</skill>
+            <skill>Gunnery/Spacecraft::Veteran</skill>
+            <skill>Gunnery/Aerospace::Veteran</skill>
+            <skill>Gunnery/BattleArmor::Veteran</skill>
+            <skill>Gunnery/Vehicle::Veteran</skill>
+        </skillPrereq>
+    </ability>
+    <ability>
+        <lookupName>blood_stalker</lookupName>
+        <xpCost>120</xpCost>
+        <weight>1</weight>
+        <skillPrereq>
+            <skill>Gunnery/Mek::Regular</skill>
+            <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Gunnery/Aircraft::Regular</skill>
+            <skill>Gunnery/Spacecraft::Regular</skill>
+            <skill>Gunnery/Aerospace::Regular</skill>
+            <skill>Gunnery/BattleArmor::Regular</skill>
+            <skill>Gunnery/Vehicle::Regular</skill>
         </skillPrereq>
     </ability>
 
     <!-- Misc SPA -->
     <ability>
         <lookupName>eagle_eyes</lookupName>
-        <xpCost>10</xpCost>
+        <xpCost>100</xpCost>
         <weight>2</weight>
         <skillPrereq>
-            <skill>Piloting/Mek::Regular</skill>
-            <skill>Piloting/Aerospace::Regular</skill>
+            <skill>Gunnery/Mek::Regular</skill>
             <skill>Piloting/Aircraft::Regular</skill>
-            <skill>Gunnery/ProtoMek::Regular</skill>
-            <skill>Piloting/Ground Vehicle::Regular</skill>
+            <skill>Gunnery/Spacecraft::Regular</skill>
+            <skill>Piloting/Spacecraft::Regular</skill>
+            <skill>Piloting/Mek::Regular</skill>
             <skill>Piloting/VTOL::Regular</skill>
             <skill>Piloting/Naval::Regular</skill>
-            <skill>Gunnery/Battlesuit::Regular</skill>
-            <skill>Piloting/Spacecraft::Regular</skill>
-            <skill>Small Arms::Regular</skill>
+            <skill>Gunnery/BattleArmor::Regular</skill>
+            <skill>Gunnery/Aerospace::Regular</skill>
+            <skill>Piloting/Aerospace::Regular</skill>
+            <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Anti-Mek::Regular</skill>
+            <skill>Piloting/Ground Vehicle::Regular</skill>
+            <skill>Gunnery/Aircraft::Regular</skill>
+            <skill>Gunnery/Vehicle::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>forward_observer</lookupName>
-        <xpCost>15</xpCost>
+        <xpCost>150</xpCost>
         <weight>3</weight>
         <skillPrereq>
-            <skill>Piloting/Mek::Regular</skill>
-            <skill>Piloting/Aerospace::Regular</skill>
+            <skill>Gunnery/Mek::Regular</skill>
             <skill>Piloting/Aircraft::Regular</skill>
-            <skill>Gunnery/ProtoMek::Regular</skill>
-            <skill>Piloting/Ground Vehicle::Regular</skill>
+            <skill>Gunnery/Spacecraft::Regular</skill>
+            <skill>Piloting/Spacecraft::Regular</skill>
+            <skill>Piloting/Mek::Regular</skill>
             <skill>Piloting/VTOL::Regular</skill>
             <skill>Piloting/Naval::Regular</skill>
-            <skill>Gunnery/Battlesuit::Regular</skill>
-            <skill>Piloting/Spacecraft::Regular</skill>
-            <skill>Small Arms::Regular</skill>
+            <skill>Gunnery/BattleArmor::Regular</skill>
+            <skill>Gunnery/Aerospace::Regular</skill>
+            <skill>Piloting/Aerospace::Regular</skill>
+            <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Anti-Mek::Regular</skill>
+            <skill>Piloting/Ground Vehicle::Regular</skill>
+            <skill>Gunnery/Aircraft::Regular</skill>
+            <skill>Gunnery/Vehicle::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>human_tro</lookupName>
-        <xpCost>5</xpCost>
+        <xpCost>50</xpCost>
         <weight>2</weight>
         <skillPrereq>
-            <skill>Piloting/Mek::Regular</skill>
-            <skill>Piloting/Aerospace::Regular</skill>
+            <skill>Gunnery/Mek::Regular</skill>
             <skill>Piloting/Aircraft::Regular</skill>
-            <skill>Gunnery/ProtoMek::Regular</skill>
-            <skill>Piloting/Ground Vehicle::Regular</skill>
+            <skill>Gunnery/Spacecraft::Regular</skill>
+            <skill>Piloting/Spacecraft::Regular</skill>
+            <skill>Piloting/Mek::Regular</skill>
             <skill>Piloting/VTOL::Regular</skill>
             <skill>Piloting/Naval::Regular</skill>
-            <skill>Gunnery/Battlesuit::Regular</skill>
-            <skill>Piloting/Spacecraft::Regular</skill>
-            <skill>Small Arms::Regular</skill>
+            <skill>Gunnery/BattleArmor::Regular</skill>
+            <skill>Gunnery/Aerospace::Regular</skill>
+            <skill>Piloting/Aerospace::Regular</skill>
+            <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Anti-Mek::Regular</skill>
+            <skill>Piloting/Ground Vehicle::Regular</skill>
+            <skill>Gunnery/Aircraft::Regular</skill>
+            <skill>Gunnery/Vehicle::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>tactical_genius</lookupName>
-        <xpCost>15</xpCost>
+        <xpCost>150</xpCost>
         <weight>1</weight>
         <skillPrereq>
-            <skill>Tactics::Veteran</skill>
+            <skill>Gunnery/Mek::Veteran</skill>
+            <skill>Piloting/Aircraft::Veteran</skill>
+            <skill>Gunnery/Spacecraft::Veteran</skill>
+            <skill>Piloting/Spacecraft::Veteran</skill>
+            <skill>Piloting/Mek::Veteran</skill>
+            <skill>Piloting/VTOL::Veteran</skill>
+            <skill>Piloting/Naval::Veteran</skill>
+            <skill>Gunnery/BattleArmor::Veteran</skill>
+            <skill>Gunnery/Aerospace::Veteran</skill>
+            <skill>Piloting/Aerospace::Veteran</skill>
+            <skill>Gunnery/ProtoMek::Veteran</skill>
+            <skill>Anti-Mek::Veteran</skill>
+            <skill>Piloting/Ground Vehicle::Veteran</skill>
+            <skill>Gunnery/Aircraft::Veteran</skill>
+            <skill>Gunnery/Vehicle::Veteran</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>allweather</lookupName>
-        <xpCost>10</xpCost>
+        <xpCost>100</xpCost>
         <weight>2</weight>
         <skillPrereq>
-            <skill>Piloting/Mek::Regular</skill>
-            <skill>Gunnery/ProtoMek::Regular</skill>
-            <skill>Piloting/Ground Vehicle::Regular</skill>
-            <skill>Piloting/VTOL::Regular</skill>
             <skill>Piloting/Aerospace::Regular</skill>
-            <skill>Piloting/Aircraft::Regular</skill>
             <skill>Piloting/Naval::Regular</skill>
+            <skill>Piloting/Ground Vehicle::Regular</skill>
+            <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Piloting/VTOL::Regular</skill>
+            <skill>Piloting/Aircraft::Regular</skill>
+            <skill>Piloting/Mek::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>sensor_geek</lookupName>
-        <xpCost>10</xpCost>
+        <xpCost>100</xpCost>
         <weight>2</weight>
         <skillPrereq>
-            <skill>Piloting/Mek::Green</skill>
-            <skill>Gunnery/ProtoMek::Green</skill>
-            <skill>Piloting/Ground Vehicle::Green</skill>
-            <skill>Piloting/VTOL::Green</skill>
             <skill>Piloting/Aerospace::Green</skill>
-            <skill>Piloting/Aircraft::Green</skill>
             <skill>Piloting/Naval::Green</skill>
-            <skill>Gunnery/Battlesuit::Green</skill>
+            <skill>Piloting/Ground Vehicle::Green</skill>
+            <skill>Gunnery/ProtoMek::Green</skill>
+            <skill>Gunnery/BattleArmor::Green</skill>
+            <skill>Piloting/VTOL::Green</skill>
+            <skill>Piloting/Aircraft::Green</skill>
+            <skill>Piloting/Mek::Green</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>weathered</lookupName>
-        <xpCost>10</xpCost>
+        <xpCost>100</xpCost>
         <weight>2</weight>
         <skillPrereq>
             <skill>Gunnery/Mek::Regular</skill>
-            <skill>Gunnery/Aerospace::Regular</skill>
-            <skill>Gunnery/Aircraft::Regular</skill>
-            <skill>Gunnery/Vehicle::Regular</skill>
-            <skill>Gunnery/Spacecraft::Regular</skill>
-            <skill>Gunnery/Battlesuit::Regular</skill>
             <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Gunnery/Aircraft::Regular</skill>
+            <skill>Gunnery/BattleArmor::Regular</skill>
+            <skill>Gunnery/Spacecraft::Regular</skill>
+            <skill>Gunnery/Aerospace::Regular</skill>
+            <skill>Gunnery/Vehicle::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>blind_fighter</lookupName>
-        <xpCost>10</xpCost>
+        <xpCost>100</xpCost>
         <weight>2</weight>
         <skillPrereq>
             <skill>Gunnery/Mek::Regular</skill>
-            <skill>Gunnery/Aerospace::Regular</skill>
-            <skill>Gunnery/Aircraft::Regular</skill>
-            <skill>Gunnery/Vehicle::Regular</skill>
-            <skill>Gunnery/Battlesuit::Regular</skill>
             <skill>Gunnery/ProtoMek::Regular</skill>
+            <skill>Gunnery/Aircraft::Regular</skill>
+            <skill>Gunnery/BattleArmor::Regular</skill>
+            <skill>Gunnery/Aerospace::Regular</skill>
+            <skill>Gunnery/Vehicle::Regular</skill>
         </skillPrereq>
+    </ability>
+    <ability>
+        <displayName>Iron Man (Unofficial)</displayName>
+        <lookupName>iron_man</lookupName>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
     </ability>
 
     <!-- Infantry SPA -->
     <ability>
         <lookupName>foot_cav</lookupName>
-        <xpCost>5</xpCost>
+        <xpCost>50</xpCost>
         <weight>3</weight>
         <skillPrereq>
             <skill>Small Arms::Regular</skill>
@@ -450,7 +626,7 @@
     </ability>
     <ability>
         <lookupName>urban_guerrilla</lookupName>
-        <xpCost>5</xpCost>
+        <xpCost>50</xpCost>
         <weight>3</weight>
         <skillPrereq>
             <skill>Small Arms::Regular</skill>
@@ -463,94 +639,102 @@
         <lookupName>tech_weapon_specialist</lookupName>
         <displayName>Tech Specialist, Weapon (Unofficial)</displayName>
         <desc>-1 to repair and maintenance checks when working with weapons</desc>
-        <xpCost>4</xpCost>
+        <xpCost>50</xpCost>
         <weight>2</weight>
         <skillPrereq>
-            <skill>Tech/Mek::Regular</skill>
-            <skill>Tech/Mechanic::Regular</skill>
-            <skill>Tech/Aero::Regular</skill>
-            <skill>Tech/BA::Regular</skill>
             <skill>Tech/Vessel::Regular</skill>
+            <skill>Tech/Aero::Regular</skill>
+            <skill>Tech/Mechanic::Regular</skill>
+            <skill>Tech/Mek::Regular</skill>
+            <skill>Tech/BattleArmor::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>tech_armor_specialist</lookupName>
         <displayName>Tech Specialist, Armor (Unofficial)</displayName>
         <desc>-1 to repair and maintenance checks when working with armor</desc>
-        <xpCost>4</xpCost>
+        <xpCost>50</xpCost>
         <weight>2</weight>
         <skillPrereq>
-            <skill>Tech/Mek::Regular</skill>
-            <skill>Tech/Mechanic::Regular</skill>
-            <skill>Tech/Aero::Regular</skill>
-            <skill>Tech/BA::Regular</skill>
             <skill>Tech/Vessel::Regular</skill>
+            <skill>Tech/Aero::Regular</skill>
+            <skill>Tech/Mechanic::Regular</skill>
+            <skill>Tech/Mek::Regular</skill>
+            <skill>Tech/BattleArmor::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>tech_internal_specialist</lookupName>
         <displayName>Tech Specialist, Internal (Unofficial)</displayName>
         <desc>-1 to repair and maintenance checks when working with internal systems</desc>
-        <xpCost>6</xpCost>
+        <xpCost>100</xpCost>
         <weight>2</weight>
         <skillPrereq>
-            <skill>Tech/Mek::Regular</skill>
-            <skill>Tech/Mechanic::Regular</skill>
-            <skill>Tech/Aero::Regular</skill>
-            <skill>Tech/BA::Regular</skill>
             <skill>Tech/Vessel::Regular</skill>
+            <skill>Tech/Aero::Regular</skill>
+            <skill>Tech/Mechanic::Regular</skill>
+            <skill>Tech/Mek::Regular</skill>
+            <skill>Tech/BattleArmor::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>tech_engineer</lookupName>
         <displayName>Engineer (unofficial)</displayName>
         <desc>-2 on refit rolls</desc>
-        <xpCost>8</xpCost>
+        <xpCost>100</xpCost>
         <weight>2</weight>
         <skillPrereq>
-            <skill>Tech/Mek::Veteran</skill>
-            <skill>Tech/Mechanic::Veteran</skill>
-            <skill>Tech/Aero::Veteran</skill>
-            <skill>Tech/BA::Veteran</skill>
             <skill>Tech/Vessel::Veteran</skill>
+            <skill>Tech/Aero::Veteran</skill>
+            <skill>Tech/Mechanic::Veteran</skill>
+            <skill>Tech/Mek::Veteran</skill>
+            <skill>Tech/BattleArmor::Veteran</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>tech_fixer</lookupName>
         <displayName>Mr/Ms Fix-it (unofficial)</displayName>
         <desc>Ignore first point of penalty for repair and maintenance on low quality equipment</desc>
-        <xpCost>4</xpCost>
+        <xpCost>50</xpCost>
         <weight>2</weight>
         <skillPrereq>
-            <skill>Tech/Mek::Regular</skill>
-            <skill>Tech/Mechanic::Regular</skill>
-            <skill>Tech/Aero::Regular</skill>
-            <skill>Tech/BA::Regular</skill>
             <skill>Tech/Vessel::Regular</skill>
+            <skill>Tech/Aero::Regular</skill>
+            <skill>Tech/Mechanic::Regular</skill>
+            <skill>Tech/Mek::Regular</skill>
+            <skill>Tech/BattleArmor::Regular</skill>
         </skillPrereq>
     </ability>
     <ability>
         <lookupName>tech_maintainer</lookupName>
         <displayName>Maintainer (Unofficial)</displayName>
-        <desc>The tech is slow and methodical at their work. They take a +1 penalty to their repair
-            rolls, but are better at maintaining units than most, with a -1 bonus.
-        </desc>
-        <xpCost>8</xpCost>
+        <desc>The tech is slow and methodical at their work. They take a +1 penalty to their repair rolls, but are better at maintaining units than most, with a -1 bonus.</desc>
+        <xpCost>100</xpCost>
         <weight>1</weight>
         <skillPrereq>
-            <skill>Tech/Mek::Regular</skill>
-            <skill>Tech/Mechanic::Regular</skill>
-            <skill>Tech/Aero::Regular</skill>
-            <skill>Tech/BA::Regular</skill>
             <skill>Tech/Vessel::Regular</skill>
+            <skill>Tech/Aero::Regular</skill>
+            <skill>Tech/Mechanic::Regular</skill>
+            <skill>Tech/Mek::Regular</skill>
+            <skill>Tech/BattleArmor::Regular</skill>
         </skillPrereq>
     </ability>
 
     <!-- OTHER SPA -->
     <ability>
         <lookupName>pain_resistance</lookupName>
-        <xpCost>4</xpCost>
+        <xpCost>50</xpCost>
         <weight>2</weight>
+    </ability>
+    <ability>
+        <lookupName>small_pilot</lookupName>
+        <xpCost>50</xpCost>
+        <weight>1</weight>
+    </ability>
+    <ability>
+        <lookupName>clan_pilot_training</lookupName>
+        <xpCost>0</xpCost>
+        <weight>0</weight>
     </ability>
 
     <!-- Support Edge Triggers - FIXME : Migrate to Isolated MHQ Support Edge Module -->
