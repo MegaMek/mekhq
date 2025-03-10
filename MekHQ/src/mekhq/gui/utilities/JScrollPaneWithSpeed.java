@@ -29,6 +29,7 @@ package mekhq.gui.utilities;
 
 import java.awt.Component;
 
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import megamek.client.ui.swing.GUIPreferences;
