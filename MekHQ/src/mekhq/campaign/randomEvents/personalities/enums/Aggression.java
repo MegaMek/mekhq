@@ -29,11 +29,9 @@ package mekhq.campaign.randomEvents.personalities.enums;
 
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
+import mekhq.campaign.randomEvents.personalities.PersonalityController.PronounData;
 
 import static megamek.codeUtilities.MathUtility.clamp;
-import static mekhq.campaign.personnel.enums.GenderDescriptors.HE_SHE_THEY;
-import static mekhq.campaign.personnel.enums.GenderDescriptors.HIM_HER_THEM;
-import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
@@ -102,7 +100,7 @@ public enum Aggression {
     /**
      * Defines the number of individual description variants available for each trait.
      */
-    public final static int MAXIMUM_VARIATIONS = 3;
+    public final static int MAXIMUM_VARIATIONS = 6;
 
     /**
      * The index at which major traits begin within the enumeration.
@@ -150,17 +148,20 @@ public enum Aggression {
         aggressionDescriptionIndex = clamp(aggressionDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
 
         final String RESOURCE_KEY = name() + ".description." + aggressionDescriptionIndex;
+        final PronounData pronounData = new PronounData(gender);
 
-        String subjectPronoun = HE_SHE_THEY.getDescriptorCapitalized(gender);
-        String subjectPronounLowerCase = HE_SHE_THEY.getDescriptor(gender);
-        String objectPronoun = HIM_HER_THEM.getDescriptorCapitalized(gender);
-        String objectPronounLowerCase = HIM_HER_THEM.getDescriptor(gender);
-        String possessivePronoun = HIS_HER_THEIR.getDescriptorCapitalized(gender);
-        String possessivePronounLowerCase = HIS_HER_THEIR.getDescriptor(gender);
+        // {0} = givenName
+        // {1} = He/She/They
+        // {2} = he/she/they
+        // {3} = Him/Her/Them
+        // {4} = him/her/them
+        // {5} = His/Her/Their
+        // {6} = his/her/their
+        // {7} = Gender Neutral = 0, Otherwise 1 (used to determine whether to use plural case)
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, givenName, subjectPronoun,
-            subjectPronounLowerCase, objectPronoun, objectPronounLowerCase, possessivePronoun,
-            possessivePronounLowerCase);
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, givenName, pronounData.subjectPronoun(),
+            pronounData.subjectPronounLowerCase(), pronounData.objectPronoun(), pronounData.objectPronounLowerCase(),
+            pronounData.possessivePronoun(), pronounData.possessivePronounLowerCase(), pronounData.pluralizer());
     }
 
     /**
@@ -201,7 +202,7 @@ public enum Aggression {
      */
     public static Aggression fromString(String text) {
         try {
-            return Aggression.valueOf(text);
+            return Aggression.valueOf(text.toUpperCase().replace(" ", "_"));
         } catch (Exception ignored) {}
 
         try {

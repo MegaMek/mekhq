@@ -30,12 +30,10 @@ package mekhq.campaign.randomEvents.personalities.enums;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.randomEvents.personalities.PersonalityController.PronounData;
 import mekhq.campaign.universe.Faction;
 
 import static megamek.codeUtilities.MathUtility.clamp;
-import static mekhq.campaign.personnel.enums.GenderDescriptors.HE_SHE_THEY;
-import static mekhq.campaign.personnel.enums.GenderDescriptors.HIM_HER_THEM;
-import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -287,7 +285,21 @@ public enum PersonalityQuirk {
     NEMESIS,
     FEAR_MEKS,
     LOCAL_CONNECTOR,
-    HATRED;
+    HATRED,
+    PANTSLESS,
+    MAKES_CLOTHES,
+    ACTS_SUSPICIOUSLY,
+    NIGHTMARES,
+    FREEZES,
+    TRAUMATIZED,
+    HAUNTED,
+    BROKEN,
+    REGRETS,
+    DARK_SECRET,
+    ANTHROPOMORPHIC,
+    CLUMSY,
+    JUSTIFIES,
+    ENJOYS_DRAMA;
     // endregion Enum Declarations
 
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
@@ -355,13 +367,7 @@ public enum PersonalityQuirk {
         }
 
         final String RESOURCE_KEY = name() + ".description." + personalityQuirkIndex + '.' + professionKey;
-
-        String subjectPronoun = HE_SHE_THEY.getDescriptorCapitalized(gender);
-        String subjectPronounLowerCase = HE_SHE_THEY.getDescriptor(gender);
-        String objectPronoun = HIM_HER_THEM.getDescriptorCapitalized(gender);
-        String objectPronounLowerCase = HIM_HER_THEM.getDescriptor(gender);
-        String possessivePronoun = HIS_HER_THEIR.getDescriptorCapitalized(gender);
-        String possessivePronounLowerCase = HIS_HER_THEIR.getDescriptor(gender);
+        final PronounData pronounData = new PronounData(gender);
 
         String formationKey;
         if (primaryRole == SOLDIER || primaryRole == BATTLE_ARMOUR) {
@@ -378,14 +384,26 @@ public enum PersonalityQuirk {
         } else {
             factionKey = "innerSphere";
         }
-        String lanceLabelLowercase = getFormattedTextAt(RESOURCE_BUNDLE,
-            formationKey + '.' + factionKey + ".lowercase");
-        String lanceLabelUppercase  = getFormattedTextAt(RESOURCE_BUNDLE,
-            formationKey + '.' + factionKey + ".uppercase");
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, givenName, subjectPronoun,
-            subjectPronounLowerCase, objectPronoun, objectPronounLowerCase, possessivePronoun,
-            possessivePronounLowerCase, lanceLabelUppercase, lanceLabelLowercase);
+        String lanceLabelUppercase  = getFormattedTextAt(RESOURCE_BUNDLE,
+            formationKey + '.' + factionKey);
+        String lanceLabelLowercase = lanceLabelUppercase.toLowerCase();
+
+        // {0} = givenName
+        // {1} = He/She/They
+        // {2} = he/she/they
+        // {3} = Him/Her/Them
+        // {4} = him/her/them
+        // {5} = His/Her/Their
+        // {6} = his/her/their
+        // {7} = Star/Lance/Level
+        // {8} = star/lance/level
+        // {9} = Gender Neutral = 0, Otherwise 1 (used to determine whether to use plural case)
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, givenName, pronounData.subjectPronoun(),
+            pronounData.subjectPronounLowerCase(), pronounData.objectPronoun(), pronounData.objectPronounLowerCase(),
+            pronounData.possessivePronoun(), pronounData.possessivePronounLowerCase(), lanceLabelUppercase,
+            lanceLabelLowercase, pronounData.pluralizer());
     }
     // endregion Getters
 

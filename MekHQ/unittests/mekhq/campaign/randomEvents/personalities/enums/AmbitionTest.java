@@ -24,6 +24,7 @@ import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.Test;
 
 import static mekhq.campaign.randomEvents.personalities.enums.Ambition.ASPIRING;
+import static mekhq.campaign.randomEvents.personalities.enums.Ambition.CONNIVING;
 import static mekhq.campaign.randomEvents.personalities.enums.Ambition.MAXIMUM_VARIATIONS;
 import static mekhq.campaign.randomEvents.personalities.enums.Ambition.NONE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
@@ -57,6 +58,13 @@ public class AmbitionTest {
         Ambition status = Ambition.fromString("");
 
         assertEquals(NONE, status);
+    }
+
+    @Test
+    public void testFromString_FromOrdinal() {
+        Ambition status = Ambition.fromString(CONNIVING.ordinal() + "");
+
+        assertEquals(CONNIVING, status);
     }
 
     @Test
