@@ -1,22 +1,29 @@
 /*
- * ScenarioTemplateEditorDialog.java
- *
- * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
- * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
- * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.dialog;
 
@@ -65,7 +72,7 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * Handles editing, saving and loading of scenario template definitions.
- * 
+ *
  * @author NickAragua
  */
 public class ScenarioTemplateEditorDialog extends JDialog implements ActionListener {
@@ -155,7 +162,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     /**
      * Constructor. Creates a new instance of this dialog with the given parent
      * JFrame.
-     * 
+     *
      * @param parent
      */
     public ScenarioTemplateEditorDialog(JFrame parent) {
@@ -211,7 +218,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
     /**
      * Sets up text entry boxes in the top - briefing, scenario name, labels.
-     * 
+     *
      * @param gbc
      */
     private void setupTopFluff(GridBagConstraints gbc) {
@@ -315,7 +322,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     /**
      * Worker function that sets up top-level headers for the force template editor
      * section.
-     * 
+     *
      * @param gbc
      */
     private void setupForceEditorHeaders(GridBagConstraints gbc) {
@@ -338,7 +345,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
     /**
      * Worker function that sets up UI elements for the force template editor.
-     * 
+     *
      * @param externalGBC
      */
     private void setupForceEditor(GridBagConstraints externalGBC) {
@@ -655,7 +662,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     /**
      * Helper function that loads the given force template into the force editor
      * interface.
-     * 
+     *
      * @param forceTemplate The force template.
      */
     private void loadForce(ScenarioForceTemplate forceTemplate) {
@@ -695,7 +702,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     /**
      * Worker function called when initializing the dialog to place the force
      * template list on the content pane.
-     * 
+     *
      * @param gbc Grid bag constraints.
      */
     private void initializeForceList(GridBagConstraints gbc) {
@@ -717,7 +724,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
     /**
      * Worker function called when initializing to place the map parameters.
-     * 
+     *
      * @param gbc
      */
     private void setupMapParameters(GridBagConstraints gbc) {
@@ -914,7 +921,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
     /**
      * Worker function that sets up the buttons on the bottom of the dialog
-     * 
+     *
      * @param gbc
      */
     private void setupBottomButtons(GridBagConstraints gbc) {
@@ -1227,7 +1234,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * Function that performs validation when the 'Add' button is clicked for a
      * force
      * and informs the user of any nonsense configuration they may have specified.
-     * 
+     *
      * @return Validation message for display.
      */
     private String validateAddForce() {
@@ -1277,7 +1284,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
          * if (valBuilder.length() > 0) {
          * valBuilder.append("\n");
          * }
-         * 
+         *
          * valBuilder.append("Force with this key already exists!");
          * }
          */
@@ -1288,7 +1295,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     /**
      * Event handler for when the "Remove" button is pressed for a particular force
      * template.
-     * 
+     *
      * @param command The command string containing the index of the force to
      *                remove.
      */
@@ -1305,7 +1312,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     /**
      * Event handler for when the "Edit" button is pressed for a particular force
      * template.
-     * 
+     *
      * @param command The command string containing the index of the force to edit.
      */
     private void editForceButtonHandler(String command) {
