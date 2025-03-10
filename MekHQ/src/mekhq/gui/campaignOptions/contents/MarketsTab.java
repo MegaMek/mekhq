@@ -736,7 +736,7 @@ public class MarketsTab {
 
         // Personnel Market
         comboPersonnelMarketType.setSelectedItem(options.getPersonnelMarketName());
-        chkPersonnelMarketReportRefresh.setSelected(options.isContractMarketReportRefresh());
+        chkPersonnelMarketReportRefresh.setSelected(options.isPersonnelMarketReportRefresh());
         chkUsePersonnelHireHiringHallOnly.setSelected(options.isUsePersonnelHireHiringHallOnly());
         spnPersonnelMarketDylansWeight.setValue(options.getPersonnelMarketDylansWeight());
         for (final Entry<SkillLevel, JSpinner> entry : spnPersonnelMarketRandomRemovalTargets.entrySet()) {
@@ -750,7 +750,7 @@ public class MarketsTab {
         spnUnitMarketRarityModifier.setValue(options.getUnitMarketRarityModifier());
         chkInstantUnitMarketDelivery.setSelected(options.isInstantUnitMarketDelivery());
         chkMothballUnitMarketDeliveries.setSelected(options.isMothballUnitMarketDeliveries());
-        chkUnitMarketReportRefresh.setSelected(options.isContractMarketReportRefresh());
+        chkUnitMarketReportRefresh.setSelected(options.isUnitMarketReportRefresh());
 
         // Contract Market
         comboContractMarketMethod.setSelectedItem(options.getContractMarketMethod());
