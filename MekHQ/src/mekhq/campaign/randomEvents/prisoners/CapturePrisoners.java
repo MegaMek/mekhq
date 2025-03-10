@@ -81,7 +81,7 @@ public class CapturePrisoners {
     private final Faction searchingFaction;
     private final boolean searchingFactionIsClan;
 
-    private final int ATTEMPT_COUNT = 3; // This will need tweaking till we're happy with the result
+    private final int ATTEMPT_COUNT = 2; // This will need tweaking till we're happy with the result
     final static int DEFECTION_CHANCE = 100;
     final static double MERCENARY_MULTIPLIER = 0.80;
     final static int CLAN_DEZGRA_MULTIPLIER = 5;
