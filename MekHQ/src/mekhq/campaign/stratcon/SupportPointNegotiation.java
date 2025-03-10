@@ -166,7 +166,11 @@ public class SupportPointNegotiation {
         while (iterator.hasNext() && negotiatedSupportPoints < maxSupportPoints) {
             Person admin = iterator.next();
             int rollResult = Compute.d6(2);
-            negotiatedSupportPoints += calculateSupportPoints(admin, rollResult);
+
+            int adminSkill = admin.getSkill(S_ADMIN).getFinalSkillValue();
+            if (rollResult >= adminSkill) {
+                negotiatedSupportPoints ++;
+            }
             iterator.remove();
         }
 
@@ -231,28 +235,6 @@ public class SupportPointNegotiation {
     private static List<AtBContract> getSortedContractsByStartDate(List<AtBContract> activeContracts) {
         activeContracts.sort(Comparator.comparing(AtBContract::getStartDate));
         return activeContracts;
-    }
-
-    /**
-     * Calculates the number of support points based on a die roll and the skill level of a given Admin/Transport person.
-     *
-     * <p>If the dice roll meets or exceeds the admin's skill level, at least one support point is awarded,
-     * with additional support points depending on the margin of success.</p>
-     *
-     * @param admin      The {@link Person} representing the Admin/Transport personnel rolling for support points.
-     * @param rollResult The result of rolling two six-sided dice (2d6).
-     * @return The number of support points awarded based on the roll and skill level.
-     */
-    private static int calculateSupportPoints(Person admin, int rollResult) {
-        int adminSkill = admin.getSkill(S_ADMIN).getFinalSkillValue();
-        if (rollResult < adminSkill) {
-            return 0;
-        }
-
-        int points = 1; // Base success
-        int marginOfSuccess = (rollResult - adminSkill) / 4;
-        points += marginOfSuccess;
-        return points;
     }
 
     /**
