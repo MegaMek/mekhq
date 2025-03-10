@@ -1,23 +1,30 @@
 /*
- * RATManager.java
- *
  * Copyright (c) 2016 - Carl Spain. All Rights Reserved.
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
- * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
- * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.universe;
 
@@ -83,7 +90,7 @@ public class RATManager extends AbstractUnitGenerator {
 
     /**
      * Replaces selected RAT collections with new list
-     * 
+     *
      * @param selected List of RAT collection names
      */
     public void setSelectedRATs(List<String> selected) {
@@ -95,7 +102,7 @@ public class RATManager extends AbstractUnitGenerator {
 
     /**
      * Replaces selected RAT collections with new list
-     * 
+     *
      * @param selected Array of RAT collection names
      */
     public void setSelectedRATs(String[] selected) {
@@ -107,7 +114,7 @@ public class RATManager extends AbstractUnitGenerator {
 
     /**
      * Append RAT collection to list of selected RATs
-     * 
+     *
      * @param collection Name of RAT collection to add
      */
     private void addRAT(String collection) {
@@ -118,7 +125,7 @@ public class RATManager extends AbstractUnitGenerator {
 
     /**
      * Remove RAT collection from list of selected RATs
-     * 
+     *
      * @param collection Name of RAT collection to remove
      */
     public void removeRAT(String collection) {
@@ -344,7 +351,7 @@ public class RATManager extends AbstractUnitGenerator {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.campaign.universe.IUnitGenerator#isSupportedUnitType(int)
      */
     @Override
@@ -360,7 +367,7 @@ public class RATManager extends AbstractUnitGenerator {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.campaign.universe.IUnitGenerator#generate(java.lang.String, int,
      * int, int, int, java.util.function.Predicate)
      */
@@ -383,7 +390,7 @@ public class RATManager extends AbstractUnitGenerator {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.campaign.universe.IUnitGenerator#generate(int, java.lang.String,
      * int, int, int, int, java.util.function.Predicate)
      */
@@ -433,7 +440,7 @@ public class RATManager extends AbstractUnitGenerator {
      * parameters.
      * Note that some of the properties of the parameters may be ignored for
      * generation mechanisms that aren't the RAT Generator
-     * 
+     *
      * @param parameters data structure containing unit generation parameters
      * @return Generated units. Null if none generated.
      */
@@ -450,7 +457,7 @@ public class RATManager extends AbstractUnitGenerator {
      * "parameters" used are
      * unit type, year, weight classes and movement modes. We also expect the rating
      * to be a number 1-5, rather than A-F.
-     * 
+     *
      * @param count      How many units to generate
      * @param parameters RATGenerator parameters (some are ignored)
      */
