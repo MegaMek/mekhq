@@ -30,6 +30,7 @@ package mekhq.campaign.randomEvents.prisoners;
 import megamek.common.Compute;
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
@@ -37,6 +38,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.enums.HonorRating;
 import mekhq.gui.dialog.DefectionOffer;
 
@@ -114,14 +116,19 @@ public class CapturePrisoners {
      * @param scenario          The {@link Scenario} representing the current mission or battle.
      * @param sarQuality        Search and Rescue quality level, affecting capture difficulty.
      */
-    public CapturePrisoners(Campaign campaign, Faction searchingFaction, Scenario scenario, int sarQuality) {
+    public CapturePrisoners(Campaign campaign, @Nullable Faction searchingFaction, Scenario scenario,
+                            int sarQuality) {
         this.campaign = campaign;
+
+        if (searchingFaction == null) {
+            searchingFaction = Factions.getInstance().getFaction("MERC");
+        }
         this.searchingFaction = searchingFaction;
 
         sarTargetNumber.addModifier(HAS_BATTLEFIELD_CONTROL, "Searcher Has Battlefield Control");
 
         int today = campaign.getLocalDate().getYear();
-        searchingFactionIsClan = searchingFaction.isClan();
+        searchingFactionIsClan = searchingFaction != null && searchingFaction.isClan();
 
         int techFaction = searchingFactionIsClan ? ITechnology.getCodeFromMMAbbr("CLAN") : ITechnology.getCodeFromMMAbbr("IS");
         try {
@@ -243,12 +250,13 @@ public class CapturePrisoners {
      * @param isMekHQCaptureStyle    Indicates whether MekHQ's custom capture style is active.
      * @param isNPC                  {@code true} if the prisoner is an NPC, otherwise {@code false}.
      */
-    void processPrisoner(Person prisoner, Faction capturingFaction, boolean isMekHQCaptureStyle, boolean isNPC) {
+    void processPrisoner(Person prisoner, @Nullable Faction capturingFaction, boolean isMekHQCaptureStyle,
+                         boolean isNPC) {
         LocalDate today = campaign.getLocalDate();
         HonorRating prisonerHonorRating = prisoner.getOriginFaction().getHonorRating(campaign);
 
         int bondsmanRoll = d6(1);
-        if (capturingFaction.isClan()) {
+        if (capturingFaction != null && capturingFaction.isClan()) {
             if (isMekHQCaptureStyle && prisoner.isClanPersonnel() && (bondsmanRoll == 1)) {
                 if (isNPC) {
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "bondsref.report",
@@ -305,7 +313,7 @@ public class CapturePrisoners {
                     adjustedDefectionChance *= CLAN_DEZGRA_MULTIPLIER;
                 }
             } else {
-                if (searchingFaction.isPirate() || searchingFaction.isMercenary()) {
+                if (searchingFaction == null || searchingFaction.isPirate() || searchingFaction.isMercenary()) {
                     adjustedDefectionChance *= CLAN_DEZGRA_MULTIPLIER;
                 }
             }
