@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2016-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
- * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
- * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign;
 
@@ -48,7 +57,7 @@ import megamek.logging.MMLogger;
  * Example usage:
  * <p>
  * - creating keys
- * 
+ *
  * <pre>
  * ExtraData.Key&lt;Integer&gt; INTKEY = new ExtraData.IntKey("int_key");
  * ExtraData.Key&lt;Double&gt; DOUBLEKEY = new ExtraData.DoubleKey("double_key");
@@ -56,9 +65,9 @@ import megamek.logging.MMLogger;
  * ExtraData.Key&lt;Boolean&gt; BOOLEANKEY = new ExtraData.BooleanKey("realy?");
  * ExtraData.Key&lt;String&gt; PLAIN_OLD_BORING_KEY = new ExtraData.StringKey("stuff");
  * </pre>
- * 
+ *
  * - setting and getting data
- * 
+ *
  * <pre>
  * ed.set(INTKEY, 75);
  * ed.set(DOUBLEKEY, 12.5);
@@ -69,9 +78,9 @@ import megamek.logging.MMLogger;
  * // the next one guarantees to not return null, but -1 if the value is not set
  * int anotherIntVal = ed.get(INTKEY, -1);
  * </pre>
- * 
+ *
  * - saving to XML and creating from XML
- * 
+ *
  * <pre>
  * ed.writeToXML(System.out);
  * ExtraData newEd = ExtraData.createFromXml(xmlNode);
