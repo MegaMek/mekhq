@@ -27,8 +27,8 @@ import mekhq.gui.campaignOptions.components.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 import static java.util.Arrays.sort;
 import static megamek.common.enums.SkillLevel.*;
@@ -63,8 +63,8 @@ public class SkillsTab {
     private Map<String, List<JLabel>> allSkillLevels;
     private Map<String, List<JSpinner>> allSkillCosts;
     private Map<String, List<JComboBox<SkillLevel>>> allSkillMilestones;
-    private double storedTargetNumber = 0;
-    private List<Double> storedValuesSpinners = new ArrayList<>();
+    private int storedTargetNumber = 0;
+    private List<Integer> storedValuesSpinners = new ArrayList<>();
     private List<SkillLevel> storedValuesComboBoxes = new ArrayList<>();
 
     private JPanel pnlEdgeCost;
@@ -344,13 +344,13 @@ public class SkillsTab {
 
         JButton copyButton = new JButton(resources.getString("btnCopy.text"));
         copyButton.addActionListener(e -> {
-            storedTargetNumber = (Double) spnTargetNumber.getValue();
+            storedTargetNumber = (Integer) spnTargetNumber.getValue();
 
             storedValuesSpinners = new ArrayList<>();
             storedValuesComboBoxes = new ArrayList<>();
 
             for (int i = 0; i < labels.size(); i++) {
-                storedValuesSpinners.add((Double) spinners.get(i).getValue());
+                storedValuesSpinners.add((Integer) spinners.get(i).getValue());
                 storedValuesComboBoxes.add((SkillLevel) comboBoxes.get(i).getSelectedItem());
             }
         });
