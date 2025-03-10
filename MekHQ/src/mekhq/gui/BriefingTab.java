@@ -839,6 +839,12 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
+        // Ensure that the MegaMek year GameOption matches the campaign year
+        // this is being set early on so that when setting up the autoconfig munitions
+        // the correct year is used
+        getCampaign().getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR)
+            .setValue(getCampaign().getGameYear());
+
         // code to support deployment of reinforcements for legacy ATB scenarios.
         if ((scenario instanceof AtBScenario atBScenario) && !(scenario instanceof AtBDynamicScenario)) {
 
@@ -870,6 +876,7 @@ public final class BriefingTab extends CampaignGuiTab {
             if (getCampaign().getCampaignOptions().isAutoConfigMunitions()) {
                 autoconfigureBotMunitions(atBScenario, chosen);
             }
+            configureBotAi(atBScenario);
         }
 
         if (scenario.getStratConScenarioType().isConvoy() && (autoResolveBehaviorSettings != null)) {
@@ -882,13 +889,43 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         if (!chosen.isEmpty()) {
-            // Ensure that the MegaMek year GameOption matches the campaign year
-            getCampaign().getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR)
-                    .setValue(getCampaign().getGameYear());
             getCampaignGui().getApplication()
                 .startHost(scenario, false, chosen, autoResolveBehaviorSettings);
-
         }
+    }
+
+    private void configureBotAi(AtBScenario scenario) {
+        Faction opFor = getEnemyFactionFromScenario(scenario);
+        boolean isPirate = opFor.isRebelOrPirate();
+        for (var bf : scenario.getBotForces()) {
+            bf.getBehaviorSettings().setIAmAPirate(isPirate);
+        }
+    }
+
+    /**
+     * Get the enemy faction from the Mission from the scenario
+     * @param scenario the scenario to get the enemy faction from
+     * @return the enemy faction
+     */
+    private Faction getEnemyFactionFromScenario(Scenario scenario) {
+        Mission mission = null;
+        if (scenario.getMissionId() != -1) {
+            mission = getCampaign().getMission(scenario.getMissionId());
+        }
+        if (mission == null) {
+            mission = comboMission.getSelectedItem();
+        }
+        String opforFactionCode = "IS";
+        Faction enemy;
+        if (mission instanceof AtBContract atBContract) {
+            enemy = atBContract.getEnemy();
+            if (enemy != null) {
+                return atBContract.getEnemy();
+            }
+            opforFactionCode = atBContract.getEnemyCode().isBlank() ? opforFactionCode : atBContract.getEnemyCode();
+        }
+        enemy = Factions.getInstance().getFaction(opforFactionCode);
+        return enemy;
     }
 
     /**
