@@ -28,6 +28,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
+import mekhq.utilities.MHQInternationalization;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,7 +37,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.regex.PatternSyntaxException;
 
-import static mekhq.utilities.EntityUtilities.isUnsupportedUnitType;
+import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -134,12 +135,24 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             // Block the purchase if the unit type is unsupported
             Entity entity = selectedUnit.getEntity();
 
-            if (entity == null || isUnsupportedUnitType(entity.getUnitType())) {
+            if (entity == null || isUnsupportedEntity(entity)) {
                 final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
                     MekHQ.getMHQOptions().getLocale());
 
+                String reason;
+                if (entity == null) {
+                    reason = MHQInternationalization.getTextAt(resources.getBaseBundleName(),
+                        "mekSelectorDialog.unsupported.null");
+                } else if (entity.getUnitType() == UnitType.GUN_EMPLACEMENT) {
+                    reason = MHQInternationalization.getTextAt(resources.getBaseBundleName(),
+                        "mekSelectorDialog.unsupported.gunEmplacement");
+                } else {
+                    reason = MHQInternationalization.getTextAt(resources.getBaseBundleName(),
+                        "mekSelectorDialog.unsupported.droneOs");
+                }
+
                 campaign.addReport(String.format(
-                    resources.getString("mekSelectorDialog.unsupported.gunEmplacement"),
+                    reason,
                     spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                     CLOSING_SPAN_TAG));
 

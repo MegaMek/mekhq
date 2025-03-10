@@ -102,10 +102,7 @@ public class CampaignManagementDialog extends JDialog {
 
         // Add the "Remove SP" button
         btnGMRemoveSP = new JButton(resources.getString("btnRemoveSP.text"));
-        btnGMRemoveSP.addActionListener(evt -> {
-            dispose();
-            removeSP(evt);
-        });
+        btnGMRemoveSP.addActionListener(this::removeSP);
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
@@ -146,8 +143,8 @@ public class CampaignManagementDialog extends JDialog {
 
     private void removeSP(ActionEvent event) {
         int currentSupportPoints = currentCampaignState.getSupportPoints();
-        if (currentSupportPoints > 1) {
-            currentCampaignState.setSupportPoints(currentSupportPoints - 1);
+        if (currentSupportPoints > 0) {
+            currentCampaignState.changeSupportPoints(-1);
         }
 
         parent.updateCampaignState();
