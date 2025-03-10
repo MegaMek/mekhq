@@ -1,16 +1,30 @@
 /*
-* MegaMek - Copyright (C) 2020 - The MegaMek Team
-*
-* This program is free software; you can redistribute it and/or modify it under
-* the terms of the GNU General Public License as published by the Free Software
-* Foundation; either version 2 of the License, or (at your option) any later
-* version.
-*
-* This program is distributed in the hope that it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-* FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
-* details.
-*/
+ * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ */
 
 package mekhq.campaign.stratcon;
 
@@ -32,7 +46,7 @@ import mekhq.campaign.mission.atb.AtBScenarioManifest;
 /**
  * This class handles functionality related to loading and sorting scenario
  * templates.
- * 
+ *
  * @author NickAragua
  */
 public class StratconScenarioFactory {
@@ -72,7 +86,7 @@ public class StratconScenarioFactory {
 
     /**
      * Helper function that loads scenario templates from the given manifest.
-     * 
+     *
      * @param manifest The manifest to process
      */
     private static void loadScenariosFromManifest(AtBScenarioManifest manifest) {
@@ -116,7 +130,7 @@ public class StratconScenarioFactory {
 
     /**
      * Retrieves a random scenario template in the appropriate location.
-     * 
+     *
      * @param location The location (ground/low atmo/space) category of the
      *                 scenario.
      * @return Random scenario template.
@@ -135,7 +149,7 @@ public class StratconScenarioFactory {
     /**
      * Retrieves a random scenario template appropriate for the given unit type.
      * This includes the more general ATB_MIX and ATB_AERO_MIX where appropriate
-     * 
+     *
      * @param unitType The desired unit type, as per megamek.common.UnitType
      * @return Random scenario template.
      */
@@ -177,7 +191,7 @@ public class StratconScenarioFactory {
     /**
      * Converts a specific unit type (AERO, MEK, etc) to a generic unit type
      * (ATB_MIX, ATB_AERO_MIX)
-     * 
+     *
      * @param unitType The unit type to convert.
      * @return Generic unit type.
      */

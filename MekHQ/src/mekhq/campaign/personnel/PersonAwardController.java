@@ -1,20 +1,29 @@
 /*
- * Copyright (C) 2018-2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
- * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
- * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.personnel;
 
@@ -33,7 +42,7 @@ import mekhq.campaign.log.PersonalLogger;
 
 /**
  * This class is responsible for the awards given to a person.
- * 
+ *
  * @author Miguel Azevedo
  */
 public class PersonAwardController {
@@ -105,7 +114,7 @@ public class PersonAwardController {
 
     /**
      * Adds and logs an award to this person based on
-     * 
+     *
      * @param setName   is the name of the set of the award
      * @param awardName is the name of the award
      * @param date      is the date it was awarded
@@ -155,7 +164,7 @@ public class PersonAwardController {
 
     /**
      * Gives the award to this person
-     * 
+     *
      * @param award is the award being loaded from XML
      */
     public void addAwardFromXml(final @Nullable Award award) {
@@ -175,7 +184,7 @@ public class PersonAwardController {
 
     /**
      * Removes an award given to this person based on:
-     * 
+     *
      * @param setName     is the name of the set of the award
      * @param awardName   is the name of the award
      * @param awardedDate is the date it was awarded, or null if it is to be bulk
@@ -199,7 +208,7 @@ public class PersonAwardController {
 
     /**
      * Removes an award given to this person (without logging the removal) based on:
-     * 
+     *
      * @param setName     is the name of the set of the award
      * @param awardName   is the name of the award
      * @param awardedDate is the date it was awarded, or null if it is to be bulk
@@ -222,7 +231,7 @@ public class PersonAwardController {
 
     /**
      * Adds an entry log for a given award.
-     * 
+     *
      * @param award that was given.
      */
     public void logAward(Award award, LocalDate date) {
@@ -248,7 +257,7 @@ public class PersonAwardController {
      * Finds an award with a given name, without taking into account the set name.
      * This is used for backward compatibility
      * and should be avoided.
-     * 
+     *
      * @param name String with the name of the award
      * @return the award
      */
