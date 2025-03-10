@@ -1,5 +1,5 @@
 /*
-* MegaMek - Copyright (C) 2020 - The MegaMek Team
+* MegaMek - Copyright (C) 2020-2025 - The MegaMek Team
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU General Public License as published by the Free Software
@@ -283,6 +283,24 @@ public class StratconScenario implements IStratconDisplayable {
     @XmlTransient
     public AtBDynamicScenario getBackingScenario() {
         return backingScenario;
+    }
+
+    /**
+     * Retrieves the {@link AtBContract} associated with the backing scenario.
+     *
+     * <p>If the backing scenario is null, this method will return {@code null}. Otherwise, it
+     * retrieves the associated contract through the provided campaign instance.
+     *
+     * @param campaign The {@code Campaign} instance used to obtain the contract.
+     * @return The {@code AtBContract} associated with the current backing scenario, or {@code null}
+     * if no backing scenario exists.
+     */
+    public @Nullable AtBContract getBackingContract(Campaign campaign) {
+        if (backingScenario == null) {
+            return null;
+        }
+
+        return backingScenario.getContract(campaign);
     }
 
     @XmlJavaTypeAdapter(DateAdapter.class)
