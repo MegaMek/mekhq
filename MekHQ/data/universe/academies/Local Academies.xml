@@ -245,10 +245,10 @@
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Vocational Administrator</qualification>
-        <curriculum>Administration</curriculum>
+        <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Vocational Logistician</qualification>
-        <curriculum>Negotiation, Scrounge</curriculum>
+        <curriculum>Administration, Scrounge</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Nursing School</qualification>
         <curriculum>MedTech</curriculum>
@@ -283,10 +283,10 @@
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Advanced Systems &amp; Technology</qualification>
-        <curriculum>Administration</curriculum>
+        <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Applied Economics</qualification>
-        <curriculum>Negotiation, Scrounge</curriculum>
+        <curriculum>Administration, Scrounge</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Medicine</qualification>
         <curriculum>Doctor</curriculum>
