@@ -82,8 +82,8 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 import static java.lang.Math.*;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
@@ -892,7 +892,10 @@ public class AtBContract extends Contract {
 
         // Add the unit to the campaign if successfully generated
         if (newUnit != null) {
-            campaign.addNewUnit(newUnit, false, 0);
+            // The 1-day delivery time is so that the unit addition is picked up by the 'mothball'
+            // campaign option. It also makes sense the unit wouldn't magically materialize in your
+            // hangar and has to get there.
+            campaign.addNewUnit(newUnit, false, 1);
         }
     }
 
