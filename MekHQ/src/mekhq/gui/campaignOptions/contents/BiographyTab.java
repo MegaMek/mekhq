@@ -564,14 +564,10 @@ public class BiographyTab {
         chkRandomizeOrigin = new CampaignOptionsCheckBox("RandomizeOrigin");
         chkRandomizeDependentsOrigin = new CampaignOptionsCheckBox("RandomizeDependentsOrigin");
         chkRandomizeAroundSpecifiedPlanet = new CampaignOptionsCheckBox("RandomizeAroundSpecifiedPlanet");
-        chkSpecifiedSystemFactionSpecific.addActionListener(evt -> {
-            refreshSystemsAndPlanets();
-        });
+        chkSpecifiedSystemFactionSpecific.addActionListener(evt -> refreshSystemsAndPlanets());
 
         chkSpecifiedSystemFactionSpecific = new CampaignOptionsCheckBox("SpecifiedSystemFactionSpecific");
-        chkSpecifiedSystemFactionSpecific.addActionListener(evt -> {
-            refreshSystemsAndPlanets();
-        });
+        chkSpecifiedSystemFactionSpecific.addActionListener(evt -> refreshSystemsAndPlanets());
 
 
         lblSpecifiedSystem = new CampaignOptionsLabel("SpecifiedSystem");
