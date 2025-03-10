@@ -1200,26 +1200,60 @@ public class PersonnelTab {
               true, "ExperienceMultipliersPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
+        layout.gridy = 0;
+        layout.gridx = 0;
         layout.gridwidth = 1;
-        int gridX = 0;
-        int gridY = 0;
+        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[0]), layout);
+        layout.gridx++;
+        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[0]), layout);
 
-        for (int i = 0; i < skillLevels.length; i++) {
-            layout.gridx = gridX;
-            layout.gridy = gridY;
-            panel.add(lblSalaryExperienceMultipliers.get(skillLevels[i]), layout);
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[4]), layout);
+        layout.gridx++;
+        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[4]), layout);
 
-            layout.gridx++;
-            panel.add(spnSalaryExperienceMultipliers.get(skillLevels[i]), layout);
+        // new column
 
-            // Move to a new row after every second entry
-            if ((i + 1) % 2 == 0) {
-                gridX += 2;
-                gridY = 0;
-            } else {
-                gridY++;
-            }
-        }
+        layout.gridx = 2;
+        layout.gridy = 0;
+        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[1]), layout);
+        layout.gridx++;
+        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[1]), layout);
+
+        layout.gridx = 2;
+        layout.gridy++;
+        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[5]), layout);
+        layout.gridx++;
+        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[5]), layout);
+
+        // new column
+
+        layout.gridx = 4;
+        layout.gridy = 0;
+        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[2]), layout);
+        layout.gridx++;
+        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[2]), layout);
+
+        layout.gridx = 4;
+        layout.gridy++;
+        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[6]), layout);
+        layout.gridx++;
+        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[6]), layout);
+
+        // new column
+
+        layout.gridx = 6;
+        layout.gridy = 0;
+        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[3]), layout);
+        layout.gridx++;
+        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[3]), layout);
+
+        layout.gridx = 6;
+        layout.gridy++;
+        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[7]), layout);
+        layout.gridx++;
+        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[7]), layout);
 
         return panel;
     }
