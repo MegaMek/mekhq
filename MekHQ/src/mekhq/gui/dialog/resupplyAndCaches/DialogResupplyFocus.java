@@ -31,10 +31,12 @@ import megamek.client.ui.swing.util.UIUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
@@ -88,6 +90,9 @@ public class DialogResupplyFocus extends JDialog {
      */
     public DialogResupplyFocus(Resupply resupply) {
         final Campaign campaign = resupply.getCampaign();
+        final List<Part> partsPool = resupply.getPartsPool();
+        final List<Part> armorPool = resupply.getArmorPool();
+        final List<Part> ammoBinPool = resupply.getAmmoBinPool();
 
         setTitle(getFormattedTextAt(RESOURCE_BUNDLE, "incomingTransmission.title"));
 
@@ -161,12 +166,13 @@ public class DialogResupplyFocus extends JDialog {
 
         // Create a container panel to hold both the button panel and the new panel
         JPanel containerPanel = new JPanel();
-        containerPanel.setLayout(new BoxLayout(containerPanel, BoxLayout.Y_AXIS)); // Stack vertically
+        containerPanel.setLayout(new BoxLayout(containerPanel, BoxLayout.Y_AXIS));
 
         // Buttons panel
         JPanel buttonPanel = new JPanel();
         JButton optionBalanced = new JButton(getFormattedTextAt(RESOURCE_BUNDLE, "optionBalanced.text"));
         optionBalanced.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "optionBalanced.tooltip"));
+        optionBalanced.setEnabled(!partsPool.isEmpty() || !armorPool.isEmpty() || !ammoBinPool.isEmpty());
         optionBalanced.addActionListener(e -> {
             dispose();
             // The Resupply class initialization assumes a balanced approach
@@ -175,9 +181,9 @@ public class DialogResupplyFocus extends JDialog {
 
         // The player should not be able to focus on parts for game balance reasons.
         // If the player could pick parts, the optimum choice would be to always pick parts.
-
         JButton optionArmor = new JButton(getFormattedTextAt(RESOURCE_BUNDLE, "optionArmor.text"));
         optionArmor.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "optionArmor.tooltip"));
+        optionArmor.setEnabled(!armorPool.isEmpty());
         optionArmor.addActionListener(e -> {
             dispose();
             resupply.setFocusAmmo(0);
@@ -188,6 +194,7 @@ public class DialogResupplyFocus extends JDialog {
 
         JButton optionAmmo = new JButton(getFormattedTextAt(RESOURCE_BUNDLE, "optionAmmo.text"));
         optionAmmo.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "optionAmmo.tooltip"));
+        optionAmmo.setEnabled(!ammoBinPool.isEmpty());
         optionAmmo.addActionListener(e -> {
             dispose();
             resupply.setFocusAmmo(0.75);
@@ -199,12 +206,12 @@ public class DialogResupplyFocus extends JDialog {
         // Add the button panel to the container
         containerPanel.add(buttonPanel);
 
-        // New panel (to be added below the button panel)
+        // OOC panel (to be added below the button panel)
         JPanel infoPanel = new JPanel(new BorderLayout());
         JLabel lblInfo = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                RIGHT_WIDTH + LEFT_WIDTH,
-                getFormattedTextAt(RESOURCE_BUNDLE, "documentation.prompt")));
+              String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+                    RIGHT_WIDTH + LEFT_WIDTH,
+                    getFormattedTextAt(RESOURCE_BUNDLE, "focusDescription.ooc")));
         lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
         infoPanel.add(lblInfo, BorderLayout.CENTER);
         infoPanel.setBorder(BorderFactory.createEtchedBorder());
