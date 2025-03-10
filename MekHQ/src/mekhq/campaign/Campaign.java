@@ -172,7 +172,9 @@ import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomM
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
-import static mekhq.campaign.randomEvents.GrayMonday.*;
+import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_CLARION_NOTE;
+import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
+import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMAN;
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
@@ -4956,12 +4958,19 @@ public class Campaign implements ITechManager {
         // getContractMarket().processNewDay(this);
         unitMarket.processNewDay(this);
 
+        processNewDayPersonnel();
+
+        // Needs to be before 'processNewDayATB' so that Dependents can't leave the moment they
+        // arrive via AtB Bonus Events
+        if ((location.isOnPlanet()) && (currentDay.getDayOfMonth() == 1)) {
+            RandomDependents randomDependents = new RandomDependents(this);
+            randomDependents.processMonthlyRemovalAndAddition();
+        }
+
         // Process New Day for AtB
         if (campaignOptions.isUseAtB()) {
             processNewDayATB();
         }
-
-        processNewDayPersonnel();
 
         processFatigueNewDay();
 
@@ -4976,11 +4985,6 @@ public class Campaign implements ITechManager {
         if ((campaignOptions.isEnableAutoAwards()) && (currentDay.getDayOfMonth() == 1)) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();
             autoAwardsController.ManualController(this, false);
-        }
-
-        if ((location.isOnPlanet()) && (currentDay.getDayOfMonth() == 1)) {
-            RandomDependents randomDependents = new RandomDependents(this);
-            randomDependents.processMonthlyRemovalAndAddition();
         }
 
         // Prisoner events can occur on Monday or the 1st of the month depending on the type of event
