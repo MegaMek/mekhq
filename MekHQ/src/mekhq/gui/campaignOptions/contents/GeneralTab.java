@@ -530,11 +530,6 @@ public class GeneralTab {
 
         txtName.setText(campaign.getName());
 
-        comboFaction.setSelectedItem(campaign.getFaction());
-        if (presetFaction != null) {
-            comboFaction.setSelectedItem(new FactionDisplay(presetFaction, date));
-        }
-
         unitRatingMethodCombo.setSelectedItem(options.getUnitRatingMethod());
         manualUnitRatingModifier.setValue(options.getManualUnitRatingModifier());
         chkClampReputationPayMultiplier.setSelected(options.isClampReputationPayMultiplier());
@@ -545,6 +540,12 @@ public class GeneralTab {
         if (presetDate != null) {
             date = presetDate;
         }
+
+        comboFaction.setSelectedItem(campaign.getFaction());
+        if (presetFaction != null) {
+            comboFaction.setSelectedItem(new FactionDisplay(presetFaction, date));
+        }
+
         // Button labels are not updated when we repaint, so we have to specifically call it here
         btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
 
@@ -581,7 +582,7 @@ public class GeneralTab {
             // Null state handled during validation
             FactionDisplay newFaction = comboFaction.getSelectedItem();
             if (newFaction != null) {
-                campaign.setFaction(comboFaction.getSelectedItem().getFaction());
+                campaign.setFaction(newFaction.getFaction());
             }
 
             campaign.setCamouflage(camouflage);

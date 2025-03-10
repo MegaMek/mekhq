@@ -1373,7 +1373,7 @@ public class PersonnelTab {
         }
 
         // General
-        chkUseTactics.setSelected(options.isUseTaxes());
+        chkUseTactics.setSelected(options.isUseTactics());
         chkUseInitiativeBonus.setSelected(options.isUseInitiativeBonus());
         chkUseToughness.setSelected(options.isUseToughness());
         chkUseRandomToughness.setSelected(options.isUseRandomToughness());
@@ -1470,7 +1470,7 @@ public class PersonnelTab {
         }
 
         // General
-        options.setUseTaxes(chkUseTactics.isSelected());
+        options.setUseTactics(chkUseTactics.isSelected());
         options.setUseInitiativeBonus(chkUseInitiativeBonus.isSelected());
         options.setUseToughness(chkUseToughness.isSelected());
         options.setUseRandomToughness(chkUseRandomToughness.isSelected());
@@ -1543,10 +1543,6 @@ public class PersonnelTab {
         options.setUseRandomDependentRemoval(chkUseRandomDependentRemoval.isSelected());
 
         // Salaries
-        options.setDisableSecondaryRoleSalary(chkDisableSecondaryRoleSalary.isSelected());
-        options.setSalaryAntiMekMultiplier((double) spnAntiMekSalary.getValue());
-        options.setSalarySpecialistInfantryMultiplier((double) spnSpecialistInfantrySalary.getValue());
-
         options.setDisableSecondaryRoleSalary(chkDisableSecondaryRoleSalary.isSelected());
         options.setSalaryAntiMekMultiplier((double) spnAntiMekSalary.getValue());
         options.setSalarySpecialistInfantryMultiplier((double) spnSpecialistInfantrySalary.getValue());
