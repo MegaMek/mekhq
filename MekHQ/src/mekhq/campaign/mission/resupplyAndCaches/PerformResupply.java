@@ -166,6 +166,16 @@ public class PerformResupply {
 
             // Then allow the player to pick a focus
             new DialogResupplyFocus(resupply);
+
+            final List<Part> partsPool = resupply.getPartsPool();
+            final List<Part> armorPool = resupply.getArmorPool();
+            final List<Part> ammoBinPool = resupply.getAmmoBinPool();
+
+            // If all three pools are empty, there is no reason to continue. We still want the above
+            // dialog triggered, as it tells the user why the pools might be empty.
+            if (partsPool.isEmpty() && armorPool.isEmpty() && ammoBinPool.isEmpty()) {
+                return;
+            }
         }
 
         // With the focus chosen, we determine the contents of the convoy
@@ -191,12 +201,7 @@ public class PerformResupply {
 
         logger.info("totalTonnage: {}", totalTonnage);
 
-
-        // This shouldn't occur, but we include it as insurance.
         if (resupply.getConvoyContents().isEmpty()) {
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "convoyUnsuccessful.text",
-                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                CLOSING_SPAN_TAG));
             return;
         }
 
