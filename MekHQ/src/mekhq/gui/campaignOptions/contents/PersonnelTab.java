@@ -33,7 +33,6 @@ import mekhq.gui.campaignOptions.components.*;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.GroupLayout.Group;
 import javax.swing.GroupLayout.ParallelGroup;
 import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JSpinner.DefaultEditor;
@@ -1182,7 +1181,9 @@ public class PersonnelTab {
      */
     private JPanel createExperienceMultipliersPanel() {
         // Contents
-        for (final SkillLevel skillLevel : Skills.SKILL_LEVELS) {
+        SkillLevel[] skillLevels = Skills.SKILL_LEVELS;
+
+        for (final SkillLevel skillLevel : skillLevels) {
             final JLabel label = new CampaignOptionsLabel("SkillLevel" + skillLevel.toString(),
                 null, true);
             label.setToolTipText(resources.getString("lblSkillLevelMultiplier.tooltip"));
@@ -1192,53 +1193,33 @@ public class PersonnelTab {
                 null, 0, 0, 100, 0.1, true);
             spinner.setToolTipText(resources.getString("lblSkillLevelMultiplier.tooltip"));
             spnSalaryExperienceMultipliers.put(skillLevel, spinner);
-
         }
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ExperienceMultipliersPanel",
-            true, "ExperienceMultipliersPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+              true, "ExperienceMultipliersPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        SkillLevel[] skillLevels = SkillLevel.values();
-        int rows = 2;
-        int columns = 4;
+        layout.gridwidth = 1;
+        int gridX = 0;
+        int gridY = 0;
 
-        SequentialGroup horizontalGroups = layout.createSequentialGroup();
-        ParallelGroup[] verticalGroups = new ParallelGroup[rows];
+        for (int i = 0; i < skillLevels.length; i++) {
+            layout.gridx = gridX;
+            layout.gridy = gridY;
+            panel.add(lblSalaryExperienceMultipliers.get(skillLevels[i]), layout);
 
-        for (int j = 0; j < rows; j++) {
-            verticalGroups[j] = layout.createParallelGroup(Alignment.BASELINE);
-        }
+            layout.gridx++;
+            panel.add(spnSalaryExperienceMultipliers.get(skillLevels[i]), layout);
 
-        for (int i = 0; i < columns; i++) {
-            ParallelGroup horizontalParallelGroup = layout.createParallelGroup();
-
-            for (int j = 0; j < rows; j++) {
-                int index = i * rows + j;
-
-                SequentialGroup horizontalSequentialGroup = layout.createSequentialGroup();
-                horizontalSequentialGroup.addComponent(lblSalaryExperienceMultipliers.get(skillLevels[index]));
-                horizontalSequentialGroup.addComponent(spnSalaryExperienceMultipliers.get(skillLevels[index]));
-                if (i != (columns - 1)) {
-                    horizontalSequentialGroup.addGap(10);
-                }
-
-                horizontalParallelGroup.addGroup(horizontalSequentialGroup);
-                verticalGroups[j].addComponent(lblSalaryExperienceMultipliers.get(skillLevels[index]));
-                verticalGroups[j].addComponent(spnSalaryExperienceMultipliers.get(skillLevels[index]));
+            // Move to a new row after every second entry
+            if ((i + 1) % 2 == 0) {
+                gridX += 2;
+                gridY = 0;
+            } else {
+                gridY++;
             }
-
-            horizontalGroups.addGroup(horizontalParallelGroup);
         }
-
-        layout.setHorizontalGroup(horizontalGroups);
-        SequentialGroup verticalGroup = layout.createSequentialGroup();
-        for (Group group: verticalGroups) {
-            verticalGroup.addGroup(group);
-        }
-        layout.setVerticalGroup(verticalGroup);
 
         return panel;
     }
