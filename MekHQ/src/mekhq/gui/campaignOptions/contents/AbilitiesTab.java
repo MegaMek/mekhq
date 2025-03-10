@@ -421,8 +421,14 @@ public class AbilitiesTab {
      *         was canceled.
      */
     private boolean editSPA(SpecialAbility ability) {
+        Map<String, SpecialAbility> temporaryMap = new HashMap<>();
+
+        for (Entry<String, CampaignOptionsAbilityInfo> info : allAbilityInfo.entrySet()) {
+            temporaryMap.put(info.getKey(), info.getValue().getAbility());
+        }
+
         EditSpecialAbilityDialog dialog = new EditSpecialAbilityDialog(null, ability,
-            Map.of(ability.getName(), ability.clone()));
+              temporaryMap);
         dialog.setVisible(true);
 
         return !dialog.wasCancelled();
