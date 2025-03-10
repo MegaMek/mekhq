@@ -43,12 +43,10 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.io.File;
 import java.util.ResourceBundle;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
-import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
 /**
  * Represents a tab in the campaign options UI for managing ruleset configurations in campaigns.
@@ -283,7 +281,7 @@ public class RulesetsTab {
     private void substantializeUniversalOptions() {
         // General
         lblSkillLevel = new CampaignOptionsLabel("SkillLevel");
-        comboSkillLevel.setToolTipText(resources.getString("lblSkillLevel.tooltip"));
+        comboSkillLevel.setToolTipText(String.format(resources.getString("lblSkillLevel.tooltip")));
 
         // OpFor Generation
         pnlUnitRatioPanel = createUniversalUnitRatioPanel();
