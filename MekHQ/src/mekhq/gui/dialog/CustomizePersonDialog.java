@@ -35,6 +35,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
 import megamek.common.Crew;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import megamek.common.enums.Gender;
@@ -787,8 +788,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 return this;
             }
         });
-        choiceOriginalUnit.addItem(null);
-        campaign.getHangar().forEachUnit(choiceOriginalUnit::addItem);
+        populateUnitChoiceCombo();
+
         if (null == person.getOriginalUnitId() || null == campaign.getUnit(person.getOriginalUnitId())) {
             choiceOriginalUnit.setSelectedItem(null);
         } else {
@@ -1065,6 +1066,42 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         getContentPane().add(panButtons, gridBagConstraints);
 
         pack();
+    }
+
+    /**
+     * Populates a combo box with a list of units that the specified person can interact with,
+     * based on their abilities to drive, gun, or tech the corresponding entities.
+     *
+     * <p>The method adds eligible units from the campaign's unit list to the combo box
+     * {@code choiceOriginalUnit}, and starts by adding a {@code null} entry to represent no selection.</p>
+     */
+    private void populateUnitChoiceCombo() {
+        choiceOriginalUnit.addItem(null); // Add a null entry as the initial option
+
+        // Iterate through all units in the campaign
+        for (Unit unit : campaign.getUnits()) {
+            Entity entity = unit.getEntity();
+
+            // Skip units without an associated entity
+            if (entity == null) {
+                continue;
+            }
+
+            // Add units to the combo box based on the person's capabilities
+            if (person.canDrive(entity)) {
+                choiceOriginalUnit.addItem(unit);
+                continue; // Skip further checks if already added
+            }
+
+            if (person.canGun(entity)) {
+                choiceOriginalUnit.addItem(unit);
+                continue; // Skip further checks if already added
+            }
+
+            if (person.canTech(entity)) {
+                choiceOriginalUnit.addItem(unit);
+            }
+        }
     }
 
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup

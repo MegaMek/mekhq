@@ -32,6 +32,8 @@ import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
@@ -130,6 +132,15 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         //check for Bloodname
         campaign.checkBloodnameAdd(person, false);
+
+        if (person.getOriginFaction().isClan()
+              && campaign.getCampaignOptions().isUseAbilities()
+              && !(person.getPrimaryRole().isSoldierOrBattleArmour() || person.getPrimaryRole().isProtoMekPilot())) {
+            if (SpecialAbility.getSpecialAbilities().containsKey("clan_pilot_training")) {
+                PersonnelOptions personnelOptions = person.getOptions();
+                personnelOptions.acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, "clan_pilot_training", true);
+            }
+        }
 
         person.setDaysToWaitForHealing(campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
 

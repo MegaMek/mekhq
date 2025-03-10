@@ -206,7 +206,7 @@ public class StratconScenarioWizard extends JDialog {
             gbc.gridy++;
             int leadershipSkill = currentScenario.getBackingScenario().getLanceCommanderSkill(S_LEADER, campaign);
             eligibleLeadershipUnits = getEligibleLeadershipUnits(
-                campaign, currentScenario.getPrimaryForceIDs(), leadershipSkill);
+                campaign, currentScenario, leadershipSkill);
             eligibleLeadershipUnits.sort(Comparator.comparing(this::getForceNameReversed));
 
             setLeadershipUI(gbc, eligibleLeadershipUnits, leadershipSkill);
@@ -406,7 +406,7 @@ public class StratconScenarioWizard extends JDialog {
         gbc.gridy++;
 
         // Obtain eligible infantry units
-        List<Unit> eligibleInfantryUnits = StratconRulesManager.getEligibleDefensiveUnits(campaign);
+        List<Unit> eligibleInfantryUnits = StratconRulesManager.getEligibleFrontlineUnits(campaign, currentScenario);
         eligibleInfantryUnits.sort(Comparator.comparing(Unit::getName));
 
         // Add a unit selector for infantry units
@@ -794,8 +794,8 @@ public class StratconScenarioWizard extends JDialog {
         JPanel rightBox = new JPanel(new BorderLayout());
         rightBox.setBorder(BorderFactory.createEtchedBorder());
 
-        TargetRoll reinforcementTargetNumber = calculateReinforcementTargetNumber(
-            campaign, currentScenario, commandLiaison, currentCampaignState, currentCampaignState.getContract());
+        TargetRoll reinforcementTargetNumber = calculateReinforcementTargetNumber(commandLiaison,
+              currentCampaignState.getContract());
         int targetNumber = reinforcementTargetNumber.getValue();
 
         StringBuilder rightDescriptionMessage = new StringBuilder();

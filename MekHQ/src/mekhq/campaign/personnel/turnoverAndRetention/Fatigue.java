@@ -61,8 +61,7 @@ public class Fatigue {
                 if ((unit.isDeployed())
                         || (unit.isDamaged())
                         || (unit.getCrewState().isUncrewed())
-                        || (unit.getCrewState().isPartiallyCrewed())
-                        || (unit.isUnmaintained())) {
+                        || (unit.getCrewState().isPartiallyCrewed())) {
                     continue;
                 }
 

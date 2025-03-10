@@ -44,14 +44,7 @@ import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
-import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
-import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
-import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
-import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsTextField;
+import mekhq.gui.campaignOptions.components.*;
 import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.dialog.iconDialogs.UnitIconDialog;
 import mekhq.gui.displayWrappers.FactionDisplay;
@@ -66,6 +59,7 @@ import java.util.ResourceBundle;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.common.options.OptionsConstants.ALLOWED_YEAR;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
+import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
 /**
  * Represents a tab within the campaign options UI that allows the user to configure
@@ -288,6 +282,7 @@ public class GeneralTab {
      */
     private static JPanel createGeneralHeader() {
         ImageIcon imageIcon = new ImageIcon("data/images/misc/MekHQ.png");
+        imageIcon = scaleImageIconToWidth(imageIcon, UIUtil.scaleForGUI(200));
         JLabel imageLabel = new JLabel(imageIcon);
 
         final JLabel lblHeader = new JLabel(resources.getString("lblGeneral.text"), SwingConstants.CENTER);
@@ -535,11 +530,6 @@ public class GeneralTab {
 
         txtName.setText(campaign.getName());
 
-        comboFaction.setSelectedItem(campaign.getFaction());
-        if (presetFaction != null) {
-            comboFaction.setSelectedItem(new FactionDisplay(presetFaction, date));
-        }
-
         unitRatingMethodCombo.setSelectedItem(options.getUnitRatingMethod());
         manualUnitRatingModifier.setValue(options.getManualUnitRatingModifier());
         chkClampReputationPayMultiplier.setSelected(options.isClampReputationPayMultiplier());
@@ -550,6 +540,12 @@ public class GeneralTab {
         if (presetDate != null) {
             date = presetDate;
         }
+
+        comboFaction.setSelectedItem(campaign.getFaction());
+        if (presetFaction != null) {
+            comboFaction.setSelectedItem(new FactionDisplay(presetFaction, date));
+        }
+
         // Button labels are not updated when we repaint, so we have to specifically call it here
         btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
 
@@ -586,7 +582,7 @@ public class GeneralTab {
             // Null state handled during validation
             FactionDisplay newFaction = comboFaction.getSelectedItem();
             if (newFaction != null) {
-                campaign.setFaction(comboFaction.getSelectedItem().getFaction());
+                campaign.setFaction(newFaction.getFaction());
             }
 
             campaign.setCamouflage(camouflage);

@@ -32,8 +32,15 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.icons.enums.OperationalStatus;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.UUID;
 
 import static mekhq.campaign.icons.enums.OperationalStatus.NOT_OPERATIONAL;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -49,6 +56,8 @@ import javax.swing.ListCellRenderer;
  * @author NickAragua
  */
 public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRenderer<Force> {
+    final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
+
     private final Campaign campaign;
 
     public ScenarioWizardLanceRenderer(Campaign campaign) {
@@ -96,10 +105,29 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
         String originNodeName = ", " + campaign.getForce(0).getName();
         forceName = forceName.replaceAll(originNodeName, "");
 
+        String fatigueReport = "";
+        if (campaign.getCampaignOptions().isUseFatigue()) {
+            int highestFatigue = 0;
+            for (UUID unitId : force.getAllUnits(false)) {
+                Unit unit = campaign.getUnit(unitId);
+
+                if (unit == null) {
+                    continue;
+                }
+
+                for (Person person : unit.getCrew()) {
+                    if (person.getFatigue() > highestFatigue) {
+                        highestFatigue = person.getEffectiveFatigue(campaign);
+                    }
+                }
+            }
+            fatigueReport = getFormattedTextAt(RESOURCE_BUNDLE, "fatigueReport.string", highestFatigue);
+        }
+
         // Format string
-        setText(String.format("<html>%s<b>%s%s, %s</b> - BV %s<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>%s</i></html>",
-            statusOpenFormat, force.getName(), statusCloseFormat, roleString,
-            force.getTotalBV(campaign, true), forceName));
+        setText(getFormattedTextAt(RESOURCE_BUNDLE, "report.string", statusOpenFormat, force.getName(),
+              statusCloseFormat, roleString, force.getTotalBV(campaign, true),
+              fatigueReport, forceName));
 
         return this;
     }

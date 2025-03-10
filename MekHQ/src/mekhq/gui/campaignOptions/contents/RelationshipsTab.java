@@ -776,7 +776,7 @@ public class RelationshipsTab {
         chkLogMarriageNameChanges.setSelected(options.isLogMarriageNameChanges());
         comboRandomMarriageMethod.setSelectedItem(options.getRandomMarriageMethod());
         chkUseRandomClanPersonnelMarriages.setSelected(options.isUseRandomClanPersonnelMarriages());
-        chkUseRandomPrisonerMarriages.setSelected(options.isUsePrisonerMarriages());
+        chkUseRandomPrisonerMarriages.setSelected(options.isUseRandomPrisonerMarriages());
         spnRandomMarriageAgeRange.setValue(options.getRandomMarriageAgeRange());
         spnRandomMarriageDiceSize.setValue(options.getRandomMarriageDiceSize());
         spnRandomSameSexMarriageDiceSize.setValue(options.getRandomSameSexMarriageDiceSize());
@@ -789,8 +789,8 @@ public class RelationshipsTab {
         comboRandomDivorceMethod.setSelectedItem(options.getRandomDivorceMethod());
         chkUseRandomOppositeSexDivorce.setSelected(options.isUseRandomOppositeSexDivorce());
         chkUseRandomSameSexDivorce.setSelected(options.isUseRandomSameSexDivorce());
-        chkUseRandomClanPersonnelDivorce.setSelected(options.isUseClanPersonnelDivorce());
-        chkUseRandomPrisonerDivorce.setSelected(options.isUsePrisonerDivorce());
+        chkUseRandomClanPersonnelDivorce.setSelected(options.isUseRandomClanPersonnelDivorce());
+        chkUseRandomPrisonerDivorce.setSelected(options.isUseRandomPrisonerDivorce());
         spnRandomDivorceDiceSize.setValue(options.getRandomDivorceDiceSize());
 
         // Procreation
