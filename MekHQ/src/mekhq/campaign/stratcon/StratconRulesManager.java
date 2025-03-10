@@ -35,7 +35,6 @@ import mekhq.campaign.event.StratconDeploymentEvent;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.*;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
@@ -1646,18 +1645,12 @@ public class StratconRulesManager {
      *             <li>-- If command rights indicate that a liaison is required, the modifier is adjusted.</li>
      * </ol>
      *
-     * @param campaign         the {@link Campaign} instance representing the current operational campaign.
-     * @param scenario         the {@link StratconScenario} for which reinforcement details are being determined.
      * @param commandLiaison   the {@link Person} acting as the command liaison, or {@code null} if no liaison exists.
-     * @param campaignState    the {@link StratconCampaignState} representing the state of the overarching campaign.
      * @param contract         the {@link AtBContract} defining the terms of the contract for this scenario.
      * @return                 a {@link TargetRoll} object representing the calculated reinforcement target number,
      *                         with appropriate modifiers applied.
      */
-    public static TargetRoll calculateReinforcementTargetNumber(Campaign campaign,
-                                                                StratconScenario scenario,
-                                                                @Nullable Person commandLiaison,
-                                                                StratconCampaignState campaignState,
+    public static TargetRoll calculateReinforcementTargetNumber(@Nullable Person commandLiaison,
                                                                 AtBContract contract) {
         // Create Target Roll
         TargetRoll reinforcementTargetNumber = new TargetRoll();
@@ -1683,21 +1676,8 @@ public class StratconRulesManager {
                 "Administration (Unskilled)");
         }
 
-        // Facilities Modifier
-        StratconTrackState track = scenario.getTrackForScenario(campaign, campaignState);
-
-        int facilityModifier = 0;
-        if (track != null) {
-            for (StratconFacility facility : track.getFacilities().values()) {
-                if (facility.getOwner().equals(ForceAlignment.Player) || facility.getOwner().equals(Allied)) {
-                    facilityModifier--;
-                } else {
-                    facilityModifier++;
-                }
-            }
-        }
-
-        reinforcementTargetNumber.addModifier(facilityModifier, "Facilities");
+        // Enemy Morale Modifier
+        reinforcementTargetNumber.addModifier(contract.getMoraleLevel().ordinal(), "Enemy Morale");
 
         // Skill Modifier
         int skillModifier = contract.getEnemySkill().getAdjustedValue() - SkillLevel.REGULAR.getAdjustedValue();
