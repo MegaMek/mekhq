@@ -4008,8 +4008,8 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-        // For aerospace units, multiply the walk MP by 3
-        if (entity.isAerospace()) {
+        // For aerospace units, multiply the walk MP
+        if (entity.isAerospace() && !entity.isSpheroid()) {
             speed *= 2;
         }
 
