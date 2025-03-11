@@ -121,14 +121,14 @@ public class AdvancementTab {
     private JPanel pnlSkillGroups;
 
     private JPanel pnlTactics;
-    private JLabel lblTacticsGreen;
-    private JSpinner spnTacticsGreen;
-    private JLabel lblTacticsReg;
-    private JSpinner spnTacticsReg;
-    private JLabel lblTacticsVet;
-    private JSpinner spnTacticsVet;
-    private JLabel lblTacticsElite;
-    private JSpinner spnTacticsElite;
+    private JLabel lblCommandSkillsGreen;
+    private JSpinner spnCommandSkillsGreen;
+    private JLabel lblCommandSkillsReg;
+    private JSpinner spnCommandSkillsReg;
+    private JLabel lblCommandSkillsVet;
+    private JSpinner spnCommandSkillsVet;
+    private JLabel lblCommandSkillsElite;
+    private JSpinner spnCommandSkillsElite;
 
     private JPanel pnlSmallArms;
     private JLabel lblCombatSA;
@@ -517,14 +517,14 @@ public class AdvancementTab {
         pnlSkillGroups = new JPanel();
 
         pnlTactics = new JPanel();
-        lblTacticsGreen = new JLabel();
-        spnTacticsGreen = new JSpinner();
-        lblTacticsReg = new JLabel();
-        spnTacticsReg = new JSpinner();
-        lblTacticsVet = new JLabel();
-        spnTacticsVet = new JSpinner();
-        lblTacticsElite = new JLabel();
-        spnTacticsElite = new JSpinner();
+        lblCommandSkillsGreen = new JLabel();
+        spnCommandSkillsGreen = new JSpinner();
+        lblCommandSkillsReg = new JLabel();
+        spnCommandSkillsReg = new JSpinner();
+        lblCommandSkillsVet = new JLabel();
+        spnCommandSkillsVet = new JSpinner();
+        lblCommandSkillsElite = new JLabel();
+        spnCommandSkillsElite = new JSpinner();
 
         pnlSmallArms = new JPanel();
         lblCombatSA = new JLabel();
@@ -738,46 +738,46 @@ public class AdvancementTab {
      */
     private JPanel createTacticsPanel() {
         // Contents
-        lblTacticsGreen = new CampaignOptionsLabel("TacticsGreen");
-        spnTacticsGreen = new CampaignOptionsSpinner("TacticsGreen",
+        lblCommandSkillsGreen = new CampaignOptionsLabel("CommandSkillsGreen");
+        spnCommandSkillsGreen = new CampaignOptionsSpinner("CommandSkillsGreen",
             0, -10, 10, 1);
 
-        lblTacticsReg = new CampaignOptionsLabel("TacticsRegular");
-        spnTacticsReg = new CampaignOptionsSpinner("TacticsRegular",
+        lblCommandSkillsReg = new CampaignOptionsLabel("CommandSkillsRegular");
+        spnCommandSkillsReg = new CampaignOptionsSpinner("CommandSkillsRegular",
             0, -10, 10, 1);
 
-        lblTacticsVet = new CampaignOptionsLabel("TacticsVeteran");
-        spnTacticsVet = new CampaignOptionsSpinner("TacticsVeteran",
+        lblCommandSkillsVet = new CampaignOptionsLabel("CommandSkillsVeteran");
+        spnCommandSkillsVet = new CampaignOptionsSpinner("CommandSkillsVeteran",
             0, -10, 10, 1);
 
-        lblTacticsElite = new CampaignOptionsLabel("TacticsElite");
-        spnTacticsElite = new CampaignOptionsSpinner("TacticsElite",
+        lblCommandSkillsElite = new CampaignOptionsLabel("CommandSkillsElite");
+        spnCommandSkillsElite = new CampaignOptionsSpinner("CommandSkillsElite",
             0, -10, 10, 1);
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("TacticsPanel", true,
-            "TacticsPanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("CommandSkillsPanel", true,
+            "CommandSkillsPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
         layout.gridwidth = 1;
         layout.gridx = 0;
         layout.gridy = 0;
-        panel.add(lblTacticsGreen, layout);
+        panel.add(lblCommandSkillsGreen, layout);
         layout.gridx++;
-        panel.add(spnTacticsGreen, layout);
+        panel.add(spnCommandSkillsGreen, layout);
         layout.gridx++;
-        panel.add(lblTacticsReg, layout);
+        panel.add(lblCommandSkillsReg, layout);
         layout.gridx++;
-        panel.add(spnTacticsReg, layout);
+        panel.add(spnCommandSkillsReg, layout);
 
         layout.gridx = 0;
         layout.gridy++;
-        panel.add(lblTacticsVet, layout);
+        panel.add(lblCommandSkillsVet, layout);
         layout.gridx++;
-        panel.add(spnTacticsVet, layout);
+        panel.add(spnCommandSkillsVet, layout);
         layout.gridx++;
-        panel.add(lblTacticsElite, layout);
+        panel.add(lblCommandSkillsElite, layout);
         layout.gridx++;
-        panel.add(spnTacticsElite, layout);
+        panel.add(spnCommandSkillsElite, layout);
 
         return panel;
     }
@@ -954,10 +954,10 @@ public class AdvancementTab {
         spnAbilityReg.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_REGULAR));
         spnAbilityVet.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_VETERAN));
         spnAbilityElite.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_ELITE));
-        spnTacticsGreen.setValue(skillPreferences.getTacticsMod(SkillType.EXP_GREEN));
-        spnTacticsReg.setValue(skillPreferences.getTacticsMod(SkillType.EXP_REGULAR));
-        spnTacticsVet.setValue(skillPreferences.getTacticsMod(SkillType.EXP_VETERAN));
-        spnTacticsElite.setValue(skillPreferences.getTacticsMod(SkillType.EXP_ELITE));
+        spnCommandSkillsGreen.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_GREEN));
+        spnCommandSkillsReg.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_REGULAR));
+        spnCommandSkillsVet.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_VETERAN));
+        spnCommandSkillsElite.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_ELITE));
         spnCombatSA.setValue(skillPreferences.getCombatSmallArmsBonus());
         spnSupportSA.setValue(skillPreferences.getSupportSmallArmsBonus());
         spnArtyProb.setValue(skillPreferences.getArtilleryProb());
@@ -1018,10 +1018,10 @@ public class AdvancementTab {
         skillPreferences.setArtilleryBonus((int) spnArtyBonus.getValue());
         skillPreferences.setSecondSkillProb((int) spnSecondProb.getValue());
         skillPreferences.setSecondSkillBonus((int) spnSecondBonus.getValue());
-        skillPreferences.setTacticsMod(SkillType.EXP_GREEN, (int) spnTacticsGreen.getValue());
-        skillPreferences.setTacticsMod(SkillType.EXP_REGULAR, (int) spnTacticsReg.getValue());
-        skillPreferences.setTacticsMod(SkillType.EXP_VETERAN, (int) spnTacticsVet.getValue());
-        skillPreferences.setTacticsMod(SkillType.EXP_ELITE, (int) spnTacticsElite.getValue());
+        skillPreferences.setCommandSkillsMod(SkillType.EXP_GREEN, (int) spnCommandSkillsGreen.getValue());
+        skillPreferences.setCommandSkillsMod(SkillType.EXP_REGULAR, (int) spnCommandSkillsReg.getValue());
+        skillPreferences.setCommandSkillsMod(SkillType.EXP_VETERAN, (int) spnCommandSkillsVet.getValue());
+        skillPreferences.setCommandSkillsMod(SkillType.EXP_ELITE, (int) spnCommandSkillsElite.getValue());
         skillPreferences.setCombatSmallArmsBonus((int) spnCombatSA.getValue());
         skillPreferences.setSupportSmallArmsBonus((int) spnSupportSA.getValue());
         skillPreferences.setSpecialAbilityBonus(SkillType.EXP_GREEN, (int) spnAbilityGreen.getValue());
