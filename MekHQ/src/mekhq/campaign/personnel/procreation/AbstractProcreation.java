@@ -372,8 +372,7 @@ public abstract class AbstractProcreation {
         final Person father = determineFather(campaign, mother);
 
         // Determine Prisoner Status
-        final PrisonerStatus prisonerStatus = campaign.getCampaignOptions().isPrisonerBabyStatus()
-                ? mother.getPrisonerStatus() : PrisonerStatus.FREE;
+        final PrisonerStatus prisonerStatus = PrisonerStatus.FREE;
 
         // Output a specific report to the campaign if they are giving birth to multiple children
         if (size > 1) {
@@ -609,7 +608,7 @@ public abstract class AbstractProcreation {
 
             if (campaign.getCampaignOptions().isUseMaternityLeave()) {
                 if (person.getStatus().isActive()
-                    && (person.getDueDate().minusWeeks(20).isAfter(today.minusDays(1)))) {
+                    && (person.getDueDate().minusWeeks(20).isBefore(today))) {
                     person.changeStatus(campaign, today, PersonnelStatus.ON_MATERNITY_LEAVE);
                 }
             }

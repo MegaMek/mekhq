@@ -2,7 +2,12 @@
 <ScenarioTemplate>
     <name>Frontline Breakthrough</name>
     <shortBriefing>Break through enemy battlelines.</shortBriefing>
-    <detailedBriefing>The mission is to penetrate the main enemy battlelines and reach the opposite edge of the battlefield. At least 50% of your units, fully operational, must break through. Alternatively, victory can be achieved by destroying at least 50% of the enemy forces defending the line.</detailedBriefing>
+    <detailedBriefing>You are tasked with penetrating the enemy’s main battle line and advancing beyond their position. The enemy has committed significant forces to this sector, making this a high-risk operation. Your primary objective is to reach the far edge of the engagement zone with at least 50% of your forces intact. If direct passage is impossible, an alternative path to victory is available—routing the enemy by destroying at least 50% of their forces.
+
+Expect heavy resistance, as the enemy will not yield ground easily. Their forces are well-positioned to block your advance, and delaying tactics may be used to slow you down. Speed, decisive strikes, and tactical maneuvering will be key to achieving your objective. If you can break their formation or force them into disarray, the path forward will open.
+
+The enemy will control the battlefield once the engagement concludes, preventing any opportunity for salvage or recovery. This is a mission of mobility and force—break through, or break them. There is no room for hesitation.</detailedBriefing>
+    <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>true</allowRotation>
@@ -27,9 +32,9 @@
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>11</deploymentZone>
+                    <deploymentZone>6</deploymentZone>
                 </deploymentZones>
-                <destinationZone>5</destinationZone>
+                <destinationZone>2</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -94,14 +99,14 @@
                 <failureEffect>
                     <effectType>ScenarioDefeat</effectType>
                     <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
+                    <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
             <additionalDetails>
                 <additionalDetail>Crippled units do not count towards this objective.</additionalDetail>
             </additionalDetails>
-            <description>Reach the destination edge with 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
+            <description>Reach the destination edge with 50% of the following forces. +2 SVP if succeeded, -1 SVP if failed.</description>
+            <destinationEdge>NORTH</destinationEdge>
             <objectiveCriterion>ReachMapEdge</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimit>0</timeLimit>
@@ -128,7 +133,7 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy or rout 50% the following force(s) and unit(s):</description>
+            <description>Destroy or rout 50% the following forces. +2 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Destroy</objectiveCriterion>
             <percentage>50</percentage>

@@ -142,38 +142,30 @@
         </entry>
         <entry>
             <key>35</key>
-            <value>Skirmish.xml</value>
-        </entry>
-        <entry>
-            <key>36</key>
-            <value>Skirmish Disruption.xml</value>
-        </entry>
-        <entry>
-            <key>37</key>
             <value>Space Aerospace Intercept.xml</value>
         </entry>
         <entry>
-            <key>38</key>
+            <key>36</key>
             <value>Space Blockade Run.xml</value>
         </entry>
         <entry>
-            <key>39</key>
+            <key>37</key>
             <value>Space DropShip Intercept.xml</value>
         </entry>
         <entry>
-            <key>40</key>
+            <key>38</key>
             <value>Tactical Withdrawal.xml</value>
         </entry>
         <entry>
-            <key>41</key>
+            <key>39</key>
             <value>VIP Ambush.xml</value>
         </entry>
         <entry>
-            <key>42</key>
+            <key>40</key>
             <value>VIP Defense.xml</value>
         </entry>
         <entry>
-            <key>43</key>
+            <key>41</key>
             <value>Engagement.xml</value>
         </entry>
     </scenarioFileNames>

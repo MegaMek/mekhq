@@ -7,6 +7,9 @@
 	<gm>false</gm>
 	<campaignOptions>
 		<manualUnitRatingModifier>0</manualUnitRatingModifier>
+        <clampReputationPayMultiplier>true</clampReputationPayMultiplier>
+        <reduceReputationPerformanceModifier>true</reduceReputationPerformanceModifier>
+        <reputationPerformanceModifierCutOff>true</reputationPerformanceModifierCutOff>
 		<logMaintenance>false</logMaintenance>
 		<defaultMaintenanceTime>4</defaultMaintenanceTime>
 		<mrmsUseRepair>true</mrmsUseRepair>
@@ -538,6 +541,7 @@
 		<limitLanceWeight>false</limitLanceWeight>
 		<limitLanceNumUnits>false</limitLanceNumUnits>
 		<assignPortraitOnRoleChange>false</assignPortraitOnRoleChange>
+        <allowDuplicatePortraits>true</allowDuplicatePortraits>
 		<allowOpForAeros>false</allowOpForAeros>
 		<allowOpForLocalUnits>false</allowOpForLocalUnits>
 		<opForAeroChance>5</opForAeroChance>

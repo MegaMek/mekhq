@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -214,7 +214,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
     private int getMarketItemCount(Campaign campaign, UnitMarketRarity rarity, int rarityModifier) {
         int totalRarity = rarity.ordinal() + rarityModifier;
 
-        if (isGrayMonday(campaign)) {
+        if (isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().isSimulateGrayMonday())) {
             totalRarity -= 4;
         }
 

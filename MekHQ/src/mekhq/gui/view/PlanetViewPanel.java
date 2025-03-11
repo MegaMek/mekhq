@@ -21,16 +21,16 @@ package mekhq.gui.view;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.education.Academy;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.PlanetaryType;
-import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.baseComponents.SourceableValueLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
+import javax.xml.transform.Source;
 import java.awt.*;
 import java.awt.geom.Arc2D;
 import java.text.NumberFormat;
@@ -138,7 +138,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         JLabel lblPlanetType = new JLabel(resourceMap.getString("lblPlanetaryType1.text"));
         gbcLabel.gridy = infoRow;
         panel.add(lblPlanetType, gbcLabel);
-        JLabel txtPlanetType = new JLabel(planet.getPlanetType().toString());
+        SourceableValueLabel txtPlanetType = new SourceableValueLabel(planet.getSourcedPlanetType());
         gbcText.gridy = infoRow;
         panel.add(txtPlanetType, gbcText);
         ++ infoRow;
@@ -148,8 +148,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblDiameter = new JLabel(resourceMap.getString("lblDiameter.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblDiameter, gbcLabel);
-            JLabel txtDiameter = new JLabel( String.format("%.1f km",
-                    planet.getDiameter()));
+            SourceableValueLabel txtDiameter = new SourceableValueLabel(planet.getSourcedDiameter(), "%.1f km");
             gbcText.gridy = infoRow;
             panel.add(txtDiameter, gbcText);
             ++ infoRow;
@@ -176,114 +175,131 @@ public class PlanetViewPanel extends JScrollablePanel {
         ++ infoRow;
 
         //Year length
-        if (null != planet.getYearLength()) {
+        if (null != planet.getSourcedYearLength()) {
             JLabel lblYear = new JLabel(resourceMap.getString("lblYear1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblYear, gbcLabel);
-            JLabel txtYear = new JLabel(planet.getYearLength() + " Terran years");
+            SourceableValueLabel txtYear = new SourceableValueLabel(planet.getSourcedYearLength(), "%s Terran years");
             gbcText.gridy = infoRow;
             panel.add(txtYear, gbcText);
             ++ infoRow;
         }
 
         //day length
-        if (null != planet.getDayLength(currentDate)) {
+        if (null != planet.getSourcedDayLength(currentDate)) {
             JLabel lblDay = new JLabel(resourceMap.getString("lblDay1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblDay, gbcLabel);
-            JLabel txtDay = new JLabel(planet.getDayLength(currentDate) + " hours");
+            SourceableValueLabel txtDay = new SourceableValueLabel(planet.getSourcedDayLength(currentDate), "%s hours");
             gbcText.gridy = infoRow;
             panel.add(txtDay, gbcText);
             ++ infoRow;
         }
 
         //Gravity
-        if (null != planet.getGravity()) {
+        if (null != planet.getSourcedGravity()) {
             JLabel lblGravity = new JLabel(resourceMap.getString("lblGravity1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblGravity, gbcLabel);
-            JLabel txtGravity = new JLabel(planet.getGravityText());
+            SourceableValueLabel txtGravity = new SourceableValueLabel(planet.getSourcedGravity(), "%sg");
             gbcText.gridy = infoRow;
             panel.add(txtGravity, gbcText);
             ++ infoRow;
         }
 
         //Atmosphere
-        if (null != planet.getAtmosphere(currentDate)) {
+        if (null != planet.getSourcedAtmosphere(currentDate)) {
             JLabel lblAtmosphere = new JLabel(resourceMap.getString("lblAtmosphere.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblAtmosphere, gbcLabel);
-            JLabel txtAtmosphere = new JLabel(planet.getAtmosphereName(currentDate));
+            SourceableValueLabel txtAtmosphere = new SourceableValueLabel(planet.getSourcedAtmosphere(currentDate));
             gbcText.gridy = infoRow;
             panel.add(txtAtmosphere, gbcText);
             ++ infoRow;
         }
 
         //Atmospheric Pressure
-        if (null != planet.getPressure(currentDate)) {
+        if (null != planet.getSourcedPressure(currentDate)) {
             JLabel lblPressure = new JLabel(resourceMap.getString("lblPressure1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblPressure, gbcLabel);
-            JLabel txtPressure = new JLabel(planet.getPressureName(currentDate));
+            SourceableValueLabel txtPressure = new SourceableValueLabel(planet.getSourcedPressure(currentDate));
             gbcText.gridy = infoRow;
             panel.add(txtPressure, gbcText);
             ++ infoRow;
         }
 
         //Atmospheric composition
-        if (null != planet.getComposition(currentDate)) {
+        if (null != planet.getSourcedComposition(currentDate)) {
             JLabel lblComposition = new JLabel(resourceMap.getString("lblComposition.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblComposition, gbcLabel);
-            JLabel txtComposition = new JLabel("<html>" + planet.getComposition(currentDate) + "</html>");
+            SourceableValueLabel txtComposition = new SourceableValueLabel(planet.getSourcedComposition(currentDate), "<html>%s</html>");
             gbcText.gridy = infoRow;
             panel.add(txtComposition, gbcText);
             ++ infoRow;
         }
 
         //Temperature
-        if ((null != planet.getTemperature(currentDate))) {
+        if ((null != planet.getSourcedTemperature(currentDate))) {
             JLabel lblTemp = new JLabel(resourceMap.getString("lblTemp1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblTemp, gbcLabel);
             //Using Unicode for the degree symbol as it is required for proper display on certain systems
-            JLabel txtTemp = new JLabel(planet.getTemperature(currentDate) + "°" + 'C');
+            SourceableValueLabel txtTemp = new SourceableValueLabel(planet.getSourcedTemperature(currentDate), "%s°C");
             gbcText.gridy = infoRow;
             panel.add(txtTemp, gbcText);
             ++ infoRow;
         }
 
         //Water
-        if (null != planet.getPercentWater(currentDate)) {
+        if (null != planet.getSourcedPercentWater(currentDate)) {
             JLabel lblWater = new JLabel(resourceMap.getString("lblWater1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblWater, gbcLabel);
-            JLabel txtWater = new JLabel(planet.getPercentWater(currentDate) + " percent");
+            SourceableValueLabel txtWater = new SourceableValueLabel(planet.getSourcedPercentWater(currentDate), "%s percent");
             gbcText.gridy = infoRow;
             panel.add(txtWater, gbcText);
             ++ infoRow;
         }
 
         //native life forms
-        if (null != planet.getLifeForm(currentDate)) {
+        if (null != planet.getSourcedLifeForm(currentDate)) {
             JLabel lblAnimal = new JLabel(resourceMap.getString("lblAnimal1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblAnimal, gbcLabel);
-            JLabel txtAnimal = new JLabel(planet.getLifeFormName(currentDate));
+            SourceableValueLabel txtAnimal = new SourceableValueLabel(planet.getSourcedLifeForm(currentDate));
             gbcText.gridy = infoRow;
             panel.add(txtAnimal, gbcText);
             ++ infoRow;
         }
 
         //satellites
-        if (null != planet.getSatellites() || planet.getSmallMoons()>0) {
+        if ((null != planet.getSatellites()) || (planet.getSmallMoons()>0) || (planet.hasRing())) {
             JLabel lblSatellite = new JLabel(resourceMap.getString("lblSatellite1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblSatellite, gbcLabel);
-            JLabel txtSatellite = new JLabel("<html>" + planet.getSatelliteDescription() + "</html>");
-            gbcText.gridy = infoRow;
-            panel.add(txtSatellite, gbcText);
-            ++ infoRow;
+            SourceableValueLabel txtSatellite;
+            if((null != planet.getSatellites())) {
+                for(Satellite satellite : planet.getSatellites()) {
+                    txtSatellite = new SourceableValueLabel(satellite.getSourcedName(), "%s (" + satellite.getSize() + ")");
+                    gbcText.gridy = infoRow;
+                    panel.add(txtSatellite, gbcText);
+                    ++ infoRow;
+                }
+            }
+            if(planet.getSmallMoons()>0) {
+                txtSatellite = new SourceableValueLabel(planet.getSourcedSmallMoons(), "%s small moons");
+                gbcText.gridy = infoRow;
+                panel.add(txtSatellite, gbcText);
+                ++ infoRow;
+            }
+            if(planet.hasRing()) {
+                txtSatellite = new SourceableValueLabel(planet.getSourcedRing(), "dust ring");
+                gbcText.gridy = infoRow;
+                panel.add(txtSatellite, gbcText);
+                ++ infoRow;
+            }
         }
 
         //landmasses
@@ -291,42 +307,58 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblLandMass = new JLabel(resourceMap.getString("lblLandMass1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblLandMass, gbcLabel);
-            JLabel txtLandMass = new JLabel("<html>" + planet.getLandMassDescription() + "</html>");
-            gbcText.gridy = infoRow;
-            panel.add(txtLandMass, gbcText);
-            ++ infoRow;
+            SourceableValueLabel txtLandMass;
+            String capitalIndent;
+            for(LandMass landmass : planet.getLandMasses()) {
+                capitalIndent = "";
+                if((null != landmass.getSourcedName())) {
+                    txtLandMass = new SourceableValueLabel(landmass.getSourcedName(), "<html>%s</html>");
+                    gbcText.gridy = infoRow;
+                    panel.add(txtLandMass, gbcText);
+                    capitalIndent = "&nbsp;&nbsp;&nbsp;";
+                    ++ infoRow;
+                }
+                if((null != landmass.getSourcedCapital())) {
+                    txtLandMass = new SourceableValueLabel(landmass.getSourcedCapital(), "<html>" + capitalIndent + "<i>Capital:</i> %s</html>");
+                    gbcText.gridy = infoRow;
+                    panel.add(txtLandMass, gbcText);
+                    ++ infoRow;
+                }
+            }
         }
 
         //Population
-        if (null != planet.getPopulation(currentDate)) {
+        if (null != planet.getSourcedPopulation(currentDate)) {
             JLabel lblPopulation = new JLabel(resourceMap.getString("lblPopulation.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblPopulation, gbcLabel);
-            JLabel txtPopulation = new JLabel(NumberFormat.getNumberInstance(Locale.getDefault()).format(planet.getPopulation(currentDate)));
+            SourceableValueLabel txtPopulation = new SourceableValueLabel(planet.getSourcedPopulation(currentDate), "%,d");
             gbcText.gridy = infoRow;
             panel.add(txtPopulation, gbcText);
             ++ infoRow;
         }
 
         //SIC codes
-        if (null != planet.getSocioIndustrial(currentDate)) {
+        if (null != planet.getSourcedSocioIndustrial(currentDate)) {
             JLabel lblSocioIndustrial = new JLabel(resourceMap.getString("lblSocioIndustrial1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblSocioIndustrial, gbcLabel);
             SocioIndustrialData sid = planet.getSocioIndustrial(currentDate);
             String sidText = (null == sid) ? "" : sid.getHTMLDescription();
-            JLabel txtSocioIndustrial = new JLabel(sidText);
+            SourceableValueLabel txtSocioIndustrial = new SourceableValueLabel(planet.getSourcedSocioIndustrial(currentDate));
+            // replace with greater detail
+            txtSocioIndustrial.setText(sidText);
             gbcText.gridy = infoRow;
             panel.add(txtSocioIndustrial, gbcText);
             ++ infoRow;
         }
 
         //HPG status
-        if (null != planet.getHPGClass(currentDate)) {
+        if (null != planet.getSourcedHPG(currentDate)) {
             JLabel lblHPG = new JLabel(resourceMap.getString("lblHPG1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblHPG, gbcLabel);
-            JLabel txtHPG = new JLabel(planet.getHPGClass(currentDate));
+            SourceableValueLabel txtHPG = new SourceableValueLabel(planet.getSourcedHPG(currentDate));
             gbcText.gridy = infoRow;
             panel.add(txtHPG, gbcText);
             ++ infoRow;
@@ -406,7 +438,9 @@ public class PlanetViewPanel extends JScrollablePanel {
         } else {
             text = planet.getDisplayableSystemPosition();
         }
-        JLabel txtPosition = new JLabel(text);
+        SourceableValueLabel txtPosition = new SourceableValueLabel(planet.getSourcedSystemPosition());
+        // replace with our text
+        txtPosition.setText(text);
         return txtPosition;
     }
 
@@ -432,7 +466,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         JLabel lblStarType = new JLabel(resourceMap.getString("lblStarType1.text"));
         gbcLabel.gridy = infoRow;
         panel.add(lblStarType, gbcLabel);
-        JLabel txtStarType = new JLabel(system.getStar().toString() + " (" + system.getRechargeTimeText(currentDate) + ')');
+        SourceableValueLabel txtStarType = new SourceableValueLabel(system.getSourcedStar(), "%s (" + system.getRechargeTimeText(currentDate) + ')');
         gbcText.gridy = infoRow;
         panel.add(txtStarType, gbcText);
         ++ infoRow;

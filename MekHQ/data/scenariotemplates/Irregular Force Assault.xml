@@ -2,7 +2,12 @@
 <ScenarioTemplate>
     <name>Irregular Force Assault</name>
     <shortBriefing>Engage infantry supported by frontline forces.</shortBriefing>
-    <detailedBriefing>Hostile infantry and irregular forces are receiving support from frontline military units. Your mission is to engage and destroy at least 50% of the combined enemy forces. Preserve at least 50% of your own forces to achieve mission success.</detailedBriefing>
+    <detailedBriefing>Hostile infantry and local insurgents are being reinforced by frontline enemy units, creating a growing threat in this sector. If left unchecked, their combined strength will destabilize our operations and undermine our control of the region. Your mission is to engage and destroy at least 50% of the combined enemy force, neutralizing their ability to continue resistance.
+
+Expect a mix of tactics—the insurgents will use terrain, ambushes, and guerrilla warfare, while the frontline units will provide structured firepower and coordination. Do not underestimate either force. Eliminate them with precision, break their ability to fight, and ensure this sector is pacified.
+
+The victor will control the battlefield at the end of the engagement, securing any remaining assets and preventing further insurgent activity. This is a mission of suppression and dominance—strike hard, eliminate resistance, and leave no doubt who commands this region.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
@@ -181,37 +186,9 @@
                 <howMuch>1</howMuch>
             </failureEffect>
             <additionalDetails />
-            <description>Destroy, cripple or force the withdrawal of 50% of the following forces and
-                units:</description>
+            <description>Destroy, cripple or force the withdrawal of 50% of the following forces. +1 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
-            <percentage>50</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Player</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>

@@ -2,7 +2,12 @@
 <ScenarioTemplate>
     <name>Low-Atmosphere DropShip Assault</name>
     <shortBriefing>Destroy DropShip before it escape.</shortBriefing>
-    <detailedBriefing>A hostile DropShip is attempting to escape in low atmosphere. Your mission is to destroy the DropShip before it can break free. Preserve at least 50% of your forces to ensure operational integrity during the assault.</detailedBriefing>
+    <detailedBriefing>A hostile DropShip is attempting to escape in low atmosphere, and we cannot allow it to break free. Whether it carries enemy personnel, critical cargo, or valuable intelligence, its destruction is paramount. Your mission is to intercept and destroy the DropShip before it can escape.
+
+Expect the enemy to deploy defensive escorts and countermeasures to protect their vessel. They may attempt evasive maneuvers or a high-speed burn to reach the upper atmosphere. You must strike decisively and disable or destroy the DropShip before it leaves your engagement range.
+
+We will control the field at the end of the engagement, ensuring that any wreckage or surviving assets remain in our hands. This is a one-shot opportunity—do not let them escape.</detailedBriefing>
+    <battlefieldControl>PLAYER</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
@@ -140,37 +145,10 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy or cripple the following force(s) and unit(s):</description>
+            <description>Destroy or cripple the following forces. +1 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>100</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Player</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
         </scenarioObjective>

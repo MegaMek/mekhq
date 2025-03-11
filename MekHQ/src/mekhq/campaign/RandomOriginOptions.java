@@ -18,16 +18,15 @@
  */
 package mekhq.campaign;
 
-import java.io.PrintWriter;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
 
 /**
  * @author Justin "Windchild" Bowen
@@ -200,8 +199,13 @@ public class RandomOriginOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeAroundSpecifiedPlanet",
                 isRandomizeAroundSpecifiedPlanet());
         if (isRandomizeAroundSpecifiedPlanet()) {
-            MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent, "specifiedPlanet", "systemId",
-                    getSpecifiedPlanet().getParentSystem().getId(), getSpecifiedPlanet().getId());
+            if (getSpecifiedPlanet() != null) {
+                MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent, "specifiedPlanet",
+                    "systemId", getSpecifiedPlanet().getParentSystem().getId(),
+                    getSpecifiedPlanet().getId());
+            } else {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeAroundSpecifiedPlanet", false);
+            }
         }
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "originSearchRadius", getOriginSearchRadius());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "originDistanceScale", getOriginDistanceScale());

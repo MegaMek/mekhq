@@ -2,7 +2,12 @@
 <ScenarioTemplate>
     <name>Reinforcements Intercepted</name>
     <shortBriefing>Destroy hostile forces.</shortBriefing>
-    <detailedBriefing>Hostile units have intercepted your reinforcements. Destroy at least 50% of the enemy force while preserving 50% of your own units.</detailedBriefing>
+    <detailedBriefing>Your reinforcements have been intercepted and pinned down, preventing them from completing their original mission. The enemy is attempting to isolate and eliminate them before they can rejoin the fight. Your objective is to break them free by destroying at least 50% of the enemy forces, forcing a retreat and allowing your units to escape.
+
+Expect the enemy to hold strong defensive positions, using suppression tactics to keep your forces contained. Focus on eliminating key threats, breaking their formation, and forcing their forces into disarray. Speed and precision will be critical—you must deal enough damage to secure an escape route before more reinforcements arrive.
+
+There is no time to secure the battlefield at the end of the engagement, meaning any salvage will be lost. This is a fight for survival and mobility, not territory. Break their grip, get our forces out, and resume the mission.</detailedBriefing>
+    <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
@@ -110,36 +115,9 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
+            <description>Destroy or rout 50% of the following forces. +1 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
-            <percentage>50</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Player</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>

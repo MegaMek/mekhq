@@ -18,15 +18,19 @@
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.enums.MissionStatus;
+
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import megamek.logging.MMLogger;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.enums.MissionStatus;
+import static mekhq.campaign.CampaignOptions.REPUTATION_PERFORMANCE_CUT_OFF_YEARS;
 
 public class CombatRecordRating {
     private static final MMLogger logger = MMLogger.create(CombatRecordRating.class);
@@ -65,9 +69,25 @@ public class CombatRecordRating {
         }
 
         // Construct a map with mission statuses and their counts
-        Map<MissionStatus, Long> missionCountsByStatus = campaign.getCompletedMissions().stream()
-                .filter(mission -> mission.getStatus() != MissionStatus.ACTIVE)
-                .collect(Collectors.groupingBy(Mission::getStatus, Collectors.counting()));
+        boolean usePerformanceCutOff = campaign.getCampaignOptions().isReputationPerformanceModifierCutOff();
+        LocalDate cutOffDate = campaign.getLocalDate().minusYears(REPUTATION_PERFORMANCE_CUT_OFF_YEARS);
+        Map<MissionStatus, Long> missionCountsByStatus = new HashMap<>();
+        for (Mission mission : campaign.getCompletedMissions()) {
+            if (mission.getStatus() == MissionStatus.ACTIVE) {
+                continue;
+            }
+
+            if (usePerformanceCutOff) {
+                if (mission instanceof AtBContract) {
+                    if (((AtBContract) mission).getEndingDate().isBefore(cutOffDate)) {
+                        continue;
+                    }
+                }
+            }
+
+            missionCountsByStatus.put(mission.getStatus(),
+                missionCountsByStatus.getOrDefault(mission.getStatus(), 0L) + 1);
+        }
 
         // Assign mission counts to each category
         int successes = missionCountsByStatus.getOrDefault(MissionStatus.SUCCESS, 0L).intValue();
@@ -82,7 +102,14 @@ public class CombatRecordRating {
         combatRecord.put("contractsBreached", contractBreaches);
 
         // Calculate combat record rating
-        int combatRecordRating = (successes * 5) - (failures * 10) - (contractBreaches * 25);
+        boolean usePerformanceModifierReduction = campaign.getCampaignOptions().isReduceReputationPerformanceModifier();
+        int successMultiplier = usePerformanceModifierReduction ? 1 : 5;
+        int failureMultiplier = usePerformanceModifierReduction ? 2 : 10;
+        int breachMultiplier = usePerformanceModifierReduction ? 5 : 25;
+
+        int combatRecordRating = (successes * successMultiplier)
+            - (failures * failureMultiplier)
+            - (contractBreaches * breachMultiplier);
 
         // if the campaign has a retainer, check retainer duration
         if (campaign.getRetainerStartDate() != null) {

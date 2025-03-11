@@ -2,7 +2,12 @@
 <ScenarioTemplate>
     <name>Space Aerospace Intercept</name>
     <shortBriefing>Intercept and destroy incoming aerospace units.</shortBriefing>
-    <detailedBriefing>Hostile aerospace units are on approach in space. Your mission is to intercept and destroy at least 50% of the enemy forces. Preserve at least 50% of your own forces to ensure success in this space engagement.</detailedBriefing>
+    <detailedBriefing>Enemy AeroSpace assets have entered our airspace, threatening our operations and territorial control. Your mission is to intercept and destroy at least 50% of the enemy’s AeroSpace forces, ensuring they are unable to regroup or continue their mission.
+
+Expect high-speed engagements with agile enemy fighters and possible bomber or support craft in formation. Control the skies, dictate the terms of engagement, and press the attack until the enemy is forced to retreat or is completely neutralized. Do not allow them to escape unscathed—this is an opportunity to cripple their airpower.
+
+The victor will control the battlefield at the end of the engagement, securing dominance over the airspace and ensuring enemy forces are unable to reestablish a foothold. Strike hard, eliminate the threat, and claim the skies as our own.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
@@ -109,36 +114,9 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
+            <description>Destroy or rout 50% of the following forces. +1 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
-            <percentage>50</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Player</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>

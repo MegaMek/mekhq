@@ -2,7 +2,12 @@
 <ScenarioTemplate>
     <name>Base Defense</name>
     <shortBriefing>Defend allied facility, minimize damage.</shortBriefing>
-    <detailedBriefing>An allied facility is under heavy assault. Your mission is to defend the base and prevent it from falling. Preserve at least 25% of the base infrastructure while neutralizing enemy forces. Success requires destroying at least 50% of the attacking enemy units.</detailedBriefing>
+    <detailedBriefing>Your orders are clear: defend the base against the incoming enemy assault. At least 25% of the base infrastructure must remain intact by the end of the engagement.
+
+At the same time, this is not just about survival. You are to destroy at least 50% of enemy forces before the battle concludes.
+
+The victor will control the field when this is over. Ensure that it is us.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>true</isAlliedFacility>
     <mapParameters>
@@ -57,7 +62,7 @@
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
                 <allowedUnitType>-2</allowedUnitType>
-                <arrivalTurn>0</arrivalTurn>
+                <arrivalTurn>1</arrivalTurn>
                 <canReinforceLinked>true</canReinforceLinked>
                 <contributesToBV>true</contributesToBV>
                 <contributesToMapSize>true</contributesToMapSize>
@@ -98,7 +103,7 @@
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
                 <allowedUnitType>-2</allowedUnitType>
-                <arrivalTurn>0</arrivalTurn>
+                <arrivalTurn>1</arrivalTurn>
                 <canReinforceLinked>true</canReinforceLinked>
                 <contributesToBV>false</contributesToBV>
                 <contributesToMapSize>true</contributesToMapSize>
@@ -153,7 +158,7 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy or rout 50% of the attacking force(s):</description>
+            <description>Destroy or rout 50% of the attacking forces. +1 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>50</percentage>
@@ -180,7 +185,7 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Preserve 25% of the following force(s) and unit(s):</description>
+            <description>Preserve 25% of the following forces. +1 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>25</percentage>

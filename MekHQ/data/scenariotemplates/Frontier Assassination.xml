@@ -2,7 +2,12 @@
 <ScenarioTemplate>
     <name>Frontier Assassination</name>
     <shortBriefing>Eliminate VIP, minimize own losses.</shortBriefing>
-    <detailedBriefing>A remote, high-value enemy target is attempting to escape. With limited reinforcements, you must locate and destroy the VIP before they can vanish into the wilderness. Ensure that at least 50% of your forces remain intact during the mission.</detailedBriefing>
+    <detailedBriefing>An enemy VIP has been located in an isolated position, presenting a rare opportunity to eliminate a key target. Their removal will deal a significant blow to enemy operations, but they are not unprotected. Your mission is to kill the VIP and destroy at least 50% of their escort force.
+
+The enemy may attempt an emergency extraction or stall for reinforcements. Do not let them escape. Strike hard, eliminate the target, and ensure their escort is crippled beyond recovery. If the enemy attempts to dig in, break their defensive perimeter and neutralize them with overwhelming force.
+
+The victor will control the battlefield at the end of the engagement, securing any salvage and eliminating remaining resistance. This is a chance to change the course of the conflict—do not let it slip away.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
@@ -135,7 +140,7 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy the following force(s) and unit(s):</description>
+            <description>Destroy the following forces. +1 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Destroy</objectiveCriterion>
             <percentage>100</percentage>
@@ -144,7 +149,7 @@
         </scenarioObjective>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Player</associatedForceName>
+                <associatedForceName>OpFor</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>
@@ -162,9 +167,9 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
+            <description>Destroy or rout 50% of the following forces. +1 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
+            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>

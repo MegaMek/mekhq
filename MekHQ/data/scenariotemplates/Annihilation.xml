@@ -2,7 +2,10 @@
 <ScenarioTemplate>
     <name>Annihilation</name>
     <shortBriefing>Obliterate the enemy force.</shortBriefing>
-    <detailedBriefing>The mission objective is total destruction. Eliminate 95% of enemy forces to secure victory. Your casualties are not a factor in this high-intensity engagement.</detailedBriefing>
+    <detailedBriefing>Your orders are clear. This is not a surgical strike, nor a precision raid—this is extermination. The enemy force in this sector must be wiped out, with 95% confirmed casualties before we consider this battlefield secured. Their continued presence is unacceptable, and we cannot afford to let even a remnant regroup for future operations.
+
+The victor controls the field, and we will be the ones standing when the dust settles.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
@@ -105,7 +108,7 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy or rout 95% of the following force(s) and unit(s):</description>
+            <description>Destroy or rout 95% of the following forces. +1 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>95</percentage>

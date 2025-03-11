@@ -2,7 +2,12 @@
 <ScenarioTemplate>
     <name>VIP Defense</name>
     <shortBriefing>Protect VIP and defeat enemy.</shortBriefing>
-    <detailedBriefing>Your mission is to protect a high-value VIP while engaging the enemy. Defeat at least 50% of enemy forces and preserve 50% of your own. Ensure the VIP remains safe throughout the engagement to achieve mission success.</detailedBriefing>
+    <detailedBriefing>An important allied VIP is under direct threat, with enemy forces moving to eliminate them. Your mission is to ensure the VIP’s survival and destroy at least 50% of the attacking force to break their assassination attempt.
+
+Expect the enemy to employ fast-moving strike teams, precision fire support, and possibly infiltration tactics to bypass defenses and reach the VIP. You must identify and eliminate key threats quickly while maintaining a defensive perimeter around the target. Every second counts—if the enemy is allowed to press their attack unchecked, the VIP will not survive.
+
+We will control the battlefield at the end of the engagement, ensuring that any surviving enemy forces are neutralized and that all salvageable assets remain in our hands. Hold the line, eliminate the attackers, and ensure our VIP lives to fight another day.</detailedBriefing>
+    <battlefieldControl>PLAYER</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
@@ -115,6 +120,10 @@
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
+                <roleChoices>
+                    <forceRole>RAIDER</forceRole>
+                    <forceRole>CAVALRY</forceRole>
+                </roleChoices>
             </value>
         </entry>
     </scenarioForces>
@@ -128,7 +137,7 @@
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
                     <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
+                    <howMuch>1</howMuch>
                 </successEffect>
             </successEffects>
             <failureEffects>
@@ -138,7 +147,7 @@
                     <howMuch>2</howMuch>
                 </failureEffect>
             </failureEffects>
-            <description>Preserve 100% of the following force(s) and unit(s):</description>
+            <description>Preserve 100% of the following forces. +1 SVP if succeeded, -2 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>100</percentage>
@@ -166,36 +175,9 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
+            <description>Destroy or rout 50% of the following forces. +1 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
-            <percentage>50</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Player</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>

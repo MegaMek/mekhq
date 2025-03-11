@@ -49,6 +49,69 @@ MEKHQ VERSION HISTORY:
 + Fix #5814: Change meklab check to last index check
 + PR #6068: Allow Battle Armor suits from different squad sizes to be used as replacements
 + Fix #6065: Unit History in UnitViewPanel does not wrap.
++ PR #5824: Extract AtB Event Types to enum
++ PR #6016: Implemented Prisoners of War & Abstracted Search and Rescue System
++ PR #6064: Add Tests for calculateContractDifficulty()
++ PR #6071: Further enhancement for BA Suit swappability in MekHQ
++ PR #6072: Add source information to PlanetViewPanel
++ Fix #6073: uses the correct getInstance instead of accessing directly the static map
++ PR #6075: Pintle turret and flags (MML #1741)
++ PR #6076: Added Reputation Sanity Options to Campaign Settings
++ PR #6077: When advancing day set cursor to wait cursor
++ PR #6083: Adjusted Prisoner Capacity Calculations and Event Logic
++ Fix #5719: Add setting for minimum daily repair time to MRMS
++ PR # #5998: Personality Revamp
++ PR #6086: Adjusted Reinforcement Arrival Time Scaling, Target Number, and Leadership Budget Logic
++ Fix #6084: Clear leadership units when setting a new scenario
++ Fix #4364: Add campaign option to allow duplicate portraits
++ PR #6095: Null Check for Random Dependents
++ Fix #6069: Updated Academy Training Types in Unit Education.xml
++ PR #6098: Corrected Glossary Links For Fatigue
++ Fix #6094: Fixed Prisoner Capture And Processing Logic #6099
++ Fix #6089: Refactored Unsupported Unit Handling
++ Fix #6088: Simplified Enum References And Removed Legacy Scenarios
++ Fix #6079: Fixed Incorrect Seed Force in Resupply Interceptions
++ Fix #6078: Added Fatigue Gain Mechanism for Training Combat Teams
++ Fix #6104: Fixed NullPointerException In RandomizeAroundSpecifiedPlanet
++ Fix #6063: Refactored StratCon Scenario Retrieval And Table Rendering
++ Fix #6055: Updated Scenario Briefings and Objectives
++ Fix #6107: Fixed Maternity Leave Activation Logic
++ Fix #6010:  Fix incorrect term in autosave settings
++ Fix #3655: Fix vehicle crew requirements for trailers
++ Fix #6112: Fix BA Ammo Issues
++ PR #6124: Multiple Immersive Dialog Improvements
++ Fix #6121: Improved Effective Fatigue Handling and Fixed Target Selection in POISON Event Effects
++ Fix #6120: Fixed Duplicate Resupply Processing for Active AtB Contracts
++ Fix #6127: Adjusted Resupply Scaling Logic
++ Fix #6119: Removed Non-Current Scenario Status Handling In CommandCenterTab.java
++ PR #6129: Prevented New Contract Offers When an Active Contract Exists
++ Fix #6117: Refactored ReputationFactor To Use Double Instead Of Integer
++ Fix #6131: Enabled Autosave Before Missions By Default
++ Fix #6113: Added Age Calculation In Personnel Table Column
++ Fix #6111: Adjusted Scenario Templates for Arrival Turn and Objectives
++ Fix #6027: Refactored Campaign Force Value Calculation
++ Fix #6023: Added Auto-Logistics Support For Actuators, Jump Jets, And Engines
++ Fix #6017: Fixed Multiple Gray Monday Bugs
++ Fix #6002: Updated Unit Count Logic When Determining if There is a Force Deployment Deficit
++ Fix #5928: Allow Appropriate Units to be Tactical Transported in Cargo
++ Fix #6056: Clarify Convoy Tonnage Requirement Label in Briefing Room
++ Fix #6143: Prisoner defection event failed to list names, missing resources error
++ Fix #6145: Contractual convoy pop-up fails to report cargo ton estimations
++ Fix #6146: Dependant was removed as soon as they joined
++ Fix #5983: Training and Education Docs - Officer/NCO Training Typos
++ PR #6156: Added New Academies To Prestigious Academies Dataset 
++ PR #6161: Adjusted Planetary Acquisitions to use the campaign option for Delivery Scale to make deliveries optionally slower
++ PR #6162: Updated Manual Unit Rating Modifier Range 
++ Fix #5639: Disabled Time Traveling in Campaign Options; Fixed Campaign Options Start Up in Abridged Mode
++ Fix #5734: Added Mothball Option for Unit Market Deliveries
++ Fix #5973, #6036: Parts in Use Now Ignores Salvage or Mothballed Units
++ Fix #5974: Fixed Duplicate StratCon Deployments
++ PR #6139: Enforced Skill Value Boundaries
++ Fix #6144: Refactored Prisoner Context Menu Behavior
++ PR #6157: Updated Battlefield Control Logic in Scenarios
++ PR #6159: Renamed `getAvailableForceIDs` Method to `getAvailableForceIDsForManualDeployment` For Improved Clarity
++ PR #6160: Replaced Magic Numbers With Constants For Scenario IDs
+
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment

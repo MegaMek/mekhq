@@ -2,7 +2,12 @@
 <ScenarioTemplate>
     <name>Heavy Recon Evasion</name>
     <shortBriefing>Evade patrols while scanning enemy heavies.</shortBriefing>
-    <detailedBriefing>Enemy patrols are active, and your mission is to scan the enemy’s heavy units. Survive for the duration of the scan. Preserve at least 50% of your forces until the turn limit is reached to ensure mission success.</detailedBriefing>
+    <detailedBriefing>You are to advance toward an overwhelming enemy position and gather intelligence on their strength. This is a high-risk reconnaissance mission, and direct engagement is not an option. Stealth, speed, and deception will be your greatest assets.
+
+If you are compromised, expect a swift and overwhelming response. Avoid unnecessary confrontations and prioritize evasion over combat. At least one of your units must survive.
+
+The enemy will control the field at the end of the engagement, meaning there will be no reinforcements or recovery options. Get in, gather intel, and get out—undetected and alive.</detailedBriefing>
+    <battlefieldControl>ENEMY</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
@@ -10,10 +15,10 @@
         <allowRotation>false</allowRotation>
         <baseHeight>0</baseHeight>
         <baseWidth>0</baseWidth>
-        <heightScalingIncrement>5</heightScalingIncrement>
+        <heightScalingIncrement>10</heightScalingIncrement>
         <mapLocation>AllGroundTerrain</mapLocation>
         <useStandardAtBSizing>true</useStandardAtBSizing>
-        <widthScalingIncrement>5</widthScalingIncrement>
+        <widthScalingIncrement>10</widthScalingIncrement>
     </mapParameters>
     <scenarioForces>
         <entry>
@@ -73,7 +78,7 @@
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
-                <forceMultiplier>1.0</forceMultiplier>
+                <forceMultiplier>2.0</forceMultiplier>
                 <forceName>OpFor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
@@ -109,12 +114,12 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
+            <description>Preserve 5% of the following forces. +1 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>50</percentage>
+            <percentage>5</percentage>
             <timeLimitAtMost>false</timeLimitAtMost>
-            <timeLimitScaleFactor>1</timeLimitScaleFactor>
+            <timeLimitScaleFactor>2</timeLimitScaleFactor>
             <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
         </scenarioObjective>
     </scenarioObjectives>

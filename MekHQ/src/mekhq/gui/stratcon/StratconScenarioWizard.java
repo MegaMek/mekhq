@@ -49,8 +49,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.scaleObjectiveTimeLimits;
@@ -84,7 +84,6 @@ public class StratconScenarioWizard extends JDialog {
     private List<Unit> eligibleLeadershipUnits;
     private JList<Unit> availableInfantryUnits = new JList<>();
     private JList<Unit> availableLeadershipUnits = new JList<>();
-    private Map<CampaignTransportType, JList<Unit>> availableTransportedLeadershipUnits = new HashMap<>();
     private CampaignTransportType selectedCampaignTransportType = null;
 
     private JComboBox<String> cboTransportType = new JComboBox<>();
@@ -101,12 +100,6 @@ public class StratconScenarioWizard extends JDialog {
         this.campaign = campaign;
         this.parent = parent;
         this.setModalityType(ModalityType.APPLICATION_MODAL);
-
-        for (CampaignTransportType campaignTransportType : getLeadershipDropdownVectorPair().stream().map(Pair::getValue).collect(Collectors.toSet())) {
-            if (campaignTransportType != null) {
-                availableTransportedLeadershipUnits.put(campaignTransportType, new JList<>());
-            }
-        }
     }
 
     /**
@@ -136,6 +129,9 @@ public class StratconScenarioWizard extends JDialog {
         currentTrackState = trackState;
         availableForceLists.clear();
         availableUnitLists.clear();
+
+        availableInfantryUnits.clearSelection();
+        availableLeadershipUnits.clearSelection();
 
         setUI(isPrimaryForce);
     }
@@ -468,7 +464,8 @@ public class StratconScenarioWizard extends JDialog {
         JScrollPane forceListContainer = new JScrollPaneWithSpeed();
 
         ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign,
-            StratconRulesManager.getAvailableForceIDs(forceTemplate.getAllowedUnitType(), campaign, currentTrackState,
+            StratconRulesManager.getAvailableForceIDsForManualDeployment(forceTemplate.getAllowedUnitType(),
+                campaign, currentTrackState,
                 (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS),
                 currentScenario, currentCampaignState));
 

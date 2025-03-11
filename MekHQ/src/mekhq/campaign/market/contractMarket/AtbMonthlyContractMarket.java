@@ -27,6 +27,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
@@ -43,9 +44,9 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import static java.lang.Math.floor;
-import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
-
+import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.d6;
+import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 /**
@@ -73,7 +74,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
     @Override
     public void generateContractOffers(Campaign campaign, boolean newCampaign) {
-        boolean isGrayMonday = isGrayMonday(campaign);
+        boolean isGrayMonday = isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().isSimulateGrayMonday());
+        boolean hasActiveContract = campaign.hasActiveContract() || campaign.hasActiveAtBContract(true);
 
         if (((campaign.getLocalDate().getDayOfMonth() == 1)) || newCampaign) {
             // need to copy to prevent concurrent modification errors
@@ -83,6 +85,16 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
             for (AtBContract contract : campaign.getActiveAtBContracts()) {
                 checkForSubcontracts(campaign, contract, unitRatingMod);
+
+                if (!contracts.isEmpty() && hasActiveContract) {
+                    updateReport(campaign);
+                }
+            }
+
+            // If the player has an active contract, they will not be offered new contracts,
+            // as MekHQ doesn't support multiple contracts (outside of subcontracts).
+            if (hasActiveContract) {
+                return;
             }
 
             int numContracts = d6() - 4 + unitRatingMod;
@@ -495,6 +507,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
     @Override
     public double calculatePaymentMultiplier(Campaign campaign, AtBContract contract) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
         double multiplier = 1.0;
 
         // Operations tempo
@@ -512,8 +525,14 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
 
         // Reputation multiplier
-        if (campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
-            multiplier *= (campaign.getReputation().getReputationModifier() * 0.2) + 0.5;
+        if (campaignOptions.getUnitRatingMethod().isCampaignOperations()) {
+            double reputationFactor = campaign.getReputation().getReputationFactor();
+
+            if (campaignOptions.isClampReputationPayMultiplier()) {
+                reputationFactor = clamp(reputationFactor, 0.5, 2.0);
+            }
+
+            multiplier *= reputationFactor;
         } else {
             int unitRatingMod = campaign.getAtBUnitRatingMod();
             if (unitRatingMod >= IUnitRating.DRAGOON_A) {
@@ -537,7 +556,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
 
         // This should always be last
-        if (isGrayMonday(campaign)) {
+        if (isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().isSimulateGrayMonday())) {
             multiplier *= 0.25;
         }
 

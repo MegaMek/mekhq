@@ -159,6 +159,7 @@ public class BiographyTab {
     private JButton btnEnableAllPortraits;
     private JButton btnDisableAllPortraits;
     private JCheckBox chkAssignPortraitOnRoleChange;
+    private JCheckBox chkAllowDuplicatePortraits;
     //end Name and Portrait Tab
 
     //start Rank Tab
@@ -215,6 +216,7 @@ public class BiographyTab {
         lblFactionNames = new JLabel();
         comboFactionNames = new MMComboBox<>("comboFactionNames", getFactionNamesModel());
         chkAssignPortraitOnRoleChange = new JCheckBox();
+        chkAllowDuplicatePortraits = new JCheckBox();
 
         pnlRandomPortrait = new JPanel();
         chkUsePortrait = new JCheckBox[1]; // We're going to properly initialize this later
@@ -1108,6 +1110,8 @@ public class BiographyTab {
         // Contents
         chkAssignPortraitOnRoleChange = new CampaignOptionsCheckBox("AssignPortraitOnRoleChange");
 
+        chkAllowDuplicatePortraits = new CampaignOptionsCheckBox("AllowDuplicatePortraits");
+
         chkUseOriginFactionForNames = new CampaignOptionsCheckBox("UseOriginFactionForNames");
 
         lblFactionNames = new CampaignOptionsLabel("FactionNames");
@@ -1122,6 +1126,8 @@ public class BiographyTab {
         layoutTop.gridx = 0;
         layoutTop.gridy = 0;
         panelTop.add(chkAssignPortraitOnRoleChange, layoutTop);
+        layoutTop.gridy++;
+        panelTop.add(chkAllowDuplicatePortraits, layoutTop);
 
         layoutTop.gridy++;
         panelTop.add(chkUseOriginFactionForNames, layoutTop);
@@ -1327,6 +1333,7 @@ public class BiographyTab {
         // 'RandomNameGenerator' is not stored in a Preset
         comboFactionNames.setSelectedItem(RandomNameGenerator.getInstance().getChosenFaction());
         chkAssignPortraitOnRoleChange.setSelected(options.isAssignPortraitOnRoleChange());
+        chkAllowDuplicatePortraits.setSelected(options.isAllowDuplicatePortraits());
 
         final boolean[] usePortraitForRole = options.isUsePortraitForRoles();
         for (int i = 0; i < chkUsePortrait.length; i++) {
@@ -1377,7 +1384,13 @@ public class BiographyTab {
         originOptions.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
         originOptions.setRandomizeDependentOrigin(chkRandomizeDependentsOrigin.isSelected());
         originOptions.setRandomizeAroundSpecifiedPlanet(chkRandomizeAroundSpecifiedPlanet.isSelected());
-        originOptions.setSpecifiedPlanet(comboSpecifiedPlanet.getSelectedItem());
+
+        Planet selectedPlanet = comboSpecifiedPlanet.getSelectedItem();
+        if (selectedPlanet == null && comboSpecifiedPlanet.getItemCount() > 0) {
+            selectedPlanet = comboSpecifiedPlanet.getItemAt(0);
+        }
+        originOptions.setSpecifiedPlanet(selectedPlanet);
+
         originOptions.setOriginSearchRadius((int) spnOriginSearchRadius.getValue());
         originOptions.setOriginDistanceScale((double) spnOriginDistanceScale.getValue());
         originOptions.setAllowClanOrigins(chkAllowClanOrigins.isSelected());
@@ -1413,6 +1426,7 @@ public class BiographyTab {
         // Name and Portraits
         options.setUseOriginFactionForNames(chkUseOriginFactionForNames.isSelected());
         options.setAssignPortraitOnRoleChange(chkAssignPortraitOnRoleChange.isSelected());
+        options.setAllowDuplicatePortraits(chkAllowDuplicatePortraits.isSelected());
         RandomNameGenerator.getInstance().setChosenFaction(comboFactionNames.getSelectedItem());
         for (int i = 0; i < chkUsePortrait.length; i++) {
             options.setUsePortraitForRole(i, chkUsePortrait[i].isSelected());

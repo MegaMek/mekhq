@@ -2,7 +2,12 @@
 <ScenarioTemplate>
     <name>Frontline Engagement</name>
     <shortBriefing>Engage and destroy enemy at the front.</shortBriefing>
-    <detailedBriefing>Enemy forces are actively engaging along the frontline. The objective is to either destroy or force them to retreat. At least 50% of the enemy must be neutralized, while maintaining 50% of friendly forces to hold the line and secure the frontline position.</detailedBriefing>
+    <detailedBriefing>The enemy is fully committed to battle along the frontline, engaging our forces in a direct confrontation. Your mission is to break their offensive by defeating at least 50% of their forces. This engagement is a decisive clash—victory here will shift the momentum of the war in our favor.
+
+Expect a determined enemy response. They will not withdraw easily and may attempt to reinforce their position as losses mount. Strike hard, exploit weaknesses, and maintain battlefield control. This is not a delaying action—this is a battle for dominance.
+
+The victor will control the battlefield at the end of the engagement, securing salvage and eliminating any remaining resistance. Ensure that when the dust settles, it is our forces standing over the wreckage. Crush them and claim the field.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
@@ -70,7 +75,7 @@
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
-                <forceMultiplier>1.0</forceMultiplier>
+                <forceMultiplier>1.25</forceMultiplier>
                 <forceName>OpFor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
@@ -105,36 +110,9 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
+            <description>Destroy or rout 50% of the following forces. +1 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
-            <percentage>50</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Player</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>

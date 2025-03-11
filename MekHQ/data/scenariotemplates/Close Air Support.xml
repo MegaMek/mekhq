@@ -2,7 +2,12 @@
 <ScenarioTemplate>
     <name>Close Air Support</name>
     <shortBriefing>Provide air support, minimize losses.</shortBriefing>
-    <detailedBriefing>Provide air support to allied ground forces under heavy attack. Prioritize minimizing casualties while neutralizing enemy units. Success depends on keeping at least 50% of allies alive and destroying half of the enemy force.</detailedBriefing>
+    <detailedBriefing>Your mission is to provide air support to allied ground forces currently under heavy attack. The enemy is pressing hard, and without intervention, our forces will be overwhelmed. You are to engage hostile units with precision strikes, break enemy formations, and relieve pressure on friendly positions. Coordination with ground command will be critical to ensuring maximum impact.
+
+Your primary objective is to preserve at least 50% of allied forces. Their survival is paramount to maintaining battlefield cohesion. Simultaneously, you must destroy or route at least 50% of the enemy forces. This engagement is about turning the tide, forcing them to break, and ensuring our ground forces can hold firm.
+
+The winner of this battle will control the field when the engagement is over. You must ensure that victory belongs to us. Strike hard, strike true, and do not let the enemy dictate the pace of battle. Your firepower will decide the outcome.</detailedBriefing>
+    <battlefieldControl>VICTOR</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
@@ -169,7 +174,7 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
+            <description>Preserve 50% of the following forces. +1 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>50</percentage>
@@ -196,7 +201,7 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
+            <description>Destroy or rout 50% of the following forces. +2 SVP if succeeded, -1 SVP if failed.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>50</percentage>

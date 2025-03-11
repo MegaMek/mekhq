@@ -50,11 +50,11 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
-import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -75,8 +75,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -85,6 +85,8 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(PersonnelTableMouseAdapter.class);
@@ -148,7 +150,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_PERSONALITY = "PERSONALITY";
     private static final String CMD_ADD_RANDOM_ABILITY = "ADD_RANDOM_ABILITY";
 
-    private static final String CMD_IMPRISON = "IMPRISON";
     private static final String CMD_FREE = "FREE";
     private static final String CMD_EXECUTE = "EXECUTE";
     private static final String CMD_JETTISON = "JETTISON";
@@ -322,6 +323,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 PersonnelRole role = PersonnelRole.valueOf(data[1]);
                 for (final Person person : people) {
                     person.setPrimaryRole(gui.getCampaign(), role);
+                    writePersonalityDescription(person);
                     gui.getCampaign().personUpdated(person);
                     if (gui.getCampaign().getCampaignOptions().isUsePortraitForRole(role)
                             && gui.getCampaign().getCampaignOptions().isAssignPortraitOnRoleChange()
@@ -627,14 +629,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     }
                 } catch (Exception e) {
                     logger.error("Unknown PrisonerStatus Option. No changes will be made.", e);
-                }
-                break;
-            }
-            case CMD_IMPRISON: {
-                for (Person person : people) {
-                    if (!person.getPrisonerStatus().isCurrentPrisoner()) {
-                        person.setPrisonerStatus(gui.getCampaign(), PrisonerStatus.PRISONER, true);
-                    }
                 }
                 break;
             }
@@ -1153,7 +1147,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             person.getGender(), person.isClanPersonnel(), person.getOriginFaction().getShortName());
                     person.setGivenName(name[0]);
                     person.setSurname(name[1]);
-                    PersonalityController.writeDescription(person);
+                    writePersonalityDescription(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -1294,6 +1288,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 gui.getCampaign().removePerson(prisoner);
             }
         }
+
+        processAdHocExecution(gui.getCampaign(), prisoners.length);
     }
 
     private void loadGMToolsForPerson(Person person) {
@@ -1452,31 +1448,30 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
         popup.add(menu);
 
-        if (StaticChecks.areAnyFree(selected)) {
-            popup.add(newMenuItem(resources.getString("imprison.text"), CMD_IMPRISON));
-        } else {
+
+        if (StaticChecks.areAllPrisoners(selected)) {
             if (gui.getCampaign().getLocation().isOnPlanet()) {
                 popup.add(newMenuItem(resources.getString("free.text"), CMD_FREE));
                 popup.add(newMenuItem(resources.getString("execute.text"), CMD_EXECUTE));
             } else {
                 popup.add(newMenuItem(resources.getString("jettison.text"), CMD_JETTISON));
             }
+
+            if (StaticChecks.areAllPrisoners(selected) && gui.getCampaign().isGM()) {
+                popup.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM));
+            }
+
+            if (StaticChecks.areAnyWillingToDefect(selected)) {
+                popup.add(newMenuItem(resources.getString("recruit.text"), CMD_RECRUIT));
+            }
+
+            if ((gui.getCampaign().getFaction().isClan()) && (StaticChecks.areAnyBondsmen(selected))) {
+                popup.add(newMenuItem(resources.getString("abtakha.text"), CMD_ABTAKHA));
+            }
         }
 
-        if (gui.getCampaign().getCampaignOptions().isUseAtBPrisonerRansom() && StaticChecks.areAllPrisoners(selected)) {
-            popup.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM));
-        }
-
-        if (gui.getCampaign().getCampaignOptions().isUseAtBPrisonerRansom() && StaticChecks.areAllPow(selected)) {
+        if (Stream.of(selected).allMatch(p -> p.getStatus().isPoW()) && gui.getCampaign().isGM()) {
             popup.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM_FRIENDLY));
-        }
-
-        if (StaticChecks.areAnyWillingToDefect(selected)) {
-            popup.add(newMenuItem(resources.getString("recruit.text"), CMD_RECRUIT));
-        }
-
-        if ((gui.getCampaign().getFaction().isClan()) && (StaticChecks.areAnyBondsmen(selected))) {
-            popup.add(newMenuItem(resources.getString("abtakha.text"), CMD_ABTAKHA));
         }
 
         if ((oneSelected) && (!person.isChild(gui.getCampaign().getLocalDate()))) {
