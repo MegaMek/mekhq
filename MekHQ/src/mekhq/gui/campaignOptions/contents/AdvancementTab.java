@@ -831,7 +831,7 @@ public class AdvancementTab {
 
         lblArtyBonus = new CampaignOptionsLabel("ArtilleryBonus");
         spnArtyBonus = new CampaignOptionsSpinner("ArtilleryBonus",
-            0, 0, 100, 1);
+            0, -10, 10, 1);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ArtilleryPanel",
@@ -870,7 +870,7 @@ public class AdvancementTab {
 
         lblSecondBonus = new CampaignOptionsLabel("SecondarySkillBonus");
         spnSecondBonus = new CampaignOptionsSpinner("SecondarySkillBonus",
-            0, 0, 100, 1);
+            0, -10, 10, 1);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SecondarySkillPanel",
