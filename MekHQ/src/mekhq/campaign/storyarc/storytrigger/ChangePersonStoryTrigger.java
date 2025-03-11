@@ -1,31 +1,31 @@
 /*
- * ChangePersonStoryTrigger.java
- *
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved
+ * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.storyarc.storytrigger;
-
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.util.UUID;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.Version;
 import megamek.logging.MMLogger;
@@ -35,6 +35,12 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.storyarc.StoryTrigger;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.util.UUID;
 
 /**
  * A StoryTrigger that can change various characteristics of a Person
@@ -162,13 +168,13 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
                 if (wn2.getNodeName().equalsIgnoreCase("personId")) {
                     personId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
-                    status = PersonnelStatus.parseFromString(wn2.getTextContent().trim());
+                    status = PersonnelStatus.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("takeUnit")) {
                     takeUnit = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("addHits")) {
                     addHits = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("deathStatusHits")) {
-                    deathStatusHits = PersonnelStatus.parseFromString(wn2.getTextContent().trim());
+                    deathStatusHits = PersonnelStatus.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("healHits")) {
                     healHits = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {

@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.campaignOptions.contents;
 
@@ -564,18 +573,15 @@ public class BiographyTab {
         chkRandomizeOrigin = new CampaignOptionsCheckBox("RandomizeOrigin");
         chkRandomizeDependentsOrigin = new CampaignOptionsCheckBox("RandomizeDependentsOrigin");
         chkRandomizeAroundSpecifiedPlanet = new CampaignOptionsCheckBox("RandomizeAroundSpecifiedPlanet");
+        chkSpecifiedSystemFactionSpecific.addActionListener(evt -> refreshSystemsAndPlanets());
 
         chkSpecifiedSystemFactionSpecific = new CampaignOptionsCheckBox("SpecifiedSystemFactionSpecific");
-        chkSpecifiedSystemFactionSpecific.addActionListener(evt -> {
-            final PlanetarySystem planetarySystem = comboSpecifiedSystem.getSelectedItem();
-            if ((planetarySystem == null)
-                || !planetarySystem.getFactionSet(campaign.getLocalDate()).contains(campaign.getFaction())) {
-                restoreComboSpecifiedSystem();
-            }
-        });
+        chkSpecifiedSystemFactionSpecific.addActionListener(evt -> refreshSystemsAndPlanets());
 
 
         lblSpecifiedSystem = new CampaignOptionsLabel("SpecifiedSystem");
+        comboSpecifiedSystem.setModel(new DefaultComboBoxModel<>(getPlanetarySystems(
+              chkSpecifiedSystemFactionSpecific.isSelected() ? campaign.getFaction() : null)));
         comboSpecifiedSystem.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -598,6 +604,10 @@ public class BiographyTab {
         });
 
         lblSpecifiedPlanet = new CampaignOptionsLabel("SpecifiedPlanet");
+        final PlanetarySystem planetarySystem = comboSpecifiedSystem.getSelectedItem();
+        if (planetarySystem != null) {
+            comboSpecifiedPlanet.setModel(new DefaultComboBoxModel<>(planetarySystem.getPlanets().toArray(new Planet[] { })));
+        }
         comboSpecifiedPlanet.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -677,6 +687,30 @@ public class BiographyTab {
         panel.add(chkExtraRandomOrigin, layout);
 
         return panel;
+    }
+
+    /**
+     * Refreshes the planetary systems and planets displayed in the associated combo boxes.
+     *
+     * <p>This method first stores the currently selected planetary system and planet. It then
+     * restores the list of available planetary systems by repopulating the `comboSpecifiedSystem`.
+     * Finally, it reselects the previously selected planetary system and planet in their respective
+     * combo boxes.</p>
+     *
+     * <p>The method ensures that the user selection persists even after the combo boxes are refreshed.
+     * Any exceptions during the selection process are caught and ignored. As if we can't restore
+     * the selection, that's fine, we just use the fallback index of 0.</p>
+     */
+    private void refreshSystemsAndPlanets() {
+        final PlanetarySystem planetarySystem = comboSpecifiedSystem.getSelectedItem();
+        final Planet planet = comboSpecifiedPlanet.getSelectedItem();
+
+        restoreComboSpecifiedSystem();
+
+        try {
+            comboSpecifiedSystem.setSelectedItem(planetarySystem);
+            comboSpecifiedPlanet.setSelectedItem(planet);
+        } catch (Exception ignored) {}
     }
 
     /**
@@ -1295,6 +1329,7 @@ public class BiographyTab {
         chkRandomizeOrigin.setSelected(originOptions.isRandomizeOrigin());
         chkRandomizeDependentsOrigin.setSelected(originOptions.isRandomizeDependentOrigin());
         chkRandomizeAroundSpecifiedPlanet.setSelected(originOptions.isRandomizeAroundSpecifiedPlanet());
+        comboSpecifiedSystem.setSelectedItem(originOptions.getSpecifiedPlanet().getParentSystem());
         comboSpecifiedPlanet.setSelectedItem(originOptions.getSpecifiedPlanet());
         spnOriginSearchRadius.setValue(originOptions.getOriginSearchRadius());
         spnOriginDistanceScale.setValue(originOptions.getOriginDistanceScale());
@@ -1386,9 +1421,6 @@ public class BiographyTab {
         originOptions.setRandomizeAroundSpecifiedPlanet(chkRandomizeAroundSpecifiedPlanet.isSelected());
 
         Planet selectedPlanet = comboSpecifiedPlanet.getSelectedItem();
-        if (selectedPlanet == null && comboSpecifiedPlanet.getItemCount() > 0) {
-            selectedPlanet = comboSpecifiedPlanet.getItemAt(0);
-        }
         originOptions.setSpecifiedPlanet(selectedPlanet);
 
         originOptions.setOriginSearchRadius((int) spnOriginSearchRadius.getValue());

@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
- * MegaMek is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
- * MegaMek is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.model;
 
@@ -26,10 +35,14 @@ import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.util.ArrayList;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
 /**
  * A table model for displaying parts
  */
 public class PartsTableModel extends DataTableModel {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources." + PartsTableModel.class.getSimpleName();
+
     public final static int COL_QUANTITY = 0;
     public final static int COL_NAME = 1;
     public final static int COL_DETAIL = 2;
@@ -58,30 +71,19 @@ public class PartsTableModel extends DataTableModel {
 
     @Override
     public String getColumnName(int column) {
-        switch (column) {
-            case COL_NAME:
-                return "Name";
-            case COL_COST:
-                return "Value per Unit";
-            case COL_TOTAL_COST:
-                return "Total Value";
-            case COL_QUANTITY:
-                return "#";
-            case COL_QUALITY:
-                return "Quality";
-            case COL_TON:
-                return "Tonnage";
-            case COL_STATUS:
-                return "Status";
-            case COL_DETAIL:
-                return "Detail";
-            case COL_TECH_BASE:
-                return "Tech Base";
-            case COL_REPAIR:
-                return "Repair Details";
-            default:
-                return "?";
-        }
+        return switch (column) {
+            case COL_NAME -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_NAME");
+            case COL_COST -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_COST");
+            case COL_TOTAL_COST -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_TOTAL_COST");
+            case COL_QUANTITY -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_QUANTITY");
+            case COL_QUALITY -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_QUALITY");
+            case COL_TON -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_TON");
+            case COL_STATUS -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_STATUS");
+            case COL_DETAIL -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_DETAIL");
+            case COL_TECH_BASE -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_TECH_BASE");
+            case COL_REPAIR -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_REPAIR");
+            default -> "?";
+        };
     }
 
     @Override
@@ -94,15 +96,7 @@ public class PartsTableModel extends DataTableModel {
         }
 
         if (col == COL_NAME) {
-            String openBrace = "";
-            String closeBrace = "";
-
-            if (part.isBrandNew()) {
-                openBrace = "<i>";
-                closeBrace = "</i>";
-            }
-
-            return "<html><nobr>" + openBrace + part.getName() + closeBrace + "</nobr></html>";
+            return "<html><nobr>" + part.getName() + "</nobr></html>";
         }
         if (col == COL_DETAIL) {
             return "<html><nobr>" + part.getDetails() + "</nobr></html>";
@@ -117,7 +111,14 @@ public class PartsTableModel extends DataTableModel {
             return part.getQuantity();
         }
         if (col == COL_QUALITY) {
-            return part.getQualityName();
+            String appendum;
+
+            if (part.isBrandNew()) {
+                appendum = getFormattedTextAt(RESOURCE_BUNDLE, "addendum.brandNew");
+            } else {
+                appendum = getFormattedTextAt(RESOURCE_BUNDLE, "addendum.used");
+            }
+            return part.getQualityName() + " (" + appendum + ')';
         }
         if (col == COL_TON) {
             return Math.round(part.getTonnage() * 100) / 100.0;

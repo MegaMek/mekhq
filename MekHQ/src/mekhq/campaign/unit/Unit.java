@@ -1,23 +1,30 @@
 /*
- * Unit.java
- *
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (c) 2016-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.unit;
 
@@ -1129,8 +1136,29 @@ public class Unit implements ITechnology {
         scenarioId = -1;
     }
 
+    /**
+     * Validates the deployment readiness of the unit.
+     *
+     * <p>This method checks multiple conditions to determine whether the unit is deployable. If the
+     * unit is not deployable, a descriptive error message is returned indicating the reason for its
+     * ineligibility. If the unit passes all validations, {@code null} is returned, implying it is
+     * ready for deployment.<p>
+     *
+     * Deployment checks performed:
+     * <ul>
+     *   <li>If the unit is not functional, it cannot be deployed.</li>
+     *   <li>If the unit is unmanned and is not an unmanned trailer, it cannot be deployed.</li>
+     *   <li>If the unit is in the process of being refitted, it cannot be deployed.</li>
+     *   <li>If the unit is a tank and does not have the required crew size, it cannot be deployed.</li>
+     *   <li>If the unit is a BattleArmor unit with empty suits, it cannot be deployed until these
+     *   are filled or salvaged.</li>
+     * </ul>
+     *
+     * @return A descriptive {@code String} error message if the unit cannot be deployed, or {@code null}
+     * if the unit is deployable.
+     */
     // TODO: Add support for advanced medical
-    public String checkDeployment() {
+    public @Nullable String checkDeployment() {
         if (!isFunctional()) {
             return "unit is not functional";
         }

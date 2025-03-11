@@ -1,23 +1,30 @@
 /*
- * AtBContract.java
- *
  * Copyright (c) 2014 Carl Spain. All rights reserved.
- * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.mission;
 
@@ -75,8 +82,8 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 import static java.lang.Math.*;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
@@ -885,7 +892,10 @@ public class AtBContract extends Contract {
 
         // Add the unit to the campaign if successfully generated
         if (newUnit != null) {
-            campaign.addNewUnit(newUnit, false, 0);
+            // The 1-day delivery time is so that the unit addition is picked up by the 'mothball'
+            // campaign option. It also makes sense the unit wouldn't magically materialize in your
+            // hangar and has to get there.
+            campaign.addNewUnit(newUnit, false, 1);
         }
     }
 
@@ -1662,6 +1672,26 @@ public class AtBContract extends Contract {
 
         enemyBotName = getEnemyName(currentYear);
         enemyCamouflage = pickRandomCamouflage(currentYear, enemyCode);
+
+        clanTechSalvageOverride();
+    }
+
+    /**
+     * Applies a salvage override rule for Clan technology based on the contract timeline and faction
+     * involvement. This method checks the factions of both the enemy and employer and determines
+     * if a salvage exchange should be forced based on whether the battle occurs before the Battle
+     * of Tukayyid.
+     *
+     * <p>This rule was implemented to better match canon employer behavior during this period.</p>
+     */
+    public void clanTechSalvageOverride() {
+        final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
+
+        if (getEnemy().isClan() && !getEmployerFaction().isClan()) {
+            if (getStartDate().isBefore(BATTLE_OF_TUKAYYID)) {
+                setSalvageExchange(true);
+            }
+        }
     }
 
     /**

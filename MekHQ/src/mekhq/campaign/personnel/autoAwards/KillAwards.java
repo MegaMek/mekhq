@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.personnel.autoAwards;
 
@@ -209,7 +218,6 @@ public class KillAwards {
                                     }
                                 }
 
-
                                 int kills = sanitizedKills.size();
                                 if (kills >= killsNeeded) {
                                     killCount.add(kills);
@@ -309,19 +317,26 @@ public class KillAwards {
     }
 
     /**
-     * Traverses the graph of Forces, starting from an origin Force, to collect associated kills from each eligible Force node in the graph.
+     * Traverses the graph of Forces, starting from an origin Force, to collect
+     * associated kills from each eligible Force node in the graph.
      * The traversal uses a depth-first search approach to visit each Force node.
      *
-     * @param killData the map containing kill records wherein the key is the Force ID and the value is a list of associated Kill objects.
-     * @param originNode the initial Force node from which the traversal begins.
-     * @param forceCredits the set containing the Force ID's that are eligible for collecting kills.
-     * @return a list of Kill objects that are associated with the traversed Force nodes that are also present in the 'forceCredits' set.
+     * @param killData     the map containing kill records wherein the key is the
+     *                     Force ID and the value is a list of associated Kill
+     *                     objects.
+     * @param originNode   the initial Force node from which the traversal begins.
+     * @param forceCredits the set containing the Force ID's that are eligible for
+     *                     collecting kills.
+     * @return a list of Kill objects that are associated with the traversed Force
+     *         nodes that are also present in the 'forceCredits' set.
      */
-    private static List<Kill> walkToeForKills(Map<Integer, List<Kill>> killData, Force originNode, Set<Integer> forceCredits) {
+    private static List<Kill> walkToeForKills(Map<Integer, List<Kill>> killData, Force originNode,
+            Set<Integer> forceCredits) {
         List<Kill> kills = new ArrayList<>();
 
         Stack<Force> stack = new Stack<>();
-        // we add visited nodes to a set, so we don't run the risk of re-evaluating previously visited nodes
+        // we add visited nodes to a set, so we don't run the risk of re-evaluating
+        // previously visited nodes
         Set<Integer> visitedForces = new HashSet<>();
         stack.push(originNode);
 

@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2040-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.campaignOptions.contents;
 
@@ -27,8 +36,8 @@ import mekhq.gui.campaignOptions.components.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 import static java.util.Arrays.sort;
 import static megamek.common.enums.SkillLevel.*;
@@ -63,8 +72,8 @@ public class SkillsTab {
     private Map<String, List<JLabel>> allSkillLevels;
     private Map<String, List<JSpinner>> allSkillCosts;
     private Map<String, List<JComboBox<SkillLevel>>> allSkillMilestones;
-    private double storedTargetNumber = 0;
-    private List<Double> storedValuesSpinners = new ArrayList<>();
+    private int storedTargetNumber = 0;
+    private List<Integer> storedValuesSpinners = new ArrayList<>();
     private List<SkillLevel> storedValuesComboBoxes = new ArrayList<>();
 
     private JPanel pnlEdgeCost;
@@ -344,13 +353,13 @@ public class SkillsTab {
 
         JButton copyButton = new JButton(resources.getString("btnCopy.text"));
         copyButton.addActionListener(e -> {
-            storedTargetNumber = (Double) spnTargetNumber.getValue();
+            storedTargetNumber = (Integer) spnTargetNumber.getValue();
 
             storedValuesSpinners = new ArrayList<>();
             storedValuesComboBoxes = new ArrayList<>();
 
             for (int i = 0; i < labels.size(); i++) {
-                storedValuesSpinners.add((Double) spinners.get(i).getValue());
+                storedValuesSpinners.add((Integer) spinners.get(i).getValue());
                 storedValuesComboBoxes.add((SkillLevel) comboBoxes.get(i).getSelectedItem());
             }
         });

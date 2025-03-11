@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2013-2025 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.dialog;
 
@@ -26,6 +35,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
 import megamek.common.Crew;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import megamek.common.enums.Gender;
@@ -778,8 +788,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 return this;
             }
         });
-        choiceOriginalUnit.addItem(null);
-        campaign.getHangar().forEachUnit(choiceOriginalUnit::addItem);
+        populateUnitChoiceCombo();
+
         if (null == person.getOriginalUnitId() || null == campaign.getUnit(person.getOriginalUnitId())) {
             choiceOriginalUnit.setSelectedItem(null);
         } else {
@@ -1056,6 +1066,42 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         getContentPane().add(panButtons, gridBagConstraints);
 
         pack();
+    }
+
+    /**
+     * Populates a combo box with a list of units that the specified person can interact with,
+     * based on their abilities to drive, gun, or tech the corresponding entities.
+     *
+     * <p>The method adds eligible units from the campaign's unit list to the combo box
+     * {@code choiceOriginalUnit}, and starts by adding a {@code null} entry to represent no selection.</p>
+     */
+    private void populateUnitChoiceCombo() {
+        choiceOriginalUnit.addItem(null); // Add a null entry as the initial option
+
+        // Iterate through all units in the campaign
+        for (Unit unit : campaign.getUnits()) {
+            Entity entity = unit.getEntity();
+
+            // Skip units without an associated entity
+            if (entity == null) {
+                continue;
+            }
+
+            // Add units to the combo box based on the person's capabilities
+            if (person.canDrive(entity)) {
+                choiceOriginalUnit.addItem(unit);
+                continue; // Skip further checks if already added
+            }
+
+            if (person.canGun(entity)) {
+                choiceOriginalUnit.addItem(unit);
+                continue; // Skip further checks if already added
+            }
+
+            if (person.canTech(entity)) {
+                choiceOriginalUnit.addItem(unit);
+            }
+        }
     }
 
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup

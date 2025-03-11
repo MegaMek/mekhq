@@ -1,16 +1,30 @@
 /*
-* MegaMek - Copyright (C) 2020 - The MegaMek Team
-*
-* This program is free software; you can redistribute it and/or modify it under
-* the terms of the GNU General Public License as published by the Free Software
-* Foundation; either version 2 of the License, or (at your option) any later
-* version.
-*
-* This program is distributed in the hope that it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-* FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
-* details.
-*/
+ * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ */
 package mekhq.campaign.stratcon;
 
 import jakarta.xml.bind.annotation.XmlElement;
@@ -283,6 +297,24 @@ public class StratconScenario implements IStratconDisplayable {
     @XmlTransient
     public AtBDynamicScenario getBackingScenario() {
         return backingScenario;
+    }
+
+    /**
+     * Retrieves the {@link AtBContract} associated with the backing scenario.
+     *
+     * <p>If the backing scenario is null, this method will return {@code null}. Otherwise, it
+     * retrieves the associated contract through the provided campaign instance.
+     *
+     * @param campaign The {@code Campaign} instance used to obtain the contract.
+     * @return The {@code AtBContract} associated with the current backing scenario, or {@code null}
+     * if no backing scenario exists.
+     */
+    public @Nullable AtBContract getBackingContract(Campaign campaign) {
+        if (backingScenario == null) {
+            return null;
+        }
+
+        return backingScenario.getContract(campaign);
     }
 
     @XmlJavaTypeAdapter(DateAdapter.class)

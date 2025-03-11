@@ -1,24 +1,34 @@
 /*
- * Copyright (c) 2017-2025 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui;
 
 import megamek.client.bot.princess.BehaviorSettings;
+import megamek.client.bot.princess.PrincessException;
 import megamek.client.generator.ReconfigurationParameters;
 import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.client.ui.baseComponents.MMComboBox;
@@ -821,10 +831,10 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (scenario instanceof AtBDynamicScenario) {
-            AtBDynamicScenarioFactory.setPlayerDeploymentTurns((AtBDynamicScenario) scenario, getCampaign());
-            AtBDynamicScenarioFactory.finalizeStaggeredDeploymentTurns((AtBDynamicScenario) scenario, getCampaign());
-            AtBDynamicScenarioFactory.setPlayerDeploymentZones((AtBDynamicScenario) scenario, getCampaign());
+        if (scenario instanceof AtBDynamicScenario atBDynamicScenario) {
+            AtBDynamicScenarioFactory.setPlayerDeploymentTurns(atBDynamicScenario, getCampaign());
+            AtBDynamicScenarioFactory.finalizeStaggeredDeploymentTurns(atBDynamicScenario, getCampaign());
+            AtBDynamicScenarioFactory.setPlayerDeploymentZones(atBDynamicScenario, getCampaign());
         }
 
         if (!undeployed.isEmpty()) {
@@ -838,10 +848,16 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        // code to support deployment of reinforcements for legacy ATB scenarios.
-        if ((scenario instanceof AtBScenario) && !(scenario instanceof AtBDynamicScenario)) {
+        // Ensure that the MegaMek year GameOption matches the campaign year
+        // this is being set early on so that when setting up the autoconfig munitions
+        // the correct year is used
+        getCampaign().getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR)
+            .setValue(getCampaign().getGameYear());
 
-            CombatTeam combatTeam = ((AtBScenario) scenario).getCombatTeamById(getCampaign());
+        // code to support deployment of reinforcements for legacy ATB scenarios.
+        if ((scenario instanceof AtBScenario atBScenario) && !(scenario instanceof AtBDynamicScenario)) {
+
+            CombatTeam combatTeam = atBScenario.getCombatTeamById(getCampaign());
             if (combatTeam != null) {
                 int assignedForceId = combatTeam.getForceId();
                 int cmdrStrategy = 0;
@@ -861,24 +877,64 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario)) {
-            ((AtBScenario) scenario).refresh(getCampaign());
+        if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario atBScenario)) {
+            atBScenario.refresh(getCampaign());
 
             // Autoconfigure munitions for all non-player forces once more, using finalized
             // forces
             if (getCampaign().getCampaignOptions().isAutoConfigMunitions()) {
-                autoconfigureBotMunitions(((AtBScenario) scenario), chosen);
+                autoconfigureBotMunitions(atBScenario, chosen);
+            }
+            configureBotAi(atBScenario);
+        }
+
+        if (scenario.getStratConScenarioType().isConvoy() && (autoResolveBehaviorSettings != null)) {
+            try {
+                autoResolveBehaviorSettings = autoResolveBehaviorSettings.getCopy();
+                autoResolveBehaviorSettings.setIAmAPirate(true);
+            } catch (PrincessException e) {
+                logger.error("Failed to copy autoResolveBehaviorSettings", e);
             }
         }
 
         if (!chosen.isEmpty()) {
-            // Ensure that the MegaMek year GameOption matches the campaign year
-            getCampaign().getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR)
-                    .setValue(getCampaign().getGameYear());
             getCampaignGui().getApplication()
                 .startHost(scenario, false, chosen, autoResolveBehaviorSettings);
-
         }
+    }
+
+    private void configureBotAi(AtBScenario scenario) {
+        Faction opFor = getEnemyFactionFromScenario(scenario);
+        boolean isPirate = opFor.isRebelOrPirate();
+        for (var bf : scenario.getBotForces()) {
+            bf.getBehaviorSettings().setIAmAPirate(isPirate);
+        }
+    }
+
+    /**
+     * Get the enemy faction from the Mission from the scenario
+     * @param scenario the scenario to get the enemy faction from
+     * @return the enemy faction
+     */
+    private Faction getEnemyFactionFromScenario(Scenario scenario) {
+        Mission mission = null;
+        if (scenario.getMissionId() != -1) {
+            mission = getCampaign().getMission(scenario.getMissionId());
+        }
+        if (mission == null) {
+            mission = comboMission.getSelectedItem();
+        }
+        String opforFactionCode = "IS";
+        Faction enemy;
+        if (mission instanceof AtBContract atBContract) {
+            enemy = atBContract.getEnemy();
+            if (enemy != null) {
+                return atBContract.getEnemy();
+            }
+            opforFactionCode = atBContract.getEnemyCode().isBlank() ? opforFactionCode : atBContract.getEnemyCode();
+        }
+        enemy = Factions.getInstance().getFaction(opforFactionCode);
+        return enemy;
     }
 
     /**

@@ -1,23 +1,30 @@
 /*
- * AtBPreferences.java
- *
  * Copyright (c) 2014 - Carl Spain. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.againstTheBot;
 
@@ -203,12 +210,15 @@ public class AtBConfiguration {
     }
 
     /**
-     * Selects a bot lance based on the organization, weight class, and roll modifier.
+     * Selects a bot lance based on the organization, weight class, and roll
+     * modifier.
      *
-     * @param org        The organization of the bot force tables.
+     * @param org         The organization of the bot force tables.
      * @param weightClass The weight class of the bot.
-     * @param rollMod    A modifier to the die roll, expressed as a fraction of the total weight.
-     * @return The selected bot lance, or null if the organization's bot force tables are not found or invalid.
+     * @param rollMod     A modifier to the die roll, expressed as a fraction of the
+     *                    total weight.
+     * @return The selected bot lance, or null if the organization's bot force
+     *         tables are not found or invalid.
      */
     public @Nullable String selectBotLances(String org, int weightClass, float rollMod) {
         // Check if the bot force tables contain the required organization
@@ -225,7 +235,9 @@ public class AtBConfiguration {
 
         // Check if the weightClassIndex is within valid range
         if (weightClassIndex < 0 || weightClassIndex >= botForceTable.size()) {
-            logger.error(String.format("Bot force tables for organization \"%s\" don't have an entry for weight class %d, limiting to valid values", org, weightClass));
+            logger.error(String.format(
+                    "Bot force tables for organization \"%s\" don't have an entry for weight class %d, limiting to valid values",
+                    org, weightClass));
 
             // Limit the weightClassIndex within valid range
             weightClassIndex = Math.max(0, Math.min(weightClassIndex, botForceTable.size() - 1));

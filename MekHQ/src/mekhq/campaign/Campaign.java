@@ -1,23 +1,30 @@
 /*
- * Campaign.java
- *
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2022 - 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign;
 
@@ -165,7 +172,9 @@ import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomM
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
-import static mekhq.campaign.randomEvents.GrayMonday.*;
+import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_CLARION_NOTE;
+import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
+import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMAN;
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
@@ -4955,12 +4964,19 @@ public class Campaign implements ITechManager {
         // getContractMarket().processNewDay(this);
         unitMarket.processNewDay(this);
 
+        processNewDayPersonnel();
+
+        // Needs to be before 'processNewDayATB' so that Dependents can't leave the moment they
+        // arrive via AtB Bonus Events
+        if ((location.isOnPlanet()) && (currentDay.getDayOfMonth() == 1)) {
+            RandomDependents randomDependents = new RandomDependents(this);
+            randomDependents.processMonthlyRemovalAndAddition();
+        }
+
         // Process New Day for AtB
         if (campaignOptions.isUseAtB()) {
             processNewDayATB();
         }
-
-        processNewDayPersonnel();
 
         processFatigueNewDay();
 
@@ -4975,11 +4991,6 @@ public class Campaign implements ITechManager {
         if ((campaignOptions.isEnableAutoAwards()) && (currentDay.getDayOfMonth() == 1)) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();
             autoAwardsController.ManualController(this, false);
-        }
-
-        if ((location.isOnPlanet()) && (currentDay.getDayOfMonth() == 1)) {
-            RandomDependents randomDependents = new RandomDependents(this);
-            randomDependents.processMonthlyRemovalAndAddition();
         }
 
         // Prisoner events can occur on Monday or the 1st of the month depending on the type of event

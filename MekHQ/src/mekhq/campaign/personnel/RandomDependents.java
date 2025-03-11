@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2025 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.personnel;
 
@@ -46,10 +55,11 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
  */
 public class RandomDependents {
     private final Campaign campaign;
-    private final CampaignOptions campaignOptions;
+    private final boolean isUseRandomDependentAddition;
+    private final boolean isUseRandomDependentRemoval;
     private final LocalDate currentDay;
 
-    private List<Person> activeDependents;
+    private List<Person> activeDependents = new ArrayList<>();
     private int activeNonDependents;
     private int dependentCapacity;
 
@@ -67,13 +77,15 @@ public class RandomDependents {
      */
     public RandomDependents(Campaign campaign) {
         this.campaign = campaign;
-        campaignOptions = campaign.getCampaignOptions();
+
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        this.isUseRandomDependentAddition = campaignOptions.isUseRandomDependentAddition();
+        this.isUseRandomDependentRemoval = campaignOptions.isUseRandomDependentRemoval();
         currentDay = campaign.getLocalDate();
 
         // Prepare the data
-        activeDependents = campaign.getActiveDependents();
+        activeNonDependents = prepareData();
         Collections.shuffle(activeDependents);
-        activeNonDependents = getActiveNonDependents();
 
         dependentCapacity = calculateDependentCapacity();
     }
@@ -104,35 +116,39 @@ public class RandomDependents {
         int dependentCount = activeDependents.size();
 
         // then roll for random addition
-        if (campaignOptions.isUseRandomDependentAddition()) {
+        if (isUseRandomDependentAddition) {
             dependentsAddNew(dependentCount);
         }
 
         // roll for random removal
-        if (campaignOptions.isUseRandomDependentRemoval()) {
+        if (isUseRandomDependentRemoval) {
             dependentsRollForRemoval();
         }
     }
 
     /**
-     * Calculates the number of active non-dependent personnel in the campaign.
+     * Calculates the number of active personnel in the campaign who are not dependents.
      *
-     * <p>This method iterates through the active personnel in the given {@link Campaign} and
-     * counts members who are not prisoners and not classified as children based on the current
-     * date. It filters out personnel who are either prisoners or considered children and
-     * increments the count for valid personnel.
+     * <p>This method iterates through the active personnel in the associated {@link Campaign}
+     * and applies the following filters to determine if a person qualifies as a
+     * non-dependent active personnel:</p>
+     * <ul>
+     *     <li>The person must not be categorized as a dependent.</li>
+     *     <li>The person must not be a prisoner (unless they are a bondsman).</li>
+     *     <li>The person must not be classified as a child based on the current date.</li>
+     * </ul>
      *
-     * @return The total number of active non-dependent personnel.
+     * <p>Personnel who fail these checks are either ignored or added to a corresponding list
+     * ({@code activeDependents}) if they are identified as dependents.</p>
+     *
+     * @return The total number of active personnel who are non-dependents and meet the given criteria.
      */
-    int getActiveNonDependents() {
+    int prepareData() {
         int activeNonDependents = 0;
 
-        for (Person person : campaign.getActivePersonnel()) {
+        for (Person person : campaign.getActivePersonnel(false)) {
             if (person.isDependent()) {
-                continue;
-            }
-
-            if (!person.getPrisonerStatus().isFreeOrBondsman()) {
+                activeDependents.add(person);
                 continue;
             }
 
@@ -153,13 +169,11 @@ public class RandomDependents {
      * eligibility for removal using {@link #isRemovalEligible(Person, LocalDate)}. Eligible
      * dependents are removed based on a rolling mechanism, and their status is updated within the
      * campaign.</p>
-     *
-     * @return The total number of dependents remaining after the removal process.
      */
-    int dependentsRollForRemoval() {
+    void dependentsRollForRemoval() {
         List<Person> dependentsToRemove = new ArrayList<>();
 
-        if (campaignOptions.isUseRandomDependentRemoval()) {
+        if (isUseRandomDependentRemoval) {
             for (Person dependent : activeDependents) {
                 if (!isRemovalEligible(dependent, currentDay)) {
                     continue;
@@ -190,21 +204,17 @@ public class RandomDependents {
             }
 
             if (!dependentsToRemove.isEmpty()) {
-                String pluralizer = getFormattedTextAt(RESOURCE_BUNDLE, dependentsToRemove.size() == 1
-                    ? "dependent.singular" : "dependent.plural");
+                int pluralizer = dependentsToRemove.size();
 
                 campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "dependentLeavesForce.report",
                     dependentsToRemove.size(), pluralizer));
 
                 for (Person dependent : dependentsToRemove) {
                     dependent.changeStatus(campaign, currentDay, LEFT);
+                    activeDependents.remove(dependent);
                 }
             }
         }
-
-        activeDependents = campaign.getActiveDependents();
-
-        return activeDependents.size();
     }
 
     /**
@@ -236,7 +246,7 @@ public class RandomDependents {
      * @param dependentCount   The current number of dependents.
      */
     void dependentsAddNew(int dependentCount) {
-        if ((campaignOptions.isUseRandomDependentAddition()) && (dependentCount < dependentCapacity)) {
+        if (isUseRandomDependentAddition && (dependentCount < dependentCapacity)) {
             int availableCapacity = dependentCapacity - dependentCount;
             int rollCount = (int) max(1, availableCapacity * 0.2);
 

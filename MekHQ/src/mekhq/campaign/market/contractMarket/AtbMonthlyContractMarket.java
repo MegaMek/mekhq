@@ -1,23 +1,30 @@
 /*
- * ContractMarket.java
- *
  * Copyright (c) 2014 Carl Spain. All rights reserved.
- * Copyright (c) 2025 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.market.contractMarket;
 
@@ -344,6 +351,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                         .withLocale(MekHQ.getMHQOptions().getDateLocale())), employer,
                         contract.getSystem().getName(contract.getStartDate()), contract.getContractType()));
 
+        contract.clanTechSalvageOverride();
+
         return contract;
     }
 
@@ -435,6 +444,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                         .withLocale(MekHQ.getMHQOptions().getDateLocale())), contract.getEmployer(),
                 contract.getSystem().getName(parent.getStartDate()), contract.getContractType()));
 
+        contract.clanTechSalvageOverride();
+
         return contract;
     }
 
@@ -500,6 +511,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         followup.setPartsAvailabilityLevel(followup.getContractType().calculatePartsAvailabilityLevel());
         followup.initContractDetails(campaign);
         followup.calculateContract(campaign);
+
+        contract.clanTechSalvageOverride();
 
         contracts.add(followup);
         followupContracts.put(followup.getId(), contract.getId());

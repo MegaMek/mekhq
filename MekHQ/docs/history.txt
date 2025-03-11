@@ -111,7 +111,48 @@ MEKHQ VERSION HISTORY:
 + PR #6157: Updated Battlefield Control Logic in Scenarios
 + PR #6159: Renamed `getAvailableForceIDs` Method to `getAvailableForceIDsForManualDeployment` For Improved Clarity
 + PR #6160: Replaced Magic Numbers With Constants For Scenario IDs
-
++ FIX #5829: ACAR - automatically change the color of the bot for another color if there is a collision
++ FIX #6059: PACAR auto-start only when using CommanderGUI
++ PR #6169: Updated Warehouse Parts Table To Better Indicate Brand-New Status in Quality Column
++ RFE #5919: Make Daily Log Killed in Action Text Show up in Red
++ Fix #6166: Corrected Resupply Interception Placeholder Messages
++ Fix #6169: Updated Reinforcement Logic to Better Support GM Overrides
++ PR #6173: Corrected Support Points Removal Logic
++ Fix #6174: Fixed new dependants claiming own name as job title in daily report
++ PR #6177: Drones are marked as unsupported units in MekHQ until they can be implemented in MegaMek
++ Fix #6180: Fixed Parts in Use Dialog selling wrong number of parts
++ PR #6190: Enforced Exchange Salvage for Contracts vs. Clan Factions Prior to Tukkayid
++ PR #6195: Added null Protection During Prisoner Capture to Avoid Lockup in Non-AtB Campaigns
++ PR #6202: Fixed Non-Binary Pronoun Support for Personality Generator; Added Additional Quirks; Expanded Characteristic Variants; Fixed Personality Generator
++ PR #6203: Added Suppress Inspection Annotations To PrisonerEvents.properties
++ PR #6204: Added Suppression Of UnusedProperty Inspection Comment to CampaignOptionsDialog.properties
++ PR #6205: Added Suppression Of UnusedProperty Inspection Comment to Resupply.properties
++ Fix #306: Added 'Can Use' Filter to Owned Unit Picker
++ Fix #403: Added Automatic Assignment of 'Clan Pilot Training' SPA to Clan Personnel
++ Fix #5305: Improved Logical Flow of Experience-Based Salary Multipliers in Campaign Options IIC
++ Fix #5960: Fixed SPA Editing in Campaign Options IIC
++ Fix #5968: Added Missing SPAs to Campaign Options IIC
++ Fix #5969: Removed Deprecated Label From Kill XP Awards in Campaign Options IIC
++ Fix #5975: Fixed Image Scaling Stopping Campaign Options IIC from Launching
++ Fix #5978: Fixed Copy-Pasting of Skill Values in Campaign Options IIC
++ Fix #6057: Improved Resupply Focus Handling And Dialog Messaging
++ Fix #6181: Fixed Tooltips and Formatting in Campaign Options IIC
++ Fix #6182: Updated Curriculums For Local Academy Administration Courses
++ Fix #6184: AtB Bonus Roll Units Now Take 1 Day to Arrive
++ Fix #6185: Fixed Incorrect Loading/Saving of Options in Campaign Options IIC
++ Fix #6187: Fixed Origin System-Planet Selection to Ensure No Null Values in Campaign Options IIC
++ Fix #6189: Added Fatigue Display when Assigning Forces to Scenarios
++ Fix #6194: Removed Requirement for Field Kitchens to Be Maintained
++ PR #6206: Reduced Attempt Count For Capturing Prisoners from 3 to 2
++ PR #6207: Fixed Unit Eligibility Logic For Frontline and Leadership Units
++ PR #6208: Rebalanced Support Point Negotiation Logic
++ PR #6209: Updated Reinforcement Target Calculation Logic
++ PR #6210: Updated Combat Teams, Roles, Training & Reinforcements.pdf
++ Fix #6216: Fixed Assignment of Player DropShip to Random Scenarios
++ PR #6221: Corrected AutoResolve Campaign Option Layout
++ PR #6222: Added Counter-Convoy Support to PACAR
++ PR #6225: Updated Part Saving to Always Save 'Brand New' Status
++ PR #6230: Adjusted Order of Personnel and Dependent Processing in New Day
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment
