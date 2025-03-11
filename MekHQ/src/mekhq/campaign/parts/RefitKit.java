@@ -28,11 +28,15 @@ import org.w3c.dom.Node;
 
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.utilities.ReportingUtilities;
 
 public class RefitKit extends Part implements IAcquisitionWork {
+    private static final MMLogger logger = MMLogger.create(Refit.class);
 
     private List<Part> partList;
     private int tons;
@@ -108,12 +112,14 @@ public class RefitKit extends Part implements IAcquisitionWork {
     public Part clone() {
         RefitKit newKit = new RefitKit();
         newKit.setName(name);
+        newKit.setCampaign(campaign);
         for (Part part : partList) {
             newKit.addPart(part.clone());
         }
         return newKit;
     }
 
+    @Override
     public String getDetails() {
         return String.format("%s Parts", partList.size());
     }
@@ -255,14 +261,29 @@ public class RefitKit extends Part implements IAcquisitionWork {
         return this;
     }
 
+    /**
+     * I think this isn't used with planetary aquisition
+     */
     @Override
     public String find(int transitDays) {
-        return "";
+       if (campaign.getQuartermaster().buyPart(this, transitDays)) {
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
+                    "<b> refit kit found.</b> Kit will arrive in " + transitDays + " days.");
+        } else {
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                    "<b> You cannot afford this refit kit. Transaction cancelled</b>.");
+        }  
     }
 
+    /**
+     * I think this isn't used with planetary aquisition
+     */
     @Override
     public String failToFind() {
-        return "";
+        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                + "'><b> part not found</b>.</font>";
     }
 
     @Override
