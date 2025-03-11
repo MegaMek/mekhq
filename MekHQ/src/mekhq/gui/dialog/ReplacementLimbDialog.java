@@ -63,8 +63,8 @@ public class ReplacementLimbDialog extends MHQDialogImmersive {
         super(campaign, getSpeaker(campaign), patient,
               createInCharacterMessage(campaign.getLocation().isOnPlanet(), !suitableDoctors.isEmpty(),
                     campaign.getCommanderAddress(false), patient, cost, campaign.getFunds().isGreaterOrEqualThan(cost)),
-              createButtons(campaign.getFunds().isGreaterOrEqualThan(cost)), getFormattedTextAt(RESOURCE_BUNDLE, "message.ooc"),
-              null, false);
+              createButtons(campaign.getLocation().isOnPlanet(), campaign.getFunds().isGreaterOrEqualThan(cost)),
+              getFormattedTextAt(RESOURCE_BUNDLE, "message.ooc"), null, false);
     }
 
     /**
@@ -75,10 +75,10 @@ public class ReplacementLimbDialog extends MHQDialogImmersive {
      *                           {@code false} otherwise.
      * @return A {@link List} of {@link ButtonLabelTooltipPair} objects representing the dialog buttons.
      */
-    private static List<ButtonLabelTooltipPair> createButtons(boolean hasSufficientFunds) {
+    private static List<ButtonLabelTooltipPair> createButtons(boolean isPlanetside, boolean hasSufficientFunds) {
         List<ButtonLabelTooltipPair> buttons = new ArrayList<>();
 
-        if (!hasSufficientFunds) {
+        if (!hasSufficientFunds || !isPlanetside) {
             ButtonLabelTooltipPair btnDecline = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
                   "understood.button"), null);
             buttons.add(btnDecline);
