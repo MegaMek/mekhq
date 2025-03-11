@@ -346,7 +346,7 @@ public final class InjuryTypes {
 
         @Override
         public String getName(BodyLocation loc, int severity) {
-            return "Replacement Limb Recovery";
+            return String.format("Replacement %s Recovery", loc.locationName());
         }
 
         @Override

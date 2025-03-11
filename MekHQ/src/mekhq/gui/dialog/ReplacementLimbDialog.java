@@ -63,22 +63,34 @@ public class ReplacementLimbDialog extends MHQDialogImmersive {
         super(campaign, getSpeaker(campaign), patient,
               createInCharacterMessage(campaign.getLocation().isOnPlanet(), !suitableDoctors.isEmpty(),
                     campaign.getCommanderAddress(false), patient, cost, campaign.getFunds().isGreaterOrEqualThan(cost)),
-              createButtons(campaign.getLocation().isOnPlanet(), campaign.getFunds().isGreaterOrEqualThan(cost)),
+              createButtons(!suitableDoctors.isEmpty(), campaign.getLocation().isOnPlanet(), campaign.getFunds().isGreaterOrEqualThan(cost)),
               getFormattedTextAt(RESOURCE_BUNDLE, "message.ooc"), null, false);
     }
 
     /**
-     * Creates the buttons for the dialog based on whether sufficient funds are available for the
-     * procedure.
+     * Creates the buttons for the dialog based on the availability of qualified doctors,
+     * whether the procedure is planetside, and if sufficient funds are available.
      *
+     * <p>The behavior of the button creation is determined by the following conditions:</p>
+     * <ul>
+     *     <li>If sufficient funds are unavailable, or if there is no qualified doctor and it is not planetside,
+     *         only an "Understood" button is created.</li>
+     *     <li>Otherwise, both "Decline" and "Accept" buttons are created.</li>
+     * </ul>
+     *
+     * @param hasQualifiedDoctor {@code true} if a qualified doctor is available to perform the procedure,
+     *                           {@code false} otherwise.
+     * @param isPlanetside {@code true} if the campaign is currently planetside, {@code false} otherwise.
      * @param hasSufficientFunds {@code true} if the campaign has enough funds to cover the procedure,
      *                           {@code false} otherwise.
+     *
      * @return A {@link List} of {@link ButtonLabelTooltipPair} objects representing the dialog buttons.
      */
-    private static List<ButtonLabelTooltipPair> createButtons(boolean isPlanetside, boolean hasSufficientFunds) {
+    private static List<ButtonLabelTooltipPair> createButtons(boolean hasQualifiedDoctor, boolean isPlanetside,
+                                                              boolean hasSufficientFunds) {
         List<ButtonLabelTooltipPair> buttons = new ArrayList<>();
 
-        if (!hasSufficientFunds || !isPlanetside) {
+        if (!hasSufficientFunds || (!hasQualifiedDoctor && !isPlanetside)) {
             ButtonLabelTooltipPair btnDecline = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
                   "understood.button"), null);
             buttons.add(btnDecline);
