@@ -27,30 +27,28 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+
+import java.util.List;
 
 public class UntreatedPersonnelNagLogic {
     /**
-     * Checks whether the campaign has any untreated personnel with injuries.
+     * Determines whether the campaign has any personnel with untreated injuries.
      *
-     * <p>
-     * This method iterates over the campaign's active personnel and identifies individuals
-     * who meet the following criteria:
+     * <p>This method evaluates the active personnel in the campaign to identify individuals who:</p>
      * <ul>
-     *     <li>The individual requires treatment ({@link Person#needsFixing()}).</li>
-     *     <li>The individual has not been assigned to a doctor.</li>
-     *     <li>The individual is not currently classified as a prisoner.</li>
+     *     <li>Require medical treatment ({@link Person#needsFixing()}).</li>
+     *     <li>Have not been assigned to a doctor (their {@code getDoctorId()} is {@code null}).</li>
      * </ul>
-     * If any personnel match these conditions, the method returns {@code true}.
      *
-     * @return {@code true} if untreated injuries are present, otherwise {@code false}.
+     * <p>If any personnel meet these criteria, the method returns {@code true}.</p>
+     *
+     * @param activePersonnel A {@link List} of active personnel in the campaign.
+     * @return {@code true} if there are untreated injuries among the personnel, {@code false} otherwise.
      */
-    public static boolean campaignHasUntreatedInjuries(Campaign campaign) {
-        for (Person person : campaign.getActivePersonnel()) {
-            if (!person.getPrisonerStatus().isCurrentPrisoner()
-                && person.needsFixing()
-                && person.getDoctorId() == null) {
+    public static boolean campaignHasUntreatedInjuries(List<Person> activePersonnel) {
+        for (Person person : activePersonnel) {
+            if (person.needsFixing() && person.getDoctorId() == null) {
                 return true;
             }
         }

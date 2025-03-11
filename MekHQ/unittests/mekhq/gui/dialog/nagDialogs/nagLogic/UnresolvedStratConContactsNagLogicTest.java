@@ -60,7 +60,7 @@ public class UnresolvedStratConContactsNagLogicTest {
     private StratconCampaignState stratconCampaignState;
     private StratconTrackState track;
     private LocalDate today;
-    private StratconScenario scenario1, scenario2;
+    private StratconScenario stratconScenario1, stratconScenario2;
 
     /**
      * Test setup for each test, runs before each test.
@@ -81,11 +81,11 @@ public class UnresolvedStratConContactsNagLogicTest {
         when(mockCoordinates1.toBTString()).thenReturn("MockCoordinate1");
         when(mockCoordinates2.toBTString()).thenReturn("MockCoordinate2");
 
-        scenario1 = mock(StratconScenario.class);
-        scenario2 = mock(StratconScenario.class);
+        stratconScenario1 = mock(StratconScenario.class);
+        stratconScenario2 = mock(StratconScenario.class);
 
-        when(scenario1.getCoords()).thenReturn(mockCoordinates1);
-        when(scenario2.getCoords()).thenReturn(mockCoordinates2);
+        when(stratconScenario1.getCoords()).thenReturn(mockCoordinates1);
+        when(stratconScenario2.getCoords()).thenReturn(mockCoordinates2);
 
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
         when(campaignOptions.isUseStratCon()).thenReturn(true);
@@ -94,25 +94,25 @@ public class UnresolvedStratConContactsNagLogicTest {
         when(contract.getStratconCampaignState()).thenReturn(stratconCampaignState);
         when(stratconCampaignState.getTracks()).thenReturn(List.of(track));
 
-        when(track.getScenarios()).thenReturn(Map.of(mockCoordinates1, scenario1, mockCoordinates2, scenario2));
-        when(scenario1.getCurrentState()).thenReturn(ScenarioState.UNRESOLVED);
-        when(scenario2.getCurrentState()).thenReturn(ScenarioState.UNRESOLVED);
+        when(track.getScenarios()).thenReturn(Map.of(mockCoordinates1, stratconScenario1, mockCoordinates2, stratconScenario2));
+        when(stratconScenario1.getCurrentState()).thenReturn(ScenarioState.UNRESOLVED);
+        when(stratconScenario2.getCurrentState()).thenReturn(ScenarioState.UNRESOLVED);
         when(campaign.getLocalDate()).thenReturn(today);
     }
 
     @Test
     public void noScenariosDue() {
-        when(scenario1.getDeploymentDate()).thenReturn(today.plusDays(1));
-        when(scenario2.getDeploymentDate()).thenReturn(today.plusDays(1));
+        when(stratconScenario1.getDeploymentDate()).thenReturn(today.plusDays(1));
+        when(stratconScenario2.getDeploymentDate()).thenReturn(today.plusDays(1));
 
-        assertFalse(hasUnresolvedContacts(campaign));
+        assertFalse(hasUnresolvedContacts(List.of(contract), today));
     }
 
     @Test
     public void scenariosDue() {
-        when(scenario1.getDeploymentDate()).thenReturn(today.plusDays(1));
-        when(scenario2.getDeploymentDate()).thenReturn(today);
+        when(stratconScenario1.getDeploymentDate()).thenReturn(today.plusDays(1));
+        when(stratconScenario2.getDeploymentDate()).thenReturn(today);
 
-        assertTrue(hasUnresolvedContacts(campaign));
+        assertTrue(hasUnresolvedContacts(List.of(contract), today));
     }
 }

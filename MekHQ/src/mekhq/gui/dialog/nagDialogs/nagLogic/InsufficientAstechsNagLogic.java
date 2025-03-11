@@ -27,26 +27,19 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import mekhq.campaign.Campaign;
-
 public class InsufficientAstechsNagLogic {
     /**
-     * Determines whether the campaign has a need for astechs.
+     * Determines whether additional astechs are needed in the campaign.
      *
-     * <p>
-     * This method checks the number of astechs needed in the given campaign
-     * and returns {@code true} if the number of needed astechs is greater than zero,
-     * indicating that there is a requirement for astechs. If the number is zero or negative,
-     * the method returns {@code false}.
-     * </p>
+     * <p>This method checks if the number of astechs required is greater than zero. If so, this
+     * indicates a need for additional astechs to meet the campaign's requirements. Otherwise, no
+     * additional astechs are required.</p>
      *
-     * @param campaign the campaign object to retrieve the astech need from
-     * @return {@code true} if the campaign requires astechs (astech need > 0),
-     *         {@code false} otherwise
+     * @param asTechsNeeded The number of astechs currently required to meet the campaign's needs.
+     * @return {@code true} if the number of required astechs ({@code asTechsNeeded}) is greater
+     *         than zero; {@code false} otherwise.
      */
-    public static boolean hasAsTechsNeeded(Campaign campaign) {
-        int asTechsNeeded = campaign.getAstechNeed();
-
+    public static boolean hasAsTechsNeeded(int asTechsNeeded) {
         return asTechsNeeded > 0;
     }
 }

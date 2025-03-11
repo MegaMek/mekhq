@@ -64,21 +64,23 @@ public class PrisonersNagDialog extends AbstractMHQNagDialog {
     }
 
     /**
-     * Checks if a nag dialog should be displayed for prisoners in the given campaign.
+     * Determines whether a nag dialog should be displayed for prisoners in the given campaign.
      *
-     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
+     * <p>This method evaluates two conditions to decide if the nag dialog for prisoners should appear:</p>
      * <ul>
-     *     <li>If the nag dialog for prisoners has not been ignored in the user options.</li>
-     *     <li>If the campaign has prisoners.</li>
+     *     <li>The user has not ignored the nag dialog for prisoners in their options.</li>
+     *     <li>The campaign has prisoners, as determined by {@link #hasPrisoners(boolean, boolean)}.</li>
      * </ul>
      *
-     * @param campaign the {@link Campaign} to check for nagging conditions
-     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
+     * @param hasActiveContract A flag indicating whether the campaign has an active contract.
+     * @param hasPrisoners A flag indicating whether there are prisoners in the campaign.
+     *
+     * @return {@code true} if the nag dialog should be displayed; {@code false} otherwise.
      */
-    public static boolean checkNag(Campaign campaign) {
+    public static boolean checkNag(boolean hasActiveContract, boolean hasPrisoners) {
         final String NAG_KEY = MHQConstants.NAG_PRISONERS;
 
         return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && hasPrisoners(campaign);
+              && hasPrisoners(hasActiveContract, hasPrisoners);
     }
 }
