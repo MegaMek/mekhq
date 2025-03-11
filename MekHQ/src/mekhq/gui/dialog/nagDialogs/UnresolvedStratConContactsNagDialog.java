@@ -84,7 +84,7 @@ public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
      * <ul>
      *     <li>StratCon functionality is enabled in the campaign options.</li>
      *     <li>The user has not ignored the nag dialog for unresolved StratCon contacts in their preferences.</li>
-     *     <li>The campaign has unresolved StratCon contacts, as determined by {@link #hasUnresolvedContacts(List, LocalDate)}.</li>
+     *     <li>The campaign has unresolved StratCon contacts, as determined by {@code #hasUnresolvedContacts}.</li>
      * </ul>
      *
      * @param isUseStratCon A flag indicating whether StratCon functionality is enabled in the campaign options.

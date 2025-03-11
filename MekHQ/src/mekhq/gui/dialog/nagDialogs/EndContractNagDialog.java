@@ -81,7 +81,7 @@ public class EndContractNagDialog extends AbstractMHQNagDialog {
      * <p>This method evaluates the following conditions to decide if the nag dialog should appear:</p>
      * <ul>
      *     <li>The user has not ignored the nag dialog for ended contracts in their options.</li>
-     *     <li>A contract in the campaign has ended, as determined by {@link #isContractEnded(LocalDate, List)}.</li>
+     *     <li>A contract in the campaign has ended, as determined by {@code #isContractEnded}.</li>
      * </ul>
      *
      * @param today The current local date used to check against the contracts' ending dates.

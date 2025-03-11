@@ -71,7 +71,7 @@ public class DeploymentShortfallNagDialog extends AbstractMHQNagDialog {
      * <ul>
      *     <li>The campaign uses AtB (Against the Bot) rules.</li>
      *     <li>The user has not ignored the nag dialog for deployment shortfalls in their options.</li>
-     *     <li>The campaign has a deployment shortfall, as determined by {@link #hasDeploymentShortfall(Campaign)}.</li>
+     *     <li>The campaign has a deployment shortfall, as determined by {@code #hasDeploymentShortfall}.</li>
      * </ul>
      *
      * @param isUseAtB A flag indicating whether the campaign is using AtB rules.

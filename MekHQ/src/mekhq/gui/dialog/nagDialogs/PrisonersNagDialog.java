@@ -69,7 +69,7 @@ public class PrisonersNagDialog extends AbstractMHQNagDialog {
      * <p>This method evaluates two conditions to decide if the nag dialog for prisoners should appear:</p>
      * <ul>
      *     <li>The user has not ignored the nag dialog for prisoners in their options.</li>
-     *     <li>The campaign has prisoners, as determined by {@link #hasPrisoners(boolean, boolean)}.</li>
+     *     <li>The campaign has prisoners, as determined by {@code #hasPrisoners}.</li>
      * </ul>
      *
      * @param hasActiveContract A flag indicating whether the campaign has an active contract.
