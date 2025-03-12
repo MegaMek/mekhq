@@ -27,28 +27,23 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
 
 import java.time.LocalDate;
 
 public class InvalidFactionNagLogic {
     /**
-     * Checks whether the campaign's faction is invalid for the current in-game date.
+     * Determines whether the specified faction is invalid for the given date.
      *
-     * <p>
-     * This method retrieves the campaign's faction using {@link Campaign#getFaction()} and evaluates
-     * its validity for the current date using {@link Faction#validIn(LocalDate)}. A faction is considered
-     * invalid if it is not valid for the campaign's local date.
-     * </p>
+     * <p>This method evaluates the validity of a faction by checking if it is applicable
+     * for the specified date using {@link Faction#validIn(LocalDate)}. A faction is deemed
+     * invalid if it is not valid for the provided date.</p>
      *
-     * @return {@code true} if the faction is invalid for the campaign's current date; otherwise,
-     * {@code false}.
+     * @param campaignFaction The {@link Faction} associated with the campaign to be validated.
+     * @param today           The {@link LocalDate} representing the current in-game date.
+     * @return {@code true} if the faction is invalid for the specified date, {@code false} otherwise.
      */
-    public static boolean isFactionInvalid(Campaign campaign) {
-        Faction campaignFaction = campaign.getFaction();
-        LocalDate today = campaign.getLocalDate();
-
+    public static boolean isFactionInvalid(Faction campaignFaction, LocalDate today) {
         return !campaignFaction.validIn(today);
     }
 }

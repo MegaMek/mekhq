@@ -74,6 +74,11 @@ public class Force {
     // region Variable Declarations
     // pathway to force icon
     public static final int FORCE_NONE = -1;
+    /**
+     * This is the id of the 'origin node'. The force from which all other forces descend. Normally
+     * named after the campaign.
+     */
+    public static final int FORCE_ORIGIN = 0;
 
     public static final int COMBAT_TEAM_OVERRIDE_NONE = -1;
     public static final int COMBAT_TEAM_OVERRIDE_FALSE = 0;

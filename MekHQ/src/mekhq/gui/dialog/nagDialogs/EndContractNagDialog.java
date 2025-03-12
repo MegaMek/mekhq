@@ -30,7 +30,11 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
+
+import java.time.LocalDate;
+import java.util.List;
 
 import static mekhq.gui.dialog.nagDialogs.nagLogic.EndContractNagLogic.isContractEnded;
 
@@ -72,21 +76,23 @@ public class EndContractNagDialog extends AbstractMHQNagDialog {
     }
 
     /**
-     * Checks if a nag dialog should be displayed for an ended contract within the given campaign.
+     * Determines whether a nag dialog should be displayed for an ended contract in the given campaign.
      *
-     * <p>The method evaluates the following conditions:</p>
+     * <p>This method evaluates the following conditions to decide if the nag dialog should appear:</p>
      * <ul>
-     *     <li>If the nag dialog for an ended contract has not been ignored in the user options.</li>
-     *     <li>If the contract associated with the provided campaign has ended.</li>
+     *     <li>The user has not ignored the nag dialog for ended contracts in their options.</li>
+     *     <li>A contract in the campaign has ended, as determined by {@code #isContractEnded}.</li>
      * </ul>
      *
-     * @param campaign the {@link Campaign} to check for nagging conditions
-     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
+     * @param today The current local date used to check against the contracts' ending dates.
+     * @param activeContracts A list of {@link AtBContract} objects representing the campaign's active contracts.
+     *
+     * @return {@code true} if the nag dialog should be displayed; {@code false} otherwise.
      */
-    public static boolean checkNag(Campaign campaign) {
+    public static boolean checkNag(LocalDate today, List<AtBContract> activeContracts) {
         final String NAG_KEY = MHQConstants.NAG_CONTRACT_ENDED;
 
         return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && isContractEnded(campaign);
+              && isContractEnded(today, activeContracts);
     }
 }

@@ -30,7 +30,10 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
+
+import java.util.Collection;
 
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnmaintainedUnitsNagLogic.campaignHasUnmaintainedUnits;
 
@@ -64,22 +67,25 @@ public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
     }
 
     /**
-     * Checks if a nag dialog should be displayed for the inability to afford loan payments in the given campaign.
+     * Determines whether a nag dialog should be displayed for unmaintained units in the campaign.
      *
-     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
+     * <p>This method evaluates the following conditions to decide if the nag dialog should appear:</p>
      * <ul>
-     *     <li>If the nag dialog for the inability to afford loan payments has not been ignored in the user options.</li>
-     *     <li>If the campaign is unable to afford its loan payments.</li>
+     *     <li>The check for unmaintained units is enabled ({@code isCheckMaintenance} is {@code true}).</li>
+     *     <li>The user has not ignored the nag dialog for unmaintained units in the options.</li>
+     *     <li>The campaign's hangar contains unmaintained units that are not salvage.</li>
      * </ul>
      *
-     * @param campaign the {@link Campaign} to check for nagging conditions
-     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
+     * @param units A {@link Collection} of {@link Unit} objects representing the campaign's hangar units.
+     * @param isCheckMaintenance A flag indicating whether to check for unmaintained units.
+     * @return {@code true} if the nag dialog should be displayed due to unmaintained units,
+     *         {@code false} otherwise.
      */
-    public static boolean checkNag(Campaign campaign) {
+    public static boolean checkNag(Collection<Unit> units, boolean isCheckMaintenance) {
         final String NAG_KEY = MHQConstants.NAG_UNMAINTAINED_UNITS;
 
-        return campaign.getCampaignOptions().isCheckMaintenance()
-            && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && campaignHasUnmaintainedUnits(campaign);
+        return isCheckMaintenance
+              && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+              && campaignHasUnmaintainedUnits(units);
     }
 }

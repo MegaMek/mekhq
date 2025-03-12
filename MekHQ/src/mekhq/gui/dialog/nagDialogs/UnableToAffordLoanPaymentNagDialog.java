@@ -30,8 +30,13 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Finances;
+import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
+
+import java.time.LocalDate;
+import java.util.List;
 
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordLoanPaymentNag.getTotalPaymentsDue;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordLoanPaymentNag.unableToAffordLoans;
@@ -61,7 +66,8 @@ public class UnableToAffordLoanPaymentNagDialog extends AbstractMHQNagDialog {
     public UnableToAffordLoanPaymentNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT);
 
-        Money totalPaymentsDue = getTotalPaymentsDue(campaign);
+        Finances finances = campaign.getFinances();
+        Money totalPaymentsDue = getTotalPaymentsDue(finances.getLoans(), campaign.getLocalDate());
 
         final String DIALOG_BODY = "UnableToAffordLoanPaymentNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
@@ -71,21 +77,24 @@ public class UnableToAffordLoanPaymentNagDialog extends AbstractMHQNagDialog {
     }
 
     /**
-     * Checks if a nag dialog should be displayed for the inability to afford loan payments in the given campaign.
+     * Determines whether a nag dialog should be displayed for the inability to afford loan payments.
      *
-     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
+     * <p>This method evaluates two conditions to decide if the nag dialog should appear:</p>
      * <ul>
-     *     <li>If the nag dialog for the inability to afford loan payments has not been ignored in the user options.</li>
-     *     <li>If the campaign is unable to afford its loan payments.</li>
+     *     <li>The user has not ignored the nag dialog for the inability to afford loan payments in their options.</li>
+     *     <li>The campaign does not have sufficient funds to cover its loan payments.</li>
      * </ul>
      *
-     * @param campaign the {@link Campaign} to check for nagging conditions
-     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
+     * @param loans A {@link List} of {@link Loan} objects representing the campaign's active loans.
+     * @param today The current date, used to calculate tomorrow's date for loan payments.
+     * @param currentFunds The current available funds in the campaign as a {@link Money} object.
+     * @return {@code true} if the nag dialog should be displayed due to insufficient funds for loan payments,
+     *         {@code false} otherwise.
      */
-    public static boolean checkNag(Campaign campaign) {
+    public static boolean checkNag(List<Loan> loans, LocalDate today, Money currentFunds) {
         final String NAG_KEY = MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT;
 
         return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && unableToAffordLoans(campaign);
+              && unableToAffordLoans(loans, today, currentFunds);
     }
 }

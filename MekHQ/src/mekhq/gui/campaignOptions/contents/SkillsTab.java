@@ -39,7 +39,6 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-import static java.util.Arrays.sort;
 import static megamek.common.enums.SkillLevel.*;
 import static mekhq.campaign.personnel.SkillType.isCombatSkill;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
@@ -146,9 +145,6 @@ public class SkillsTab {
         }
 
         // Contents
-        String[] allSkills = SkillType.getSkillList();
-        sort(allSkills);
-
         List<SkillType> relevantSkills = new ArrayList<>();
         for (String skillName : SkillType.getSkillList()) {
             SkillType skill = SkillType.getType(skillName);
