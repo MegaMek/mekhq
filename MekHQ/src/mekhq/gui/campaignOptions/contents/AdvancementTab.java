@@ -827,7 +827,7 @@ public class AdvancementTab {
         // Contents
         lblArtyProb = new CampaignOptionsLabel("ArtilleryChance");
         spnArtyProb = new CampaignOptionsSpinner("ArtilleryChance",
-            0, -10, 10, 1);
+            0, 0, 100, 1);
 
         lblArtyBonus = new CampaignOptionsLabel("ArtilleryBonus");
         spnArtyBonus = new CampaignOptionsSpinner("ArtilleryBonus",
@@ -862,11 +862,11 @@ public class AdvancementTab {
         // Contents
         lblAntiMekSkill = new CampaignOptionsLabel("AntiMekChance");
         spnAntiMekSkill = new CampaignOptionsSpinner("AntiMekChance",
-            0, -10, 10, 1);
+            0, 0, 100, 1);
 
         lblSecondProb = new CampaignOptionsLabel("SecondarySkillChance");
         spnSecondProb = new CampaignOptionsSpinner("SecondarySkillChance",
-            0, -10, 10, 1);
+            0, 0, 100, 1);
 
         lblSecondBonus = new CampaignOptionsLabel("SecondarySkillBonus");
         spnSecondBonus = new CampaignOptionsSpinner("SecondarySkillBonus",
