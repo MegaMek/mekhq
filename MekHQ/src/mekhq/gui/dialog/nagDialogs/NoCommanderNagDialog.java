@@ -27,9 +27,11 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
+import megamek.common.annotations.Nullable;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import static mekhq.gui.dialog.nagDialogs.nagLogic.NoCommanderNagLogic.hasNoCommander;
@@ -72,21 +74,23 @@ public class NoCommanderNagDialog extends AbstractMHQNagDialog {
     }
 
     /**
-     * Checks if a nag dialog should be displayed for the absence of a commander in the given campaign.
+     * Determines whether a nag dialog should be displayed for the absence of a commander.
      *
-     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
+     * <p>This method checks two conditions to decide if the nag dialog should appear:</p>
      * <ul>
-     *     <li>If the nag dialog for the absence of a commander has not been ignored in the user options.</li>
-     *     <li>If the campaign does not have a commander assigned.</li>
+     *     <li>The user has not ignored the nag dialog for the absence of a commander in their options.</li>
+     *     <li>No flagged commander is assigned to the campaign.</li>
      * </ul>
      *
-     * @param campaign the {@link Campaign} to check for nagging conditions
-     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
+     * @param flaggedCommander The {@link Person} designated as the flagged commander, or {@code null}
+     *                         if no commander is assigned.
+     * @return {@code true} if the nag dialog should be displayed due to the absence of a commander,
+     *         {@code false} otherwise.
      */
-    static public boolean checkNag(Campaign campaign) {
+    public static boolean checkNag(@Nullable Person flaggedCommander) {
         final String NAG_KEY = MHQConstants.NAG_NO_COMMANDER;
 
         return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && hasNoCommander(campaign);
+              && hasNoCommander(flaggedCommander);
     }
 }

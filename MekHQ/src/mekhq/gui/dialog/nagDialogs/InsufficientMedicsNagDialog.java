@@ -78,21 +78,22 @@ public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog {
     }
 
     /**
-     * Checks if a nag dialog should be displayed for insufficient medics in the given campaign.
+     * Determines whether a nag dialog should be displayed for insufficient medics in the campaign.
      *
-     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
+     * <p>This method evaluates the following conditions to decide if the nag dialog should appear:</p>
      * <ul>
-     *     <li>If the nag dialog for insufficient medics has not been ignored in the user options.</li>
-     *     <li>If the campaign does not have the required number of medics.</li>
+     *     <li>The user has not ignored the nag dialog for insufficient medics in their options.</li>
+     *     <li>The campaign requires additional medics ({@code medicsRequired} is greater than zero).</li>
      * </ul>
      *
-     * @param campaign the {@link Campaign} to check for nagging conditions
-     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
+     * @param medicsRequired The number of additional medics required to meet the campaign's needs.
+     * @return {@code true} if the nag dialog should be displayed due to insufficient medics,
+     *         {@code false} otherwise.
      */
-    public static boolean checkNag(Campaign campaign) {
+    public static boolean checkNag(int medicsRequired) {
         final String NAG_KEY = MHQConstants.NAG_INSUFFICIENT_MEDICS;
 
         return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && hasMedicsNeeded(campaign);
+              && hasMedicsNeeded(medicsRequired);
     }
 }

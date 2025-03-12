@@ -27,16 +27,12 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import mekhq.campaign.Campaign;
 import mekhq.gui.dialog.nagDialogs.InsufficientAstechsNagDialog;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAstechsNagLogic.hasAsTechsNeeded;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * This class contains test cases for the {@link InsufficientAstechsNagDialog} class.
@@ -44,32 +40,18 @@ import static org.mockito.Mockito.when;
  * {@code checkAstechsNeededCount()} method.
  */
 class InsufficientAstechsNagLogicTest {
-    private Campaign campaign;
-
-    /**
-     * Test setup for each test, runs before each test.
-     * Initializes the mock objects and sets up the necessary mock behaviors.
-     */
-    @BeforeEach
-    void init() {
-        campaign = mock(Campaign.class);
-    }
-
     @Test
     void noAsTechsNeeded() {
-        when(campaign.getAstechNeed()).thenReturn(0);
-        assertFalse(hasAsTechsNeeded(campaign));
+        assertFalse(hasAsTechsNeeded(0));
     }
 
     @Test
     void oneAsTechNeeded() {
-        when(campaign.getAstechNeed()).thenReturn(1);
-        assertTrue(hasAsTechsNeeded(campaign)); // Updated assertion
+        assertTrue(hasAsTechsNeeded(1));
     }
 
     @Test
     void negativeAsTechsNeeded() {
-        when(campaign.getAstechNeed()).thenReturn(-1);
-        assertFalse(hasAsTechsNeeded(campaign));
+        assertFalse(hasAsTechsNeeded(-1));
     }
 }
