@@ -29,11 +29,17 @@ package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.stratcon.StratconTrackState;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 public class UnresolvedStratConContactsNagLogic {
+    final static String RESOURCE_BUNDLE = "mekhq.resources.GUI";
+
     /**
      * Checks if there are any unresolved contacts in the current report.
      *
@@ -71,17 +77,42 @@ public class UnresolvedStratConContactsNagLogic {
         // to which the player can deploy forces
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
             if (contract.getStratconCampaignState() == null) {
-                continue;
+                continue; // Skip contracts without a Stratcon campaign state
             }
 
             for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
                 for (StratconScenario scenario : track.getScenarios().values()) {
-                    if ((scenario.getCurrentState() == ScenarioState.UNRESOLVED)
-                        && (campaign.getLocalDate().equals(scenario.getDeploymentDate()))) {
-                        unresolvedContacts.append(String.format("<br><b>- %s</b>, %s, %s-%s %s",
-                            scenario.getName(), contract.getName(),
-                            track.getDisplayableName(), scenario.getCoords().toBTString(),
-                            scenario.isTurningPoint() ? " (Turning Point)" : ""));
+                    // Check if the scenario is unresolved and the deployment date matches the local date
+                    if (scenario.getCurrentState() == ScenarioState.UNRESOLVED
+                          && campaign.getLocalDate().equals(scenario.getDeploymentDate())) {
+
+                        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+
+                        // Determine if the scenario is special or a turning point
+                        boolean isCrisis = backingScenario != null
+                              && backingScenario.getStratConScenarioType().isSpecial();
+                        boolean isTurningPoint = scenario.isTurningPoint();
+
+                        // Define the addendum text based on StratCon scenario type
+                        String addendum;
+                        if (isCrisis) {
+                            addendum = getTextAt(RESOURCE_BUNDLE, "UnresolvedStratConContactsNagDialog.crisis");
+                        } else if (isTurningPoint) {
+                            addendum = getTextAt(RESOURCE_BUNDLE, "UnresolvedStratConContactsNagDialog.turningPoint");
+                        } else {
+                            addendum = ""; // No additional label if neither condition is true
+                        }
+
+                        // Append formatted unresolved scenario information
+                        unresolvedContacts.append(getFormattedTextAt(
+                              RESOURCE_BUNDLE,
+                              "UnresolvedStratConContactsNagDialog.report",
+                              scenario.getName(),
+                              contract.getName(),
+                              track.getDisplayableName(),
+                              scenario.getCoords().toBTString(),
+                              addendum
+                        ));
                     }
                 }
             }
