@@ -97,25 +97,6 @@ public class AverageExperienceRating {
     }
 
     /**
-     * Calculates a modifier for Against the Bot's various systems, based on the
-     * average skill level.
-     *
-     * @param campaign the campaign from which to calculate the ATB modifier
-     * @return the ATB modifier as an integer value
-     */
-    public static int getAtBModifier(Campaign campaign) {
-        SkillLevel averageSkillLevel = getSkillLevel(campaign, false);
-
-        return switch (averageSkillLevel) {
-            case NONE, ULTRA_GREEN -> 0;
-            case GREEN -> 1;
-            case REGULAR -> 2;
-            case VETERAN -> 3;
-            case ELITE, HEROIC, LEGENDARY -> 4;
-        };
-    }
-
-    /**
      * Calculates the average experience rating of combat personnel in the given
      * campaign.
      *
