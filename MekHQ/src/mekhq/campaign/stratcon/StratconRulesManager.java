@@ -2821,6 +2821,16 @@ public class StratconRulesManager {
                         campaignState.updateVictoryPoints(victory ? 1 : -1);
                     }
 
+                    ScenarioType scenarioType = backingScenario.getStratConScenarioType();
+                    if (scenarioType.isSpecial()) {
+                        if (!backingScenario.getStatus().isOverallVictory()) {
+                            // If the player loses this scenario, they lose -1 CVP. This represents
+                            // the importance of the intel the prisoners hold, or the penalty for
+                            // allowing an enemy force free reign in the player's logistics line.
+                            campaignState.updateVictoryPoints(-1);
+                        }
+                    }
+
                     // this must be done before removing the scenario from the track
                     // in case any objectives are linked to the scenario's coordinates
                     updateStrategicObjectives(victory, scenario, track);

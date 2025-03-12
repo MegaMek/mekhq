@@ -4252,18 +4252,23 @@ public class Campaign implements ITechManager {
             for (final Scenario scenario : contract.getCurrentAtBScenarios()) {
                 if ((scenario.getDate() != null) && scenario.getDate().isBefore(getLocalDate())) {
                     if (getCampaignOptions().isUseStratCon() && (scenario instanceof AtBDynamicScenario)) {
+                        StratconCampaignState campaignState = contract.getStratconCampaignState();
+
+                        if (campaignState == null) {
+                            return;
+                        }
+
                         final boolean stub = StratconRulesManager.processIgnoredScenario(
-                                (AtBDynamicScenario) scenario, contract.getStratconCampaignState());
+                                (AtBDynamicScenario) scenario, campaignState);
 
                         if (stub) {
                             ScenarioType scenarioType = scenario.getStratConScenarioType();
-                            if (scenarioType.isResupply()) {
-                                processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
+                            if (scenarioType.isSpecial()) {
+                                campaignState.updateVictoryPoints(-1);
                             }
 
-                            if (scenarioType.isJailBreak()) {
-                                StratconCampaignState campaignState = contract.getStratconCampaignState();
-                                campaignState.changeSupportPoints(-1);
+                            if (scenarioType.isResupply()) {
+                                processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
                             }
 
                             scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
