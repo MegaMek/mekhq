@@ -153,6 +153,21 @@ MEKHQ VERSION HISTORY:
 + PR #6222: Added Counter-Convoy Support to PACAR
 + PR #6225: Updated Part Saving to Always Save 'Brand New' Status
 + PR #6230: Adjusted Order of Personnel and Dependent Processing in New Day
++ Fix #2724: Stopped Scenarios Spawning if the Scenario Due Date is After Contract End Date
++ Fix #3175: Fixed Enemy Personnel SPAs Not Loading
++ PR #6239: Corrected Minimum Interception Chance in Resupply Logic
++ PR #6240: Adjusted Resupply Tonnage Calculation to Enforce a Minimum Weight of 1 Ton
++ PR #6242: Fixed Incorrect Alphabetical Sorting of Skills
++ PR #6243: Reduced the Reinforcement Arrival Time of Non-Spheroid AeroSpace Assets (Including DropShip Transported Units)
++ PR #6246: Rebranded 'Tactics Skills' Campaign Options to 'Command Skills'; Expanded Coverage to Include Leadership and Strategy
++ PR #6247: Fixed Artillery, Anti-Mek, and Secondary Skill Spinner Min and Max Values in Campaign Options IIC
++ Fix #498, #1024: Added Limb Replacement Surgery Option for Campaigns Using Advanced Medical
++ PR #6249: Optimized Daily Nags
++ PR #6251: Added Admin Strain Nag Dialog
++ PR #6252: Corrected Scenario Objectives in Close Air Support Template
++ PR #6253: Fixed Campaign Victory Point Handling For Crisis Scenarios (Jail Break and Resupply Interception)
++ PR #6254: Added 829 New Callsigns (Credit: Tempest56)
++ PR #6256: Added Administrator Role Documentation
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment
