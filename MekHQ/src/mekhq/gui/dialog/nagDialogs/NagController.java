@@ -38,6 +38,8 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrainModifier;
+
 /**
  * A controller class responsible for managing and triggering daily nag dialogs in the campaign.
  *
@@ -215,6 +217,15 @@ public class NagController {
         if (PregnantCombatantNagDialog.checkNag(hasActiveContract, activePersonnel)) {
             PregnantCombatantNagDialog pregnantCombatantNagDialog = new PregnantCombatantNagDialog(campaign);
             if (pregnantCombatantNagDialog.wasAdvanceDayCanceled()) {
+                return true;
+            }
+        }
+
+        // Admin Strain
+        if (AdminStrainNagDialog.checkNag(campaignOptions.isUseRandomRetirement(),
+              campaignOptions.isUseAdministrativeStrain(), getAdministrativeStrainModifier(campaign))) {
+            AdminStrainNagDialog adminStrainNagDialog = new AdminStrainNagDialog(campaign);
+            if (adminStrainNagDialog.wasAdvanceDayCanceled()) {
                 return true;
             }
         }
