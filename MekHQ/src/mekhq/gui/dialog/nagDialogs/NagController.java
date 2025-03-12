@@ -28,6 +28,9 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrainModifier;
 
 /**
  * A controller class responsible for managing and triggering daily nag dialogs in the campaign.
@@ -184,6 +187,16 @@ public class NagController {
         if (PregnantCombatantNagDialog.checkNag(campaign)) {
             PregnantCombatantNagDialog pregnantCombatantNagDialog = new PregnantCombatantNagDialog(campaign);
             if (pregnantCombatantNagDialog.wasAdvanceDayCanceled()) {
+                return true;
+            }
+        }
+
+        // Admin Strain
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (AdminStrainNagDialog.checkNag(campaignOptions.isUseRandomRetirement(),
+              campaignOptions.isUseAdministrativeStrain(), getAdministrativeStrainModifier(campaign))) {
+            AdminStrainNagDialog adminStrainNagDialog = new AdminStrainNagDialog(campaign);
+            if (adminStrainNagDialog.wasAdvanceDayCanceled()) {
                 return true;
             }
         }
