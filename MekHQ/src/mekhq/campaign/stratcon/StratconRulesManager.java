@@ -2813,7 +2813,7 @@ public class StratconRulesManager {
                     }
 
                     ScenarioType scenarioType = backingScenario.getStratConScenarioType();
-                    if (scenarioType.isResupply() || scenarioType.isJailBreak()) {
+                    if (scenarioType.isSpecial()) {
                         if (!backingScenario.getStatus().isOverallVictory()) {
                             // If the player loses this scenario, they lose -1 CVP. This represents
                             // the importance of the intel the prisoners hold, or the penalty for

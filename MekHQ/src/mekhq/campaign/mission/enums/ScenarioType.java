@@ -83,6 +83,13 @@ public enum ScenarioType {
     }
 
     /**
+     * @return {@code true} if the instance is one of the special types; {@code false} otherwise.
+     */
+    public boolean isSpecial() {
+        return this == SPECIAL_LOSTECH || this == SPECIAL_RESUPPLY || this == SPECIAL_JAIL_BREAK;
+    }
+
+    /**
      * Parses a {@code ScenarioType} from a string input.
      *
      * <p>This method attempts to interpret the given string as either:</p>

@@ -33,6 +33,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconScenario;
@@ -129,17 +130,32 @@ public class ScenarioTableModel extends DataTableModel {
 
                     if (stratconScenario != null) {
                         boolean isTurningPoint = stratconScenario.isTurningPoint();
-                        String openingSpan = isTurningPoint
-                            ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor())
-                            : "";
+                        ScenarioType scenarioType = scenario.getStratConScenarioType();
 
-                        String turningPointText = isTurningPoint ? ' ' + resources.getString("col_status.turningPoint") : "";
+                        // Determine the appropriate opening span based on the scenario type
+                        String openingSpan = "";
+                        if (scenarioType.isSpecial()) {
+                            openingSpan = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+                        } else if (isTurningPoint) {
+                            openingSpan = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
+                        }
 
-                        String closingSpan = isTurningPoint ? CLOSING_SPAN_TAG : "";
+                        String turningPointText = isTurningPoint
+                              ? ' ' + resources.getString("col_status.turningPoint")
+                              : "";
 
-                        // We bold the text to assist colorblind players
-                        return String.format("<html>%s%s<b>%s</b>%s</html", scenario.getStatus().toString(),
-                            openingSpan, turningPointText, closingSpan);
+                        String closingSpan = (!openingSpan.isEmpty())
+                              ? CLOSING_SPAN_TAG :
+                              "";
+
+                        // Wrap the entire segment in <html> tags, bold text for accessibility
+                        return String.format(
+                              "<html>%s%s<b>%s</b>%s</html>",
+                              scenario.getStatus(),
+                              openingSpan,
+                              turningPointText,
+                              closingSpan
+                        );
                     }
                 }
             }

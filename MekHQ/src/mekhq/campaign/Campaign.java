@@ -4263,13 +4263,12 @@ public class Campaign implements ITechManager {
 
                         if (stub) {
                             ScenarioType scenarioType = scenario.getStratConScenarioType();
-                            if (scenarioType.isResupply()) {
-                                processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
+                            if (scenarioType.isSpecial()) {
                                 campaignState.updateVictoryPoints(-1);
                             }
 
-                            if (scenarioType.isJailBreak()) {
-                                campaignState.changeSupportPoints(-1);
+                            if (scenarioType.isResupply()) {
+                                processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
                             }
 
                             scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
