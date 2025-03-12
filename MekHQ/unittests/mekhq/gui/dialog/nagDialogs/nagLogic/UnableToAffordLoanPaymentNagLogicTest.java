@@ -96,17 +96,17 @@ class UnableToAffordLoanPaymentNagLogicTest {
     void canAffordLoans() {
         initializeLoans(2);
 
-        when(campaign.getFunds()).thenReturn(Money.of(10));
+        Money currentFunds = Money.of(10);
 
-        assertFalse(unableToAffordLoans(campaign));
+        assertFalse(unableToAffordLoans(List.of(firstLoan, secondLoan), today, currentFunds));
     }
 
     @Test
     void cannotAffordLoans() {
         initializeLoans(1);
 
-        when(campaign.getFunds()).thenReturn(Money.of(5));
+        Money currentFunds = Money.of(5);
 
-        assertTrue(unableToAffordLoans(campaign));
+        assertTrue(unableToAffordLoans(List.of(firstLoan, secondLoan), today, currentFunds));
     }
 }

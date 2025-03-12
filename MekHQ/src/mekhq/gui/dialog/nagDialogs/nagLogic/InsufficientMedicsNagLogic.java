@@ -27,24 +27,19 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import mekhq.campaign.Campaign;
-
 public class InsufficientMedicsNagLogic {
     /**
-     * Checks if there is a need for medics in the campaign.
+     * Determines whether additional medics are needed in the campaign.
      *
-     * <p>
-     * This method evaluates whether the number of required medics is greater than zero.
-     * If {@code medicsRequired} is greater than zero, it means that additional medics
-     * are needed to meet the campaign's requirements.
-     * </p>
+     * <p>This method checks if the number of required medics is greater than zero. If it is, this
+     * indicates a need for additional medics to meet the campaign's requirements; otherwise, no
+     * additional medics are required.</p>
      *
-     * @return {@code true} if the number of required medics ({@code medicsRequired}) is greater than zero;
+     * @param medicsRequired The number of medics currently required to meet the campaign's needs.
+     * @return {@code true} if the number of required medics ({@code medicsRequired}) is greater than zero,
      *         {@code false} otherwise.
      */
-    public static boolean hasMedicsNeeded(Campaign campaign) {
-        int medicsRequired = campaign.getMedicsNeed();
-
+    public static boolean hasMedicsNeeded(int medicsRequired) {
         return medicsRequired > 0;
     }
 }

@@ -27,7 +27,6 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 
@@ -36,40 +35,40 @@ import java.util.List;
 
 public class UnableToAffordLoanPaymentNag {
     /**
-     * Determines whether the campaign's current funds are insufficient to cover
-     * the total loan payments due.
+     * Checks if the campaign's current funds are insufficient to cover the total loan payments due.
      *
-     * <p>
-     * This method compares the campaign's available funds with the {@code totalPaymentsDue}
-     * amount. If the available funds are less than the total loan payments due, it returns {@code true},
-     * indicating that the campaign cannot afford the loan payments; otherwise, it returns {@code false}.
-     * </p>
+     * <p>This method calculates the total loan payments due for tomorrow and compares it to the current
+     * available funds. If the available funds are less than the total payment amount, the method returns
+     * {@code true}, indicating that the campaign cannot afford the payments. Otherwise, it returns
+     * {@code false}.</p>
      *
-     * @return {@code true} if the campaign's funds are less than the total loan payments due;
+     * @param loans A {@link List} of {@link Loan} objects representing the campaign's active loans.
+     * @param today The current date, used to calculate tomorrow's date for loan payments.
+     * @param currentFunds The current available funds in the campaign as a {@link Money} object.
+     * @return {@code true} if the campaign's funds are less than the total loan payments due,
      *         {@code false} otherwise.
      */
-    public static boolean unableToAffordLoans(Campaign campaign) {
-        Money totalPaymentsDue = getTotalPaymentsDue(campaign);
-        return campaign.getFunds().isLessThan(totalPaymentsDue);
+    public static boolean unableToAffordLoans(List<Loan> loans, LocalDate today, Money currentFunds) {
+        Money totalPaymentsDue = getTotalPaymentsDue(loans, today);
+        return currentFunds.isLessThan(totalPaymentsDue);
     }
 
     /**
-     * Calculates the total loan payments due for tomorrow.
+     * Calculates the total loan payments due for the following day.
      *
-     * <p>
-     * This method retrieves the list of loans associated with the campaign and checks if their
-     * next payment date matches tomorrow's date. If a payment is due, the amount is added to the
-     * cumulative total, which is stored in the {@code totalPaymentsDue} field.
-     * </p>
+     * <p>This method iterates through a list of loans to determine which payments are due tomorrow.
+     * For each loan with a due date matching tomorrow's date, its payment amount is added to the cumulative total.
+     * The final total is returned as a {@link Money} object.</p>
+     *
+     * @param loans A {@link List} of {@link Loan} objects associated with the campaign.
+     * @param today The current date, used to calculate tomorrow's date.
+     * @return The total payments due for tomorrow as a {@link Money} object.
      */
-    public static Money getTotalPaymentsDue(Campaign campaign) {
+    public static Money getTotalPaymentsDue(List<Loan> loans, LocalDate today) {
         Money totalPaymentsDue = Money.zero();
 
-        // gets the list of the campaign's current loans
-        List<Loan> loans = campaign.getFinances().getLoans();
-
         // gets tomorrow's date
-        LocalDate tomorrow = campaign.getLocalDate().plusDays(1);
+        LocalDate tomorrow = today.plusDays(1);
 
         // iterate over all loans
         for (Loan loan : loans) {

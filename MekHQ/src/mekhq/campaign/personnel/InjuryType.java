@@ -151,7 +151,7 @@ public class InjuryType {
     }
 
     /** Does having this injury mean the location is missing? (Amputation, genetic defect, ...) */
-    public boolean impliesMissingLocation(BodyLocation loc) {
+    public boolean impliesMissingLocation() {
         return false;
     }
 

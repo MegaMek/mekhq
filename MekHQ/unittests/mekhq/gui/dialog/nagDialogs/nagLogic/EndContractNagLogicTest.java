@@ -28,7 +28,7 @@
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.gui.dialog.nagDialogs.EndContractNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,7 +51,7 @@ public class EndContractNagLogicTest {
     // Mock objects for the tests
     private Campaign campaign;
     private LocalDate today;
-    private Contract contract1, contract2;
+    private AtBContract contract1, contract2;
 
     /**
      * Test setup for each test, runs before each test.
@@ -64,10 +64,8 @@ public class EndContractNagLogicTest {
         // Initialize the mock objects
         campaign = mock(Campaign.class);
         today = LocalDate.now();
-        contract1 = mock(Contract.class);
-        contract2 = mock(Contract.class);
-
-        when(campaign.getLocalDate()).thenReturn(today);
+        contract1 = mock(AtBContract.class);
+        contract2 = mock(AtBContract.class);
     }
 
     // In the following tests the isContractEnded() method is called, and its response is
@@ -75,36 +73,36 @@ public class EndContractNagLogicTest {
 
     @Test
     void noActiveContracts() {
-        when(campaign.getActiveContracts()).thenReturn(new ArrayList<>());
-        assertFalse(isContractEnded(campaign));
+        assertFalse(isContractEnded(today, new ArrayList<>()));
     }
 
     @Test
     void oneActiveContractEndsTomorrow() {
-        when(campaign.getActiveContracts()).thenReturn(List.of(contract1));
         when(contract1.getEndingDate()).thenReturn(today.plusDays(1));
-        assertFalse(isContractEnded(campaign));
+
+        assertFalse(isContractEnded(today, List.of(contract1)));
     }
 
     @Test
     void oneActiveContractEndsToday() {
-        when(campaign.getActiveContracts()).thenReturn(List.of(contract1));
         when(contract1.getEndingDate()).thenReturn(today);
-        assertTrue(isContractEnded(campaign));
+
+        assertTrue(isContractEnded(today, List.of(contract1)));
     }
 
     @Test
     void twoActiveContractsOneEndsTomorrowOneEndsToday() {
-        when(campaign.getActiveContracts()).thenReturn(List.of(contract1, contract2));
         when(contract1.getEndingDate()).thenReturn(today.plusDays(1));
         when(contract2.getEndingDate()).thenReturn(today);
-        assertTrue(isContractEnded(campaign));
+
+        assertTrue(isContractEnded(today, List.of(contract1, contract2)));
     }
 
     @Test
     void twoActiveContractsBothEndToday() {
-        when(campaign.getActiveContracts()).thenReturn(List.of(contract1, contract2));
         when(contract1.getEndingDate()).thenReturn(today);
-        assertTrue(isContractEnded(campaign));
+        when(contract2.getEndingDate()).thenReturn(today);
+
+        assertTrue(isContractEnded(today, List.of(contract1, contract2)));
     }
 }

@@ -6025,11 +6025,13 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "info");
         // endregion Basic Campaign Info
 
-        // region Campaign Options
+        // region Options
         if (getCampaignOptions() != null) {
             getCampaignOptions().writeToXml(pw, indent);
         }
-        // endregion Campaign Options
+        getGameOptions().writeToXML(pw, indent);
+        // endregion Options
+
 
         // Lists of objects:
         units.writeToXML(pw, indent, "units"); // Units
@@ -6084,8 +6086,6 @@ public class Campaign implements ITechManager {
 
         // parts is the biggest so it goes last
         parts.writeToXML(pw, indent, "parts"); // Parts
-
-        getGameOptions().writeToXML(pw, indent);
 
         // current story arc
         if (null != storyArc) {

@@ -293,6 +293,15 @@ public class StratconRulesManager {
                 track = getRandomItem(tracks);
             }
 
+            final int deploymentDelay = track.getDeploymentTime();
+            final LocalDate scenarioTargetDate = campaign.getLocalDate().plusDays(deploymentDelay);
+            final LocalDate contractEnd = campaignState.getContract().getEndingDate();
+
+            if (!scenarioTargetDate.isBefore(contractEnd)) {
+                logger.info("Skipping scenario because it is on or after the contract end date.");
+                return;
+            }
+
             if (autoAssignLances && availableForceIDs.isEmpty()) {
                 break;
             }

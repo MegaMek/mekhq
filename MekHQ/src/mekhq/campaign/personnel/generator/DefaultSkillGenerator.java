@@ -82,11 +82,21 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             }
         }
 
-        // roll tactics skill
-        if (!(primaryRole.isSupport() || secondaryRole.isSupport(true))) {
-            int tacLvl = Utilities.generateExpLevel(rskillPrefs.getTacticsMod(expLvl));
-            if (tacLvl > SkillType.EXP_ULTRA_GREEN) {
-                addSkill(person, SkillType.S_TACTICS, tacLvl, rskillPrefs.randomizeSkill(), bonus);
+        // roll lesdership skills
+        if (primaryRole.isCombat()) {
+            int leadershipSkillLevel = Utilities.generateExpLevel(rskillPrefs.getCommandSkillsModifier(expLvl));
+            if (leadershipSkillLevel > SkillType.EXP_ULTRA_GREEN) {
+                addSkill(person, SkillType.S_TACTICS, leadershipSkillLevel, rskillPrefs.randomizeSkill(), bonus);
+            }
+
+            leadershipSkillLevel = Utilities.generateExpLevel(rskillPrefs.getCommandSkillsModifier(expLvl));
+            if (leadershipSkillLevel > SkillType.EXP_ULTRA_GREEN) {
+                addSkill(person, SkillType.S_STRATEGY, leadershipSkillLevel, rskillPrefs.randomizeSkill(), bonus);
+            }
+
+            leadershipSkillLevel = Utilities.generateExpLevel(rskillPrefs.getCommandSkillsModifier(expLvl));
+            if (leadershipSkillLevel > SkillType.EXP_ULTRA_GREEN) {
+                addSkill(person, SkillType.S_LEADER, leadershipSkillLevel, rskillPrefs.randomizeSkill(), bonus);
             }
         }
 

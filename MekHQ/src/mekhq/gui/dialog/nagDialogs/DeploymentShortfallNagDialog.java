@@ -65,23 +65,25 @@ public class DeploymentShortfallNagDialog extends AbstractMHQNagDialog {
     }
 
     /**
-     * Checks if a nag dialog should be displayed for a campaign regarding deployment shortfalls.
+     * Determines whether a nag dialog should be displayed for deployment shortfalls in the specified campaign.
      *
-     * <p>The method determines whether to show the nag dialog by verifying the following conditions:</p>
+     * <p>This method evaluates several conditions to decide if the nag dialog should be shown:</p>
      * <ul>
-     *     <li>If the campaign is using AtB rules.</li>
-     *     <li>If the nag dialog for deployment shortfall has not been ignored as per the user options.</li>
-     *     <li>If there is a deployment shortfall in the given campaign.</li>
+     *     <li>The campaign uses AtB (Against the Bot) rules.</li>
+     *     <li>The user has not ignored the nag dialog for deployment shortfalls in their options.</li>
+     *     <li>The campaign has a deployment shortfall, as determined by {@code #hasDeploymentShortfall}.</li>
      * </ul>
      *
-     * @param campaign the {@link Campaign} to check for nagging conditions
-     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
+     * @param isUseAtB A flag indicating whether the campaign is using AtB rules.
+     * @param campaign The {@link Campaign} object used to check for deployment shortfalls.
+     *
+     * @return {@code true} if the nag dialog should be displayed due to deployment shortfalls; {@code false} otherwise.
      */
-    static public boolean checkNag(Campaign campaign) {
+    public static boolean checkNag(boolean isUseAtB, Campaign campaign) {
         final String NAG_KEY = MHQConstants.NAG_SHORT_DEPLOYMENT;
 
-        return campaign.getCampaignOptions().isUseAtB()
-            && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && hasDeploymentShortfall(campaign);
+        return isUseAtB
+              && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+              && hasDeploymentShortfall(campaign);
     }
 }

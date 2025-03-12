@@ -3986,20 +3986,31 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Worker function that calculates the AtB-rules walk MP for an entity, for
-     * deployment purposes.
+     * Calculates the walk movement points (MP) of an entity for deployment purposes. This takes
+     * into consideration the entity's jump capability and type-specific adjustments.
      *
-     * @param entity The entity to examine.
-     * @return The walk MP.
+     * @param entity The entity whose movement points are being calculated. This could be a unit
+     *               of various types (e.g., 'Mek, infantry, or aerospace unit).
+     * @return The calculated walk MP value to be used for deployment purposes. Adjustments are made
+     * for jump MP, infantry units, and aerospace units.
      */
     private static int calculateAtBSpeed(Entity entity) {
-        int speed = entity.getWalkMP();
+        int speed = entity.getWalkMP(); // Get the base walk MP of the entity
+
         if (entity.getJumpMP() > 0) {
+            // If the entity has jump capability, adjust the speed
             if (entity instanceof Infantry) {
+                // For infantry, use jump MP instead of walk MP
                 speed = entity.getJumpMP();
             } else {
+                // For all other units, add 1 to the walk MP
                 speed++;
             }
+        }
+
+        // For aerospace units, multiply the walk MP
+        if (entity.isAerospace() && !entity.isSpheroid()) {
+            speed *= 2;
         }
 
         return speed;

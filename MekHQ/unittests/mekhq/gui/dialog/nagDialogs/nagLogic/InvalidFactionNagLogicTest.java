@@ -80,7 +80,7 @@ class InvalidFactionNagLogicTest {
         when(faction.validIn(dateValid)).thenReturn(true);
         when(campaign.getLocalDate()).thenReturn(dateValid);
 
-        assertFalse(isFactionInvalid(campaign));
+        assertFalse(isFactionInvalid(faction, dateValid));
     }
 
     @Test
@@ -88,6 +88,6 @@ class InvalidFactionNagLogicTest {
         when(faction.validIn(dateInvalid)).thenReturn(false);
         when(campaign.getLocalDate()).thenReturn(dateInvalid);
 
-        assertTrue(isFactionInvalid(campaign));
+        assertTrue(isFactionInvalid(faction, dateInvalid));
     }
 }

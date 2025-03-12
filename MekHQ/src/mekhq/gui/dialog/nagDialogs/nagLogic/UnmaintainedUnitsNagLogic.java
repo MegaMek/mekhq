@@ -27,26 +27,28 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
+
+import java.util.Collection;
 
 public class UnmaintainedUnitsNagLogic {
     /**
-     * Checks whether the campaign has any unmaintained units in the hangar.
+     * Checks if the campaign has any unmaintained units in the hangar.
      *
-     * <p>
-     * This method iterates over the units in the campaign's hangar and identifies units
-     * that meet the following criteria:
+     * <p>This method iterates through a collection of units and identifies those that:</p>
      * <ul>
-     *     <li>The unit is classified as unmaintained ({@link Unit#isUnmaintained()}).</li>
-     *     <li>The unit is not marked as salvage ({@link Unit#isSalvage()}).</li>
+     *     <li>Are classified as unmaintained (see {@link Unit#isUnmaintained()}).</li>
+     *     <li>Are not marked as salvage (see {@link Unit#isSalvage()}).</li>
      * </ul>
-     * If any units match these conditions, the method returns {@code true}.
+     * <p>If any unit matches these criteria, the method returns {@code true}; otherwise, it returns
+     * {@code false}.</p>
      *
-     * @return {@code true} if unmaintained units are found, otherwise {@code false}.
+     * @param units A {@link Collection} of {@link Unit} objects representing the campaign's hangar units.
+     * @return {@code true} if unmaintained, non-salvage units are found in the collection,
+     *         {@code false} otherwise.
      */
-    public static boolean campaignHasUnmaintainedUnits(Campaign campaign) {
-        for (Unit unit : campaign.getHangar().getUnits()) {
+    public static boolean campaignHasUnmaintainedUnits(Collection<Unit> units) {
+        for (Unit unit : units) {
             if ((unit.isUnmaintained()) && (!unit.isSalvage())) {
                 return true;
             }
