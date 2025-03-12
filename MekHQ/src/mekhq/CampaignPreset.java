@@ -444,7 +444,7 @@ public class CampaignPreset {
 
     public static @Nullable CampaignPreset parseFromXML(final NodeList nl, final Version version) {
         if (version.isHigherThan(MHQConstants.VERSION)) {
-            logger.error("Cannot parse Campaign Preset from {} in older version {}.",
+            logger.error("Cannot parse Campaign Preset from newer version {} in the current version {}",
                   version, MHQConstants.VERSION);
             return null;
         }
