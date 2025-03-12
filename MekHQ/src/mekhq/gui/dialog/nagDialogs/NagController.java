@@ -37,7 +37,6 @@ import mekhq.campaign.unit.Unit;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
-import mekhq.campaign.CampaignOptions;
 
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrainModifier;
 
@@ -223,7 +222,6 @@ public class NagController {
         }
 
         // Admin Strain
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
         if (AdminStrainNagDialog.checkNag(campaignOptions.isUseRandomRetirement(),
               campaignOptions.isUseAdministrativeStrain(), getAdministrativeStrainModifier(campaign))) {
             AdminStrainNagDialog adminStrainNagDialog = new AdminStrainNagDialog(campaign);
