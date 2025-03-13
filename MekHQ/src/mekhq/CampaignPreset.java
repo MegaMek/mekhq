@@ -294,11 +294,17 @@ public class CampaignPreset {
         return presets;
     }
 
+    /**
+     * @deprecated This method is scheduled to be removed following the next milestone
+     * @since 50.04
+     */
+    @Deprecated
     public void applyContinuousToCampaign(final Campaign campaign) {
         if (getGameOptions() != null) {
             campaign.setGameOptions(getGameOptions());
             if (getCampaignOptions() == null) {
-                campaign.updateCampaignOptionsFromGameOptions();
+                campaign.getCampaignOptions().updateCampaignOptionsFromGameOptions(campaign);
+                MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
             }
         }
 
