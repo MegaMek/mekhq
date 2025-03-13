@@ -294,11 +294,17 @@ public class CampaignPreset {
         return presets;
     }
 
+    /**
+     * @deprecated This method is scheduled to be removed following the next milestone
+     * @since 50.04
+     */
+    @Deprecated
     public void applyContinuousToCampaign(final Campaign campaign) {
         if (getGameOptions() != null) {
             campaign.setGameOptions(getGameOptions());
             if (getCampaignOptions() == null) {
-                campaign.updateCampaignOptionsFromGameOptions();
+                campaign.getCampaignOptions().updateCampaignOptionsFromGameOptions(campaign.getGameOptions());
+                MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
             }
         }
 
@@ -443,19 +449,16 @@ public class CampaignPreset {
     }
 
     public static @Nullable CampaignPreset parseFromXML(final NodeList nl, final Version version) {
-        if (MHQConstants.VERSION.isLowerThan(version)) {
-            String message = String.format(
-                    "Cannot parse Campaign Preset from %s in older version %s.",
-                    version.toString(), MHQConstants.VERSION);
-            logger.error(message);
+        if (version.isHigherThan(MHQConstants.VERSION)) {
+            logger.error("Cannot parse Campaign Preset from newer version {} in the current version {}",
+                  version, MHQConstants.VERSION);
             return null;
         }
 
+        // TODO Replace this with the Milestone Constant once we hit a Milestone after 49.19.1
         if (version.isLowerThan(LAST_COMPATIBLE_VERSION)) {
-            String message = String.format(
-                "Cannot parse Campaign Preset from %s in newer version %s.",
-                version.toString(), MHQConstants.VERSION);
-            logger.error(message);
+            logger.error("Campaign Presets from {} are incompatible with version {}.",
+                  version, MHQConstants.VERSION);
             return null;
         }
 

@@ -40,6 +40,7 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 /**
@@ -254,7 +255,7 @@ public class Loan {
 
         if (isGrayMonday(date, simulateGrayMonday)) {
             // This simulates the player taking out a predatory loan
-            return new Loan(10000000, 70, 1, FinancialTerm.MONTHLY, 100, date);
+            return new Loan(10000000, 60, 1, FinancialTerm.MONTHLY, 100, date);
         }
 
         if (rating <= 0) {
@@ -305,16 +306,21 @@ public class Loan {
         }
     }
 
-    public static int getMaxYears(final int rating) {
-        if (rating < 5) {
-            return 1;
-        } else if (rating < 9) {
-            return 2;
-        } else if (rating < 14) {
-            return 3;
-        } else {
-            return 5;
-        }
+    /**
+     * Determines the maximum number of years by clamping the given rating to a valid range.
+     *
+     * <p>This method returns a value that ensures the input {@code rating} falls within the specified
+     * range of 1 to 7. Ratings below 1 are clamped to 1, and ratings above 7 are clamped to 7. The
+     * clamped value is directly returned.</p>
+     *
+     * <p>The clamped values coincide with the Experience Level ordinals (Ultra-Green, Green, etc).
+     * This means a Veteran-rated campaign (ordinal 4) could take up to a 4-year loan.</p>
+     *
+     * @param rating the input rating value to be clamped.
+     * @return the clamped rating, guaranteed to be a value between 1 and 7 (inclusive).
+     */
+    public static int getMaxYears(int rating) {
+        return clamp(rating, 1, 7);
     }
 
     public static int getCollateralIncrement(final int rating, final boolean interestPositive) {
