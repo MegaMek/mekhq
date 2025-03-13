@@ -7317,28 +7317,7 @@ public class Campaign implements ITechManager {
         for (final IBasicOption option : options) {
             getGameOptions().getOption(option.getName()).setValue(option.getValue());
         }
-        updateCampaignOptionsFromGameOptions();
-    }
-
-    public void updateCampaignOptionsFromGameOptions() {
-        getCampaignOptions()
-                .setUseTactics(getGameOptions().getOption(OptionsConstants.RPG_COMMAND_INIT).booleanValue());
-        getCampaignOptions().setUseInitiativeBonus(
-                getGameOptions().getOption(OptionsConstants.RPG_INDIVIDUAL_INITIATIVE).booleanValue());
-        getCampaignOptions().setUseToughness(getGameOptions().getOption(OptionsConstants.RPG_TOUGHNESS).booleanValue());
-        getCampaignOptions()
-                .setUseArtillery(getGameOptions().getOption(OptionsConstants.RPG_ARTILLERY_SKILL).booleanValue());
-        getCampaignOptions()
-                .setUseAbilities(getGameOptions().getOption(OptionsConstants.RPG_PILOT_ADVANTAGES).booleanValue());
-        getCampaignOptions().setUseEdge(getGameOptions().getOption(OptionsConstants.EDGE).booleanValue());
-        getCampaignOptions()
-                .setUseImplants(getGameOptions().getOption(OptionsConstants.RPG_MANEI_DOMINI).booleanValue());
-        getCampaignOptions()
-                .setQuirks(getGameOptions().getOption(OptionsConstants.ADVANCED_STRATOPS_QUIRKS).booleanValue());
-        getCampaignOptions()
-                .setAllowCanonOnly(getGameOptions().getOption(OptionsConstants.ALLOWED_CANON_ONLY).booleanValue());
-        getCampaignOptions().setTechLevel(TechConstants
-                .getSimpleLevel(getGameOptions().getOption(OptionsConstants.ALLOWED_TECHLEVEL).stringValue()));
+        campaignOptions.updateCampaignOptionsFromGameOptions(gameOptions);
         MekHQ.triggerEvent(new OptionsChangedEvent(this));
     }
 

@@ -33,6 +33,7 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import megamek.common.enums.SkillLevel;
+import megamek.common.options.GameOptions;
 import megamek.common.preference.ClientPreferences;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
@@ -60,6 +61,9 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.Map.Entry;
+
+import static megamek.common.TechConstants.getSimpleLevel;
+import static megamek.common.options.OptionsConstants.*;
 
 /**
  * @author natit
@@ -6360,5 +6364,53 @@ public class CampaignOptions {
 
     public void setAutoResolveExperimentalPacarGuiEnabled(boolean autoResolveExperimentalPacarGuiEnabled) {
         this.autoResolveExperimentalPacarGuiEnabled = autoResolveExperimentalPacarGuiEnabled;
+    }
+
+    /**
+     * Updates the campaign options to reflect the current game options settings.
+     *
+     * <p>This method retrieves the {@link GameOptions} and updates the corresponding campaign-specific
+     * settings, such as the use of tactics, initiative bonuses, toughness, artillery, pilot abilities,
+     * edge, implants, quirks, canon restrictions, and allowed tech level. This synchronization ensures
+     * that the campaign options match the current state of the game options.</p>
+     *
+     * @param gameOptions the {@link GameOptions} whose values will be used to update the campaign options.
+     */
+    public void updateCampaignOptionsFromGameOptions(GameOptions gameOptions) {
+        useTactics = gameOptions.getOption(RPG_COMMAND_INIT).booleanValue();
+        useInitiativeBonus = gameOptions.getOption(RPG_INDIVIDUAL_INITIATIVE).booleanValue();
+        useToughness = gameOptions.getOption(RPG_TOUGHNESS).booleanValue();
+        useArtillery = gameOptions.getOption(RPG_ARTILLERY_SKILL).booleanValue();
+        useAbilities = gameOptions.getOption(RPG_PILOT_ADVANTAGES).booleanValue();
+        useEdge = gameOptions.getOption(EDGE).booleanValue();
+        useImplants = gameOptions.getOption(RPG_MANEI_DOMINI).booleanValue();
+        useQuirks = gameOptions.getOption(ADVANCED_STRATOPS_QUIRKS).booleanValue();
+        allowCanonOnly = gameOptions.getOption(ALLOWED_CANON_ONLY).booleanValue();
+        techLevel = getSimpleLevel(gameOptions.getOption(ALLOWED_TECHLEVEL).stringValue());
+    }
+
+    /**
+     * Updates the game options to reflect the current campaign options settings.
+     *
+     * <p>This method synchronizes the values of the given {@link GameOptions} with the current campaign-specific
+     * options, such as the use of tactics, initiative bonuses, toughness, artillery, pilot abilities, edge,
+     * implants, quirks, canon restrictions, and allowed tech level. These updates ensure parity between the
+     * campaign options and the game options.</p>
+     *
+     * @param gameOptions the {@link GameOptions} to update based on the current campaign options.
+     */
+    public void updateGameOptionsFromCampaignOptions(GameOptions gameOptions) {
+        gameOptions.getOption(RPG_COMMAND_INIT).setValue(useTactics);
+        gameOptions.getOption(RPG_INDIVIDUAL_INITIATIVE).setValue(useInitiativeBonus);
+        gameOptions.getOption(RPG_TOUGHNESS).setValue(useToughness);
+        gameOptions.getOption(RPG_ARTILLERY_SKILL).setValue(useArtillery);
+        gameOptions.getOption(RPG_PILOT_ADVANTAGES).setValue(useAbilities);
+        gameOptions.getOption(EDGE).setValue(useEdge);
+        gameOptions.getOption(RPG_MANEI_DOMINI).setValue(useImplants);
+        gameOptions.getOption(ADVANCED_STRATOPS_QUIRKS).setValue(useQuirks);
+        gameOptions.getOption(ALLOWED_CANON_ONLY).setValue(allowCanonOnly);
+        gameOptions.getOption(ALLOWED_CANON_ONLY).setValue(allowCanonOnly);
+
+        gameOptions.getOption(ALLOWED_TECHLEVEL).setValue(TechConstants.T_SIMPLE_NAMES[techLevel]);
     }
 }
