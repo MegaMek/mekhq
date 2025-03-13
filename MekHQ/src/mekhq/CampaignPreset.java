@@ -303,7 +303,7 @@ public class CampaignPreset {
         if (getGameOptions() != null) {
             campaign.setGameOptions(getGameOptions());
             if (getCampaignOptions() == null) {
-                campaign.getCampaignOptions().updateCampaignOptionsFromGameOptions(campaign);
+                campaign.getCampaignOptions().updateCampaignOptionsFromGameOptions(campaign.getGameOptions());
                 MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
             }
         }

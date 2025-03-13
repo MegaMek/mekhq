@@ -7317,7 +7317,7 @@ public class Campaign implements ITechManager {
         for (final IBasicOption option : options) {
             getGameOptions().getOption(option.getName()).setValue(option.getValue());
         }
-        campaignOptions.updateCampaignOptionsFromGameOptions(this);
+        campaignOptions.updateCampaignOptionsFromGameOptions(gameOptions);
         MekHQ.triggerEvent(new OptionsChangedEvent(this));
     }
 

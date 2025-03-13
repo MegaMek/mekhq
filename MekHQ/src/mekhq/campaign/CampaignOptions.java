@@ -41,7 +41,6 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.autoresolve.AutoResolveMethod;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
-import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.PersonnelMarket;
@@ -6370,17 +6369,14 @@ public class CampaignOptions {
     /**
      * Updates the campaign options to reflect the current game options settings.
      *
-     * <p>This method retrieves the {@link GameOptions} from the provided {@link Campaign} and updates
-     * various campaign-specific options, such as the use of tactics, initiative bonuses, toughness,
-     * artillery, pilot abilities, edge, implants, quirks, canon restrictions, and allowed tech level.
-     * After updating the options, it triggers an {@link OptionsChangedEvent} to notify relevant systems
-     * of the changes.</p>
+     * <p>This method retrieves the {@link GameOptions} and updates the corresponding campaign-specific
+     * settings, such as the use of tactics, initiative bonuses, toughness, artillery, pilot abilities,
+     * edge, implants, quirks, canon restrictions, and allowed tech level. This synchronization ensures
+     * that the campaign options match the current state of the game options.</p>
      *
-     * @param campaign the {@link Campaign} whose options should be updated based on the current game options.
+     * @param gameOptions the {@link GameOptions} whose values will be used to update the campaign options.
      */
-    public void updateCampaignOptionsFromGameOptions(Campaign campaign) {
-        GameOptions gameOptions = campaign.getGameOptions();
-
+    public void updateCampaignOptionsFromGameOptions(GameOptions gameOptions) {
         useTactics = gameOptions.getOption(RPG_COMMAND_INIT).booleanValue();
         useInitiativeBonus = gameOptions.getOption(RPG_INDIVIDUAL_INITIATIVE).booleanValue();
         useToughness = gameOptions.getOption(RPG_TOUGHNESS).booleanValue();
@@ -6396,17 +6392,14 @@ public class CampaignOptions {
     /**
      * Updates the game options to reflect the current campaign options settings.
      *
-     * <p>This method synchronizes the {@link GameOptions} in the provided {@link Campaign} with
-     * the values of the corresponding campaign options. It adjusts settings such as tactics,
-     * initiative bonuses, toughness, artillery, pilot abilities, edge, implants, quirks, canon
-     * restrictions, and allowed tech level based on the current campaign options. After updating
-     * the options, it triggers an {@link OptionsChangedEvent} to notify relevant systems of the changes.</p>
+     * <p>This method synchronizes the values of the given {@link GameOptions} with the current campaign-specific
+     * options, such as the use of tactics, initiative bonuses, toughness, artillery, pilot abilities, edge,
+     * implants, quirks, canon restrictions, and allowed tech level. These updates ensure parity between the
+     * campaign options and the game options.</p>
      *
-     * @param campaign the {@link Campaign} whose game options should be updated based on the current campaign options.
+     * @param gameOptions the {@link GameOptions} to update based on the current campaign options.
      */
-    public void updateGameOptionsFromCampaignOptions(Campaign campaign) {
-        GameOptions gameOptions = campaign.getGameOptions();
-
+    public void updateGameOptionsFromCampaignOptions(GameOptions gameOptions) {
         gameOptions.getOption(RPG_COMMAND_INIT).setValue(useTactics);
         gameOptions.getOption(RPG_INDIVIDUAL_INITIATIVE).setValue(useInitiativeBonus);
         gameOptions.getOption(RPG_TOUGHNESS).setValue(useToughness);

@@ -446,7 +446,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             recalculateCombatTeams(campaign);
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign, options));
 
-            options.updateGameOptionsFromCampaignOptions(campaign);
+            options.updateGameOptionsFromCampaignOptions(campaign.getGameOptions());
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
         }
     }
