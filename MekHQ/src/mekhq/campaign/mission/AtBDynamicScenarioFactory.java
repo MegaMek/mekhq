@@ -46,7 +46,9 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario.BenchedEntityData;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
@@ -89,6 +91,7 @@ import static mekhq.campaign.mission.Scenario.T_GROUND;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX;
+import static mekhq.campaign.personnel.SkillType.EXP_ELITE;
 import static mekhq.campaign.universe.IUnitGenerator.unitTypeSupportsWeightClass;
 
 /**
@@ -2578,7 +2581,10 @@ public class AtBDynamicScenarioFactory {
         en.setCrew(new Crew(en.getCrew().getCrewType(), crewName, Compute.getFullCrewSize(en),
                 skills[0], skills[1], gender, faction.isClan(), extraData));
 
-        applyTacticsModifiers(skill, campaign, en);
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (campaignOptions.isUseTactics() || campaignOptions.isUseInitiativeBonus()) {
+            en.getCrew().setCommandBonus(getTacticsModifier(skill, campaign.getRandomSkillPreferences(), faction));
+        }
 
         en.setExternalIdAsString(UUID.randomUUID().toString());
 
@@ -2586,53 +2592,66 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Applies tactics-related modifiers to an entity based on the given skill, campaign settings, and
-     * random factors.
-     * <p>
-     * This method adjusts the initiative modifier for the crew of the specified entity based on the
-     * provided skill level and campaign options. The adjustment depends on whether tactics or initiative
-     * bonuses are enabled in the campaign settings. Additionally, if initiative bonuses are enabled,
-     * a dice roll is used to add randomness to the modifier.
-     * </p>
+     * Calculates the tactics modifier for a given crew based on their skill level, considering random
+     * preferences and faction-specific adjustments.
+     *
+     * <p>This method determines the tactics modifier based on the provided skill level, random
+     * preferences, and faction data. The modifier calculation involves several checks and
+     * adjustments:</p>
      *
      * <ul>
-     *     <li>If tactics or initiative bonuses are enabled, the base modifier is derived from the
-     *     skill's adjusted value.</li>
-     *     <li>If initiative bonuses are enabled, a random dice roll (1d6) further modifies the
-     *     initiative modifier:
+     *     <li>If the skill level is less than "Green," the modifier is set to {@code 0}.</li>
+     *     <li>The base modifier is derived from the skill's adjusted value, capped at {@code EXP_ELITE}.</li>
+     *     <li>The command skills modifier is retrieved from the random skill preferences based on the
+     *     adjusted value.</li>
+     *     <li>If the entity is a formation leader, an additional bonus of {@code 2} is added to the
+     *     modifier (capped at {@code 10}). A random check determines leadership status, based on
+     *     the faction's standard 'lance-level' formation size.</li>
+     *     <li>If randomization is enabled in the skill preferences, a dice roll (1d6) further
+     *     adjusts the modifier:
      *         <ul>
-     *             <li>A roll of {@code 1} or {@code 2}: reduces the modifier by 1 (to a minimum of 0).</li>
-     *             <li>A roll of {@code 5} or {@code 6}: increases the modifier by 1.</li>
+     *             <li>A roll of {@code 1} or {@code 2} reduces the modifier by {@code 1}, if it’s
+     *             greater than {@code 0}.</li>
+     *             <li>A roll of {@code 5} or {@code 6} increases the modifier by {@code 1}, if it’s
+     *             less than {@code 10}.</li>
      *         </ul>
      *     </li>
-     *     <li>The computed initiative modifier is set as the command bonus for the entity's crew.</li>
      * </ul>
      *
-     * @param skill    the skill level used to calculate the base initiative modifier.
-     * @param campaign the campaign context holding configuration options which influence the calculations.
-     * @param en       the entity whose crew will have their command bonus updated based on the computed modifier.
+     * @param skill                  the skill level used to derive the base modifier.
+     * @param randomSkillPreferences preferences that govern how command skills are adjusted,
+     *                               including the randomization of skill values.
+     * @param faction                the faction data used to determine additional bonuses,
+     *                               such as formation leadership.
+     *
+     * @return the calculated tactics modifier, factoring in skill level, preferences, and
+     * faction-specific adjustments.
      */
-    private static void applyTacticsModifiers(SkillLevel skill, Campaign campaign, Entity en) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseTactics = campaignOptions.isUseTactics();
-        boolean isUseInitiativeBonus = campaignOptions.isUseInitiativeBonus();
-        if (isUseTactics || isUseInitiativeBonus) {
-            int initiativeModifier = skill.getAdjustedValue();
-
-            if (isUseInitiativeBonus) {
-                int roll = d6();
-
-                if (roll <= 2) {
-                    initiativeModifier = Math.max(0, initiativeModifier - 1);
-                }
-
-                if (roll >= 5) {
-                    initiativeModifier = initiativeModifier + 1;
-                }
-            }
-
-            en.getCrew().setCommandBonus(initiativeModifier);
+    private static int getTacticsModifier(SkillLevel skill, RandomSkillPreferences randomSkillPreferences,
+                                          Faction faction) {
+        if (!skill.isGreenOrGreater()) {
+            return 0;
         }
+
+        int adjustedValue = Math.min(skill.getAdjustedValue(), EXP_ELITE);
+        int commandSkillsModifier = randomSkillPreferences.getCommandSkillsModifier(adjustedValue);
+
+        // Are they a formation leader? If so, increase their 'tactics' by 2
+        if (randomInt(CombatTeam.getStandardForceSize(faction)) == 0) {
+            commandSkillsModifier = Math.min(commandSkillsModifier + 2, 10);
+        }
+
+        if (randomSkillPreferences.randomizeSkill()) {
+            int roll = Compute.d6();
+
+            if (roll < 2 && commandSkillsModifier > 0) {
+                commandSkillsModifier--;
+            } else if (roll > 5 && commandSkillsModifier < 10) {
+                commandSkillsModifier++;
+            }
+        }
+
+        return commandSkillsModifier;
     }
 
     /**
