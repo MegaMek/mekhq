@@ -7321,10 +7321,6 @@ public class Campaign implements ITechManager {
     }
 
     public void updateCampaignOptionsFromGameOptions() {
-        getCampaignOptions()
-                .setUseTactics(getGameOptions().getOption(OptionsConstants.RPG_COMMAND_INIT).booleanValue());
-        getCampaignOptions().setUseInitiativeBonus(
-                getGameOptions().getOption(OptionsConstants.RPG_INDIVIDUAL_INITIATIVE).booleanValue());
         getCampaignOptions().setUseToughness(getGameOptions().getOption(OptionsConstants.RPG_TOUGHNESS).booleanValue());
         getCampaignOptions()
                 .setUseArtillery(getGameOptions().getOption(OptionsConstants.RPG_ARTILLERY_SKILL).booleanValue());

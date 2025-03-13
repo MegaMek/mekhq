@@ -96,8 +96,6 @@ public class PersonnelTab {
 
     //start General Tab
     private JPanel pnlPersonnelGeneralOptions;
-    private JCheckBox chkUseTactics;
-    private JCheckBox chkUseInitiativeBonus;
     private JCheckBox chkUseToughness;
     private JCheckBox chkUseRandomToughness;
     private JCheckBox chkUseArtillery;
@@ -372,8 +370,6 @@ public class PersonnelTab {
      */
     private void initializeGeneralTab() {
         pnlPersonnelGeneralOptions = new JPanel();
-        chkUseTactics = new JCheckBox();
-        chkUseInitiativeBonus = new JCheckBox();
         chkUseToughness = new JCheckBox();
         chkUseRandomToughness = new JCheckBox();
         chkUseArtillery = new JCheckBox();
@@ -464,8 +460,6 @@ public class PersonnelTab {
      */
     private JPanel createGeneralOptionsPanel() {
         // Contents
-        chkUseTactics = new CampaignOptionsCheckBox("UseTactics");
-        chkUseInitiativeBonus = new CampaignOptionsCheckBox("UseInitiativeBonus");
         chkUseToughness = new CampaignOptionsCheckBox("UseToughness");
         chkUseRandomToughness = new CampaignOptionsCheckBox("UseRandomToughness");
         chkUseArtillery = new CampaignOptionsCheckBox("UseArtillery");
@@ -481,12 +475,6 @@ public class PersonnelTab {
 
         layout.gridy = 0;
         layout.gridwidth = 1;
-        panel.add(chkUseTactics, layout);
-
-        layout.gridy++;
-        panel.add(chkUseInitiativeBonus, layout);
-
-        layout.gridy++;
         panel.add(chkUseToughness, layout);
 
         layout.gridy++;
@@ -1373,8 +1361,6 @@ public class PersonnelTab {
         }
 
         // General
-        chkUseTactics.setSelected(options.isUseTactics());
-        chkUseInitiativeBonus.setSelected(options.isUseInitiativeBonus());
         chkUseToughness.setSelected(options.isUseToughness());
         chkUseRandomToughness.setSelected(options.isUseRandomToughness());
         chkUseArtillery.setSelected(options.isUseArtillery());
@@ -1470,8 +1456,6 @@ public class PersonnelTab {
         }
 
         // General
-        options.setUseTactics(chkUseTactics.isSelected());
-        options.setUseInitiativeBonus(chkUseInitiativeBonus.isSelected());
         options.setUseToughness(chkUseToughness.isSelected());
         options.setUseRandomToughness(chkUseRandomToughness.isSelected());
         options.setUseArtillery(chkUseArtillery.isSelected());

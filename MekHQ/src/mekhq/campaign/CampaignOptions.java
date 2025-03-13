@@ -199,8 +199,6 @@ public class CampaignOptions {
 
     // region Personnel Tab
     // General Personnel
-    private boolean useTactics;
-    private boolean useInitiativeBonus;
     private boolean useToughness;
     private boolean useRandomToughness;
     private boolean useArtillery;
@@ -733,8 +731,6 @@ public class CampaignOptions {
 
         // region Personnel Tab
         // General Personnel
-        setUseTactics(false);
-        setUseInitiativeBonus(false);
         setUseToughness(false);
         setUseRandomToughness(false);
         setUseArtillery(false);
@@ -1460,22 +1456,6 @@ public class CampaignOptions {
 
     // region Personnel Tab
     // region General Personnel
-    public boolean isUseTactics() {
-        return useTactics;
-    }
-
-    public void setUseTactics(final boolean useTactics) {
-        this.useTactics = useTactics;
-    }
-
-    public boolean isUseInitiativeBonus() {
-        return useInitiativeBonus;
-    }
-
-    public void setUseInitiativeBonus(final boolean useInitiativeBonus) {
-        this.useInitiativeBonus = useInitiativeBonus;
-    }
-
     public boolean isUseToughness() {
         return useToughness;
     }
@@ -4743,8 +4723,6 @@ public class CampaignOptions {
 
         // region Personnel Tab
         // region General Personnel
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTactics", isUseTactics());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useInitiativeBonus", isUseInitiativeBonus());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useToughness", isUseToughness());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomToughness", isUseRandomToughness());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useArtillery", isUseArtillery());
@@ -5413,10 +5391,6 @@ public class CampaignOptions {
 
                     // region Personnel Tab
                     // region General Personnel
-                } else if (wn2.getNodeName().equalsIgnoreCase("useTactics")) {
-                    retVal.setUseTactics(Boolean.parseBoolean(wn2.getTextContent()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useInitiativeBonus")) {
-                    retVal.setUseInitiativeBonus(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useToughness")) {
                     retVal.setUseToughness(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomToughness")) {
