@@ -2577,6 +2577,11 @@ public class AtBDynamicScenarioFactory {
         en.setCrew(new Crew(en.getCrew().getCrewType(), crewName, Compute.getFullCrewSize(en),
                 skills[0], skills[1], gender, faction.isClan(), extraData));
 
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (campaignOptions.isUseTactics() || campaignOptions.isUseInitiativeBonus()) {
+            en.getCrew().setCommandBonus(skill.ordinal());
+        }
+
         en.setExternalIdAsString(UUID.randomUUID().toString());
 
         return en;
