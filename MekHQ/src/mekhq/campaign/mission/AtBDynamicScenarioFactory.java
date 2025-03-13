@@ -48,7 +48,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
-import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario.BenchedEntityData;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
@@ -82,6 +81,7 @@ import java.util.stream.IntStream;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.client.ratgenerator.MissionRole.*;
+import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.UnitType.*;
@@ -2636,22 +2636,34 @@ public class AtBDynamicScenarioFactory {
         int adjustedValue = Math.min(skill.getAdjustedValue(), EXP_ELITE);
         int commandSkillsModifier = randomSkillPreferences.getCommandSkillsModifier(adjustedValue);
 
+        int skillRoll = clamp(d6(2) + commandSkillsModifier, 2, 12);
+        int skillLevel = switch (skillRoll) {
+            case 2 -> 0;
+            case 3, 4, 5 -> 1;
+            case 6, 7, 8, 9 -> 2;
+            case 10, 11 -> 3;
+            case 12 -> 4;
+            default -> 0;
+        };
+
         // Are they a formation leader? If so, increase their 'tactics' by 2
-        if (randomInt(CombatTeam.getStandardForceSize(faction)) == 0) {
-            commandSkillsModifier = Math.min(commandSkillsModifier + 2, 10);
+        if (randomInt(getStandardForceSize(faction)) == 0) {
+            skillLevel = Math.min(skillLevel + 2, 10);
         }
 
         if (randomSkillPreferences.randomizeSkill()) {
-            int roll = Compute.d6();
+            int randomnessRoll = d6();
 
-            if (roll < 2 && commandSkillsModifier > 0) {
-                commandSkillsModifier--;
-            } else if (roll > 5 && commandSkillsModifier < 10) {
-                commandSkillsModifier++;
+            if (randomnessRoll == 1) {
+                skillLevel--;
+            }
+
+            if (randomnessRoll == 6) {
+                skillLevel++;
             }
         }
 
-        return commandSkillsModifier;
+        return clamp(skillLevel, 0, 10);
     }
 
     /**
@@ -3511,11 +3523,11 @@ public class AtBDynamicScenarioFactory {
     private static void setBotForceParameters(BotForce generatedForce, ScenarioForceTemplate forceTemplate,
             ForceAlignment forceAlignment, AtBContract contract) {
         if (forceAlignment == ForceAlignment.Allied) {
-            generatedForce.setName(java.lang.String.format("%s %s", contract.getAllyBotName(), forceTemplate.getForceName()));
+            generatedForce.setName(String.format("%s %s", contract.getAllyBotName(), forceTemplate.getForceName()));
             generatedForce.setColour(contract.getAllyColour());
             generatedForce.setCamouflage(contract.getAllyCamouflage().clone());
         } else if (forceAlignment == ForceAlignment.Opposing) {
-            generatedForce.setName(java.lang.String.format("%s %s", contract.getEnemyBotName(), forceTemplate.getForceName()));
+            generatedForce.setName(String.format("%s %s", contract.getEnemyBotName(), forceTemplate.getForceName()));
             generatedForce.setColour(contract.getEnemyColour());
             generatedForce.setCamouflage(contract.getEnemyCamouflage().clone());
         } else {
