@@ -2579,7 +2579,7 @@ public class AtBDynamicScenarioFactory {
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         if (campaignOptions.isUseTactics() || campaignOptions.isUseInitiativeBonus()) {
-            en.getCrew().setCommandBonus(skill.ordinal());
+            en.getCrew().setCommandBonus(skill.getAdjustedValue());
         }
 
         en.setExternalIdAsString(UUID.randomUUID().toString());
