@@ -80,6 +80,7 @@ import java.util.stream.IntStream;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.client.ratgenerator.MissionRole.*;
+import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.UnitType.*;
 import static megamek.common.planetaryconditions.Wind.TORNADO_F4;
@@ -2123,7 +2124,7 @@ public class AtBDynamicScenarioFactory {
 
                     // If a roll against the battle armor target number succeeds, try to generate a
                     // battle armor unit first
-                    if (Compute.d6(2) >= infantryToBAUpgradeTNs[params.getQuality()]) {
+                    if (d6(2) >= infantryToBAUpgradeTNs[params.getQuality()]) {
                         newParams.setMissionRoles(requiredRoles.getOrDefault(BATTLE_ARMOR, new HashSet<>()));
                         transportedUnit = generateTransportedBAUnit(newParams, bayCapacity, skill, false, campaign);
 
@@ -2379,7 +2380,7 @@ public class AtBDynamicScenarioFactory {
             // logic copied from AtBScenario.addStar() to randomly determine if the given
             // unit is actually going to be a nova adjusted from 11/8 to 8/6 so that players
             // actually encounter novas.
-            int roll = Compute.d6(2);
+            int roll = d6(2);
             int novaTarget = 8;
             if (factionCode.equals("CHH") || factionCode.equals("CSL")) {
                 novaTarget = 6;
@@ -2516,7 +2517,7 @@ public class AtBDynamicScenarioFactory {
         final AbstractSkillGenerator skillGenerator = new ModifiedConstantSkillGenerator();
 
         int skillValue = skill.ordinal();
-        int skillRoll = Compute.d6(1);
+        int skillRoll = d6(1);
 
         if (skillRoll == 1) {
             skillValue = max(1, skillValue - 1);
@@ -2529,7 +2530,7 @@ public class AtBDynamicScenarioFactory {
         skillGenerator.setLevel(skill);
         int[] skills = skillGenerator.generateRandomSkills(en);
 
-        if (faction.isClan() && (Compute.d6(2) > (6 - skill.ordinal() + skills[0] + skills[1]))) {
+        if (faction.isClan() && (d6(2) > (6 - skill.ordinal() + skills[0] + skills[1]))) {
             Phenotype phenotype = Phenotype.NONE;
             switch (en.getUnitType()) {
                 case MEK:
@@ -2577,14 +2578,61 @@ public class AtBDynamicScenarioFactory {
         en.setCrew(new Crew(en.getCrew().getCrewType(), crewName, Compute.getFullCrewSize(en),
                 skills[0], skills[1], gender, faction.isClan(), extraData));
 
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (campaignOptions.isUseTactics() || campaignOptions.isUseInitiativeBonus()) {
-            en.getCrew().setCommandBonus(skill.getAdjustedValue());
-        }
+        applyTacticsModifiers(skill, campaign, en);
 
         en.setExternalIdAsString(UUID.randomUUID().toString());
 
         return en;
+    }
+
+    /**
+     * Applies tactics-related modifiers to an entity based on the given skill, campaign settings, and
+     * random factors.
+     * <p>
+     * This method adjusts the initiative modifier for the crew of the specified entity based on the
+     * provided skill level and campaign options. The adjustment depends on whether tactics or initiative
+     * bonuses are enabled in the campaign settings. Additionally, if initiative bonuses are enabled,
+     * a dice roll is used to add randomness to the modifier.
+     * </p>
+     *
+     * <ul>
+     *     <li>If tactics or initiative bonuses are enabled, the base modifier is derived from the
+     *     skill's adjusted value.</li>
+     *     <li>If initiative bonuses are enabled, a random dice roll (1d6) further modifies the
+     *     initiative modifier:
+     *         <ul>
+     *             <li>A roll of {@code 1} or {@code 2}: reduces the modifier by 1 (to a minimum of 0).</li>
+     *             <li>A roll of {@code 5} or {@code 6}: increases the modifier by 1.</li>
+     *         </ul>
+     *     </li>
+     *     <li>The computed initiative modifier is set as the command bonus for the entity's crew.</li>
+     * </ul>
+     *
+     * @param skill    the skill level used to calculate the base initiative modifier.
+     * @param campaign the campaign context holding configuration options which influence the calculations.
+     * @param en       the entity whose crew will have their command bonus updated based on the computed modifier.
+     */
+    private static void applyTacticsModifiers(SkillLevel skill, Campaign campaign, Entity en) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseTactics = campaignOptions.isUseTactics();
+        boolean isUseInitiativeBonus = campaignOptions.isUseInitiativeBonus();
+        if (isUseTactics || isUseInitiativeBonus) {
+            int initiativeModifier = skill.getAdjustedValue();
+
+            if (isUseInitiativeBonus) {
+                int roll = d6();
+
+                if (roll <= 2) {
+                    initiativeModifier = Math.max(0, initiativeModifier - 1);
+                }
+
+                if (roll >= 5) {
+                    initiativeModifier = initiativeModifier + 1;
+                }
+            }
+
+            en.getCrew().setCommandBonus(initiativeModifier);
+        }
     }
 
     /**
@@ -2870,7 +2918,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         // Random determination of Mek or ground vehicle
-        int roll = Compute.d6(2);
+        int roll = d6(2);
         int unitType = campaign.getCampaignOptions().isClanVehicles() && (roll <= vehicleTarget) ? TANK
                 : MEK;
 
@@ -3444,11 +3492,11 @@ public class AtBDynamicScenarioFactory {
     private static void setBotForceParameters(BotForce generatedForce, ScenarioForceTemplate forceTemplate,
             ForceAlignment forceAlignment, AtBContract contract) {
         if (forceAlignment == ForceAlignment.Allied) {
-            generatedForce.setName(String.format("%s %s", contract.getAllyBotName(), forceTemplate.getForceName()));
+            generatedForce.setName(java.lang.String.format("%s %s", contract.getAllyBotName(), forceTemplate.getForceName()));
             generatedForce.setColour(contract.getAllyColour());
             generatedForce.setCamouflage(contract.getAllyCamouflage().clone());
         } else if (forceAlignment == ForceAlignment.Opposing) {
-            generatedForce.setName(String.format("%s %s", contract.getEnemyBotName(), forceTemplate.getForceName()));
+            generatedForce.setName(java.lang.String.format("%s %s", contract.getEnemyBotName(), forceTemplate.getForceName()));
             generatedForce.setColour(contract.getEnemyColour());
             generatedForce.setCamouflage(contract.getEnemyCamouflage().clone());
         } else {
