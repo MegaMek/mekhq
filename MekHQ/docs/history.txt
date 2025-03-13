@@ -168,6 +168,7 @@ MEKHQ VERSION HISTORY:
 + PR #6253: Fixed Campaign Victory Point Handling For Crisis Scenarios (Jail Break and Resupply Interception)
 + PR #6254: Added 829 New Callsigns (Credit: Tempest56)
 + PR #6256: Added Administrator Role Documentation
++ PR #6271: Corrected One-Way Sync Between MegaMek and Campaign Options
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment
