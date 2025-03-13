@@ -35,6 +35,7 @@ import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Hangar;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.icons.ForcePieceIcon;
 import mekhq.campaign.icons.LayeredForceIcon;
@@ -435,6 +436,31 @@ public class Force {
 
         for (Force force : subForces) {
             allUnits.addAll(force.getAllUnits(standardForcesOnly));
+        }
+
+        return allUnits;
+    }
+
+    /**
+     * Retrieves all units associated with the current force as {@link Unit} objects.
+     *
+     * <p>This method converts the list of unit IDs from the force into a list of
+     * {@link Unit} objects by fetching them from the provided {@link Hangar}.
+     * Units are only included if they can be successfully resolved from the hangar.</p>
+     *
+     * @param hangar             the {@link Hangar} containing the units to retrieve.
+     * @param standardForcesOnly a flag indicating whether to include only standard forces.
+     *                           If {@code true}, only units belonging to standard forces are returned.
+     * @return a list of {@link Unit} objects associated with the force.
+     */
+    public List<Unit> getAllUnitsAsUnits(Hangar hangar, boolean standardForcesOnly) {
+        List<Unit> allUnits = new ArrayList<>();
+
+        for (UUID unitId : getAllUnits(standardForcesOnly)) {
+            Unit unit = hangar.getUnit(unitId);
+            if (unit != null) {
+                allUnits.add(unit);
+            }
         }
 
         return allUnits;

@@ -50,6 +50,8 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
+import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
+
 /**
  * A custom panel that gets filled in with goodies from a Force record
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -521,14 +523,16 @@ public class ForceViewPanel extends JScrollablePanel {
             }
         }
 
-        if (campaign.getCampaignOptions().isUseFatigue() && (person.getEffectiveFatigue(campaign) > 0)) {
+        int effectiveFatigue = getEffectiveFatigue(person.getFatigue(), person.isClanPersonnel(),
+              person.getSkillLevel(campaign, false), campaign.getFieldKitchenWithinCapacity());
+        if (campaign.getCampaignOptions().isUseFatigue() && (effectiveFatigue > 0)) {
             isFatigued = true;
             if (isInjured) {
                 toReturn.append(',');
             }
             toReturn.append(' ');
 
-            String fatigueMessage = person.getEffectiveFatigue(campaign) + " fatigue";
+            String fatigueMessage = effectiveFatigue + " fatigue";
 
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
                 MekHQ.getMHQOptions().getFontColorWarningHexColor(), fatigueMessage));
