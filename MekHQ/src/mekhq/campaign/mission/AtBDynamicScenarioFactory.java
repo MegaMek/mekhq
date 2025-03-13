@@ -2592,59 +2592,65 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Calculates the tactics modifier for a given crew based on their skill level, considering random
-     * preferences and faction-specific adjustments.
+     * Calculates the tactics modifier for a given crew based on their skill level, random preferences,
+     * and faction-specific adjustments.
      *
-     * <p>This method determines the tactics modifier based on the provided skill level, random
-     * preferences, and faction data. The modifier calculation involves several checks and
-     * adjustments:</p>
+     * <p>This method determines the tactics modifier through a series of checks, adjustments, and
+     * randomizations, considering crew skills, faction-based leadership status. The final modifier
+     * is clamped to a range between {@code 0} and {@code 10}.</p>
      *
      * <ul>
      *     <li>If the skill level is less than "Green," the modifier is set to {@code 0}.</li>
-     *     <li>The base modifier is derived from the skill's adjusted value, capped at {@code EXP_ELITE}.</li>
-     *     <li>The command skills modifier is retrieved from the random skill preferences based on the
-     *     adjusted value.</li>
-     *     <li>If the entity is a formation leader, an additional bonus of {@code 2} is added to the
-     *     modifier (capped at {@code 10}). A random check determines leadership status, based on
-     *     the faction's standard 'lance-level' formation size.</li>
-     *     <li>If randomization is enabled in the skill preferences, a dice roll (1d6) further
-     *     adjusts the modifier:
+     *     <li>The base modifier is derived from the skill's adjusted value, capped at {@code EXP_ELITE},
+     *     and further modified by rolling two six-sided dice (2d6) added to the command skills
+     *     modifier. The result of this calculation falls within the range of {@code 2} to {@code 12}
+     *     and determines a skill level:
      *         <ul>
-     *             <li>A roll of {@code 1} or {@code 2} reduces the modifier by {@code 1}, if it’s
-     *             greater than {@code 0}.</li>
-     *             <li>A roll of {@code 5} or {@code 6} increases the modifier by {@code 1}, if it’s
-     *             less than {@code 10}.</li>
+     *             <li>Rolls of {@code 2} result in a skill level of {@code 0}.</li>
+     *             <li>Rolls of {@code 3, 4, 5} result in a skill level of {@code 1}.</li>
+     *             <li>Rolls of {@code 6, 7, 8, 9} result in a skill level of {@code 2}.</li>
+     *             <li>Rolls of {@code 10, 11} result in a skill level of {@code 3}.</li>
+     *             <li>Rolls of {@code 12} result in a skill level of {@code 4}.</li>
+     *         </ul>
+     *     </li>
+     *     <li>If the entity is a formation leader, an additional bonus of {@code 2} is added to the
+     *     modifier, capped at {@code 10}. Leadership status is determined randomly based on the
+     *     faction's standard lance-level formation size.</li>
+     *     <li>If randomization preferences in the skill settings are enabled, additional adjustments
+     *     occur:
+     *         <ul>
+     *             <li>A roll of {@code 1} reduces the modifier by {@code 1}.</li>
+     *             <li>A roll of {@code 6} increases the modifier by {@code 1}.</li>
      *         </ul>
      *     </li>
      * </ul>
      *
-     * @param skill                  the skill level used to derive the base modifier.
-     * @param randomSkillPreferences preferences that govern how command skills are adjusted,
-     *                               including the randomization of skill values.
-     * @param faction                the faction data used to determine additional bonuses,
-     *                               such as formation leadership.
+     * <p>The final skill level is clamped to ensure it falls within the range of {@code 0} to {@code 10}.</p>
      *
-     * @return the calculated tactics modifier, factoring in skill level, preferences, and
+     * @param skill                  the skill level used to derive the base modifier.
+     * @param randomSkillPreferences preferences that govern how command skills are adjusted and randomized.
+     * @param faction                the faction data used to determine leadership-related bonuses, such as
+     *                               formation size.
+     *
+     * @return the calculated tactics modifier, factoring in skill level, preferences, randomization, and
      * faction-specific adjustments.
      */
     private static int getTacticsModifier(SkillLevel skill, RandomSkillPreferences randomSkillPreferences,
                                           Faction faction) {
-        if (!skill.isGreenOrGreater()) {
-            return 0;
+        int skillLevel = 0;
+        if (skill.isGreenOrGreater()) {
+            int adjustedValue = Math.min(skill.getAdjustedValue(), EXP_ELITE);
+            int commandSkillsModifier = randomSkillPreferences.getCommandSkillsModifier(adjustedValue);
+
+            int skillRoll = clamp(d6(2) + commandSkillsModifier, 2, 12);
+            skillLevel = switch (skillRoll) {
+                case 3, 4, 5 -> 1;
+                case 6, 7, 8, 9 -> 2;
+                case 10, 11 -> 3;
+                case 12 -> 4;
+                default -> 0; // 2
+            };
         }
-
-        int adjustedValue = Math.min(skill.getAdjustedValue(), EXP_ELITE);
-        int commandSkillsModifier = randomSkillPreferences.getCommandSkillsModifier(adjustedValue);
-
-        int skillRoll = clamp(d6(2) + commandSkillsModifier, 2, 12);
-        int skillLevel = switch (skillRoll) {
-            case 2 -> 0;
-            case 3, 4, 5 -> 1;
-            case 6, 7, 8, 9 -> 2;
-            case 10, 11 -> 3;
-            case 12 -> 4;
-            default -> 0;
-        };
 
         // Are they a formation leader? If so, increase their 'tactics' by 2
         if (randomInt(getStandardForceSize(faction)) == 0) {
