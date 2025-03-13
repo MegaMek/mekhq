@@ -169,6 +169,10 @@ MEKHQ VERSION HISTORY:
 + PR #6254: Added 829 New Callsigns (Credit: Tempest56)
 + PR #6256: Added Administrator Role Documentation
 + PR #6271: Corrected One-Way Sync Between MegaMek and Campaign Options
++ PR #6260: Updated Stock Presets for 50.04; Fixed Critical Preset Loading Bug; Retired 'Campaign Operations (StratCon)' Preset
++ PR #6261: Fixed Gray Monday Loans; Improved AtB Modifier Handling
++ PR #6263: Added Initiative Bonuses from Tactics to Princess Units
++ PR #6268: Corrected Arrival Turn Values in a Few Scenario Templates
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment
