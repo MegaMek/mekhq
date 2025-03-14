@@ -187,17 +187,17 @@ public class RoninOfferDialog extends MHQDialogImmersive {
         report.append("<div style='text-align: center;'>")
               .append("<b>").append(ronin.getFullTitle()).append("</b>")
               .append(" (").append(ronin.getPrimaryRole()).append(')')
-              .append("</div><br>");
+              .append("</div>");
 
         // Start table for skills and abilities
-        report.append("<table style='width:100%;'>");
+        report.append("<table style='width:75%;'>");
 
         // Left column: Skills
         report.append("<tr><td style='vertical-align:top; width:50%;'><b>")
               .append(getFormattedTextAt(RESOURCE_BUNDLE, "message.ooc.skills"))
               .append("</b><br>");
         for (Skill skill : ronin.getSkills().getSkills()) {
-            report.append("- ").append(skill.getType().getName()).append(": ").append(skill).append("<br>");
+            report.append(skill.getType().getName()).append(": ").append(skill).append("<br>");
         }
         report.append("</td>");
 
@@ -209,12 +209,12 @@ public class RoninOfferDialog extends MHQDialogImmersive {
         for (Enumeration<IOption> i = ronin.getOptions(LVL3_ADVANTAGES); i.hasMoreElements();) {
             final IOption ability = i.nextElement();
             if (ability.booleanValue()) {
-                report.append("- ").append(Utilities.getOptionDisplayName(ability)).append("<br>");
+                report.append(Utilities.getOptionDisplayName(ability)).append("<br>");
                 hasAbilities = true;
             }
         }
         if (!hasAbilities) {
-            report.append(getFormattedTextAt(RESOURCE_BUNDLE, "message.ooc.noAbilities")); // Fallback for no abilities
+            report.append(getFormattedTextAt(RESOURCE_BUNDLE, "message.ooc.noAbilities"));
         }
         report.append("</td></tr>");
 
