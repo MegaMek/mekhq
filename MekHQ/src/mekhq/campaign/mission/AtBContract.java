@@ -863,9 +863,9 @@ public class AtBContract extends Contract {
      * @param campaign the current {@link Campaign} in which the Ronin will be recruited.
      */
     private static void recruitRonin(Campaign campaign) {
-        int roll = randomInt(4);
+        int roll = randomInt(5);
 
-        PersonnelRole role = roll == 3 ? AEROSPACE_PILOT : MEKWARRIOR;
+        PersonnelRole role = roll == 0 ? AEROSPACE_PILOT : MEKWARRIOR;
         Person ronin = campaign.newPerson(role);
 
         RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
