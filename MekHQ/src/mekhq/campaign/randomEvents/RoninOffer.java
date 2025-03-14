@@ -29,16 +29,16 @@
 package mekhq.campaign.randomEvents;
 
 import megamek.client.generator.RandomCallsignGenerator;
-import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.gui.dialog.RoninOfferDialog;
 
-import java.util.Objects;
-
+import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT;
+import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateBigPersonality;
-import static mekhq.gui.dialog.HireBulkPersonnelDialog.overrideSkills;
 import static mekhq.gui.dialog.HireBulkPersonnelDialog.reRollAdvantages;
 import static mekhq.gui.dialog.HireBulkPersonnelDialog.reRollLoyalty;
 
@@ -64,10 +64,13 @@ public class RoninOffer {
      * @param campaign the current {@link Campaign} to which the Ronin is added if recruited.
      */
     public RoninOffer(Campaign campaign) {
-        Person ronin = campaign.newPerson(PersonnelRole.MEKWARRIOR);
+        int roll = randomInt(5);
 
-        overrideSkills(campaign, ronin, PersonnelRole.MEKWARRIOR,
-              Objects.requireNonNull(SkillLevel.VETERAN).ordinal());
+        PersonnelRole role = roll == 0 ? AEROSPACE_PILOT : MEKWARRIOR;
+        Person ronin = campaign.newPerson(role);
+
+        RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
+        boolean useExtraRandomness = randomSkillPreferences.randomizeSkill();
 
         generateBigPersonality(ronin);
 
