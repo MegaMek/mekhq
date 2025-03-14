@@ -28,7 +28,6 @@
  */
 package mekhq.campaign.mission;
 
-import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.RATGenerator;
@@ -57,8 +56,8 @@ import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
-import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.randomEvents.RoninOffer;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractDefinition;
 import mekhq.campaign.stratcon.StratconContractInitializer;
@@ -68,7 +67,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.fameAndInfamy.BatchallFactions;
-import mekhq.gui.dialog.RoninOfferDialog;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -107,14 +105,10 @@ import static mekhq.campaign.mission.enums.AtBMoraleLevel.ADVANCING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateBigPersonality;
 import static mekhq.campaign.rating.IUnitRating.*;
 import static mekhq.campaign.stratcon.StratconContractDefinition.getContractDefinition;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FACTIONS;
-import static mekhq.gui.dialog.HireBulkPersonnelDialog.overrideSkills;
-import static mekhq.gui.dialog.HireBulkPersonnelDialog.reRollAdvantages;
-import static mekhq.gui.dialog.HireBulkPersonnelDialog.reRollLoyalty;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
@@ -808,19 +802,19 @@ public class AtBContract extends Contract {
                     }
                 } else {
                     campaign.addReport("Bonus: Ronin");
-                    recruitRonin(campaign);
+                    new RoninOffer(campaign);
                 }
                 yield false;
             }
             case 2 -> {
                 campaign.addReport("Bonus: Ronin");
-                recruitRonin(campaign);
+                new RoninOffer(campaign);
                 yield false;
             }
             case 3 -> { // Resupply
                 if (campaignOptions.isUseAtB() && !campaignOptions.isUseStratCon()) {
                     campaign.addReport("Bonus: Ronin");
-                    recruitRonin(campaign);
+                    new RoninOffer(campaign);
                     yield false;
                 } else {
                     if (isPostScenario) {
@@ -850,36 +844,6 @@ public class AtBContract extends Contract {
             default -> throw new IllegalStateException(
                 "Unexpected value in mekhq/campaign/mission/AtBContract.java/doBonusRoll: " + roll);
         };
-    }
-
-    /**
-     * Generates a Ronin and adds them to the personnel roster.
-     *
-     * @param campaign the current campaign.
-     */
-    private static void recruitRonin(Campaign campaign) {
-        Person ronin = campaign.newPerson(PersonnelRole.MEKWARRIOR);
-
-        overrideSkills(campaign, ronin, PersonnelRole.MEKWARRIOR,
-            Objects.requireNonNull(SkillLevel.VETERAN).ordinal());
-
-        generateBigPersonality(ronin);
-
-        reRollLoyalty(ronin, ronin.getExperienceLevel(campaign, false));
-        reRollAdvantages(campaign, ronin, ronin.getExperienceLevel(campaign, false));
-        ronin.setCallsign(RandomCallsignGenerator.getInstance().generate());
-
-        RoninOfferDialog roninOfferDialogInitialMessage = new RoninOfferDialog(campaign, true, ronin);
-        if (roninOfferDialogInitialMessage.getDialogChoice() != 0) {
-            return;
-        }
-
-        RoninOfferDialog roninOfferDialogFollowUpMessage = new RoninOfferDialog(campaign, false, ronin);
-        if (roninOfferDialogFollowUpMessage.getDialogChoice() != 0) {
-            return;
-        }
-
-        campaign.recruitPerson(ronin, true);
     }
 
     /**

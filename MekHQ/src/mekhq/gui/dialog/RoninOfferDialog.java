@@ -14,6 +14,7 @@ import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.gui.baseComponents.MHQDialogImmersive;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -173,7 +174,7 @@ public class RoninOfferDialog extends MHQDialogImmersive {
     /**
      * Creates the out-of-character report for the dialog.
      *
-     * <p>The report includes detailed information about the Ronin, including their name, skills,
+     * <p>The report includes detailed information about the Ronin, including their skills,
      * and abilities. This information is presented in a clear and formatted way for the player's
      * decision-making process.</p>
      *
@@ -183,12 +184,6 @@ public class RoninOfferDialog extends MHQDialogImmersive {
     private static String createOutOfCharacterMessage(Person ronin) {
         StringBuilder report = new StringBuilder();
 
-        // Header with Ronin's name and primary role
-        report.append("<div style='text-align: center;'>")
-              .append("<b>").append(ronin.getFullTitle()).append("</b>")
-              .append(" (").append(ronin.getPrimaryRole()).append(')')
-              .append("</div>");
-
         // Start table for skills and abilities
         report.append("<table style='width:75%;'>");
 
@@ -196,7 +191,11 @@ public class RoninOfferDialog extends MHQDialogImmersive {
         report.append("<tr><td style='vertical-align:top; width:50%;'><b>")
               .append(getFormattedTextAt(RESOURCE_BUNDLE, "message.ooc.skills"))
               .append("</b><br>");
-        for (Skill skill : ronin.getSkills().getSkills()) {
+
+        List<Skill> skillList = new ArrayList<>(ronin.getSkills().getSkills());
+        Collections.reverse(skillList);
+
+        for (Skill skill : skillList) {
             report.append(skill.getType().getName()).append(": ").append(skill).append("<br>");
         }
         report.append("</td>");
