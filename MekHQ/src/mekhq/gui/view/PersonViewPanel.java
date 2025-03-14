@@ -62,13 +62,14 @@ import java.awt.Dialog.ModalityType;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
+import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
@@ -1621,8 +1622,9 @@ public class PersonViewPanel extends JScrollablePanel {
 
             StringBuilder fatigueDisplay = new StringBuilder("<html>");
 
-            int effectiveFatigue = person.getEffectiveFatigue(campaign);
-            int fatigueTurnoverModifier = MathUtility.clamp(((person.getEffectiveFatigue(campaign) - 1) / 4) - 1, 0, 3);
+            int effectiveFatigue = getEffectiveFatigue(person.getFatigue(), person.isClanPersonnel(),
+                  person.getSkillLevel(campaign, false), campaign.getFieldKitchenWithinCapacity());
+            int fatigueTurnoverModifier = MathUtility.clamp(((effectiveFatigue - 1) / 4) - 1, 0, 3);
 
             if (effectiveFatigue != fatigue) {
                 fatigueDisplay.append("<s><font color='gray'>").append(fatigue).append("</font></s> ")

@@ -40,16 +40,10 @@ import java.awt.*;
 import java.util.UUID;
 
 import static mekhq.campaign.icons.enums.OperationalStatus.NOT_OPERATIONAL;
+import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
-
-import java.awt.Color;
-import java.awt.Component;
-
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.ListCellRenderer;
 
 /**
  * Handles rendering of individual lances in the StratCon scenario wizard.
@@ -117,7 +111,8 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
 
                 for (Person person : unit.getCrew()) {
                     if (person.getFatigue() > highestFatigue) {
-                        highestFatigue = person.getEffectiveFatigue(campaign);
+                        highestFatigue = getEffectiveFatigue(person.getFatigue(), person.isClanPersonnel(),
+                              person.getSkillLevel(campaign, false), campaign.getFieldKitchenWithinCapacity());
                     }
                 }
             }
