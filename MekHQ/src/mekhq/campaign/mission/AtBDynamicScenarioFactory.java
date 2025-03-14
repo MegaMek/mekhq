@@ -468,7 +468,18 @@ public class AtBDynamicScenarioFactory {
                 logger.warn(String.format("Invalid force alignment %d", forceTemplate.getForceAlignment()));
         }
 
+        if (factionCode.isBlank()) {
+            logger.error("Faction code is blank, using fallback faction code." +
+                  " This is indicative of a deeper problem and should be reported.");
+            factionCode = "IS";
+        }
+
         final Faction faction = Factions.getInstance().getFaction(factionCode);
+        if (faction == null) {
+            logger.error("Faction code is null, aborting force generation.");
+            return 0;
+        }
+
         String parentFactionType = AtBConfiguration.getParentFactionType(faction);
         boolean isPlanetOwner = isPlanetOwner(contract, currentDate, factionCode);
 
