@@ -45,9 +45,9 @@ public class PrisonersNagLogic {
      */
     public static boolean hasPrisoners(boolean hasActiveContract, boolean hasPrisoners) {
         if (!hasActiveContract) {
-            return hasPrisoners;
+            return false;
         }
 
-        return false;
+        return hasPrisoners;
     }
 }
