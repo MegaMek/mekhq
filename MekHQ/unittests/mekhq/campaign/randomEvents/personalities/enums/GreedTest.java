@@ -103,4 +103,14 @@ public class GreedTest {
         String description = NONE.getDescription(MAXIMUM_VARIATIONS, Gender.MALE, "Barry");
         assertTrue(isResourceKeyValid(description));
     }
+
+    @Test
+    public void testGetRoninMessage_notInvalid() {
+        for (Greed trait : Greed.values()) {
+            for (int i = 0; i < Greed.MAXIMUM_VARIATIONS; i++) {
+                String description = trait.getRoninMessage("Commander");
+                assertTrue(isResourceKeyValid(description));
+            }
+        }
+    }
 }
