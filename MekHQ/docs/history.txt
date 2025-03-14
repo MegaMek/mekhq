@@ -173,6 +173,7 @@ MEKHQ VERSION HISTORY:
 + PR #6261: Fixed Gray Monday Loans; Improved AtB Modifier Handling
 + PR #6263: Added Initiative Bonuses from Tactics to Princess Units
 + PR #6268: Corrected Arrival Turn Values in a Few Scenario Templates
++ Fix #6272: Fixed Typographical Error in GrayMonday Properties
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment
