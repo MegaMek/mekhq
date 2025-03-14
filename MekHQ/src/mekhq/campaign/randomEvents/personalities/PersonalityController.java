@@ -33,8 +33,11 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.personalities.enums.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import static java.lang.Math.max;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HE_SHE_THEY;
@@ -52,6 +55,24 @@ import static mekhq.campaign.randomEvents.personalities.enums.Intelligence.*;
  */
 public class PersonalityController {
     public final static int PERSONALITY_QUIRK_CHANCE = 10;
+
+    /**
+     * Represents the four primary types of personality characteristics a character can possess.
+     *
+     * <p>This enum is used to categorize and manage the key personality traits
+     * of a character, which include:</p>
+     * <ul>
+     *     <li>{@link #AGGRESSION} - Reflecting the character's tendency toward hostility or
+     *     assertiveness.</li>
+     *     <li>{@link #AMBITION} - Representing the character's drive to achieve goals or power.</li>
+     *     <li>{@link #GREED} - Indicating the character's desire for wealth or material possessions.</li>
+     *     <li>{@link #SOCIAL} - Showcasing the character's inclination towards sociability and
+     *     interpersonal relationships.</li>
+     * </ul>
+     */
+    public enum PersonalityTraitType {
+        AGGRESSION, AMBITION, GREED, SOCIAL, INTELLIGENCE, PERSONALITY_QUIRK;
+    }
 
     /**
      * Generates a personality for the given person by assigning various personality characteristics
@@ -106,6 +127,7 @@ public class PersonalityController {
             person.setPersonalityQuirk(PersonalityQuirk.NONE);
         }
 
+        // INTELLIGENCE
         person.setIntelligence(generateIntelligence(randomInt(8346)));
 
         // finally, write the description
@@ -117,6 +139,95 @@ public class PersonalityController {
             performPersonalityGenerationFallback(person);
             writePersonalityDescription(person);
         }
+    }
+
+    /**
+     * Generates an expansive "big" personality for a major character, Ronin, or hero.
+     *
+     * <p>This method creates a detailed set of personality traits for the given person,
+     * selecting and assigning a combination of major traits, a quirk, and intelligence.
+     * It ensures the generated personality reflects a high degree of uniqueness and depth.</p>
+     *
+     * <p>The method proceeds as follows:
+     * <ul>
+     *     <li>Randomly selects up to four major traits (Aggression, Ambition, Greed, Social).</li>
+     *     <li>Assigns the selected traits to the person's corresponding personality attributes.</li>
+     *     <li>Generates and applies a unique personality quirk to the person.</li>
+     *     <li>Generates an intelligence score using the maximum of two random values.</li>
+     *     <li>Writes a personality description based on the generated traits and attributes.</li>
+     * </ul>
+     *
+     * @param person the {@link Person} object to which the full personality will be applied
+     */
+    public static void generateBigPersonality(Person person) {
+        // As this method is likely going to be be applied over an existing personality profile, we
+        // wipe the old to ensure a clean slate.
+        person.setAggression(Aggression.NONE);
+        person.setAmbition(Ambition.NONE);
+        person.setGreed(Greed.NONE);
+        person.setSocial(Social.NONE);
+
+        // Then we generate a new personality
+        List<PersonalityTraitType> possibleTraits = new ArrayList<>(Arrays.asList(
+              PersonalityTraitType.AGGRESSION,
+              PersonalityTraitType.AMBITION,
+              PersonalityTraitType.GREED,
+              PersonalityTraitType.SOCIAL));
+
+        Collections.shuffle(possibleTraits);
+
+        List<PersonalityTraitType> chosenTraits = new ArrayList<>();
+
+        PersonalityTraitType firstTrait = possibleTraits.get(0);
+        possibleTraits.remove(firstTrait);
+        chosenTraits.add(firstTrait);
+
+        PersonalityTraitType secondTrait = possibleTraits.get(0);
+        possibleTraits.remove(secondTrait);
+        chosenTraits.add(secondTrait);
+
+        if (randomInt(4) == 0) {
+            PersonalityTraitType thirdTrait = possibleTraits.get(0);
+            possibleTraits.remove(thirdTrait);
+            chosenTraits.add(thirdTrait);
+        }
+
+        if (randomInt(4) == 0) {
+            PersonalityTraitType forthTrait = possibleTraits.get(0);
+            chosenTraits.add(forthTrait);
+        }
+
+        for (PersonalityTraitType traitType : chosenTraits) {
+            switch (traitType) {
+                case AGGRESSION -> {
+                    String traitIndex = getTraitIndex(Aggression.MAJOR_TRAITS_START_INDEX);
+                    person.setAggression(Aggression.fromString(traitIndex));
+                }
+                case AMBITION -> {
+                    String traitIndex = getTraitIndex(Ambition.MAJOR_TRAITS_START_INDEX);
+                    person.setAmbition(Ambition.fromString(traitIndex));
+                }
+                case GREED -> {
+                    String traitIndex = getTraitIndex(Greed.MAJOR_TRAITS_START_INDEX);
+                    person.setGreed(Greed.fromString(traitIndex));
+                }
+                case SOCIAL -> {
+                    String traitIndex = getTraitIndex(Social.MAJOR_TRAITS_START_INDEX);
+                    person.setSocial(Social.fromString(traitIndex));
+                }
+            }
+        }
+
+        // PERSONALITY QUIRK
+        generateAndApplyPersonalityQuirk(person);
+
+        // INTELLIGENCE
+        int firstIntelligence = randomInt(8346);
+        int secondIntelligence = randomInt(8346);
+        person.setIntelligence(generateIntelligence(max(firstIntelligence, secondIntelligence)));
+
+        // finally, write the description
+        writePersonalityDescription(person);
     }
 
     /**
