@@ -45,6 +45,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.CombatTeam;
@@ -92,10 +93,7 @@ import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.UnitType.MEK;
-import static megamek.common.enums.SkillLevel.ELITE;
-import static megamek.common.enums.SkillLevel.REGULAR;
-import static megamek.common.enums.SkillLevel.parseFromInteger;
-import static megamek.common.enums.SkillLevel.parseFromString;
+import static megamek.common.enums.SkillLevel.*;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.force.FormationLevel.BATTALION;
@@ -106,13 +104,15 @@ import static mekhq.campaign.mission.enums.AtBMoraleLevel.ADVANCING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
+import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
+import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
+import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
+import static mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT;
+import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
 import static mekhq.campaign.rating.IUnitRating.*;
 import static mekhq.campaign.stratcon.StratconContractDefinition.getContractDefinition;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FACTIONS;
-import static mekhq.gui.dialog.HireBulkPersonnelDialog.overrideSkills;
-import static mekhq.gui.dialog.HireBulkPersonnelDialog.reRollAdvantages;
-import static mekhq.gui.dialog.HireBulkPersonnelDialog.reRollLoyalty;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
@@ -853,16 +853,31 @@ public class AtBContract extends Contract {
     /**
      * Generates a Ronin and adds them to the personnel roster.
      *
-     * @param campaign the current campaign.
+     * <p>This method creates a new Ronin with either the "MEKWARRIOR" or "AEROSPACE_PILOT" role,
+     * depending on a random roll; sets their skills based on predefined preferences
+     * and randomization; rerolls their loyalty and advantages; assigns a random callsign;
+     * and finally adds them to the campaign's personnel roster.</p>
+     *
+     * <p>Administrator settings are not applied in this method, as the Ronin will not be an admin.</p>
+     *
+     * @param campaign the current {@link Campaign} in which the Ronin will be recruited.
      */
     private static void recruitRonin(Campaign campaign) {
-        Person ronin = campaign.newPerson(PersonnelRole.MEKWARRIOR);
+        int roll = randomInt(5);
 
-        overrideSkills(campaign, ronin, PersonnelRole.MEKWARRIOR,
-            Objects.requireNonNull(SkillLevel.VETERAN).ordinal());
+        PersonnelRole role = roll == 0 ? AEROSPACE_PILOT : MEKWARRIOR;
+        Person ronin = campaign.newPerson(role);
 
-        reRollLoyalty(ronin, ronin.getExperienceLevel(campaign, false));
-        reRollAdvantages(campaign, ronin, ronin.getExperienceLevel(campaign, false));
+        RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
+        boolean useExtraRandomness = randomSkillPreferences.randomizeSkill();
+
+        // We don't care about admin settings, as we're not going to have an admin here
+        overrideSkills(false, false, useExtraRandomness,
+              ronin, role, VETERAN);
+
+        SkillLevel skillLevel = ronin.getSkillLevel(campaign, false);
+        reRollLoyalty(ronin, skillLevel);
+        reRollAdvantages(campaign, ronin, skillLevel);
         ronin.setCallsign(RandomCallsignGenerator.getInstance().generate());
 
         campaign.recruitPerson(ronin, true);
