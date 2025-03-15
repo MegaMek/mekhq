@@ -4,7 +4,7 @@
     <shortBriefing>Eliminate VIP, minimize own losses.</shortBriefing>
     <detailedBriefing>This is a precision strike inside an active warzone. The enemy dominates the field, but we’re not here for a prolonged engagement—we’re here for a kill mission. Your primary objective is to assassinate a high-value target before they can escape. This individual is critical to the enemy’s war effort, and their elimination will shift the balance in our favor.
 
-We expect a fierce but contained battle. Your forces will be operating behind enemy lines, deep within hostile territory. Extraction is not a priority—the enemy will retain control of the battlefield when the dust settles. Your task is to neutralize the VIP and preserve at least 50% of your forces while executing the operation.</detailedBriefing>
+We expect a fierce but contained battle. Your forces will be operating behind enemy lines, deep within hostile territory. Extraction is not a priority—the enemy will retain control of the battlefield when the dust settles. Your task is to neutralize the VIP, no other considerations are of value.</detailedBriefing>
     <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
