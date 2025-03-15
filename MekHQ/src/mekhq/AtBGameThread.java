@@ -739,6 +739,7 @@ public class AtBGameThread extends GameThread {
             entity.setOwner(botClient.getLocalPlayer());
             String fName = String.format(forceName, lanceName, forceIdLance);
             entity.setForceString(fName);
+            entity.setStartingPos(botForce.getStartingPos());
             entities.add(entity);
             i++;
 
