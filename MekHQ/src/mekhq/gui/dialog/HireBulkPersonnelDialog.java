@@ -32,19 +32,14 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
-import megamek.common.options.IOption;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
-import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 
@@ -56,14 +51,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.List;
+import java.util.Objects;
+import java.util.ResourceBundle;
 
-import static megamek.codeUtilities.MathUtility.clamp;
-import static megamek.common.Compute.d6;
-import static mekhq.campaign.personnel.SkillType.*;
-import static mekhq.campaign.personnel.enums.PersonnelRole.*;
-import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
+import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
+import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
+import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
 
 /**
  * @author Jay Lawson
@@ -359,7 +352,7 @@ public class HireBulkPersonnelDialog extends JDialog {
 
                     CampaignOptions campaignOptions = campaign.getCampaignOptions();
                     overrideSkills(campaignOptions.isAdminsHaveNegotiation(), campaignOptions.isAdminsHaveScrounge(),
-                          useExtraRandomness, person, selectedItem.getRole(), skillLevel.getSelectedItem().ordinal());
+                          useExtraRandomness, person, selectedItem.getRole(), skillLevel.getSelectedItem());
                 }
             }
 
@@ -381,10 +374,10 @@ public class HireBulkPersonnelDialog extends JDialog {
                 }
             }
 
-            int experienceLevel = person.getExperienceLevel(campaign, false);
+            SkillLevel actualSkillLevel = person.getSkillLevel(campaign, false);
 
-            reRollLoyalty(person, experienceLevel);
-            reRollAdvantages(campaign, person, experienceLevel);
+            reRollLoyalty(person, actualSkillLevel);
+            reRollAdvantages(campaign, person, actualSkillLevel);
 
             if (!campaign.recruitPerson(person, isGmHire)) {
                 number = 0;
@@ -392,162 +385,6 @@ public class HireBulkPersonnelDialog extends JDialog {
                 number--;
             }
         }
-    }
-
-    /**
-     * Re-rolls the SPAs of a person based on their experience level.
-     *
-     * @param campaign       The current campaign.
-     * @param person         The person whose advantages are being re-rolled.
-     * @param experienceLevel The experience level of the person.
-     */
-    public static void reRollAdvantages(Campaign campaign, Person person, int experienceLevel) {
-        Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);
-
-        for (IOption option : Collections.list(options)) {
-            person.getOptions().getOption(option.getName()).clearValue();
-        }
-
-        if (experienceLevel > 0) {
-            AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
-            specialAbilityGenerator.setSkillPreferences(new RandomSkillPreferences());
-            specialAbilityGenerator.generateSpecialAbilities(campaign, person, experienceLevel);
-        }
-    }
-
-    /**
-     * Re-rolls the loyalty of a person based on their experience level.
-     *
-     * @param person         The person whose loyalty is being re-rolled.
-     * @param experienceLevel The experience level of the person.
-     */
-    public static void reRollLoyalty(Person person, int experienceLevel) {
-        if (experienceLevel <= 0) {
-            person.setLoyalty(d6(3) + 2);
-        } else if (experienceLevel == 1) {
-            person.setLoyalty(d6(3) + 1);
-        } else {
-            person.setLoyalty(d6(3));
-        }
-    }
-
-    /**
-     * Overrides the skills of a person based on their role, experience level, and additional conditions.
-     *
-     * @param isAdminsHaveNegotiation whether administrators should have negotiation skills.
-     * @param isAdminsHaveScrounge    whether administrators should have scrounge skills.
-     * @param isUseExtraRandom        whether extra randomization should be applied to skill levels.
-     * @param person                  the {@link Person} whose skills are being overridden.
-     * @param primaryRole             the {@link PersonnelRole} of the person.
-     * @param expLvl                  the experience level to which the skills should be set.
-     */
-    public static void overrideSkills(boolean isAdminsHaveNegotiation, boolean isAdminsHaveScrounge,
-                                      boolean isUseExtraRandom, Person person, PersonnelRole primaryRole,
-                                      int expLvl) {
-        // Role-to-Skill Mapping
-        Map<PersonnelRole, List<String>> roleSkills = Map.ofEntries(
-              Map.entry(MEKWARRIOR, List.of(S_PILOT_MEK, S_GUN_MEK)),
-              Map.entry(LAM_PILOT, List.of(S_PILOT_MEK, S_GUN_MEK, S_PILOT_AERO, S_GUN_AERO)),
-              Map.entry(GROUND_VEHICLE_DRIVER, List.of(S_PILOT_GVEE, S_GUN_VEE)),
-              Map.entry(NAVAL_VEHICLE_DRIVER, List.of(S_PILOT_NVEE, S_GUN_VEE)),
-              Map.entry(VTOL_PILOT, List.of(S_PILOT_VTOL, S_GUN_VEE)),
-              Map.entry(VEHICLE_GUNNER, List.of(S_GUN_VEE)),
-              Map.entry(VEHICLE_CREW, List.of(S_TECH_MECHANIC)),
-              Map.entry(MECHANIC, List.of(S_TECH_MECHANIC)),
-              Map.entry(AEROSPACE_PILOT, List.of(S_PILOT_AERO, S_GUN_AERO)),
-              Map.entry(CONVENTIONAL_AIRCRAFT_PILOT, List.of(S_PILOT_JET, S_GUN_JET)),
-              Map.entry(PROTOMEK_PILOT, List.of(S_GUN_PROTO)),
-              Map.entry(BATTLE_ARMOUR, List.of(S_GUN_BA, S_ANTI_MEK)),
-              Map.entry(SOLDIER, List.of(S_SMALL_ARMS)),
-              Map.entry(VESSEL_PILOT, List.of(S_PILOT_SPACE)),
-              Map.entry(VESSEL_GUNNER, List.of(S_GUN_SPACE)),
-              Map.entry(VESSEL_CREW, List.of(S_TECH_VESSEL)),
-              Map.entry(VESSEL_NAVIGATOR, List.of(S_NAV)),
-              Map.entry(MEK_TECH, List.of(S_TECH_MEK)),
-              Map.entry(AERO_TEK, List.of(S_TECH_AERO)),
-              Map.entry(BA_TECH, List.of(S_TECH_BA)),
-              Map.entry(DOCTOR, List.of(S_DOCTOR))
-        );
-
-        // Add admin-specific logic
-        if (primaryRole == ADMINISTRATOR_COMMAND || primaryRole == ADMINISTRATOR_LOGISTICS ||
-              primaryRole == ADMINISTRATOR_TRANSPORT || primaryRole == ADMINISTRATOR_HR) {
-            List<String> adminSkills = new ArrayList<>();
-
-            adminSkills.add(S_ADMIN);
-            if (isAdminsHaveNegotiation) {
-                adminSkills.add(S_NEG);
-            }
-            if (isAdminsHaveScrounge) {
-                adminSkills.add(S_SCROUNGE);
-            }
-
-            addSkillsAndRandomize(person, adminSkills, expLvl, isUseExtraRandom);
-            return;
-        }
-
-        // Handle Normal Role Skills
-        List<String> skills = roleSkills.getOrDefault(primaryRole, List.of());
-        addSkillsAndRandomize(person, skills, expLvl, isUseExtraRandom);
-    }
-
-    /**
-     * Adds the specified skills to a person and optionally applies randomization to those skills.
-     *
-     * @param person    the {@link Person} to whom the skills are to be added.
-     * @param skills    a list of skill names to add.
-     * @param expLvl    the experience level to which the skills are to be set.
-     * @param randomize {@code true} if the skill levels should be randomized after being added;
-     *                  {@code false} otherwise.
-     */
-    private static void addSkillsAndRandomize(Person person, List<String> skills, int expLvl, boolean randomize) {
-        for (String skill : skills) {
-            addSkillFixedExperienceLevel(person, skill, expLvl);
-        }
-
-        if (randomize) {
-            randomizeSkills(person, skills);
-        }
-    }
-
-    /**
-     * Randomizes the skill levels for the given person within a specific range.
-     * Skill levels may increase, decrease, or stay the same based on a dice roll.
-     *
-     * @param person the {@link Person} whose skills are being randomized.
-     * @param skills a list of skill names that should be randomized.
-     */
-    private static void randomizeSkills(Person person, List<String> skills) {
-        for (String skillName : skills) {
-            Skill skill = person.getSkill(skillName);
-
-            if (skill == null) {
-                continue;
-            }
-
-            int roll = d6(); // Roll once for the skill
-            int adjustedLevel = skill.getLevel() + (roll == 6 ? 1 : roll == 1 ? -1 : 0);
-            skill.setLevel(clamp(adjustedLevel, 0, 10));
-        }
-    }
-
-    /**
-     * Adds a skill to a person with a fixed experience level.
-     * If the person already has the specified skill, the bonus value will be
-     * retained.
-     *
-     * @param person        The Person to add the skill to.
-     * @param skill         The name of the skill to add.
-     * @param experienceLvl The experience level for the skill.
-     */
-    private static void addSkillFixedExperienceLevel(Person person, String skill, int experienceLvl) {
-        int bonus = 0;
-
-        if (person.hasSkill(skill)) {
-            bonus = person.getSkill(skill).getBonus();
-        }
-
-        addSkill(person, skill, experienceLvl, bonus);
     }
 
     private void refreshRanksCombo() {

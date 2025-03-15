@@ -104,15 +104,15 @@ import static mekhq.campaign.mission.enums.AtBMoraleLevel.ADVANCING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
+import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
+import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
+import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
 import static mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
 import static mekhq.campaign.rating.IUnitRating.*;
 import static mekhq.campaign.stratcon.StratconContractDefinition.getContractDefinition;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FACTIONS;
-import static mekhq.gui.dialog.HireBulkPersonnelDialog.overrideSkills;
-import static mekhq.gui.dialog.HireBulkPersonnelDialog.reRollAdvantages;
-import static mekhq.gui.dialog.HireBulkPersonnelDialog.reRollLoyalty;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
@@ -873,10 +873,11 @@ public class AtBContract extends Contract {
 
         // We don't care about admin settings, as we're not going to have an admin here
         overrideSkills(false, false, useExtraRandomness,
-              ronin, role, VETERAN.ordinal());
+              ronin, role, VETERAN);
 
-        reRollLoyalty(ronin, ronin.getExperienceLevel(campaign, false));
-        reRollAdvantages(campaign, ronin, ronin.getExperienceLevel(campaign, false));
+        SkillLevel skillLevel = ronin.getSkillLevel(campaign, false);
+        reRollLoyalty(ronin, skillLevel);
+        reRollAdvantages(campaign, ronin, skillLevel);
         ronin.setCallsign(RandomCallsignGenerator.getInstance().generate());
 
         campaign.recruitPerson(ronin, true);

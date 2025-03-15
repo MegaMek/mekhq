@@ -32,6 +32,7 @@ import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
@@ -81,7 +82,7 @@ import java.util.stream.Stream;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.enums.SkillLevel.*;
-import static mekhq.gui.dialog.HireBulkPersonnelDialog.overrideSkills;
+import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 
 public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(UnitTableMouseAdapter.class);
@@ -347,18 +348,18 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                 boolean fixSkillLevels = false;
 
-                int skillLevel = REGULAR.ordinal();
+                SkillLevel skillLevel = REGULAR;
                 if (command.contains("ELITE")) {
-                    skillLevel = ELITE.ordinal();
+                    skillLevel = ELITE;
                     fixSkillLevels = true;
                 } else if (command.contains("VETERAN")) {
-                    skillLevel = VETERAN.ordinal();
+                    skillLevel = VETERAN;
                     fixSkillLevels = true;
                 } else if (command.contains("ULTRA_GREEN")) {
-                    skillLevel = ULTRA_GREEN.ordinal();
+                    skillLevel = ULTRA_GREEN;
                     fixSkillLevels = true;
                 } else if (command.contains("GREEN")) {
-                    skillLevel = GREEN.ordinal();
+                    skillLevel = GREEN;
                     fixSkillLevels = true;
                 }
 
