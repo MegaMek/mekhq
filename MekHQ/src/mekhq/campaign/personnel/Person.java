@@ -1386,7 +1386,7 @@ public class Person {
      */
     public BloodGroup getBloodGroup() {
         if (bloodGroup == null) {
-            bloodGroup = BloodGroup.getRandomBloodGroup();
+            bloodGroup = getRandomBloodGroup();
         }
 
         return bloodGroup;
@@ -2219,7 +2219,7 @@ public class Person {
             }
             // Always save the person's gender, as it would otherwise get confusing fast
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gender", getGender().name());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bloodGroup", bloodGroup.name());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bloodGroup", getBloodGroup().name());
             if (!getRankSystem().equals(campaign.getRankSystem())) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rankSystem", getRankSystem().getCode());
             }
