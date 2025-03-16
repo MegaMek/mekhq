@@ -55,8 +55,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Period;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -177,8 +177,8 @@ public class MedicalViewDialog extends JDialog {
 
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         Container scrollPanel = new JPanel();
-        getContentPane().add(new JScrollPaneWithSpeed(scrollPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
+        getContentPane().add(new JScrollPaneWithSpeed(scrollPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
         initComponents(scrollPanel);
 
         JButton okayButton = new JButton(resourceMap.getString("buttonDone.text"));
@@ -192,6 +192,7 @@ public class MedicalViewDialog extends JDialog {
         getContentPane().add(okayButton);
         pack();
         setUserPreferences();
+        setModal(true);
     }
 
     private void initComponents(Container cont) {
