@@ -56,7 +56,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
-import static mekhq.campaign.personnel.enums.BloodGroup.getInherentedBloodGroup;
+import static mekhq.campaign.personnel.enums.BloodGroup.getInheritedBloodGroup;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 
 /**
@@ -400,7 +400,7 @@ public abstract class AbstractProcreation {
             baby.setSurname(campaign.getCampaignOptions().getBabySurnameStyle()
                     .generateBabySurname(mother, father, baby.getGender()));
             baby.setDateOfBirth(today);
-            baby.setBloodGroup(getInherentedBloodGroup(mother.getBloodGroup(),
+            baby.setBloodGroup(getInheritedBloodGroup(mother.getBloodGroup(),
                   father == null ? getRandomBloodGroup() : father.getBloodGroup()));
 
             // Create reports and log the birth

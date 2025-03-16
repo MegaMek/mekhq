@@ -27,8 +27,6 @@
  */
 package mekhq.campaign.personnel.enums;
 
-// Imports omitted for brevity
-
 import megamek.codeUtilities.ObjectUtility;
 import megamek.logging.MMLogger;
 
@@ -37,21 +35,32 @@ import java.util.List;
 import static megamek.common.Compute.randomInt;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
+/**
+ * Represents blood groups and their genetic inheritance logic in the MekHQ campaign system.
+ *
+ * <p>
+ * This enum defines blood groups with their associated probabilities of occurrence, Rh Factor,
+ * genetic composition (alleles), and utility methods for determining inherited blood groups
+ * and localized labels. BloodGroup is designed to model real-world blood group inheritance and
+ * probability.
+ * </p>
+ */
 public enum BloodGroup {
-    AA_POSITIVE(36, true, Allele.A, Allele.A),
-    AA_NEGATIVE(6, false, Allele.A, Allele.A),
-    AB_POSITIVE(3, true, Allele.A, Allele.B),
-    AB_NEGATIVE(1, false, Allele.A, Allele.B),
-    AO_POSITIVE(3, true, Allele.A, Allele.B),
-    AO_NEGATIVE(1, false, Allele.A, Allele.O),
+    AA_POSITIVE(7,  true,  Allele.A, Allele.A),
+    AA_NEGATIVE(1,  false, Allele.A, Allele.A),
+    AO_POSITIVE(27, true,  Allele.A, Allele.O),
+    AO_NEGATIVE(5,  false, Allele.A, Allele.O),
 
-    BB_POSITIVE(9, true, Allele.B, Allele.B),
-    BB_NEGATIVE(2, false, Allele.B, Allele.B),
-    BO_POSITIVE(9, true, Allele.B, Allele.O),
-    BO_NEGATIVE(2, false, Allele.B, Allele.O),
+    AB_POSITIVE(4,  true,  Allele.A, Allele.B),
+    AB_NEGATIVE(1,  false, Allele.A, Allele.B),
 
-    OO_POSITIVE(37, true, Allele.O, Allele.O),
-    OO_NEGATIVE(7, false, Allele.O, Allele.O);
+    BB_POSITIVE(1,  true,  Allele.B, Allele.B),
+    BB_NEGATIVE(1,  false, Allele.B, Allele.B),
+    BO_POSITIVE(9,  true,  Allele.B, Allele.O),
+    BO_NEGATIVE(1,  false, Allele.B, Allele.O),
+
+    OO_POSITIVE(37, true,  Allele.O, Allele.O),
+    OO_NEGATIVE(6,  false, Allele.O, Allele.O);
 
     private final int chance;  // Represents the probability of occurrence for the blood group.
     private final boolean hasPositiveRhFactor;  // Indicates if the blood group has a positive Rh factor.
@@ -153,7 +162,7 @@ public enum BloodGroup {
      *     <li>If both parents have O_NEGATIVE, the child will always inherit OO_NEGATIVE (recessive).</li>
      * </ul>
      */
-    public static BloodGroup getInherentedBloodGroup(BloodGroup motherBloodGroup, BloodGroup fatherBloodGroup) {
+    public static BloodGroup getInheritedBloodGroup(BloodGroup motherBloodGroup, BloodGroup fatherBloodGroup) {
         Allele motherAllele = ObjectUtility.getRandomItem(motherBloodGroup.getAlleles());
         Allele fatherAllele = ObjectUtility.getRandomItem(fatherBloodGroup.getAlleles());
 
