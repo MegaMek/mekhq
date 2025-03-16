@@ -56,6 +56,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
+import static mekhq.campaign.personnel.enums.BloodGroup.getInherentedBloodGroup;
+import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 
 /**
  * AbstractProcreation is the baseline class for procreation and birth in MekHQ. It holds all the
@@ -398,6 +400,8 @@ public abstract class AbstractProcreation {
             baby.setSurname(campaign.getCampaignOptions().getBabySurnameStyle()
                     .generateBabySurname(mother, father, baby.getGender()));
             baby.setDateOfBirth(today);
+            baby.setBloodGroup(getInherentedBloodGroup(mother.getBloodGroup(),
+                  father == null ? getRandomBloodGroup() : father.getBloodGroup()));
 
             // Create reports and log the birth
             campaign.addReport(String.format(resources.getString("babyBorn.report"),

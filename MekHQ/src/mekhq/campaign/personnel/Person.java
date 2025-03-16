@@ -124,6 +124,8 @@ public class Person {
     // endregion Name
 
     private Gender gender;
+    private BloodGroup bloodGroup;
+
     private Portrait portrait;
 
     private PersonnelRole primaryRole;
@@ -1371,6 +1373,25 @@ public class Person {
         return gender;
     }
 
+    public void setBloodGroup(final BloodGroup bloodGroup) {
+        this.bloodGroup = bloodGroup;
+    }
+
+    /**
+     * Retrieves the blood group of the person. If the blood group has not been set, it generates a
+     * random blood group using {@link BloodGroup#getRandomBloodGroup()}.
+     *
+     * @return The {@link BloodGroup} of the entity. If no blood group is previously assigned,
+     *         a random one is generated and returned.
+     */
+    public BloodGroup getBloodGroup() {
+        if (bloodGroup == null) {
+            bloodGroup = BloodGroup.getRandomBloodGroup();
+        }
+
+        return bloodGroup;
+    }
+
     /**
      * Sets the date of birth (the date they are born) for the person.
      *
@@ -2198,6 +2219,7 @@ public class Person {
             }
             // Always save the person's gender, as it would otherwise get confusing fast
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gender", getGender().name());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bloodGroup", bloodGroup.name());
             if (!getRankSystem().equals(campaign.getRankSystem())) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rankSystem", getRankSystem().getCode());
             }
@@ -2583,6 +2605,8 @@ public class Person {
                     retVal.hitsPrior = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
                     retVal.setGender(Gender.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("bloodGroup")) {
+                    retVal.setBloodGroup(BloodGroup.fromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
                     final RankSystem rankSystem = Ranks.getRankSystemFromCode(wn2.getTextContent().trim());
 
