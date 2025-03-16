@@ -31,6 +31,7 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.TargetRoll;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
+import mekhq.campaign.OptimizeInfirmaryAssignments;
 import mekhq.campaign.event.MedicPoolChangedEvent;
 import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.PersonMedicalAssignmentEvent;
@@ -45,8 +46,8 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.ImageObserver;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 /**
  * Shows injured and medical personnel
@@ -55,6 +56,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
     private JTable docTable;
     private JButton btnAssignDoc;
     private JButton btnUnassignDoc;
+    private JButton btnOptimizeAssignments;
     private JList<Person> listAssignedPatient;
     private JList<Person> listUnassignedPatient;
 
@@ -79,7 +81,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
     @Override
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
 
         setLayout(new GridBagLayout());
 
@@ -109,24 +111,32 @@ public final class InfirmaryTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 1.0;
         add(scrollDocTable, gridBagConstraints);
 
+        // Create buttons
         btnAssignDoc = new JButton(resourceMap.getString("btnAssignDoc.text"));
         btnAssignDoc.setToolTipText(resourceMap.getString("btnAssignDoc.toolTipText"));
         btnAssignDoc.setEnabled(false);
         btnAssignDoc.addActionListener(ev -> assignDoctor());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        add(btnAssignDoc, gridBagConstraints);
 
         btnUnassignDoc = new JButton(resourceMap.getString("btnUnassignDoc.text"));
         btnUnassignDoc.setEnabled(false);
         btnUnassignDoc.addActionListener(ev -> unassignDoctor());
+
+        btnOptimizeAssignments = new JButton(resourceMap.getString("btnOptimizeAssignments.text"));
+        btnOptimizeAssignments.addActionListener(ev -> new OptimizeInfirmaryAssignments(getCampaign()));
+
+        // Create a panel to group the buttons together horizontally
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        buttonPanel.add(btnAssignDoc);
+        buttonPanel.add(btnUnassignDoc);
+        buttonPanel.add(btnOptimizeAssignments);
+
+        // Add the button panel to the layout
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        add(btnUnassignDoc, gridBagConstraints);
+        add(buttonPanel, gridBagConstraints);
 
         assignedPatientModel = new PatientTableModel(getCampaign());
         listAssignedPatient = new JList<>(assignedPatientModel);

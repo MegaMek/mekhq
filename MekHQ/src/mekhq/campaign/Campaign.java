@@ -4564,6 +4564,11 @@ public class Campaign implements ITechManager {
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                 personnelWhoAdvancedInXP.size(), CLOSING_SPAN_TAG));
         }
+
+        // Update the force icons based on the end-of-day unit status if desired
+        if (MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments()) {
+            new OptimizeInfirmaryAssignments(this);
+        }
     }
 
     /**
