@@ -89,6 +89,7 @@ import java.util.stream.Stream;
 import static java.lang.Math.abs;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
