@@ -64,7 +64,8 @@ public class ReplacementLimbDialog extends MHQDialogImmersive {
               createInCharacterMessage(campaign.getLocation().isOnPlanet(), !suitableDoctors.isEmpty(),
                     campaign.getCommanderAddress(false), patient, cost, campaign.getFunds().isGreaterOrEqualThan(cost)),
               createButtons(!suitableDoctors.isEmpty(), campaign.getLocation().isOnPlanet(), campaign.getFunds().isGreaterOrEqualThan(cost)),
-              getFormattedTextAt(RESOURCE_BUNDLE, "message.ooc"), null, false);
+              getFormattedTextAt(RESOURCE_BUNDLE, "message.ooc"), null, false,
+              null, true);
     }
 
     /**
