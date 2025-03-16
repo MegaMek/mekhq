@@ -1266,7 +1266,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             if (person.isDoctor()) {
                 Skill skill = person.getSkill(S_DOCTOR);
 
-                if (skill != null && skill.getLevel() >= REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5) {
+                if (skill != null && skill.getFinalSkillValue() >= REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5) {
                     suitableDoctors.add(person);
                 }
             }

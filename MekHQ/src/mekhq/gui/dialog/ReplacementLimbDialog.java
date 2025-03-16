@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
+import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
@@ -64,7 +65,8 @@ public class ReplacementLimbDialog extends MHQDialogImmersive {
               createInCharacterMessage(campaign.getLocation().isOnPlanet(), !suitableDoctors.isEmpty(),
                     campaign.getCommanderAddress(false), patient, cost, campaign.getFunds().isGreaterOrEqualThan(cost)),
               createButtons(!suitableDoctors.isEmpty(), campaign.getLocation().isOnPlanet(), campaign.getFunds().isGreaterOrEqualThan(cost)),
-              getFormattedTextAt(RESOURCE_BUNDLE, "message.ooc"), null, false);
+              getFormattedTextAt(RESOURCE_BUNDLE, "message.ooc", REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5),
+              null, false);
     }
 
     /**
