@@ -174,6 +174,17 @@ MEKHQ VERSION HISTORY:
 + PR #6263: Added Initiative Bonuses from Tactics to Princess Units
 + PR #6268: Corrected Arrival Turn Values in a Few Scenario Templates
 + Fix #6272: Fixed Typographical Error in GrayMonday Properties
++ PR #3365: Removed Infirmary Background Image
++ Fix #6267: Fixed Incorrect Tracking of Deployment Zones
++ PR #6273: Refactored Skill Overrides; Added Randomization Logic; Added AeroSpace Ronin
++ PR #6274: Fixed Field Kitchen Ignore Non-Combatants Option Not Saving
++ Fix #6276: Fixed Prisoner Nag Displaying When No Prisoners Held
++ PR #6278: Fixed Republic of the Sphere Being Incorrectly Selected as Enemy Post-Fortress Wall
++ PR #6280: Corrected Assassination Scenario Briefing
++ PR #6282: Fixed Tactics-based Commander Initiative to Not Require SPA, Edge, or Implant Options to Be Enabled
++ PR #6286: Increased Minimum Skill Requirement For Replacement Limb Procedures to Match RAW
++ PR #6291: Added Handling for When Unit Quality is Manually Set to Empty or null Quality
++ PR #6292: Added Specific Handling for Legacy Prisoner Capture Styles
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment
