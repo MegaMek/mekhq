@@ -54,8 +54,29 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 public class MercenaryAuction {
     private static final String RESOURCE_BUNDLE = "mekhq.resources." + MercenaryAuctionDialog.class.getSimpleName();
 
-    private static final int AUCTION_MINIMUM_BID = 50;
-    private static final double AUCTION_MAXIMUM_BID = 1.5;
+    /**
+     * The minimum bid percentage required to participate in the auction.
+     *
+     * <p>This constant defines the lowest percentage of the unit's base value that a player is
+     * allowed to bid in an auction. It ensures that all bids meet a minimum threshold, preventing
+     * unreasonably low offers during the auction process.</p>
+     *
+     * <p>This is stored as an {@link Integer}, not a {@link Double}, as it's used to set up a
+     * {@link javax.swing.JSpinner} and players tend to have an easier time understanding percentages
+     * when presented as integers.
+     */
+    private static final int AUCTION_MINIMUM_BID_PERCENT = 50;
+
+    /**
+     * Represents the maximum bid percentage allowed during a mercenary auction.
+     *
+     * <p>This constant defines the upper limit for the bid multiplier a player can apply when
+     * participating in an auction, where the value is represented as a multiplier (e.g., 1.5
+     * corresponds to 150%). It ensures that the auction bidding process is capped at a predefined
+     * value as bids above this value have the same % chance of success, so we don't want the player
+     * paying more than they need.</p>
+     */
+    private static final double AUCTION_MAXIMUM_BID_PERCENT = 1.5;
 
     /**
      * Creates and processes a mercenary auction.
@@ -87,7 +108,7 @@ public class MercenaryAuction {
 
         // If the player can't afford the minimum bid, we just tell them about the opportunity and
         // then close out the auction.
-        if (maximumBid < AUCTION_MINIMUM_BID) {
+        if (maximumBid < AUCTION_MINIMUM_BID_PERCENT) {
             new GenericImmersiveMessageDialog(campaign, campaign.getSeniorAdminPerson(TRANSPORT),
                   null, getFormattedTextAt(RESOURCE_BUNDLE, "auction.ic.noFunds",
                   campaign.getCommanderAddress(false), entity.getShortName()),
@@ -97,15 +118,15 @@ public class MercenaryAuction {
 
         // Otherwise, we show the Auction dialog.
         MercenaryAuctionDialog mercenaryAuctionDialog = new MercenaryAuctionDialog(campaign, entity,
-              min(maximumBid, AUCTION_MINIMUM_BID * 2), AUCTION_MINIMUM_BID, maximumBid, 5);
-        int adjustedBid = mercenaryAuctionDialog.getSpinnerValue() - AUCTION_MINIMUM_BID;
+              min(maximumBid, AUCTION_MINIMUM_BID_PERCENT * 2), AUCTION_MINIMUM_BID_PERCENT, maximumBid, 5);
+        int adjustedBid = mercenaryAuctionDialog.getSpinnerValue() - AUCTION_MINIMUM_BID_PERCENT;
 
         // If the player confirmed the auction (option 0) then check whether they were successful,
         // deliver the unit, and deduct funds.
         if (mercenaryAuctionDialog.getDialogChoice() == 0) {
             // The use of <= is important here as it ensures that even if the user bids 50 %, they can
             // still win.
-            if (randomInt(AUCTION_MINIMUM_BID * 2) <= adjustedBid) {
+            if (randomInt(AUCTION_MINIMUM_BID_PERCENT * 2) <= adjustedBid) {
                 Money finalBid = valueAsMoney.multipliedBy(mercenaryAuctionDialog.getSpinnerValue() / 100);
 
                 campaignFinances.debit(EQUIPMENT_PURCHASE, campaign.getLocalDate(), finalBid,
@@ -144,7 +165,7 @@ public class MercenaryAuction {
      *         (e.g., 0.5 for 50%, 1.0 for 100%).
      */
     private double getMaxBidPercentage(Money valueAsMoney, Money campaignFunds) {
-        for (double i = 0.5; i <= AUCTION_MAXIMUM_BID; i += 0.05) {
+        for (double i = 0.5; i <= AUCTION_MAXIMUM_BID_PERCENT; i += 0.05) {
             Money adjustedValueAsMoney = valueAsMoney.multipliedBy(i);
 
             if (adjustedValueAsMoney.isGreaterOrEqualThan(campaignFunds)) {
