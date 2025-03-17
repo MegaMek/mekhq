@@ -216,6 +216,10 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     "Set Quality", JOptionPane.PLAIN_MESSAGE, null, possibilities,
                     PartQuality.QUALITY_D.toName(reverse));
 
+            if (quality == null || quality.isBlank()) {
+                return;
+            }
+
             PartQuality q = PartQuality.fromName(quality, reverse);
             for (Unit unit : units) {
                 if (null != unit) {
