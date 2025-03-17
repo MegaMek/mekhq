@@ -809,6 +809,14 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_MRMS, value);
     }
 
+    public boolean getNewDayOptimizeMedicalAssignments() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS, false);
+    }
+
+    public void setNewDayOptimizeMedicalAssignments(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE).putBoolean(MHQConstants.NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS, value);
+    }
+
     public boolean getNewDayForceIconOperationalStatus() {
         return userPreferences.node(MHQConstants.NEW_DAY_NODE)
                 .getBoolean(MHQConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS, true);
