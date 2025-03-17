@@ -84,6 +84,7 @@ import megameklab.util.CConfig;
 import megameklab.util.UnitUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.enums.RefitClass;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
@@ -373,7 +374,7 @@ public class MekLabTab extends CampaignGuiTab {
             btnRefit.setEnabled(false);
             btnRefit.setToolTipText(refit.checkFixable());
             btnSaveForLater.setEnabled(true);
-        } else if (refit.getRefitClass() == Refit.NO_CHANGE && entity.getWeight() == testEntity.calculateWeight()) {
+        } else if (refit.getRefitClass() == RefitClass.NO_CHANGE && entity.getWeight() == testEntity.calculateWeight()) {
             btnRefit.setEnabled(false);
             btnRefit.setToolTipText("Nothing to change.");
             btnSaveForLater.setEnabled(false);
@@ -415,14 +416,14 @@ public class MekLabTab extends CampaignGuiTab {
         }
         shoppingPanel.removeAll();
         JLabel lblItem;
-        for (String name : refit.getShoppingListDescription()) {
-            lblItem = new JLabel(name);
-            shoppingPanel.add(lblItem);
-        }
-        if (refit.getShoppingListDescription().length == 0) {
-            lblItem = new JLabel("None");
-            shoppingPanel.add(lblItem);
-        }
+        // for (String name : refit.getShoppingListDescription()) { //FIXME: Come back for this - WeaverThree
+        //     lblItem = new JLabel(name);
+        //     shoppingPanel.add(lblItem);
+        // }
+        // if (refit.getShoppingListDescription().length == 0) {
+        lblItem = new JLabel("None");
+        shoppingPanel.add(lblItem);
+        // }
     }
 
     public double calculateTotalHeat() {

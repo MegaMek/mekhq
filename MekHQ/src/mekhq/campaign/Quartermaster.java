@@ -31,6 +31,7 @@ import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.weapons.infantry.InfantryWeapon;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PartArrivedEvent;
 import mekhq.campaign.event.PartChangedEvent;
@@ -50,6 +51,7 @@ import java.util.Objects;
  * Manages machines and materiel for a campaign.
  */
 public class Quartermaster {
+    private static final MMLogger logger = MMLogger.create(Refit.class);
     public enum PartAcquisitionResult {
         PartInherentFailure,
         PlanetSpecificFailure,
@@ -459,6 +461,8 @@ public class Quartermaster {
     public void arrivePart(Part part) {
         Objects.requireNonNull(part);
 
+        logger.info("ARRIVE PART: " + part);
+      
         // Parts on a unit do not need to be reported as being "arrived",
         // the unit itself will receive an arrival event.
         if (part.getUnit() != null) {
@@ -750,7 +754,8 @@ public class Quartermaster {
             if (getCampaign().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
                     getCampaign().getLocalDate(), cost, "Purchase of " + part.getName())) {
                 if (part instanceof Refit) {
-                    ((Refit) part).addRefitKitParts(transitDays);
+                    // Refit class no longer used for refit kit items
+                    // ((Refit) part).addRefitKitParts(transitDays);
                 } else {
                     addPart(part, transitDays);
                 }
@@ -760,7 +765,8 @@ public class Quartermaster {
             }
         } else {
             if (part instanceof Refit) {
-                ((Refit) part).addRefitKitParts(transitDays);
+                // Refit class no longer used for refit kit items
+                // ((Refit) part).addRefitKitParts(transitDays);
             } else {
                 addPart(part, transitDays);
             }
