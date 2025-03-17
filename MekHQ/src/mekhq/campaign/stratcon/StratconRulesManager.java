@@ -293,6 +293,15 @@ public class StratconRulesManager {
                 track = getRandomItem(tracks);
             }
 
+            final int deploymentDelay = track.getDeploymentTime();
+            final LocalDate scenarioTargetDate = campaign.getLocalDate().plusDays(deploymentDelay);
+            final LocalDate contractEnd = campaignState.getContract().getEndingDate();
+
+            if (!scenarioTargetDate.isBefore(contractEnd)) {
+                logger.info("Skipping scenario because it is on or after the contract end date.");
+                return;
+            }
+
             if (autoAssignLances && availableForceIDs.isEmpty()) {
                 break;
             }
@@ -2810,6 +2819,16 @@ public class StratconRulesManager {
 
                     if (scenario.isTurningPoint() && !backingScenario.getStatus().isDraw()) {
                         campaignState.updateVictoryPoints(victory ? 1 : -1);
+                    }
+
+                    ScenarioType scenarioType = backingScenario.getStratConScenarioType();
+                    if (scenarioType.isSpecial()) {
+                        if (!backingScenario.getStatus().isOverallVictory()) {
+                            // If the player loses this scenario, they lose -1 CVP. This represents
+                            // the importance of the intel the prisoners hold, or the penalty for
+                            // allowing an enemy force free reign in the player's logistics line.
+                            campaignState.updateVictoryPoints(-1);
+                        }
                     }
 
                     // this must be done before removing the scenario from the track

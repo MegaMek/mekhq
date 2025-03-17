@@ -30,7 +30,10 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
+
+import java.util.List;
 
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UntreatedPersonnelNagLogic.campaignHasUntreatedInjuries;
 
@@ -64,21 +67,22 @@ public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
     }
 
     /**
-     * Checks if a nag dialog should be displayed for untreated personnel injuries in the given campaign.
+     * Determines whether a nag dialog should be displayed for untreated injuries among personnel.
      *
-     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
+     * <p>This method evaluates two conditions to decide if the nag dialog should appear:</p>
      * <ul>
-     *     <li>If the nag dialog for untreated personnel injuries has not been ignored in the user options.</li>
-     *     <li>If the campaign has untreated injuries among its personnel.</li>
+     *     <li>The user has not ignored the nag dialog for untreated personnel injuries in their options.</li>
+     *     <li>There are untreated injuries among the campaign's personnel.</li>
      * </ul>
      *
-     * @param campaign the {@link Campaign} to check for nagging conditions
-     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
+     * @param activePersonnel A {@link List} of active personnel in the campaign.
+     * @return {@code true} if the nag dialog should be displayed due to untreated injuries,
+     *         {@code false} otherwise.
      */
-    public static boolean checkNag(Campaign campaign) {
+    public static boolean checkNag(List<Person> activePersonnel) {
         final String NAG_KEY = MHQConstants.NAG_UNTREATED_PERSONNEL;
 
         return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && campaignHasUntreatedInjuries(campaign);
+            && campaignHasUntreatedInjuries(activePersonnel);
     }
 }

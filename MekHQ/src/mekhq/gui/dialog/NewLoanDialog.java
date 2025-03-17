@@ -52,6 +52,8 @@ import java.text.NumberFormat;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+
 /**
  * @author Taharqa
  */
@@ -142,7 +144,11 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
         panMain.setLayout(new GridBagLayout());
         panBtn.setLayout(new GridLayout(0, 2));
 
-        txtName = new JTextField(loan.getInstitution());
+        if (isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().isSimulateGrayMonday())) {
+            txtName = new JTextField(resourceMap.getString("lblName.grayMonday"));
+        } else {
+            txtName = new JTextField(loan.getInstitution());
+        }
         txtName.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void changedUpdate(DocumentEvent e) {
@@ -580,9 +586,12 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
     }
 
     private void setSliders() {
+        boolean isGrayMonday = isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().isSimulateGrayMonday());
+
         if (campaign.getCampaignOptions().isUseLoanLimits()) {
             int[] interest = Loan.getInterestBracket(rating);
             sldInterest = new JSlider(interest[0], interest[2], loan.getRate());
+            sldInterest.setEnabled(!isGrayMonday);
             if (interest[2] - interest[0] > 30) {
                 sldInterest.setMajorTickSpacing(10);
             } else {
@@ -600,6 +609,7 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
             }
             sldCollateral.setPaintTicks(true);
             sldCollateral.setPaintLabels(true);
+            sldCollateral.setEnabled(!isGrayMonday);
 
             sldLength = new JSlider(1, Loan.getMaxYears(rating), loan.getYears());
             sldLength.setMajorTickSpacing(1);
@@ -610,11 +620,13 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
             sldInterest.setMajorTickSpacing(10);
             sldInterest.setPaintTicks(true);
             sldInterest.setPaintLabels(true);
+            sldInterest.setEnabled(!isGrayMonday);
 
             sldCollateral = new JSlider(0, 300, loan.getCollateral());
             sldCollateral.setMajorTickSpacing(50);
             sldCollateral.setPaintTicks(true);
             sldCollateral.setPaintLabels(true);
+            sldCollateral.setEnabled(!isGrayMonday);
 
             sldLength = new JSlider(1, 10, loan.getYears());
             sldLength.setMajorTickSpacing(1);

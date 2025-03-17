@@ -180,6 +180,10 @@ public class CampaignXmlParser {
                     }
                 } else if (xn.equalsIgnoreCase("custom")) {
                     reloadUnitData |= processCustom(retVal, wn);
+                } else if (xn.equalsIgnoreCase("campaignOptions")) {
+                    retVal.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
+                } else if (xn.equalsIgnoreCase("gameOptions")) {
+                    retVal.getGameOptions().fillFromXML(wn.getChildNodes());
                 }
             } else {
                 // If it's a text node or attribute or whatever at this level,
@@ -246,11 +250,7 @@ public class CampaignXmlParser {
                 // Okay, so what element is it?
                 String xn = wn.getNodeName();
 
-
-
-                if (xn.equalsIgnoreCase("campaignOptions")) {
-                    retVal.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
-                } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
+                if (xn.equalsIgnoreCase("randomSkillPreferences")) {
                     retVal.setRandomSkillPreferences(
                             RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn, version));
                 } else if (xn.equalsIgnoreCase("parts")) {
@@ -278,8 +278,6 @@ public class CampaignXmlParser {
                     processStoryArcNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("fameAndInfamy")) {
                     processFameAndInfamyNodes(retVal, wn);
-                } else if (xn.equalsIgnoreCase("gameOptions")) {
-                    retVal.getGameOptions().fillFromXML(wn.getChildNodes());
                 } else if (xn.equalsIgnoreCase("kills")) {
                     processKillNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("shoppingList")) {

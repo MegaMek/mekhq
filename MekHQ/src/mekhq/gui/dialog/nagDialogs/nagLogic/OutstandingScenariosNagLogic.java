@@ -107,6 +107,11 @@ public class OutstandingScenariosNagLogic {
                                 .append(", ").append(track.getDisplayableName())
                                 .append('-').append(stratconScenario.getCoords().toBTString());
 
+                            if (scenario.getStratConScenarioType().isSpecial()) {
+                                activeScenarios.append(" (Crisis)");
+                                continue;
+                            }
+
                             if (stratconScenario.isTurningPoint()) {
                                 activeScenarios.append(" (Turning Point)");
                             }

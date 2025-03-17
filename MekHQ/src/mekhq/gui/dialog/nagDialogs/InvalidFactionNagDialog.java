@@ -30,7 +30,10 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
+
+import java.time.LocalDate;
 
 import static mekhq.gui.dialog.nagDialogs.nagLogic.InvalidFactionNagLogic.isFactionInvalid;
 
@@ -73,21 +76,22 @@ public class InvalidFactionNagDialog extends AbstractMHQNagDialog {
     }
 
     /**
-     * Checks if a nag dialog should be displayed for an invalid faction in the given campaign.
+     * Determines whether a nag dialog should be displayed for an invalid faction in the campaign.
      *
-     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
+     * <p>This method checks two conditions to decide if the nag dialog should appear:</p>
      * <ul>
-     *     <li>If the nag dialog for an invalid faction has not been ignored in the user options.</li>
-     *     <li>If the faction associated with the campaign is considered invalid.</li>
+     *     <li>The user has not ignored the nag dialog for invalid factions in their options.</li>
+     *     <li>The faction associated with the campaign is invalid for the specified date.</li>
      * </ul>
      *
-     * @param campaign the {@link Campaign} to check for nagging conditions
-     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
+     * @param campaignFaction The {@link Faction} associated with the campaign to be checked.
+     * @param today           The {@link LocalDate} representing the current in-game date.
+     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise.
      */
-    public static boolean checkNag(Campaign campaign) {
+    public static boolean checkNag(Faction campaignFaction, LocalDate today) {
         final String NAG_KEY = MHQConstants.NAG_INVALID_FACTION;
 
         return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && (isFactionInvalid(campaign));
+            && (isFactionInvalid(campaignFaction, today));
     }
 }

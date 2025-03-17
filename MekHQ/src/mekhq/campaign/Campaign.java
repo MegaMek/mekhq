@@ -4254,18 +4254,23 @@ public class Campaign implements ITechManager {
             for (final Scenario scenario : contract.getCurrentAtBScenarios()) {
                 if ((scenario.getDate() != null) && scenario.getDate().isBefore(getLocalDate())) {
                     if (getCampaignOptions().isUseStratCon() && (scenario instanceof AtBDynamicScenario)) {
+                        StratconCampaignState campaignState = contract.getStratconCampaignState();
+
+                        if (campaignState == null) {
+                            return;
+                        }
+
                         final boolean stub = StratconRulesManager.processIgnoredScenario(
-                                (AtBDynamicScenario) scenario, contract.getStratconCampaignState());
+                                (AtBDynamicScenario) scenario, campaignState);
 
                         if (stub) {
                             ScenarioType scenarioType = scenario.getStratConScenarioType();
-                            if (scenarioType.isResupply()) {
-                                processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
+                            if (scenarioType.isSpecial()) {
+                                campaignState.updateVictoryPoints(-1);
                             }
 
-                            if (scenarioType.isJailBreak()) {
-                                StratconCampaignState campaignState = contract.getStratconCampaignState();
-                                campaignState.changeSupportPoints(-1);
+                            if (scenarioType.isResupply()) {
+                                processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
                             }
 
                             scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
@@ -6026,11 +6031,13 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "info");
         // endregion Basic Campaign Info
 
-        // region Campaign Options
+        // region Options
         if (getCampaignOptions() != null) {
             getCampaignOptions().writeToXml(pw, indent);
         }
-        // endregion Campaign Options
+        getGameOptions().writeToXML(pw, indent);
+        // endregion Options
+
 
         // Lists of objects:
         units.writeToXML(pw, indent, "units"); // Units
@@ -6085,8 +6092,6 @@ public class Campaign implements ITechManager {
 
         // parts is the biggest so it goes last
         parts.writeToXML(pw, indent, "parts"); // Parts
-
-        getGameOptions().writeToXML(pw, indent);
 
         // current story arc
         if (null != storyArc) {
@@ -7318,28 +7323,7 @@ public class Campaign implements ITechManager {
         for (final IBasicOption option : options) {
             getGameOptions().getOption(option.getName()).setValue(option.getValue());
         }
-        updateCampaignOptionsFromGameOptions();
-    }
-
-    public void updateCampaignOptionsFromGameOptions() {
-        getCampaignOptions()
-                .setUseTactics(getGameOptions().getOption(OptionsConstants.RPG_COMMAND_INIT).booleanValue());
-        getCampaignOptions().setUseInitiativeBonus(
-                getGameOptions().getOption(OptionsConstants.RPG_INDIVIDUAL_INITIATIVE).booleanValue());
-        getCampaignOptions().setUseToughness(getGameOptions().getOption(OptionsConstants.RPG_TOUGHNESS).booleanValue());
-        getCampaignOptions()
-                .setUseArtillery(getGameOptions().getOption(OptionsConstants.RPG_ARTILLERY_SKILL).booleanValue());
-        getCampaignOptions()
-                .setUseAbilities(getGameOptions().getOption(OptionsConstants.RPG_PILOT_ADVANTAGES).booleanValue());
-        getCampaignOptions().setUseEdge(getGameOptions().getOption(OptionsConstants.EDGE).booleanValue());
-        getCampaignOptions()
-                .setUseImplants(getGameOptions().getOption(OptionsConstants.RPG_MANEI_DOMINI).booleanValue());
-        getCampaignOptions()
-                .setQuirks(getGameOptions().getOption(OptionsConstants.ADVANCED_STRATOPS_QUIRKS).booleanValue());
-        getCampaignOptions()
-                .setAllowCanonOnly(getGameOptions().getOption(OptionsConstants.ALLOWED_CANON_ONLY).booleanValue());
-        getCampaignOptions().setTechLevel(TechConstants
-                .getSimpleLevel(getGameOptions().getOption(OptionsConstants.ALLOWED_TECHLEVEL).stringValue()));
+        campaignOptions.updateCampaignOptionsFromGameOptions(gameOptions);
         MekHQ.triggerEvent(new OptionsChangedEvent(this));
     }
 

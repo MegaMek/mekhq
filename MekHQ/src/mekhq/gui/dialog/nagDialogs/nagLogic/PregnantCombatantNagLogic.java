@@ -27,38 +27,40 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
+import java.util.List;
+
 public class PregnantCombatantNagLogic {
     /**
-     * Checks if the current campaign contains any personnel who are pregnant and actively assigned
-     * to a force.
+     * Determines if the current campaign contains any personnel who are pregnant and actively assigned
+     * to a combat force.
      *
-     * <p>
-     * This method iterates through all active personnel in the campaign to determine if any
-     * are pregnant. If a pregnant person is assigned to a unit that belongs to a combat force
-     * (i.e., a force with an ID other than {@link Force#FORCE_NONE}), this method returns {@code true}.
-     * Otherwise, it returns {@code false}.
-     * </p>
+     * <p>This method evaluates the following conditions to return {@code true}:</p>
+     * <ul>
+     *     <li>The campaign has an active contract.</li>
+     *     <li>There are pregnant personnel in the list of active personnel.</li>
+     *     <li>A pregnant person is assigned to a unit that is part of a combat force
+     *         (i.e., a force with an ID other than {@link Force#FORCE_NONE}).</li>
+     * </ul>
      *
-     * <p>
-     * If there are no active missions in the campaign, the method short-circuits and immediately
-     * returns {@code false}.
-     * </p>
+     * <p>If no active contract exists in the campaign, the method immediately returns {@code false}.
+     * This prevents unnecessary processing of the personnel list.</p>
      *
-     * @return {@code true} if there are pregnant personnel actively assigned to a combat force,
-     * {@code false} otherwise.
+     * @param hasActiveContract A flag indicating whether the campaign currently has an active contract.
+     * @param activePersonnel A list of {@link Person} objects representing the active personnel in the campaign.
+     *
+     * @return {@code true} if there are pregnant personnel assigned to a combat force; {@code false} otherwise.
      */
-    public static boolean hasActivePregnantCombatant(Campaign campaign) {
-        if (campaign.getActiveMissions(false).isEmpty()) {
+    public static boolean hasActivePregnantCombatant(boolean hasActiveContract, List<Person> activePersonnel) {
+        if (!hasActiveContract) {
             return false;
         }
 
-        // there is no reason to use a stream here, as there won't be enough iterations to warrant it
-        for (Person person : campaign.getActivePersonnel()) {
+        // There is no reason to use a stream here, as there won't be enough iterations to warrant it.
+        for (Person person : activePersonnel) {
             if (person.isPregnant()) {
                 Unit unit = person.getUnit();
 

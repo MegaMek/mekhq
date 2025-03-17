@@ -49,6 +49,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static java.lang.Math.floor;
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.common.MiscType.F_SPONSON_TURRET;
@@ -95,6 +96,7 @@ public class Resupply {
     private Money convoyContentsValueCalculated;
 
     public static final int CARGO_MULTIPLIER = 4;
+    public static final int CARGO_MINIMUM_WEIGHT = 4;
     public static final int RESUPPLY_AMMO_TONNAGE = 1;
     public static final int RESUPPLY_ARMOR_TONNAGE = 5;
     final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
@@ -431,7 +433,7 @@ public class Resupply {
         final int TONNAGE_DIVIDER = 125;
         final double dropSize = baseTonnage / TONNAGE_DIVIDER;
 
-        return (int) round(dropSize);
+        return (int) max(CARGO_MINIMUM_WEIGHT, round(dropSize));
     }
 
     /**

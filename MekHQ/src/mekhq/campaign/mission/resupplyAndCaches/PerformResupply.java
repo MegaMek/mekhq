@@ -383,7 +383,7 @@ public class PerformResupply {
 
         interceptionChance += (int) Math.ceil(convoyWeight / INTERCEPTION_LOAD_INFLUENCE);
         // There is always a 1in10 chance of Interception, no matter how stealthy the convoy.
-        interceptionChance = Math.max(0, interceptionChance);
+        interceptionChance = Math.max(1, interceptionChance);
 
         // With interception chance calculated, we check to see whether an interception or event has occurred.
         if (Compute.randomInt(10) < interceptionChance) {

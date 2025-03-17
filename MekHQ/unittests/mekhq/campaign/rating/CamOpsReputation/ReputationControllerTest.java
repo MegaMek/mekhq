@@ -36,7 +36,7 @@ import org.mockito.MockedStatic;
 
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -90,9 +90,6 @@ class ReputationControllerTest {
         averageExperienceRating.when(() ->
             AverageExperienceRating.getAverageExperienceModifier(SkillLevel.VETERAN))
             .thenReturn(20);
-        averageExperienceRating.when(() ->
-            AverageExperienceRating.getAtBModifier(campaign))
-            .thenReturn(3);
         commandRating.when(() ->
             CommandRating.calculateCommanderRating(campaign, null))
             .thenReturn(Collections.singletonMap("total", 3));
@@ -139,9 +136,6 @@ class ReputationControllerTest {
         averageExperienceRating.when(() ->
                 AverageExperienceRating.getAverageExperienceModifier(SkillLevel.ULTRA_GREEN))
             .thenReturn(5);
-        averageExperienceRating.when(() ->
-                AverageExperienceRating.getAtBModifier(campaign))
-            .thenReturn(0);
         commandRating.when(() ->
                 CommandRating.calculateCommanderRating(campaign, null))
             .thenReturn(Collections.singletonMap("total", 0));

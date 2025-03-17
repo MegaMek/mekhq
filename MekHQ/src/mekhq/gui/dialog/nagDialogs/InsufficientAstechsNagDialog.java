@@ -76,21 +76,22 @@ public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
     }
 
     /**
-     * Checks if a nag dialog should be displayed for insufficient AsTechs in the given campaign.
+     * Determines whether a nag dialog should be displayed for insufficient AsTechs in the campaign.
      *
-     * <p>The method evaluates the following conditions:</p>
+     * <p>This method evaluates the following conditions to decide if the nag dialog should appear:</p>
      * <ul>
-     *     <li>If the nag dialog for insufficient AsTechs has not been ignored in the user options.</li>
-     *     <li>If the campaign does not have the required number of AsTechs.</li>
+     *     <li>The user has not ignored the nag dialog for insufficient AsTechs in their options.</li>
+     *     <li>The campaign requires additional AsTechs ({@code asTechsNeeded} is greater than zero).</li>
      * </ul>
      *
-     * @param campaign the {@link Campaign} to check for nagging conditions
-     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
+     * @param asTechsNeeded The number of additional AsTechs required to meet the campaign's needs.
+     * @return {@code true} if the nag dialog should be displayed due to insufficient AsTechs,
+     *         {@code false} otherwise.
      */
-    public static boolean checkNag(Campaign campaign) {
+    public static boolean checkNag(int asTechsNeeded) {
         final String NAG_KEY = MHQConstants.NAG_INSUFFICIENT_ASTECHS;
 
         return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && hasAsTechsNeeded(campaign);
+              && hasAsTechsNeeded(asTechsNeeded);
     }
 }

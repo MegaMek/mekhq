@@ -27,7 +27,6 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.nagDialogs.UnmaintainedUnitsNagDialog;
@@ -47,8 +46,6 @@ import static org.mockito.Mockito.when;
  * It tests the different combinations of unit states and verifies the behavior of the {@code checkHanger()} method.
  */
 class UnmaintainedUnitsNagLogicTest {
-    // Mock objects for the tests
-    private Campaign campaign;
     private Hangar hangar;
     private Unit mockUnit1, mockUnit2;
 
@@ -59,13 +56,9 @@ class UnmaintainedUnitsNagLogicTest {
     @BeforeEach
     void init() {
         // Initialize the mock objects
-        campaign = mock(Campaign.class);
-        hangar = mock(Hangar.class);
+        // Mock objects for the tests
         mockUnit1 = mock(Unit.class);
         mockUnit2 = mock(Unit.class);
-
-        // When the Campaign mock calls 'getHangar()' return the 'hangar' mock
-        when(campaign.getHangar()).thenReturn(hangar);
     }
 
     /**
@@ -83,9 +76,6 @@ class UnmaintainedUnitsNagLogicTest {
 
         when(mockUnit2.isUnmaintained()).thenReturn(unit2Unmaintained);
         when(mockUnit2.isSalvage()).thenReturn(unit2Salvage);
-
-        List<Unit> units = List.of(mockUnit1, mockUnit2);
-        when(hangar.getUnits()).thenReturn(units);
     }
 
     // In the following tests the checkHanger() method is called, and its response is checked
@@ -94,60 +84,60 @@ class UnmaintainedUnitsNagLogicTest {
     @Test
     void unmaintainedUnitExistsUnit1() {
         initializeUnits(true, false, false, false);
-        assertTrue(campaignHasUnmaintainedUnits(campaign));
+        assertTrue(campaignHasUnmaintainedUnits(List.of(mockUnit1, mockUnit2)));
     }
 
     @Test
     void unmaintainedUnitExistsUnit2() {
         initializeUnits(false, false, true, false);
-        assertTrue(campaignHasUnmaintainedUnits(campaign));
+        assertTrue(campaignHasUnmaintainedUnits(List.of(mockUnit1, mockUnit2)));
     }
 
     @Test
     void unmaintainedUnitExistsButSalvageUnit1() {
         initializeUnits(true, true, true, false);
-        assertTrue(campaignHasUnmaintainedUnits(campaign));
+        assertTrue(campaignHasUnmaintainedUnits(List.of(mockUnit1, mockUnit2)));
     }
 
     @Test
     void unmaintainedUnitExistsButSalvageUnit2() {
         initializeUnits(true, false, true, true);
-        assertTrue(campaignHasUnmaintainedUnits(campaign));
+        assertTrue(campaignHasUnmaintainedUnits(List.of(mockUnit1, mockUnit2)));
     }
 
     @Test
     void unmaintainedUnitExistsButSalvageMixed() {
         initializeUnits(false, true, true, false);
-        assertTrue(campaignHasUnmaintainedUnits(campaign));
+        assertTrue(campaignHasUnmaintainedUnits(List.of(mockUnit1, mockUnit2)));
     }
 
     @Test
     void noUnmaintainedUnitExistsNoSalvage() {
         initializeUnits(false, false, false, false);
-        assertFalse(campaignHasUnmaintainedUnits(campaign));
+        assertFalse(campaignHasUnmaintainedUnits(List.of(mockUnit1, mockUnit2)));
     }
 
     @Test
     void noUnmaintainedUnitExistsAllSalvage() {
         initializeUnits(false, true, false, true);
-        assertFalse(campaignHasUnmaintainedUnits(campaign));
+        assertFalse(campaignHasUnmaintainedUnits(List.of(mockUnit1, mockUnit2)));
     }
 
     @Test
     void noUnmaintainedUnitExistsButSalvageUnit1() {
         initializeUnits(false, true, false, false);
-        assertFalse(campaignHasUnmaintainedUnits(campaign));
+        assertFalse(campaignHasUnmaintainedUnits(List.of(mockUnit1, mockUnit2)));
     }
 
     @Test
     void noUnmaintainedUnitExistsButSalvageUnit2() {
         initializeUnits(false, false, false, true);
-        assertFalse(campaignHasUnmaintainedUnits(campaign));
+        assertFalse(campaignHasUnmaintainedUnits(List.of(mockUnit1, mockUnit2)));
     }
 
     @Test
     void noUnmaintainedUnitExistsButSalvageMixed() {
         initializeUnits(false, true, false, false);
-        assertFalse(campaignHasUnmaintainedUnits(campaign));
+        assertFalse(campaignHasUnmaintainedUnits(List.of(mockUnit1, mockUnit2)));
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -27,19 +27,21 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-public class InsufficientMedicsNagLogic {
+public class AdminStrainNagLogic {
     /**
-     * Determines whether additional medics are needed in the campaign.
+     * Checks whether a campaign is experiencing administrative strain.
      *
-     * <p>This method checks if the number of required medics is greater than zero. If it is, this
-     * indicates a need for additional medics to meet the campaign's requirements; otherwise, no
-     * additional medics are required.</p>
+     * <p>Administrative strain occurs when the administrative strain level is greater than zero.
+     * This method serves as a simple utility check to determine if administrative strain
+     * exists in the campaign based on the provided strain level.</p>
      *
-     * @param medicsRequired The number of medics currently required to meet the campaign's needs.
-     * @return {@code true} if the number of required medics ({@code medicsRequired}) is greater than zero,
+     * @param adminStrain The administrative strain level of the campaign. A value greater than 0
+     *                    indicates the presence of administrative strain.
+     *
+     * @return {@code true} if administrative strain is present (i.e., {@code adminStrain > 0}).
      *         {@code false} otherwise.
      */
-    public static boolean hasMedicsNeeded(int medicsRequired) {
-        return medicsRequired > 0;
+    public static boolean hasAdminStrain(int adminStrain) {
+        return adminStrain > 0;
     }
 }

@@ -37,7 +37,6 @@ import static mekhq.gui.dialog.nagDialogs.nagLogic.NoCommanderNagLogic.hasNoComm
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * This class is a test class for the {@link NoCommanderNagDialog} class.
@@ -57,7 +56,7 @@ class NoCommanderNagLogicTest {
     void init() {
         // Initialize the mock objects
         campaign = mock(Campaign.class);
-        commander = mock(Person.class);
+        commander = new Person(campaign);
         commanderNull = null;
     }
 
@@ -66,13 +65,11 @@ class NoCommanderNagLogicTest {
 
     @Test
     void commanderPresent() {
-        when(campaign.getFlaggedCommander()).thenReturn(commander);
-        assertFalse(hasNoCommander(campaign));
+        assertFalse(hasNoCommander(commander));
     }
 
     @Test
     void commanderMissing() {
-        when(campaign.getFlaggedCommander()).thenReturn(commanderNull);
-        assertTrue(hasNoCommander(campaign));
+        assertTrue(hasNoCommander(commanderNull));
     }
 }

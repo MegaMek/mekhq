@@ -41,7 +41,6 @@ public class IconPackage {
     private final Map<String, String> guiElements = new HashMap<>();
     {
         // Skin defaults
-        guiElements.put("infirmary_background", "data/images/misc/field_hospital.jpg");
         guiElements.put("default_male_paperdoll", "data/images/misc/paperdoll/default_male.xml");
         guiElements.put("default_female_paperdoll", "data/images/misc/paperdoll/default_female.xml");
     }

@@ -28,7 +28,6 @@
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -36,9 +35,11 @@ import mekhq.gui.dialog.nagDialogs.PregnantCombatantNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
 
+import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.force.Force.FORCE_ORIGIN;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.PregnantCombatantNagLogic.hasActivePregnantCombatant;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -65,15 +66,10 @@ class PregnantCombatantNagLogicTest {
     void init() {
         // Initialize the mock objects
         campaign = mock(Campaign.class);
-        mission = mock(Mission.class);
-        personNotPregnant = mock(Person.class);
-        personPregnant = mock(Person.class);
+        personNotPregnant = new Person(campaign);
+        personPregnant = new Person(campaign);
+        personPregnant.setDueDate(LocalDate.of(3151, 1, 1));
         unit = mock(Unit.class);
-
-
-        // Stubs
-        when(personNotPregnant.isPregnant()).thenReturn(false);
-        when(personPregnant.isPregnant()).thenReturn(true);
     }
 
     // In the following tests the isPregnantCombatant() method is called, and its response is
@@ -81,47 +77,32 @@ class PregnantCombatantNagLogicTest {
 
     @Test
     void noActiveMission() {
-        when(campaign.getActiveMissions(false)).thenReturn(new ArrayList<>());
-        assertFalse(hasActivePregnantCombatant(campaign));
+        assertFalse(hasActivePregnantCombatant(false, List.of(personPregnant)));
     }
 
     @Test
     void activeMissionsNoPregnancy() {
-        when(campaign.getActiveMissions(false)).thenReturn(List.of(mission));
-        when(campaign.getActivePersonnel()).thenReturn(List.of(personNotPregnant));
-
-        assertFalse(hasActivePregnantCombatant(campaign));
+        assertFalse(hasActivePregnantCombatant(true, List.of(personNotPregnant)));
     }
 
     @Test
     void activeMissionsPregnancyNoUnit() {
-        when(campaign.getActiveMissions(false)).thenReturn(List.of(mission));
-        when(campaign.getActivePersonnel()).thenReturn(List.of(personNotPregnant, personPregnant));
-
-        when(personPregnant.getUnit()).thenReturn(null);
-
-        assertFalse(hasActivePregnantCombatant(campaign));
+        assertFalse(hasActivePregnantCombatant(true, List.of(personPregnant)));
     }
 
     @Test
-    void activeMissionsPregnancyNoForce() {
-        when(campaign.getActiveMissions(false)).thenReturn(List.of(mission));
-        when(campaign.getActivePersonnel()).thenReturn(List.of(personNotPregnant, personPregnant));
+    void activeMissionsPregnancyYesUnitNoForce() {
+        personPregnant.setUnit(unit);
+        when(unit.getForceId()).thenReturn(FORCE_NONE);
 
-        when(personPregnant.getUnit()).thenReturn(unit);
-        when(unit.getForceId()).thenReturn(Force.FORCE_NONE);
-
-        assertFalse(hasActivePregnantCombatant(campaign));
+        assertFalse(hasActivePregnantCombatant(true, List.of(personPregnant)));
     }
 
     @Test
     void activeMissionsPregnancyYesUnitYesForce() {
-        when(campaign.getActiveMissions(false)).thenReturn(List.of(mission));
-        when(campaign.getActivePersonnel()).thenReturn(List.of(personNotPregnant, personPregnant));
+        personPregnant.setUnit(unit);
+        when(unit.getForceId()).thenReturn(FORCE_ORIGIN);
 
-        when(personPregnant.getUnit()).thenReturn(unit);
-        when(unit.getForceId()).thenReturn(1);
-
-        assertTrue(hasActivePregnantCombatant(campaign));
+        assertTrue(hasActivePregnantCombatant(true, List.of(personPregnant)));
     }
 }

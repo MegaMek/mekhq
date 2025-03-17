@@ -43,7 +43,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static mekhq.campaign.rating.CamOpsReputation.AverageExperienceRating.getAtBModifier;
 import static mekhq.campaign.rating.CamOpsReputation.AverageExperienceRating.getAverageExperienceModifier;
 import static mekhq.campaign.rating.CamOpsReputation.AverageExperienceRating.getSkillLevel;
 import static mekhq.campaign.rating.CamOpsReputation.CombatRecordRating.calculateCombatRecordRating;
@@ -136,7 +135,7 @@ public class ReputationController {
         // step one: calculate average experience rating
         averageSkillLevel = getSkillLevel(campaign, true);
         averageExperienceRating = getAverageExperienceModifier(averageSkillLevel);
-        atbModifier = getAtBModifier(campaign);
+        atbModifier = averageSkillLevel.ordinal();
 
         // step two: calculate command rating
         commanderMap = calculateCommanderRating(campaign, campaign.getFlaggedCommander());

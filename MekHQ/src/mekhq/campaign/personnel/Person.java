@@ -3806,7 +3806,7 @@ public class Person {
     public boolean isLocationMissing(final @Nullable BodyLocation location) {
         return (location != null)
                 && (getInjuriesByLocation(location).stream()
-                        .anyMatch(injury -> injury.getType().impliesMissingLocation(location))
+                        .anyMatch(injury -> injury.getType().impliesMissingLocation())
                         || isLocationMissing(location.Parent()));
     }
 
