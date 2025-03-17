@@ -45,8 +45,8 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.ImageObserver;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 /**
  * Shows injured and medical personnel
@@ -82,11 +82,6 @@ public final class InfirmaryTab extends CampaignGuiTab {
                 MekHQ.getMHQOptions().getLocale());
 
         setLayout(new GridBagLayout());
-
-        String bgImageFile = getIconPackage().getGuiElement("infirmary_background");
-        if (null != bgImageFile && !bgImageFile.isEmpty()) {
-            bgImage = Toolkit.getDefaultToolkit().createImage(bgImageFile);
-        }
 
         doctorsModel = new DocTableModel(getCampaign());
         docTable = new JTable(doctorsModel);
