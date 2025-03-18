@@ -706,23 +706,18 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         Faction employerFaction = contract.getEmployerFaction();
 
         if (employerFaction.isISMajorOrSuperPower()) {
-            mods.mods[CLAUSE_SALVAGE] += -1;
+            mods.mods[CLAUSE_SALVAGE] -= 1;
             mods.mods[CLAUSE_TRANSPORT] += 1;
-        }
-        if (employerFaction.isMinorPower()) {
-            mods.mods[CLAUSE_SALVAGE] += -2;
-        }
-        if (employerFaction.isMercenary()) {
-            mods.mods[CLAUSE_COMMAND] += -1;
+        } else if (employerFaction.isMinorPower()) {
+            mods.mods[CLAUSE_SALVAGE] -= 2;
+        } else if (employerFaction.isMercenary()) {
+            mods.mods[CLAUSE_COMMAND] -= 1;
             mods.mods[CLAUSE_SALVAGE] += 2;
             mods.mods[CLAUSE_SUPPORT] += 1;
             mods.mods[CLAUSE_TRANSPORT] += 1;
-        }
-        if (employerFaction.equals("IND")) {
-            mods.mods[CLAUSE_COMMAND] += 0;
-            mods.mods[CLAUSE_SALVAGE] += -1;
-            mods.mods[CLAUSE_SUPPORT] += -1;
-            mods.mods[CLAUSE_TRANSPORT] += 0;
+        } else if (employerFaction.getShortName().equals("IND")) {
+            mods.mods[CLAUSE_SALVAGE] -= 1;
+            mods.mods[CLAUSE_SUPPORT] -= 1;
         }
 
         int modifier = getEmployerNegotiatorModifier(employerFaction);
