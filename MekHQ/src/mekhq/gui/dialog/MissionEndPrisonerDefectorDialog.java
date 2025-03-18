@@ -58,7 +58,7 @@ public class MissionEndPrisonerDefectorDialog extends MHQDialogImmersive {
     public MissionEndPrisonerDefectorDialog(Campaign campaign) {
         super(campaign, campaign.getSeniorAdminPerson(COMMAND), null,
             createInCharacterMessage(campaign), createButtons(), createOutOfCharacterMessage(),
-            null, false, null, true);
+            null, false);
     }
 
     /**

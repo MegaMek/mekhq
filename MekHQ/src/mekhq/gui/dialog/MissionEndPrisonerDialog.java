@@ -57,8 +57,7 @@ public class MissionEndPrisonerDialog extends MHQDialogImmersive {
         super(campaign, getSpeaker(campaign), null,
             createInCharacterMessage(campaign, ransom, isAllied, isSuccess, isGoodEvent),
             createButtons(isAllied, isSuccess, isGoodEvent),
-            createOutOfCharacterMessage(isAllied, isSuccess, isGoodEvent), null,
-              false, null, true);
+            createOutOfCharacterMessage(isAllied, isSuccess, isGoodEvent), null, false);
     }
 
     /**
