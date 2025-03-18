@@ -186,6 +186,7 @@ MEKHQ VERSION HISTORY:
 + PR #6291: Added Handling for When Unit Quality is Manually Set to Empty or null Quality
 + PR #6292: Added Specific Handling for Legacy Prisoner Capture Styles
 + Fix #5977: Updated Label Texts for Clarity in Campaign Options IIC
++ PR #6298: Added Employer Modifiers to Contract Negotiations
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment
