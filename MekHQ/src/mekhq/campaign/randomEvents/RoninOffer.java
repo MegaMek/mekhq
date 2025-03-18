@@ -29,6 +29,7 @@
 package mekhq.campaign.randomEvents;
 
 import megamek.client.generator.RandomCallsignGenerator;
+import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
@@ -36,11 +37,13 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.gui.dialog.RoninOfferDialog;
 
 import static megamek.common.Compute.randomInt;
+import static megamek.common.enums.SkillLevel.VETERAN;
+import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
+import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
+import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
 import static mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateBigPersonality;
-import static mekhq.gui.dialog.HireBulkPersonnelDialog.reRollAdvantages;
-import static mekhq.gui.dialog.HireBulkPersonnelDialog.reRollLoyalty;
 
 /**
  * Represents a Ronin, a special type of recruitable personnel such as a MechWarrior,
@@ -72,10 +75,16 @@ public class RoninOffer {
         RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
         boolean useExtraRandomness = randomSkillPreferences.randomizeSkill();
 
+        // We don't care about admin settings, as we're not going to have an admin here
+        overrideSkills(false, false, useExtraRandomness,
+              ronin, role, VETERAN);
+
         generateBigPersonality(ronin);
 
-        reRollLoyalty(ronin, ronin.getExperienceLevel(campaign, false));
-        reRollAdvantages(campaign, ronin, ronin.getExperienceLevel(campaign, false));
+        SkillLevel skillLevel = ronin.getSkillLevel(campaign, false);
+        reRollLoyalty(ronin, skillLevel);
+        reRollAdvantages(campaign, ronin, skillLevel);
+
         ronin.setCallsign(RandomCallsignGenerator.getInstance().generate());
 
         RoninOfferDialog roninOfferDialogInitialMessage = new RoninOfferDialog(campaign, true, ronin);
