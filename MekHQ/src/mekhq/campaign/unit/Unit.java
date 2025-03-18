@@ -4411,7 +4411,20 @@ public class Unit implements ITechnology {
 
         // Clear any stale game data that may somehow have gotten set incorrectly
         getCampaign().clearGameData(entity);
+
         // Set up SPAs, Implants, Edge, etc
+        // Find the unit commander
+        Person commander = getCommander();
+
+        // Set Tactics-based Commander's Initiative Bonus, if applicable
+        entity.getCrew().setCommandBonus(0);
+        if (getCampaign().getCampaignOptions().isUseTactics()) {
+            // Tactics command bonus. This should actually reflect the unit's commander
+            if (null != commander && commander.hasSkill(SkillType.S_TACTICS)) {
+                entity.getCrew().setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
+            }
+        }
+
         if (getCampaign().getCampaignOptions().isUseAbilities()
                 || getCampaign().getCampaignOptions().isUseEdge()
                 || getCampaign().getCampaignOptions().isUseImplants()) {
@@ -4447,8 +4460,6 @@ public class Unit implements ITechnology {
                     || entity.hasETypeFlag(Entity.ETYPE_TANK)
                     || entity.hasETypeFlag(Entity.ETYPE_INFANTRY)
                     || entity.hasETypeFlag(Entity.ETYPE_TRIPOD_MEK)) {
-                // Find the unit commander
-                Person commander = getCommander();
                 // If there is no crew, there's nothing left to do here.
                 if (null == commander) {
                     return;
@@ -4545,14 +4556,6 @@ public class Unit implements ITechnology {
                 // Important if you just changed technician edge options for members of either
                 // unit type
                 resetEngineer();
-                // Tactics command bonus. This should actually reflect the unit's commander,
-                // unlike most everything else in this block.
-                // TODO : game option to use tactics as command and ind init bonus
-                if (commander.hasSkill(SkillType.S_TACTICS)) {
-                    entity.getCrew().setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
-                } else {
-                    entity.getCrew().setCommandBonus(0);
-                }
 
                 // TODO : Set up crew hits. This might only apply to spacecraft, and should
                 // reflect
@@ -4563,7 +4566,6 @@ public class Unit implements ITechnology {
 
             } else {
                 // For other unit types, just use the unit commander's abilities.
-                Person commander = getCommander();
                 PilotOptions cdrOptions = new PilotOptions(); // MegaMek-style as it is sent to MegaMek
                 if (null != commander) {
                     for (String optionName : optionNames) {
@@ -4592,13 +4594,6 @@ public class Unit implements ITechnology {
                 // There was a resetEngineer() here. We shouldn't need it as spacecraft and
                 // infantry are handled
                 // by the preceding block
-
-                // TODO: game option to use tactics as command and ind init bonus
-                if (null != commander && commander.hasSkill(SkillType.S_TACTICS)) {
-                    entity.getCrew().setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
-                } else {
-                    entity.getCrew().setCommandBonus(0);
-                }
             }
         }
     }

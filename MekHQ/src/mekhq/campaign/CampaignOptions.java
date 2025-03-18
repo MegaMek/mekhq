@@ -5499,7 +5499,7 @@ public class CampaignOptions {
 
                     // region Prisoners
                 } else if (wn2.getNodeName().equalsIgnoreCase("prisonerCaptureStyle")) {
-                    retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.valueOf(wn2.getTextContent().trim()));
+                    retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.fromString(wn2.getTextContent().trim()));
                     // endregion Prisoners
 
                     //region Dependent
