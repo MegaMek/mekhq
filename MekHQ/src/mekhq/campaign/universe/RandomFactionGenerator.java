@@ -28,16 +28,6 @@
  */
 package mekhq.campaign.universe;
 
-import java.time.LocalDate;
-import java.time.Month;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
@@ -48,6 +38,13 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.OptionsChangedEvent;
+
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static mekhq.MHQConstants.FORTRESS_REPUBLIC;
 
 /**
  * @author Neoancient
@@ -191,7 +188,7 @@ public class RandomFactionGenerator {
             if (f.isClan() || FactionHints.isEmptyFaction(f)) {
                 continue;
             }
-            if (f.getShortName().equals("ROS") && getCurrentDate().isAfter(MHQConstants.FORTRESS_REPUBLIC)) {
+            if (f.getShortName().equals("ROS") && getCurrentDate().isAfter(FORTRESS_REPUBLIC)) {
                 continue;
             }
 
@@ -340,6 +337,11 @@ public class RandomFactionGenerator {
                     || enemy.getShortName().equals("CLAN")) {
                 continue;
             }
+
+            if (enemy.getShortName().equals("ROS") && getCurrentDate().isAfter(FORTRESS_REPUBLIC)) {
+                continue;
+            }
+
             int totalCount = borderTracker.getBorderSystems(employer, enemy).size();
             double count = totalCount;
             // Split the border between main controlling faction and any contained factions.
@@ -349,6 +351,11 @@ public class RandomFactionGenerator {
                                 employer, getCurrentDate())) {
                     continue;
                 }
+
+                if (cFaction.getShortName().equals("ROS") && getCurrentDate().isAfter(FORTRESS_REPUBLIC)) {
+                    continue;
+                }
+
                 if (factionHints.isNeutral(cFaction, enemy, getCurrentDate())
                         || factionHints.isNeutral(enemy, cFaction, getCurrentDate())) {
                     continue;
@@ -377,7 +384,7 @@ public class RandomFactionGenerator {
             if (!f.isClan() && !FactionHints.isEmptyFaction(f)) {
                 set.add(f.getShortName());
             }
-            if (f.getShortName().equals("ROS") && getCurrentDate().isAfter(MHQConstants.FORTRESS_REPUBLIC)) {
+            if (f.getShortName().equals("ROS") && getCurrentDate().isAfter(FORTRESS_REPUBLIC)) {
                 continue;
             }
             /* Add factions which do not control any planets to the employer list */
