@@ -78,10 +78,6 @@ planet:
 
       On Ovan, local nobles have come to exercise complete control over the citizenry by their ownership of all of the desalinization units, power plants and farms, and by careful appointment of family members and cronies in the bureaucracy. The nobles enforce their rule and discourage citizens from seeking aid from the Confederation by showing exceeding loyalty to Sian, which in turn looks the other way when reports of abuse by Ovan nobles are received. The nobles also abuse their rights to create military ranks by forming huge private militias, comprised primarily of gangs of club-wielding thugs, and levying taxes on their fiefs. The difference between Ovan and other Kleptocracies is that the government has learned enough moderation to make their plundering sustainable for generations.
     smallMoons: 2
-    landmass:
-      - name:
-          source: canon
-          value: .na.character
     event:
       - date: '2270-08-02'
         faction:
