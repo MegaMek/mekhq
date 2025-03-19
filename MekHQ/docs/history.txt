@@ -191,6 +191,7 @@ MEKHQ VERSION HISTORY:
 + PR #6297: Removed Timer Delay for Filter Panel in Interstellar Map Tab
 + PR #6299: Disabled Remove CVP and Remove SP Options if GM Mode is Disabled; Allowed GMs to Take SP and CVP into Negative
 + PR #6300: Fixed Support Point Generation Soft Cap
++ Fix #6302: Refit will now properly consider different qualities as "used for refit planning
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment
