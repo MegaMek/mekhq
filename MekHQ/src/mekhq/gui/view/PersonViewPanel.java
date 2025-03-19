@@ -62,8 +62,8 @@ import java.awt.Dialog.ModalityType;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
@@ -583,6 +583,8 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblAge2 = new JLabel();
         JLabel lblGender1 = new JLabel();
         JLabel lblGender2 = new JLabel();
+        JLabel lblBloodType1 = new JLabel();
+        JLabel lblBloodType2 = new JLabel();
         JLabel lblOriginalUnit1 = new JLabel();
         JLabel lblOriginalUnit2 = new JLabel();
         JLabel lblDueDate1 = new JLabel();
@@ -745,6 +747,28 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInfo.add(lblGender2, gridBagConstraints);
+        y++;
+
+        lblBloodType1.setName("lblBloodType1");
+        lblBloodType1.setText(resourceMap.getString("lblBloodType1.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlInfo.add(lblBloodType1, gridBagConstraints);
+
+        lblBloodType2.setName("lblBloodType2");
+        lblBloodType2.setText(person.getBloodGroup().getLabel());
+        lblBloodType1.setLabelFor(lblBloodType2);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlInfo.add(lblBloodType2, gridBagConstraints);
         y++;
 
         boolean displayOriginalUnit = person.getOriginalUnitId() != null
