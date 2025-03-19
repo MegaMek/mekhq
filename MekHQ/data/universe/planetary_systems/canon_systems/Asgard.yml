@@ -5,7 +5,9 @@ ycood: 266.198
 spectralType:
   source: canon
   value: K9V
-primarySlot: 4
+primarySlot:
+  source: 25 Years of Art and Fiction, pg. 177
+  value: 4
 event:
   - date: '2374-10-02'
     zenithCharge: yes
@@ -57,28 +59,32 @@ planet:
       value: Asgard
     type: TERRESTRIAL
     orbitalDist: 0.2
-    sysPos: 4
+    sysPos:
+      source: 25 Years of Art and Fiction, pg. 177
+      value: 4
     icon: green43
     pressure:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 177
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 25 Years of Art and Fiction, pg. 177
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 177
       value: 0.94
-    diameter: 11195
-    density: 5.91826879002
+    diameter: 11178
+    density: 5.909525231611
     dayLength: 23
     yearLength: 0.7
     temperature:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 177
       value: 35
     water:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 177
       value: 60
     lifeForm:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 177
       value: AMPHIBIAN
     desc: Asgard is a planet with nearly two billion inhabitants. The planet is divided
       into five continents, the largest is Muspell and is the location of the planetary
@@ -86,21 +92,27 @@ planet:
       to the Combine as the Alliance’s power waned.
     landmass:
       - name:
-          source: canon
+          source: 25 Years of Art and Fiction, pg. 177
           value: Muspell
         capital:
-          source: canon
+          source: 25 Years of Art and Fiction, pg. 177
           value: Vernan
     satellite:
-      - name: Althiem
+      - name:
+          source: 25 Years of Art and Fiction, pg. 177
+          value: Alfheim
         size: medium
-        icon: oddmoon1
-      - name: Midgard
-        size: medium
-        icon: rock15
-      - name: Hel
+        icon: rock17
+      - name:
+          source: 25 Years of Art and Fiction, pg. 177
+          value: Hel
         size: medium
         icon: rock7
+      - name:
+          source: 25 Years of Art and Fiction, pg. 177
+          value: Midgard
+        size: medium
+        icon: rock15
     event:
       - date: '2170-02-01'
         faction:

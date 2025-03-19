@@ -3,9 +3,11 @@ sucsId: 229
 xcood: 53.764
 ycood: -51.489
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K8IV
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2362-07-12'
     nadirCharge: yes
@@ -64,28 +66,32 @@ planet:
       value: Azha
     type: TERRESTRIAL
     orbitalDist: 0.6
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: green6
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.1
-    diameter: 12691
-    density: 6.099096410483
+    diameter: 12683
+    density: 6.095151998722
     dayLength: 25
     yearLength: 0.9
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 53
     water:
-      source: canon
+      source: MWDA world profiles
       value: 43
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: "3135 - Azha is a small but strategically important world due to its location.
       The Bureaucratic and Logistical Offices of the Capellan military were located
@@ -107,16 +113,16 @@ planet:
       and were never heard from again. The planet surrendered shortly thereafter. "
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Brasilia
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Castellan
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Casella
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Ortega
     event:
       - date: '2243-01-11'

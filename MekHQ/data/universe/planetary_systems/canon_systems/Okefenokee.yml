@@ -3,9 +3,11 @@ sucsId: 1930
 xcood: 606.925
 ycood: -67.511
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 96'
   value: G5V
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Davion, pg. 96'
+  value: 4
 event:
   - date: '2694-07-14'
     nadirCharge: yes
@@ -59,28 +61,32 @@ planet:
       value: Okefenokee
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Davion, pg. 96'
+      value: 4
     icon: green23
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 96'
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 96'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 96'
       value: 1.1
-    diameter: 12585
-    density: 6.112877490675
+    diameter: 12615
+    density: 6.127678191687
     dayLength: 24
     yearLength: 1.3
     temperature:
-      source: canon
-      value: 34
+      source: 'Handbook: House Davion, pg. 96'
+      value: 38
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 96'
       value: 74
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 96'
       value: MAMMAL
     desc: |-
       Okefenokee is the typical Federated Suns backwater. Okefenokee is covered in jungles and was settled in the 26th century by a religious sect looking for seclusion in deep space. For centuries the planet was mostly independent and left alone, until during the late 3rd Succession War the planet’s large deposits of oil were discovered.
@@ -90,18 +96,24 @@ planet:
       Okefenokee is covered in jungles and swamps that are teeming with life. Unfortunately for anyone unlucky enough to wander into the swamps and jungles, much of these creatures are aggressive. The planet has only three real cities and most of the small population is thinly spread across the planet with usually no more than a few thousand in any community.
     landmass:
       - capital:
-          source: canon
+          source: 'Handbook: House Davion, pg. 96'
           value: Okesten
     satellite:
-      - name: Fraun
-        size: medium
-        icon: oddmoon3
-      - name: Haifa
-        size: medium
-        icon: oddmoon1
-      - name: al-Zun
+      - name:
+          source: 'Handbook: House Davion, pg. 96'
+          value: al-Zun
         size: large
         icon: rock14
+      - name:
+          source: 'Handbook: House Davion, pg. 96'
+          value: Fraun
+        size: medium
+        icon: oddmoon3
+      - name:
+          source: 'Handbook: House Davion, pg. 96'
+          value: Haifa
+        size: medium
+        icon: oddmoon1
     event:
       - date: '2680-08-30'
         faction:

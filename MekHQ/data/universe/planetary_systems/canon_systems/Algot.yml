@@ -3,9 +3,11 @@ sucsId: 71
 xcood: 85.816
 ycood: -82.771
 spectralType:
-  source: canon
+  source: House Liao, pg. 153
   value: G2IV
-primarySlot: 5
+primarySlot:
+  source: House Liao, pg. 153
+  value: 5
 event:
   - date: '2360-08-30'
     zenithCharge: yes
@@ -77,28 +79,32 @@ planet:
       value: Algot
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 5
+    sysPos:
+      source: House Liao, pg. 153
+      value: 5
     icon: green12
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.1
-    diameter: 13449
-    density: 5.772915798853
+    diameter: 13420
+    density: 5.760395838504
     dayLength: 22
     yearLength: 2.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 48
     water:
-      source: canon
+      source: MWDA world profiles
       value: 56
     lifeForm:
-      source: canon
+      source: House Liao, pg. 153
       value: PLANT
     desc: |-
       3135 - One of the first planets settled by early Tikonov explorers, by the beginning of the 29th century Algot was one of the most populous planets in the region. Algot was a major industrial centre specialising in computer and electronic sciences. Both the technological industry and population have declined significantly since.
@@ -110,13 +116,15 @@ planet:
       During the Jihad, Word of Blake used disabling poisons to subdue the planet. The Blakists took the world with minimal force, though they did firebomb the military compound outside of Cassol, destroying the AFFS unit stationed there.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Camellias
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Algot Prime
     satellite:
-      - name: Victoria’s Jewel
+      - name:
+          source: MWDA world profiles
+          value: Victoria's Jewel
         size: medium
         icon: rock9
     event:

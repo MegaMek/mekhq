@@ -3,9 +3,11 @@ sucsId: 2103
 xcood: 21.709
 ycood: -157.74
 spectralType:
-  source: canon
+  source: House Liao, pg. 147
   value: F5V
-primarySlot: 7
+primarySlot:
+  source: House Liao, pg. 147
+  value: 7
 event:
   - date: '2360-06-24'
     nadirCharge: yes
@@ -135,7 +137,9 @@ planet:
       value: Raballa
     type: TERRESTRIAL
     orbitalDist: 1.4
-    sysPos: 7
+    sysPos:
+      source: House Liao, pg. 147
+      value: 7
     icon: green25
     pressure: THIN
     atmosphere: BREATHABLE
@@ -148,7 +152,7 @@ planet:
     temperature: 36
     water: 20
     lifeForm:
-      source: canon
+      source: House Liao, pg. 147
       value: PLANT
     desc: In the 31st Century, changing weather conditions on Raballa resulted in
       a drastic decline in farm production. This ruined Raballa's balance of trade

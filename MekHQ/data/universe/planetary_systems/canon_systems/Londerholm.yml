@@ -3,9 +3,11 @@ sucsId: 2951
 xcood: -42.221
 ycood: 1872.682
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: G7III
-primarySlot: 2
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 2
 event:
   - date: '2803-03-21'
     zenithCharge: yes
@@ -30,28 +32,32 @@ planet:
       value: Londerholm
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 2
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 2
     icon: green19
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 1.5
-    diameter: 18667
-    density: 5.656854249492
+    diameter: 18651
+    density: 5.651961970171
     dayLength: 27
     yearLength: 2.0
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 30
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 70
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: BIRD
     desc: No description available.
     landmass:

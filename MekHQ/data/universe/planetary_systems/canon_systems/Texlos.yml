@@ -3,9 +3,11 @@ sucsId: 2521
 xcood: 110.627
 ycood: -272.516
 spectralType:
-  source: canon
+  source: 'Handbook: House Liao, pg. 83'
   value: K8V
-primarySlot: 6
+primarySlot:
+  source: 'Handbook: House Liao, pg. 83'
+  value: 6
 event:
   - date: '2380-02-11'
     nadirCharge: yes
@@ -103,28 +105,32 @@ planet:
       value: Texlos
     type: TERRESTRIAL
     orbitalDist: 0.24
-    sysPos: 6
+    sysPos:
+      source: 'Handbook: House Liao, pg. 83'
+      value: 6
     icon: green36
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 83'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 83'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 83'
       value: 0.99
-    diameter: 11939
-    density: 5.836706860227
+    diameter: 11929
+    density: 5.832045893312
     dayLength: 24
     yearLength: 0.8
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 83'
       value: 30
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 83'
       value: 45
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 83'
       value: AMPHIBIAN
     desc: |-
       Texlos is a cool, temperate planet with a moderate climate and pleasant garden atmosphere. During the Succession Wars, Texlos' location on the Capellan border with the Federated Suns discouraged immigration, however the planet maintained one of the highest population growth rates in the region. The planet historically provided a large pool of manpower for the St. Ives Armor Cavalry and St. Ives reserve units. Rebuilt after the Second Succession War, Texlos's small industrial base supports several Aerospace industry firms.
@@ -135,22 +141,28 @@ planet:
       Kajuka (Aerospace division)
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Livius
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Valencia
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Titus
     satellite:
-      - name: Alicia
+      - name:
+          source: 'Handbook: House Liao, pg. 83'
+          value: Alicia
         size: medium
         icon: oddmoon2
-      - name: Maxia
+      - name:
+          source: 'Handbook: House Liao, pg. 83'
+          value: Maxia
         size: large
         icon: rock8
-      - name: Rose
+      - name:
+          source: 'Handbook: House Liao, pg. 83'
+          value: Rose
         size: medium
         icon: rock4
     event:

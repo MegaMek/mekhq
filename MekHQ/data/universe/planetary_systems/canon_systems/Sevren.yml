@@ -3,9 +3,11 @@ sucsId: 2288
 xcood: -44.468
 ycood: 313.247
 spectralType:
-  source: canon
+  source: House Steiner
   value: K0III
-primarySlot: 3
+primarySlot:
+  source: House Steiner
+  value: 3
 event:
   - date: '2351-08-30'
     nadirCharge: yes
@@ -56,7 +58,9 @@ planet:
       value: Sevren
     type: TERRESTRIAL
     orbitalDist: 1.28
-    sysPos: 3
+    sysPos:
+      source: House Steiner
+      value: 3
     icon: green42
     pressure: HIGH
     atmosphere: BREATHABLE
@@ -69,7 +73,7 @@ planet:
     temperature: 35
     water: 38
     lifeForm:
-      source: canon
+      source: House Steiner
       value: MAMMAL
     desc: Sevren is a large agricultural world that, for most of its history, was
       along the Commonwealth/Combine border and suffered many raids as a result. Aside

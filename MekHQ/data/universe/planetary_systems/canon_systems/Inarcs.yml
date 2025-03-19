@@ -3,9 +3,11 @@ sucsId: 1191
 xcood: -295.18
 ycood: 337.543
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 81'
   value: K9III
-primarySlot: 5
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 81'
+  value: 5
 event:
   - date: '2673-01-13'
     nadirCharge: yes
@@ -86,28 +88,32 @@ planet:
       value: Inarcs
     type: TERRESTRIAL
     orbitalDist: 0.5
-    sysPos: 5
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 81'
+      value: 5
     icon: green2
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 81'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 81'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 81'
       value: 0.92
-    diameter: 10769
-    density: 5.983553795948
+    diameter: 10787
+    density: 5.993619874525
     dayLength: 26
     yearLength: 0.8
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 81'
       value: 45
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 81'
       value: 60
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 81'
       value: AMPHIBIAN
     desc: Insel Desteufels (“Devil’s Island”) is the only continent set in a vast
       ocean peppered with island chains. Inarcs planetary capital is Utopia. The major
@@ -123,13 +129,15 @@ planet:
       the continent.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 81'
           value: Insel Desteufels
         capital:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 81'
           value: Utopia
     satellite:
-      - name: Agiruur
+      - name:
+          source: 'Handbook: House Steiner, pg. 81'
+          value: Agiruur
         size: medium
         icon: rock12
     event:

@@ -3,9 +3,11 @@ sucsId: 466
 xcood: 12.917
 ycood: -0.564
 spectralType:
-  source: canon
+  source: FedCom Civil War, pg. 189
   value: G5V
-primarySlot: 3
+primarySlot:
+  source: FedCom Civil War, pg. 189
+  value: 3
 event:
   - date: '2405-02-09'
     nadirCharge: yes
@@ -51,29 +53,33 @@ planet:
       value: Caph
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 3
+    sysPos:
+      source: FedCom Civil War, pg. 189
+      value: 3
     icon: green56
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 189
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 189
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 189
       value: 1.0
-    diameter: 12823
-    density: 5.504259245072
+    diameter: 12795
+    density: 5.492347279654
     dayLength: 16
     yearLength: 1.3
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 189
       value: 30
     water:
-      source: canon
+      source: FedCom Civil War, pg. 189
       value: 20
     lifeForm:
-      source: canon
-      value: INSECT
+      source: FedCom Civil War, pg. 189
+      value: REPTILE
     desc: |-
       Caph was one of the first planets settled after the advent of the K-F Drives and the planet was the center of advanced engineering research throughout the time of the Terran Hegemony and Star League. The Caph Institute of Technology is credited as being the birthplace of much of the technology necessary for early BattleMechs. The universities on planet were also well-known for their research into advanced medical procedures.
 
@@ -84,19 +90,21 @@ planet:
       3135 - Settlers first came to Caph during the early exodus from Terra, and found a world of primitive, tropical forests, fertile lands, and great mineral wealth potential. The only problem was the planet‘s deadly local wildlife, dominated by creatures very similar to the long-vanished dinosaurs of Terra. Efforts to overcome the indigenous species and spare entire settlements from destruction by giant, rampaging lizards are largely credited for the development of early BattleMech design theory. Once the threat was contained, during the age of the Terran Hegemony and the Star League, Caph became a center for advanced learning and chemical research, home to some of the Star League era‘s largest chemical and pharmaceutical corporations, as well as the Caph Institute of Technology. Unfortunately, when Stefan Amaris usurped the Camerons and took over the Hegemony, Caph suffered from the liberal use of nuclear and biological weapons that destroyed most of the large settlements and ultimately caused the virtual extinction of the Caph dinosaurs. The planet was gradually recovering by the 3030s, with some small cities managing to survive on the rim of the smaller, northern continent of Brunnel, including the present-day capital city of Aswan. New Derry, the planet‘s second-largest city, is located eighty kilometers east of Aswan, and is home to the planet‘s largest active spaceport. Additional trading centers on Brunnel include Rehope, Cimmeron, and New Zevon, all separated from each other by vast expanses of baked-hard ground and barren rock, dotted by the ruins of Star League-era cities. Of Caph‘s remaining two continents, Caph Prime and Steam, only Steam can support life, but the discovery of surviving dinosaurs in the thick jungles there has transformed the continent into a large biological preserve. Nicknamed “The Cretaceous Zone” by the Caph locals, Steam‘s human population consists only of a few small outposts and research centers funded by the Caph government to maintain and study the native inhabitants.
     landmass:
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 189
           value: Brunnel
         capital:
-          source: canon
+          source: FedCom Civil War, pg. 189
           value: Aswan
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 189
           value: Caph Prime
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 189
           value: Steam
     satellite:
-      - name: Caph’s Stone
+      - name:
+          source: FedCom Civil War, pg. 189
+          value: Caph's Stone
         size: medium
         icon: rock17
     event:

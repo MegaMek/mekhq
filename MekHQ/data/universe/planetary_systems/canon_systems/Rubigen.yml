@@ -3,9 +3,11 @@ sucsId: 2186
 xcood: 30.493
 ycood: 217.858
 spectralType:
-  source: canon
+  source: House Kurita
   value: G6II
-primarySlot: 4
+primarySlot:
+  source: House Kurita
+  value: 4
 event:
   - date: '2383-12-09'
     zenithCharge: yes
@@ -64,7 +66,9 @@ planet:
       value: Rubigen
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 4
+    sysPos:
+      source: House Kurita
+      value: 4
     icon: green20
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -77,7 +81,7 @@ planet:
     temperature: 32
     water: 38
     lifeForm:
-      source: canon
+      source: House Kurita
       value: MAMMAL
     desc: Rubigen is a cold, icy planet and most of the habitable terrain is covered
       in snow and ice. While the ice does not cover the planet’s two seas they are
@@ -88,7 +92,7 @@ planet:
       from Rubigen are naval officers and fur, especially from the Rubigen red wolverine.
     landmass:
       - capital:
-          source: canon
+          source: House Kurita
           value: City Rubigen
     event:
       - date: '2167-06-07'

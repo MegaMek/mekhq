@@ -3,9 +3,11 @@ sucsId: 1188
 xcood: -2.077
 ycood: 34.077
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: M5V
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2367-04-07'
     nadirCharge: yes
@@ -63,28 +65,32 @@ planet:
       value: Imbros III
     type: TERRESTRIAL
     orbitalDist: 0.08
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green57
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.88
-    diameter: 12742
-    density: 4.85006174102
+    diameter: 12746
+    density: 4.851762572284
     dayLength: 24
     yearLength: 0.4
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 25
     water:
-      source: canon
+      source: MWDA world profiles
       value: 44
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: |-
       Imbros III was a part of the Terran Hegemony when Stefan Amaris usurped the Star League throne and sounded the death knell of humanity‘s Golden Age. An unremarkable, water-poor world of rocky mountains and bone-dry canyons, with little mineral wealth save a few veins of precious metals and an abundance of bauxite, Imbros sparked little to no interest for the Usurper. Instead, he forced House Kurita, using hostages of the Draconis Combine‘s ruling line as leverage, to garrison this planet in advance of Kerensky‘s return. These same Combine forces gave way easily to the liberating SLDF, only to return in force after the League‘s collapse just a few years later. Though never a valuable military or industrial prize, Imbros III did provide strategic value to the Combine as a border world to the Lyran Commonwealth, so the centuries of warfare that followed the fall of the League saw many raids and campaigns either launched against this planet or staged from it.
@@ -92,28 +98,34 @@ planet:
       Trunner, the largest city and planetary capital, is home to Imbross AeroTech Industries Company‘s offworld sales division, and sits on the banks of the Youli River on the southern continent of Opilacca. Southeast of Opilacca lie the large twin continents of Barnar and Martego. On Martego, between the Maulan and Wanalahi Rivers, lies the major spaceport city of Larabel, where IATIC also maintains its corporate headquarters. Small towns—most interconnected by a series of winding monorailways that cross expanses of alternating woods and deserts—dot the continents of Opilacca, Barnar, and Martego. Imbros III‘s fourth continent, the glacial south polar continent of Fryggia, is totally uninhabited.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Barnar
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Fryggia
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Martego
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Opilacca
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Trunner
     satellite:
-      - name: Aberne
+      - name:
+          source: MWDA world profiles
+          value: Aberne
         size: medium
         icon: oddmoon3
-      - name: Behr
+      - name:
+          source: MWDA world profiles
+          value: Behr
         size: medium
         icon: rock17
-      - name: Otabwe
+      - name:
+          source: MWDA world profiles
+          value: Otabwe
         size: large
         icon: rock15
     event:

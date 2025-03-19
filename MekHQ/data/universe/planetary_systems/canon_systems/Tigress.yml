@@ -3,9 +3,11 @@ sucsId: 2544
 xcood: 74.697
 ycood: -29.514
 spectralType:
-  source: canon
+  source: House Liao, pg. 142
   value: G7V
-primarySlot: 4
+primarySlot:
+  source: House Liao, pg. 142
+  value: 4
 event:
   - date: '2423-08-24'
     zenithCharge: yes
@@ -64,28 +66,32 @@ planet:
       value: Tigress
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 4
+    sysPos:
+      source: House Liao, pg. 142
+      value: 4
     icon: green38
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.8
-    diameter: 10549
-    density: 5.340295082335
+    diameter: 10538
+    density: 5.334888480479
     dayLength: 23
     yearLength: 1.1
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 32
     water:
-      source: canon
+      source: MWDA world profiles
       value: 70
     lifeForm:
-      source: canon
+      source: House Liao, pg. 142
       value: AMPHIBIAN
     desc: Chancellor Tormax Liao granted Tigress to the family of Erika Laurel as
       a private fiefdom during the 3rd Succession War. Erika Laurel was one of the
@@ -94,14 +100,20 @@ planet:
       income and standard of living in the Confederation.
     landmass:
       - name: Morrigna
-        capital: Friedberg
+        capital:
+          source: MWDA world profiles
+          value: Four Cities
       - name: Anociticus
       - name: Fand Prime
     satellite:
-      - name: Jarvic
+      - name:
+          source: MWDA world profiles
+          value: Jarvic
         size: medium
         icon: oddmoon1
-      - name: Totalia
+      - name:
+          source: MWDA world profiles
+          value: Totalia
         size: giant
         icon: rock8
     event:

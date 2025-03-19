@@ -3,9 +3,11 @@ sucsId: 2891
 xcood: 521.902
 ycood: -141.512
 spectralType:
-  source: canon
+  source: House Davion
   value: G5V
-primarySlot: 4
+primarySlot:
+  source: House Davion
+  value: 4
 planet:
   - name: Clayton
     type: DWARF_TERRESTRIAL
@@ -62,7 +64,9 @@ planet:
       value: Cogdell
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 4
+    sysPos:
+      source: House Davion
+      value: 4
     icon: green10
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -75,7 +79,7 @@ planet:
     temperature: 41
     water: 26
     lifeForm:
-      source: canon
+      source: House Davion
       value: REPTILE
     desc: Cogdell was originally ‘settled’ when a group of convicts from the Periphery
       were dumped on the planet without supplies. The prisoners managed to scrape
@@ -88,7 +92,9 @@ planet:
     smallMoons: 5
     landmass:
       - name: North Reading I
-        capital: New Union Dale
+        capital:
+          source: House Davion
+          value: Hangman's Death
       - name: North Reading II
     event:
       - date: '2865-05-01'

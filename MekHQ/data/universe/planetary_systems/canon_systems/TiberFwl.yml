@@ -3,9 +3,11 @@ sucsId: 2542
 xcood: -123.801
 ycood: -147.432
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 63'
   value: G5V
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Marik, pg. 63'
+  value: 4
 event:
   - date: '2395-07-24'
     nadirCharge: yes
@@ -64,28 +66,32 @@ planet:
       value: Tiber (FWL)
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Marik, pg. 63'
+      value: 4
     icon: green23
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 63'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 63'
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 63'
       value: 1.0
-    diameter: 11696
-    density: 5.979812227293
+    diameter: 11724
+    density: 5.994161835911
     dayLength: 24
     yearLength: 1.1
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 63'
       value: 50
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 63'
       value: 22
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 63'
       value: FISH
     desc: |-
       Tiber is a major manufacturing world in the Principality of Regulus and even though the planet is jointly administered by Regulus and the Duchy of New Assam, Regulus is the primary power on planet and controls the vast majority of the factories located on the continent of Perugia, while the Duchy of New Assam administers the lightly industrialized continent of New Assam.
@@ -94,24 +100,28 @@ planet:
       Earthwerks Incorporated
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 63'
           value: New Assam
         capital:
-          source: canon
-          value: Tezpur
+          source: 'Handbook: House Marik, pg. 63'
+          value: Tezpur;Verona
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 63'
           value: Perugia
         capital:
           source: canon
           value: Verona
     satellite:
-      - name: Palatine
-        size: medium
-        icon: oddmoon1
-      - name: Ostia
+      - name:
+          source: 'Handbook: House Marik, pg. 63'
+          value: Ostia
         size: medium
         icon: oddmoon2
+      - name:
+          source: 'Handbook: House Marik, pg. 63'
+          value: Palatine
+        size: medium
+        icon: oddmoon1
     event:
       - date: '2253-08-20'
         faction:

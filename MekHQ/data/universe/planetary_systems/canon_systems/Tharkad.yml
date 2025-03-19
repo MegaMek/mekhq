@@ -3,9 +3,11 @@ sucsId: 2526
 xcood: -212.999
 ycood: 151.773
 spectralType:
-  source: canon
+  source: 25 Years of Art and Fiction, pg. 167
   value: G6V
-primarySlot: 5
+primarySlot:
+  source: 25 Years of Art and Fiction, pg. 167
+  value: 5
 event:
   - date: '2385-05-03'
     nadirCharge: yes
@@ -96,28 +98,32 @@ planet:
       value: Tharkad
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 5
+    sysPos:
+      source: 25 Years of Art and Fiction, pg. 167
+      value: 5
     icon: wet19
     pressure:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 167
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 25 Years of Art and Fiction, pg. 167
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 167
       value: 1.1
-    diameter: 12561
-    density: 6.17746060559
+    diameter: 12537
+    density: 6.165844923878
     dayLength: 19
     yearLength: 1.3
     temperature:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 167
       value: 20
     water:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 167
       value: 80
     lifeForm:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 167
       value: MAMMAL
     desc: |-
       First discovered in 2310, Tharkad's cliamte is comparable to the arctic wilderness of Terra. The original colonists introduced many cold-weather plants and animals from Terra. Despite being an icy and rugged planet industries and population centers sprang up on almost every continent and Tharkad has served as the capital of the Lyran Commonwealth since 2407.
@@ -133,37 +139,27 @@ planet:
       Tharkad Aerospace Group
     landmass:
       - name:
-          source: canon
+          source: 'Jihad Turning Points: Tharkad, pg. 3'
           value: Bremen
         capital:
-          source: canon
+          source: 25 Years of Art and Fiction, pg. 167
           value: Tharkad City
       - name:
-          source: canon
+          source: 'Jihad Turning Points: Tharkad, pg. 3'
           value: Franz
       - name:
-          source: canon
+          source: 'Jihad Turning Points: Tharkad, pg. 3'
           value: Grolsch
       - name:
-          source: canon
+          source: 'Jihad Turning Points: Tharkad, pg. 3'
           value: Heidelberg
       - name:
-          source: canon
+          source: 'Jihad Turning Points: Tharkad, pg. 3'
           value: Sutherland
-      - name:
-          source: canon
-          value: Tatyana
-        capital:
-          source: canon
-          value: Archipelago
-      - name:
-          source: canon
-          value: New Bismark
-        capital:
-          source: canon
-          value: Archipelago
     satellite:
-      - name: Marsden
+      - name:
+          source: 25 Years of Art and Fiction, pg. 167
+          value: Marsden
         size: medium
         icon: oddmoon3
     event:

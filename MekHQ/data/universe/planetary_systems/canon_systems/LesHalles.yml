@@ -3,9 +3,11 @@ sucsId: 1480
 xcood: -39.048
 ycood: -187.965
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 65'
   value: F5II
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Marik, pg. 65'
+  value: 2
 event:
   - date: '2742-05-20'
     nadirCharge: yes
@@ -32,28 +34,32 @@ planet:
       value: Les Halles
     type: TERRESTRIAL
     orbitalDist: 3.92
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Marik, pg. 65'
+      value: 2
     icon: wet12
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 65'
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 65'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 65'
       value: 0.85
-    diameter: 11822
-    density: 5.07467628144
+    diameter: 11797
+    density: 5.063741505654
     dayLength: 20
     yearLength: 7.9
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 65'
       value: 30
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 65'
       value: 85
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 65'
       value: MICROBE
     desc: |-
       Les Halles is an arctic planet with only a narrow equatorial band that is capable of comfortably supporting human life. Les Halles is located at a strategic location along the border of the Free Worlds League and the Capellan Confederation, which has often made it a military target, the planet also serves as a major trade hub. Les Halles supports several cities built around the multiple spaceports on planet. The spaceports are often ringed by large warehouses full of various goods and resources both mundane and exotic. While trade is heavily monitored it is no secret that Les Halles has a thriving black-market.
@@ -71,7 +77,7 @@ planet:
           source: canon
           value: Orléans
         capital:
-          source: canon
+          source: 'Handbook: House Marik, pg. 65'
           value: Beauborg
     event:
       - date: '2739-02-21'

@@ -3,9 +3,11 @@ sucsId: 38
 xcood: 69.791
 ycood: 51.65
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G2V
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2372-01-16'
     zenithCharge: yes
@@ -17,28 +19,32 @@ planet:
       value: Yance I (Agador)
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: green16
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.06
-    diameter: 15135
-    density: 4.922252678253
+    diameter: 15134
+    density: 4.922061576778
     dayLength: 23
     yearLength: 1.2
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 22
     water:
-      source: canon
+      source: MWDA world profiles
       value: 67
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: The colonists who settled Yance I—dubbed Agador by its inhabitants—were
       anti-technologists, mostly of Amish descent, who sought to create a world free
@@ -89,28 +95,32 @@ planet:
       is uninhabited.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Alameda
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Ausdaner
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Brisbane
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Neuhoffen
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Paradiesland
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Firstpoint
     satellite:
-      - name: Alyssa
+      - name:
+          source: MWDA world profiles
+          value: Alyssa
         size: medium
         icon: oddmoon1
-      - name: Clytemnestra
+      - name:
+          source: MWDA world profiles
+          value: Clytemnestra
         size: medium
         icon: oddmoon2
     event:

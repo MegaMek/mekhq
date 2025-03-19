@@ -3,9 +3,11 @@ sucsId: 561
 xcood: -388.555
 ycood: -66.824
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 237
   value: G5IV
-primarySlot: 4
+primarySlot:
+  source: Masters and Minions, pg. 237
+  value: 4
 event:
   - date: '3081-02-16'
     nadirCharge: no
@@ -69,41 +71,49 @@ planet:
       value: Circinus
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 4
+    sysPos:
+      source: Masters and Minions, pg. 237
+      value: 4
     icon: green12
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 237
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 237
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 237
       value: 0.98
-    diameter: 12346
-    density: 5.571402002944
+    diameter: 12354
+    density: 5.574879955927
     dayLength: 21
     yearLength: 2.0
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 237
       value: 45
     water:
-      source: canon
+      source: Masters and Minions, pg. 237
       value: 50
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 237
       value: REPTILE
     desc: Circinus is an arid world that contains vast deposits of raw minerals and
       gemstones. Rumors persist of hidden training facilities and supply caches of
       stolen Lyran and League goods in the remote northern deserts.
     landmass:
       - capital:
-          source: canon
-          value: Clayborne Remembered
+          source: Masters and Minions, pg. 237
+          value: Zachariah
     satellite:
-      - name: Bronco
+      - name:
+          source: Masters and Minions, pg. 237
+          value: Bronco
         size: medium
         icon: oddmoon2
-      - name: Raxx
+      - name:
+          source: Masters and Minions, pg. 237
+          value: Raxx
         size: large
         icon: rock12
     event:

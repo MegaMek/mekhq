@@ -3,7 +3,7 @@ sucsId: 1194
 xcood: 72.368
 ycood: -249.026
 spectralType:
-  source: canon
+  source: 'Objective Raids: Capellan Confederation'
   value: A7V
 primarySlot: 5
 event:
@@ -79,25 +79,27 @@ planet:
     sysPos: 5
     icon: green32
     pressure:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Objective Raids: Capellan Confederation'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 1.0
-    diameter: 12903
-    density: 5.442481950708
+    diameter: 12908
+    density: 5.444481428031
     dayLength: 17
     yearLength: 5.1
     temperature:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 56
     water:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 22
     lifeForm:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: MICROBE
     desc: |-
       Indicass is an arid planet that remains populated due to its extensive raw material reserves surrounding the planet's one body of water and the heavy industry built up around those resources. These raw materials are used by local industry to produce war materiel. Indicass is protected by a military training facility.
@@ -109,10 +111,10 @@ planet:
     smallMoons: 3
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Indicass
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Xin Singapore
     event:
       - date: '2245-06-13'

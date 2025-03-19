@@ -3,9 +3,11 @@ sucsId: 1018
 xcood: 353.609
 ycood: -177.861
 spectralType:
-  source: canon
+  source: House Davion
   value: A5V
-primarySlot: 5
+primarySlot:
+  source: House Davion
+  value: 5
 planet:
   - name: Graham's Nest
     type: DWARF_TERRESTRIAL
@@ -70,7 +72,9 @@ planet:
       value: Gulkana
     type: TERRESTRIAL
     orbitalDist: 5.32
-    sysPos: 5
+    sysPos:
+      source: House Davion
+      value: 5
     icon: green55
     pressure:
       source: canon
@@ -91,7 +95,7 @@ planet:
       source: canon
       value: 30
     lifeForm:
-      source: canon
+      source: House Davion
       value: PLANT
     desc: Gulkana is a relatively small planet with few natural resources. However,
       it is home to some heavy industry, which specializes in making weapons for dropships.
@@ -107,7 +111,7 @@ planet:
           source: canon
           value: Pangaea
         capital:
-          source: canon
+          source: House Davion
           value: Kanpur
     event:
       - date: '2273-08-10'

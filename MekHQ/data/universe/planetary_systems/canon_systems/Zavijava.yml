@@ -3,9 +3,11 @@ sucsId: 2823
 xcood: -31.803
 ycood: -0.304
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: M3V
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2354-06-21'
     nadirCharge: yes
@@ -52,28 +54,32 @@ planet:
       value: Zavijava
     type: TERRESTRIAL
     orbitalDist: 0.12
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: wet21
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.08
-    diameter: 12470
-    density: 6.096241492373
+    diameter: 12460
+    density: 6.091343670752
     dayLength: 24
     yearLength: 0.5
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 31
     water:
-      source: canon
+      source: MWDA world profiles
       value: 86
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: 3135 - Zavijava is an extremely volcanic world, so much so that high quantities
       of sulfur gas and other particulate matter blown into the atmosphere by constant
@@ -109,16 +115,18 @@ planet:
       to the fallen on both sides of the Jihad.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Peninah
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Velvel
         capital:
-          source: canon
-          value: Tzion
+          source: MWDA world profiles
+          value: 'Noé'
     satellite:
-      - name: Haldana
+      - name:
+          source: MWDA world profiles
+          value: Haldana
         size: large
         icon: rock3
     event:

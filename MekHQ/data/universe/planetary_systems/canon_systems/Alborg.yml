@@ -3,9 +3,11 @@ sucsId: 3129
 xcood: 552.551
 ycood: 499.127
 spectralType:
-  source: canon
+  source: Interstellar Players, pg. 110
   value: F2IV
-primarySlot: 3
+primarySlot:
+  source: Interstellar Players, pg. 110
+  value: 3
 event:
   - date: '2549-11-04'
     nadirCharge: yes
@@ -48,28 +50,32 @@ planet:
       value: Ålborg
     type: TERRESTRIAL
     orbitalDist: 4.2
-    sysPos: 3
+    sysPos:
+      source: Interstellar Players, pg. 110
+      value: 3
     icon: green40
     pressure:
-      source: canon
+      source: Interstellar Players, pg. 110
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Interstellar Players, pg. 110
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Interstellar Players, pg. 110
       value: 0.98
-    diameter: 11249
-    density: 6.099619466649
+    diameter: 11270
+    density: 6.110979417521
     dayLength: 21
     yearLength: 8.7
     temperature:
-      source: canon
+      source: Interstellar Players, pg. 110
       value: 33
     water:
-      source: canon
+      source: Interstellar Players, pg. 110
       value: 71
     lifeForm:
-      source: canon
+      source: Interstellar Players, pg. 110
       value: REPTILE
     desc: Alborg has the most comfortable climate of the four JarnFolk planets. Alborg
       boasts a temperate climate, lush fauna, and fertile arable land. In addition
@@ -78,15 +84,19 @@ planet:
       JarnFolk and is controlled by the most powerful families.
     landmass:
       - capital:
-          source: canon
+          source: Interstellar Players, pg. 110
           value: Christiana
     satellite:
-      - name: Sjaeland
+      - name:
+          source: Interstellar Players, pg. 110
+          value: Sjæland
         size: medium
-        icon: oddmoon1
-      - name: Skane
+        icon: rock2
+      - name:
+          source: Interstellar Players, pg. 110
+          value: Skåne
         size: medium
-        icon: rock13
+        icon: rock5
     event:
       - date: '2504-04-21'
         faction:

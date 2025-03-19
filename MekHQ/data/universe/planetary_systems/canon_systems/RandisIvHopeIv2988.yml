@@ -23,9 +23,7 @@ planet:
     water: 0
     event:
       - date: '2108-12-05'
-        name: Hope I
       - date: '2988-01-01'
-        name: Randis I
   - name: Hope II
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.35
@@ -42,9 +40,7 @@ planet:
     water: 0
     event:
       - date: '2108-12-05'
-        name: Hope II
       - date: '2988-01-01'
-        name: Randis II
   - name: Hope III
     type: TERRESTRIAL
     orbitalDist: 0.5
@@ -73,9 +69,7 @@ planet:
         icon: oddmoon3
     event:
       - date: '2108-12-05'
-        name: Hope III
       - date: '2988-01-01'
-        name: Randis III
   - name:
       source: canon
       value: Hope IV
@@ -84,25 +78,27 @@ planet:
     sysPos: 4
     icon: wet14
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 238
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 238
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 238
       value: 1.01
-    diameter: 13313
-    density: 5.32753415713
+    diameter: 13318
+    density: 5.329533702726
     dayLength: 25
     yearLength: 0.7
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 238
       value: 39
     water:
-      source: canon
+      source: Masters and Minions, pg. 238
       value: 75
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 238
       value: FISH
     desc: |-
       Originally known as Hope IV and later New Hope, the planet was renamed Randis IV near the end of the 30th Century when a former Free Worlds League MechWarrior named Erdelmaine Randis formed the Fiefdom of Randis and the Brotherhood of Randis. The planet has acted as the home of this monastic order of MechWarriors ever since.
@@ -121,7 +117,7 @@ planet:
           source: canon
           value: Hope
         capital:
-          source: canon
+          source: Masters and Minions, pg. 238
           value: Hope City
       - name:
           source: canon
@@ -130,7 +126,9 @@ planet:
           source: canon
           value: Volcroth
     satellite:
-      - name: Eminence
+      - name:
+          source: Masters and Minions, pg. 238
+          value: Eminence
         size: giant
         icon: rock16
     event:
@@ -272,10 +270,7 @@ planet:
           value:
             - IND
       - date: '2108-12-05'
-        name: Hope IV
       - date: '2988-01-01'
-        name: Randis IV
-        message: Hope IV renamed to Randis IV
   - name: Hope V
     type: TERRESTRIAL
     orbitalDist: 1.4
@@ -297,9 +292,7 @@ planet:
       - name: Wairoa
     event:
       - date: '2108-12-05'
-        name: Hope V
       - date: '2988-01-01'
-        name: Randis V
   - name: Hope VI
     type: GAS_GIANT
     orbitalDist: 2.6
@@ -324,9 +317,7 @@ planet:
         icon: rock1
     event:
       - date: '2108-12-05'
-        name: Hope VI
       - date: '2988-01-01'
-        name: Randis VI
   - name: Hope VII
     type: GAS_GIANT
     orbitalDist: 5.0
@@ -347,9 +338,7 @@ planet:
         icon: rock13
     event:
       - date: '2108-12-05'
-        name: Hope VII
       - date: '2988-01-01'
-        name: Randis VII
   - name: Hope VIII
     type: GAS_GIANT
     orbitalDist: 9.8
@@ -370,9 +359,7 @@ planet:
         icon: rock4
     event:
       - date: '2108-12-05'
-        name: Hope VIII
       - date: '2988-01-01'
-        name: Randis VIII
   - name: Hope IX
     type: GAS_GIANT
     orbitalDist: 19.4
@@ -409,9 +396,7 @@ planet:
         icon: rock5
     event:
       - date: '2108-12-05'
-        name: Hope IX
       - date: '2988-01-01'
-        name: Randis IX
   - name: Hope X
     type: ICE_GIANT
     orbitalDist: 38.6
@@ -436,6 +421,4 @@ planet:
         icon: oddmoon1
     event:
       - date: '2108-12-05'
-        name: Hope X
       - date: '2988-01-01'
-        name: Randis X

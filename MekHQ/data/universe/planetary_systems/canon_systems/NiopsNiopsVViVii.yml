@@ -3,9 +3,11 @@ sucsId: 1875
 xcood: -374.013
 ycood: -263.173
 spectralType:
-  source: canon
+  source: Periphery (1ed), pg. 139
   value: M5V
-primarySlot: 7
+primarySlot:
+  source: Periphery (1ed), pg. 139
+  value: 7
 planet:
   - name: Niops I
     type: GIANT_TERRESTRIAL
@@ -121,7 +123,9 @@ planet:
       value: Niops (Niops V, VI, VII)
     type: TERRESTRIAL
     orbitalDist: 0.08
-    sysPos: 7
+    sysPos:
+      source: Periphery (1ed), pg. 139
+      value: 7
     icon: green57
     pressure:
       source: canon
@@ -138,7 +142,7 @@ planet:
       value: 20
     water: 46
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 139
       value: FISH
     desc: "The Niops Association was originally a self sufficient research facility
       designed by the Star League to maintain a multi-century study of the system's

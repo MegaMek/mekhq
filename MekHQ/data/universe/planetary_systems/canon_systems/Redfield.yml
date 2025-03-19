@@ -3,9 +3,11 @@ sucsId: 2126
 xcood: 140.093
 ycood: -212.747
 spectralType:
-  source: canon
+  source: House Davion
   value: K5IV
-primarySlot: 3
+primarySlot:
+  source: House Davion
+  value: 3
 planet:
   - name: Volcanus
     type: DWARF_TERRESTRIAL
@@ -50,7 +52,9 @@ planet:
       value: Redfield
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 3
+    sysPos:
+      source: House Davion
+      value: 3
     icon: green23
     pressure: THIN
     atmosphere: BREATHABLE
@@ -63,7 +67,7 @@ planet:
     temperature: 20
     water: 43
     lifeForm:
-      source: canon
+      source: House Davion
       value: MAMMAL
     desc: |-
       Due to Redfield’s small sun making attacks easier than most, the planet has been the site of numerous battles between the Federated Suns and the Capellan Confederation. The planet is always well garrisoned and the defenders are required to be on a high level of alert due to the possibility of attack with less than a day’s notice.

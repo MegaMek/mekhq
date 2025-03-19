@@ -3,9 +3,11 @@ sucsId: 2793
 xcood: 75.47
 ycood: -43.928
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G6V
-primarySlot: 5
+primarySlot:
+  source: MWDA world profiles
+  value: 5
 planet:
   - name: Chang Fei
     type: DWARF_TERRESTRIAL
@@ -68,28 +70,32 @@ planet:
       value: Yangtze
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 5
+    sysPos:
+      source: MWDA world profiles
+      value: 5
     icon: wet6
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.1
-    diameter: 12370
-    density: 6.262051054073
+    diameter: 12357
+    density: 6.255660417277
     dayLength: 24
     yearLength: 1.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 27
     water:
-      source: canon
+      source: MWDA world profiles
       value: 80
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: FISH
     desc: |-
       Settlers from the ancient Terran state of China named the planet Yangtze after the Yangtze River of their homeland. Like the Yangtze floodplain on Terra, Yangtze‘s landmasses are flat and covered in a thick layer of fertile soil fed by seasonal flooding from the planet‘s many slow-moving rivers. Fearful of the destruction wrought by these inland floods, Yangtze‘s initial settlers huddled in small fishing villages and towns on the rocky coasts of the planet‘s two small continents, Han and Sung.
@@ -99,15 +105,11 @@ planet:
       Under The Republic of the Sphere, Yangtze has rebuilt the least-damaged dams and dikes on Han and Sung, and regained approximately one-fourth of its peak agricultural output under the First Star League.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Han
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Sung
-    satellite:
-      - name: TG-1
-        size: large
-        icon: rock4
     event:
       - date: '2174-05-22'
         faction:

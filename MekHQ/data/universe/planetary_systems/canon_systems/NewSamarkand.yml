@@ -3,9 +3,11 @@ sucsId: 1848
 xcood: 359.452
 ycood: 248.589
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 27
   value: F0IV
-primarySlot: 6
+primarySlot:
+  source: Masters and Minions, pg. 27
+  value: 6
 event:
   - date: '2362-06-06'
     zenithCharge: yes
@@ -104,28 +106,30 @@ planet:
       value: New Samarkand
     type: GIANT_TERRESTRIAL
     orbitalDist: 4.48
-    sysPos: 6
+    sysPos:
+      source: Masters and Minions, pg. 27
+      value: 6
     icon: green48
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 27
       value: STANDARD
     atmosphere: TOXICPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 27
       value: 1.05
-    diameter: 12798
-    density: 5.780059766913
+    diameter: 12782
+    density: 5.772887999809
     dayLength: 18
     yearLength: 9.6
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 27
       value: 35
     water:
-      source: canon
+      source: Masters and Minions, pg. 27
       value: 70
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 27
       value: MAMMAL
     desc: |-
       In the early days of space colonization, New Samarkand was one of the most populous colonies. It was also a deeply divided state. The planet was covered with sovereign city states that each had their own armed forces and were regularly at war with each other. It was on New Samarkand that House Kurita first rose to prominence, the brothers Shiro and Urizen Kurita rose first to control the city-state of Yamashiro and eventually the entire planet. From there they began the foundations for what would become the Draconis Combine.
@@ -139,30 +143,24 @@ planet:
       During the Jihad, Kiyomori Minamoto temporarily relocated the capital back to New Samarkand while Luthien was fought over by forces loyal to the Combine, Word of Blake and the Black Dragon Society. In addition to relocating the Combine's capital to New Samarkand the planet also became the head of the former Galdeon Military District after biological agents destroyed Galedon V. The return to prominence of New Samarkand has revitalized the economy on planet and attracted several more manufacturing concerns driven off their home planets by the Jihad.
     landmass:
       - name:
-          source: canon
-          value: Shimoji
-        capital:
-          source: canon
-          value: Yamashiro
-      - name:
-          source: canon
+          source: Masters and Minions, pg. 27
           value: Nippon
-      - name:
-          source: canon
-          value: Kurima
-      - name:
-          source: canon
-          value: Tarama
     satellite:
-      - name: Jimmu
+      - name:
+          source: Masters and Minions, pg. 27
+          value: Chūai
+        size: medium
+        icon: oddmoon3
+      - name:
+          source: Masters and Minions, pg. 27
+          value: Jimmu
         size: medium
         icon: rock16
-      - name: Kish
-        size: large
-        icon: rock2
-      - name: Chiai
+      - name:
+          source: Masters and Minions, pg. 27
+          value: Kōshō
         size: medium
-        icon: rock10
+        icon: rock15
     event:
       - date: '2167-12-30'
         faction:

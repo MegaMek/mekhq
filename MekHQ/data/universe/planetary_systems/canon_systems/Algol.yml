@@ -3,9 +3,11 @@ sucsId: 69
 xcood: 64.875
 ycood: -67.773
 spectralType:
-  source: canon
+  source: FedCom Civil War, pg. 187
   value: G5V
-primarySlot: 4
+primarySlot:
+  source: FedCom Civil War, pg. 187
+  value: 4
 event:
   - date: '2481-12-13'
     zenithCharge: yes
@@ -61,28 +63,32 @@ planet:
       value: Algol
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 4
+    sysPos:
+      source: FedCom Civil War, pg. 187
+      value: 4
     icon: green31
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 187
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 187
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 187
       value: 1.1
-    diameter: 13533
-    density: 5.708123225909
+    diameter: 13538
+    density: 5.710174000786
     dayLength: 22
     yearLength: 1.3
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 187
       value: 30
     water:
-      source: canon
-      value: 54
+      source: FedCom Civil War, pg. 187
+      value: 50
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 187
       value: FISH
     desc: |-
       3135 - Algol, originally part of the old Tikonov Union, became an important agricultural center during the height of Star League. Algol has two major continents and a few islands. The largest continent, Shalom, contains the planetary capital of Algol City, that was founded on the coast due to the abundance of fish found in the surrounding waters. Durant, the other continent, has extremely rich soil that allows the production of a wide range of agricultural products. The largest city, Kollasa, is home to the planet‘s massive food-processing plants. Algol‘s food exports are transported to Algol City for shipment off world through its large spaceport. Algol produced enough food to trade with and supply all the worlds within one jump.
@@ -92,22 +98,23 @@ planet:
       Unlike other nearby worlds, Algol‘s food production has kept the horrors of war from visiting it. When the Word of Blake launched the Jihad, the Federated Suns troops on planet surrendered in order to protect the planet and its people from the threat of weapons of mass destruction. The AFFS troops were interned in a makeshift prison in the AFFS depot at Groffer's Toll. The Blakist commander ordered the destruction of the depot and the deaths of all but a handful of AFFS troops after they attempted to escape.
     landmass:
       - name:
-          source: canon
-          value: Shalom
-        capital:
-          source: canon
-          value: Algol City
-      - name:
-          source: canon
+          source: FedCom Civil War, pg. 187
           value: Durant
       - name:
-          source: canon
-          value: Sparro
+          source: FedCom Civil War, pg. 187
+          value: Shalom
+        capital:
+          source: FedCom Civil War, pg. 187
+          value: Algol City
     satellite:
-      - name: Hargrove
+      - name:
+          source: FedCom Civil War, pg. 187
+          value: Hargrove
         size: medium
         icon: oddmoon3
-      - name: Sung
+      - name:
+          source: FedCom Civil War, pg. 187
+          value: Sung
         size: large
         icon: rock7
     event:

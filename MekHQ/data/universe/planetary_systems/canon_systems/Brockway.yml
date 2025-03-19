@@ -3,9 +3,11 @@ sucsId: 401
 xcood: 218.167
 ycood: -355.971
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 87'
   value: K7IV
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Davion, pg. 87'
+  value: 4
 event:
   - date: '2353-06-21'
     nadirCharge: yes
@@ -62,28 +64,32 @@ planet:
       value: Brockway
     type: TERRESTRIAL
     orbitalDist: 0.42
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Davion, pg. 87'
+      value: 4
     icon: green33
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 87'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 87'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 87'
       value: 1.16
-    diameter: 12566
-    density: 6.505488584193
+    diameter: 12548
+    density: 6.496415548134
     dayLength: 27
     yearLength: 0.8
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 87'
       value: 48
     water:
-      source: canon
-      value: 57
+      source: 'Handbook: House Davion, pg. 87'
+      value: 56
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 87'
       value: MAMMAL
     desc: Brockway is a harsh planet that was settled due to the abundance of natural
       resources. However, as settlement began it was discovered that the plants and
@@ -95,10 +101,14 @@ planet:
         capital: New Stephentown
       - name: Faunus II
     satellite:
-      - name: Colbert
+      - name:
+          source: 'Handbook: House Davion, pg. 87'
+          value: Colbert
         size: medium
         icon: oddmoon1
-      - name: Jurissa
+      - name:
+          source: 'Handbook: House Davion, pg. 87'
+          value: Jurissa
         size: medium
         icon: oddmoon3
     event:

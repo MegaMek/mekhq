@@ -3,9 +3,11 @@ sucsId: 647
 xcood: 279.421
 ycood: 20.112
 spectralType:
-  source: canon
+  source: FedCom Civil War, pg. 190
   value: M8V
-primarySlot: 4
+primarySlot:
+  source: FedCom Civil War, pg. 190
+  value: 4
 event:
   - date: '2364-11-02'
     nadirCharge: yes
@@ -71,28 +73,32 @@ planet:
       value: Dahar IV
     type: TERRESTRIAL
     orbitalDist: 0.04
-    sysPos: 4
+    sysPos:
+      source: FedCom Civil War, pg. 190
+      value: 4
     icon: green27
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 190
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 190
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 190
       value: 1.0
-    diameter: 11977
-    density: 5.889977583969
+    diameter: 11954
+    density: 5.878765906091
     dayLength: 24
     yearLength: 0.3
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 190
       value: 55
     water:
-      source: canon
+      source: FedCom Civil War, pg. 190
       value: 20
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 190
       value: MAMMAL
     desc: Dahar IV is a scorching desert planet known best for its hardy people and
       the metal ores they mine from the planet. The planet has abundant deposits of
@@ -106,19 +112,23 @@ planet:
       for the harsh, but relatively comfortable, conditions on the rest of the planet.
     landmass:
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 190
           value: Bauxum
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 190
           value: Dusty
         capital:
-          source: canon
+          source: FedCom Civil War, pg. 190
           value: Drakaar
     satellite:
-      - name: Drakhor
+      - name:
+          source: FedCom Civil War, pg. 190
+          value: Drakhar
         size: medium
-        icon: rock1
-      - name: Drakkon
+        icon: rock3
+      - name:
+          source: FedCom Civil War, pg. 190
+          value: Drakkon
         size: medium
         icon: oddmoon2
     event:

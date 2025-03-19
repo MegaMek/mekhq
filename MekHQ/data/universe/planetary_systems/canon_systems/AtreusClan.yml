@@ -5,7 +5,9 @@ ycood: 1734.247
 spectralType:
   source: canon
   value: G6VI
-primarySlot: 3
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 3
 event:
   - date: '2804-06-02'
     nadirCharge: yes
@@ -44,28 +46,32 @@ planet:
       value: Atreus (Clan)
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 3
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 3
     icon: green35
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 1.6
-    diameter: 17181
-    density: 6.539821917468
+    diameter: 17187
+    density: 6.542174203696
     dayLength: 25
     yearLength: 2.0
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 35
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 40
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: AMPHIBIAN
     desc: No description available.
     smallMoons: 2

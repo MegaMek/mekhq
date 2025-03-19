@@ -3,9 +3,11 @@ sucsId: 410
 xcood: 13.177
 ycood: -13.229
 spectralType:
-  source: canon
+  source: Star League, pg. 170
   value: F5IV
-primarySlot: 4
+primarySlot:
+  source: Star League, pg. 170
+  value: 4
 event:
   - date: '2399-08-15'
     nadirCharge: yes
@@ -64,28 +66,32 @@ planet:
       value: Bryant
     type: TERRESTRIAL
     orbitalDist: 3.92
-    sysPos: 4
+    sysPos:
+      source: Star League, pg. 170
+      value: 4
     icon: green24
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.98
-    diameter: 10847
-    density: 6.336019737933
+    diameter: 10858
+    density: 6.342636889664
     dayLength: 26
     yearLength: 7.9
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 37
     water:
-      source: canon
+      source: MWDA world profiles
       value: 64
     lifeForm:
-      source: canon
+      source: Star League, pg. 170
       value: MAMMAL
     desc: A world of violent storms, first colonized in the twenty-second century
       by the Terran Hegemony to exploit its chemical and mechanical resources, fertile
@@ -111,28 +117,28 @@ planet:
       fauna.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Altario
       - name:
-          source: canon
-          value: Tomainisia
-      - name:
-          source: canon
-          value: Voltanasia
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Zephyrim
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Brein
     satellite:
-      - name: Jarra
+      - name:
+          source: MWDA world profiles
+          value: Jarra
         size: large
         icon: rock14
-      - name: Sennu
+      - name:
+          source: MWDA world profiles
+          value: Sennu
         size: large
         icon: rock12
-      - name: Summersdale
+      - name:
+          source: MWDA world profiles
+          value: Summersdale
         size: medium
         icon: oddmoon2
     event:

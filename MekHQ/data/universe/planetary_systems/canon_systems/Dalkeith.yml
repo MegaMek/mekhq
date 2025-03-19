@@ -5,7 +5,9 @@ ycood: 157.711
 spectralType:
   source: canon
   value: F9V
-primarySlot: 5
+primarySlot:
+  source: FedCom Civil War, pg. 197
+  value: 5
 event:
   - date: '2359-06-20'
     zenithCharge: yes
@@ -82,28 +84,32 @@ planet:
       value: Dalkeith
     type: TERRESTRIAL
     orbitalDist: 1.1
-    sysPos: 5
+    sysPos:
+      source: FedCom Civil War, pg. 197
+      value: 5
     icon: green28
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 197
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 197
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 197
       value: 1.0
-    diameter: 11538
-    density: 6.112247095136
+    diameter: 11518
+    density: 6.101527243017
     dayLength: 24
     yearLength: 1.6
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 197
       value: 30
     water:
-      source: canon
+      source: FedCom Civil War, pg. 197
       value: 70
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 197
       value: BIRD
     desc: |-
       Dalkeith was a beautiful planet in the centuries during the Star League, unfortunately after its collapse the planet was turned into a nuclear wasteland during the early Succession wars and even after three centuries, the atmosphere is still tainted, requiring filtered breathing devices to go outside. Only Dunnbar is still hospitable out of the planet’s three continents and the planet’s population shrank 90% between 2775 and the 31st century.
@@ -111,28 +117,36 @@ planet:
       During the First Succession War, the Draconis Combine used over a dozen 100-megaton nuclear weapons across the heavily inhabited continent of Rockmeir, destroying the Star League Castle Brian and the planet’s capital of Newhaven, along with most of the population. The continent of Devarick met a similar fate when the Combine turned more nuclear and chemical weapons against the defending Lyran forces there. The planet would likely have been abandoned after the First Succession War if not for the rich deposits of rare metals in the Alveria mountain range on Dunnbar.
     landmass:
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 197
+          value: Devarick
+      - name:
+          source: FedCom Civil War, pg. 197
           value: Dunnbar
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 197
           value: Rockmeir
         capital:
           source: canon
           value: Newhaven [destroyed 2810]
-      - name:
-          source: canon
-          value: Devarick
     satellite:
-      - name: Dal-Mar
+      - name:
+          source: FedCom Civil War, pg. 197
+          value: Dal-Mar
         size: medium
         icon: rock2
-      - name: Dal-Ra
+      - name:
+          source: FedCom Civil War, pg. 197
+          value: Dal-Ra
         size: medium
         icon: rock5
-      - name: Dal-Rue
+      - name:
+          source: FedCom Civil War, pg. 197
+          value: Dal-Rue
         size: medium
         icon: oddmoon1
-      - name: Dal-Tal
+      - name:
+          source: FedCom Civil War, pg. 197
+          value: Dal-Tal
         size: medium
         icon: oddmoon3
     event:

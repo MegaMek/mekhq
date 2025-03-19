@@ -5,7 +5,9 @@ ycood: -404.334
 spectralType:
   source: canon
   value: K2V
-primarySlot: 5
+primarySlot:
+  source: Periphery (1ed), pg. 86
+  value: 5
 event:
   - date: '2536-04-13'
     zenithCharge: yes
@@ -76,7 +78,9 @@ planet:
       value: Sterope (New Taurus)
     type: TERRESTRIAL
     orbitalDist: 0.49
-    sysPos: 5
+    sysPos:
+      source: Periphery (1ed), pg. 86
+      value: 5
     icon: green23
     pressure:
       source: canon
@@ -97,7 +101,7 @@ planet:
       source: canon
       value: 50
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 86
       value: MAMMAL
     desc: Sterope was not colonized until the 26th century during a concerted effort
       by the Taurian Concordat to settle more worlds. Sterope is a comfortable planet

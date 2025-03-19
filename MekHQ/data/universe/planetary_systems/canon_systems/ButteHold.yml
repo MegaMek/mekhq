@@ -5,7 +5,9 @@ ycood: 462.398
 spectralType:
   source: canon
   value: G8V
-primarySlot: 3
+primarySlot:
+  source: Periphery (1ed), pg. 150
+  value: 3
 planet:
   - name: Stubber
     type: GIANT_TERRESTRIAL
@@ -53,7 +55,9 @@ planet:
       value: Butte Hold
     type: TERRESTRIAL
     orbitalDist: 0.8
-    sysPos: 3
+    sysPos:
+      source: Periphery (1ed), pg. 150
+      value: 3
     icon: green56
     pressure:
       source: canon
@@ -74,7 +78,7 @@ planet:
       source: canon
       value: 43
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 150
       value: FISH
     desc: |-
       Butte Hold was originally settled by aqua-culturalists seeking to breed the fish-analogous species of Butte Hold into a source of food for the Rim World Republic in 2597. The Rim World Republic claimed the world and began settling it two decades later and unfortunately those efforts brought about the unsavory criminal organizations that would come to rule the world for centuries to come.
@@ -91,7 +95,7 @@ planet:
           value: Throline
         capital:
           source: canon
-          value: Butte Hold, aka Raider’s Roost
+          value: Butte Hold, aka Raider's Roost
     satellite:
       - name: Kane
         size: medium

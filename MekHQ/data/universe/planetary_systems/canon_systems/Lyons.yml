@@ -3,9 +3,11 @@ sucsId: 1546
 xcood: -23.01
 ycood: 38.727
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F8V
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 planet:
   - name: Rostock
     type: TERRESTRIAL
@@ -27,28 +29,32 @@ planet:
       value: Lyons
     type: TERRESTRIAL
     orbitalDist: 1.92
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: wet11
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.99
-    diameter: 11616
-    density: 5.990992066405
+    diameter: 11614
+    density: 5.990209871345
     dayLength: 19
     yearLength: 2.9
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 46
     water:
-      source: canon
+      source: MWDA world profiles
       value: 77
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: |-
       Lyons was a modest world when first discovered, with ample resources but few features that truly stood out among the hundreds of worlds being colonized at the time. Warm, with a very terrestrial climate, fertile soil, and a host of common metals within easy reach of mining interests, only the unusually high amount of volcanic activity, particularly along the central mountain ranges of the primary continent of Fedkirk, makes the world distinctive. To avoid the worst of the chronic eruptions and lava flows of the so-called Fedkirk Fire Chain, settlements on Fedkirk were established on the farthest coasts, leaving much of the interior region unspoiled and sparsely populated. Additional cities grew up on the smaller continents of Glastone, Leuben, and Pairse, including the planetary capital of Clovis‘ Point (originally named David‘s Point, but renamed to honor one of Lyons most outstanding citizens), which occupies the end of Glastone‘s northernmost peninsula. With mining and manufacturing concerns limited in scope, Lyons developed only a modest commercial industry, but enough to attain self-sufficiency in short order.
@@ -56,22 +62,24 @@ planet:
       When the Terran Alliance fell, the people of Lyons hardly felt the loss until the Terran Hegemony rose in its place and annexed the planet with ease. The Lyran Commonwealth, however, took an active interest in Lyons as a potential center for trade, and negotiated with the Hegemony for joint administration during the Star League era. Unfortunately, with the fall of the League, Lyons‘s prominence seemed to come to an end. In the Succession Wars that followed, the world was raided several times, as might be expected for a Lyran/Draconis border planet, but a dedicated aerospace defense force based on its single moon often discouraged the casual raiding force. After the Succession Wars, Lyons rose in stature again as the lynchpin world of the so-called Lyons Thumb, a region of Lyran-occupied space extending into the Draconis Combine that remained under constant threat from House Kurita for decades. Unfortunately, the rise of the Free Skye movement hindered defensive operations, and some experts say contributed to the planet‘s eventual fall to the Combine at the onset of the FedCom Civil War. Remarkably, Lyons came through all the collective fighting of the Star League‘s fall, the Succession Wars, the FedCom Civil War, and even the Jihad with minimal damage. Today, the planet is home to a diverse mix of Republic citizens whose origins include the Draconis Combine, the Free Worlds League, and even Clan Ghost Bear, as well as a healthy dose of the native Lyran-descendant population.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Fedkirk
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Glastone
         capital:
-          source: canon
-          value: David‘s Point
+          source: MWDA world profiles
+          value: Clovis' Point
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Leuben
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Pairse
     satellite:
-      - name: Bier
+      - name:
+          source: MWDA world profiles
+          value: Bier
         size: medium
         icon: oddmoon1
     event:

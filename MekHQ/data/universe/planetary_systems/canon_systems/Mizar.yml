@@ -3,9 +3,11 @@ sucsId: 1730
 xcood: -54.548
 ycood: 20.628
 spectralType:
-  source: canon
+  source: House Steiner
   value: A2V
-primarySlot: 6
+primarySlot:
+  source: House Steiner
+  value: 6
 event:
   - date: '2361-01-18'
     nadirCharge: yes
@@ -94,28 +96,32 @@ planet:
       value: Mizar
     type: TERRESTRIAL
     orbitalDist: 7.0
-    sysPos: 6
+    sysPos:
+      source: House Steiner
+      value: 6
     icon: wet21
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.92
-    diameter: 11850
-    density: 5.481843004515
+    diameter: 11822
+    density: 5.468917927007
     dayLength: 26
     yearLength: 18.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 52
     water:
-      source: canon
+      source: MWDA world profiles
       value: 84
     lifeForm:
-      source: canon
+      source: House Steiner
       value: MAMMAL
     desc: |-
       Mizar is an exceptionally unique planet: it orbits a rare double binary and the four small A class suns constantly bake the planet. Mizar is kept liveable due to large bodies of water and being the planet furthest from the stars in the system.
@@ -125,22 +131,19 @@ planet:
       3135 - Though it bakes beneath a huge sun that is, in fact, part of a double-binary star system, Mizar has managed to become known as one of the greatest resort worlds in the Inner Sphere. The arrangement of the double binary system leads to complex solar cycles on Mizar that assure the planet is fully lit almost perpetually. Varying degrees of sunlight from the four A-class suns of the Mizar system produce peculiarly long and irregular seasons, varying from a temperate terrestrial springtime to a lingering tropical heat wave—even at the poles. Despite the heat, however, Mizar was miraculously blessed with an abundance of water, native life, and breathtaking vistas from New Venice Beach, the planet‘s longest stretch of snow-white sands, along the eastern coast of the Paradasia continent, to the “plastic crystal” mountains of the southern Utopian Isles. These features made Mizar a tourist spot almost from the moment of its discovery, and the hospitality of the natives became legendary. They welcomed the Terran Hegemony when Admiral McKenna first forged the empire that would one day rule the Star League, and throughout humanity‘s Golden Age Mizar was jointly administered by the Hegemony and the neighboring Lyran Commonwealth. Their economy booming as a tourist spot, the Mizarians came to obsess about appearances and all the finer things in life, from fancy cars and the latest fashions, to palatial estates and cutting-edge sculptures made from native “plastic crystal” all meticulously groomed and refined for maximum beauty at all times. The Amaris Crisis, which precipitated the fall of the Star League, spared Mizar only because the Lyran government‘s troops were already on-planet in force when word of the coup broke out; Amaris decided against putting another Successor State at his throat while Kerensky‘s noose closed around him. Throughout the Succession Wars few raids were launched against the world, but those few invaders who did land on the surface often as not found themselves unable to bring themselves to harm the planet‘s greatest natural and man-made wonders, instead hoping to capture this world intact. The absence of significant military or industrial resources also made Mizar a poor invasion candidate; even the Word of Blake managed to cause little damage to the planet. Today, visitors are more than welcome to land at any of the four major spaceports on the Majestica, Paradasia, Solasia, and Wunderlund continents, though the capital city of NouveauParis on Solasia remains the most stunning of the planet‘s hot spots—and the best place to get a good Fire Lizard, Mizar‘s very own specialty drink.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Majestica
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Paradasia
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Solasia
         capital:
-          source: canon
-          value: NouveauParis
+          source: House Steiner
+          value: New Venice Beach
       - name:
-          source: canon
-          value: Utopian Isles
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Wunderlund
     event:
       - date: '2242-08-13'

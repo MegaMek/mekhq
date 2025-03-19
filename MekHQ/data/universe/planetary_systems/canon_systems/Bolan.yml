@@ -3,9 +3,11 @@ sucsId: 359
 xcood: -277.973
 ycood: 5.192
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 76'
   value: G4V
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 76'
+  value: 2
 event:
   - date: '2387-09-03'
     zenithCharge: yes
@@ -29,28 +31,32 @@ planet:
       value: Bolan
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 76'
+      value: 2
     icon: green10
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 76'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 76'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 76'
       value: 0.78
-    diameter: 12285
-    density: 4.458727523033
+    diameter: 12289
+    density: 4.46034608996
     dayLength: 26
     yearLength: 1.1
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 76'
       value: 54
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 76'
       value: 44
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 76'
       value: BIRD
     desc: |-
       Bolan is a dry, mountainous world with just enough natural resources to support the planet's populace and a modest level of industrialization. Much of the industry was crippled during the 1st Succession War when the Free Worlds League abandoned the planet and used nuclear weapons on the factories as they were departing. Industry on planet has been slowly recovering ever since. Unfortunately, many locations on planet, including the entire continent of Sabari, which was once the hub of trade and major military bases in the Star League era, are uninhabited and still scarred with radiation.
@@ -60,16 +66,16 @@ planet:
       Bolan was primarily colonized by settlers from India, Pakistan and Afghanistan.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 76'
           value: Kashmir
         capital:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 76'
           value: Bolan City
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 76'
           value: Sabari
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 76'
           value: Sakété
     event:
       - date: '2267-12-22'

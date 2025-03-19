@@ -3,9 +3,11 @@ sucsId: 2949
 xcood: 46.182
 ycood: 1745.002
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: K4V
-primarySlot: 2
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 2
 event:
   - date: '2810-07-10'
     nadirCharge: yes
@@ -36,28 +38,32 @@ planet:
       value: Ironhold
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 2
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 2
     icon: green42
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 1.1
-    diameter: 12267
-    density: 6.271679974381
+    diameter: 12296
+    density: 6.286696220205
     dayLength: 24
     yearLength: 0.8
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 20
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 70
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: BIRD
     desc: No description available.
     landmass:

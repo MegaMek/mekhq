@@ -3,9 +3,11 @@ sucsId: 2272
 xcood: -82.36
 ycood: 62.765
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: A7V
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2397-03-07'
     nadirCharge: yes
@@ -55,28 +57,32 @@ planet:
       value: Seginus
     type: TERRESTRIAL
     orbitalDist: 2.88
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green23
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.02
-    diameter: 10879
-    density: 6.573261650033
+    diameter: 10892
+    density: 6.58111421493
     dayLength: 25
     yearLength: 5.1
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 52
     water:
-      source: canon
+      source: MWDA world profiles
       value: 72
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: FISH
     desc: |-
       Seginus is a hot and steamy world with a single gigantic supercontinent, Teremun, that seems almost completely covered in rocky mountains, thick jungles, and swirling storms. Thunderstorms, hurricanes, and tornadoes constantly churn the water and pound the land on this world, varying in intensity between seasons, but seemingly never coming to an end. Settled in spite of its harsh climate and lack of mineral or metallurgical wealth, Seginus eventually came under the sway of the Federation of Skye, and later the Lyran Commonwealth, its people benefiting from the mercantile alliances that became the foundations of House Steiner.
@@ -86,16 +92,20 @@ planet:
       The capital city, Gambootas, is home not only to the planet‘s sole interstellar spaceport, but also to the corporate headquarters of Segine AquaCulture, the planet‘s largest marine ranching and food processing industry.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Teremun
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Gambootas
     satellite:
-      - name: Minisc
+      - name:
+          source: MWDA world profiles
+          value: Minisc
         size: medium
         icon: rock4
-      - name: Ophra
+      - name:
+          source: MWDA world profiles
+          value: Ophra
         size: giant
         icon: rock7
     event:

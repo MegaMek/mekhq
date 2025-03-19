@@ -3,9 +3,11 @@ sucsId: 97
 xcood: 8.836
 ycood: 13.754
 spectralType:
-  source: canon
+  source: House Kurita
   value: F7III
-primarySlot: 5
+primarySlot:
+  source: House Kurita
+  value: 5
 event:
   - date: '2372-02-21'
     nadirCharge: yes
@@ -78,28 +80,32 @@ planet:
       value: Altair
     type: TERRESTRIAL
     orbitalDist: 3.64
-    sysPos: 5
+    sysPos:
+      source: House Kurita
+      value: 5
     icon: green1
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.0
-    diameter: 11547
-    density: 6.104228171097
+    diameter: 11530
+    density: 6.095146760384
     dayLength: 23
     yearLength: 7.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 57
     water:
-      source: canon
+      source: MWDA world profiles
       value: 6
     lifeForm:
-      source: canon
+      source: House Kurita
       value: REPTILE
     desc: 3135 - Large, dry, and devastated, Altair is only now beginning to recover
       from the horrors of one of the worst atrocities committed during the Blakist
@@ -127,10 +133,12 @@ planet:
       to Stone‘s new Republic.
     landmass:
       - capital:
-          source: canon
+          source: MWDA world profiles
           value: Hehiro City
     satellite:
-      - name: Olgar
+      - name:
+          source: MWDA world profiles
+          value: Olgar
         size: medium
         icon: oddmoon1
     event:
