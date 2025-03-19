@@ -4031,8 +4031,9 @@ public class AtBDynamicScenarioFactory {
      * @param turnModifier A number to subtract from the deployment turn.
      * @param isDelayed Whether the arrival of the entities was delayed
      */
-    public static void setDeploymentTurnsForReinforcements(Campaign campaign, Scenario scenario, List<Entity> entityList,
-                                                           int turnModifier, boolean isDelayed) {
+    public static void setDeploymentTurnsForReinforcements(Campaign campaign, Scenario scenario,
+                                                           List<Entity> entityList, int turnModifier,
+                                                           boolean isDelayed) {
         // Build a set of all player transported entities. We don't need to do this for NPC entities
         // as how they're transported is different and their arrival times are better isolated when
         // dealing with transported vs. untransported units.
@@ -4042,7 +4043,7 @@ public class AtBDynamicScenarioFactory {
         for (List<UUID> transportedUnitIds : transportedIds.values()) {
             for (UUID transportedUnitId : transportedUnitIds) {
                 Entity entity = getEntityFromUnitId(campaign, transportedUnitId);
-                if (entity != null) {
+                if (entity != null && entityList.contains(entity)) {
                     transportedEntities.add(entity);
                 }
             }
