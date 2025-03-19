@@ -71,8 +71,8 @@ public class CampaignManagementDialog extends JDialog {
                         StratconTrackState currentTrack, boolean gmMode) {
         currentCampaignState = campaignState;
 
-        btnRemoveCVP.setEnabled(currentCampaignState.getVictoryPoints() > 0);
-        btnGMRemoveSP.setEnabled(currentCampaignState.getSupportPoints() > 0);
+        btnRemoveCVP.setEnabled(gmMode);
+        btnGMRemoveSP.setEnabled(gmMode);
         btnGMAddVP.setEnabled(gmMode);
         btnGMAddSP.setEnabled(gmMode);
 
