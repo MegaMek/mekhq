@@ -94,7 +94,7 @@ planet:
           source: MWDA world profiles
           value: Pactolus
         capital:
-          source: MWDA world profiles
+          source: MWDA world profiles (landmass unclear)
           value: Dotara
       - name:
           source: MWDA world profiles
