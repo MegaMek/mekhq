@@ -93,12 +93,12 @@ planet:
       - name:
           source: MWDA world profiles
           value: Naskia
-      - name:
-          source: MWDA world profiles
-          value: Worrens
         capital:
           source: MWDA world profiles
           value: West Romaine
+      - name:
+          source: MWDA world profiles
+          value: Worrens
     satellite:
       - name:
           source: MWDA world profiles
