@@ -198,6 +198,7 @@ MEKHQ VERSION HISTORY:
 + PR #6305: Corrected Multiple Facility Errors
 + PR #6306: Add canon static planet data and sources
 + Fix #6266: Patrol lance still scouts adjacent hexes even if deployment is cancelled
++ PR #6314: Corrected Resource Bundle Reference In PrisonerRansomEventDialog
 
 
 0.50.03 (2025-02-02 2030 UTC)
