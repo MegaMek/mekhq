@@ -99,10 +99,22 @@ planet:
     landmass:
       - name:
           source: MWDA world profiles
-          value: Scotia
+          value: Chimera
         capital:
           source: MWDA world profiles
           value: Gethin
+      - name:
+          source: MWDA world profiles
+          value: Newfoundland
+      - name:
+          source: MWDA world profiles
+          value: Sunderland
+      - name:
+          source: MWDA world profiles
+          value: Tonka Li (archipelago)
+      - name:
+          source: MWDA world profiles
+          value: Tonka Lu (archipelago)
     satellite:
       - name:
           source: MWDA world profiles
