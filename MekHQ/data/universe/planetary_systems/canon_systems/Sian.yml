@@ -95,12 +95,12 @@ planet:
       - name:
           source: 'Objective Raids: Capellan Confederation'
           value: South Home
-        capital:
-          source: 'Handbook: House Liao, pg. 77'
-          value: Forbidden City
       - name:
           source: 'Objective Raids: Capellan Confederation'
           value: Wuhan
+        capital:
+          source: 'Handbook: House Liao, pg. 77'
+          value: Forbidden City
     satellite:
       - name:
           source: 'Objective Raids: Capellan Confederation'
