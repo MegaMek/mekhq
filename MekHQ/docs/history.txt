@@ -196,6 +196,7 @@ MEKHQ VERSION HISTORY:
 + PR #6303: Fixed Deployment Turn Calculation For Mounted Reinforcements
 + PR #6304: Added Note About SP Spending to Reinforcement Dialog
 + PR #6305: Corrected Multiple Facility Errors
++ PR #6306: Add canon static planet data and sources
 
 
 0.50.03 (2025-02-02 2030 UTC)
