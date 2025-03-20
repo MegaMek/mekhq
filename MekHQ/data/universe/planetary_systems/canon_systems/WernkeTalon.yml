@@ -87,12 +87,12 @@ planet:
       - name:
           source: 'Handbook: House Davion, pg. 91'
           value: Crimeia
-      - name:
-          source: 'Handbook: House Davion, pg. 91'
-          value: Jal
         capital:
           source: 'Handbook: House Davion, pg. 91'
           value: Hamish
+      - name:
+          source: 'Handbook: House Davion, pg. 91'
+          value: Jal
       - name:
           source: 'Handbook: House Davion, pg. 91'
           value: Tonkya
