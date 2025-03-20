@@ -77,12 +77,12 @@ planet:
       - name:
           source: 'Objective Raids: Capellan Confederation'
           value: Cius
-        capital:
-          source: 'Objective Raids: Capellan Confederation'
-          value: Nicaea
       - name:
           source: 'Objective Raids: Capellan Confederation'
           value: Nicomedia
+        capital:
+          source: 'Objective Raids: Capellan Confederation'
+          value: Bithinia
     event:
       - date: '2270-07-23'
         faction:
