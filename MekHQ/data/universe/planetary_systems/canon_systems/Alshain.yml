@@ -115,11 +115,20 @@ planet:
       The planetary capital is Silverdale and site of the planet’s primary spaceport, the capital is located on the continent of Aquilae. After the Draconis Combine gave the Rasalhague District its freedom, Alshain became the capital of the replacement military district and many of the Rasalhague Regulars became the Ashlain Regulars. Alshain and much of the Alshain Military District were captured by Clan Ghost Bear, with the Ghost Bears making Alshain their new capital when they moved to the Inner Sphere.
     landmass:
       - name:
-          source: Masters and Minions, pg. 110
-          value: Ydre
+          source: 'Objectives: The Clans, pg. 22'
+          value: Aquilae
         capital:
-          source: Masters and Minions, pg. 110
+          source: 'Objectives: The Clans, pg. 22'
           value: Silverdale
+      - name:
+          source: 'Objectives: The Clans, pg. 22'
+          value: Bunjil
+      - name:
+          source: 'Objectives: The Clans, pg. 22'
+          value: Swan
+      - name:
+          source: 'Objectives: The Clans, pg. 22'
+          value: Corvi
     satellite:
       - name:
           source: Masters and Minions, pg. 110
