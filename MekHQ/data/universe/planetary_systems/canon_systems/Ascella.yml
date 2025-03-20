@@ -68,15 +68,15 @@ planet:
       - name:
           source: MWDA world profiles
           value: Askahr
+        capital:
+          source: MWDA world profiles
+          value: Tarawa
       - name:
           source: MWDA world profiles
           value: Aytagrad
       - name:
           source: MWDA world profiles
           value: Niejawa
-        capital:
-          source: MWDA world profiles
-          value: Tarawa
       - name:
           source: MWDA world profiles
           value: Ogleca
