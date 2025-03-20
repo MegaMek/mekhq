@@ -3,9 +3,11 @@ sucsId: 1044
 xcood: 78.057
 ycood: 43.443
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: M4II
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 planet:
   - name: Dook
     type: TERRESTRIAL
@@ -62,28 +64,32 @@ planet:
       value: Halstead Station
     type: TERRESTRIAL
     orbitalDist: 0.12
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green43
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: MWDA world profiles
+      value: TOXICPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.62
     diameter: 9589
-    density: 4.544070998824
+    density: 4.543966388395
     dayLength: 23
     yearLength: 0.5
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 17
     water:
-      source: canon
+      source: MWDA world profiles
       value: 40
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: '3130 - The founding of Halstead Station traces back to the early days of
       human expansion, when the growing Ozawa Mercantile Association sought to ensure
@@ -117,12 +123,8 @@ planet:
       Sea, the single large ocean that dominates much of the planet‘s southern hemisphere.'
     landmass:
       - capital:
-          source: canon
+          source: MWDA world profiles
           value: Halstead Station
-    satellite:
-      - name: None
-        size: medium
-        icon: rock17
     event:
       - date: '2250-04-03'
         faction:

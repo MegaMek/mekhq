@@ -3,9 +3,11 @@ sucsId: 2306
 xcood: 0.242
 ycood: -331.187
 spectralType:
-  source: canon
+  source: 'Objective Raids: Capellan Confederation'
   value: K9V
-primarySlot: 5
+primarySlot:
+  source: 'Objective Raids: Capellan Confederation'
+  value: 5
 event:
   - date: '2731-05-19'
     zenithCharge: yes
@@ -99,28 +101,32 @@ planet:
       value: Shiba
     type: TERRESTRIAL
     orbitalDist: 0.2
-    sysPos: 5
+    sysPos:
+      source: 'Objective Raids: Capellan Confederation'
+      value: 5
     icon: green54
     pressure:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Objective Raids: Capellan Confederation'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 1.09
-    diameter: 12886
-    density: 5.923806705969
+    diameter: 12908
+    density: 5.934142835198
     dayLength: 17
     yearLength: 0.7
     temperature:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 35
     water:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 52
     lifeForm:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: REPTILE
     desc: |-
       Shiba is a relatively comfortable planet, with abundant natural resources and sufficient agriculture to feed its population, though the planet is not home to significant industry.
@@ -128,16 +134,18 @@ planet:
       Shiba is home to a Duchy RTC facility, which is located in the flatlands of Abbot and focuses on training vehicle crews and unarmored infantry.
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Abbey
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Montauk
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Abbot
     satellite:
-      - name: Amity
+      - name:
+          source: 'Objective Raids: Capellan Confederation'
+          value: Amity
         size: medium
         icon: oddmoon1
     event:

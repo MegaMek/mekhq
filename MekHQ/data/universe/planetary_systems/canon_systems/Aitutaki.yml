@@ -3,9 +3,11 @@ sucsId: 45
 xcood: -164.636
 ycood: -166.561
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 63'
   value: K8II
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Marik, pg. 63'
+  value: 3
 event:
   - date: '2350-11-16'
     zenithCharge: yes
@@ -43,28 +45,32 @@ planet:
       value: Aitutaki
     type: TERRESTRIAL
     orbitalDist: 0.6
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Marik, pg. 63'
+      value: 3
     icon: green34
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 63'
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 63'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 63'
       value: 1.15
-    diameter: 12208
-    density: 6.588355345608
+    diameter: 12237
+    density: 6.604174469783
     dayLength: 21
     yearLength: 0.9
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 63'
       value: 45
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 63'
       value: 70
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 63'
       value: REPTILE
     desc: |-
       Aitutaki was originally established as a trade way-station by the Principality of Regulus, however the planet’s economy has since switched to an agricultural center for the region. The planet has also been a primary training hub for the Regulan military since the early 25th Century.
@@ -72,18 +78,14 @@ planet:
       Aitutaki’s early settlers made a unique distinction by creating two capital cities, Ladakh and Srinagar. Ladakh was created as the center of government and Srinagar as the center for financial, commercial and industrial concerns with the intent of minimizing interference between commerce and government.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 63'
           value: Andrine
         capital:
-          source: canon
-          value: Ladakh and Srinagar
+          source: 'Handbook: House Marik, pg. 63'
+          value: Ladakh
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 63'
           value: Simla
-    satellite:
-      - name: None
-        size: large
-        icon: rock16
     event:
       - date: '2247-03-21'
         faction:

@@ -3,9 +3,11 @@ sucsId: 2058
 xcood: 62.546
 ycood: -81.213
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G6III
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2371-03-14'
     zenithCharge: yes
@@ -64,28 +66,32 @@ planet:
       value: Poznan
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: green47
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.2
-    diameter: 14512
-    density: 5.807058203998
+    diameter: 14517
+    density: 5.809094591141
     dayLength: 23
     yearLength: 2.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 45
     water:
-      source: canon
+      source: MWDA world profiles
       value: 65
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: "3135 - Poznan was colonized by refugees from Poland, Portugal, and Spain
       during the original Exodus from Terra. It was named after the first capital
@@ -114,33 +120,29 @@ planet:
       laid claim to Poznan, it has continued to harbor dissidents and malcontents. "
     landmass:
       - name:
-          source: canon
-          value: Boleslaw
-      - name:
-          source: canon
-          value: Mieszko
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Barcelona
         capital:
-          source: canon
+          source: MWDA world profiles
           value: New Madrid
       - name:
-          source: canon
+          source: MWDA world profiles
+          value: Boleslaw
+      - name:
+          source: MWDA world profiles
+          value: Galicia
+      - name:
+          source: MWDA world profiles
+          value: Mieszko
+      - name:
+          source: MWDA world profiles
           value: Palma
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Seville
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Zaragoza
-      - name:
-          source: canon
-          value: Galicia
-    satellite:
-      - name: Krzyki
-        size: large
-        icon: rock5
     event:
       - date: '2267-07-18'
         faction:

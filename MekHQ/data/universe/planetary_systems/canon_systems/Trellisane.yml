@@ -3,9 +3,11 @@ sucsId: 2579
 xcood: -251.263
 ycood: -55.107
 spectralType:
-  source: canon
+  source: House Marik, pg. 165
   value: G7III
-primarySlot: 3
+primarySlot:
+  source: House Marik, pg. 165
+  value: 3
 event:
   - date: '2381-06-29'
     nadirCharge: yes
@@ -50,7 +52,9 @@ planet:
       value: Trellisane
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 3
+    sysPos:
+      source: House Marik, pg. 165
+      value: 3
     icon: green42
     pressure: HIGH
     atmosphere: TAINTEDPOISON
@@ -63,7 +67,7 @@ planet:
     temperature: 35
     water: 49
     lifeForm:
-      source: canon
+      source: House Marik, pg. 165
       value: MAMMAL
     desc: |-
       Trellisane was originally settled by a community dispirited by the way democracy had been falling by the wayside on Terra. Unfortunately, the planet only kept up their zeal for two-generations before voter participation began to plummet as people began to feel their vote no longer made a difference. In an original solution to the problem, Trellisane’s population decided to make voting mandatory for all citizens of age, however they were limited to one in three elections in order to limit the voting pool so people could feel their vote had more impact. These efforts surprisingly worked and convinced people to vote and voice their opinions.

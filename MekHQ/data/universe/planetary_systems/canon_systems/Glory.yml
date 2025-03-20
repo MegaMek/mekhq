@@ -3,9 +3,11 @@ sucsId: 2943
 xcood: 99.292
 ycood: 1835.555
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: G4IV
-primarySlot: 4
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 4
 event:
   - date: '2808-06-24'
     zenithCharge: yes
@@ -60,28 +62,32 @@ planet:
       value: Glory
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 4
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 4
     icon: green15
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 0.9
     diameter: 11553
-    density: 5.474828487241
+    density: 5.474727379534
     dayLength: 26
     yearLength: 2.0
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 40
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 50
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: MAMMAL
     desc: No description available.
     landmass:

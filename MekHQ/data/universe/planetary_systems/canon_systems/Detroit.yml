@@ -3,9 +3,11 @@ sucsId: 698
 xcood: 19.15
 ycood: -452.551
 spectralType:
-  source: canon
+  source: 'Handbook: Major Periphery States, pg. 101'
   value: G1V
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: Major Periphery States, pg. 101'
+  value: 3
 event:
   - date: '2803-05-08'
     zenithCharge: yes
@@ -46,28 +48,32 @@ planet:
       value: Detroit
     type: TERRESTRIAL
     orbitalDist: 1.0
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: Major Periphery States, pg. 101'
+      value: 3
     icon: wet20
     pressure:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 101'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: Major Periphery States, pg. 101'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 101'
       value: 1.03
-    diameter: 12657
-    density: 5.71176157526
+    diameter: 12665
+    density: 5.715334168954
     dayLength: 22
     yearLength: 1.4
     temperature:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 101'
       value: 33
     water:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 101'
       value: 78
     lifeForm:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 101'
       value: AMPHIBIAN
     desc: |-
       Detroit is the site of ‘Mech and Aerospace factories as well as multiple other local industries. Aside from the heavy industry, Detriot is also home to abundant agriculture and fishing concerns which more than feed the population. The planet is also home to many beautiful natural areas which are popular tourist attractions.
@@ -81,19 +87,23 @@ planet:
       Novis AT-H Incorporated
     landmass:
       - name:
-          source: canon
+          source: Masters and Minions, pg. 178
           value: North
       - name:
-          source: canon
+          source: Masters and Minions, pg. 178
           value: South
         capital:
-          source: canon
+          source: Masters and Minions, pg. 178
           value: Ann Arbor
     satellite:
-      - name: Livonia
+      - name:
+          source: 'Handbook: Major Periphery States, pg. 101'
+          value: Livonia
         size: large
         icon: rock6
-      - name: Tecumseh
+      - name:
+          source: 'Handbook: Major Periphery States, pg. 101'
+          value: Tecumseh
         size: giant
         icon: rock15
     event:

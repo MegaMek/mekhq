@@ -3,9 +3,11 @@ sucsId: 1139
 xcood: -170.584
 ycood: 367.787
 spectralType:
-  source: canon
+  source: FedCom Civil War, pg. 204
   value: G6V
-primarySlot: 4
+primarySlot:
+  source: FedCom Civil War, pg. 204
+  value: 4
 event:
   - date: '2521-06-12'
     zenithCharge: yes
@@ -65,28 +67,32 @@ planet:
       value: Hot Springs
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 4
+    sysPos:
+      source: FedCom Civil War, pg. 204
+      value: 4
     icon: green40
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 204
       value: STANDARD
-    atmosphere: TOXICPOISON
+    atmosphere:
+      source: FedCom Civil War, pg. 204
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 204
       value: 1.0
-    diameter: 13097
-    density: 5.360520078823
+    diameter: 13103
+    density: 5.363162060717
     dayLength: 22
     yearLength: 1.1
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 204
       value: 45
     water:
-      source: canon
+      source: FedCom Civil War, pg. 204
       value: 60
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 204
       value: MAMMAL
     desc: Hot Springs was colonized to take advantage of the planet’s abundance of
       mineral and metal ores, however the planet quickly became famous for its rich
@@ -102,16 +108,18 @@ planet:
       to the renowned Institute for Advance Studies in Physical Therapy.
     landmass:
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 204
           value: Manta Springs
         capital:
-          source: canon
+          source: FedCom Civil War, pg. 204
           value: Boulder
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 204
           value: Silver Springs
     satellite:
-      - name: Buckstone
+      - name:
+          source: FedCom Civil War, pg. 204
+          value: Buckstone
         size: large
         icon: rock5
     event:

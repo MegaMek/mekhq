@@ -3,9 +3,11 @@ sucsId: 1313
 xcood: 53.764
 ycood: -29.514
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: M0V
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2364-02-09'
     zenithCharge: yes
@@ -33,28 +35,32 @@ planet:
       value: Kawich
     type: TERRESTRIAL
     orbitalDist: 0.2
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green3
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.1
-    diameter: 15574
-    density: 4.94413232473
+    diameter: 15605
+    density: 4.9538707445
     dayLength: 27
     yearLength: 0.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 26
     water:
-      source: canon
+      source: MWDA world profiles
       value: 60
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: |-
       Ten small continents dot Kawich‘s large but shallow seas. Kawich‘s soil is generally poor, but its rocks are rich in metal ores, minerals, and petroleum. Although mining and refining industries boomed on Kawich under the Terran Hegemony, Kawich‘s population has always retained a frontier attitude given the hardscrabble land they must work.
@@ -64,37 +70,42 @@ planet:
       The Blakist Holy War destroyed much of Kawich‘s industry, but The Republic of the Sphere managed to resurrect most of Kawich‘s mines, drills, and refineries during the Golden Age of Peace.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Adaven
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Armagosa
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Darrough
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Hannapah
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Ione
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Nyala
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Ophir
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Pactolus
+        capital:
+          source: MWDA world profiles (landmass unclear)
+          value: Dotara
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Tolicha
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Wahmonie
     satellite:
-      - name: Cactus
+      - name:
+          source: MWDA world profiles
+          value: Cactus
         size: medium
         icon: rock4
     event:

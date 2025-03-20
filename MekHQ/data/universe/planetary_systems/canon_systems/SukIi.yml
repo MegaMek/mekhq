@@ -3,9 +3,11 @@ sucsId: 2430
 xcood: -29.214
 ycood: 256.116
 spectralType:
-  source: canon
+  source: House Steiner
   value: G5V
-primarySlot: 2
+primarySlot:
+  source: House Steiner
+  value: 2
 event:
   - date: '2350-05-21'
     zenithCharge: yes
@@ -33,7 +35,9 @@ planet:
       value: Suk II
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 2
+    sysPos:
+      source: House Steiner
+      value: 2
     icon: dry20
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -48,7 +52,7 @@ planet:
     temperature: 35
     water: 15
     lifeForm:
-      source: canon
+      source: House Steiner
       value: REPTILE
     desc: |-
       Suk II would be an extremely pleasant an hospitable world if not for one problem, more than half of the planet’s water is contaminated by a native algae and requires an expensive purification system before it can be used by humans.

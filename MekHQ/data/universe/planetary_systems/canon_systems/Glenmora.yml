@@ -3,9 +3,11 @@ sucsId: 967
 xcood: 285.367
 ycood: 52.938
 spectralType:
-  source: canon
+  source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
   value: G2V
-primarySlot: 3
+primarySlot:
+  source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
+  value: 3
 event:
   - date: '2370-12-11'
     nadirCharge: yes
@@ -48,28 +50,32 @@ planet:
       value: Glenmora
     type: TERRESTRIAL
     orbitalDist: 1.0
-    sysPos: 3
+    sysPos:
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
+      value: 3
     icon: wet10
     pressure:
-      source: canon
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
       value: 1.01
-    diameter: 11284
-    density: 6.269399907946
+    diameter: 11303
+    density: 6.279795559106
     dayLength: 28
     yearLength: 1.4
     temperature:
-      source: canon
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
       value: 27
     water:
-      source: canon
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
       value: 78
     lifeForm:
-      source: canon
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
       value: INSECT
     desc: |-
       3028 - Glenmora is a water-rich world covered in oceans. The only continent sized landmass is Hades, which is famous for its vast volcanic fields. Unfortunately the regular eruptions from the many volcanoes that created the continent cause ash to create thick clouds that often block out the sun nearly year round. Despite this, seventy percent of the planet’s population live on Hades and endure the ever present overcast skies. The remaining thirty percent of the planet’s population reside on the multitude of large islands that dot Glemora’s oceans.
@@ -79,10 +85,16 @@ planet:
       Glenmora’s location on the Federated Suns and Draconis Combine border has made the planet a target for multiple raids and several invasions throughout the centuries. As a result the planet has always maintained a large militia, which supports the standard infantry and mechanized infantry regiments with several heavy tank regiments.
     landmass:
       - name:
-          source: canon
+          source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
+          value: Carson
+      - name:
+          source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
+          value: Davison
+      - name:
+          source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
           value: Hades
         capital:
-          source: canon
+          source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
           value: Tronka
     event:
       - date: '2288-05-18'

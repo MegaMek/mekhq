@@ -3,9 +3,11 @@ sucsId: 1636
 xcood: 405.307
 ycood: 6.93
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 101'
   value: F7II
-primarySlot: 5
+primarySlot:
+  source: 'Handbook: House Davion, pg. 101'
+  value: 5
 event:
   - date: '2406-09-18'
     zenithCharge: yes
@@ -79,28 +81,32 @@ planet:
       value: Mayetta
     type: TERRESTRIAL
     orbitalDist: 3.64
-    sysPos: 5
+    sysPos:
+      source: 'Handbook: House Davion, pg. 101'
+      value: 5
     icon: green6
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 101'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 101'
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 101'
       value: 0.9
-    diameter: 13042
-    density: 4.846123403594
+    diameter: 13047
+    density: 4.847856566693
     dayLength: 25
     yearLength: 7.0
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 101'
       value: 24
     water:
-      source: canon
-      value: 58
+      source: 'Handbook: House Davion, pg. 101'
+      value: 57
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 101'
       value: AMPHIBIAN
     desc: If not for a K-F drive accident in 2387, Mayetta may have never been colonized.
       While Mayetta was not what the settlers on the small fleet were looking for,
@@ -118,10 +124,14 @@ planet:
       - name: ECN-4
       - name: ECN-5
     satellite:
-      - name: Big Rock
+      - name:
+          source: 'Handbook: House Davion, pg. 101'
+          value: Big Rock
         size: medium
         icon: rock7
-      - name: Forsin
+      - name:
+          source: 'Handbook: House Davion, pg. 101'
+          value: Forsin
         size: medium
         icon: oddmoon2
     event:

@@ -3,9 +3,11 @@ sucsId: 142
 xcood: 164.654
 ycood: 130.745
 spectralType:
-  source: canon
+  source: A Time of War, pg. 380
   value: G2V
-primarySlot: 2
+primarySlot:
+  source: A Time of War, pg. 380
+  value: 2
 event:
   - date: '2460-05-09'
     zenithCharge: yes
@@ -30,28 +32,32 @@ planet:
       value: Annapolis
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 2
+    sysPos:
+      source: A Time of War, pg. 380
+      value: 2
     icon: green24
     pressure:
-      source: canon
+      source: A Time of War, pg. 380
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: A Time of War, pg. 380
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: A Time of War, pg. 380
       value: 0.95
-    diameter: 13076
-    density: 5.101873268467
+    diameter: 13081
+    density: 5.10378710771
     dayLength: 21
     yearLength: 1.2
     temperature:
-      source: canon
+      source: A Time of War, pg. 380
       value: 35
     water:
-      source: canon
+      source: A Time of War, pg. 380
       value: 73
     lifeForm:
-      source: canon
+      source: A Time of War, pg. 380
       value: MAMMAL
     desc: |-
       Annapolis was once like New Avalon and El Dorado, a fantastic world with plentiful fresh water, a Terran-compatible ecology, fresh air and excellent mineral resources. Discovered in 2218 and opened for colonization in 2235 to great fanfare, Annapolis was settled by the elite of the Terran Alliance (reflected in its name, drawn from a small town near one of the Alliance's centers of power). The Alliance planned the world as a showcase regional capital to solve crippling communication and control delays to Alliance colonies. Accordingly, Annapolis received massive funding and heavy immigration from Terra.
@@ -67,18 +73,22 @@ planet:
       A few Stone Age tribes exist in the planet's deep deserts and jungles, far from the reach of the government and dominant culture. These peoples are some of the most primitive and quixotic groups in the Inner Sphere. For example, deep in the cloud forests of Queen Anne's Land dwells a cargo cult that worships amazingly accurate mockups of Star League-era DropShips. They tend to follow the usual course of cargo cults, prophesying that their great benefactors from the stars, with magical powers and great gifts, will one day return if they maintain their mockups. One of these tribes maintains a six-meter tall, perfect likeness of Aleksandr Kerensky, carved of a type of granite isotopically confirmed to be from a completely different star system than Annapolis.
     landmass:
       - name:
-          source: canon
-          value: Queen Anne’s Land
+          source: A Time of War, pg. 380
+          value: Queen Anne's Land
         capital:
-          source: canon
+          source: A Time of War, pg. 380
           value: Maryland
     satellite:
-      - name: Severn
-        size: medium
-        icon: rock2
-      - name: Proctor
+      - name:
+          source: A Time of War, pg. 380
+          value: Proctor
         size: medium
         icon: rock14
+      - name:
+          source: A Time of War, pg. 380
+          value: Severn
+        size: medium
+        icon: rock2
     event:
       - date: '2235-09-18'
         faction:

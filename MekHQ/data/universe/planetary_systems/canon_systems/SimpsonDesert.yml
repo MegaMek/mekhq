@@ -3,9 +3,11 @@ sucsId: 2342
 xcood: -271.591
 ycood: -99.305
 spectralType:
-  source: canon
+  source: House Marik, pg. 161
   value: G9V
-primarySlot: 4
+primarySlot:
+  source: House Marik, pg. 161
+  value: 4
 planet:
   - name: Boothroyd
     type: GIANT_TERRESTRIAL
@@ -313,7 +315,9 @@ planet:
       value: Simpson Desert
     type: TERRESTRIAL
     orbitalDist: 0.8
-    sysPos: 4
+    sysPos:
+      source: House Marik, pg. 161
+      value: 4
     icon: green16
     pressure: HIGH
     atmosphere: BREATHABLE
@@ -326,7 +330,7 @@ planet:
     temperature: 37
     water: 45
     lifeForm:
-      source: canon
+      source: House Marik, pg. 161
       value: MAMMAL
     desc: Contrary to the name Simpson Desert is actually a comfortable temperate
       planet. The two (incorrect) explanations for the name are first explanation

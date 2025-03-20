@@ -3,9 +3,11 @@ sucsId: 2736
 xcood: 63.844
 ycood: -119.184
 spectralType:
-  source: canon
+  source: 'Handbook: House Liao, pg. 76'
   value: G3IV
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Liao, pg. 76'
+  value: 3
 event:
   - date: '2373-04-30'
     nadirCharge: yes
@@ -45,28 +47,32 @@ planet:
       value: Wei
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Liao, pg. 76'
+      value: 3
     icon: wet11
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 76'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 76'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 76'
       value: 1.0
-    diameter: 12000
-    density: 5.8284
+    diameter: 12029
+    density: 5.842348002115
     dayLength: 24
     yearLength: 2.3
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 76'
       value: 45
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 76'
       value: 76
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 76'
       value: REPTILE
     desc: |-
       Wei is hotter than Terra but is otherwise a very comfortable planet for human life. During the Star League, Wei was secretly used as a repository for a deadly nerve gas agent. After the collapse of the Star League this repository was forgotten until the early 31st Century when it was rediscovered by the Capellan Confederation.
@@ -74,18 +80,22 @@ planet:
       Wei is home to one of the many Duchy RTC training facilities in the Confederation. The facility specializes in training infanrty and armor crews in the mountains of Province.
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Province
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Vandannis City
     satellite:
-      - name: Arlis
-        size: medium
-        icon: oddmoon2
-      - name: Arils
+      - name:
+          source: 'Handbook: House Liao, pg. 76'
+          value: Arils
         size: medium
         icon: rock13
+      - name:
+          source: 'Handbook: House Liao, pg. 76'
+          value: Arlis
+        size: medium
+        icon: oddmoon2
     event:
       - date: '2176-12-10'
         faction:

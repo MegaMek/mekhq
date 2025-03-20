@@ -5,7 +5,9 @@ ycood: 239.059
 spectralType:
   source: canon
   value: G1V
-primarySlot: 4
+primarySlot:
+  source: House Steiner
+  value: 4
 event:
   - date: '2359-07-24'
     zenithCharge: yes
@@ -73,7 +75,9 @@ planet:
       value: Carse
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 4
+    sysPos:
+      source: House Steiner
+      value: 4
     icon: wet3
     pressure: THIN
     atmosphere: BREATHABLE
@@ -86,7 +90,7 @@ planet:
     temperature: 19
     water: 84
     lifeForm:
-      source: canon
+      source: House Steiner
       value: INSECT
     desc: |-
       The Carse system has two stars - a G1V and an M1V. Due to the unique orbit around these two stars the inhabited planet (Carse IV) has an extremely varied climate depending on which of the four seasonal cycles it is currently in. As of 3025 the planet was in a cold cycle and as a result was blanketed in snow and its smallest ocean, Minor Mare, was completely frozen over.

@@ -3,9 +3,11 @@ sucsId: 1976
 xcood: -84.553
 ycood: 234.789
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 135
   value: B7V
-primarySlot: 7
+primarySlot:
+  source: Masters and Minions, pg. 135
+  value: 7
 event:
   - date: '2405-01-08'
     zenithCharge: yes
@@ -113,28 +115,32 @@ planet:
       value: Pandora
     type: TERRESTRIAL
     orbitalDist: 23.4
-    sysPos: 7
+    sysPos:
+      source: Masters and Minions, pg. 135
+      value: 7
     icon: green24
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 135
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 135
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 135
       value: 1.02
-    diameter: 11783
-    density: 6.100297431517
+    diameter: 11767
+    density: 6.091875553206
     dayLength: 29
     yearLength: 113.2
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 135
       value: 40
     water:
-      source: canon
+      source: Masters and Minions, pg. 135
       value: 69
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 135
       value: MAMMAL
     desc: |-
       Pandora is a vibrant world with a rich native ecosystem and stunning natural beauty. The planet was originally colonized by people eager to reconnect with nature. Unfortunately the comfortable planet attracted more settlers that had other ideas and the planet quickly became more developed. The industrial development attracted unwanted outside attention and the planet saw quite a bit of warfare in its early history until some peace was restored when the planet was annexed by the Lyran Commonwealth.
@@ -150,22 +156,24 @@ planet:
       Quickscell Company
     landmass:
       - name:
-          source: canon
+          source: Masters and Minions, pg. 135
           value: Echo
       - name:
-          source: canon
+          source: Masters and Minions, pg. 135
           value: Kaos
         capital:
-          source: canon
-          value: Defiance
+          source: Masters and Minions, pg. 135
+          value: Deliverance
       - name:
-          source: canon
+          source: Masters and Minions, pg. 135
           value: Limbo
       - name:
-          source: canon
+          source: Masters and Minions, pg. 135
           value: Nirvana
     satellite:
-      - name: Hope
+      - name:
+          source: Masters and Minions, pg. 135
+          value: Hope
         size: large
         icon: rock6
     event:

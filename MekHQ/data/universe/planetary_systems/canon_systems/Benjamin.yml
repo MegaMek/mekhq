@@ -3,9 +3,11 @@ sucsId: 302
 xcood: 123.977
 ycood: 134.529
 spectralType:
-  source: canon
+  source: House Kurita
   value: M1V
-primarySlot: 3
+primarySlot:
+  source: House Kurita
+  value: 3
 event:
   - date: '2376-03-17'
     zenithCharge: yes
@@ -63,7 +65,9 @@ planet:
       value: Benjamin
     type: TERRESTRIAL
     orbitalDist: 0.2
-    sysPos: 3
+    sysPos:
+      source: House Kurita
+      value: 3
     icon: green14
     pressure:
       source: canon
@@ -84,7 +88,7 @@ planet:
       source: canon
       value: 51
     lifeForm:
-      source: canon
+      source: House Kurita
       value: MAMMAL
     desc: |-
       Benjamin is a large planet that is barely habitable due to its dim sun. In order to make the planet more liveable early engineers installed twenty ‘mini-suns’ into orbit which act much like jumpship solar sails and help collect and redirect more sunlight at the surface of the planet. Despite the dim sun, Benjamin manages a cool but temperate climate that allows for the the growth of hardier crops and livestock that can survive the colder temperatures. While Benjamin does not possess abundant natural resources it does possess some deposits of petroleum and coal which make up the backbone of the limited industry on planet, which primarily produces parts for wheeled vehicles. While the light industry and modest agriculture concerns do not make Benjamin a standout planet, the fact that the planet is a Military District capital does. The entire Benjamin Military District is run from the sprawling administrative center located in the planetary capital, Deber City.
@@ -93,13 +97,16 @@ planet:
     smallMoons: 6
     landmass:
       - name:
-          source: canon
+          source: 'Objectives: Draconis Combine, pg. 23'
           value: Castano
+        capital:
+          source: House Kurita
+          value: Deber City
       - name:
-          source: canon
+          source: 'Objectives: Draconis Combine, pg. 23'
           value: Gojjam
       - name:
-          source: canon
+          source: 'Objectives: Draconis Combine, pg. 23'
           value: Osaka
     event:
       - date: '2169-05-09'

@@ -3,9 +3,11 @@ sucsId: 51
 xcood: 60.097
 ycood: 31.239
 spectralType:
-  source: canon
+  source: FedCom Civil War, pg. 202
   value: A9III
-primarySlot: 5
+primarySlot:
+  source: FedCom Civil War, pg. 202
+  value: 5
 event:
   - date: '2352-09-27'
     zenithCharge: yes
@@ -86,28 +88,32 @@ planet:
       value: Al Na'ir
     type: TERRESTRIAL
     orbitalDist: 4.76
-    sysPos: 5
+    sysPos:
+      source: FedCom Civil War, pg. 202
+      value: 5
     icon: green21
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 202
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 202
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 202
       value: 0.6
-    diameter: 9043
-    density: 4.663980998176
+    diameter: 9042
+    density: 4.663383337053
     dayLength: 26
     yearLength: 10.5
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 202
       value: 35
     water:
-      source: canon
+      source: FedCom Civil War, pg. 202
       value: 30
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 202
       value: NONE
     desc: Al Na‘ir is the fifth planet from its parent star and is the only rock in
       the system that is even remotely capable of supporting life, with a sulfur-tainted
@@ -152,13 +158,18 @@ planet:
       is on Cedar Rock as well.
     landmass:
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 202
           value: Cedar Rock
         capital:
-          source: canon
+          source: FedCom Civil War, pg. 202
           value: Homai-Zaki
+      - name:
+          source: FedCom Civil War, pg. 202
+          value: Scarborough
     satellite:
-      - name: Taliswan
+      - name:
+          source: FedCom Civil War, pg. 202
+          value: Taliswan
         size: large
         icon: rock6
     event:

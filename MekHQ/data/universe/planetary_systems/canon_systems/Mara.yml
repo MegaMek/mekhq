@@ -3,9 +3,11 @@ sucsId: 1599
 xcood: 121.748
 ycood: 8.743
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F4V
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2416-08-21'
     zenithCharge: yes
@@ -15,28 +17,32 @@ planet:
       value: Mara
     type: TERRESTRIAL
     orbitalDist: 2.24
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: wet20
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.93
-    diameter: 14177
-    density: 4.610546915187
+    diameter: 14176
+    density: 4.610296936674
     dayLength: 21
     yearLength: 3.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 34
     water:
-      source: canon
+      source: MWDA world profiles
       value: 81
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: AMPHIBIAN
     desc: The terrestrial planet of Mara was settled in the early age of colonial
       expansion, after it was recognized for the pleasant agricultural world it could
@@ -61,19 +67,23 @@ planet:
       designs.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Appilagio
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Terrace
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Naramo
     satellite:
-      - name: Montoya
+      - name:
+          source: MWDA world profiles
+          value: Montoya
         size: large
         icon: rock6
-      - name: Vasquez
+      - name:
+          source: MWDA world profiles
+          value: Vasquez
         size: large
         icon: rock8
     event:

@@ -5,7 +5,9 @@ ycood: 51.376
 spectralType:
   source: canon
   value: G8V
-primarySlot: 4
+primarySlot:
+  source: Masters and Minions, pg. 95
+  value: 4
 event:
   - date: '2411-01-30'
     zenithCharge: yes
@@ -61,28 +63,32 @@ planet:
       value: Skye
     type: TERRESTRIAL
     orbitalDist: 0.8
-    sysPos: 4
+    sysPos:
+      source: Masters and Minions, pg. 95
+      value: 4
     icon: green46
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 95
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 95
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 95
       value: 1.03
-    diameter: 11129
-    density: 6.536953291146
+    diameter: 11101
+    density: 6.520510561069
     dayLength: 25
     yearLength: 1.1
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 95
       value: 30
     water:
-      source: canon
+      source: Masters and Minions, pg. 95
       value: 70
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 95
       value: MAMMAL
     desc: |-
       3135 - A rare, habitable planet in a binary star system, Skye‘s single, pan-hemispheric supercontinent of New Scotland boasts cool climates in the northern and southern reaches, coupled with moody rain, fog-wreathed hills, and deep green valleys. These features, more than the vast mineral and metallurgical wealth buried beneath, drew the first settlers, most of whom hailed from Terra‘s British Isles, to this world. These first Scottish and Irish colonists flocked to Skye to recreate the splendors of their native lands, making a fresh start on a world unspoiled by mankind‘s rampant industrialization, and they enacted strict “zoning laws” to limit commercial development and heavy industry. Mining, refining, and manufacturing were restricted to less than fifty percent of the world‘s land area, but despite this severe limitation, which left vast resources untapped by default, these laws did not impede the growth of industry and trade on Skye. A side effect of this arrangement, however, was that exploitable lands were swiftly gobbled up by the wealthiest people and corporations, locking up these resources and giving rise to a nobility that became locked in a geopolitical stasis for centuries. Ian McQuiston, entrepreneur and founder of Skye Traders, was the most powerful of Skye‘s original ruling class, whose economic empire extended to encompass many of the surrounding worlds. Under his guidance and rule, Skye rose to prominence quickly on the galactic scene, ultimately forming the Federation of Skye.
@@ -101,13 +107,15 @@ planet:
       Skye Pleasure Craft
     landmass:
       - name:
-          source: canon
+          source: Masters and Minions, pg. 95
           value: New Scotland
         capital:
-          source: canon
+          source: Masters and Minions, pg. 95
           value: New Glasgow
     satellite:
-      - name: Luna
+      - name:
+          source: Masters and Minions, pg. 95
+          value: Luna
         size: medium
         icon: oddmoon1
     event:

@@ -3,9 +3,11 @@ sucsId: 2204
 xcood: -15.002
 ycood: -344.373
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 67'
   value: G9VI
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Marik, pg. 67'
+  value: 4
 event:
   - date: '2393-09-26'
     zenithCharge: yes
@@ -63,28 +65,32 @@ planet:
       value: Sadurni
     type: TERRESTRIAL
     orbitalDist: 1.28
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Marik, pg. 67'
+      value: 4
     icon: green36
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 67'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 67'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 67'
       value: 1.1
-    diameter: 14924
-    density: 5.175924647829
+    diameter: 14930
+    density: 5.177869083448
     dayLength: 19
     yearLength: 1.7
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 67'
       value: 35
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 67'
       value: 65
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 67'
       value: MAMMAL
     desc: Sadurni is a comfortable planet for human habitation and the planet’s economy
       is primarily based on agriculture. The planet is also renowned for its skilled
@@ -92,16 +98,18 @@ planet:
       military importance.
     landmass:
       - name:
-          source: canon
-          value: Patra
-      - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 67'
           value: Katerini
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 67'
+          value: Patra
+      - name:
+          source: 'Handbook: House Marik, pg. 67'
           value: Xanthi
     satellite:
-      - name: Radlan
+      - name:
+          source: 'Handbook: House Marik, pg. 67'
+          value: Radlan
         size: large
         icon: rock7
     event:

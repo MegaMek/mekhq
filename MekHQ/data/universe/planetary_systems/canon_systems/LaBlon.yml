@@ -3,9 +3,11 @@ sucsId: 1435
 xcood: -31.803
 ycood: 72.852
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G2V
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2409-10-12'
     nadirCharge: yes
@@ -50,28 +52,32 @@ planet:
       value: La Blon
     type: TERRESTRIAL
     orbitalDist: 1.0
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: wet6
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.04
-    diameter: 12899
-    density: 5.675291970952
+    diameter: 12889
+    density: 5.670692835189
     dayLength: 20
     yearLength: 1.4
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 59
     water:
-      source: canon
+      source: MWDA world profiles
       value: 96
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       La Blon is a tropical world almost completely covered by water. Its three main landmasses, Elise (in the northern hemisphere), Ballay, and Renaria (in the southern), are more like large islands than continents, and each is surrounded by a host of smaller island clusters. This, combined with the planet‘s warmth and typically moderate weather—except during the “wet seasons,” when tropical storms and hurricanes become more of the norm—has made La Blon a favorite vacation spot for tourists. Despite this allure, it was the abundant natural resources of the planet and its inhabitable moon, Ivanov, which drew colonists here centuries ago. A wealth of common metals and modestly fertile soils have given La Blon a ubsistence-level economy in mining, light manufacturing, and even agriculture, more than enough to supplement its seasonal tourism trade. These features made La Blon a favorite corporate retreat during the height of the Star League and again under Lyran rule during the height of the Federated Commonwealth alliance. La Blon became known as the place where one could go to get away from it all and still be connected to the real world.
@@ -80,25 +86,31 @@ planet:
       La Blon‘s capital, Amadeus, is located at the foot of the Carbondale Mountains on Elise. The city is also home to the planet‘s largest spaceport and to La Blon Interstellar Entertainment (LBIE). Founded shortly after the formation of The Republic, LBIE has since branched out from film and tri-vid production, and now also lays a significant claim to the planet‘s hotel and travel brokerage industries. The coastal city of Lisellei, on the Renaria continent, boasts the planet‘s largest seaport, and is home to the Diamond Mine, easily La Blon‘s largest casino resort.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Ballay
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Elise
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Amadeus
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Renaria
     satellite:
-      - name: Gwenhyvar
+      - name:
+          source: MWDA world profiles
+          value: Gwenhyvar
         size: large
         icon: rock9
-      - name: Ivanov
+      - name:
+          source: MWDA world profiles
+          value: Ivanov
         size: medium
         icon: rock6
-      - name: Tiarra
+      - name:
+          source: MWDA world profiles
+          value: Tiarra
         size: large
         icon: rock10
     event:

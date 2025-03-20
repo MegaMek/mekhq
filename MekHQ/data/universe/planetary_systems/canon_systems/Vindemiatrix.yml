@@ -3,9 +3,11 @@ sucsId: 2690
 xcood: -100.411
 ycood: 26.388
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G8III
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 planet:
   - name: Juturna
     type: DWARF_TERRESTRIAL
@@ -42,28 +44,32 @@ planet:
       value: Vindemiatrix
     type: TERRESTRIAL
     orbitalDist: 1.28
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green41
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.03
-    diameter: 13785
-    density: 5.247162854436
+    diameter: 13790
+    density: 5.24905193149
     dayLength: 19
     yearLength: 1.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 49
     water:
-      source: canon
+      source: MWDA world profiles
       value: 48
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: Orbiting a yellow giant that is prone to all manner of solar activity, from
       massive sunspots to occasional gravitational shifts intense enough to set off
@@ -92,16 +98,16 @@ planet:
     smallMoons: 4
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Kressia
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Scandavara
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Brattleston Depot
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Treshiria
     event:
       - date: '2600-02-16'

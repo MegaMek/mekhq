@@ -3,9 +3,11 @@ sucsId: 995
 xcood: -100.617
 ycood: 297.223
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 86'
   value: G4V
-primarySlot: 1
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 86'
+  value: 1
 event:
   - date: '2733-11-26'
     zenithCharge: yes
@@ -17,46 +19,53 @@ planet:
       value: Graus
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 1
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 86'
+      value: 1
     icon: green9
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 86'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 86'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 86'
       value: 1.01
-    diameter: 11149
-    density: 6.349268094767
+    diameter: 11164
+    density: 6.357815670597
     dayLength: 24
     yearLength: 1.1
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 86'
       value: 43
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 86'
       value: 71
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 86'
       value: MAMMAL
     desc: Graus was settled for its beautiful landscapes and moderate mineral deposits.
       Primarily an agricultural planet, Graus also boasts light industry focusing
       on luxury items, including recreational vehicles and holovids. By the early
       31st Century the planet embraced pacifism and rejected all major military presence
       on the planet.
+    ring:
+      source: 'Handbook: House Steiner, pg. 86'
+      value: yes
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 86'
           value: Albion
         capital:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 86'
           value: New Paris
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 86'
           value: Bromme
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 86'
           value: Gaulia
     satellite:
       - name: dust ring

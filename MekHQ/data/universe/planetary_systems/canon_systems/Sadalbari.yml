@@ -3,9 +3,11 @@ sucsId: 2203
 xcood: 137.775
 ycood: 42.859
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K0VI
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2359-05-23'
     nadirCharge: yes
@@ -19,28 +21,32 @@ planet:
       value: Sadalbari
     type: TERRESTRIAL
     orbitalDist: 1.28
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: green30
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
-      value: 1.1
-    diameter: 14589
-    density: 5.294926967017
+      source: MWDA world profiles
+      value: 1.16
+    diameter: 14987
+    density: 5.439382381407
     dayLength: 17
     yearLength: 1.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 39
     water:
-      source: canon
+      source: MWDA world profiles
       value: 59
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: AMPHIBIAN
     desc: The first settlers to come to the mostly tropical world of Sadalbari hailed
       from the African and Middle Eastern regions of Terra. At the time, rainforests
@@ -66,19 +72,21 @@ planet:
       on the planet's large, southern polar continent of Beth'lamel.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Aberlani
       - name:
-          source: canon
-          value: Beth’lamel
+          source: MWDA world profiles
+          value: Beth'lamel
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Ramolia
       - name:
-          source: canon
+          source: MWDA world profiles
           value: New Kenya
     satellite:
-      - name: Meche
+      - name:
+          source: MWDA world profiles
+          value: Meche
         size: medium
         icon: oddmoon1
     event:

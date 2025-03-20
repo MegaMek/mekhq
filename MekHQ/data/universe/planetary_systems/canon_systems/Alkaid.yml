@@ -3,9 +3,11 @@ sucsId: 74
 xcood: -94.096
 ycood: 47.002
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: B1V
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 planet:
   - name: Messer's Den
     type: GIANT_TERRESTRIAL
@@ -36,28 +38,32 @@ planet:
       value: Alkaid
     type: TERRESTRIAL
     orbitalDist: 142.0
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green39
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.17
-    diameter: 16061
-    density: 5.099019513593
+    diameter: 16093
+    density: 5.109205222591
     dayLength: 23
     yearLength: 1692.1
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 43
     water:
-      source: canon
+      source: MWDA world profiles
       value: 37
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: |-
       3135 - Alkaid is a dry world, dominated by sun-cracked desert wastes between low plateaus and hills of eternally shifting sands. Only near the shorelines of Khalek, the large polar continent, and the nearby Hekker island chain, just south of Khalek, could life be considered comfortable. The twenty-fourth-century discovery of a host of commercially valuable chemicals and ores, just below its rocky, sandy surface led to the development of a chemical industry and a series of in-system buoys to guide traffic to and from the planet that helped bring about the first permanent settlements by the Federation of Skye.
@@ -67,19 +73,18 @@ planet:
       During the Jihad, Word of Blake forces entered the system via pirate points and seized control of the primary spaceports on Khalek. The Lyran defenders went to ground on Inahalia instead, waging a guerilla war until reinforcements arrived to relieve them.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
+          value: Inahalia
+      - name:
+          source: MWDA world profiles
           value: Khalek
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Verstigrad
-      - name:
-          source: canon
-          value: Hekker Island Chain
-      - name:
-          source: canon
-          value: Inahalia
     satellite:
-      - name: Vishnu
+      - name:
+          source: MWDA world profiles
+          value: Vishnu
         size: large
         icon: rock16
     event:

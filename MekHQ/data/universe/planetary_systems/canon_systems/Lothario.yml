@@ -3,9 +3,11 @@ sucsId: 1522
 xcood: -474.391
 ycood: -185.731
 spectralType:
-  source: canon
+  source: 'Handbook: Major Periphery States, pg. 166'
   value: M3III
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: Major Periphery States, pg. 166'
+  value: 2
 planet:
   - name: Hickton's End
     type: GIANT_TERRESTRIAL
@@ -33,28 +35,32 @@ planet:
       value: Lothario
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.21
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: Major Periphery States, pg. 166'
+      value: 2
     icon: green9
     pressure:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 166'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: Major Periphery States, pg. 166'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 166'
       value: 1.1
-    diameter: 12231
-    density: 6.342229938832
+    diameter: 12210
+    density: 6.331253777429
     dayLength: 10
     yearLength: 0.6
     temperature:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 166'
       value: 20
     water:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 166'
       value: 70
     lifeForm:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 166'
       value: MAMMAL
     desc: |-
       Lothario is an ice covered planet with a thin atmosphere and beautiful auroras. The population centers on planet are all located within the marginally habitable regions along the equator and still most of the population subsides in subterranean dwellings. The primary industries and trade on Lothario are involved with mining iron and copper, and the fur trade.
@@ -79,7 +85,9 @@ planet:
           source: canon
           value: Siegfried
     satellite:
-      - name: Logan
+      - name:
+          source: 'Handbook: Major Periphery States, pg. 166'
+          value: Logan
         size: medium
         icon: oddmoon2
     event:

@@ -3,9 +3,11 @@ sucsId: 1948
 xcood: -76.278
 ycood: -211.423
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 79
   value: F2III
-primarySlot: 4
+primarySlot:
+  source: Masters and Minions, pg. 79
+  value: 4
 event:
   - date: '2365-09-07'
     nadirCharge: yes
@@ -62,28 +64,32 @@ planet:
       value: Oriente
     type: TERRESTRIAL
     orbitalDist: 4.2
-    sysPos: 4
+    sysPos:
+      source: Masters and Minions, pg. 79
+      value: 4
     icon: green5
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 79
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 79
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 79
       value: 1.1
-    diameter: 11776
-    density: 6.542769626274
+    diameter: 11796
+    density: 6.553625631014
     dayLength: 21
     yearLength: 8.7
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 79
       value: 45
     water:
-      source: canon
-      value: 58
+      source: Masters and Minions, pg. 79
+      value: 57
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 79
       value: MAMMAL
     desc: |-
       Oriente is the capital of the Duchy of Oriente and a key world in the Free Worlds League. While the planet is heavily industrialized its pleasant, slightly warmer than Terran, climate also allows agriculture to flourish on the temperate continents of Martigues and Navarran.
@@ -99,28 +105,17 @@ planet:
       Etna Foundries
     landmass:
       - name:
-          source: canon
-          value: Avillan
-      - name:
-          source: canon
+          source: Masters and Minions, pg. 79
           value: Burgos
-      - name:
-          source: canon
-          value: Martigues
-        capital:
-          source: canon
-          value: Amur
-      - name:
-          source: canon
-          value: Navarran
-      - name:
-          source: canon
-          value: Tarragonan
     satellite:
-      - name: Coruna
+      - name:
+          source: Masters and Minions, pg. 79
+          value: Coruna
         size: large
         icon: rock10
-      - name: Escorial
+      - name:
+          source: Masters and Minions, pg. 79
+          value: Escorial
         size: large
         icon: rock4
     event:

@@ -3,9 +3,11 @@ sucsId: 555
 xcood: -180.694
 ycood: 90.425
 spectralType:
-  source: canon
+  source: House Steiner
   value: G5V
-primarySlot: 3
+primarySlot:
+  source: House Steiner
+  value: 3
 event:
   - date: '2651-03-23'
     nadirCharge: yes
@@ -49,7 +51,9 @@ planet:
       value: Chukchi III
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 3
+    sysPos:
+      source: House Steiner
+      value: 3
     icon: green46
     pressure:
       source: canon
@@ -70,7 +74,7 @@ planet:
       source: canon
       value: 72
     lifeForm:
-      source: canon
+      source: House Steiner
       value: REPTILE
     desc: |-
       Chukchi III remained a relatively backwater planet for most of its history, full of picturesque green valleys and snow capped mountains. This changed in the early 31st Century with the discovery of massive deposits of Titanium in the planet. As a result there was a period of rapid industrialization of the planet in order to fully exploit the titanium. This unfortunately resulted in the destruction of much of the planet’s picturesque wilderness and the rapid growth also introduced organized crime to Chukchi III.

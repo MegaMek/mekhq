@@ -3,9 +3,11 @@ sucsId: 2470
 xcood: 0.767
 ycood: -66.743
 spectralType:
-  source: canon
+  source: House Liao, pg. 142
   value: M2IV
-primarySlot: 8
+primarySlot:
+  source: House Liao, pg. 142
+  value: 8
 event:
   - date: '2364-06-15'
     zenithCharge: yes
@@ -151,7 +153,9 @@ planet:
       value: Tall Trees
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 8
+    sysPos:
+      source: House Liao, pg. 142
+      value: 8
     icon: green24
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -164,7 +168,7 @@ planet:
     temperature: 32
     water: 37
     lifeForm:
-      source: canon
+      source: House Liao, pg. 142
       value: MAMMAL
     desc: As of 3025 Tall Trees was home to a secret Confederation genetic research
       installation. While the research station is believed to be the source of the

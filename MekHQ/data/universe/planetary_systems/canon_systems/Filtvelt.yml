@@ -3,9 +3,11 @@ sucsId: 869
 xcood: 506.643
 ycood: -181.529
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 44
   value: G5III
-primarySlot: 3
+primarySlot:
+  source: Masters and Minions, pg. 44
+  value: 3
 event:
   - date: '2375-04-30'
     nadirCharge: yes
@@ -51,28 +53,32 @@ planet:
       value: Filtvelt
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 3
+    sysPos:
+      source: Masters and Minions, pg. 44
+      value: 3
     icon: green17
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 44
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 44
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 44
       value: 0.78
-    diameter: 11240
-    density: 4.87297193815
+    diameter: 11244
+    density: 4.874886083698
     dayLength: 27
     yearLength: 2.0
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 44
       value: 31
     water:
-      source: canon
+      source: Masters and Minions, pg. 44
       value: 55
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 44
       value: MAMMAL
     desc: |-
       Filtvelt is a relatively unremarkable planet located in the Outback of the Federated Suns. At least until February 20, 3072 when the Filtvelt Coalition declared its independence from the Suns due to negligence during the Word of Blake Jihad. Other than lower than standard gravity, Filtvelt is a comfortable temperate planet with fertile soil and long growing seasons which makes it an ideal breadbasket planet that supplies food to neighboring systems. Filtvelt has modest natural resources and industry, including a Cal-Boeing of Dorwinion plant that produces conventional aircraft and the Coalition Armory, a small facility that originally did just repair and refit work, it was retooled by the Filtvelt Coalition to create primitive BattleMechs.
@@ -89,13 +95,17 @@ planet:
           source: canon
           value: Hurum
         capital:
-          source: canon
+          source: Masters and Minions, pg. 44
           value: Undredal
     satellite:
-      - name: Færder
+      - name:
+          source: Masters and Minions, pg. 44
+          value: Færder
         size: medium
         icon: rock12
-      - name: Torbjørnskjær
+      - name:
+          source: Masters and Minions, pg. 44
+          value: Torbjørnskjær
         size: giant
         icon: rock13
     event:

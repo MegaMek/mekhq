@@ -3,9 +3,11 @@ sucsId: 482
 xcood: -63.082
 ycood: 82.416
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K5IV
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2387-06-12'
     zenithCharge: yes
@@ -55,28 +57,32 @@ planet:
       value: Carnwath
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green37
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.16
-    diameter: 16261
-    density: 5.042286934938
+    diameter: 16214
+    density: 5.027736612446
     dayLength: 21
     yearLength: 1.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 54
     water:
-      source: canon
+      source: MWDA world profiles
       value: 53
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       Lacking in significant resources or strategic value, the warm, oppressive world of Carnwath was never regarded as worth anyone‘s time during the Succession Wars. However, in the early days of space exploration and colonization, Carnwath was the center of a minor—and very brief—alien scare when its first settlers described what appeared to be the remains of an ancient civilization, complete with the remains of a strange species of bipedal creatures. At the crux of this discovery were several mysterious formations that resembled vaguely humanoid faces, reminiscent of the figures on Terra‘s Easter Island, ringing a central cluster of five jagged, pyramidal structures that actually gave off radioactive readings. Archaeologists were dispatched to Carnwath almost immediately, and studied the “alien structures” for less than six months before concluding that they were a peculiarity of native processes of wind and water erosion that had exposed evidence from a long-ago asteroid strike on the planet‘s northern continent of Wartholi. The meteor, evidently composed mainly of metallic ores and unusual—but naturally occurring—radium, was partially liquefied by the heat of reentry and fragmented on impact. Several larger cores formed the basis of the pyramids while smaller chunks of matter, blown clear of the central site, formed a ring at the edges of the crater. Over millennia, erosion wiped away the softer native soil around the site, exposing the mildly radioactive “pyramids” and “faces.” Though believers in extraterrestrial intelligence argued these theories, the final evidence became clear when exo-biologists proved the “humanoid” remains found nearby were nothing more than an alien variation on ancient Terra‘s velociraptors, and various biological features of the long-dead amphibian beasts proved they were nothing more than desert scavengers, likely struck down by the very same phenomenon that produced the so-called “ruins.” Though discredited, the Ruins of Carnwath continue to draw the curious and die-hard believers in alien intelligence to this world almost 800 years later. This tourism industry, however, has proven barely sufficient to supplement the planet‘s annual income from its very average industrial and agricultural exports.
@@ -84,16 +90,16 @@ planet:
       Carnwath‘s capital city, Carnwath City, is located on the Wartholi continent, three hundred kilometers east of the Ruins of Carnwath. Though it is regarded as the center of planetary commerce and industry, with over two million inhabitants in the capital alone, the southern continents of Blanith and Kormyri actually boast a full three quarters of the Carnwathian population.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Blanith
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Kormyri
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Wartholi
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Carnwath City
     event:
       - date: '2169-01-13'

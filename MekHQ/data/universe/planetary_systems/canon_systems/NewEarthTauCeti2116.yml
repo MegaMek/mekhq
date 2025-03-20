@@ -5,7 +5,9 @@ ycood: 3.055
 spectralType:
   source: canon
   value: F0V
-primarySlot: 4
+primarySlot:
+  source: Star League, pg. 175
+  value: 4
 event:
   - date: '2405-03-29'
     zenithCharge: yes
@@ -69,28 +71,32 @@ planet:
       value: Tau Ceti
     type: TERRESTRIAL
     orbitalDist: 2.56
-    sysPos: 4
+    sysPos:
+      source: Star League, pg. 175
+      value: 4
     icon: green21
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.0
-    diameter: 11813
-    density: 5.939901572939
+    diameter: 11822
+    density: 5.944466623048
     dayLength: 26
     yearLength: 4.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 31
     water:
-      source: canon
+      source: MWDA world profiles
       value: 74
     lifeForm:
-      source: canon
+      source: Star League, pg. 175
       value: MAMMAL
     desc: 3135 - Originally known as Tau Ceti IV, the first inhabitable world seen
       by human eyes beyond the Terran solar system was so much like home, its discoverers
@@ -132,25 +138,27 @@ planet:
       has been minimal.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Arctiqua
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Kellargo
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Lanhold
       - name:
-          source: canon
+          source: MWDA world profiles
           value: McKenna
         capital:
-          source: canon
-          value: Foundation Point
+          source: MWDA world profiles
+          value: Wiedergeburt
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Neoasia
     satellite:
-      - name: Lanna
+      - name:
+          source: MWDA world profiles
+          value: Lanna
         size: medium
         icon: oddmoon2
     event:
@@ -452,10 +460,7 @@ planet:
       - date: '3145-01-01'
         population: 1195306486.0
       - date: '2108-12-05'
-        name: Tau Ceti
       - date: '2116-01-01'
-        name: New Earth
-        message: Tau Ceti renamed to New Earth
   - name: Bracco's Belt
     type: ASTEROID_BELT
     orbitalDist: 8.32

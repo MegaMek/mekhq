@@ -3,9 +3,11 @@ sucsId: 2937
 xcood: 149.39
 ycood: 1723.536
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: A6V
-primarySlot: 2
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 2
 event:
   - date: '2802-02-06'
     nadirCharge: yes
@@ -32,28 +34,32 @@ planet:
       value: Bearclaw
     type: TERRESTRIAL
     orbitalDist: 5.04
-    sysPos: 2
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 2
     icon: green1
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 1.1
-    diameter: 11915
-    density: 6.462487203931
+    diameter: 11938
+    density: 6.475190322099
     dayLength: 25
     yearLength: 11.4
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 20
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 50
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: FISH
     desc: No description available.
     landmass:

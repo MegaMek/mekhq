@@ -3,9 +3,11 @@ sucsId: 403
 xcood: 159.739
 ycood: -377.477
 spectralType:
-  source: canon
+  source: FedCom Civil War, pg. 189
   value: F9II
-primarySlot: 6
+primarySlot:
+  source: FedCom Civil War, pg. 189
+  value: 6
 event:
   - date: '2359-11-06'
     zenithCharge: yes
@@ -104,28 +106,32 @@ planet:
       value: Bromhead
     type: TERRESTRIAL
     orbitalDist: 3.08
-    sysPos: 6
+    sysPos:
+      source: FedCom Civil War, pg. 189
+      value: 6
     icon: green28
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 189
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 189
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 189
       value: 1.0
-    diameter: 13747
-    density: 5.108262592534
+    diameter: 13752
+    density: 5.110177805644
     dayLength: 21
     yearLength: 5.5
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 189
       value: 40
     water:
-      source: canon
+      source: FedCom Civil War, pg. 189
       value: 40
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 189
       value: BIRD
     desc: Bromhead is an arid planet with only modest natural resources but sufficient
       arable land, despite the dry conditions. Bromhead has been important primarily
@@ -138,16 +144,18 @@ planet:
       as a desert and mountain training ground for soldiers.
     landmass:
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 189
           value: Salazaar
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 189
           value: Zanzabar
         capital:
-          source: canon
+          source: FedCom Civil War, pg. 189
           value: Brom's Home
     satellite:
-      - name: Brom’s Reflection
+      - name:
+          source: FedCom Civil War, pg. 189
+          value: Brom's Reflection
         size: large
         icon: rock8
     event:
