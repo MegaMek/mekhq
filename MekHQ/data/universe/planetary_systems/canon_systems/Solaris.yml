@@ -166,12 +166,12 @@ planet:
       - name:
           source: A Time of War, pg. 383
           value: Equatus
-        capital:
-          source: 25 Years of Art and Fiction, pg. 191
-          value: Solaris City
       - name:
           source: A Time of War, pg. 383
           value: Grayland
+        capital:
+          source: 25 Years of Art and Fiction, pg. 191
+          value: Solaris City
     satellite:
       - name:
           source: 25 Years of Art and Fiction, pg. 191
