@@ -51,16 +51,16 @@ planet:
     landmass:
       - name:
           source: 'Objective Raids: Capellan Confederation'
-          value: Chone
-      - name:
-          source: 'Objective Raids: Capellan Confederation'
-          value: Dendez
-      - name:
-          source: 'Objective Raids: Capellan Confederation'
-          value: Klieksa
+          value: Chengu
         capital:
           source: 'Objective Raids: Capellan Confederation'
-          value: Dronane
+          value: Zhi-Chiang
+      - name:
+          source: 'Objective Raids: Capellan Confederation'
+          value: Montong
+      - name:
+          source: 'Objective Raids: Capellan Confederation'
+          value: Dendeez
     satellite:
       - name:
           source: 'Objective Raids: Capellan Confederation'
