@@ -67,12 +67,12 @@ planet:
       - name:
           source: 'Handbook: House Steiner, pg. 90'
           value: Lestrade
-      - name:
-          source: 'Handbook: House Steiner, pg. 90'
-          value: Wessler
         capital:
           source: 'Handbook: House Steiner, pg. 90'
           value: Curitiba
+      - name:
+          source: 'Handbook: House Steiner, pg. 90'
+          value: Wessler
     satellite:
       - name:
           source: 'Handbook: House Steiner, pg. 90'
