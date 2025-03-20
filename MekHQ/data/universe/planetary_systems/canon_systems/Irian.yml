@@ -91,12 +91,15 @@ planet:
       - name:
           source: 'Handbook: House Marik, pg. 70'
           value: Hathor
+        capital:
+          source: MWDA world profiles
+          value: Kentwood (since 3075)
       - name:
           source: 'Handbook: House Marik, pg. 70'
           value: Indran
         capital:
           source: MWDA world profiles
-          value: Kirin River
+          value: Kirin River (destroyed in 3075)
       - name:
           source: 'Handbook: House Marik, pg. 70'
           value: Kriess
