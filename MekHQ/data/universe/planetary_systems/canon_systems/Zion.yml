@@ -73,17 +73,8 @@ planet:
       despite small terrorist groups continuing to carry out attacks, preventing the
       official return of civilian government to the planet.
     landmass:
-      - name:
-          source: canon
-          value: Mondaria
-        capital:
+      - capital:
           source: 'Handbook: House Marik, pg. 73'
-          value: Beersheba
-      - name:
-          source: canon
-          value: Chavalet
-      - name:
-          source: canon
           value: Beersheba
     satellite:
       - name:
