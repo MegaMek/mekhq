@@ -90,12 +90,12 @@ planet:
       - name:
           source: 'Jihad Turning Points: Atreus, pg. 3'
           value: Corin
-        capital:
-          source: 'Jihad Turning Points: Atreus, pg. 3'
-          value: Atreus City
       - name:
           source: 'Jihad Turning Points: Atreus, pg. 3'
           value: Ionia
+        capital:
+          source: 'Jihad Turning Points: Atreus, pg. 3'
+          value: Atreus City
       - name:
           source: 'Jihad Turning Points: Atreus, pg. 3'
           value: Lanan
