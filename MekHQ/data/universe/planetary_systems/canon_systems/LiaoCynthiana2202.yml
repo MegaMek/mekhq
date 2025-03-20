@@ -82,13 +82,13 @@ planet:
           value: Anderia
       - name:
           source: 'Objective Raids: Capellan Confederation'
-          value: Běifāng
+          value: Beilù
         capital:
           source: 'Objective Raids: Capellan Confederation'
-          value: Forbidden City
+          value: Chang-an
       - name:
           source: 'Objective Raids: Capellan Confederation'
-          value: Nán
+          value: Nánlù
     satellite:
       - name:
           source: 'Handbook: House Liao, pg. 74'
