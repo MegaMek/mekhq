@@ -41,6 +41,7 @@ import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.planetaryconditions.Atmosphere;
+import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
@@ -66,9 +67,8 @@ import mekhq.campaign.stratcon.*;
 import mekhq.campaign.stratcon.StratconFacility.FacilityType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.*;
-import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.enums.EraFlag;
-import mekhq.campaign.universe.enums.HonorRating;
+import megamek.common.universe.HonorRating;
 import mekhq.campaign.universe.fameAndInfamy.BatchallFactions;
 
 import java.io.File;
@@ -4187,7 +4187,7 @@ public class AtBDynamicScenarioFactory {
             factionCode = planetFactions.get(0);
             Faction ownerFaction = Factions.getInstance().getFaction(factionCode);
 
-            if (ownerFaction.is(Tag.ABANDONED)) {
+            if (ownerFaction.is(FactionTag.ABANDONED)) {
                 factionCode = "MERC";
             }
         }

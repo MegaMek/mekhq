@@ -39,9 +39,9 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
+import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.enums.PlanetaryType;
@@ -717,7 +717,7 @@ public class Planet {
         }
 
         for (Faction faction : factions) {
-            if (!faction.is(Tag.ABANDONED)) {
+            if (!faction.is(FactionTag.ABANDONED)) {
                 return false;
             }
         }

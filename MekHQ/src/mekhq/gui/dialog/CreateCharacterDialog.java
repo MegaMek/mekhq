@@ -43,6 +43,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.Option;
 import megamek.common.options.OptionsConstants;
+import megamek.common.universe.FactionTag;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.*;
@@ -51,7 +52,6 @@ import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.randomEvents.personalities.enums.*;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -937,7 +937,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             if (faction.equals(person.getOriginFaction())) {
                 factionsModel.addElement(faction);
             } else {
-                if (faction.is(Tag.HIDDEN) || faction.is(Tag.SPECIAL)) {
+                if (faction.is(FactionTag.HIDDEN) || faction.is(FactionTag.SPECIAL)) {
                     continue;
                 }
 

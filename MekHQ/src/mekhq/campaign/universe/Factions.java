@@ -30,17 +30,11 @@ package mekhq.campaign.universe;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.RATGenerator;
 import megamek.common.annotations.Nullable;
+import megamek.common.universe.Factions2;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.utilities.MHQXMLUtility;
-import org.w3c.dom.*;
-import org.xml.sax.SAXException;
 
 import javax.swing.*;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -51,7 +45,7 @@ public class Factions {
     // region Variable Declarations
     private static Factions instance;
 
-    private Map<String, Faction> factions = new HashMap<>();
+    private final Map<String, Faction> factions = new HashMap<>();
 
     private RATGenerator ratGenerator;
     // endregion Variable Declarations
@@ -115,11 +109,7 @@ public class Factions {
 
     public Faction getFaction(String sname) {
         Faction defaultFaction = new Faction();
-        if (factions == null) {
-            return defaultFaction;
-        } else {
-            return factions.getOrDefault(sname, defaultFaction);
-        }
+        return factions.getOrDefault(sname, defaultFaction);
     }
 
     public Faction getFactionFromFullNameAndYear(final String factionName, final int year) {
@@ -161,84 +151,25 @@ public class Factions {
 
     /**
      * Loads the default Factions data.
-     *
-     * @throws DOMException
-     * @throws ParserConfigurationException
-     * @throws IOException
-     * @throws SAXException
      */
-    public static Factions loadDefault()
-            throws DOMException, SAXException, IOException, ParserConfigurationException {
+    public static Factions loadDefault() {
         logger.info("Starting load of faction data from XML...");
-
-        Factions factions = load("data/universe/factions.xml");
-
+        Factions factions = load();
         logger.info(String.format("Loaded a total of %d factions", factions.factions.size()));
-
         return factions;
     }
 
     /**
      * Loads Factions data from a file.
      *
-     * @param factionsPath The path to the XML file containing Factions data.
-     *
-     * @throws DOMException
-     * @throws ParserConfigurationException
-     * @throws IOException
-     * @throws SAXException
      */
-    public static Factions load(String factionsPath)
-            throws DOMException, SAXException, IOException, ParserConfigurationException {
-        Factions retVal = new Factions();
-
-        Document xmlDoc;
-
-        try (FileInputStream fis = new FileInputStream(factionsPath)) {
-            // Using factory get an instance of document builder
-            DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
-
-            // Parse using builder to get DOM representation of the XML file
-            xmlDoc = db.parse(fis);
-        }
-
-        Element factionEle = xmlDoc.getDocumentElement();
-        NodeList nl = factionEle.getChildNodes();
-
-        // Get rid of empty text nodes and adjacent text nodes...
-        // Stupid weird parsing of XML. At least this cleans it up.
-        factionEle.normalize();
-
-        // Okay, lets iterate through the children, eh?
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn = nl.item(x);
-
-            if (!wn.getParentNode().equals(factionEle)) {
-                continue;
-            }
-
-            int xc = wn.getNodeType();
-
-            if (xc == Node.ELEMENT_NODE) {
-                String xn = wn.getNodeName();
-
-                if (xn.equalsIgnoreCase("faction")) {
-                    Faction faction = Faction.getFactionFromXML(wn);
-                    if (!retVal.factions.containsKey(faction.getShortName())) {
-                        retVal.factions.put(faction.getShortName(), faction);
-                    } else {
-                        String message = String.format(
-                                "Faction code \"%s\" already used for faction %s, can't re-use it for %s",
-                                faction.getShortName(),
-                                retVal.factions.get(faction.getShortName()).getFullName(0),
-                                faction.getFullName(0));
-                        logger.error(message);
-                    }
-                }
-            }
-        }
-
-        return retVal;
+    public static Factions load() {
+        // Factions are populated from the new unified factions list instead of loading them directly
+        Factions factionsObject = new Factions();
+        Factions2.getInstance().getFactions().stream()
+              .map(Faction::new)
+              .forEach(f -> factionsObject.factions.put(f.getShortName(), f));
+        return factionsObject;
     }
 
     /**

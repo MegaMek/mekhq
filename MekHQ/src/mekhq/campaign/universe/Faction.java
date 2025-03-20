@@ -29,34 +29,31 @@
 package mekhq.campaign.universe;
 
 import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
+import megamek.common.universe.Faction2;
+import megamek.common.universe.FactionTag;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.universe.enums.HonorRating;
-import mekhq.utilities.MHQXMLUtility;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import megamek.common.universe.HonorRating;
 
 import java.awt.*;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.universe.enums.HonorRating.LIBERAL;
-import static mekhq.campaign.universe.enums.HonorRating.OPPORTUNISTIC;
-import static mekhq.campaign.universe.enums.HonorRating.STRICT;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Faction {
-    private static final MMLogger logger = MMLogger.create(Faction.class);
 
     // region Variable Declarations
     public static final String DEFAULT_CODE = "???";
+
+    private Faction2 faction2;
 
     private String shortName;
     private String fullName;
@@ -73,9 +70,13 @@ public class Faction {
     private String layeredForceIconBackgroundFilename;
     private String layeredForceIconLogoCategory;
     private String layeredForceIconLogoFilename;
-    private Set<Tag> tags;
+    private Set<FactionTag> tags;
     private int start; // Start year (inclusive)
     private int end; // End year (inclusive)
+    private String successor;
+    private HonorRating preInvasionHonorRating;
+    private HonorRating postInvasionHonorRating;
+
     // endregion Variable Declarations
 
     // region Constructors
@@ -94,9 +95,50 @@ public class Faction {
         setLayeredForceIconBackgroundFilename(null);
         setLayeredForceIconLogoCategory("");
         setLayeredForceIconLogoFilename(null);
-        tags = EnumSet.noneOf(Tag.class);
+        tags = EnumSet.noneOf(FactionTag.class);
         start = 0;
         end = 9999;
+    }
+
+    public Faction(Faction2 faction2) {
+        this(faction2.getKey(), faction2.getName());
+        this.faction2 = faction2;
+        startingPlanet = faction2.getCapital();
+        nameGenerator = faction2.getNameGenerator();
+        color = faction2.getColor();
+        successor = faction2.getSuccessor();
+        List<String> yamlTags = faction2.getTags().stream().map(Enum::toString).toList();
+        tags = yamlTags.stream().map(FactionTag::valueOf).collect(Collectors.toSet());
+        eraMods = faction2.getEraMods();
+        if (faction2.getBackground() != null) {
+            Path backgroundPath = Path.of(faction2.getBackground());
+            if (backgroundPath.getParent()!=null) {
+                layeredForceIconBackgroundCategory = backgroundPath.getParent().toString();
+            }
+            layeredForceIconBackgroundFilename = backgroundPath.getFileName().toString();
+        }
+        if (faction2.getLogo() != null) {
+            Path logoPath = Path.of(faction2.getLogo());
+            if (logoPath.getParent()!=null) {
+                layeredForceIconLogoCategory = logoPath.getParent().toString();
+            }
+            layeredForceIconLogoFilename = logoPath.getFileName().toString();
+        }
+        alternativeFactionCodes = faction2.getFallBackFactions().toArray(new String[0]);
+        nameChanges = faction2.getNameChanges();
+        for (Entry<Integer, String> entry : faction2.getCapitalChanges().entrySet()) {
+            planetChanges.put(LocalDate.ofYearDay(entry.getKey(), 1), entry.getValue());
+        }
+        if (!faction2.getYearsActive().isEmpty()) {
+            Integer startYear = faction2.getYearsActive().get(0).start;
+            start = startYear == null ? 0 : startYear;
+            Integer endYear = faction2.getYearsActive().get(0).end;
+            start = endYear == null ? 0 : endYear;
+        }
+        HonorRating preInvasion = faction2.getPreInvasionHonorRating();
+        preInvasionHonorRating = (preInvasion != null) ? preInvasion : HonorRating.STRICT;
+        HonorRating postInvasion = faction2.getPostInvasionHonorRating();
+        postInvasionHonorRating = (postInvasion != null) ? postInvasion : HonorRating.OPPORTUNISTIC;
     }
     // endregion Constructors
 
@@ -117,10 +159,6 @@ public class Faction {
         return alternativeFactionCodes;
     }
 
-    public void setAlternativeFactionCodes(final String... alternativeFactionCodes) {
-        this.alternativeFactionCodes = alternativeFactionCodes;
-    }
-
     public Color getColor() {
         return color;
     }
@@ -136,6 +174,10 @@ public class Faction {
     public String getStartingPlanet(final LocalDate date) {
         final Entry<LocalDate, String> change = planetChanges.floorEntry(date);
         return (change == null) ? startingPlanet : change.getValue();
+    }
+
+    public Optional<String> getCamosFolder(int year) {
+        return Optional.ofNullable(faction2 != null ? faction2.getCamosFolder(year) : null);
     }
 
     public int getEraMod(int year) {
@@ -179,7 +221,7 @@ public class Faction {
         }
     }
 
-    public boolean is(Tag tag) {
+    public boolean is(FactionTag tag) {
         return tags.contains(tag);
     }
 
@@ -192,7 +234,7 @@ public class Faction {
      *             a specific characteristic or quality of the faction, such as
      *             {@code PIRATE}, {@code SUPER}, {@code REBEL}, among others.
      */
-    public void setTags(Set<Tag> tags) {
+    public void setTags(Set<FactionTag> tags) {
         this.tags = tags;
     }
 
@@ -254,19 +296,19 @@ public class Faction {
 
     // region Checks
     public boolean isPlayable() {
-        return is(Tag.PLAYABLE);
+        return is(FactionTag.PLAYABLE);
     }
 
     public boolean isMercenary() {
-        return is(Tag.MERC);
+        return is(FactionTag.MERC);
     }
 
     public boolean isPirate() {
-        return is(Tag.PIRATE);
+        return is(FactionTag.PIRATE);
     }
 
     public boolean isRebel() {
-        return is(Tag.REBEL);
+        return is(FactionTag.REBEL);
     }
 
     public boolean isRebelOrPirate() {
@@ -295,19 +337,19 @@ public class Faction {
     }
 
     public boolean isClan() {
-        return is(Tag.CLAN);
+        return is(FactionTag.CLAN);
     }
 
     public boolean isInnerSphere() {
-        return is(Tag.IS);
+        return is(FactionTag.IS);
     }
 
     public boolean isPeriphery() {
-        return is(Tag.PERIPHERY);
+        return is(FactionTag.PERIPHERY);
     }
 
     public boolean isDeepPeriphery() {
-        return is(Tag.DEEP_PERIPHERY);
+        return is(FactionTag.DEEP_PERIPHERY);
     }
 
     public boolean isIndependent() {
@@ -316,7 +358,7 @@ public class Faction {
 
     // region Power Checks
     public boolean isSuperPower() {
-        return is(Tag.SUPER);
+        return is(FactionTag.SUPER);
     }
 
     public boolean isMajorOrSuperPower() {
@@ -328,121 +370,54 @@ public class Faction {
     }
 
     public boolean isMajorPower() {
-        return is(Tag.MAJOR);
+        return is(FactionTag.MAJOR);
     }
 
     public boolean isMinorPower() {
-        return is(Tag.MINOR);
+        return is(FactionTag.MINOR);
     }
 
     public boolean isSmall() {
-        return is(Tag.SMALL);
+        return is(FactionTag.SMALL);
     }
 
     public boolean isNoble() {
-        return is(Tag.NOBLE);
+        return is(FactionTag.NOBLE);
     }
 
     public boolean isPlanetaryGovt() {
-        return is(Tag.PLANETARY_GOVERNMENT);
+        return is(FactionTag.PLANETARY_GOVERNMENT);
     }
 
     public boolean isCorporation() {
-        return is(Tag.CORPORATION);
+        return is(FactionTag.CORPORATION);
     }
 
     public boolean isInactive() {
-        return is(Tag.INACTIVE);
+        return is(FactionTag.INACTIVE);
     }
 
     public boolean isChaos() {
-        return is(Tag.CHAOS);
+        return is(FactionTag.CHAOS);
     }
 
     public boolean isStingy() {
-        return is(Tag.STINGY);
+        return is(FactionTag.STINGY);
     }
 
     public boolean isGenerous() {
-        return is(Tag.GENEROUS);
+        return is(FactionTag.GENEROUS);
     }
 
     public boolean isControlling() {
-        return is(Tag.CONTROLLING);
+        return is(FactionTag.CONTROLLING);
     }
 
     public boolean isLenient() {
-        return is(Tag.LENIENT);
+        return is(FactionTag.LENIENT);
     }
     // endregion Power Checks
     // endregion Checks
-
-    public static Faction getFactionFromXML(Node wn) throws DOMException {
-        Faction retVal = new Faction();
-        NodeList nl = wn.getChildNodes();
-
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
-            try {
-                if (wn2.getNodeName().equalsIgnoreCase("shortname")) {
-                    retVal.shortName = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("fullname")) {
-                    retVal.fullName = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("altNamesByYear")) {
-                    int year = Integer.parseInt(wn2.getAttributes().getNamedItem("year").getTextContent());
-                    retVal.nameChanges.put(year, wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("altNames")) {
-                    retVal.altNames = wn2.getTextContent().split(",", 0);
-                } else if (wn2.getNodeName().equalsIgnoreCase("alternativeFactionCodes")) {
-                    retVal.setAlternativeFactionCodes(wn2.getTextContent().trim().split(","));
-                } else if (wn2.getNodeName().equalsIgnoreCase("startingPlanet")) {
-                    retVal.startingPlanet = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("changePlanet")) {
-                    retVal.planetChanges.put(
-                            MHQXMLUtility.parseDate(wn2.getAttributes().getNamedItem("year").getTextContent().trim()),
-                            wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eraMods")) {
-                    String[] values = wn2.getTextContent().split(",", -2);
-                    int eraModCount = values.length;
-                    retVal.eraMods = new int[eraModCount];
-                    for (int i = 0; i < eraModCount; i++) {
-                        retVal.eraMods[i] = Integer.parseInt(values[i]);
-                    }
-                } else if (wn2.getNodeName().equalsIgnoreCase("nameGenerator")) {
-                    retVal.nameGenerator = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("colorRGB")) {
-                    String[] values = wn2.getTextContent().split(",");
-                    if (values.length == 3) {
-                        int colorRed = Integer.parseInt(values[0]);
-                        int colorGreen = Integer.parseInt(values[1]);
-                        int colorBlue = Integer.parseInt(values[2]);
-                        retVal.color = new Color(colorRed, colorGreen, colorBlue);
-                    }
-                } else if (wn2.getNodeName().equalsIgnoreCase("currencyCode")) {
-                    retVal.currencyCode = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("layeredForceIconBackgroundCategory")) {
-                    retVal.setLayeredForceIconBackgroundCategory(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("layeredForceIconBackgroundFilename")) {
-                    retVal.setLayeredForceIconBackgroundFilename(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("layeredForceIconLogoCategory")) {
-                    retVal.setLayeredForceIconLogoCategory(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("layeredForceIconLogoFilename")) {
-                    retVal.setLayeredForceIconLogoFilename(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("tags")) {
-                    Arrays.stream(wn2.getTextContent().split(",")).map(tag -> tag.toUpperCase(Locale.ROOT))
-                            .map(Tag::valueOf).forEach(tag -> retVal.tags.add(tag));
-                } else if (wn2.getNodeName().equalsIgnoreCase("start")) {
-                    retVal.start = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("end")) {
-                    retVal.end = Integer.parseInt(wn2.getTextContent());
-                }
-            } catch (Exception e) {
-                logger.error("", e);
-            }
-        }
-
-        return retVal;
-    }
 
     /** @return Sorted list of faction names as one string */
     public static String getFactionNames(Collection<Faction> factions, int year) {
@@ -473,105 +448,48 @@ public class Faction {
         return false;
     }
 
-    public enum Tag {
-        /** Inner sphere */
-        IS, PERIPHERY, DEEP_PERIPHERY, CLAN,
-        /** A bunch of dirty pirates */
-        PIRATE,
-        /** Major mercenary bands */
-        MERC,
-        /** Major trading company */
-        TRADER,
-        /**
-         * Super Power: the Terran Hegemony, the First Star League, and the Federated
-         * Commonwealth. (CamOps p12)
-         */
-        SUPER,
-        /**
-         * Major Power: e.g. Inner Sphere Great Houses, Republic of the Sphere, Terran
-         * Alliance,
-         * Second Star League, Inner Sphere Clans. (CamOps p12)
-         */
-        MAJOR,
-        /**
-         * Faction is limited to a single star system, or potentially just a part of a
-         * planet (CamOps p12)
-         */
-        MINOR,
-        /** Independent world or Small State (CamOps p12) */
-        SMALL,
-        /** Faction is rebelling against the superior ("parent") faction */
-        REBEL,
-        /**
-         * Faction isn't overtly acting on the political/military scale; think ComStar
-         * before clan invasion
-         */
-        INACTIVE,
-        /** Faction represents empty space */
-        ABANDONED,
-        /** Faction represents a lack of unified government */
-        CHAOS,
-        /** Faction is campaign-specific, generated on the fly */
-        GENERATED,
-        /** Faction is hidden from view */
-        HIDDEN,
-        /** Faction code is not intended to be for players */
-        SPECIAL,
-        /** Faction is meant to be played */
-        PLAYABLE,
-        /** Faction is an independent noble (Camops p. 39) */
-        NOBLE,
-        /** Faction is an independent planetary government (Camops p. 39) */
-        PLANETARY_GOVERNMENT,
-        /** Faction is an independent corporation (Camops p. 39) */
-        CORPORATION,
-        /** Faction is stingy and tends to pay less for contracts (Camops p. 42) */
-        STINGY,
-        /** Faction is generous and tends to pay more for contracts (Camops p. 42) */
-        GENEROUS,
-        /** Faction is controlling with mercenary command rights (Camops p. 42) */
-        CONTROLLING,
-        /** Faction is lenient with mercenary command rights (Camops p. 42) */
-        LENIENT
-    }
-
     /**
-     * Calculates the honor rating for a given Clan.
+     * Returns the honor rating for a given Clan. Our research showed the post-Invasion shift in Clan doctrine to occur
+     * between 3053 and 3055. This is based on the table found on page 274 of Total Warfare. Any Clan not mentioned on
+     * that table is assumed to be Strict (pre-invasion) -> Opportunistic (post-invasion).
+     * <p>
+     * Note that this method uses 3053 and 3054 randomly as a threshold to determine if the current year is
+     * post-invasion. Thus, in those years, the result may vary between calls with otherwise equal parameters.
      *
-     * @param campaign    the ongoing campaign
+     * @param campaign the ongoing campaign
      * @return the honor rating as an {@link HonorRating} enum
      */
     public HonorRating getHonorRating(Campaign campaign) {
-        // Our research showed the post-Invasion shift in Clan doctrine to occur between 3053 and 3055
         boolean isPostInvasion = campaign.getLocalDate().getYear() >= 3053 + randomInt(2);
+        return isPostInvasion ? postInvasionHonorRating : preInvasionHonorRating;
+    }
 
-        // This is based on the table found on page 274 of Total Warfare
-        // Any Clan not mentioned on that table is assumed to be Strict → Opportunistic
-        return switch (shortName) {
-            case "CCC", "CHH", "CIH", "CNC", "CSR" -> OPPORTUNISTIC;
-            case "CCO", "CGS", "CSV" -> STRICT;
-            case "CGB", "CWIE" -> {
-                if (isPostInvasion) {
-                    yield LIBERAL;
-                } else {
-                    yield STRICT;
-                }
-            }
-            case "CDS" -> LIBERAL;
-            case "CW" -> {
-                if (isPostInvasion) {
-                    yield LIBERAL;
-                } else {
-                    yield OPPORTUNISTIC;
-                }
-            }
-            default -> {
-                if (isPostInvasion) {
-                    yield OPPORTUNISTIC;
-                } else {
-                    yield STRICT;
-                }
-            }
-        };
+    /**
+     * Returns the size of the lowest formation type (e.g., lance). If this faction gives the size directly
+     * (formationBaseSize:) this value is returned. Otherwise the fallback Factions are called recursively. When there
+     * is no callback Faction, 5 is returned for a clan faction and 4 otherwise.
+     * <p>
+     * This means that the Word of Blake Faction will give a value of 6 and WoB subcommands do not have to give any
+     * value as long as their fallback Faction is WoB.
+     *
+     * @return The size of a lance, point or analogous formation type
+     */
+    public int getFormationBaseSize() {
+        return faction2.getFormationBaseSize();
+    }
+
+    /**
+     * Returns the grouping multiplier for accumulated formations such as company, galaxy or level 3. If this faction
+     * gives the value directly (formationGrouping:) this value is returned. Otherwise the fallback Factions are called
+     * recursively. When there is no callback Faction, 5 is returned for a clan faction and 3 otherwise (3 lances form a
+     * company, 3 companies form a battalion etc)
+     * <p>
+     * This means that the Word of Blake Faction will give a value of 6 and WoB subcommands do not have to give any
+     * value as long as their fallback Faction is WoB.
+     *
+     * @return How many formations form a formation of a higher type (e.g., lances in a company)
+     */
+    public int getFormationGrouping() {
+        return faction2.getFormationGrouping();
     }
 }

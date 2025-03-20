@@ -308,94 +308,16 @@ public class AtBContract extends Contract {
 
 
     /**
-     * Retrieves the directory for the camouflage of a faction based on the current year and faction code.
+     * Returns the directory for the camouflages of a faction based on the year and faction code.
      *
-     * @param currentYear The current year in the game.
-     * @param factionCode The code representing the faction.
-     * @return The directory for the camouflage of the faction.
+     * @param year The year
+     * @param factionCode The code representing the faction, e.g. FS or HL
+     * @return The directory under data/images/camo for the camouflages of the faction
      */
-    private static String getCamouflageDirectory(int currentYear, String factionCode) {
-        return switch (factionCode) {
-            case "ARC" -> "Aurigan Coalition";
-            case "CDP" -> "Calderon Protectorate";
-            case "CC" -> "Capellan Confederation";
-            case "CIR" -> "Circinus Federation";
-            case "CS" -> "ComStar";
-            case "DC" -> "Draconis Combine";
-            case "CF" -> "Federated Commonwealth";
-            case "FS" -> "Federated Suns";
-            case "FVC" -> "Filtvelt Coalition";
-            case "FRR" -> "Free Rasalhague Republic";
-            case "FWL" -> "Free Worlds League";
-            case "FR" -> "Fronc Reaches";
-            case "HL" -> "Hanseatic League";
-            case "LL" -> "Lothian League";
-            case "LA" -> "Lyran Commonwealth";
-            case "MOC" -> "Magistracy of Canopus";
-            case "MH" -> "Marian Hegemony";
-            case "MERC" -> "Mercs";
-            case "OA" -> "Outworlds Alliance";
-            case "PIR" -> "Pirates";
-            case "ROS" -> "Republic of the Sphere";
-            case "SL" -> "Star League Defense Force";
-            case "TC" -> "Taurian Concordat";
-            case "WOB" -> "Word of Blake";
-            case "Root" -> "";
-            default -> {
-                Faction faction = Factions.getInstance().getFaction(factionCode);
-
-                if (faction.isClan()) {
-                    yield getClanCamouflageDirectory(currentYear, factionCode);
-                } else {
-                    yield "Standard Camouflage";
-                }
-            }
-        };
-    }
-
-    /**
-     * Retrieves the directory for the camouflage of a clan faction based on
-     * the current year and faction code.
-     *
-     * @param currentYear The current year in the game.
-     * @param factionCode The code representing the faction.
-     * @return The directory for the camouflage of the clan faction.
-     */
-    private static String getClanCamouflageDirectory(int currentYear, String factionCode) {
-        final String ROOT_DIRECTORY = "Clans/";
-
-        return switch (factionCode) {
-            case "CBS" -> ROOT_DIRECTORY + "Blood Spirit";
-            case "CB" -> ROOT_DIRECTORY + "Burrock";
-            case "CCC" -> ROOT_DIRECTORY + "Cloud Cobra";
-            case "CCO" -> ROOT_DIRECTORY + "Coyote";
-            case "CDS" -> {
-                if (currentYear < 3100) {
-                    yield ROOT_DIRECTORY + "Diamond Shark";
-                } else {
-                    yield ROOT_DIRECTORY + "Sea Fox (Dark Age)";
-                }
-            }
-            case "CFM" -> ROOT_DIRECTORY + "Fire Mandrill";
-            case "CGB", "RD" -> ROOT_DIRECTORY + "Ghost Bear";
-            case "CGS" -> ROOT_DIRECTORY + "Goliath Scorpion";
-            case "CHH" -> ROOT_DIRECTORY + "Hell's Horses";
-            case "CIH" -> ROOT_DIRECTORY + "Ice Hellion";
-            case "CJF" -> ROOT_DIRECTORY + "Jade Falcon";
-            case "CMG" -> ROOT_DIRECTORY + "Mongoose";
-            case "CNC" -> ROOT_DIRECTORY + "Nova Cat";
-            case "CSJ" -> ROOT_DIRECTORY + "Smoke Jaguar";
-            case "CSR" -> ROOT_DIRECTORY + "Snow Raven";
-            case "SOC" -> ROOT_DIRECTORY + "Society";
-            case "CSA" -> ROOT_DIRECTORY + "Star Adder";
-            case "CSV" -> ROOT_DIRECTORY + "Steel Viper";
-            case "CSL" -> ROOT_DIRECTORY + "Stone Lion";
-            case "CWI" -> ROOT_DIRECTORY + "Widowmaker";
-            case "CW", "CWE" -> ROOT_DIRECTORY + "Wolf";
-            case "CWIE" -> ROOT_DIRECTORY + "Wolf-in-Exile";
-            case "CWOV" -> ROOT_DIRECTORY + "Wolverine";
-            default -> "Standard Camouflage";
-        };
+    private static String getCamouflageDirectory(int year, String factionCode) {
+        return Factions.getInstance().getFaction(factionCode)
+              .getCamosFolder(year)
+              .orElse("Standard Camouflage");
     }
 
     public void calculateLength(final boolean variable) {
