@@ -32,6 +32,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.MHQDialogImmersive;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -51,37 +52,58 @@ public class GenericImmersiveMessageDialog extends MHQDialogImmersive {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
 
     /**
-     * Constructs a {@code GenericImmersiveMessageDialog} with the given campaign and message details.
+     * Constructs a {@code GenericImmersiveMessageDialog} with the specified campaign and message
+     * details.
      *
-     * <p>This dialog is structured to represent an immersive interaction, typically with the appearance
-     * of one or two characters "speaking" to the player. The dialog is modal by default and displays
-     * a single "Understood" button for closing the dialog.</p>
+     * <p>This dialog represents an immersive interaction, typically involving the appearance
+     * of one or two characters "speaking" to the player. The dialog is modal by default, and
+     * it provides customizable button labels for user interaction, with the commonly used
+     * button being "Understood" for closing the dialog.</p>
      *
-     * @param campaign              The current game state.
-     * @param leftSpeaker           The left {@link Person} speaker, or {@code null} for no speaker.
-     * @param rightSpeaker          The right {@link Person} speaker, or {@code null} for no speaker.
+     * @param campaign              The current game state, providing relevant campaign data.
+     * @param leftSpeaker           The {@link Person} appearing as the left speaker, or {@code null}
+     *                              if no speaker is present on the left side.
+     * @param rightSpeaker          The {@link Person} appearing as the right speaker, or {@code null}
+     *                              if no speaker is present on the right side.
      * @param centerMessage         The primary message to be displayed in the center of the dialog.
+     * @param buttonLabels          A {@link List} of custom button labels to display in the dialog.
+     *                              If the list is empty, a default "Understood" button is displayed.
      * @param outOfCharacterMessage An optional out-of-character (OOC) message, or {@code null} if
-     *                             not applicable.
+     *                              not applicable. This message is displayed in a non-character
+     *                              context, usually to provide additional information or context
+     *                              to the player.
      */
     public GenericImmersiveMessageDialog(Campaign campaign, @Nullable Person leftSpeaker,
                                          @Nullable Person rightSpeaker, String centerMessage,
-                                         @Nullable String outOfCharacterMessage) {
-        super(campaign, leftSpeaker, rightSpeaker, centerMessage, createButtons(), outOfCharacterMessage,
+                                         List<String> buttonLabels, @Nullable String outOfCharacterMessage) {
+        super(campaign, leftSpeaker, rightSpeaker, centerMessage, createButtons(buttonLabels), outOfCharacterMessage,
               null, false, null, true);
     }
 
     /**
-     * Creates the list of buttons for the dialog.
+     * Creates a list of buttons to be displayed in the dialog based on the provided labels.
      *
-     * <p>This method generates a single "Understood" button for acknowledging and closing the dialog.</p>
+     * <p>If the list of button labels is empty, a default "Understood" button is created for
+     * acknowledging and closing the dialog. Otherwise, buttons are generated with the given
+     * labels without additional tooltips.</p>
      *
-     * @return A {@link List} containing a {@link ButtonLabelTooltipPair} for the "Understood" button.
+     * @param buttonLabels A {@link List} of button label strings to generate. If empty, a default
+     *                    "Understood" button is created.
+     * @return A {@link List} of {@link ButtonLabelTooltipPair} objects, one for each button to be
+     * displayed.
      */
-    private static List<ButtonLabelTooltipPair> createButtons() {
-        ButtonLabelTooltipPair btnConfirm = new ButtonLabelTooltipPair(
-              getFormattedTextAt(RESOURCE_BUNDLE, "Understood.text"), null);
+    private static List<ButtonLabelTooltipPair> createButtons(List<String> buttonLabels) {
+        if (buttonLabels.isEmpty()) {
+            return List.of(new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "Understood.text"), null));
+        }
 
-        return List.of(btnConfirm);
+        List<ButtonLabelTooltipPair> buttons = new ArrayList<>();
+
+        for (String buttonLabel : buttonLabels) {
+            buttons.add(new ButtonLabelTooltipPair(buttonLabel, null));
+        }
+
+        return buttons;
     }
 }
