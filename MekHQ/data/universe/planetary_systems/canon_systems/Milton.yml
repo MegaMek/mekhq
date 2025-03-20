@@ -97,11 +97,17 @@ planet:
       largest spacecraft component manufacturer.
     landmass:
       - name:
-          source: 25 Years of Art and Fiction, pg. 109
-          value: Phronx
+          source: MWDA world profiles
+          value: Etienne
         capital:
           source: MWDA world profiles
           value: Paradise Foundation
+      - name:
+          source: MWDA world profiles
+          value: Olquia
+      - name:
+          source: 25 Years of Art and Fiction, pg. 109
+          value: Phronx
       - name:
           source: 25 Years of Art and Fiction, pg. 109
           value: Selajia
