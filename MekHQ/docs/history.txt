@@ -192,6 +192,11 @@ MEKHQ VERSION HISTORY:
 + PR #6299: Disabled Remove CVP and Remove SP Options if GM Mode is Disabled; Allowed GMs to Take SP and CVP into Negative
 + PR #6300: Fixed Support Point Generation Soft Cap
 + Fix #6302: Refit will now properly consider different qualities as "used for refit planning
++ PR #6301: Archived AtB Documentation
++ PR #6303: Fixed Deployment Turn Calculation For Mounted Reinforcements
++ PR #6304: Added Note About SP Spending to Reinforcement Dialog
++ PR #6305: Corrected Multiple Facility Errors
+
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment
