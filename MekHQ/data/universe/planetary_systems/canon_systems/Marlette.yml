@@ -81,16 +81,16 @@ planet:
     smallMoons: 5
     landmass:
       - name:
-          source: canon
+          source: 'Objectives: Federated Suns, p. 21'
           value: Sanilac
-      - name:
-          source: canon
-          value: Saginaw
         capital:
-          source: 'Handbook: House Davion, pg. 95'
+          source: 'Objectives: Federated Suns, p. 21'
           value: Achemar
       - name:
-          source: canon
+          source: 'Objectives: Federated Suns, p. 21'
+          value: Saginaw
+      - name:
+          source: 'Objectives: Federated Suns, p. 21'
           value: Flint
     event:
       - date: '2278-08-04'
