@@ -122,8 +122,8 @@ public class InterstellarMapPanel extends JPanel {
         systems = campaign.getSystems();
         hqview = view;
         jumpPath = new JumpPath();
-        optionPanelHidden = true;
-        optionPanelTimer = new Timer(50, new ActionListener() {
+        optionPanelHidden = false;
+        optionPanelTimer = new Timer(0, new ActionListener() {
             Point viewPoint = new Point();
 
             @Override
