@@ -44,7 +44,6 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.CombatTeam;
@@ -92,7 +91,10 @@ import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.UnitType.MEK;
-import static megamek.common.enums.SkillLevel.*;
+import static megamek.common.enums.SkillLevel.ELITE;
+import static megamek.common.enums.SkillLevel.REGULAR;
+import static megamek.common.enums.SkillLevel.parseFromInteger;
+import static megamek.common.enums.SkillLevel.parseFromString;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.force.FormationLevel.BATTALION;
@@ -103,11 +105,6 @@ import static mekhq.campaign.mission.enums.AtBMoraleLevel.ADVANCING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
-import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
-import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
-import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
-import static mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT;
-import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
 import static mekhq.campaign.rating.IUnitRating.*;
 import static mekhq.campaign.stratcon.StratconContractDefinition.getContractDefinition;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
@@ -805,19 +802,19 @@ public class AtBContract extends Contract {
                     }
                 } else {
                     campaign.addReport("Bonus: Ronin");
-                    new RoninOffer(campaign);
+                    new RoninOffer(campaign, stratconCampaignState, requiredCombatTeams);
                 }
                 yield false;
             }
             case 2 -> {
                 campaign.addReport("Bonus: Ronin");
-                new RoninOffer(campaign);
+                new RoninOffer(campaign, stratconCampaignState, requiredCombatTeams);
                 yield false;
             }
             case 3 -> { // Resupply
                 if (campaignOptions.isUseAtB() && !campaignOptions.isUseStratCon()) {
                     campaign.addReport("Bonus: Ronin");
-                    new RoninOffer(campaign);
+                    new RoninOffer(campaign, stratconCampaignState, requiredCombatTeams);
                     yield false;
                 } else {
                     if (isPostScenario) {
