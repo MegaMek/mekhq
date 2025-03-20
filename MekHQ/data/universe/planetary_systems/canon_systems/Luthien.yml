@@ -103,14 +103,20 @@ planet:
       contrast to the rest of the planet.\n\t\t"
     landmass:
       - name:
-          source: Masters and Minions, pg. 26
+          source: 'Jihad Turning Points: Luthien'
           value: Aichi
       - name:
-          source: Masters and Minions, pg. 26
-          value: Sakura
+          source: 'Jihad Turning Points: Luthien'
+          value: Hokkaidō
         capital:
-          source: Masters and Minions, pg. 26
+          source: 'Jihad Turning Points: Luthien'
           value: Imperial City
+      - name:
+          source: 'Jihad Turning Points: Luthien'
+          value: Sakura
+      - name:
+          source: 'Jihad Turning Points: Luthien'
+          value: Shizuoka
     satellite:
       - name:
           source: Masters and Minions, pg. 26
