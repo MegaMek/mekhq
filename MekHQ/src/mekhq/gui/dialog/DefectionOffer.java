@@ -58,7 +58,7 @@ public class DefectionOffer extends MHQDialogImmersive {
     public DefectionOffer(Campaign campaign, Person defector, boolean isBondsman) {
         super(campaign, campaign.getSeniorAdminPerson(HR), null, createInCharacterMessage(campaign,
                 defector, isBondsman), createButtons(), createOutOfCharacterMessage(isBondsman),
-            null, false);
+            null, false, null, true);
     }
 
     /**
