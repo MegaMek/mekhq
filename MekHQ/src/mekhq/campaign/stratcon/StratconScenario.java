@@ -32,12 +32,15 @@ import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.adapter.DateAdapter;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.*;
+import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 
 import java.time.LocalDate;
@@ -50,6 +53,8 @@ import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.UNRESOLVED;
  * @author NickAragua
  */
 public class StratconScenario implements IStratconDisplayable {
+    private static final MMLogger logger = MMLogger.create(StratconScenario.class);
+
     /**
      * Represents the possible states of a Stratcon scenario
      */
@@ -115,6 +120,17 @@ public class StratconScenario implements IStratconDisplayable {
         if (!getBackingScenario().getForceIDs().contains(force.getId())) {
             backingScenario.addForce(force.getId(), templateID);
             force.setScenarioId(getBackingScenarioID(), campaign);
+
+            for (UUID unitID : force.getAllUnits(true)) {
+                Unit unit = campaign.getUnit(unitID);
+
+                if (unit == null) {
+                    return;
+                }
+
+                addPlayerTransportRelationships(unit);
+            }
+
             MekHQ.triggerEvent(new DeploymentChangedEvent(force, getBackingScenario()));
         }
     }
@@ -126,6 +142,9 @@ public class StratconScenario implements IStratconDisplayable {
     public void addUnit(Unit unit, String templateID, boolean useLeadership) {
         if (!backingScenario.containsPlayerUnit(unit.getId())) {
             backingScenario.addUnit(unit.getId(), templateID);
+
+            addPlayerTransportRelationships(unit);
+
             unit.setScenarioId(getBackingScenarioID());
 
             if (useLeadership) {
@@ -134,6 +153,34 @@ public class StratconScenario implements IStratconDisplayable {
             }
 
             MekHQ.triggerEvent(new DeploymentChangedEvent(unit, getBackingScenario()));
+        }
+    }
+
+    /**
+     * Establishes transport relationships between the specified unit and any assigned transport
+     * units in the campaign. Each transport assignment of the given unit is checked, and if valid
+     * transport is found, a transport relationship is added to the backing scenario.
+     *
+     * @param unit the {@code Unit} for which transport relationships will be established.
+     *             This unit will be checked for active transport assignments.
+     */
+    private void addPlayerTransportRelationships(Unit unit) {
+        for (CampaignTransportType transportType : CampaignTransportType.values()) {
+            ITransportAssignment transportAssignment = unit.getTransportAssignment(transportType);
+            if (transportAssignment != null) {
+                Unit transport = transportAssignment.getTransport();
+
+                if (transport == null) {
+                    logger.warn(
+                          "Unit {} has a transport assigned, but the transported unit doesn't exist",
+                          unit.getId());
+                    continue;
+                }
+
+                UUID transportId = transport.getId();
+
+                backingScenario.addPlayerTransportRelationship(transportId, unit.getId());
+            }
         }
     }
 
