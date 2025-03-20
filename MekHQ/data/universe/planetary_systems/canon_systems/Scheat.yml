@@ -67,7 +67,7 @@ planet:
           source: MWDA world profiles
           value: Kohl
         capital:
-          source: MWDA world profiles
+          source: noncanon
           value: Tikohl
       - name:
           source: MWDA world profiles
