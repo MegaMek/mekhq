@@ -32,7 +32,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.Hashtable;
-
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -40,7 +39,6 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
 
 import megamek.client.ui.preferences.JWindowPreference;
@@ -65,26 +63,26 @@ public class EditSkillPerquisiteDialog extends JDialog {
     private boolean cancelled;
 
     private Hashtable<String, JComboBox<SkillLevel>> skillLevels = new Hashtable<>();
-    private Hashtable<String, JCheckBox> skillChks = new Hashtable<>();
+    private Hashtable<String, JCheckBox>             skillChks   = new Hashtable<>();
 
     public EditSkillPerquisiteDialog(final JFrame frame, final SkillPerquisite pre) {
         super(frame, true);
         cancelled = false;
-        prereq = pre;
+        prereq    = pre;
         initComponents();
         setLocationRelativeTo(frame);
         setUserPreferences();
     }
 
     private void initComponents() {
-        btnOK = new JButton();
+        btnOK    = new JButton();
         btnClose = new JButton();
 
         JPanel panMain = new JPanel(new GridLayout(SkillType.skillList.length, 2));
 
         for (int i = 0; i < SkillType.getSkillList().length; i++) {
-            final String type = SkillType.getSkillList()[i];
-            JCheckBox chkSkill = new JCheckBox(type);
+            final String type     = SkillType.getSkillList()[i];
+            JCheckBox    chkSkill = new JCheckBox(type);
             chkSkill.setSelected(prereq.getSkillLevel(type) > -1);
             chkSkill.addItemListener(evt -> changeLevelEnabled(type));
             skillChks.put(type, chkSkill);
@@ -130,7 +128,13 @@ public class EditSkillPerquisiteDialog extends JDialog {
         pack();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditSkillPerquisiteDialog.class);
