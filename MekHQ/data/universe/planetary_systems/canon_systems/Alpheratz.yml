@@ -126,12 +126,15 @@ planet:
       - name:
           source: Masters and Minions, pg. 165
           value: North Continent
+        capital:
+          source: 'Handbook: Major Periphery States, pg. 150'
+          value: Famindas (destroyed in 3071)
       - name:
           source: Masters and Minions, pg. 165
           value: South Continent
         capital:
-          source: 'Handbook: Major Periphery States, pg. 150'
-          value: Famindas
+          source: Masters and Minions, pg. 165
+          value: Carolinas (since 3071)
     satellite:
       - name:
           source: 'Handbook: Major Periphery States, pg. 150'
