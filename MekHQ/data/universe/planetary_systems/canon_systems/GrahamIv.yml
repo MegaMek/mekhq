@@ -125,10 +125,13 @@ planet:
           value: Barvionne
         capital:
           source: Star League, pg. 172
-          value: Dekirk City
+          value: Dekirk City (Destroyed during Amaris Coup)
       - name:
           source: MWDA world profiles
           value: Palothica
+      - capital:
+          source: MWDA world profiles
+          value: New Dekirk City (orbiting space station)
     satellite:
       - name:
           source: MWDA world profiles
