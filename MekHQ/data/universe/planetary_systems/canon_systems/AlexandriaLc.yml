@@ -89,12 +89,12 @@ planet:
       - name:
           source: 'Handbook: House Steiner, pg. 88'
           value: Cairusia
-        capital:
-          source: 'Handbook: House Steiner, pg. 88'
-          value: Alexandretta
       - name:
           source: 'Handbook: House Steiner, pg. 88'
           value: Jeddasia
+        capital:
+          source: 'Handbook: House Steiner, pg. 88'
+          value: Alexandretta
     satellite:
       - name:
           source: 'Handbook: House Steiner, pg. 88'
