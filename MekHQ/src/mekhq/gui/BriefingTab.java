@@ -78,8 +78,8 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.io.File;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
@@ -873,7 +873,8 @@ public final class BriefingTab extends CampaignGuiTab {
                     }
                 }
 
-                AtBDynamicScenarioFactory.setDeploymentTurnsForReinforcements(reinforcementEntities, cmdrStrategy);
+                AtBDynamicScenarioFactory.setDeploymentTurnsForReinforcements(getCampaign(), scenario,
+                      reinforcementEntities, cmdrStrategy);
             }
         }
 
