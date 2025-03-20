@@ -1313,39 +1313,51 @@ public class StratconRulesManager {
     }
 
     /**
-     * Processes the deployment of a force to the specified coordinates on the given track.
+     * Processes the deployment of a combat force to a specified location on a track in the campaign.
      *
-     * <p>This includes revealing the deployed coordinates, identifying and revealing facilities
-     * and scenarios within the scan range, and updating necessary game states such as fatigue
-     * and force assignments. It does not include assigning the force to specific scenarios.</p>
-     *
-     * <strong>Behavior:</strong>
+     * <p>This method handles actions related to force deployment, including:</p>
      * <ul>
-     *   <li>If the force's deployment coordinates are unrevealed, fatigue is increased for the force.</li>
-     *   <li>Ensures that fatigue is increased only once during the deployment process.</li>
-     *   <li>Reveals all coordinates, facilities, and scenarios within the force's scan range.</li>
-     *   <li>Handles cloaked scenarios by activating them and updating game states as necessary.</li>
-     *   <li>Updates the track's revealed coordinates to include the deployment and adjacent areas within range.</li>
-     *   <li>Assigns the deployed force to the specified coordinates and clears their previous track assignments.</li>
+     *   <li>Revealing the deployed coordinates and all adjacent coordinates within the force's scan range.</li>
+     *   <li>Updating the visibility of facilities and scenarios in the affected area.</li>
+     *   <li>Assigning the force to the specified deployment coordinates and clearing previous track assignments.</li>
+     *   <li>Triggering any necessary events, such as deployment event handling or scenario updates.</li>
      * </ul>
      *
-     * <strong>Notes:</strong>
-     * <ul>
-     *   <li>Scout or patrol roles may increase the scan range.</li>
-     *   <li>The method uses a breadth-first search (BFS) approach to traverse the hex grid and reveal neighbors
-     *       within the scan range efficiently, avoiding redundant processing using a visited set.</li>
-     * </ul>
+     * <p>Patrol and scouting roles may extend the scan range, and fatigue is increased only once
+     * if the deployment reveals previously unrevealed coordinates.</p>
      *
-     * @param coords    The coordinates where the force is being deployed.
-     * @param forceID   The ID of the force being deployed.
-     * @param campaign  The current campaign context, used to retrieve combat teams and update game events.
-     * @param track     The current track state where the deployment is happening.
-     * @param sticky    Whether the force should be persistently assigned to the track.
-     *
-     * @throws IllegalStateException if the force or the associated combat team is missing or invalid.
+     * @param coords   The {@link StratconCoords} where the combat force is being deployed.
+     * @param forceID  The unique ID of the combat force being deployed.
+     * @param campaign The current {@link Campaign} instance representing the game's state.
+     * @param track    The {@link StratconTrackState} where the force is being deployed.
+     * @param sticky   Whether the force should remain persistently assigned to this track.
      */
     public static void processForceDeployment(StratconCoords coords, int forceID, Campaign campaign,
                                               StratconTrackState track, boolean sticky) {
+        scanNeighboringCoords(coords, forceID, campaign, track);
+
+        // the force may be located in other places on the track - clear it out
+        track.unassignForce(forceID);
+        track.assignForce(forceID, coords, campaign.getLocalDate(), sticky);
+        MekHQ.triggerEvent(new StratconDeploymentEvent(campaign.getForce(forceID)));
+    }
+
+    /**
+     * Scans neighboring coordinates around the deployment location to reveal facilities, scenarios,
+     * and coordinates within the force's scan range. Updates campaign and track states as needed.
+     *
+     * <p>This method uses a breadth-first search (BFS) approach to efficiently traverse the hex grid,
+     * marking which coordinates have been visited and ensuring no redundant operations occur. It also
+     * increases fatigue, reveals cloaked scenarios, and activates facilities or scenarios in the
+     * affected area.</p>
+     *
+     * @param coords   The {@link StratconCoords} of the initial deployment location.
+     * @param forceID  The unique ID of the force being deployed.
+     * @param campaign The current {@link Campaign} instance representing the game's state.
+     * @param track    The {@link StratconTrackState} where the deployment and scanning are being tracked.
+     */
+    private static void scanNeighboringCoords(StratconCoords coords, int forceID, Campaign campaign,
+                                              StratconTrackState track) {
         // we want to ensure we only increase Fatigue once
         boolean hasFatigueIncreased = false;
 
@@ -1398,6 +1410,10 @@ public class StratconRulesManager {
             }
         }
 
+        if (scenario != null || targetFacility != null) {
+            return;
+        }
+
         // Traverse neighboring coordinates up to the specified distance
         while (!queue.isEmpty()) {
             Pair<StratconCoords, Integer> current = queue.poll();
@@ -1435,11 +1451,6 @@ public class StratconRulesManager {
                 }
             }
         }
-
-        // the force may be located in other places on the track - clear it out
-        track.unassignForce(forceID);
-        track.assignForce(forceID, coords, campaign.getLocalDate(), sticky);
-        MekHQ.triggerEvent(new StratconDeploymentEvent(campaign.getForce(forceID)));
     }
 
     /**
