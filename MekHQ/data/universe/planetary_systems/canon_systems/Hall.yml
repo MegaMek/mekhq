@@ -84,12 +84,12 @@ planet:
       - name:
           source: 25 Years of Art and Fiction, pg. 218
           value: Urra
-        capital:
-          source: 25 Years of Art and Fiction, pg. 218
-          value: Harney
       - name:
           source: 25 Years of Art and Fiction, pg. 218
           value: Wass
+        capital:
+          source: 25 Years of Art and Fiction, pg. 218
+          value: Harney
     satellite:
       - name:
           source: 25 Years of Art and Fiction, pg. 218
