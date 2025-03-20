@@ -103,4 +103,14 @@ public class AmbitionTest {
         String description = NONE.getDescription(MAXIMUM_VARIATIONS, Gender.MALE, "Barry");
         assertTrue(isResourceKeyValid(description));
     }
+
+    @Test
+    public void testGetRoninMessage_notInvalid() {
+        for (Ambition trait : Ambition.values()) {
+            for (int i = 0; i < Ambition.MAXIMUM_VARIATIONS; i++) {
+                String description = trait.getRoninMessage("Commander");
+                assertTrue(isResourceKeyValid(description));
+            }
+        }
+    }
 }
