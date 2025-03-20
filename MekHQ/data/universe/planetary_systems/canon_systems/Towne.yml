@@ -116,9 +116,6 @@ planet:
       - name:
           source: MWDA world profiles
           value: Fetryl
-        capital:
-          source: MWDA world profiles
-          value: Port Howard
       - name:
           source: MWDA world profiles
           value: Gherst
@@ -128,6 +125,9 @@ planet:
       - name:
           source: MWDA world profiles
           value: Hyboria
+        capital:
+          source: MWDA world profiles
+          value: Port Howard
       - name:
           source: MWDA world profiles
           value: Krom
