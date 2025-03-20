@@ -96,14 +96,17 @@ planet:
       sufficient on both counts. The people have Vanra have a grand military tradition.
     landmass:
       - name:
-          source: 'Handbook: House Marik, pg. 76'
-          value: Modena
+          source: 'Objectives: Free Worlds League, p. 25'
+          value: Cantania
         capital:
-          source: 'Handbook: House Marik, pg. 76'
+          source: 'Objectives: Free Worlds League, p. 25'
           value: Orloff City
+      - name:
+          source: 'Objectives: Free Worlds League, p. 25'
+          value: Modena
     satellite:
       - name:
-          source: 'Handbook: House Marik, pg. 76'
+          source: 'Objectives: Free Worlds League, p. 25'
           value: Citadel
         size: medium
         icon: oddmoon1
