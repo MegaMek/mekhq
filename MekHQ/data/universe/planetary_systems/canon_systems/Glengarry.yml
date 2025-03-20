@@ -85,12 +85,12 @@ planet:
       - name:
           source: 'Historical Turning Point: Glengarry, pg. 3'
           value: Pictland
-        capital:
-          source: 'Historical Turning Point: Glengarry, pg. 3'
-          value: Dunkeld
       - name:
           source: 'Historical Turning Point: Glengarry, pg. 3'
           value: Scotia
+        capital:
+          source: 'Historical Turning Point: Glengarry, pg. 3'
+          value: Dunkeld
     satellite:
       - name:
           source: 'Historical Turning Point: Glengarry, pg. 3'
