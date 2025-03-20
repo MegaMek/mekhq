@@ -97,16 +97,16 @@ planet:
     smallMoons: 6
     landmass:
       - name:
-          source: canon
+          source: 'Objectives: Draconis Combine, pg. 23'
           value: Castano
         capital:
           source: House Kurita
           value: Deber City
       - name:
-          source: canon
+          source: 'Objectives: Draconis Combine, pg. 23'
           value: Gojjam
       - name:
-          source: canon
+          source: 'Objectives: Draconis Combine, pg. 23'
           value: Osaka
     event:
       - date: '2169-05-09'
