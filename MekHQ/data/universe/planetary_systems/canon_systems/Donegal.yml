@@ -109,15 +109,15 @@ planet:
       - name:
           source: 'Handbook: House Steiner, pg. 84'
           value: Dunellen
-        capital:
-          source: 'Handbook: House Steiner, pg. 84'
-          value: Marsdenville
       - name:
           source: 'Handbook: House Steiner, pg. 84'
           value: Hinterlands
       - name:
           source: 'Handbook: House Steiner, pg. 84'
           value: Lockenar
+        capital:
+          source: 'Objectives: Lyran Alliance, p. 22'
+          value: Marsdenville
     satellite:
       - name:
           source: 'Handbook: House Steiner, pg. 84'
