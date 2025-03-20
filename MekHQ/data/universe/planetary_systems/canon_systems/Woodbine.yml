@@ -134,17 +134,18 @@ planet:
       suffered numerous raids throughout its history.
     landmass:
       - name:
-          source: FedCom Civil War, pg. 195
-          value: Mansdor
-      - name:
-          source: FedCom Civil War, pg. 195
-          value: Reindi
-      - name:
-          source: FedCom Civil War, pg. 195
-          value: Zebulon
+          source: 'Objectives: Federated Suns, p. 26'
+          value: Arturro
         capital:
-          source: FedCom Civil War, pg. 195
+          source: 'Objectives: Federated Suns, p. 26'
           value: Gastogne
+      - name:
+          source: 'Objectives: Federated Suns, p. 26'
+          value: Guam
+      - name:
+          source: 'Objectives: Federated Suns, p. 26'
+          value: Sjardijn
+
     satellite:
       - name:
           source: 'Handbook: House Davion, pg. 103'
