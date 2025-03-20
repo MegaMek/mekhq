@@ -99,15 +99,15 @@ planet:
       - name:
           source: 'Handbook: House Steiner, pg. 85'
           value: Abundance
-        capital:
-          source: 'Handbook: House Steiner, pg. 85'
-          value: KevGlen City
       - name:
           source: 'Handbook: House Steiner, pg. 85'
           value: Amber
       - name:
           source: 'Handbook: House Steiner, pg. 85'
           value: Grandeur
+        capital:
+          source: 'Handbook: House Steiner, pg. 85'
+          value: KevGlen City
       - name:
           source: 'Handbook: House Steiner, pg. 85'
           value: Lush
