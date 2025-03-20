@@ -67,7 +67,8 @@ public class GenericImmersiveMessageDialog extends MHQDialogImmersive {
      *                              if no speaker is present on the right side.
      * @param centerMessage         The primary message to be displayed in the center of the dialog.
      * @param buttonLabels          A {@link List} of custom button labels to display in the dialog.
-     *                              If the list is empty, a default "Understood" button is displayed.
+     *                              If the list is {@code null}, a default "Understood" button is
+     *                              displayed.
      * @param outOfCharacterMessage An optional out-of-character (OOC) message, or {@code null} if
      *                              not applicable. This message is displayed in a non-character
      *                              context, usually to provide additional information or context
@@ -75,25 +76,26 @@ public class GenericImmersiveMessageDialog extends MHQDialogImmersive {
      */
     public GenericImmersiveMessageDialog(Campaign campaign, @Nullable Person leftSpeaker,
                                          @Nullable Person rightSpeaker, String centerMessage,
-                                         List<String> buttonLabels, @Nullable String outOfCharacterMessage) {
+                                         @Nullable List<String> buttonLabels, @Nullable String outOfCharacterMessage,
+                                         boolean useVerticalLayout) {
         super(campaign, leftSpeaker, rightSpeaker, centerMessage, createButtons(buttonLabels), outOfCharacterMessage,
-              null, false, null, true);
+              null, useVerticalLayout, null, true);
     }
 
     /**
      * Creates a list of buttons to be displayed in the dialog based on the provided labels.
      *
-     * <p>If the list of button labels is empty, a default "Understood" button is created for
+     * <p>If the list of button labels is {@code null}, a default "Understood" button is created for
      * acknowledging and closing the dialog. Otherwise, buttons are generated with the given
      * labels without additional tooltips.</p>
      *
-     * @param buttonLabels A {@link List} of button label strings to generate. If empty, a default
-     *                    "Understood" button is created.
+     * @param buttonLabels A {@link List} of button label strings to generate. If {@code null}, a
+     *                    default "Understood" button is created.
      * @return A {@link List} of {@link ButtonLabelTooltipPair} objects, one for each button to be
      * displayed.
      */
-    private static List<ButtonLabelTooltipPair> createButtons(List<String> buttonLabels) {
-        if (buttonLabels.isEmpty()) {
+    private static List<ButtonLabelTooltipPair> createButtons(@Nullable List<String> buttonLabels) {
+        if (buttonLabels == null || buttonLabels.isEmpty()) {
             return List.of(new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
                   "Understood.text"), null));
         }
