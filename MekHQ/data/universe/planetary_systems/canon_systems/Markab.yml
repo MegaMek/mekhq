@@ -138,8 +138,8 @@ planet:
           source: MWDA world profiles
           value: Al-Qoradana
         capital:
-          source: MWDA world profiles
-          value: Al Pagasi
+          source: noncanon
+          value: Al-Pagasi
     satellite:
       - name:
           source: MWDA world profiles
