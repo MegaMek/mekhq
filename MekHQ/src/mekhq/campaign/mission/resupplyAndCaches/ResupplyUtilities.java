@@ -28,7 +28,6 @@
 package mekhq.campaign.mission.resupplyAndCaches;
 
 import megamek.common.Compute;
-import megamek.common.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
@@ -39,9 +38,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.resupplyAndCaches.DialogAbandonedConvoy;
 
 import java.util.UUID;
-import java.util.Vector;
 
-import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.CARGO_MULTIPLIER;
@@ -49,7 +46,6 @@ import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TO
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.calculateTargetCargoTonnage;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.KIA;
-import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 /**
  * Utility class for managing resupply operations and events in MekHQ campaigns.
@@ -163,81 +159,5 @@ public class ResupplyUtilities {
         // Armor and ammo are always delivered in blocks, so cargo will never be less than the sum
         // of those blocks
         return max(RESUPPLY_AMMO_TONNAGE + RESUPPLY_ARMOR_TONNAGE, (int) Math.ceil(targetTonnage));
-    }
-
-    /**
-     * Determines if a convoy only contains VTOL or similar units.
-     *
-     * @param campaign the {@link Campaign} instance the convoy belongs to.
-     * @param convoy   the {@link Force} representing the convoy to check.
-     * @return {@code true} if the convoy only contains VTOL units, {@code false} otherwise.
-     */
-    public static boolean forceContainsOnlyVTOLForces(Campaign campaign, Force convoy) {
-        for (UUID unitId : convoy.getAllUnits(false)) {
-            Entity entity = getEntityFromUnitId(campaign, unitId);
-
-            if (entity == null) {
-                continue;
-            }
-
-            if (!entity.isAirborneVTOLorWIGE()) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Determines if a convoy contains a majority of VTOL (or similar) units.
-     *
-     * <p>This is calculated by checking if at least half of the units are VTOLs or similarly
-     * airborne types.</p>
-     *
-     * @param campaign      the {@link Campaign} instance the convoy belongs to.
-     * @param convoy  the {@link Force} representing the convoy being evaluated.
-     * @return {@code true} if the VTOL units constitute at least half of the units, {@code false} otherwise.
-     */
-    public static boolean forceContainsMajorityVTOLForces(Campaign campaign, Force convoy) {
-        Vector<UUID> allUnits = convoy.getAllUnits(false);
-        int convoySize = allUnits.size();
-        int vtolCount = 0;
-
-        for (UUID unitId : convoy.getAllUnits(false)) {
-            Entity entity = getEntityFromUnitId(campaign, unitId);
-
-            if (entity == null) {
-                continue;
-            }
-
-            if (entity.isAirborneVTOLorWIGE()) {
-                vtolCount++;
-            }
-        }
-
-        return vtolCount >= floor((double) convoySize / 2);
-    }
-
-    /**
-     * Determines if a convoy only contains aerial units, such as aerospace or conventional fighters.
-     *
-     * @param campaign the {@link Campaign} instance the convoy belongs to.
-     * @param convoy   the {@link Force} representing the convoy to check.
-     * @return {@code true} if the convoy only contains aerial units, {@code false} otherwise.
-     */
-    public static boolean forceContainsOnlyAerialForces(Campaign campaign, Force convoy) {
-        for (UUID unitId : convoy.getAllUnits(false)) {
-            Entity entity = getEntityFromUnitId(campaign, unitId);
-
-            if (entity == null) {
-                continue;
-            }
-
-            if (!entity.isAerospace() && !entity.isConventionalFighter()) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }
