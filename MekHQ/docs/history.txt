@@ -203,6 +203,7 @@ MEKHQ VERSION HISTORY:
 + Fix #6315: Fixed MekHQ Throwing Meks into Low Altitude Scenarios
 + PR #6319: Added Early Exit for Objective Determination Self-Correction Loop
 + PR #6323: Added MekHQ New Player Guide
++ PR #6325: Updated New Player Guide PDF
 
 
 0.50.03 (2025-02-02 2030 UTC)
