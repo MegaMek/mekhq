@@ -38,6 +38,7 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Hangar;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.ScenarioChangedEvent;
@@ -1669,7 +1670,7 @@ public class StratconRulesManager {
             CLOSING_SPAN_TAG, roll, targetNumber));
         campaign.addReport(reportStatus.toString());
 
-        ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(force, campaign);
+        ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(force, campaign.getHangar());
 
         generateReinforcementInterceptionScenario(campaign, scenario, contract, track, scenarioTemplate, force);
 
@@ -1679,41 +1680,46 @@ public class StratconRulesManager {
     /**
      * Retrieves the appropriate {@link ScenarioTemplate} for an interception scenario based on the
      * provided {@link Force} and {@link Campaign}.
-     * <p>
-     * The method determines which scenario template file should be used by analyzing the primary unit
-     * type of the {@link Force} within the given {@link Campaign}. It then deserializes the template
-     * file into a {@link ScenarioTemplate} object.
-     * <p>
-     * Special cases:
+     *
+     * <p>This method determines the correct scenario template file to use by analyzing the composition
+     * of the {@link Force} within the context of the given {@link Campaign}. The selected template
+     * file is then deserialized into a {@link ScenarioTemplate} object.</p>
+     *
+     * <p><strong>Special Cases:</strong></p>
      * <ul>
-     *   <li>If the primary unit type is `CONV_FIGHTER` or `AEROSPACEFIGHTER` (and a random check passes),
-     *       a "Low-Atmosphere" template is selected.</li>
-     *   <li>If the primary unit type qualifies as an `AEROSPACEFIGHTER` or higher,
-     *       a "Space" template is selected.</li>
-     *   <li>Otherwise, the default template is used.</li>
+     *     <li>A "Space" template is chosen if all units are aerospace and a random condition is met
+     *             (1 in 3 chance).</li>
+     *     <li>A "Low-Atmosphere" template is selected if the {@link Force} contains only airborne
+     *             units but does not meet the criteria for a "Space" template.</li>
+     *     <li>A default ground template is selected if no specific cases are matched.</li>
      * </ul>
      *
      * @param force    The {@link Force} instance that the scenario is based on.
-     *                 This is used to determine the primary unit type.
-     * @param campaign The {@link Campaign} in which the interception is taking place.
-     *                 Provides context for evaluating the {@link Force}.
-     * @return A {@link ScenarioTemplate} instance based on the template file matching the logic above,
-     *         or a default template if no specific case is matched.
-     * @see ScenarioTemplate#Deserialize(String)
+     *                 The force composition is used to determine the appropriate scenario template.
+     * @param hangar   The {@link Hangar} instance from which to retrieve the {@link Unit}.
+     * @return A {@link ScenarioTemplate} instance representing the chosen scenario template file based
+     *         on the logic described, or a default template if no special conditions are satisfied.
      */
-    private static ScenarioTemplate getInterceptionScenarioTemplate(Force force, Campaign campaign) {
+    private static ScenarioTemplate getInterceptionScenarioTemplate(Force force, Hangar hangar) {
         String templateString = "data/scenariotemplates/%sReinforcements Intercepted.xml";
 
         ScenarioTemplate scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, ""));
 
-        int primaryUnitType = force.getPrimaryUnitType(campaign);
+        boolean airborneOnly = force.forceContainsOnlyAerialForces(hangar, false,
+              false);
 
-        if ((primaryUnitType == CONV_FIGHTER)
-            || (primaryUnitType == AEROSPACEFIGHTER) && (randomInt(3) == 0)) {
-            scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, "Low-Atmosphere "));
-        } else if (primaryUnitType >= AEROSPACEFIGHTER) {
-            scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, "Space "));
+        boolean aerospaceOnly = false;
+        if (airborneOnly) {
+            aerospaceOnly = force.forceContainsOnlyAerialForces(hangar, false,
+                  false);
         }
+
+        if (aerospaceOnly && (randomInt(3) == 0)) {
+            scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, "Space "));
+        } else if (airborneOnly) {
+            scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, "Low-Atmosphere "));
+        }
+
         return scenarioTemplate;
     }
 

@@ -35,6 +35,7 @@ import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Hangar;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.icons.ForcePieceIcon;
 import mekhq.campaign.icons.LayeredForceIcon;
@@ -54,7 +55,9 @@ import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.floor;
 import static java.lang.Math.round;
+import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 /**
  * This is a hierarchical object to define forces for TO&amp;E. Each Force
@@ -1122,5 +1125,133 @@ public class Force {
         MekHQ.triggerEvent(new OrganizationChangedEvent(origin));
 
         return origin.getFormationLevel().parseToInt();
+    }
+
+    /**
+     * Determines whether a convoy consists solely of VTOL (Vertical Take-Off and Landing) or WIGE
+     * (Wing in Ground Effect) units.
+     *
+     * <p>This method evaluates the convoy by checking each unit to verify that all resolved units
+     * are either VTOLs or WIGE units.</p>
+     *
+     * <p><strong>Behavior:</strong></p>
+     * <ul>
+     *   <li>Retrieves all units in the convoy based on the {@code standardForcesOnly} flag.</li>
+     *   <li>Skips any unit that cannot be resolved (null entity).</li>
+     *   <li>Returns {@code false} if any resolved unit is not categorized as a VTOL or WIGE unit.</li>
+     *   <li>Returns {@code true} if all resolved units meet the VTOL or WIGE criteria.</li>
+     * </ul>
+     *
+     * @param hangar             The {@link Hangar} instance from which to retrieve the {@link Unit}.
+     * @param standardForcesOnly A flag to filter and include only standard forces from the convoy.
+     * @return {@code true} if all resolved units in the convoy are VTOL or WIGE units, {@code false} otherwise.
+     */
+    public boolean forceContainsOnlyVTOLForces(Hangar hangar, boolean standardForcesOnly) {
+        for (UUID unitId : getAllUnits(standardForcesOnly)) {
+            Entity entity = getEntityFromUnitId(hangar, unitId);
+
+            if (entity == null) {
+                continue;
+            }
+
+            if (!entity.isAirborneVTOLorWIGE()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Determines whether a convoy contains a majority of VTOL (Vertical Take-Off and Landing) or WIGE
+     * (Wing in Ground Effect) units.
+     *
+     * <p>This method evaluates the convoy by calculating whether at least half of the resolved units
+     * in the convoy are categorized as VTOLs or WIGE units.</p>
+     *
+     * <p><strong>Behavior:</strong></p>
+     * <ul>
+     *   <li>Retrieves all units in the convoy based on the {@code standardForcesOnly} flag.</li>
+     *   <li>Counts the number of units categorized as airborne VTOL or WIGE.</li>
+     *   <li>Adjusts the total convoy size if unresolved (null) entities are skipped without counting
+     *       them toward the total size.</li>
+     *   <li>Stops counting early if a majority of VTOL or WIGE units is determined before evaluating
+     *       all entities.</li>
+     * </ul>
+     *
+     * @param hangar             The {@link Hangar} instance from which to retrieve the {@link Unit}.
+     * @param standardForcesOnly A flag to filter and include only standard forces from the convoy.
+     * @return {@code true} if VTOL or WIGE units constitute at least half of the resolved convoy units,
+     *         {@code false} otherwise.
+     */
+    public boolean forceContainsMajorityVTOLForces(Hangar hangar, boolean standardForcesOnly) {
+        Vector<UUID> allUnits = getAllUnits(standardForcesOnly);
+        int convoySize = allUnits.size();
+        int vtolCount = 0;
+
+        for (UUID unitId : allUnits) {
+            Entity entity = getEntityFromUnitId(hangar, unitId);
+
+            if (entity == null) {
+                convoySize--;
+                continue;
+            }
+
+            if (entity.isAirborneVTOLorWIGE()) {
+                vtolCount++;
+            }
+
+            if (vtolCount >= convoySize / 2) {
+                break;
+            }
+        }
+
+        return vtolCount >= floor((double) convoySize / 2);
+    }
+
+    /**
+     * Determines whether a convoy contains only aerospace or conventional fighters.
+     *
+     * <p>This method checks all units in the convoy to confirm if they consist exclusively of aerial
+     * units based on their type.</p>
+     *
+     * <p><strong>Behavior:</strong></p>
+     * <ul>
+     *   <li>Filters the convoy's units based on the {@code standardForcesOnly} flag.</li>
+     *   <li>Iterates through all selected units in the convoy.</li>
+     *   <li>Skips any unit that cannot be resolved (null entity).</li>
+     *   <li>If {@code excludeConventionalFighters} is {@code true} and the convoy contains any
+     *       conventional fighters, the method immediately returns {@code false}.</li>
+     *   <li>Returns {@code false} if any unit in the convoy is not an aerial unit (i.e., not an aerospace
+     *       unit or conventional fighter).</li>
+     *   <li>Returns {@code true} if all units in the convoy meet the aerial unit criteria.</li>
+     * </ul>
+     *
+     * @param hangar                     The {@link Hangar} instance from which to retrieve the {@link Unit}.
+     * @param standardForcesOnly         A flag to filter and include only standard forces from the convoy.
+     * @param excludeConventionalFighters A flag determining if conventional fighters should be excluded from
+     *                                    the assessment.
+     * @return {@code true} if the convoy consists only of aerial units (respecting the provided filters),
+     *         {@code false} otherwise.
+     */
+    public boolean forceContainsOnlyAerialForces(Hangar hangar, boolean standardForcesOnly,
+                                                 boolean excludeConventionalFighters) {
+        for (UUID unitId : getAllUnits(standardForcesOnly)) {
+            Entity entity = getEntityFromUnitId(hangar, unitId);
+
+            if (entity == null) {
+                continue;
+            }
+
+            if (excludeConventionalFighters && entity.isConventionalFighter()) {
+                return false;
+            }
+
+            if (!entity.isAerospace() && !entity.isConventionalFighter()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

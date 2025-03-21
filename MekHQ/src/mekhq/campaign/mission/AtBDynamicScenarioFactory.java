@@ -46,6 +46,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.Hangar;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.force.Force;
@@ -3808,13 +3809,13 @@ public class AtBDynamicScenarioFactory {
             setDeploymentTurnsStaggeredByLance(untransportedEntities);
         } else if (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
             if (forceTemplate.getForceAlignment() == ForceAlignment.Opposing.ordinal()) {
-                setDeploymentTurnsForReinforcements(campaign, scenario, untransportedEntities,
+                setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, untransportedEntities,
                         scenario.getHostileReinforcementDelayReduction());
             } else if (forceTemplate.getForceAlignment() != ForceAlignment.Third.ordinal()) {
-                setDeploymentTurnsForReinforcements(campaign, scenario, untransportedEntities,
+                setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, untransportedEntities,
                         scenario.getFriendlyReinforcementDelayReduction());
             } else {
-                setDeploymentTurnsForReinforcements(campaign, scenario, untransportedEntities, 0);
+                setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, untransportedEntities, 0);
             }
         } else {
             for (Entity entity : untransportedEntities) {
@@ -3913,7 +3914,7 @@ public class AtBDynamicScenarioFactory {
                     logger.info(String.format("We're using reinforcement deployment turn calculation for %s",
                         playerForce.getName()));
 
-                    setDeploymentTurnsForReinforcements(campaign, scenario, forceEntities,
+                    setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, forceEntities,
                           strategy + scenario.getFriendlyReinforcementDelayReduction());
 
                     // Here we selectively overwrite the earlier entries
@@ -3932,7 +3933,7 @@ public class AtBDynamicScenarioFactory {
                         }
 
                         if (!delayedEntities.isEmpty()) {
-                            setDeploymentTurnsForReinforcements(campaign, scenario, delayedEntities,
+                            setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, delayedEntities,
                                 strategy + scenario.getFriendlyReinforcementDelayReduction(),
                                 true);
                         }
@@ -3948,7 +3949,7 @@ public class AtBDynamicScenarioFactory {
             } else {
                 logger.info(String.format("We're using a fallback deployment turn calculation for %s",
                     playerForce.getName()));
-                setDeploymentTurnsForReinforcements(campaign, scenario, forceEntities, strategy);
+                setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, forceEntities, strategy);
             }
         }
 
@@ -3966,13 +3967,13 @@ public class AtBDynamicScenarioFactory {
                 if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
                     setDeploymentTurnsStaggeredByLance(Collections.singletonList(entity));
                 } else if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
-                    setDeploymentTurnsForReinforcements(campaign, scenario, Collections.singletonList(entity),
+                    setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, Collections.singletonList(entity),
                           strategy);
                 } else {
                     entity.setDeployRound(deployRound);
                 }
             } else {
-                setDeploymentTurnsForReinforcements(campaign, scenario, Collections.singletonList(entity),
+                setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, Collections.singletonList(entity),
                       strategy);
             }
         }
@@ -4061,27 +4062,57 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Given a list of entities, set the arrival turns for them as if they were all
-     * reinforcements on the same side.
+     * Sets the arrival turns for a list of entities as if they were all reinforcements on the same side.
      *
-     * @param entityList   List of entities to process
-     * @param turnModifier A number to subtract from the deployment turn.
+     * <p>This overloaded method calculates the deployment turns of reinforcements based on their
+     * speeds, with an optional adjustment via the {@code turnModifier}. It assumes that the
+     * reinforcements are not delayed, simplifying the calculation logic compared to the main method.</p>
+     *
+     * @param hangar       The {@link Hangar} instance containing the available entities.
+     *                     Used to resolve player-transported entities via unit IDs.
+     * @param scenario     The {@link Scenario} under which the entities are being deployed.
+     *                     Provides transport linkage information and overall deployment context.
+     * @param entityList   List of {@link Entity} objects to process for deployment turns.
+     * @param turnModifier A value to subtract from the calculated deployment turn, typically reflecting a
+     *                     strategy skill or similar modifier.
+     * @see #setDeploymentTurnsForReinforcements(Hangar, Scenario, List, int, boolean)
      */
-    public static void setDeploymentTurnsForReinforcements(Campaign campaign, Scenario scenario,
+    public static void setDeploymentTurnsForReinforcements(Hangar hangar, Scenario scenario,
                                                            List<Entity> entityList, int turnModifier) {
-        setDeploymentTurnsForReinforcements(campaign, scenario, entityList, turnModifier, false);
+        setDeploymentTurnsForReinforcements(hangar, scenario, entityList, turnModifier, false);
     }
 
     /**
-     * Given a list of entities, set the arrival turns for them as if they were all
-     * reinforcements on the same side. This overloaded method allows for defining whether the
-     * force was delayed.
+     * Sets the arrival turns for a list of entities as if they were all reinforcements on the same side.
      *
-     * @param entityList   List of entities to process
-     * @param turnModifier A number to subtract from the deployment turn.
-     * @param isDelayed Whether the arrival of the entities was delayed
+     * <p>This method accounts for player-transported units, delayed arrivals, and individual unit speeds
+     * to calculate the deployment (arrival) turns of reinforcements. The calculation ensures that the
+     * slowest unit in the group determines the overall arrival turn, with optional adjustments for delays
+     * or modifiers such as a commander’s strategic skill level.</p>
+     *
+     * <p><strong>Behavior:</strong></p>
+     * <ul>
+     *   <li>Identifies and separates player-transported entities. These entities are excluded from the
+     *       arrival turn calculations because their arrival follows a different logic.</li>
+     *   <li>Organizes reinforcements into pools by force to handle their arrival times separately.</li>
+     *   <li>For delayed reinforcements, calculates different arrival scales to account for the delay.</li>
+     *   <li>Determines arrival turns based on the "atb speed" of each unit, which represents their
+     *       effective arrival speed, with slower units impacting the group's arrival time.</li>
+     *   <li>Applies the given {@code turnModifier} (e.g., strategy skill) to adjust the final arrival turn.</li>
+     *   <li>Updates the deployment round for all entities in the list to the calculated arrival turn.</li>
+     * </ul>
+     *
+     * @param hangar       The {@link Hangar} instance containing the available entities.
+     *                     Used to resolve player-transported entities via unit IDs.
+     * @param scenario     The {@link Scenario} under which the entities are being deployed.
+     *                     Provides transport linkage information and overall deployment context.
+     * @param entityList   List of {@link Entity} objects to process for deployment turns.
+     * @param turnModifier A value to subtract from the calculated deployment turn, typically reflecting a
+     *                     strategy skill or similar modifier.
+     * @param isDelayed    A flag indicating whether the reinforcements were delayed. Delayed reinforcements
+     *                     are assigned a higher arrival scale, increasing their arrival turn.
      */
-    public static void setDeploymentTurnsForReinforcements(Campaign campaign, Scenario scenario,
+    public static void setDeploymentTurnsForReinforcements(Hangar hangar, Scenario scenario,
                                                            List<Entity> entityList, int turnModifier,
                                                            boolean isDelayed) {
         // Build a set of all player transported entities. We don't need to do this for NPC entities
@@ -4092,7 +4123,7 @@ public class AtBDynamicScenarioFactory {
         Map<UUID, List<UUID>> transportedIds = scenario.getPlayerTransportLinkages();
         for (List<UUID> transportedUnitIds : transportedIds.values()) {
             for (UUID transportedUnitId : transportedUnitIds) {
-                Entity entity = getEntityFromUnitId(campaign, transportedUnitId);
+                Entity entity = getEntityFromUnitId(hangar, transportedUnitId);
                 if (entity != null && entityList.contains(entity)) {
                     transportedEntities.add(entity);
                 }
