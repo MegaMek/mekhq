@@ -200,6 +200,7 @@ MEKHQ VERSION HISTORY:
 + Fix #6266: Patrol lance still scouts adjacent hexes even if deployment is cancelled
 + PR #6314: Corrected Resource Bundle Reference In PrisonerRansomEventDialog
 + Fix #6313: Added Self-Correction Step to Scenario Objective Processing
++ Fix #6315: Fixed MekHQ Throwing Meks into Low Altitude Scenarios
 
 
 0.50.03 (2025-02-02 2030 UTC)
