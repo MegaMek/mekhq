@@ -250,11 +250,6 @@ planet:
           source: canon
           value:
             - LA
-      - date: '3148-01-30'
-        faction:
-          source: canon
-          value:
-            - LA
   - name: Unktome Belt
     type: ASTEROID_BELT
     orbitalDist: 3.64
