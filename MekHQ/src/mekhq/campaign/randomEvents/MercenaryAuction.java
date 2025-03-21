@@ -28,151 +28,113 @@
 package mekhq.campaign.randomEvents;
 
 import megamek.common.Entity;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Finances;
-import mekhq.campaign.finances.Money;
+import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.gui.dialog.GenericImmersiveMessageDialog;
 import mekhq.gui.dialog.MercenaryAuctionDialog;
 
-import static java.lang.Math.floor;
-import static java.lang.Math.min;
+import static java.lang.Math.max;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
-import static mekhq.campaign.finances.enums.TransactionType.EQUIPMENT_PURCHASE;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
- * This class handles the logic for determining auction eligibility based on the player's finances
+ * This class handles the logic for determining auction eligibility based on the player's resources
  * and provides the interface for bidding in mercenary auctions. Successful auctions result in the
  * unit being added to the campaign, while failures notify the player of the outcome.
  */
 public class MercenaryAuction {
+    private static final MMLogger logger = MMLogger.create(MercenaryAuction.class);
+
     private static final String RESOURCE_BUNDLE = "mekhq.resources." + MercenaryAuctionDialog.class.getSimpleName();
 
-    /**
-     * The minimum bid percentage required to participate in the auction.
-     *
-     * <p>This constant defines the lowest percentage of the unit's base value that a player is
-     * allowed to bid in an auction. It ensures that all bids meet a minimum threshold, preventing
-     * unreasonably low offers during the auction process.</p>
-     *
-     * <p>This is stored as an {@link Integer}, not a {@link Double}, as it's used to set up a
-     * {@link javax.swing.JSpinner} and players tend to have an easier time understanding percentages
-     * when presented as integers.
-     */
-    private static final int AUCTION_MINIMUM_BID_PERCENT = 50;
-
-    /**
-     * Represents the maximum bid percentage allowed during a mercenary auction.
-     *
-     * <p>This constant defines the upper limit for the bid multiplier a player can apply when
-     * participating in an auction, where the value is represented as a multiplier (e.g., 1.5
-     * corresponds to 150%). It ensures that the auction bidding process is capped at a predefined
-     * value as bids above this value have the same % chance of success, so we don't want the player
-     * paying more than they need.</p>
-     */
-    private static final double AUCTION_MAXIMUM_BID_PERCENT = 1.5;
+    private static final int AUCTION_TIER_SUCCESS_PERCENT = 20;
 
     /**
      * Creates and processes a mercenary auction.
      *
      * <p>The auction determines eligibility for bidding, calculates the maximum bid based on campaign
-     * finances, and displays an auction dialog for the player to place their bid. Additionally, it
+     * resources, and displays an auction dialog for the player to place their bid. Additionally, it
      * handles the outcome of the auction, applying the results to the campaign accordingly.</p>
      *
      * @param campaign The current {@link Campaign} instance where the auction takes place.
      * @param unitType The type of unit being auctioned (e.g., `MECH`, `VEHICLE`).
      */
-    public MercenaryAuction(Campaign campaign, int unitType) {
+    public MercenaryAuction(Campaign campaign, int requiredCombatTeams, StratconCampaignState campaignState,
+                            int unitType) {
         String faction = campaign.getFaction().getShortName();
 
         Entity entity = getEntity(faction, REGULAR, getRandomUnitQuality(-2).toNumeric(),
               unitType, UNIT_WEIGHT_UNSPECIFIED, null, campaign);
 
         if (entity == null) {
+            logger.error("Unable to find entity for unit type {} in 'MercenaryAuction'", unitType);
             return;
         }
 
-        double value = entity.getCost(false);
-        Money valueAsMoney = Money.of(value);
+        // Fallback for non-StratCon campaigns
+        if (campaignState == null) {
+            int deliveryTime = d6();
+            campaign.addNewUnit(entity, false, deliveryTime);
+            return;
+        }
 
-        Finances campaignFinances = campaign.getFinances();
-        Money campaignFunds = campaignFinances.getBalance();
-
-        int maximumBid = (int) floor(getMaxBidPercentage(valueAsMoney, campaignFunds) * 100);
+        int maximumBid = campaignState.getSupportPoints();
+        int minimumBid = maximumBid * requiredCombatTeams;
+        boolean cannotAffordOpeningBid = (maximumBid < minimumBid) || (maximumBid == 0);
 
         // If the player can't afford the minimum bid, we just tell them about the opportunity and
         // then close out the auction.
-        if (maximumBid < AUCTION_MINIMUM_BID_PERCENT) {
+        if (cannotAffordOpeningBid) {
+            String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "auction.ic.noFunds",
+                  campaign.getCommanderAddress(false), entity.getShortName());
+
+            String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "auction.ooc.noFunds",
+                  minimumBid, maximumBid);
+
             new GenericImmersiveMessageDialog(campaign, campaign.getSeniorAdminPerson(TRANSPORT),
-                  null, getFormattedTextAt(RESOURCE_BUNDLE, "auction.ic.noFunds",
-                  campaign.getCommanderAddress(false), entity.getShortName()),
-                  null);
+                  null, inCharacterMessage, null, outOfCharacterMessage,
+                  true);
             return;
         }
 
         // Otherwise, we show the Auction dialog.
         MercenaryAuctionDialog mercenaryAuctionDialog = new MercenaryAuctionDialog(campaign, entity,
-              min(maximumBid, AUCTION_MINIMUM_BID_PERCENT * 2), AUCTION_MINIMUM_BID_PERCENT, maximumBid, 5);
-        int adjustedBid = mercenaryAuctionDialog.getSpinnerValue() - AUCTION_MINIMUM_BID_PERCENT;
+              minimumBid, maximumBid, AUCTION_TIER_SUCCESS_PERCENT, max(requiredCombatTeams, 1));
+        int finalBid = mercenaryAuctionDialog.getSpinnerValue() * AUCTION_TIER_SUCCESS_PERCENT;
 
         // If the player confirmed the auction (option 0) then check whether they were successful,
         // deliver the unit, and deduct funds.
         if (mercenaryAuctionDialog.getDialogChoice() == 0) {
             // The use of <= is important here as it ensures that even if the user bids 50 %, they can
             // still win.
-            if (randomInt(AUCTION_MINIMUM_BID_PERCENT * 2) <= adjustedBid) {
-                Money finalBid = valueAsMoney.multipliedBy(mercenaryAuctionDialog.getSpinnerValue() / 100);
-
-                campaignFinances.debit(EQUIPMENT_PURCHASE, campaign.getLocalDate(), finalBid,
-                      getFormattedTextAt(RESOURCE_BUNDLE, "auction.transaction", entity.getShortName()));
+            if (randomInt(100) <= finalBid) {
+                campaignState.changeSupportPoints(finalBid);
 
                 // The delivery time is so that the unit addition is picked up by the 'mothball'
                 // campaign option. It also makes sense the unit wouldn't magically materialize in your
                 // hangar and has to get there.
                 int deliveryTime = d6();
-                campaign.addNewUnit(entity, false, deliveryTime);
+                // The +1 here is to account for this being an end of day event, so we automatically
+                // eat the first day.
+                campaign.addNewUnit(entity, false, deliveryTime + 1);
 
                 // This dialog informs the player their bid was successful
                 new GenericImmersiveMessageDialog(campaign, campaign.getSeniorAdminPerson(TRANSPORT),
                       null, getFormattedTextAt(RESOURCE_BUNDLE, "auction.successful",
-                      entity.getChassis(), deliveryTime), null);
+                      entity.getChassis(), deliveryTime), null, null, true);
             } else {
-
                 // This dialog informs the player their bid was unsuccessful
                 new GenericImmersiveMessageDialog(campaign, campaign.getSeniorAdminPerson(TRANSPORT),
                       null, getFormattedTextAt(RESOURCE_BUNDLE, "auction.failure",
-                      entity.getChassis()), null);
+                      entity.getChassis()), null, null, true);
             }
         }
-    }
-
-    /**
-     * Calculates the maximum bid percentage a player can afford.
-     *
-     * <p>This method iterates through possible percentages (starting at 50% and incrementing by 5%)
-     * to determine the maximum bid percentage the player can afford. The final amount is constrained
-     * by a maximum of 150%.</p>
-     *
-     * @param valueAsMoney The monetary value of the unit being auctioned, represented as {@link Money}.
-     * @param campaignFunds The player's current campaign funds, represented as {@link Money}.
-     * @return The maximum bid percentage the player can afford as a multiplier
-     *         (e.g., 0.5 for 50%, 1.0 for 100%).
-     */
-    private double getMaxBidPercentage(Money valueAsMoney, Money campaignFunds) {
-        for (double i = 0.5; i <= AUCTION_MAXIMUM_BID_PERCENT; i += 0.05) {
-            Money adjustedValueAsMoney = valueAsMoney.multipliedBy(i);
-
-            if (adjustedValueAsMoney.isGreaterOrEqualThan(campaignFunds)) {
-                return i - 0.05;
-            }
-        }
-
-        return 1.5;
     }
 }

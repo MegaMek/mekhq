@@ -834,15 +834,15 @@ public class AtBContract extends Contract {
                 }
             }
             case 4 -> {
-                new MercenaryAuction(campaign, TANK);
+                new MercenaryAuction(campaign, requiredCombatTeams, stratconCampaignState, TANK);
                 yield false;
             }
             case 5 -> {
-                new MercenaryAuction(campaign, AEROSPACEFIGHTER);
+                new MercenaryAuction(campaign, requiredCombatTeams, stratconCampaignState, AEROSPACEFIGHTER);
                 yield false;
             }
             case 6 -> {
-                new MercenaryAuction(campaign, MEK);
+                new MercenaryAuction(campaign, requiredCombatTeams, stratconCampaignState, MEK);
                 yield false;
             }
             default -> throw new IllegalStateException(

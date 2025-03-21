@@ -42,50 +42,47 @@ import javax.swing.event.HyperlinkEvent.EventType;
 import java.awt.*;
 import java.util.List;
 
-import static java.lang.Math.round;
-import static megamek.common.UnitType.getTypeDisplayableName;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * A dialog for handling mercenary unit auctions in the campaign.
  *
- * This dialog allows players to interact with an immersive bidding system for mercenary units.
+ * <p>This dialog allows players to interact with an immersive bidding system for mercenary units.
  * It provides an in-character message about the auction, an adjustable spinner to set the bid percentage,
  * and buttons to confirm or cancel the auction. Upon confirmation, additional actions like viewing
- * detailed data about the unit (TRO View) are available.
+ * detailed data about the unit (TRO View) are available.</p>
  */
 public class MercenaryAuctionDialog extends MHQDialogImmersive {
-
-    // Constants
     private static final String RESOURCE_BUNDLE = "mekhq.resources." + MercenaryAuctionDialog.class.getSimpleName();
 
     private Entity entity;
 
     /**
-     * Constructs a modal {@code MercenaryAuctionDialog} to allow bidding on a specific mercenary unit.
+     * Constructs a new auction dialog for mercenary units in the campaign.
      *
-     * The dialog initializes with predefined settings, including the player details, the entity being
-     * auctioned, and a spinner for adjusting the bid percentage. The dialog blocks further execution
-     * until the player interacts with it and either confirms or cancels their bid.
+     * <p>The dialog presents an immersive interface for players to bid on mercenary units,
+     * including in-character and out-of-character messages, action buttons, and an adjustable
+     * spinner for bid percentage control. The dialog operates as a modal window.</p>
      *
-     * @param campaign     The {@link Campaign} instance, representing the current state of the player's campaign.
-     * @param entity       The {@link Entity} being auctioned, containing details about the mercenary unit.
-     * @param defaultValue The default percentage value for the bid (e.g., 60).
-     * @param minimumValue The minimum percentage value for the bid (e.g., 50).
-     * @param maximumValue The maximum percentage value for the bid (e.g., 150).
-     * @param stepSize     The step size for the percentage increments in the spinner (e.g., 5).
+     * @param campaign       The {@link Campaign} instance containing information about the auction.
+     * @param entity         The {@link Entity} representing the mercenary unit being auctioned.
+     * @param minimumBid     The minimum allowable bid percentage.
+     * @param maximumBid     The maximum allowable bid percentage.
+     * @param percentPerStep The percentage increment for the bid adjustments.
+     * @param stepSize       The step size for each spinner adjustment.
      */
-    public MercenaryAuctionDialog(Campaign campaign, Entity entity, int defaultValue,
-                                  int minimumValue, int maximumValue, int stepSize) {
+    public MercenaryAuctionDialog(Campaign campaign, Entity entity, int minimumBid, int maximumBid,
+                                  int percentPerStep, int stepSize) {
         super(campaign, campaign.getSeniorAdminPerson(TRANSPORT), null,
-              createInCharacterMessage(campaign.getCommanderAddress(false), entity),
-              createButtons(), createOutOfCharacterMessage(entity.getShortName()), null,
-              false, createJSpinnerPanel(defaultValue, minimumValue, maximumValue, stepSize),
+              createCenterMessage(campaign, entity.getShortName()), createButtons(),
+              createOutOfCharacterMessage(minimumBid, maximumBid, percentPerStep),
+              null, false,
+              createJSpinnerPanel(minimumBid, minimumBid, maximumBid, stepSize),
               false
         );
 
-        // This setup ensures the dialog both operates as modal and also assigns the entity being
+        // This setup ensures the dialogs both operate as modal and also assign the entity being
         // auctioned. Just setting it to modal is not enough.
         setVisible(false);
         setEntity(entity);
@@ -102,26 +99,20 @@ public class MercenaryAuctionDialog extends MHQDialogImmersive {
         this.entity = entity;
     }
 
+
     /**
-     * Generates the in-character auction announcement message.
+     * Creates a center-aligned in-character message for the auction dialog.
      *
-     * <p>This message contains details such as the commanding officer's address, the name, type,
-     * and cost range of the unit, making the interaction immersive for the user.</p>
+     * <p>The message typically informs players about the context of the auction,
+     * using details from the campaign and the short name of the entity being auctioned.</p>
      *
-     * @param commanderAddress The email-like address of the commanding officer.
-     * @param entity           The {@link Entity} being auctioned.
-     * @return A formatted string representing the in-character message.
+     * @param campaign  The {@link Campaign} instance providing context for the message.
+     * @param shortName The short name of the entity being auctioned.
+     * @return A formatted in-character message for display in the auction dialog.
      */
-    private static String createInCharacterMessage(String commanderAddress, Entity entity) {
-        String unitName = entity.getShortName();
-        int unitTypeCode = entity.getUnitType();
-        String unitType = getTypeDisplayableName(unitTypeCode);
-
-        double value = entity.getCost(false);
-
-        return getFormattedTextAt(RESOURCE_BUNDLE, "auction.ic", commanderAddress, unitName,
-              unitType, round(value * 0.5), round(value * 0.75), round(value), round(value * 1.25),
-              round(value * 1.5));
+    private static String createCenterMessage(Campaign campaign, String shortName) {
+        return getFormattedTextAt(RESOURCE_BUNDLE, "auction.ic.hasFunds",
+              campaign.getCommanderAddress(false), shortName);
     }
 
     /**
@@ -141,14 +132,19 @@ public class MercenaryAuctionDialog extends MHQDialogImmersive {
     }
 
     /**
-     * Generates the out-of-character auction announcement message, including a hyperlinked unit
-     * label.
+     * Creates an out-of-character message for the auction dialog.
      *
-     * @param shortName The short name of the unit being auctioned.
-     * @return A formatted string representing the out-of-character auction details.
+     * <p>This message provides players with information about the auction rules and ranges,
+     * including the minimum and maximum bid percentages as well as the bid increment steps.</p>
+     *
+     * @param minimumBid     The minimum allowable bid percentage.
+     * @param maximumBid     The maximum allowable bid percentage.
+     * @param percentPerStep The increment step size for bidding percentages.
+     * @return A formatted out-of-character message for display in the auction dialog.
      */
-    private static String createOutOfCharacterMessage(String shortName) {
-        return getFormattedTextAt(RESOURCE_BUNDLE, "auction.ooc", shortName);
+    private static String createOutOfCharacterMessage(int minimumBid, int maximumBid, int percentPerStep) {
+        return getFormattedTextAt(RESOURCE_BUNDLE, "auction.ooc.hasFunds", minimumBid, maximumBid,
+              percentPerStep);
     }
 
     /**
@@ -165,11 +161,7 @@ public class MercenaryAuctionDialog extends MHQDialogImmersive {
      */
     private static @Nullable JPanel createJSpinnerPanel(int defaultValue, int minimumValue,
                                                         int maximumValue, int stepSize) {
-        if ((defaultValue < minimumValue) || (defaultValue > maximumValue)) {
-            return null;
-        }
-
-        JSpinner spinner = new JSpinner(new SpinnerNumberModel(defaultValue, 50, maximumValue, stepSize));
+        JSpinner spinner = new JSpinner(new SpinnerNumberModel(defaultValue, minimumValue, maximumValue, stepSize));
         JLabel label = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE, "spinner.label.auction"));
 
         JPanel spinnerPanel = new JPanel();
