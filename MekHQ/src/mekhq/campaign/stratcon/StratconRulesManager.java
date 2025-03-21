@@ -280,7 +280,8 @@ public class StratconRulesManager {
             availableForceIDs = availableForcePool;
         }
 
-        Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs, campaign);
+        Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs,
+              campaign.getHangar(), campaign.getAllForces());
 
         for (int scenarioIndex = 0; scenarioIndex < scenarioCount; scenarioIndex++) {
             if (autoAssignLances && availableForceIDs.isEmpty()) {
@@ -407,7 +408,8 @@ public class StratconRulesManager {
 
          // Grab the available lances and sort them by map type
          List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract, false);
-         Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs, campaign);
+         Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs,
+               campaign.getHangar(), campaign.getAllForces());
 
          // Select the target coords.
          if (scenarioCoords == null) {
@@ -1895,16 +1897,42 @@ public class StratconRulesManager {
     }
 
     /**
-     * A hackish worker function that takes the given list of force IDs and
-     * separates it into three
-     * sets; one of forces that can be "primary" on a ground map one of forces that
-     * can be "primary" on
-     * an atmospheric map one of forces that can be "primary" in a space map
+     * Categorizes a list of force IDs into groups based on the type of map they can primarily support.
      *
-     * @param forceIDs List of force IDs to check
-     * @return Sorted hash map
+     * <p>This overloaded method analyzes each force associated with the given force IDs in the context of
+     * the provided {@link Hangar} and a pre-resolved list of {@link Force} objects. It determines whether
+     * each force is suited for ground, atmospheric, or space maps, assigning them to the appropriate map
+     * types. Forces may belong to multiple map types based on their composition.</p>
+     *
+     * <p><strong>Behavior:</strong></p>
+     * <ul>
+     *   <li>Forces are classified into the following map types:
+     *       <ul>
+     *         <li><strong>AllGroundTerrain</strong>: Includes all forces.</li>
+     *         <li><strong>LowAtmosphere</strong>: Forces that only contain airborne units.</li>
+     *         <li><strong>Space</strong>: Forces that exclusively contain aerospace-capable units.</li>
+     *       </ul>
+     *   </li>
+     *   <li>A force can appear in multiple map types, such as both "LowAtmosphere" and "Space" for
+     *       aerospace-only forces.</li>
+     *   <li>Logs an error and continues processing if any force associated with a given ID cannot
+     *       be found in the provided list of forces.</li>
+     * </ul>
+     *
+     * @param forceIDs  A list of force IDs to classify.
+     * @param hangar    The {@link Hangar} instance containing aerial or aerospace-related information
+     *                  about forces.
+     * @param allForces A pre-resolved list of {@link Force} objects. Forces are accessed using their
+     *                  IDs as indices, providing performance benefits when compared to fetching forces
+     *                  on demand.
+     * @return A {@link Map} where each {@link MapLocation} key corresponds to a map type, and the value
+     *         is a list of force IDs that can operate in that map type.
      */
-    public static Map<MapLocation, List<Integer>> sortForcesByMapType(List<Integer> forceIDs, Campaign campaign) {
+    public static Map<MapLocation, List<Integer>> sortForcesByMapType(List<Integer> forceIDs,
+                                                                      Hangar hangar, List<Force> allForces) {
+        boolean airborneOnly;
+        boolean aerospaceOnly;
+
         Map<MapLocation, List<Integer>> retVal = new HashMap<>();
 
         retVal.put(AllGroundTerrain, new ArrayList<>());
@@ -1912,22 +1940,30 @@ public class StratconRulesManager {
         retVal.put(Space, new ArrayList<>());
 
         for (int forceID : forceIDs) {
-            switch (campaign.getForce(forceID).getPrimaryUnitType(campaign)) {
-                case BATTLE_ARMOR:
-                case INFANTRY:
-                case MEK:
-                case TANK:
-                case PROTOMEK:
-                case VTOL:
-                    retVal.get(AllGroundTerrain).add(forceID);
-                    break;
-                case AEROSPACEFIGHTER:
-                    retVal.get(Space).add(forceID);
-                    // intentional fallthrough here, ASFs can go to atmospheric maps too
-                case CONV_FIGHTER:
-                    retVal.get(LowAtmosphere).add(forceID);
-                    break;
+            Force force = allForces.get(forceID);
+
+            if (force == null) {
+                logger.error("Force ID {} is null in sortForcesByMapType", forceID);
+                continue;
             }
+
+            airborneOnly = force.forceContainsOnlyAerialForces(hangar, false,
+                  false);
+
+            aerospaceOnly = false;
+            if (airborneOnly) {
+                aerospaceOnly = force.forceContainsOnlyAerialForces(hangar, false,
+                      false);
+            }
+
+            if (aerospaceOnly) {
+                retVal.get(LowAtmosphere).add(forceID);
+                retVal.get(Space).add(forceID);
+            } else if (airborneOnly) {
+                retVal.get(LowAtmosphere).add(forceID);
+            }
+
+            retVal.get(AllGroundTerrain).add(forceID);
         }
         return retVal;
     }
