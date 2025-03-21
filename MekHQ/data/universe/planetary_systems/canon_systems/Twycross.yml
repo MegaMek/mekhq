@@ -3,9 +3,11 @@ sucsId: 2608
 xcood: -108.349
 ycood: 365.246
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 153
   value: F0IV
-primarySlot: 3
+primarySlot:
+  source: Masters and Minions, pg. 153
+  value: 3
 event:
   - date: '2609-12-07'
     zenithCharge: yes
@@ -59,28 +61,32 @@ planet:
       value: Twycross
     type: TERRESTRIAL
     orbitalDist: 4.48
-    sysPos: 3
+    sysPos:
+      source: Masters and Minions, pg. 153
+      value: 3
     icon: green34
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 153
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 153
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 153
       value: 1.0
-    diameter: 10965
-    density: 6.441051467758
+    diameter: 10938
+    density: 6.425063693804
     dayLength: 20
     yearLength: 9.6
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 153
       value: 65
     water:
-      source: canon
+      source: Masters and Minions, pg. 153
       value: 40
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 153
       value: MAMMAL
     desc: |-
       For most of its history Twycross was the capital of the Trellshire Province in the Lyran Commonwealth’s Tamar Pact. The planet itself has an unusually high occurance of typhoons, tornadoes and other extreme weather which require most of the population to live underground. The majority of above-ground buildings are never tall and must be built extremely well to survive the harsh climate. Twycross is home to Trellshire Industries’ BattleMech plant.
@@ -96,13 +102,15 @@ planet:
           source: canon
           value: Twycross North
         capital:
-          source: canon
+          source: Masters and Minions, pg. 153
           value: Camora
       - name:
           source: canon
           value: Twycross South
     satellite:
-      - name: Twycross III
+      - name:
+          source: Masters and Minions, pg. 153
+          value: Twycross III
         size: medium
         icon: oddmoon2
     event:

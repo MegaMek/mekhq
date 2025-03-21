@@ -3,9 +3,11 @@ sucsId: 919
 xcood: 283.632
 ycood: -124.547
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 94'
   value: F5III
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Davion, pg. 94'
+  value: 4
 event:
   - date: '2356-07-30'
     zenithCharge: yes
@@ -62,28 +64,32 @@ planet:
       value: Galax
     type: TERRESTRIAL
     orbitalDist: 3.92
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Davion, pg. 94'
+      value: 4
     icon: green28
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 94'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 94'
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 94'
       value: 1.13
-    diameter: 13631
-    density: 5.85110783662
+    diameter: 13602
+    density: 5.838452948253
     dayLength: 24
     yearLength: 7.9
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 94'
       value: 33
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 94'
       value: 32
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 94'
       value: REPTILE
     desc: |-
       Galax was settled entirely due to the discovery of rich deposits of minerals, ores and other raw materials needed for industry. The initial settlers came to mine the inhospitable world, unfortunately it wasn’t until the 28th century that a joint Star League - Federated Suns terraforming effort made the planet survivable, if still not comfortable, for people outside of pressurized buildings. Despite best efforts, the planet still relies on imported food.
@@ -99,7 +105,9 @@ planet:
       - name: Gibson's Plains
       - name: Carey
     satellite:
-      - name: Malabar
+      - name:
+          source: 'Handbook: House Davion, pg. 94'
+          value: Malabar
         size: large
         icon: rock9
     event:

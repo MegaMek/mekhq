@@ -3,9 +3,11 @@ sucsId: 2510
 xcood: -243.532
 ycood: -310.772
 spectralType:
-  source: canon
+  source: House Marik, pg. 164
   value: F6VI
-primarySlot: 2
+primarySlot:
+  source: House Marik, pg. 164
+  value: 2
 event:
   - date: '2560-08-29'
     zenithCharge: yes
@@ -32,7 +34,9 @@ planet:
       value: Tellman's Mistake
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 2
+    sysPos:
+      source: House Marik, pg. 164
+      value: 2
     icon: green50
     pressure: THIN
     atmosphere: BREATHABLE
@@ -45,7 +49,7 @@ planet:
     temperature: 33
     water: 43
     lifeForm:
-      source: canon
+      source: House Marik, pg. 164
       value: MAMMAL
     desc: Tellman’s Mistake is a backwater planet located near the Free Worlds League
       Periphery with an economy based on agriculture. The planet was settled entirely

@@ -3,9 +3,11 @@ sucsId: 1140
 xcood: 33.337
 ycood: -276.876
 spectralType:
-  source: canon
+  source: 'Objective Raids: Capellan Confederation'
   value: G6V
-primarySlot: 3
+primarySlot:
+  source: 'Objective Raids: Capellan Confederation'
+  value: 3
 event:
   - date: '2375-03-29'
     nadirCharge: yes
@@ -60,28 +62,32 @@ planet:
       value: Housekarle
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 3
+    sysPos:
+      source: 'Objective Raids: Capellan Confederation'
+      value: 3
     icon: green4
     pressure:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Objective Raids: Capellan Confederation'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 1.0
-    diameter: 12643
-    density: 5.582594720783
+    diameter: 12616
+    density: 5.570527876779
     dayLength: 22
     yearLength: 1.3
     temperature:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 38
     water:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 64
     lifeForm:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: MAMMAL
     desc: |-
       Housekarle is a relatively comfortable planet with sufficient agriculture, abundant natural resources and a higher degree of technology than the majority of planets in the Inner Sphere, however the planet has limited industry.
@@ -89,16 +95,18 @@ planet:
       Housekarle is home to one of the Confederations many Duchy RTC facilities and trains vehilce crews and unarmored infantry.
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Hastings
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Godwinson
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Stanford
     satellite:
-      - name: Royal
+      - name:
+          source: 'Objective Raids: Capellan Confederation'
+          value: Royal
         size: medium
         icon: rock4
     event:

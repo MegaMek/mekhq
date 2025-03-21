@@ -3,9 +3,11 @@ sucsId: 2944
 xcood: -66.81
 ycood: 1835.346
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: G6III
-primarySlot: 3
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 3
 event:
   - date: '2803-06-21'
     zenithCharge: yes
@@ -55,28 +57,32 @@ planet:
       value: Grant's Station
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 3
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 3
     icon: green45
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 1.5
-    diameter: 14969
-    density: 7.034096964832
+    diameter: 14978
+    density: 7.03812184824
     dayLength: 17
     yearLength: 2.0
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 35
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 70
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: BIRD
     desc: No description available.
     smallMoons: 2

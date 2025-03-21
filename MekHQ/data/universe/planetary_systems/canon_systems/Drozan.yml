@@ -3,9 +3,11 @@ sucsId: 744
 xcood: 31.267
 ycood: -369.942
 spectralType:
-  source: canon
+  source: 'Handbook: House Liao, pg. 86'
   value: F2V
-primarySlot: 5
+primarySlot:
+  source: 'Handbook: House Liao, pg. 86'
+  value: 5
 event:
   - date: '2735-10-11'
     nadirCharge: yes
@@ -93,28 +95,32 @@ planet:
       value: Drozan
     type: TERRESTRIAL
     orbitalDist: 2.4
-    sysPos: 5
+    sysPos:
+      source: 'Handbook: House Liao, pg. 86'
+      value: 5
     icon: green47
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 86'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 86'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 86'
       value: 0.96
-    diameter: 11304
-    density: 5.988754625957
+    diameter: 11285
+    density: 5.978485391606
     dayLength: 26
     yearLength: 3.9
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 86'
       value: 29
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 86'
       value: 71
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 86'
       value: MAMMAL
     desc: Drozan is a warm, temperate planet well suited to a nearly infinite variety
       of agricultural production. Drozan provides five percent of the Confederation's
@@ -129,13 +135,13 @@ planet:
       crews and unarmored infantry.
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Broad
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Walton
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Rid
     event:
       - date: '2731-09-01'

@@ -3,9 +3,11 @@ sucsId: 2773
 xcood: 44.199
 ycood: -36.749
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G5V
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2358-09-04'
     zenithCharge: yes
@@ -77,28 +79,32 @@ planet:
       value: Woodstock
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: green22
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.0
-    diameter: 13097
-    density: 5.360520078823
+    diameter: 13103
+    density: 5.363162060717
     dayLength: 22
     yearLength: 1.1
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 45
     water:
-      source: canon
+      source: MWDA world profiles
       value: 73
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       3135 - Woodstock was colonised during the latter half of the 22nd century by refugees from the Terran North American continent. Woodstock is a temperate world devoted to raising agricultural products and a variety of livestock. The three oceans are as rich and vibrant with life, while the land is fertile.
@@ -108,19 +114,21 @@ planet:
       Woodstock‘s third continent, Essex, is the only blemish on this otherwise beautiful world. During Amaris' occupation of the Hegemony, Woodstock was attacked by elements of the 141st Amaris Dragoons, using chemical and nuclear weapons to target the military base located on Essex, obliterating the SLDF garrison. The weapons poisoned Essex, rendering the continent all but uninhabitable. The continent is now used in studying radiation‘s effect on the environment.
     landmass:
       - name:
-          source: canon
-          value: York
+          source: MWDA world profiles
+          value: Essex
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Sjardijin
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Recital City
       - name:
-          source: canon
-          value: Essex
+          source: MWDA world profiles
+          value: York
     satellite:
-      - name: Lionel
+      - name:
+          source: MWDA world profiles
+          value: Lionel
         size: medium
         icon: rock9
     event:

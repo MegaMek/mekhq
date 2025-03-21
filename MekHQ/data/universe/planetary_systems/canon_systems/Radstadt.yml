@@ -3,9 +3,11 @@ sucsId: 2106
 xcood: 41.368
 ycood: 316.631
 spectralType:
-  source: canon
+  source: 25 Years of Art and Fiction, pg. 121
   value: G5III
-primarySlot: 3
+primarySlot:
+  source: 25 Years of Art and Fiction, pg. 121
+  value: 3
 event:
   - date: '2402-06-13'
     zenithCharge: yes
@@ -54,28 +56,32 @@ planet:
       value: Radstadt
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 3
+    sysPos:
+      source: 25 Years of Art and Fiction, pg. 121
+      value: 3
     icon: green10
     pressure:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 121
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 25 Years of Art and Fiction, pg. 121
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 121
       value: 0.93
-    diameter: 13257
-    density: 4.926230043785
+    diameter: 13262
+    density: 4.928100557923
     dayLength: 24
     yearLength: 2.0
     temperature:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 121
       value: 23
     water:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 121
       value: 55
     lifeForm:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 121
       value: REPTILE
     desc: |-
       Overall Radstadt is a typical cool-temperate terran-planet that has sufficient resources, a lot of land devoted to agriculture with a thriving fishing industry and basic heavy industry that is capable of locally supplying most non-military grade machinery. The biggest exports from Radstadt are fish and timber, with the Radstadt Pine being prized due to its ability when treated to shimmer as if flecked with gold.
@@ -83,10 +89,12 @@ planet:
       During its time in the Draconis Combine, Radstadt was infamous for being home to one of the largest prison complexes in the entire Combine. The Lotus Flower Correctional Institute could rival most small cities in size and was located right outside of Munich, the planetary capital. The ‘pinnacle’ of the prison complex was the Black Tower, a large windowless tower of black concrete that was used to house the worst offenders in the Combine.
     landmass:
       - capital:
-          source: canon
+          source: 25 Years of Art and Fiction, pg. 121
           value: Munich
     satellite:
-      - name: Taurach
+      - name:
+          source: 25 Years of Art and Fiction, pg. 121
+          value: Taurach
         size: giant
         icon: rock16
     event:

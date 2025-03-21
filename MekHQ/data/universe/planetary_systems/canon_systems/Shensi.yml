@@ -3,7 +3,7 @@ sucsId: 2301
 xcood: 53.764
 ycood: -92.524
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F6V
 primarySlot: 3
 event:
@@ -58,25 +58,27 @@ planet:
     sysPos: 3
     icon: green53
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.0
-    diameter: 15232
-    density: 4.635863249728
+    diameter: 15196
+    density: 4.624770789786
     dayLength: 22
     yearLength: 1.9
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 30
     water:
-      source: canon
+      source: MWDA world profiles
       value: 59
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: AMPHIBIAN
     desc: "3135 - Shensi is covered with tens of thousands of kilometers of forest
       that lured people from northwest North America, northern China, and Siberia.
@@ -99,19 +101,21 @@ planet:
       when it was folded into The Republic of the Sphere. "
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Klondike
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Whitehorse
       - name:
-          source: canon
-          value: Mogot
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Kungara
+      - name:
+          source: MWDA world profiles
+          value: Mogot
     satellite:
-      - name: Kung Pow
+      - name:
+          source: MWDA world profiles
+          value: Kung Pow
         size: medium
         icon: rock16
     event:

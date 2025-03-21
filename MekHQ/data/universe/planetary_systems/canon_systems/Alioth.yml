@@ -3,9 +3,11 @@ sucsId: 73
 xcood: -58.94
 ycood: 13.908
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: A0V
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2355-06-27'
     zenithCharge: yes
@@ -42,28 +44,32 @@ planet:
       value: Alioth
     type: TERRESTRIAL
     orbitalDist: 8.12
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green18
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.9
-    diameter: 12886
-    density: 4.904866438101
+    diameter: 12891
+    density: 4.906583056016
     dayLength: 27
     yearLength: 23.2
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 44
     water:
-      source: canon
+      source: MWDA world profiles
       value: 63
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: |-
       3135 - Alioth’s thick, hyper-oxygenated atmosphere and unusual warmth for a planet that orbits so far out from its star impressed the first colonists. The abundance of native flora for such a geologically young world is the result of bursts of solar radiation that pulse from the sun every few hundred years or so. The colonists have learnt to shield their structures against the harmful bursts of solar radiation created by this unusually active sun, which have been known to completely disrupt communications and produce worldwide outbreaks of cancer cases every few generations. Local astronomers have also learnt to read the telltale signs of new bursts of activity, in response to which the planet itself goes into a kind of global shutdown. Inspite of this, Aloith's fertile soils and mild weather cycles have made it possible for a variety of Terran and Terran-hybrid food crops to flourish and support a booming agricultural industry. In addition, the island chains off the coasts of Uvania, the planet‘s large northern continent, with their semi-tropical landscapes of wildly varied native flora, and striking mountain landscapes, were perfect for establishing a robust tourist trade. Warrinzer, the capital of Alioth, is located on the northeastern coast of Uvania, fifty kilometers north of the primary port city of Staniskil.
@@ -71,19 +77,21 @@ planet:
       During the Terran Hegemony era, Alioth became a breadbasket and holiday retreat for citizens across the Hegemony, and business truly boomed in the Star League era, when the world opened up to foreign travelers as well. After the fall of the Star League, Alioth was claimed by the Lyran Commonwealth and became another Free Worlds/Lyran border planet. It was a strategic point during raids and campaigns waged through the Succession Wars and the Jihad, Alioth‘s farmlands became scarred battlegrounds and its resorts declined as garrison troops and invading soldiers alike consumed the local resources. Under Republican rule, however, Alioth has begun to bounce back, thanks in part to a variety of local efforts funded by the 'Peace Dividends' that followed Stone's Military Material Redemption Program. Today, the resorts off Uvania are open once again, and even the southern continents of Lilandro and Stravio have reported their first profitable crop years in over a century.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Lilandro
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Stravio
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Uvania
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Warrinzer
     satellite:
-      - name: Galayna
+      - name:
+          source: MWDA world profiles
+          value: Galayna
         size: large
         icon: rock4
     event:

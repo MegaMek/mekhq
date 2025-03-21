@@ -5,7 +5,9 @@ ycood: -68.578
 spectralType:
   source: canon
   value: K8V
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Liao, pg. 74'
+  value: 3
 event:
   - date: '2427-12-19'
     nadirCharge: yes
@@ -43,28 +45,32 @@ planet:
       value: Cynthiana
     type: TERRESTRIAL
     orbitalDist: 0.24
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Liao, pg. 74'
+      value: 3
     icon: green20
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 74'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 74'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 74'
       value: 1.05
-    diameter: 13747
-    density: 5.363675722161
+    diameter: 13752
+    density: 5.365686695927
     dayLength: 20
     yearLength: 0.8
     temperature:
-      source: canon
-      value: 30
+      source: 'Handbook: House Liao, pg. 74'
+      value: 33
     water:
-      source: canon
-      value: 55
+      source: 'Handbook: House Liao, pg. 74'
+      value: 35
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 74'
       value: REPTILE
     desc: |-
       Liao is the ancestral home of House Liao and as such has always had a symbolic importance to the Capellan Confederation, if not a practical importance. The Liaos continued to maintain a palatial residence in the northern hemisphere. However, the rest of the planet has always been a relatively insignificant backwater that has little militarily or industrially sites of interest. The Capellans always maintained a local garrison on planet following several raids during the Succession Wars. The planet’s terrain is dominated by rolling plains with few features of interest.
@@ -72,21 +78,23 @@ planet:
       Liao is home to the Liao Conservatory of Military Arts, which is located in the planetary capital and trains MechWarriors, Aerospace pilots, vehicle crews and infantry. The planet is also home to one of many Duchy RTC facilities in the Confederation and trains infantry and conventional armor crews.
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Anderia
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Beilù
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Chang-an
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Nánlù
     satellite:
-      - name: Elias' Promise
-        size: giant
-        icon: rock1
+      - name:
+          source: 'Handbook: House Liao, pg. 74'
+          value: Cynthia
+        size: medium
+        icon: oddmoon1
     event:
       - date: '2189-03-18'
         faction:
@@ -367,10 +375,7 @@ planet:
       - date: '3145-01-01'
         population: 2276412820.0
       - date: '2108-12-05'
-        name: Cynthiana
       - date: '2202-01-01'
-        name: Liao
-        message: Cynthiana renamed to Liao
   - name: Ned Er Tcher
     type: TERRESTRIAL
     orbitalDist: 0.96

@@ -3,9 +3,11 @@ sucsId: 2170
 xcood: 150.442
 ycood: -383.425
 spectralType:
-  source: canon
+  source: 'Handbook: House Liao, pg. 86'
   value: F3V
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Liao, pg. 86'
+  value: 2
 planet:
   - name: Logan
     type: TERRESTRIAL
@@ -27,28 +29,32 @@ planet:
       value: Rollis
     type: TERRESTRIAL
     orbitalDist: 2.4
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Liao, pg. 86'
+      value: 2
     icon: green21
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 86'
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 86'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 86'
       value: 1.02
-    diameter: 13965
-    density: 5.172436404699
+    diameter: 13912
+    density: 5.152649084665
     dayLength: 18
     yearLength: 3.9
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 86'
       value: 32
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 86'
       value: 56
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 86'
       value: PLANT
     desc: Rollis is best known as a stopping off point from the Capallen Confederation
       into the Periphery, though it was originally settled by the Taurians and taken
@@ -66,19 +72,21 @@ planet:
       exercises.
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Como
         capital:
-          source: canon
-          value: New Harmon
+          source: 'Objective Raids: Capellan Confederation'
+          value: Gastov
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Spruce
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Wright
     satellite:
-      - name: Rory
+      - name:
+          source: 'Handbook: House Liao, pg. 86'
+          value: Rory
         size: large
         icon: rock7
     event:

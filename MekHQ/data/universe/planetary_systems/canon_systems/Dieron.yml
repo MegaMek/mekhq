@@ -3,9 +3,11 @@ sucsId: 714
 xcood: 12.201
 ycood: 14.909
 spectralType:
-  source: canon
+  source: 'Jihad Turning Points: Dieron, pg. 3'
   value: G3V
-primarySlot: 4
+primarySlot:
+  source: 'Jihad Turning Points: Dieron, pg. 3'
+  value: 4
 event:
   - date: '2362-01-09'
     nadirCharge: yes
@@ -76,28 +78,32 @@ planet:
       value: Dieron
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 4
+    sysPos:
+      source: 'Jihad Turning Points: Dieron, pg. 3'
+      value: 4
     icon: green21
     pressure:
-      source: canon
+      source: 'Jihad Turning Points: Dieron, pg. 3'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Jihad Turning Points: Dieron, pg. 3'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Jihad Turning Points: Dieron, pg. 3'
       value: 1.02
-    diameter: 14436
-    density: 4.935403626374
+    diameter: 14480
+    density: 4.950412147822
     dayLength: 23
     yearLength: 1.2
     temperature:
-      source: canon
+      source: 'Jihad Turning Points: Dieron, pg. 3'
       value: 27
     water:
-      source: canon
+      source: 'Jihad Turning Points: Dieron, pg. 3'
       value: 54
     lifeForm:
-      source: canon
+      source: 'Jihad Turning Points: Dieron, pg. 3'
       value: AMPHIBIAN
     desc: |-
       Dieron was one of the worlds abandoned by the Terran Alliance following the Outer Reaches Rebellion. Later the world would be incorporated into the Terran Hegemony becoming part of the Lone Star Province. Dieron is a world with numerous large mountain ranges creating countless small valleys. The planet is geologically unstable, as a result earthquakes are a common problem. Nestled into the large Mountain are cramped cities stuck between towering mountains. In the time of the Star League, Dieron was a large and thriving planet. The SLDF maintained a major command and logistics center on Dieron. The largest of the Star League complexes at the time was Fortress Dieron. After the Exodus the Draconis Combine became quite interested in acquiring Dieron. The planet's extensive natural resources, advanced technology and industry made it a prime target. When the Combine seized the planet they had underestimated how much of the planet had suffered during the war to oust Stefan Amaris. The SLDF has also been very thurough stripping the planet of all useful material. After seizing the planet the Combine began creating factories in the shells of Dieron’s deep mountains and slowly rebuilt the world into a thriving industrial powerhouse. Even with the earthquakes, claustrophobic living space, and occasional political dissent, the Dieronese are a content people. The natives are protective of their world and despite centuries of Kurita rule many natives still remember the glory days of the Terran Hegemony and the Star League and still refer to locations and cities by their original colonial names.
@@ -109,22 +115,26 @@ planet:
       3135 - Once a major administrative center, electronics producer, and site of orbital shipyards for the Star League, Dieron survived Amaris‘ coup intact, only to be ravaged by returning SLDF troops in the war to liberate the Hegemony. The Castles Brian in the planet‘s numerous mountain ranges were obliterated by naval bombardments during the effort, but their memory remained strong in the minds of many Dieronese, who clung to that memory of their world‘s former glory. Their cities, cramped in the valleys formed by the steep, crisscrossing mountain ranges, often became hotbeds for resistance against the Combine‘s rule after House Kurita seized the planet following the fall of the League. The Combine leadership often used rumors of a Star League cache found in the mountains to keep the locals distracted, sending many of the population into the treacherous highlands, braving the elements and chronic earthquakes, in the hope of uncovering a relic of their past. When the Blakist Jihad was launched, Dieron, as a Combine district capital, was targeted by a massive attack that included nuclear weapons and orbital bombardment. The major industrial city of Aldinga, nestled at the heart of the northern Mataeo continent, ceased to exist when shelling from a Word of Blake WarShip actually struck a nearby fault line that literally caved in the entire valley. The smaller southern continent of Voltenna remains a scarred, radiation-scorched wasteland today, dotted with the ruins of several cities and towns. Only the north polar continent of Wennisaka was spared any damage from the Jihad onslaught, despite the presence of Fort Shiro, a former Combine military headquarters and site of a major spaceport. The planetary capital city, Tahlwynn, is located on Mataeo, in the Loretta-Argus mountain basin, and also serves as the planet‘s primary spaceport.
     landmass:
       - name:
-          source: canon
+          source: 'Jihad Turning Points: Dieron, pg. 3'
           value: Mataeo
         capital:
-          source: canon
-          value: Fortress Dieron
+          source: 'Jihad Turning Points: Dieron, pg. 3'
+          value: Tahlwynn
       - name:
-          source: canon
+          source: 'Jihad Turning Points: Dieron, pg. 3'
           value: Voltenna
       - name:
-          source: canon
+          source: 'Jihad Turning Points: Dieron, pg. 3'
           value: Wennisaka
     satellite:
-      - name: Bemer
+      - name:
+          source: 'Jihad Turning Points: Dieron, pg. 3'
+          value: Bemer
         size: medium
         icon: oddmoon3
-      - name: Nebulos
+      - name:
+          source: 'Jihad Turning Points: Dieron, pg. 3'
+          value: Nebulos
         size: medium
         icon: oddmoon1
     event:

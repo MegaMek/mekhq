@@ -3,9 +3,11 @@ sucsId: 1854
 xcood: 231.063
 ycood: -296.899
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 43
   value: K5IV
-primarySlot: 4
+primarySlot:
+  source: Masters and Minions, pg. 43
+  value: 4
 event:
   - date: '2382-01-14'
     zenithCharge: yes
@@ -70,28 +72,32 @@ planet:
       value: New Syrtis
     type: TERRESTRIAL
     orbitalDist: 0.49
-    sysPos: 4
+    sysPos:
+      source: Masters and Minions, pg. 43
+      value: 4
     icon: green38
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 43
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 43
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 43
       value: 1.0
-    diameter: 11228
-    density: 6.238286068705
+    diameter: 11247
+    density: 6.248630032039
     dayLength: 18
     yearLength: 0.9
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 43
       value: 35
     water:
-      source: canon
+      source: Masters and Minions, pg. 43
       value: 50
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 43
       value: PLANT
     desc: |-
       New Syrtis is an icy world trapped in an ice age with only a thin equatorial band capable of comfortably supporting human life. The planet was originally settled in order to mine the many deposits of natural metals and minerals. The planet’s mining efforts were tightly regulated and heavy industry grew on planet to make use of the mined materials and New Syrtis became an important source of military manufacturing in the region.
@@ -101,25 +107,15 @@ planet:
       New Syrtis Shipyards
     landmass:
       - name:
-          source: canon
-          value: Auskel
-      - name:
-          source: canon
-          value: Copplin
-      - name:
-          source: canon
-          value: Frankalia
-      - name:
-          source: canon
+          source: 'Handbook: House Davion, pg. 89'
           value: Mawreddog
         capital:
-          source: canon
+          source: Masters and Minions, pg. 43
           value: Saso
-      - name:
-          source: canon
-          value: Sparro
     satellite:
-      - name: Varnay’s Star
+      - name:
+          source: Masters and Minions, pg. 43
+          value: Varnay's Star
         size: large
         icon: rock1
     event:

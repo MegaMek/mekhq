@@ -5,7 +5,9 @@ ycood: -411.522
 spectralType:
   source: canon
   value: G6V
-primarySlot: 5
+primarySlot:
+  source: Periphery (1ed), pg. 85
+  value: 5
 event:
   - date: '2753-01-29'
     zenithCharge: yes
@@ -100,7 +102,9 @@ planet:
       value: Brinton
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 5
+    sysPos:
+      source: Periphery (1ed), pg. 85
+      value: 5
     icon: green48
     pressure:
       source: canon
@@ -121,7 +125,7 @@ planet:
       source: canon
       value: 57
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 85
       value: BIRD
     desc: |-
       Near the end of the Third Succession War, Capellan raiders set off an ancient bio-weapon that resulted in the entire planet being contaminated and saw the removal of the planet from star charts for several decades. However, despite the deadly contamination that was still killing off any unprotected visitors decades later, the importance of the O-P Computer Electronics plant on planet kept Brinton from being completely abandoned. Without the contamination from the bioweapon, Brinton was a comfortable planet with abundant resources and arable land and well developed technologically and industrially for a Periphery planet. The O-P Computer Electronics plant is located in the city of Fago on the Charlton continent.

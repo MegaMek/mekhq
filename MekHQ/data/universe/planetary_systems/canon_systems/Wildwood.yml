@@ -5,7 +5,9 @@ ycood: -440.009
 spectralType:
   source: canon
   value: G4V
-primarySlot: 2
+primarySlot:
+  source: Periphery (1ed), pg. 104
+  value: 2
 event:
   - date: '2718-02-23'
     zenithCharge: yes
@@ -38,7 +40,9 @@ planet:
       value: Wildwood
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 2
+    sysPos:
+      source: Periphery (1ed), pg. 104
+      value: 2
     icon: green30
     pressure: HIGH
     atmosphere: BREATHABLE
@@ -51,7 +55,7 @@ planet:
     temperature: 42
     water: 34
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 104
       value: BIRD
     desc: 3025 - Wildwood is a major agricultural world best known throughout the
       Magistracy of Canopus and into the Free Worlds League for its vineyards and

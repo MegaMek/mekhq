@@ -3,9 +3,11 @@ sucsId: 1979
 xcood: 342.497
 ycood: -292.438
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 97'
   value: M0III
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Davion, pg. 97'
+  value: 3
 event:
   - date: '2363-03-23'
     zenithCharge: yes
@@ -47,28 +49,32 @@ planet:
       value: Panpour
     type: TERRESTRIAL
     orbitalDist: 0.5
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Davion, pg. 97'
+      value: 3
     icon: wet4
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 97'
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 97'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 97'
       value: 1.0
-    diameter: 13076
-    density: 5.370392914176
+    diameter: 13081
+    density: 5.3724074818
     dayLength: 19
     yearLength: 0.8
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 97'
       value: 49
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 97'
       value: 88
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 97'
       value: FISH
     desc: |-
       Panpour was originally surveyed in the mid 23rd century but was not settled until the early 2300s by the United Hindu Collective and was the capital of the small realm. The planet was liveable but not the most comfortable planet for human life, however abundant ores attracted colonists. Early terraforming operations were able to make the land more arable and allowed the planet to eventually have enough agriculture to be self-sufficient. The planet remained a backwater until the Reunification War when the planet gained the interest of the Federated Suns and the Star League as a forward logistics center. Almost immediately Panpour was transformed into an industrial giant, fully able to support the war efforts in the Periphery.
@@ -79,61 +85,38 @@ planet:
       Challenge Systems
     landmass:
       - name:
-          source: canon
-          value: Remig
-        capital:
-          source: canon
-          value: Matam
-      - name:
-          source: canon
+          source: 'Handbook: House Davion, pg. 97'
           value: Mestin
       - name:
-          source: canon
-          value: Mysore
-      - name:
-          source: canon
-          value: Aminidivi
-      - name:
-          source: canon
-          value: Laccadive
-      - name:
-          source: canon
-          value: Minicoy
-      - name:
-          source: canon
-          value: Kongu Nadu
-      - name:
-          source: canon
-          value: Maidan
-      - name:
-          source: canon
-          value: Onattukara
-      - name:
-          source: canon
-          value: Palanadu
-      - name:
-          source: canon
-          value: Telangana
-      - name:
-          source: canon
-          value: Valluvanadu
-      - name:
-          source: canon
-          value: Venad
+          source: 'Handbook: House Davion, pg. 97'
+          value: Remig
+        capital:
+          source: 'Handbook: House Davion, pg. 97'
+          value: Matam
     satellite:
-      - name: Brach
+      - name:
+          source: 'Handbook: House Davion, pg. 97'
+          value: Brach
         size: large
         icon: rock12
-      - name: Faub
+      - name:
+          source: 'Handbook: House Davion, pg. 97'
+          value: Faub
         size: large
         icon: rock9
-      - name: Kraygor
+      - name:
+          source: 'Handbook: House Davion, pg. 97'
+          value: Kraygor
         size: medium
         icon: rock17
-      - name: Moch
+      - name:
+          source: 'Handbook: House Davion, pg. 97'
+          value: Moch
         size: large
         icon: rock6
-      - name: Zeik
+      - name:
+          source: 'Handbook: House Davion, pg. 97'
+          value: Zeik
         size: giant
         icon: rock8
     event:

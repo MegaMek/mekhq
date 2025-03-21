@@ -3,9 +3,11 @@ sucsId: 2789
 xcood: 113.214
 ycood: 224.941
 spectralType:
-  source: canon
+  source: House Kurita
   value: F0V
-primarySlot: 2
+primarySlot:
+  source: House Kurita
+  value: 2
 event:
   - date: '2356-05-22'
     nadirCharge: yes
@@ -31,7 +33,9 @@ planet:
       value: Xinyang
     type: TERRESTRIAL
     orbitalDist: 2.56
-    sysPos: 2
+    sysPos:
+      source: House Kurita
+      value: 2
     icon: green38
     pressure:
       source: canon
@@ -52,7 +56,7 @@ planet:
       source: canon
       value: 70
     lifeForm:
-      source: canon
+      source: House Kurita
       value: AMPHIBIAN
     desc: Xinyang is the capital world of the Xinyang Prefecture. Located in the center
       of the Draconis Combine close to Luthien, Xinyang wasn't subject to raids like

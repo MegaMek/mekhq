@@ -46,6 +46,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.Hangar;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.force.Force;
@@ -93,6 +94,7 @@ import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX;
 import static mekhq.campaign.personnel.SkillType.EXP_ELITE;
 import static mekhq.campaign.universe.IUnitGenerator.unitTypeSupportsWeightClass;
+import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 /**
  * This class handles the creation and substantive manipulation of
@@ -1411,8 +1413,11 @@ public class AtBDynamicScenarioFactory {
         // if the objective is a reach edge/prevent reaching edge and the direction is
         // "destination edge" ("None").
 
+        reviewBotForceTemplateCompleteness(scenario);
+
         for (int x = 0; x < scenario.getNumBots(); x++) {
             BotForce botForce = scenario.getBotForce(x);
+
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
             boolean botForceIsHostile = botForce.getTeam() == ForceAlignment.Opposing.ordinal() ||
                     botForce.getTeam() == ForceAlignment.Third.ordinal();
@@ -1482,6 +1487,54 @@ public class AtBDynamicScenarioFactory {
         }
 
         return actualObjective;
+    }
+
+    /**
+     * Ensures that the bot force templates in the given {@link AtBDynamicScenario} are complete by
+     * checking for any missing bot forces and restoring their corresponding templates.
+     *
+     * <p>This method iterates through all the bot forces in the scenario and verifies if each one
+     * is mapped to an appropriate {@link ScenarioForceTemplate} in the force templates map. If a
+     * mapping is missing, it matches the force to its template by name and adds it to the map.</p>
+     *
+     * <p><strong>Behavior:</strong></p>
+     * <ul>
+     *   <li>Retrieves the current map of bot forces to their templates from the scenario.</li>
+     *   <li>Checks all bot forces in the scenario for missing entries in the template map.</li>
+     *   <li>Searches for the appropriate template by matching force names to template names.</li>
+     *   <li>Restores the missing templates by adding them back into the map.</li>
+     * </ul>
+     *
+     * <p><strong>Purpose:</strong></p>
+     * <p>This method was introduced to address a rare instance where bot forces would not be tracked
+     * correctly. The root cause could not be tracked down, so we implemented this method to ensure
+     * data correctness and to self-fix any issues. This also ensures that any bot forces added
+     * post-initial generation (for whatever reason) will be properly tracked.</p>
+     *
+     * @param scenario The {@link AtBDynamicScenario} whose bot force templates are being reviewed and completed.
+     */
+    private static void reviewBotForceTemplateCompleteness(AtBDynamicScenario scenario) {
+        Map<BotForce, ScenarioForceTemplate> forceTemplates = scenario.getBotForceTemplates();
+
+        ScenarioTemplate scenarioTemplate = scenario.getTemplate();
+        List<ScenarioForceTemplate> templates = scenarioTemplate.getAllBotControlledAllies();
+        templates.addAll(scenarioTemplate.getAllBotControlledHostiles());
+
+        for (BotForce force : scenario.getBotForces()) {
+            ScenarioForceTemplate forceTemplate = forceTemplates.get(force);
+
+            if (forceTemplate == null) {
+                String templateName = force.getTemplateName();
+
+                for (ScenarioForceTemplate template : templates) {
+                    if (template.getForceName().equals(templateName)) {
+                        forceTemplate = template;
+                        scenario.getBotForceTemplates().put(force, forceTemplate);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -3757,13 +3810,13 @@ public class AtBDynamicScenarioFactory {
             setDeploymentTurnsStaggeredByLance(untransportedEntities);
         } else if (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
             if (forceTemplate.getForceAlignment() == ForceAlignment.Opposing.ordinal()) {
-                setDeploymentTurnsForReinforcements(untransportedEntities,
+                setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, untransportedEntities,
                         scenario.getHostileReinforcementDelayReduction());
             } else if (forceTemplate.getForceAlignment() != ForceAlignment.Third.ordinal()) {
-                setDeploymentTurnsForReinforcements(untransportedEntities,
+                setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, untransportedEntities,
                         scenario.getFriendlyReinforcementDelayReduction());
             } else {
-                setDeploymentTurnsForReinforcements(untransportedEntities, 0);
+                setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, untransportedEntities, 0);
             }
         } else {
             for (Entity entity : untransportedEntities) {
@@ -3862,7 +3915,8 @@ public class AtBDynamicScenarioFactory {
                     logger.info(String.format("We're using reinforcement deployment turn calculation for %s",
                         playerForce.getName()));
 
-                    setDeploymentTurnsForReinforcements(forceEntities, strategy + scenario.getFriendlyReinforcementDelayReduction());
+                    setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, forceEntities,
+                          strategy + scenario.getFriendlyReinforcementDelayReduction());
 
                     // Here we selectively overwrite the earlier entries
                     if (!scenario.getFriendlyDelayedReinforcements().isEmpty()) {
@@ -3880,7 +3934,7 @@ public class AtBDynamicScenarioFactory {
                         }
 
                         if (!delayedEntities.isEmpty()) {
-                            setDeploymentTurnsForReinforcements(delayedEntities,
+                            setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, delayedEntities,
                                 strategy + scenario.getFriendlyReinforcementDelayReduction(),
                                 true);
                         }
@@ -3896,7 +3950,7 @@ public class AtBDynamicScenarioFactory {
             } else {
                 logger.info(String.format("We're using a fallback deployment turn calculation for %s",
                     playerForce.getName()));
-                setDeploymentTurnsForReinforcements(forceEntities, strategy);
+                setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, forceEntities, strategy);
             }
         }
 
@@ -3914,12 +3968,14 @@ public class AtBDynamicScenarioFactory {
                 if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
                     setDeploymentTurnsStaggeredByLance(Collections.singletonList(entity));
                 } else if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
-                    setDeploymentTurnsForReinforcements(Collections.singletonList(entity), strategy);
+                    setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, Collections.singletonList(entity),
+                          strategy);
                 } else {
                     entity.setDeployRound(deployRound);
                 }
             } else {
-                setDeploymentTurnsForReinforcements(Collections.singletonList(entity), strategy);
+                setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, Collections.singletonList(entity),
+                      strategy);
             }
         }
     }
@@ -4007,27 +4063,75 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Given a list of entities, set the arrival turns for them as if they were all
-     * reinforcements on the same side.
+     * Sets the arrival turns for a list of entities as if they were all reinforcements on the same side.
      *
-     * @param entityList   List of entities to process
-     * @param turnModifier A number to subtract from the deployment turn.
+     * <p>This overloaded method calculates the deployment turns of reinforcements based on their
+     * speeds, with an optional adjustment via the {@code turnModifier}. It assumes that the
+     * reinforcements are not delayed, simplifying the calculation logic compared to the main method.</p>
+     *
+     * @param hangar       The {@link Hangar} instance containing the available entities.
+     *                     Used to resolve player-transported entities via unit IDs.
+     * @param scenario     The {@link Scenario} under which the entities are being deployed.
+     *                     Provides transport linkage information and overall deployment context.
+     * @param entityList   List of {@link Entity} objects to process for deployment turns.
+     * @param turnModifier A value to subtract from the calculated deployment turn, typically reflecting a
+     *                     strategy skill or similar modifier.
+     * @see #setDeploymentTurnsForReinforcements(Hangar, Scenario, List, int, boolean)
      */
-    public static void setDeploymentTurnsForReinforcements(List<Entity> entityList, int turnModifier) {
-        setDeploymentTurnsForReinforcements(entityList, turnModifier, false);
+    public static void setDeploymentTurnsForReinforcements(Hangar hangar, Scenario scenario,
+                                                           List<Entity> entityList, int turnModifier) {
+        setDeploymentTurnsForReinforcements(hangar, scenario, entityList, turnModifier, false);
     }
 
     /**
-     * Given a list of entities, set the arrival turns for them as if they were all
-     * reinforcements on the same side. This overloaded method allows for defining whether the
-     * force was delayed.
+     * Sets the arrival turns for a list of entities as if they were all reinforcements on the same side.
      *
-     * @param entityList   List of entities to process
-     * @param turnModifier A number to subtract from the deployment turn.
-     * @param isDelayed Whether the arrival of the entities was delayed
+     * <p>This method accounts for player-transported units, delayed arrivals, and individual unit speeds
+     * to calculate the deployment (arrival) turns of reinforcements. The calculation ensures that the
+     * slowest unit in the group determines the overall arrival turn, with optional adjustments for delays
+     * or modifiers such as a commander’s strategic skill level.</p>
+     *
+     * <p><strong>Behavior:</strong></p>
+     * <ul>
+     *   <li>Identifies and separates player-transported entities. These entities are excluded from the
+     *       arrival turn calculations because their arrival follows a different logic.</li>
+     *   <li>Organizes reinforcements into pools by force to handle their arrival times separately.</li>
+     *   <li>For delayed reinforcements, calculates different arrival scales to account for the delay.</li>
+     *   <li>Determines arrival turns based on the "atb speed" of each unit, which represents their
+     *       effective arrival speed, with slower units impacting the group's arrival time.</li>
+     *   <li>Applies the given {@code turnModifier} (e.g., strategy skill) to adjust the final arrival turn.</li>
+     *   <li>Updates the deployment round for all entities in the list to the calculated arrival turn.</li>
+     * </ul>
+     *
+     * @param hangar       The {@link Hangar} instance containing the available entities.
+     *                     Used to resolve player-transported entities via unit IDs.
+     * @param scenario     The {@link Scenario} under which the entities are being deployed.
+     *                     Provides transport linkage information and overall deployment context.
+     * @param entityList   List of {@link Entity} objects to process for deployment turns.
+     * @param turnModifier A value to subtract from the calculated deployment turn, typically reflecting a
+     *                     strategy skill or similar modifier.
+     * @param isDelayed    A flag indicating whether the reinforcements were delayed. Delayed reinforcements
+     *                     are assigned a higher arrival scale, increasing their arrival turn.
      */
-    public static void setDeploymentTurnsForReinforcements(List<Entity> entityList, int turnModifier,
+    public static void setDeploymentTurnsForReinforcements(Hangar hangar, Scenario scenario,
+                                                           List<Entity> entityList, int turnModifier,
                                                            boolean isDelayed) {
+        // Build a set of all player transported entities. We don't need to do this for NPC entities
+        // as how they're transported is different and their arrival times are better isolated when
+        // dealing with transported vs. untransported units.
+        Set<Entity> transportedEntities = new HashSet<>();
+
+        Map<UUID, List<UUID>> transportedIds = scenario.getPlayerTransportLinkages();
+        for (List<UUID> transportedUnitIds : transportedIds.values()) {
+            for (UUID transportedUnitId : transportedUnitIds) {
+                Entity entity = getEntityFromUnitId(hangar, transportedUnitId);
+                if (entity != null && entityList.contains(entity)) {
+                    transportedEntities.add(entity);
+                }
+            }
+        }
+
+        // That out of the way, we now calculate the arrival time for each entity
         int arrivalScale = REINFORCEMENT_ARRIVAL_SCALE;
 
         // First, we organize the reinforcements into pools.
@@ -4039,6 +4143,11 @@ public class AtBDynamicScenarioFactory {
 
         // first, we figure out the slowest "atb speed" of this group.
         for (Entity entity : entityList) {
+            // Skip transported units
+            if (transportedEntities.contains(entity)) {
+                continue;
+            }
+
             if (isDelayed) {
                 int forceId = entity.getForceId();
 
@@ -4048,11 +4157,6 @@ public class AtBDynamicScenarioFactory {
                     delayByForce.put(forceId, delayedArrivalScale);
                     arrivalScale = delayedArrivalScale;
                 }
-            }
-
-            // don't include transported units in this calculation
-            if (entity.getTransportId() != Entity.NONE) {
-                continue;
             }
 
             int speed = max(1, calculateAtBSpeed(entity));
@@ -4065,11 +4169,10 @@ public class AtBDynamicScenarioFactory {
             // commander's strategy skill level.
             int rollingArrivalTurn = max(0, (arrivalScale / speed) - turnModifier);
 
-            if (rollingArrivalTurn > actualArrivalTurn) {
-                actualArrivalTurn = rollingArrivalTurn;
-            }
+            actualArrivalTurn = max(rollingArrivalTurn, actualArrivalTurn);
         }
 
+        // Finally, we arrive the arrival times to each entity
         for (Entity entity : entityList) {
             entity.setDeployRound(actualArrivalTurn);
         }

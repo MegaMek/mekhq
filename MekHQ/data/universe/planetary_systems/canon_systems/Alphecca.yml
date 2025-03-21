@@ -3,9 +3,11 @@ sucsId: 89
 xcood: -46.79
 ycood: 61.987
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: A0V
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 planet:
   - name: Walker
     type: TERRESTRIAL
@@ -27,28 +29,32 @@ planet:
       value: Alphecca
     type: TERRESTRIAL
     orbitalDist: 8.12
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: wet11
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.18
-    diameter: 14933
-    density: 5.548993523411
+    diameter: 14939
+    density: 5.551085936211
     dayLength: 24
     yearLength: 23.2
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 34
     water:
-      source: canon
+      source: MWDA world profiles
       value: 83
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: AMPHIBIAN
     desc: |-
       From orbit, Alphecca is an unremarkable world of blue-green oceans, with a scattering of six island continents and a multitude of smaller chains that are covered half the time by mist and clouds. On the surface, the world‘s lands are equally plain, mostly consisting of rolling hills, the odd rocky mountain peak, and grassy plains. Though the climate varies from arctic tundra to tropical equatorial reaches, on close inspection nothing about Alphecca stands out from the hundreds of swirling worlds that mankind calls home. Lacking in significant, readily accessible natural resources, Alphecca proved suitable only for settlement as a quiet farming world, its primary exports being native grains and meat from the gillarg, a large, relatively dumb amphibian that many locals describe as “a cross between a cow and a cowardly, toothless alligator.”
@@ -58,28 +64,30 @@ planet:
       Alphecca‘s capital city, Galanette Rainbow, is located on the northernmost island continent of Gataka. The other northern continent, Rubekka, is home to the planet‘s largest seaport city, Fescher‘s Dock. Of the other four island continents, Greim, Korinthas, Mursank, and Shario, only the southern polar continent of Greim is unpopulated, due to its inhospitable climate.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Gataka
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Galanette Rainbow
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Greim
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Korinthas
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Mursank
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Rubekka
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Shario
     satellite:
-      - name: Xanti
+      - name:
+          source: MWDA world profiles
+          value: Xanti
         size: giant
         icon: rock16
     event:

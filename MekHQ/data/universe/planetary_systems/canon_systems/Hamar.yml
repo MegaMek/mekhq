@@ -3,9 +3,11 @@ sucsId: 3135
 xcood: 591.896
 ycood: 495.13
 spectralType:
-  source: canon
+  source: Interstellar Players, pg. 110
   value: K6V
-primarySlot: 7
+primarySlot:
+  source: Interstellar Players, pg. 110
+  value: 7
 event:
   - date: '2511-07-30'
     zenithCharge: yes
@@ -120,28 +122,30 @@ planet:
       value: Hamar
     type: TERRESTRIAL
     orbitalDist: 0.24
-    sysPos: 7
+    sysPos:
+      source: Interstellar Players, pg. 110
+      value: 7
     icon: wet8
     pressure:
-      source: canon
-      value: THIN
+      source: Interstellar Players, pg. 110
+      value: STANDARD
     atmosphere: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Interstellar Players, pg. 110
       value: 0.88
-    diameter: 13264
-    density: 4.654195791062
+    diameter: 13276
+    density: 4.658324889603
     dayLength: 19
     yearLength: 0.8
     temperature:
-      source: canon
+      source: Interstellar Players, pg. 110
       value: 25
     water:
-      source: canon
+      source: Interstellar Players, pg. 110
       value: 81
     lifeForm:
-      source: canon
+      source: Interstellar Players, pg. 110
       value: MAMMAL
     desc: Hamar is a planet split. The planet itself is icy and mostly desolate, it
       is made liveable by a series of volcanoes that feed the dual communities present
@@ -159,7 +163,9 @@ planet:
       - name: Lindland
       - name: Tayyib
     satellite:
-      - name: Jotunheim
+      - name:
+          source: Interstellar Players, pg. 110
+          value: Jotunheim
         size: medium
         icon: rock10
     event:

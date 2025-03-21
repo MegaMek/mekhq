@@ -3,9 +3,11 @@ sucsId: 901
 xcood: -64.275
 ycood: 107.739
 spectralType:
-  source: canon
+  source: FedCom Civil War, pg. 198
   value: M5V
-primarySlot: 6
+primarySlot:
+  source: FedCom Civil War, pg. 198
+  value: 6
 event:
   - date: '2406-03-24'
     nadirCharge: yes
@@ -124,28 +126,32 @@ planet:
       value: Freedom
     type: TERRESTRIAL
     orbitalDist: 0.08
-    sysPos: 6
+    sysPos:
+      source: FedCom Civil War, pg. 198
+      value: 6
     icon: green51
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 198
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 198
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 198
       value: 1.0
-    diameter: 14552
-    density: 4.850712500727
+    diameter: 14520
+    density: 4.839993685915
     dayLength: 27
     yearLength: 0.4
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 198
       value: 40
     water:
-      source: canon
+      source: FedCom Civil War, pg. 198
       value: 70
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 198
       value: MAMMAL
     desc: Freedom is famous for being ‘the planet that brought down the Terran Alliance’
       due to its importance in the events that led up to the collapse of the Alliance
@@ -158,16 +164,18 @@ planet:
       water purifiers that are used throughout the Inner Sphere.
     landmass:
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 198
           value: Independence
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 198
           value: Republic
         capital:
-          source: canon
+          source: FedCom Civil War, pg. 198
           value: Jefferson City
     satellite:
-      - name: Vigil’s Light
+      - name:
+          source: FedCom Civil War, pg. 198
+          value: Vigil's Light
         size: medium
         icon: oddmoon1
     event:

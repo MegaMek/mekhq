@@ -3,9 +3,11 @@ sucsId: 1045
 xcood: 64.875
 ycood: -43.47
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K2III
-primarySlot: 6
+primarySlot:
+  source: MWDA world profiles
+  value: 6
 event:
   - date: '2400-02-08'
     zenithCharge: yes
@@ -96,28 +98,32 @@ planet:
       value: Hamal
     type: TERRESTRIAL
     orbitalDist: 1.12
-    sysPos: 6
+    sysPos:
+      source: MWDA world profiles
+      value: 6
     icon: green38
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.8
-    diameter: 11040
-    density: 5.07496
+    diameter: 11059
+    density: 5.083702636195
     dayLength: 22
     yearLength: 1.5
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 10
     water:
-      source: canon
+      source: MWDA world profiles
       value: 40
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: |-
       3135 - Hamal is a cold desert world dominated by arid, frozen tundra and windstorms the locals call ―sand blizzards. Settlers from the highlands of Terra‘s South American continent established their only major city, Califa Hamal, on the planet‘s equator, where temperatures can reach above freezing. Hamal‘s surface is a single landmass with small, landlocked seas containing mostly crushed ice.
@@ -129,16 +135,22 @@ planet:
       During their Holy War, the Blakists found ready converts among the technologically poor tribes on Hamal, with some still loyal to Blakist theology to this day.
     landmass:
       - capital:
-          source: canon
+          source: MWDA world profiles
           value: Califa Hamal
     satellite:
-      - name: Arietis
+      - name:
+          source: MWDA world profiles
+          value: Arietis
         size: large
         icon: rock12
-      - name: Natih
+      - name:
+          source: MWDA world profiles
+          value: Natih
         size: large
         icon: rock4
-      - name: Ras
+      - name:
+          source: MWDA world profiles
+          value: Ras
         size: medium
         icon: oddmoon2
     event:

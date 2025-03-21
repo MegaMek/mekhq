@@ -3,9 +3,11 @@ sucsId: 2847
 xcood: -50.158
 ycood: -10.386
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 76'
   value: A4V
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Marik, pg. 76'
+  value: 3
 event:
   - date: '2405-05-09'
     zenithCharge: yes
@@ -46,28 +48,32 @@ planet:
       value: Zosma
     type: TERRESTRIAL
     orbitalDist: 3.36
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Marik, pg. 76'
+      value: 3
     icon: green28
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 76'
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 76'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 76'
       value: 1.21
-    diameter: 13175
-    density: 6.478975342366
+    diameter: 13150
+    density: 6.466568872267
     dayLength: 28
     yearLength: 6.3
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 76'
       value: 67
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 76'
       value: 22
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 76'
       value: PLANT
     desc: Zosma is poor in most resources and barely inhabitable, however an abundance
       of mineral deposits on its single continent and strategic military importance
@@ -75,10 +81,12 @@ planet:
       pressurized and radiation-shielded habitats to survive.
     landmass:
       - capital:
-          source: canon
+          source: 'Handbook: House Marik, pg. 76'
           value: Duhr Prime
     satellite:
-      - name: Brandeis
+      - name:
+          source: 'Handbook: House Marik, pg. 76'
+          value: Brandeis
         size: large
         icon: rock8
     event:

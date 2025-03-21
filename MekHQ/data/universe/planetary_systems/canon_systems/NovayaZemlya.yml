@@ -3,9 +3,11 @@ sucsId: 1901
 xcood: 180.681
 ycood: -183.311
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 90'
   value: G2IV
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Davion, pg. 90'
+  value: 4
 event:
   - date: '2366-09-13'
     zenithCharge: yes
@@ -65,29 +67,33 @@ planet:
       value: Novaya Zemlya
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Davion, pg. 90'
+      value: 4
     icon: green25
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 90'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 90'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
-      value: 1.05
-    diameter: 14911
-    density: 4.970501217477
+      source: 'Handbook: House Davion, pg. 90'
+      value: 1.04
+    diameter: 14807
+    density: 4.935904489245
     dayLength: 21
     yearLength: 2.3
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 90'
       value: 30
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 90'
       value: 48
     lifeForm:
-      source: canon
-      value: FISH
+      source: 'Handbook: House Davion, pg. 90'
+      value: PLANT
     desc: |-
       Novaya Zemlya was initially a prosperous and thriving planet which was initially colonized in the 23rd century, the planet remained independent until choosing to join the Federated Suns in 2325. Unfortunately the planet suffered a cataclysmic event in 2399, namely the first orbital bombardment in history. The Capellan Confederation, after suffering a series of humiliating military defeats to the Federated Suns, sent a fleet to raze the planet. The attacks wiped out nearly 75% of life on the planet and the survivors had to face massive radiation and the resulting nuclear winter. Even though relief aid arrived within days, recovery was slow despite the best efforts of the Federated Suns and later the Star League. The planet only started to truly began to thrive again in the 31st century after more than 600 years.
 
@@ -98,7 +104,7 @@ planet:
           source: canon
           value: Yushny
         capital:
-          source: canon
+          source: 'Handbook: House Davion, pg. 90'
           value: Arkangel
       - name:
           source: canon
@@ -110,13 +116,19 @@ planet:
           source: canon
           value: Severny
     satellite:
-      - name: Doriya
+      - name:
+          source: 'Handbook: House Davion, pg. 90'
+          value: Doriya
         size: medium
         icon: oddmoon2
-      - name: Kanto's Ground
+      - name:
+          source: 'Handbook: House Davion, pg. 90'
+          value: Kanto's Ground
         size: medium
         icon: oddmoon1
-      - name: Ust
+      - name:
+          source: 'Handbook: House Davion, pg. 90'
+          value: Ust
         size: medium
         icon: rock8
     event:

@@ -3,9 +3,11 @@ sucsId: 2053
 xcood: 3.354
 ycood: 160.222
 spectralType:
-  source: canon
+  source: House Steiner
   value: F9V
-primarySlot: 4
+primarySlot:
+  source: House Steiner
+  value: 4
 event:
   - date: '2357-09-18'
     zenithCharge: yes
@@ -81,7 +83,9 @@ planet:
       value: Port Moseby
     type: TERRESTRIAL
     orbitalDist: 1.76
-    sysPos: 4
+    sysPos:
+      source: House Steiner
+      value: 4
     icon: green19
     pressure:
       source: canon
@@ -102,7 +106,7 @@ planet:
       source: canon
       value: 65
     lifeForm:
-      source: canon
+      source: House Steiner
       value: MAMMAL
     desc: |-
       Port Moseby is a major trading hub between the Commonwealth and Combine. The planet has many sprawling cities with large spaceports that act as business and trade centers, jumpships and dropships are constantly streaming through the system bringing in and taking out more goods.

@@ -5,7 +5,9 @@ ycood: 300.325
 spectralType:
   source: canon
   value: G6V
-primarySlot: 3
+primarySlot:
+  source: Masters and Minions, pg. 122
+  value: 3
 event:
   - date: '2627-11-25'
     zenithCharge: yes
@@ -48,28 +50,32 @@ planet:
       value: Weingarten
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 3
+    sysPos:
+      source: Masters and Minions, pg. 122
+      value: 3
     icon: green48
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 122
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 122
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 122
       value: 1.0
-    diameter: 12343
-    density: 5.673977771546
+    diameter: 12364
+    density: 5.683774263195
     dayLength: 25
     yearLength: 1.3
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 122
       value: 33
     water:
-      source: canon
+      source: Masters and Minions, pg. 122
       value: 71
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 122
       value: MAMMAL
     desc: Weingarten is a beautiful planet with long mild growing seasons that make
       it ideal for agriculture, and for most of its history the planet was best known
@@ -102,7 +108,9 @@ planet:
           source: canon
           value: Neuberlin
     satellite:
-      - name: Weintraube
+      - name:
+          source: Masters and Minions, pg. 122
+          value: Weintraube
         size: giant
         icon: rock14
     event:

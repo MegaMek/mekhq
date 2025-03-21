@@ -3,9 +3,11 @@ sucsId: 1323
 xcood: -57.392
 ycood: 198.214
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 121
   value: F2V
-primarySlot: 4
+primarySlot:
+  source: Masters and Minions, pg. 121
+  value: 4
 event:
   - date: '2368-04-29'
     zenithCharge: yes
@@ -73,28 +75,32 @@ planet:
       value: Kelenfold
     type: TERRESTRIAL
     orbitalDist: 2.4
-    sysPos: 4
+    sysPos:
+      source: Masters and Minions, pg. 121
+      value: 4
     icon: green29
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 121
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 121
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 121
       value: 0.9
-    diameter: 14595
-    density: 4.324499820939
+    diameter: 14610
+    density: 4.329029221917
     dayLength: 22
     yearLength: 3.9
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 121
       value: 31
     water:
-      source: canon
+      source: Masters and Minions, pg. 121
       value: 68
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 121
       value: REPTILE
     desc: Kelenfold is an unremarkable planet with a thin atmosphere, a bright star
       and lower than standard-gravity due to its smaller size and lower density than

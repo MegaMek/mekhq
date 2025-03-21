@@ -3,9 +3,11 @@ sucsId: 2346
 xcood: -2.562
 ycood: -7.86
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 71'
   value: A1V
-primarySlot: 6
+primarySlot:
+  source: 'Handbook: House Marik, pg. 71'
+  value: 6
 event:
   - date: '2380-07-03'
     zenithCharge: yes
@@ -92,28 +94,32 @@ planet:
       value: Sirius
     type: TERRESTRIAL
     orbitalDist: 7.56
-    sysPos: 6
+    sysPos:
+      source: 'Handbook: House Marik, pg. 71'
+      value: 6
     icon: dry19
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 71'
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 71'
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 71'
       value: 1.1
-    diameter: 13558
-    density: 5.681033289538
+    diameter: 13583
+    density: 5.69135355563
     dayLength: 22
     yearLength: 20.9
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 71'
       value: 65
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 71'
       value: 16
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 71'
       value: PLANT
     desc: |-
       The Sirius system contains three inhabited planets, Sirius V, VI and VI-a (the 6th Planet’s moon). The oldest colonies are on Sirius VI-a, which is also the most comfortable for human life. All three planets have a thin atmosphere but only VI-a is breathable by humans. Sirius V and VI were colonized only when it became readily apparent that both contained a vast wealth of raw minerals and ores. Terraforming efforts greatly improved the livability of Sirius VI. The three planets form a symbiotic relationship where Sirius VI-a provides food for the two planets while the mineral wealth of Sirius V and VI bring trade to the system. Sirius was one of the major bases for industry during the time of the Star League. Unfortunately the Amaris Coup and the subsequent Succession Wars destroyed much of the manufacturing in the system and resulted in the loss of many of the domed and pressurized cities on Sirius V and VI respectively. Unfortunately the planet’s fortunes continued to fall during the 31st Century and by the 3060s most of the population live in scattered agrarian societies and Sirian V is nearly uninhabited.
@@ -132,13 +138,15 @@ planet:
           source: canon
           value: Sirius VI-a - Bounty
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Lost Hope
       - name:
           source: canon
           value: Hinterlands
     satellite:
-      - name: Sirius VI-a
+      - name:
+          source: 'Handbook: House Marik, pg. 71'
+          value: Sirius VI-a
         size: giant
         icon: rock8
     event:

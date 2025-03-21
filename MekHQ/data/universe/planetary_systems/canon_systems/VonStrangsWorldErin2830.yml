@@ -5,7 +5,9 @@ ycood: 515.891
 spectralType:
   source: canon
   value: M2V
-primarySlot: 4
+primarySlot:
+  source: Periphery (1ed), pg. 127
+  value: 4
 planet:
   - name: Ch'ang Mu
     type: TERRESTRIAL
@@ -69,7 +71,9 @@ planet:
       value: Erin
     type: TERRESTRIAL
     orbitalDist: 0.16
-    sysPos: 4
+    sysPos:
+      source: Periphery (1ed), pg. 127
+      value: 4
     icon: green7
     pressure: HIGH
     atmosphere: BREATHABLE
@@ -82,7 +86,7 @@ planet:
     temperature: 24
     water: 60
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 127
       value: MAMMAL
     desc: No description available.
     smallMoons: 3
@@ -251,10 +255,7 @@ planet:
           value:
             - IND
       - date: '2108-12-05'
-        name: Erin
       - date: '2830-01-01'
-        name: Von Strang's World
-        message: Erin renamed to Von Strang's World
   - name: Batchelor's Belt
     type: ASTEROID_BELT
     orbitalDist: 1.12

@@ -3,9 +3,11 @@ sucsId: 1816
 xcood: 266.497
 ycood: -110.836
 spectralType:
-  source: canon
+  source: 'Jihad Turning Points: New Avalon, pg. 3'
   value: G5V
-primarySlot: 4
+primarySlot:
+  source: 'Jihad Turning Points: New Avalon, pg. 3'
+  value: 4
 event:
   - date: '2392-10-27'
     nadirCharge: yes
@@ -75,28 +77,32 @@ planet:
       value: New Avalon
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 4
+    sysPos:
+      source: 'Jihad Turning Points: New Avalon, pg. 3'
+      value: 4
     icon: green41
     pressure:
-      source: canon
+      source: 'Jihad Turning Points: New Avalon, pg. 3'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Jihad Turning Points: New Avalon, pg. 3'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Jihad Turning Points: New Avalon, pg. 3'
       value: 1.0
-    diameter: 11674
-    density: 6.021173577655
+    diameter: 11673
+    density: 6.020521334621
     dayLength: 25
     yearLength: 1.1
     temperature:
-      source: canon
+      source: 'Jihad Turning Points: New Avalon, pg. 3'
       value: 30
     water:
-      source: canon
+      source: 'Jihad Turning Points: New Avalon, pg. 3'
       value: 60
     lifeForm:
-      source: canon
+      source: 'Jihad Turning Points: New Avalon, pg. 3'
       value: MAMMAL
     desc: |-
       Discovered in 2205 by the aptly named TAS Camelot, this lush planet quickly attracted colonists. Meanwhile, the native life was genetically altered to yield more Terran-like foodstuffs. New Avalon grew to become the breadbasket for worlds around it. This important role assisted Lucien Davion's rise to power and eventually resulted in the Davion family ruling the Federated Suns from this agricultural world and the planet is one of the core "Golden Five" worlds in the Federated Suns.
@@ -115,31 +121,34 @@ planet:
       Federated News Services
     landmass:
       - name:
-          source: canon
+          source: Masters and Minions, pg. 43
           value: Albion
         capital:
-          source: canon
+          source: 'Jihad Turning Points: New Avalon, pg. 3'
           value: Avalon City
       - name:
-          source: canon
-          value: New Hebrides
+          source: Masters and Minions, pg. 43
+          value: Brunswick
       - name:
-          source: canon
+          source: Masters and Minions, pg. 43
           value: New Scotland
       - name:
-          source: canon
+          source: Masters and Minions, pg. 43
           value: Rostock
-      - name:
-          source: canon
-          value: Brunswick
     satellite:
-      - name: Avatar
+      - name:
+          source: 'Jihad Turning Points: New Avalon, pg. 3'
+          value: Avatar
         size: large
         icon: rock4
-      - name: Galahad
+      - name:
+          source: 'Jihad Turning Points: New Avalon, pg. 3'
+          value: Galahad
         size: giant
         icon: rock6
-      - name: Valiant
+      - name:
+          source: 'Jihad Turning Points: New Avalon, pg. 3'
+          value: Valiant
         size: medium
         icon: rock2
     event:

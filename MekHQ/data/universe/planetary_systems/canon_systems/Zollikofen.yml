@@ -3,9 +3,11 @@ sucsId: 2845
 xcood: -28.959
 ycood: 19.339
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G3V
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2359-07-15'
     zenithCharge: yes
@@ -21,28 +23,32 @@ planet:
       value: Zollikofen
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: wet11
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.8
-    diameter: 12727
-    density: 4.414043370879
+    diameter: 12732
+    density: 4.415741484518
     dayLength: 27
     yearLength: 1.2
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 44
     water:
-      source: canon
+      source: MWDA world profiles
       value: 80
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: 3135 - Zollikofen, sometimes nicknamed “treasure planet” is perhaps one
       of the great oddities of the Inner Sphere. Like many of the better colonies
@@ -84,18 +90,11 @@ planet:
     smallMoons: 1
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Besitzland
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Fulbright
-    satellite:
-      - name: Rihm 1
-        size: medium
-        icon: oddmoon2
-      - name: Rihm 2
-        size: medium
-        icon: oddmoon1
     event:
       - date: '2270-09-01'
         faction:

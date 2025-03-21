@@ -3,9 +3,11 @@ sucsId: 773
 xcood: 67.969
 ycood: -370.238
 spectralType:
-  source: canon
+  source: 'Objective Raids: Capellan Confederation'
   value: G3V
-primarySlot: 5
+primarySlot:
+  source: 'Objective Raids: Capellan Confederation'
+  value: 5
 event:
   - date: '2652-06-10'
     zenithCharge: yes
@@ -91,28 +93,32 @@ planet:
       value: Egress
     type: TERRESTRIAL
     orbitalDist: 1.0
-    sysPos: 5
+    sysPos:
+      source: 'Objective Raids: Capellan Confederation'
+      value: 5
     icon: green22
     pressure:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Objective Raids: Capellan Confederation'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 1.0
-    diameter: 13393
-    density: 5.252257314389
+    diameter: 13387
+    density: 5.249735630432
     dayLength: 17
     yearLength: 1.4
     temperature:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 35
     water:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 41
     lifeForm:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: BIRD
     desc: Egress has a relatively comfortable temperate-tropical climate, however
       the higher than standard pressure can make it somewhat unpleasant for visitors
@@ -122,18 +128,14 @@ planet:
       RTC, which focuses on training vehicle crews and unarmored infantry.
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Bowie
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Smith
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Hilt
-    satellite:
-      - name: Chang Sheng
-        size: medium
-        icon: oddmoon3
     event:
       - date: '2598-09-01'
         faction:

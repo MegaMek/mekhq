@@ -3,9 +3,11 @@ sucsId: 2747
 xcood: -5.436
 ycood: -276.084
 spectralType:
-  source: canon
+  source: 'Handbook: House Liao, pg. 80'
   value: G3V
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Liao, pg. 80'
+  value: 2
 event:
   - date: '2367-04-02'
     zenithCharge: yes
@@ -39,28 +41,32 @@ planet:
       value: Westerhand
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Liao, pg. 80'
+      value: 2
     icon: green1
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 80'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 80'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 80'
       value: 0.93
-    diameter: 16411
-    density: 3.978666514555
+    diameter: 16419
+    density: 3.980577570661
     dayLength: 17
     yearLength: 1.2
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 80'
       value: 49
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 80'
       value: 66
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 80'
       value: MAMMAL
     desc: |-
       Hotter and drier than the Game World itself, with nowhere near the universal renown, Westerhand has nonetheless remained a haven for various mercenary commands despite an increasingly competitive hiring market. Located in the Sian Commonality of the Capellan Confederation, just one jump shy of the Free Worlds League's Duchy of Andurien, this world first came into use as a mercenary recruitment center during the reign of Chancellor Maximilian Liao, though the original intent was not aimed at the mercenary profession at all, but rather at stimulating an entertainment industry similar to the Solaris Games.
@@ -72,22 +78,28 @@ planet:
       Presently, aside from the Games and the Hiring Hall, Westerhand does not feature training facilities, but a number of local and offworld agencies have expressed an interest in establishing either specialized, bare-bones martial colleges or even a full-scale military university catering to the mercenary profession. Furthermore, rumors have begun to circulate that the Westerhand Hiring Hall may seek MRBC sanction in order to improve its standing as a place for professional soldiers to do business.
     landmass:
       - name:
-          source: canon
+          source: Mercenaries Supplemental, pg. 14
+          value: Garringer
+      - name:
+          source: Mercenaries Supplemental, pg. 14
           value: Keystone
         capital:
-          source: canon
+          source: 'Handbook: House Liao, pg. 80'
           value: Victory City
-      - name:
-          source: canon
-          value: Garringer
     satellite:
-      - name: Delsia
+      - name:
+          source: 'Handbook: House Liao, pg. 80'
+          value: Delsia
         size: large
         icon: rock16
-      - name: Ralston
+      - name:
+          source: 'Handbook: House Liao, pg. 80'
+          value: Ralston
         size: medium
         icon: rock13
-      - name: Vannora
+      - name:
+          source: 'Handbook: House Liao, pg. 80'
+          value: Vannora
         size: large
         icon: rock9
     event:

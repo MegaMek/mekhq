@@ -3,9 +3,11 @@ sucsId: 491
 xcood: 317.678
 ycood: 79.828
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 99'
   value: M5Ia
-primarySlot: 1
+primarySlot:
+  source: 'Handbook: House Davion, pg. 99'
+  value: 1
 event:
   - date: '2353-09-17'
     nadirCharge: yes
@@ -15,28 +17,32 @@ planet:
       value: Cassias
     type: TERRESTRIAL
     orbitalDist: 0.14
-    sysPos: 1
+    sysPos:
+      source: 'Handbook: House Davion, pg. 99'
+      value: 1
     icon: green10
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 99'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 99'
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 99'
       value: 1.1
-    diameter: 12110
-    density: 6.402168517096
+    diameter: 12092
+    density: 6.392801099159
     dayLength: 21
     yearLength: 0.5
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 99'
       value: 45
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 99'
       value: 30
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 99'
       value: AMPHIBIAN
     desc: |-
       Cassias is a tropical world with a moderate population. The planet sits on the border of the Federated Suns and the Draconis Combine, however the planet is also on the unofficial border of the Federated Suns’ “civilized space” and outback. Due to a high concentration of nitrogen in the atmosphere early settlers were forced to live in domed cities, however atmosphere processors on Cassias have since made the air breathable by humans and removed the need for the domes. The three continents of Cassias are all mountainous and covered by thick jungles.
@@ -44,30 +50,38 @@ planet:
       Agriculture is an important industry on Cassias, though it rarely produces foodstuffs, the primary exports are rubber, textiles and timber. The planet also has a thriving metal and natural gas industry. However, the primary importance of Cassias to the Federated Suns has always been the planet’s location on the border with the Combine, as a result the AFFS have always maintained a presence on Cassias.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Davion, pg. 99'
           value: Borneo
       - name:
-          source: canon
+          source: 'Handbook: House Davion, pg. 99'
           value: Java
         capital:
-          source: canon
-          value: Jakarta City
+          source: FedCom Civil War, pg. 190
+          value: New Jakarta City
       - name:
-          source: canon
+          source: 'Handbook: House Davion, pg. 99'
           value: Kalimantan
     satellite:
-      - name: Ramah
-        size: medium
-        icon: oddmoon1
-      - name: Bambang
+      - name:
+          source: 'Handbook: House Davion, pg. 99'
+          value: Bambang
         size: medium
         icon: oddmoon2
-      - name: Budiono
+      - name:
+          source: 'Handbook: House Davion, pg. 99'
+          value: Budiono
         size: large
         icon: rock8
-      - name: Kinjuri
+      - name:
+          source: 'Handbook: House Davion, pg. 99'
+          value: Kinjuri
         size: medium
         icon: rock5
+      - name:
+          source: 'Handbook: House Davion, pg. 99'
+          value: Ramah
+        size: medium
+        icon: oddmoon1
     event:
       - date: '2340-05-01'
         faction:

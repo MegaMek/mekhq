@@ -3,9 +3,11 @@ sucsId: 1338
 xcood: -125.089
 ycood: -105.506
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 61'
   value: F6V
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Marik, pg. 61'
+  value: 2
 event:
   - date: '2372-06-21'
     nadirCharge: yes
@@ -41,28 +43,32 @@ planet:
       value: Keystone
     type: TERRESTRIAL
     orbitalDist: 1.3
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Marik, pg. 61'
+      value: 2
     icon: green21
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 61'
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 61'
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 61'
       value: 1.1
-    diameter: 11776
-    density: 6.542769626274
+    diameter: 11796
+    density: 6.553625631014
     dayLength: 22
     yearLength: 1.9
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 61'
       value: 35
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 61'
       value: 35
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 61'
       value: PLANT
     desc: |-
       Keystone was never a comfortable world to live on and centuries of heavy industrial output have not improved the planet’s livability. The planet was originally settled to take advantage of large deposits of raw metals and a large number of heavy industries were built up to make use of the minerals mined from the planet. While the mineral deposits have since dried up, the factories remain and Keystone continued to be an industrial powerhouse in the Free Worlds League.
@@ -83,7 +89,9 @@ planet:
           source: canon
           value: Darras
     satellite:
-      - name: Ea
+      - name:
+          source: 'Handbook: House Marik, pg. 61'
+          value: Ea
         size: large
         icon: rock7
     event:
