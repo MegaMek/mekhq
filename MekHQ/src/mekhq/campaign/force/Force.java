@@ -1128,23 +1128,23 @@ public class Force {
     }
 
     /**
-     * Determines whether a convoy consists solely of VTOL (Vertical Take-Off and Landing) or WIGE
+     * Determines whether a force consists solely of VTOL (Vertical Take-Off and Landing) or WIGE
      * (Wing in Ground Effect) units.
      *
-     * <p>This method evaluates the convoy by checking each unit to verify that all resolved units
+     * <p>This method evaluates the force by checking each unit to verify that all resolved units
      * are either VTOLs or WIGE units.</p>
      *
      * <p><strong>Behavior:</strong></p>
      * <ul>
-     *   <li>Retrieves all units in the convoy based on the {@code standardForcesOnly} flag.</li>
+     *   <li>Retrieves all units in the force based on the {@code standardForcesOnly} flag.</li>
      *   <li>Skips any unit that cannot be resolved (null entity).</li>
      *   <li>Returns {@code false} if any resolved unit is not categorized as a VTOL or WIGE unit.</li>
      *   <li>Returns {@code true} if all resolved units meet the VTOL or WIGE criteria.</li>
      * </ul>
      *
      * @param hangar             The {@link Hangar} instance from which to retrieve the {@link Unit}.
-     * @param standardForcesOnly A flag to filter and include only standard forces from the convoy.
-     * @return {@code true} if all resolved units in the convoy are VTOL or WIGE units, {@code false} otherwise.
+     * @param standardForcesOnly A flag to filter and include only standard forces from the force.
+     * @return {@code true} if all resolved units in the force are VTOL or WIGE units, {@code false} otherwise.
      */
     public boolean forceContainsOnlyVTOLForces(Hangar hangar, boolean standardForcesOnly) {
         for (UUID unitId : getAllUnits(standardForcesOnly)) {
@@ -1163,37 +1163,37 @@ public class Force {
     }
 
     /**
-     * Determines whether a convoy contains a majority of VTOL (Vertical Take-Off and Landing) or WIGE
+     * Determines whether a force contains a majority of VTOL (Vertical Take-Off and Landing) or WIGE
      * (Wing in Ground Effect) units.
      *
-     * <p>This method evaluates the convoy by calculating whether at least half of the resolved units
-     * in the convoy are categorized as VTOLs or WIGE units.</p>
+     * <p>This method evaluates the force by calculating whether at least half of the resolved units
+     * in the force are categorized as VTOLs or WIGE units.</p>
      *
      * <p><strong>Behavior:</strong></p>
      * <ul>
-     *   <li>Retrieves all units in the convoy based on the {@code standardForcesOnly} flag.</li>
+     *   <li>Retrieves all units in the force based on the {@code standardForcesOnly} flag.</li>
      *   <li>Counts the number of units categorized as airborne VTOL or WIGE.</li>
-     *   <li>Adjusts the total convoy size if unresolved (null) entities are skipped without counting
+     *   <li>Adjusts the total force size if unresolved (null) entities are skipped without counting
      *       them toward the total size.</li>
      *   <li>Stops counting early if a majority of VTOL or WIGE units is determined before evaluating
      *       all entities.</li>
      * </ul>
      *
      * @param hangar             The {@link Hangar} instance from which to retrieve the {@link Unit}.
-     * @param standardForcesOnly A flag to filter and include only standard forces from the convoy.
-     * @return {@code true} if VTOL or WIGE units constitute at least half of the resolved convoy units,
+     * @param standardForcesOnly A flag to filter and include only standard forces from the force.
+     * @return {@code true} if VTOL or WIGE units constitute at least half of the resolved force units,
      *         {@code false} otherwise.
      */
     public boolean forceContainsMajorityVTOLForces(Hangar hangar, boolean standardForcesOnly) {
         Vector<UUID> allUnits = getAllUnits(standardForcesOnly);
-        int convoySize = allUnits.size();
+        int forceSize = allUnits.size();
         int vtolCount = 0;
 
         for (UUID unitId : allUnits) {
             Entity entity = getEntityFromUnitId(hangar, unitId);
 
             if (entity == null) {
-                convoySize--;
+                forceSize--;
                 continue;
             }
 
@@ -1201,37 +1201,37 @@ public class Force {
                 vtolCount++;
             }
 
-            if (vtolCount >= convoySize / 2) {
+            if (vtolCount >= forceSize / 2) {
                 break;
             }
         }
 
-        return vtolCount >= floor((double) convoySize / 2);
+        return vtolCount >= floor((double) forceSize / 2);
     }
 
     /**
-     * Determines whether a convoy contains only aerospace or conventional fighters.
+     * Determines whether a force contains only aerospace or conventional fighters.
      *
-     * <p>This method checks all units in the convoy to confirm if they consist exclusively of aerial
+     * <p>This method checks all units in the force to confirm if they consist exclusively of aerial
      * units based on their type.</p>
      *
      * <p><strong>Behavior:</strong></p>
      * <ul>
-     *   <li>Filters the convoy's units based on the {@code standardForcesOnly} flag.</li>
-     *   <li>Iterates through all selected units in the convoy.</li>
+     *   <li>Filters the force's units based on the {@code standardForcesOnly} flag.</li>
+     *   <li>Iterates through all selected units in the force.</li>
      *   <li>Skips any unit that cannot be resolved (null entity).</li>
-     *   <li>If {@code excludeConventionalFighters} is {@code true} and the convoy contains any
+     *   <li>If {@code excludeConventionalFighters} is {@code true} and the force contains any
      *       conventional fighters, the method immediately returns {@code false}.</li>
-     *   <li>Returns {@code false} if any unit in the convoy is not an aerial unit (i.e., not an aerospace
+     *   <li>Returns {@code false} if any unit in the force is not an aerial unit (i.e., not an aerospace
      *       unit or conventional fighter).</li>
-     *   <li>Returns {@code true} if all units in the convoy meet the aerial unit criteria.</li>
+     *   <li>Returns {@code true} if all units in the force meet the aerial unit criteria.</li>
      * </ul>
      *
      * @param hangar                     The {@link Hangar} instance from which to retrieve the {@link Unit}.
-     * @param standardForcesOnly         A flag to filter and include only standard forces from the convoy.
+     * @param standardForcesOnly         A flag to filter and include only standard forces from the force.
      * @param excludeConventionalFighters A flag determining if conventional fighters should be excluded from
      *                                    the assessment.
-     * @return {@code true} if the convoy consists only of aerial units (respecting the provided filters),
+     * @return {@code true} if the force consists only of aerial units (respecting the provided filters),
      *         {@code false} otherwise.
      */
     public boolean forceContainsOnlyAerialForces(Hangar hangar, boolean standardForcesOnly,
