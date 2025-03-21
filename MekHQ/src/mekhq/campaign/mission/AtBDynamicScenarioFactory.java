@@ -1529,6 +1529,7 @@ public class AtBDynamicScenarioFactory {
                     if (template.getForceName().equals(templateName)) {
                         forceTemplate = template;
                         scenario.getBotForceTemplates().put(force, forceTemplate);
+                        break;
                     }
                 }
             }
