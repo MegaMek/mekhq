@@ -1713,7 +1713,7 @@ public class StratconRulesManager {
         boolean aerospaceOnly = false;
         if (airborneOnly) {
             aerospaceOnly = force.forceContainsOnlyAerialForces(hangar, false,
-                  false);
+                  true);
         }
 
         if (aerospaceOnly && (randomInt(3) == 0)) {
@@ -1953,7 +1953,7 @@ public class StratconRulesManager {
             aerospaceOnly = false;
             if (airborneOnly) {
                 aerospaceOnly = force.forceContainsOnlyAerialForces(hangar, false,
-                      false);
+                      true);
             }
 
             if (aerospaceOnly) {
