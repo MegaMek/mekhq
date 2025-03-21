@@ -3,9 +3,11 @@ sucsId: 2308
 xcood: -88.149
 ycood: -4.964
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 72'
   value: A8V
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Marik, pg. 72'
+  value: 4
 event:
   - date: '2389-02-14'
     zenithCharge: yes
@@ -65,28 +67,32 @@ planet:
       value: Shiloh
     type: TERRESTRIAL
     orbitalDist: 2.88
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Marik, pg. 72'
+      value: 4
     icon: dry24
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 72'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 72'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 72'
       value: 1.11
-    diameter: 12433
-    density: 6.259673773512
+    diameter: 12447
+    density: 6.266899690524
     dayLength: 24
     yearLength: 5.1
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 72'
       value: 55
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 72'
       value: 15
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 72'
       value: PLANT
     desc: |-
       Shiloh is a harsh and desolate planet and is home to the Exituri, an anti-technology cult. The planet was first colonized in 2138 and has changed little since the earliest days. The land is tiled by oxen and plows and the planet actively shuns modern conveniences and technologies. Aside from a tightly controlled Spaceport, the population of Shiloh has limited connection to the rest of the Inner Sphere. The planet has the highest birthrate in the Free Worlds League, however this is offset by the high rate of childhood mortality due to the lack of modern medicine. The planet’s primary exports are wood and bone carvings, textiles and metal works.
@@ -95,8 +101,8 @@ planet:
     smallMoons: 2
     landmass:
       - capital:
-          source: canon
-          value: Randersville
+          source: 'Handbook: House Marik, pg. 72'
+          value: Vedic
     event:
       - date: '2215-05-30'
         faction:

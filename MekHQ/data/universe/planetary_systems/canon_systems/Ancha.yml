@@ -3,9 +3,11 @@ sucsId: 126
 xcood: 75.47
 ycood: 36.138
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G3VI
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2352-10-02'
     zenithCharge: yes
@@ -21,28 +23,32 @@ planet:
       value: Ancha
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: green47
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.08
-    diameter: 13434
-    density: 5.629150620232
+    diameter: 13458
+    density: 5.639414427274
     dayLength: 24
     yearLength: 2.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 32
     water:
-      source: canon
+      source: MWDA world profiles
       value: 44
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: BIRD
     desc: The first colonies established on Ancha failed when an undetected viral
       taint decimated their numbers and left the survivors frail and sterile. With
@@ -60,16 +66,18 @@ planet:
       city of Armitage.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
+          value: Gastiogne
+      - name:
+          source: MWDA world profiles
           value: Normandy
         capital:
-          source: canon
+          source: MWDA world profiles
           value: New Summit
-      - name:
-          source: canon
-          value: Gastiogne
     satellite:
-      - name: Bromi
+      - name:
+          source: MWDA world profiles
+          value: Bromi
         size: large
         icon: rock6
     event:

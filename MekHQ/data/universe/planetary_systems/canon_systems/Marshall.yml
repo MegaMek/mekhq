@@ -5,7 +5,9 @@ ycood: 1792.14
 spectralType:
   source: canon
   value: M8V
-primarySlot: 3
+primarySlot:
+  source: 25 Years of Art and Fiction, pg. 157
+  value: 3
 event:
   - date: '2821-08-23'
     zenithCharge: yes
@@ -47,28 +49,32 @@ planet:
       value: Marshall
     type: TERRESTRIAL
     orbitalDist: 0.04
-    sysPos: 3
+    sysPos:
+      source: 25 Years of Art and Fiction, pg. 157
+      value: 3
     icon: green46
     pressure:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 157
       value: STANDARD
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: 25 Years of Art and Fiction, pg. 157
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 157
       value: 1.1
-    diameter: 13080
-    density: 5.902660443605
+    diameter: 13088
+    density: 5.906357651826
     dayLength: 21
     yearLength: 0.3
     temperature:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 157
       value: 30
     water:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 157
       value: 50
     lifeForm:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 157
       value: REPTILE
     desc: No description available for Marshall. The system's 4th planet, Xian, is
       also inhabited and has a single satellite named Diamondstar and the highest

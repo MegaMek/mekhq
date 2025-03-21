@@ -3,9 +3,11 @@ sucsId: 2954
 xcood: 120.807
 ycood: 1784.439
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 109
   value: F2II
-primarySlot: 2
+primarySlot:
+  source: Warriors of Kerensky, pg. 109
+  value: 2
 event:
   - date: '2808-12-25'
     nadirCharge: yes
@@ -31,41 +33,45 @@ planet:
       value: New Kent
     type: TERRESTRIAL
     orbitalDist: 4.2
-    sysPos: 2
+    sysPos:
+      source: Warriors of Kerensky, pg. 109
+      value: 2
     icon: green46
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 109
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 109
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 109
       value: 1.5
-    diameter: 16635
-    density: 6.332155343379
+    diameter: 16641
+    density: 6.33451513099
     dayLength: 22
     yearLength: 8.7
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 109
       value: 40
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 109
       value: 40
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 109
       value: AMPHIBIAN
     desc: No description available.
     smallMoons: 2
     landmass:
       - name:
-          source: canon
+          source: Warriors of Kerensky, pg. 109
           value: Celebes
       - name:
-          source: canon
-          value: Kang
-      - name:
-          source: canon
+          source: Warriors of Kerensky, pg. 109
           value: Ionia
+      - name:
+          source: Warriors of Kerensky, pg. 109
+          value: Kang
     event:
       - date: '2802-04-05'
         faction:

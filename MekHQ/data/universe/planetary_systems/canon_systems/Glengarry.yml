@@ -3,9 +3,11 @@ sucsId: 965
 xcood: -76.782
 ycood: 76.984
 spectralType:
-  source: canon
+  source: 'Historical Turning Point: Glengarry, pg. 3'
   value: K1IV
-primarySlot: 3
+primarySlot:
+  source: 'Historical Turning Point: Glengarry, pg. 3'
+  value: 3
 planet:
   - name: Y1R-1
     type: DWARF_TERRESTRIAL
@@ -43,28 +45,32 @@ planet:
       value: Glengarry
     type: TERRESTRIAL
     orbitalDist: 0.8
-    sysPos: 3
+    sysPos:
+      source: 'Historical Turning Point: Glengarry, pg. 3'
+      value: 3
     icon: green37
     pressure:
-      source: canon
+      source: 'Historical Turning Point: Glengarry, pg. 3'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Historical Turning Point: Glengarry, pg. 3'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Historical Turning Point: Glengarry, pg. 3'
       value: 0.97
-    diameter: 11741
-    density: 5.814192107692
+    diameter: 11733
+    density: 5.810070234633
     dayLength: 18
     yearLength: 1.1
     temperature:
-      source: canon
+      source: 'Historical Turning Point: Glengarry, pg. 3'
       value: 29
     water:
-      source: canon
+      source: 'Historical Turning Point: Glengarry, pg. 3'
       value: 65
     lifeForm:
-      source: canon
+      source: 'Historical Turning Point: Glengarry, pg. 3'
       value: REPTILE
     desc: |-
       A small world of terrestrial features, blessed with abundant resources, it is rather surprising in hindsight to know that this world was completely overlooked in the early years of colonization. With three large landmasses claiming most of the northern hemisphere, and deep, island-speckled oceans in the south, this cool world was a paradise just waiting to be discovered. In truth, infighting among the various private interests who were to mount the first expedition to Glengarry, complicated by the increasing friction between the Terran Alliance and its far-flung colonies, disrupted any efforts to settle the planet during the early days of humanity‘s expansion among the stars. To make matters worse, later surveys revealed dangerously high levels of arsenic and cyanide gases in the atmosphere, which first had to be cleansed in order to make the planet suitable for colonization. These factors kept settlers away until the early days of the Star League, when terraforming efforts by the nearby Federation of Skye finally cleansed the atmosphere of its toxic chemicals. Glengarry‘s first settlers hailed from a mix of Scottish, Norwegian, and Canadian origins, both native to Terra and from among the Skye Federation‘s populace. Drawn originally to the continent of Scotia, the smallest of the three northern hemispheric land masses, by its abundant ore resources in the mountain ranges, and the fertile soils of the valleys and lowlands, these colonists quickly established strict development guidelines to preserve the planet‘s native splendor. Similar to the “zoning laws” used in other Federation worlds, such as Skye itself, thecolonists created a self-perpetuating standard that has left the larger two continents, Dalraida and Pictland, virtually uninhabited even today, while Scotia eventually became a well-balanced center for light industrial, commercial, and agricultural development.
@@ -74,19 +80,21 @@ planet:
       The capital city, Dunkeld, a sprawling metropolis as big as any capital on a major planet, lies under the shadow of Castle Hill, site of fortifications that were built during the peak of the Star League era. The ruins of these fortifications, which still bear the black scorching and weatherworn pockmarks of the fanatics‘ last stand against allied forces during the Jihad, now stand as silent tribute to one of humanity‘s darkest hours.
     landmass:
       - name:
-          source: canon
-          value: Dalraida
-        capital:
-          source: canon
-          value: Dunkeld
+          source: 'Historical Turning Point: Glengarry, pg. 3'
+          value: Dalriada
       - name:
-          source: canon
+          source: 'Historical Turning Point: Glengarry, pg. 3'
           value: Pictland
       - name:
-          source: canon
+          source: 'Historical Turning Point: Glengarry, pg. 3'
           value: Scotia
+        capital:
+          source: 'Historical Turning Point: Glengarry, pg. 3'
+          value: Dunkeld
     satellite:
-      - name: Celine
+      - name:
+          source: 'Historical Turning Point: Glengarry, pg. 3'
+          value: Celine
         size: medium
         icon: oddmoon1
     event:

@@ -3,9 +3,11 @@ sucsId: 1604
 xcood: -58.94
 ycood: -15.558
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G1IV
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2389-02-12'
     zenithCharge: yes
@@ -69,28 +71,32 @@ planet:
       value: Marcus
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: green46
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.12
-    diameter: 14634
-    density: 5.420059887153
+    diameter: 14578
+    density: 5.399243314313
     dayLength: 17
     yearLength: 2.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 48
     water:
-      source: canon
+      source: MWDA world profiles
       value: 65
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       3135 - Marcus is a heavy world with an oppressive atmosphere and mountains squashed into rolling hills. However, Marcus was an irresistible colonisation target in the early days of exploration, due to its abundance of radioactive and industrial mineral resources. The city of Zotikos stands again on the northern continent of Montezumia, and is host to the planet's primary spaceport.
@@ -100,22 +106,33 @@ planet:
       The Word of Blake Jihad initially overlooked the planet, but later in the Jihad, Word of Blake troops, hoping to cut off a coalition counteroffensive, smashed the planetary capital of Zotikos and fought a fierce, but doomed, battle for control of the Wahryn uranium mines. Zotikos was subsequently rebuilt after the end of the Jihad.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Montezumia
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Zotikos
+      - name:
+          source: MWDA world profiles
+          value: Wahryn
     satellite:
-      - name: Bandi
+      - name:
+          source: MWDA world profiles
+          value: Bandi
         size: medium
         icon: oddmoon1
-      - name: Cele
+      - name:
+          source: MWDA world profiles
+          value: Cele
         size: medium
         icon: rock8
-      - name: Palila
+      - name:
+          source: MWDA world profiles
+          value: Palila
         size: medium
         icon: oddmoon2
-      - name: Washi
+      - name:
+          source: MWDA world profiles
+          value: Washi
         size: medium
         icon: rock3
     event:

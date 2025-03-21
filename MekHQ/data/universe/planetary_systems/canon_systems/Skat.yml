@@ -3,9 +3,11 @@ sucsId: 2350
 xcood: 93.311
 ycood: 26.833
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F7V
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2350-03-27'
     nadirCharge: yes
@@ -57,28 +59,32 @@ planet:
       value: Skat
     type: TERRESTRIAL
     orbitalDist: 1.3
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green31
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.22
-    diameter: 13971
-    density: 6.146833575554
+    diameter: 13960
+    density: 6.141794300263
     dayLength: 18
     yearLength: 1.9
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 33
     water:
-      source: canon
-      value: 58
+      source: MWDA world profiles
+      value: 57
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: FISH
     desc: In most respects, Skat is an unremarkable world with four large continents
       covering almost half the planetary surface, three tiny asteroid moons in close
@@ -102,31 +108,37 @@ planet:
       while the city of Londerhalt is arguably the planet‘s largest industrial center.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Freiheim
         capital:
-          source: canon
-          value: Aneheim
+          source: MWDA world profiles
+          value: Aneheim;Inyong City
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Quayling
         capital:
           source: canon
           value: Inyong City
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Uchida
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Unzervalt
     satellite:
-      - name: Tanaka
-        size: giant
-        icon: rock8
-      - name: Escholtz
+      - name:
+          source: MWDA world profiles
+          value: Escholtz
         size: large
         icon: rock6
-      - name: Vance
+      - name:
+          source: MWDA world profiles
+          value: Tanaka
+        size: giant
+        icon: rock8
+      - name:
+          source: MWDA world profiles
+          value: Vance
         size: medium
         icon: rock14
     event:

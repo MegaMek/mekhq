@@ -3,9 +3,11 @@ sucsId: 1596
 xcood: 189.215
 ycood: -71.907
 spectralType:
-  source: canon
+  source: House Davion
   value: F5V
-primarySlot: 4
+primarySlot:
+  source: House Davion
+  value: 4
 event:
   - date: '2405-05-07'
     nadirCharge: yes
@@ -72,7 +74,9 @@ planet:
       value: Manteno
     type: TERRESTRIAL
     orbitalDist: 2.24
-    sysPos: 4
+    sysPos:
+      source: House Davion
+      value: 4
     icon: green36
     pressure: HIGH
     atmosphere: BREATHABLE
@@ -85,7 +89,7 @@ planet:
     temperature: 22
     water: 38
     lifeForm:
-      source: canon
+      source: House Davion
       value: MAMMAL
     desc: For most of its history, Manteno was a stable and comfortable world with
       vast deposits of minerals, ores and other raw materials. The rich deposits of

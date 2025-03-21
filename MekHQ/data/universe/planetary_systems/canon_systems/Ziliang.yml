@@ -3,9 +3,11 @@ sucsId: 2838
 xcood: 68.494
 ycood: -264.187
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 92'
   value: M6Ib
-primarySlot: 5
+primarySlot:
+  source: 'Handbook: House Davion, pg. 92'
+  value: 5
 event:
   - date: '2352-03-26'
     nadirCharge: yes
@@ -101,28 +103,32 @@ planet:
       value: Ziliang
     type: TERRESTRIAL
     orbitalDist: 0.08
-    sysPos: 5
+    sysPos:
+      source: 'Handbook: House Davion, pg. 92'
+      value: 5
     icon: green21
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 92'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 92'
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 92'
       value: 1.2
-    diameter: 14047
-    density: 6.029613901764
+    diameter: 14017
+    density: 6.016542020294
     dayLength: 26
     yearLength: 0.4
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 92'
       value: 47
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 92'
       value: 27
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 92'
       value: INSECT
     desc: Ziliang was primarily an unimportant backwater planet with a harsh climate
       supported primarily by mining. Located in the interior of the Capellan Confederation
@@ -137,10 +143,6 @@ planet:
       - name: Moore's Field Alpha
         capital: Yah's Glory Prime
       - name: Moore's Field Beta
-    satellite:
-      - name: Galeotes
-        size: medium
-        icon: oddmoon2
     event:
       - date: '2279-07-26'
         faction:

@@ -5,7 +5,9 @@ ycood: 481.099
 spectralType:
   source: canon
   value: K4V
-primarySlot: 5
+primarySlot:
+  source: Periphery (1ed), pg. 153
+  value: 5
 planet:
   - name: Montlhéry
     type: TERRESTRIAL
@@ -75,7 +77,9 @@ planet:
       value: Santander V (Santander's World)
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 5
+    sysPos:
+      source: Periphery (1ed), pg. 153
+      value: 5
     icon: green40
     pressure: THIN
     atmosphere: BREATHABLE
@@ -88,7 +92,7 @@ planet:
     temperature: 31
     water: 42
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 153
       value: PLANT
     desc: No description available.
     landmass:

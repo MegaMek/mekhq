@@ -3,9 +3,11 @@ sucsId: 1677
 xcood: -38.289
 ycood: 22.951
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K0IV
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 planet:
   - name: Mutta
     type: GIANT_TERRESTRIAL
@@ -32,28 +34,32 @@ planet:
       value: Menkent
     type: TERRESTRIAL
     orbitalDist: 1.28
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green55
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.83
-    diameter: 10511
-    density: 5.568522117956
+    diameter: 10493
+    density: 5.558919350236
     dayLength: 20
     yearLength: 1.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 63
     water:
-      source: canon
+      source: MWDA world profiles
       value: 47
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: 3135 - Many of the locals on Menkent refer to their world as the burial
       site of the Marsden dynasty, thanks to the heroic death of the Lyran Commonwealth‘s
@@ -84,16 +90,16 @@ planet:
       both are far less densely populated.
     landmass:
       - name:
-          source: canon
-          value: Areseppi
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Aphirojia
       - name:
-          source: canon
+          source: MWDA world profiles
+          value: Areseppi
+      - name:
+          source: MWDA world profiles
           value: Terrasota
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Blackstone
     event:
       - date: '2169-10-07'

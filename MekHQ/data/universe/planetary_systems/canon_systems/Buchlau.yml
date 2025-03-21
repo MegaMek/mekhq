@@ -3,9 +3,11 @@ sucsId: 412
 xcood: 70.048
 ycood: -68.804
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F5II
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2372-10-14'
     zenithCharge: yes
@@ -52,28 +54,32 @@ planet:
       value: Buchlau
     type: TERRESTRIAL
     orbitalDist: 3.92
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green4
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.2
-    diameter: 13341
-    density: 6.321787401751
+    diameter: 13340
+    density: 6.321494215777
     dayLength: 22
     yearLength: 7.9
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 30
     water:
-      source: canon
+      source: MWDA world profiles
       value: 68
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: FISH
     desc: |-
       3135 - Buchlau was originally a member of the Tikonov Grand Union. Buchlau's only continent, Vienna, is covered with dense jungle, with a large mountain mesa, nearly a thousand kilometers across, rising up out of the jungle in the centre of the continent. Belgrade, the capital, is located on the mesa along with a large drop-port. Vienna, is surrounded by a vast, turbulent ocean.
@@ -85,21 +91,27 @@ planet:
       During the Jihad, the planetary governor contacted the World of Blake forces and offered to surrender the world so that it would not suffer the same fate as had Algol and Algot. The offer was accepted. Following the Jihad, untouched Buchlau has become one of the primary food-producing worlds in Prefecture V of the Republic of the Sphere.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Vienna
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Belgrade
     satellite:
-      - name: Berchtold
+      - name:
+          source: MWDA world profiles
+          value: Berchtold
         size: medium
         icon: rock4
-      - name: Graf
+      - name:
+          source: MWDA world profiles
+          value: Graf
         size: medium
         icon: oddmoon3
-      - name: 'Leopold '
-        size: large
-        icon: rock7
+      - name:
+          source: MWDA world profiles
+          value: Leopold
+        size: medium
+        icon: rock14
     event:
       - date: '2179-12-05'
         faction:

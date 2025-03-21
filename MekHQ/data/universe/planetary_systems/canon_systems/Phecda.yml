@@ -3,9 +3,11 @@ sucsId: 2021
 xcood: -74.451
 ycood: -1.595
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: A0V
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2466-02-25'
     zenithCharge: yes
@@ -47,28 +49,32 @@ planet:
       value: Phecda
     type: TERRESTRIAL
     orbitalDist: 8.12
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: wet20
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.98
-    diameter: 14405
-    density: 4.80196038399
+    diameter: 14374
+    density: 4.791473202243
     dayLength: 19
     yearLength: 23.2
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 20
     water:
-      source: canon
+      source: MWDA world profiles
       value: 86
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: 3135 - Though blessed by an abundance of surface water, the fact that much
       of it is trapped beneath its growing polar caps (Phecda is entering an ice age,
@@ -101,22 +107,26 @@ planet:
       transport.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Gamurmaj
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Atlantic Coast
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Kuld
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Phreezi
     satellite:
-      - name: Vondra
+      - name:
+          source: MWDA world profiles
+          value: Vondra
         size: medium
         icon: oddmoon1
-      - name: Xanthippe
+      - name:
+          source: MWDA world profiles
+          value: Xanthippe
         size: medium
         icon: oddmoon2
     event:

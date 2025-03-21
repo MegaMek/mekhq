@@ -3,9 +3,11 @@ sucsId: 2303
 xcood: 40.84
 ycood: -21.506
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K5V
-primarySlot: 5
+primarySlot:
+  source: MWDA world profiles
+  value: 5
 event:
   - date: '2374-06-17'
     nadirCharge: yes
@@ -86,28 +88,32 @@ planet:
       value: Sheratan
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 5
+    sysPos:
+      source: MWDA world profiles
+      value: 5
     icon: green35
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.9
-    diameter: 12425
-    density: 5.085435867644
+    diameter: 12431
+    density: 5.087922852464
     dayLength: 27
     yearLength: 0.8
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 31
     water:
-      source: canon
+      source: MWDA world profiles
       value: 40
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       Once the emerald jewel in the crown of the Terran Hegemony, Sheratan‘s surface was a single landmass blanketed by thick forests, lush jungles, and verdant farmland; dotted by a few, large, landlocked seas. Sheratan‘s ruling family, the Grensons, were staunch supporters of Terra‘s Cameron family when they assumed leadership of the Terran Hegemony and, later, founded the First Star League. In fact, First Lord Jonathan Cameron married Lady Ludmella Grenson, a connection to the First Star League that Sheratan‘s population remains proud of to this day. During the fall of the First Star League, on the order of the Usurper Stefan Amaris, the Grenson family was nearly wiped out for its association with the Camerons. With no hereditary rulers, the Capellan Confederation easily claimed Sheratan after the fall of the First Star League.
@@ -117,8 +123,8 @@ planet:
       By the time of the founding of The Republic of the Sphere, Sheratan‘s population had fallen to levels the planet‘s now-meager agricultural output could support and the economy stabilized. When a portion of the Wolf Clan joined The Republic, interest in Sheratan‘s ties to the First Star League led some to settle near Sheratan‘s capital of Gellen‘s Heights, further boosting the planet‘s economy.
     landmass:
       - capital:
-          source: canon
-          value: Gellen‘s Heights
+          source: MWDA world profiles
+          value: Gellen's Heights
     event:
       - date: '2240-10-31'
         faction:

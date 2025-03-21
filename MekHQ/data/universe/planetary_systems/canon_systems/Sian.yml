@@ -3,9 +3,11 @@ sucsId: 2327
 xcood: 7.152
 ycood: -229.662
 spectralType:
-  source: canon
+  source: 'Handbook: House Liao, pg. 77'
   value: G0III
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Liao, pg. 77'
+  value: 2
 event:
   - date: '2441-04-20'
     nadirCharge: yes
@@ -44,28 +46,32 @@ planet:
       value: Sian
     type: TERRESTRIAL
     orbitalDist: 3.08
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Liao, pg. 77'
+      value: 2
     icon: green32
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 77'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 77'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 77'
       value: 1.0
-    diameter: 11364
-    density: 6.161546125036
+    diameter: 11385
+    density: 6.172805743621
     dayLength: 29
     yearLength: 5.5
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 77'
       value: 30
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 77'
       value: 70
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 77'
       value: PLANT
     desc: |-
       The planet is known for lush jungles and tropical environments. Development is controlled and limited so that much of the terrain outside of cities is virgin wilderness. The planetary capital Zi-Jin Cheng (“Forbidden City”) is also the capital of the Capellan Confederation and home to the Celestial Palace, home to House Liao.
@@ -81,28 +87,34 @@ planet:
       Saroyan Special Production
     landmass:
       - name:
-          source: canon
-          value: Liaoning “The Walrus”
-        capital:
-          source: canon
-          value: Zi-Jin Cheng (“Forbidden City”
-      - name:
-          source: canon
-          value: Wuhan
-      - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Imarra
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
+          value: Liaoning
+      - name:
+          source: 'Objective Raids: Capellan Confederation'
           value: South Home
+      - name:
+          source: 'Objective Raids: Capellan Confederation'
+          value: Wuhan
+        capital:
+          source: 'Handbook: House Liao, pg. 77'
+          value: Forbidden City
     satellite:
-      - name: Fu Hsi
+      - name:
+          source: 'Objective Raids: Capellan Confederation'
+          value: Fu Hsi
         size: large
         icon: rock14
-      - name: Nuwa
-        size: large
-        icon: rock6
-      - name: Shennong
+      - name:
+          source: 'Objective Raids: Capellan Confederation'
+          value: Nüwa
+        size: medium
+        icon: oddmoon2
+      - name:
+          source: 'Objective Raids: Capellan Confederation'
+          value: Shennong
         size: large
         icon: rock12
     event:

@@ -5,7 +5,9 @@ ycood: -20.722
 spectralType:
   source: canon
   value: M5V
-primarySlot: 5
+primarySlot:
+  source: 'Objective Raids: Capellan Confederation'
+  value: 5
 event:
   - date: '2362-07-29'
     zenithCharge: yes
@@ -30,7 +32,6 @@ planet:
       - name: Carl's Corner
     event:
       - date: '2108-12-05'
-        name: Carver I
   - name: Carver II
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.14
@@ -57,7 +58,6 @@ planet:
         icon: rock13
     event:
       - date: '2108-12-05'
-        name: Carver II
   - name: Carver III
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.2
@@ -79,7 +79,6 @@ planet:
         icon: rock4
     event:
       - date: '2108-12-05'
-        name: Carver III
   - name: Carver IV
     type: ICE_GIANT
     orbitalDist: 0.32
@@ -104,34 +103,37 @@ planet:
         icon: oddmoon1
     event:
       - date: '2108-12-05'
-        name: Carver IV
   - name:
       source: canon
       value: Carver V
     type: TERRESTRIAL
     orbitalDist: 0.08
-    sysPos: 5
+    sysPos:
+      source: 'Objective Raids: Capellan Confederation'
+      value: 5
     icon: wet6
     pressure:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Objective Raids: Capellan Confederation'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
-      value: 0.84
-    diameter: 12423
-    density: 4.73286382648
+      source: 'Objective Raids: Capellan Confederation'
+      value: 0.98
+    diameter: 13445
+    density: 5.122301887657
     dayLength: 21
     yearLength: 0.4
     temperature:
-      source: canon
-      value: 34
+      source: 'Objective Raids: Capellan Confederation'
+      value: 39
     water:
-      source: canon
-      value: 87
+      source: 'Objective Raids: Capellan Confederation'
+      value: 85
     lifeForm:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: REPTILE
     desc: 3135 Settled by self-styled pilgrims from the poorest nations in the African
       and South American continents on Terra, everything about Carver V seemed a divine
@@ -174,30 +176,17 @@ planet:
       then, Liberty has once more become a paradise to visitors and natives alike.
     landmass:
       - name:
-          source: canon
-          value: Drasken Island Chain
+          source: 'Objective Raids: Capellan Confederation'
+          value: Chone
       - name:
-          source: canon
-          value: .na.character
+          source: 'Objective Raids: Capellan Confederation'
+          value: Dendez
       - name:
-          source: canon
-          value: Kalimbawe Island Chain
-      - name:
-          source: canon
-          value: .na.character
-      - name:
-          source: canon
-          value: Quantico Island Chain
+          source: 'Objective Raids: Capellan Confederation'
+          value: Klieksa
         capital:
-          source: canon
-          value: Bellacqu
-    satellite:
-      - name: Justice
-        size: large
-        icon: rock8
-      - name: Freedom
-        size: large
-        icon: rock7
+          source: 'Objective Raids: Capellan Confederation'
+          value: Dronane
     event:
       - date: '2228-11-22'
         faction:
@@ -524,10 +513,7 @@ planet:
           value:
             - CC
       - date: '2108-12-05'
-        name: Carver V
       - date: '3063-01-01'
-        name: Liberty
-        message: Carver V renamed to Liberty
   - name: Carver VI
     type: TERRESTRIAL
     orbitalDist: 1.04
@@ -548,7 +534,6 @@ planet:
       - name: Rover
     event:
       - date: '2108-12-05'
-        name: Carver VI
   - name: Carver VII
     type: GAS_GIANT
     orbitalDist: 2.0
@@ -566,7 +551,6 @@ planet:
     smallMoons: 12
     event:
       - date: '2108-12-05'
-        name: Carver VII
   - name: Carver VIII
     type: ICE_GIANT
     orbitalDist: 3.92
@@ -590,7 +574,6 @@ planet:
         icon: rock2
     event:
       - date: '2108-12-05'
-        name: Carver VIII
   - name: Carver IX
     type: GAS_GIANT
     orbitalDist: 7.76
@@ -618,7 +601,6 @@ planet:
         icon: rock1
     event:
       - date: '2108-12-05'
-        name: Carver IX
   - name: Carver X
     type: GIANT_TERRESTRIAL
     orbitalDist: 15.44
@@ -644,7 +626,6 @@ planet:
         icon: rock9
     event:
       - date: '2108-12-05'
-        name: Carver X
   - name: Carver XI
     type: GAS_GIANT
     orbitalDist: 30.8
@@ -677,7 +658,6 @@ planet:
         icon: rock14
     event:
       - date: '2108-12-05'
-        name: Carver XI
   - name: Mercurius Belt
     type: ASTEROID_BELT
     orbitalDist: 61.52

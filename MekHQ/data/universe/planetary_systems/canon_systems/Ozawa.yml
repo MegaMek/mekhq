@@ -3,9 +3,11 @@ sucsId: 1967
 xcood: 84.778
 ycood: 2.798
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 102'
   value: K5II
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Davion, pg. 102'
+  value: 2
 event:
   - date: '2496-05-08'
     zenithCharge: yes
@@ -32,28 +34,32 @@ planet:
       value: Ozawa
     type: TERRESTRIAL
     orbitalDist: 0.49
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Davion, pg. 102'
+      value: 2
     icon: green36
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 102'
       value: STANDARD
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 102'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 102'
       value: 0.92
-    diameter: 10640
-    density: 6.059780484219
+    diameter: 10655
+    density: 6.068130560168
     dayLength: 23
     yearLength: 0.9
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 102'
       value: 39
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 102'
       value: 44
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 102'
       value: MAMMAL
     desc: |-
       Originally a beautiful planet with rough terrain and extreme weather, Ozawa suffered significant damage during the course of the Succession Wars. The rough weather and tidal conditions kept some early colonists away, however the planet grew slowly and industry sprang up after large deposits of metal ores were discovered. The planet became a major manufacturing center, unfortunately this made the planet a major target when the Succession Wars broke out. Bitter fighting between the Capellan Confederation, Federated Suns and Draconis Combine left the planet torn apart, especially after the Combine resorted to nuclear weapons to remove entrenched Federated Suns units. The Suns finally claimed victory in 2841 and the planet has slowly begun to recover since.
@@ -64,25 +70,27 @@ planet:
       Wunderland Enterprises
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Kushiro
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Sapporo
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Muroran
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Niigata
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Sendai
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Todoga
     satellite:
-      - name: Daikoku
+      - name:
+          source: 'Handbook: House Davion, pg. 102'
+          value: Daikoku
         size: large
         icon: rock9
     event:

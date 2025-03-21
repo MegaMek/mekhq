@@ -3,9 +3,11 @@ sucsId: 992
 xcood: 46.002
 ycood: -298.878
 spectralType:
-  source: canon
+  source: 'Handbook: House Liao, pg. 78'
   value: G5IV
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Liao, pg. 78'
+  value: 4
 event:
   - date: '2360-03-27'
     zenithCharge: yes
@@ -83,28 +85,32 @@ planet:
       value: Grand Base
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Liao, pg. 78'
+      value: 4
     icon: green27
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 78'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 78'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 78'
       value: 1.1
-    diameter: 15418
-    density: 5.014265364224
+    diameter: 15417
+    density: 5.01405795542
     dayLength: 22
     yearLength: 2.0
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 78'
       value: 36
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 78'
       value: 34
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 78'
       value: REPTILE
     desc: |-
       Grand Base is the personal holding of the Duke of Thomas in perpetuity. It is a major military staging, training and repair facility for the Confederation. Grand Base has traditionally been one of the Confederation's largest ‘Mech production facilities, right behind Tikonov. At all times it is garrisoned by two Sian Commonality reserve units, one Warrior House regiment, and supported by local militia, aerospace fighter and naval support units. Additionally, it is home-base of the elite Death Commandos.
@@ -115,18 +121,22 @@ planet:
       Earthwerks Limited
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Behemoth
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Hudson
     satellite:
-      - name: Hightower
-        size: medium
-        icon: rock3
-      - name: Capetown
+      - name:
+          source: 'Handbook: House Liao, pg. 78'
+          value: Capetown
         size: medium
         icon: rock6
+      - name:
+          source: 'Handbook: House Liao, pg. 78'
+          value: Hightower
+        size: medium
+        icon: rock3
     event:
       - date: '2200-07-02'
         faction:

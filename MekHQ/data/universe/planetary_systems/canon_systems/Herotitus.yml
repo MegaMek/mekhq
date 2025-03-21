@@ -3,9 +3,11 @@ sucsId: 1100
 xcood: 58.729
 ycood: -430.11
 spectralType:
-  source: canon
+  source: Mercenaries Supplemental II, pg. 16
   value: G3IV
-primarySlot: 2
+primarySlot:
+  source: Mercenaries Supplemental II, pg. 16
+  value: 2
 event:
   - date: '2718-01-19'
     nadirCharge: yes
@@ -33,28 +35,32 @@ planet:
       value: Herotitus
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 2
+    sysPos:
+      source: Mercenaries Supplemental II, pg. 16
+      value: 2
     icon: green4
     pressure:
-      source: canon
+      source: Mercenaries Supplemental II, pg. 16
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Mercenaries Supplemental II, pg. 16
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Mercenaries Supplemental II, pg. 16
       value: 0.98
-    diameter: 12219
-    density: 5.616951421987
+    diameter: 12240
+    density: 5.626637159068
     dayLength: 20
     yearLength: 2.3
     temperature:
-      source: canon
+      source: Mercenaries Supplemental II, pg. 16
       value: 36
     water:
-      source: canon
+      source: Mercenaries Supplemental II, pg. 16
       value: 72
     lifeForm:
-      source: canon
+      source: Mercenaries Supplemental II, pg. 16
       value: REPTILE
     desc: Herotitus is a pleasant agricultural world with long, mild growing seasons
       and large portions of the planet’s northern continents , Baccali and Pomona,are
@@ -73,16 +79,16 @@ planet:
     smallMoons: 1
     landmass:
       - name:
-          source: canon
+          source: Mercenaries Supplemental II, pg. 16
           value: Baccali
       - name:
-          source: canon
+          source: Mercenaries Supplemental II, pg. 16
           value: Marpessa
         capital:
-          source: canon
-          value: New Hedron
+          source: Mercenaries Supplemental II, pg. 16
+          value: New Hedon
       - name:
-          source: canon
+          source: Mercenaries Supplemental II, pg. 16
           value: Pomona
     event:
       - date: '2500-10-10'

@@ -3,9 +3,11 @@ sucsId: 918
 xcood: 90.726
 ycood: 14.234
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K8V
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2425-11-23'
     nadirCharge: yes
@@ -54,28 +56,32 @@ planet:
       value: Galatia III
     type: TERRESTRIAL
     orbitalDist: 0.24
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green29
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.84
-    diameter: 12275
-    density: 4.813773342515
+    diameter: 12269
+    density: 4.811440084769
     dayLength: 23
     yearLength: 0.8
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 38
     water:
-      source: canon
+      source: MWDA world profiles
       value: 74
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: BIRD
     desc: Astonishingly similar to Terra in many ways, colonists were drawn to Galatia
       III in hopes of building a new life on an alien world. Though invaded several
@@ -89,20 +95,30 @@ planet:
       and tropical island getaways.
     landmass:
       - name: Pointe Aux Barques
-        capital: New Mount Holly
+        capital:
+          source: MWDA world profiles
+          value: St. Paul
       - name: Upton
       - name: Linwood
     satellite:
-      - name: Athens
+      - name:
+          source: MWDA world profiles
+          value: Athens
         size: giant
         icon: rock17
-      - name: Olympus
+      - name:
+          source: MWDA world profiles
+          value: Olympus
         size: large
         icon: rock9
-      - name: Thebes
+      - name:
+          source: MWDA world profiles
+          value: Thebes
         size: medium
         icon: oddmoon2
-      - name: Troy
+      - name:
+          source: MWDA world profiles
+          value: Troy
         size: medium
         icon: rock1
     event:

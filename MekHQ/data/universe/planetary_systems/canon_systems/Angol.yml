@@ -3,9 +3,11 @@ sucsId: 136
 xcood: 87.88
 ycood: -38.822
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: M0VI
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2392-06-22'
     zenithCharge: yes
@@ -53,28 +55,32 @@ planet:
       value: Angol
     type: TERRESTRIAL
     orbitalDist: 0.5
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: dry26
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.3
-    diameter: 12807
-    density: 7.126818527729
+    diameter: 12813
+    density: 7.130158632646
     dayLength: 28
     yearLength: 0.8
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 5
     water:
-      source: canon
+      source: MWDA world profiles
       value: 10
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: |-
       Angol is a frozen planet circling a small, dying red star. Angol‘s fossil record shows that it was a habitable planet before its parent star shrank, and the world‘s oceans and atmosphere froze into planet-wide glaciers.
@@ -90,12 +96,8 @@ planet:
       There are no continents per se, but the capital of Carius‘s Cache is situated near the planet‘s south pole.
     landmass:
       - capital:
-          source: canon
-          value: Carius‘s Cache
-    satellite:
-      - name: Civatateo
-        size: large
-        icon: rock8
+          source: MWDA world profiles
+          value: Carius's Cache
     event:
       - date: '2177-02-06'
         faction:

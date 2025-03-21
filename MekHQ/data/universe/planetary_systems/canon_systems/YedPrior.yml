@@ -3,9 +3,11 @@ sucsId: 2797
 xcood: -62.042
 ycood: 124.024
 spectralType:
-  source: canon
+  source: House Steiner
   value: F0III
-primarySlot: 5
+primarySlot:
+  source: House Steiner
+  value: 5
 event:
   - date: '2475-12-04'
     zenithCharge: yes
@@ -84,7 +86,9 @@ planet:
       value: Yed Prior
     type: TERRESTRIAL
     orbitalDist: 4.48
-    sysPos: 5
+    sysPos:
+      source: House Steiner
+      value: 5
     icon: green28
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -97,7 +101,7 @@ planet:
     temperature: 33
     water: 37
     lifeForm:
-      source: canon
+      source: House Steiner
       value: MAMMAL
     desc: Yed Prior is a temperate planet with a wide range of climates and cultures.
       The planet is home to the well-known Mitchellson University of Arts and Crafts.

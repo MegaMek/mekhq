@@ -3,9 +3,11 @@ sucsId: 56
 xcood: -67.732
 ycood: 1.767
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F0VI
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2362-09-26'
     nadirCharge: yes
@@ -59,28 +61,32 @@ planet:
       value: Alchiba
     type: TERRESTRIAL
     orbitalDist: 4.48
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green31
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.73
-    diameter: 8758
-    density: 5.868130211188
+    diameter: 8750
+    density: 5.862896146424
     dayLength: 24
     yearLength: 9.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 50
     water:
-      source: canon
+      source: MWDA world profiles
       value: 55
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: AMPHIBIAN
     desc: |-
       3135 - Alchiba is a warm world orbiting a harsh, bright yellow, sub-dwarf star. The planet's axial tilt is synchronized with its rotation and orbit so that the northern hemisphere receives less direct sunlight than the southern hemisphere and equatorial reaches. Havenri, the northern polar continent, and its surrounding island chains have been blessed with rich soils and a temperate climate that is well suited for agriculture. The three southern continents, Frome, Nakkara, and Priez, are largely dominated by deserts and barren mountains. Settlers thus developed much of Havenri for habitation and agriculture, while the southern continents host limited mining and ore-refining industries of common and industrial metals. The agricultural and light machine products trade flows through the planetary capital and port city of Fairweather, on Havenri.
@@ -88,31 +94,39 @@ planet:
       During the Star League era, Alchiba was jointly administered by the Lyran Commonwealth and the Terran Hegemony, serving as a trading post. Amaris' troops to largely ignore the planet and left it to the Lyran Commonwealth due to its lack of heavy military industries. During the Succession Wars, Alchiba was the target of the odd raid launched by the Free World League or the Draconis Combine. During the Jihad, the Word of Blake ignored this world completely. As a result, The Republic of the Sphere inherited a remarkably undamaged world.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Frome
       - name:
-          source: canon
-          value: Nakkara
-      - name:
-          source: canon
-          value: Priez
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Havenri
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Fairweather
+      - name:
+          source: MWDA world profiles
+          value: Nakkara
+      - name:
+          source: MWDA world profiles
+          value: Priez
     satellite:
-      - name: Kaylen
+      - name:
+          source: MWDA world profiles
+          value: Kaylen
         size: giant
         icon: rock5
-      - name: Lorcan
+      - name:
+          source: MWDA world profiles
+          value: Lorcan
         size: medium
         icon: rock8
-      - name: Onna
+      - name:
+          source: MWDA world profiles
+          value: Onna
         size: medium
         icon: rock9
-      - name: Quinlin
+      - name:
+          source: MWDA world profiles
+          value: Quinlin
         size: large
         icon: rock13
     event:

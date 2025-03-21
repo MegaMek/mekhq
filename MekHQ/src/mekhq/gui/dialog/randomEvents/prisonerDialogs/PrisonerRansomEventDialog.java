@@ -46,7 +46,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
  * messaging and allows the player to accept or decline the offer.</p>
  */
 public class PrisonerRansomEventDialog extends MHQDialogImmersive {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerRansomEvent";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
     /**
      * Creates a dialog to present a ransom offer for prisoners.

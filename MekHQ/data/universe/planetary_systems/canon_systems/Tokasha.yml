@@ -3,9 +3,11 @@ sucsId: 2966
 xcood: 108.093
 ycood: 1728.42
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 111
   value: K5IV
-primarySlot: 4
+primarySlot:
+  source: Warriors of Kerensky, pg. 111
+  value: 4
 event:
   - date: '2808-10-29'
     nadirCharge: yes
@@ -71,28 +73,32 @@ planet:
       value: Tokasha
     type: TERRESTRIAL
     orbitalDist: 0.49
-    sysPos: 4
+    sysPos:
+      source: Warriors of Kerensky, pg. 111
+      value: 4
     icon: green44
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 111
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 111
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 111
       value: 0.8
-    diameter: 13281
-    density: 4.216370213558
+    diameter: 13307
+    density: 4.224762932643
     dayLength: 26
     yearLength: 0.9
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 111
       value: 35
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 111
       value: 60
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 111
       value: BIRD
     desc: No description available.
     landmass:

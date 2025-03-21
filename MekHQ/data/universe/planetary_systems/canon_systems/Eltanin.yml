@@ -3,9 +3,11 @@ sucsId: 796
 xcood: -1.917
 ycood: 99.345
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K5IV
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2436-12-25'
     zenithCharge: yes
@@ -53,28 +55,32 @@ planet:
       value: Eltanin
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green44
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.73
-    diameter: 10956
-    density: 4.702841160509
+    diameter: 10932
+    density: 4.692658433524
     dayLength: 26
     yearLength: 1.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 42
     water:
-      source: canon
+      source: MWDA world profiles
       value: 41
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: |-
       Travelers visiting Eltanin are cautioned to take the recommended series of antibiotics and inoculations before visiting the surface, due to a persistent virus that wiped out all native animal life and has ravaged off-worlders since the first colonists set foot on this arid world almost a thousand years ago. The airborne virus, known locally as Eltanin Brain Fever, attacks the central nervous system and has symptoms ranging from a loss of fine motor control to seizures and blindness, eventually leading to death. Scientists tracked the source of the virus to the local wildlife, which was dying off even as the first settlers came to this world. Preventative treatments suitable for humans and most terrestrial animals were eventually found, but only after all remaining indigenous fauna had perished.
@@ -84,16 +90,18 @@ planet:
       The capital city of Eltanin, Dry Springs, is the administrative and trading center of the planet, as well as one of thirty transportation hubs on the northern polar Platonesia supercontinent where it is situated. Eltanin‘s second largest city, Burmah, located on the southern supercontinent of Anterratica, is home to the headquarters of Eltanin Interplanetary, a local transport consortium that controls a majority of the planet‘s fifty-nine spaceports (the extreme number to be used in the event of a planetary evacuation, though most of them are mothballed, but ready to use within hours), and employs a fleet of small and medium-sized DropShips and shuttlecraft. EI also provides day-to-day transport services for Eltanin‘s many large islands in the tropical and equatorial regions between the two giant land masses, complementing the planet‘s seagoing traffic.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
+          value: Anterratica
+      - name:
+          source: MWDA world profiles
           value: Platonesia
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Dry Springs
-      - name:
-          source: canon
-          value: Anterratica
     satellite:
-      - name: Brodi
+      - name:
+          source: MWDA world profiles
+          value: Brodi
         size: medium
         icon: rock10
     event:

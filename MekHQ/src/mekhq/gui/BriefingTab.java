@@ -873,8 +873,8 @@ public final class BriefingTab extends CampaignGuiTab {
                     }
                 }
 
-                AtBDynamicScenarioFactory.setDeploymentTurnsForReinforcements(getCampaign(), scenario,
-                      reinforcementEntities, cmdrStrategy);
+                AtBDynamicScenarioFactory.setDeploymentTurnsForReinforcements(getCampaign().getHangar(),
+                      scenario, reinforcementEntities, cmdrStrategy);
             }
         }
 

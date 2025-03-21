@@ -3,9 +3,11 @@ sucsId: 2371
 xcood: -122.316
 ycood: -7.025
 spectralType:
-  source: canon
+  source: 25 Years of Art and Fiction, pg. 191
   value: K1V
-primarySlot: 7
+primarySlot:
+  source: 25 Years of Art and Fiction, pg. 191
+  value: 7
 event:
   - date: '2356-09-08'
     nadirCharge: yes
@@ -119,28 +121,32 @@ planet:
       value: Solaris
     type: TERRESTRIAL
     orbitalDist: 0.56
-    sysPos: 7
+    sysPos:
+      source: 25 Years of Art and Fiction, pg. 191
+      value: 7
     icon: wet5
     pressure:
-      source: canon
-      value: THIN
-    atmosphere: BREATHABLE
+      source: 25 Years of Art and Fiction, pg. 191
+      value: STANDARD
+    atmosphere:
+      source: 25 Years of Art and Fiction, pg. 191
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 191
       value: 1.1
-    diameter: 12390
-    density: 6.229821326958
+    diameter: 12399
+    density: 6.2345032488
     dayLength: 29
     yearLength: 1.0
     temperature:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 191
       value: 25
     water:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 191
       value: 80
     lifeForm:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 191
       value: FISH
     desc: |-
       Solaris VII is best known as the Game World. Since the time of the Star League the planet has been host to 'Mech duels. The planet is part of the Lyran Commonwealth but it is home to an enclave from each of the major Inner Sphere powers and the best selling games are usually between Stables that support rivaling Great Houses.
@@ -158,18 +164,20 @@ planet:
       Vining Engineering and Salvage Team
     landmass:
       - name:
-          source: canon
+          source: A Time of War, pg. 383
           value: Equatus
       - name:
-          source: canon
-          value: Greyland
+          source: A Time of War, pg. 383
+          value: Grayland
         capital:
-          source: canon
+          source: 25 Years of Art and Fiction, pg. 191
           value: Solaris City
     satellite:
-      - name: Able
+      - name:
+          source: 25 Years of Art and Fiction, pg. 191
+          value: Solaris 7 Able
         size: medium
-        icon: rock14
+        icon: rock3
     event:
       - date: '2235-08-10'
         faction:

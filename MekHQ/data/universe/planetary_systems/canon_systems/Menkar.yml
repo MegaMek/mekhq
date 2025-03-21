@@ -5,7 +5,9 @@ ycood: -92.066
 spectralType:
   source: canon
   value: M2III
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2355-08-08'
     zenithCharge: yes
@@ -67,28 +69,32 @@ planet:
       value: Menkar
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: green33
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.1
-    diameter: 15418
-    density: 5.014265364224
+    diameter: 15417
+    density: 5.01405795542
     dayLength: 25
     yearLength: 0.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 35
     water:
-      source: canon
+      source: MWDA world profiles
       value: 66
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       3135 - Menkar‘s star is on its way to becoming unstable, though this did not stop the planet from being colonized. Menkar, is a large planet with two large continents, Ulug Beg and Al Tizini, and three medium-sized archipelagoes, Monkar, Menkab, and Al Minkar. Menkar‘s two oceans are deep and full of life. The majority of the planet‘s population live on the continents of Ulug Beg and Al Tizini. The continents have arid landscapes and fertile valleys fed by large rivers. The archipelagoes of Monkar, Menkab, and Al Minkar are mostly covered with jungle, where plants are harvested for medical research and special medicines used in reversing the rejection effects of transplanted organs or replacement limbs.
@@ -96,22 +102,15 @@ planet:
       During the Fourth Succession War, the Federated Suns captured the planet without a shot being fired. The planet‘s military surrendered in order to save the planet from seeing war for the first time. At the height of the Jihad, Word of Blake forces invaded and the planetary government surrendered, or so it appeared. The planetary government knew of the horrendous acts of barbarism the Blakists had committed. The Blakists left a garrison on the planet and departed. A week after this departure, a mysterious illness swept through the garrison force, as well as the local population. When the war was over and Menkar liberated, the Blakists were all dead, as were 10 percent of the population who sacrificed themselves to kill off the invaders.
     landmass:
       - name:
-          source: canon
-          value: Ulug Beg
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Al Tizini
       - name:
-          source: canon
-          value: Monkar
-      - name:
-          source: canon
-          value: Menkab
-      - name:
-          source: canon
-          value: Al Minkar
+          source: MWDA world profiles
+          value: Ulug Beg
     satellite:
-      - name: Metuchen
+      - name:
+          source: MWDA world profiles
+          value: Metuchen
         size: medium
         icon: oddmoon1
     event:

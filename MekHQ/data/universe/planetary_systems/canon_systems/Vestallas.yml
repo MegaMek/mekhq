@@ -3,7 +3,7 @@ sucsId: 2679
 xcood: 66.689
 ycood: -214.831
 spectralType:
-  source: canon
+  source: House Liao, pg. 151
   value: G6V
 primarySlot: 7
 event:
@@ -130,7 +130,7 @@ planet:
     temperature: 24
     water: 48
     lifeForm:
-      source: canon
+      source: House Liao, pg. 151
       value: MAMMAL
     desc: |-
       Since the beginning of the 31st century, underground vaults on Vestallas' have stored the Confederation's treasury of hard currency, precious metals, rare paintings, etc. Vestallas is also noted for its unique architectural style, featuring gracefully curved walls as well as gently curved and sloping floors. The style is aesthetically pleasing and keeps the population in a constant state of disequilibrium which has been described as a "natural high" by the locals.

@@ -3,9 +3,11 @@ sucsId: 1800
 xcood: 47.655
 ycood: 33.587
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K5IV
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2379-07-08'
     zenithCharge: yes
@@ -35,28 +37,32 @@ planet:
       value: Nashira
     type: TERRESTRIAL
     orbitalDist: 0.49
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: wet8
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.92
-    diameter: 12724
-    density: 5.089429591384
+    diameter: 12714
+    density: 5.085340172233
     dayLength: 23
     yearLength: 0.9
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 25
     water:
-      source: canon
+      source: MWDA world profiles
       value: 81
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: Valuable minerals, chemical wealth, and advanced electronics, metallurgical
       and hydrocarbon fuel industries—coupled with a pleasant terrestrial climate—made
@@ -94,21 +100,25 @@ planet:
       of New Anaheim.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
+          value: Copenwald
+      - name:
+          source: MWDA world profiles
           value: Katiasha
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Logan City
-      - name:
-          source: canon
-          value: Copenwald
     satellite:
-      - name: Kassandra
-        size: medium
-        icon: oddmoon1
-      - name: Jiin
+      - name:
+          source: MWDA world profiles
+          value: Jiin
         size: medium
         icon: rock12
+      - name:
+          source: MWDA world profiles
+          value: Kassandra
+        size: medium
+        icon: oddmoon1
     event:
       - date: '2268-04-06'
         faction:

@@ -3,9 +3,11 @@ sucsId: 2039
 xcood: 51.435
 ycood: -79.668
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: M8VI
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 planet:
   - name: Giffoni Sei Casali
     type: GIANT_TERRESTRIAL
@@ -64,28 +66,32 @@ planet:
       value: Pleione
     type: TERRESTRIAL
     orbitalDist: 0.07
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: wet3
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.89
-    diameter: 11415
-    density: 5.486105552931
+    diameter: 11408
+    density: 5.48267491074
     dayLength: 22
     yearLength: 0.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 58
     water:
-      source: canon
+      source: MWDA world profiles
       value: 84
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: FISH
     desc: |-
       3135 - Pleione was colonized during the early Exodus period and became a stepping-stone to the stars beyond. It is an inhospitable desert world, with an abundant supply of water, which it exports. Jezrael, the only continent, represents less than 20 percent of the planet's surface. It's terrain is mostly featureless, except for the large rock formations that dot the landscape.
@@ -93,10 +99,12 @@ planet:
       Pleione was part of the Tikonov Grand Union before joining the Capellan Confederation. The Star League used Pleione as a military supply world and built a massive fort atop the largest rock formation on Jezrael. This fort, known by the Capellans as "Thunder Rock", was used as a headquarters and regimental supply depot. It was here that Capellan forces fought against Federated Suns mercenaries during the Fourth Succession War. Confederation forces regained Pleione once the Sarna March collapsed as the result of the Marik-Liao invasion of 3057. Pleione, along with Ningpo and Poznan, reaffirmed its allegiance to the Celestial Throne and House Liao during the Confederation‘s Xin Sheng movement. The Confederation assigned Little Richard‘s Panzer Brigade to defend Pleione, as well as to back up Confederation forces on Ningpo and Poznan. During the FedCom Civil War, the Brigade was sent to take Genoa and Arboris in October of 3066. On Genoa, Little Richard's Panzer Brigade met with disaster when engaged by the Twelfth Vegan Ranger's Beta Regiment. In a matter of a month, their regiment was reduced to a barely operational battalion. The unit were sent back to Pleione, and was in the middle of recovering when Word of Blake forces invaded. Little Richard's forces fought valiantly, they made their last stand at "Thunder Rock" where they died to a man, after which the planet surrendered.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Jezrael
     satellite:
-      - name: Caran
+      - name:
+          source: MWDA world profiles
+          value: Caran
         size: medium
         icon: oddmoon2
     event:

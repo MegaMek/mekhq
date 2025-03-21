@@ -3,9 +3,11 @@ sucsId: 2941
 xcood: 44.164
 ycood: 1733.181
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: M9III
-primarySlot: 1
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 1
 event:
   - date: '2810-01-28'
     zenithCharge: yes
@@ -15,28 +17,32 @@ planet:
       value: Foster
     type: TERRESTRIAL
     orbitalDist: 0.04
-    sysPos: 1
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 1
     icon: green49
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 1.0
-    diameter: 12823
-    density: 5.504259245072
+    diameter: 12795
+    density: 5.492347279654
     dayLength: 24
     yearLength: 0.3
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 25
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 50
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: AMPHIBIAN
     desc: No description available.
     smallMoons: 5

@@ -3,9 +3,11 @@ sucsId: 1122
 xcood: 264.176
 ycood: 36.654
 spectralType:
-  source: canon
+  source: 25 Years of Art and Fiction, pg. 87
   value: G4III
-primarySlot: 4
+primarySlot:
+  source: 25 Years of Art and Fiction, pg. 87
+  value: 4
 event:
   - date: '2374-11-10'
     zenithCharge: yes
@@ -83,28 +85,32 @@ planet:
       value: Hoff
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 4
+    sysPos:
+      source: 25 Years of Art and Fiction, pg. 87
+      value: 4
     icon: green41
     pressure:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 87
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 25 Years of Art and Fiction, pg. 87
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 87
       value: 0.95
-    diameter: 14716
-    density: 4.563103966405
+    diameter: 14673
+    density: 4.549885479782
     dayLength: 23
     yearLength: 2.0
     temperature:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 87
       value: 25
     water:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 87
       value: 73
     lifeForm:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 87
       value: MAMMAL
     desc: Hoff is covered in wide open plains crossed by rivers, which made it an
       ideal agriculture world. Early settlers planted crops in the fertile soil and
@@ -118,7 +124,9 @@ planet:
         capital: Seggebruch
       - name: Krehbiel
     satellite:
-      - name: Spad
+      - name:
+          source: 25 Years of Art and Fiction, pg. 87
+          value: Spad
         size: medium
         icon: oddmoon3
     event:

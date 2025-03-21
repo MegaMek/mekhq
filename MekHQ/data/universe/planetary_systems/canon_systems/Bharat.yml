@@ -3,9 +3,11 @@ sucsId: 321
 xcood: 58.927
 ycood: -41.666
 spectralType:
-  source: canon
+  source: House Liao, pg. 139
   value: F2III
-primarySlot: 4
+primarySlot:
+  source: House Liao, pg. 139
+  value: 4
 event:
   - date: '2392-11-10'
     zenithCharge: yes
@@ -68,28 +70,32 @@ planet:
       value: Bharat
     type: TERRESTRIAL
     orbitalDist: 4.2
-    sysPos: 4
+    sysPos:
+      source: House Liao, pg. 139
+      value: 4
     icon: green43
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.6
-    diameter: 9141
-    density: 4.602203687823
+    diameter: 9152
+    density: 4.607496981649
     dayLength: 17
     yearLength: 8.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 30
     water:
-      source: canon
+      source: MWDA world profiles
       value: 70
     lifeForm:
-      source: canon
+      source: House Liao, pg. 139
       value: MAMMAL
     desc: The planet Bharat is well known as a nature and hunting preserve available
       to both noblemen and commoners. The planet has a variety of terrain and distinctive
@@ -100,16 +106,16 @@ planet:
       around logging of the many types of imported Terran trees.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Veerta
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Vidya
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Chakra
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Vinamrata
     event:
       - date: '2319-05-10'

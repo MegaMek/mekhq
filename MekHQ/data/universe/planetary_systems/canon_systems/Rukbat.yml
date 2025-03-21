@@ -3,9 +3,11 @@ sucsId: 2189
 xcood: 42.128
 ycood: 108.781
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K9IV
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2353-09-13'
     zenithCharge: yes
@@ -32,28 +34,32 @@ planet:
       value: Rukbat
     type: TERRESTRIAL
     orbitalDist: 0.35
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: wet9
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.12
-    diameter: 11105
-    density: 7.116339266344
+    diameter: 11083
+    density: 7.102012343844
     dayLength: 26
     yearLength: 0.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 38
     water:
-      source: canon
+      source: MWDA world profiles
       value: 89
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: 3135 - Seen from orbit, Rukbat is a wonderful expanse of endless oceans,
       tropical islands and small continents, with woodlands and green valleys aplenty.
@@ -94,19 +100,21 @@ planet:
       to restore Rukbat‘s food economy.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Melrin
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Schender Minor
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Oskart
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Schender Prime
     satellite:
-      - name: Aladanna
+      - name:
+          source: MWDA world profiles
+          value: Aladanna
         size: large
         icon: rock9
     event:

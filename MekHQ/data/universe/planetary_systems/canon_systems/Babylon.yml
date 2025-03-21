@@ -3,9 +3,11 @@ sucsId: 2930
 xcood: -123.508
 ycood: 1600.89
 spectralType:
-  source: canon
+  source: 'Historical: Operation Klondike, pg. 135'
   value: G7V
-primarySlot: 2
+primarySlot:
+  source: 'Historical: Operation Klondike, pg. 135'
+  value: 2
 event:
   - date: '2803-07-26'
     zenithCharge: yes
@@ -45,28 +47,32 @@ planet:
       value: Babylon
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 2
+    sysPos:
+      source: 'Historical: Operation Klondike, pg. 135'
+      value: 2
     icon: green49
     pressure:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 135'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Historical: Operation Klondike, pg. 135'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 135'
       value: 1.5
-    diameter: 13757
-    density: 7.65543112843
+    diameter: 13763
+    density: 7.658998039926
     dayLength: 20
     yearLength: 1.1
     temperature:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 135'
       value: 35
     water:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 135'
       value: 40
     lifeForm:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 135'
       value: REPTILE
     desc: |-
       Babylon is an arid planet that originally did not appeal to early colonists. Not only was it a harsh climate, many early colonists suffered from the "Babylon Plague" caused by native pathogens. Thousands perished in the months before scientists were able to come up with an effective vaccine.
@@ -76,22 +82,24 @@ planet:
       Babylon is home to the Goliath Scorpion, which were a bane of early settlers.
     landmass:
       - name:
-          source: canon
+          source: 'Historical: Operation Klondike, pg. 135'
           value: Abyssinia
       - name:
-          source: canon
+          source: 'Historical: Operation Klondike, pg. 135'
           value: Callandra
       - name:
-          source: canon
+          source: 'Historical: Operation Klondike, pg. 135'
           value: Corsen
       - name:
-          source: canon
+          source: 'Historical: Operation Klondike, pg. 135'
           value: Solath
       - name:
-          source: canon
+          source: 'Historical: Operation Klondike, pg. 135'
           value: Valence
     satellite:
-      - name: Ur
+      - name:
+          source: 'Historical: Operation Klondike, pg. 135'
+          value: Ur
         size: large
         icon: rock16
     event:

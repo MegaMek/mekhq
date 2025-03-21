@@ -258,7 +258,8 @@ public class PrisonEscapeScenario {
         }
 
         List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract, false);
-        Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs, campaign);
+        Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs,
+              campaign.getHangar(), campaign.getAllForces());
 
         int randomForceIndex = randomInt(availableForceIDs.size());
         int randomForceID = availableForceIDs.get(randomForceIndex);

@@ -3,9 +3,11 @@ sucsId: 140
 xcood: 74.697
 ycood: -9.356
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: A8III
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2486-03-25'
     zenithCharge: yes
@@ -21,28 +23,32 @@ planet:
       value: Ankaa
     type: TERRESTRIAL
     orbitalDist: 5.04
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: green56
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TOXICPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.7
-    diameter: 11772
-    density: 4.175615886527
+    diameter: 11777
+    density: 4.177221787532
     dayLength: 21
     yearLength: 11.4
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 65
     water:
-      source: canon
+      source: MWDA world profiles
       value: 5
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MICROBE
     desc: |-
       A small world blasted by its white-hot parent star, Ankaa held little promise for settlers during the first waves of interstellar colonization. Only 400 years after the first JumpShips left Terra did Sunni Muslim settlers land on Ankaa, one of the few uninhabited worlds left in the Inner Sphere by that time. These colonists decided to make a new life in Ankaa‘s polar regions, with their deadly climate and desolate but beautiful landscapes.
@@ -56,19 +62,27 @@ planet:
       The capital of Anqabad is located near the north pole.
     landmass:
       - capital:
-          source: canon
+          source: MWDA world profiles
           value: Anqabad
     satellite:
-      - name: Al Anqa
+      - name:
+          source: MWDA world profiles
+          value: Al Anqa
         size: medium
         icon: rock6
-      - name: Al Nair
+      - name:
+          source: MWDA world profiles
+          value: Al Nair
         size: medium
         icon: oddmoon1
-      - name: Al Ri‘al
+      - name:
+          source: MWDA world profiles
+          value: Al Ri'al
         size: medium
         icon: oddmoon2
-      - name: Al Zaurak
+      - name:
+          source: MWDA world profiles
+          value: Al Zaurak
         size: medium
         icon: oddmoon3
     event:

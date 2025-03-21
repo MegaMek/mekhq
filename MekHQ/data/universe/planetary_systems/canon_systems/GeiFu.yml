@@ -3,9 +3,11 @@ sucsId: 943
 xcood: 57.639
 ycood: -199.071
 spectralType:
-  source: canon
+  source: 'Objective Raids: Capellan Confederation'
   value: F5II
-primarySlot: 3
+primarySlot:
+  source: 'Objective Raids: Capellan Confederation'
+  value: 3
 event:
   - date: '2352-08-08'
     nadirCharge: yes
@@ -52,28 +54,32 @@ planet:
       value: Gei-Fu
     type: TERRESTRIAL
     orbitalDist: 3.92
-    sysPos: 3
+    sysPos:
+      source: 'Objective Raids: Capellan Confederation'
+      value: 3
     icon: green36
     pressure:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Objective Raids: Capellan Confederation'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 0.95
-    diameter: 12600
-    density: 5.2795
+    diameter: 12623
+    density: 5.289033256731
     dayLength: 22
     yearLength: 7.9
     temperature:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 43
     water:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 72
     lifeForm:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: MAMMAL
     desc: |-
       Gei-Fu’s greatest contribution to the Capellan Confederation is its high military enrollment. In fact, the planet regularly boasts the highest percentage of population signing up, of any planet in the entire nation. Otherwise, Gei-Fu is unremarkable, it supports enough agriculture to feed its population with limited reliance on imported food and the planet has moderate deposits of natural resources and limited industry. The planet is relatively comfortable for human habitation, aside from the high humidity and heat.
@@ -81,16 +87,18 @@ planet:
       Gei-Fu is home to one of the many Duchy RTC training facilities throughout the Capellan Confederation that train infantry and conventional armor crews. Due to the high recruitment levels on Gei-Fu the Duchy RTC training facilities on planet also provide training for MechWarriors and Aerospace pilots.
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Tiāntáng
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Zìyóu
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Yushui
     satellite:
-      - name: Yè xīng
+      - name:
+          source: 'Objective Raids: Capellan Confederation'
+          value: Yè xīng
         size: giant
         icon: rock16
     event:

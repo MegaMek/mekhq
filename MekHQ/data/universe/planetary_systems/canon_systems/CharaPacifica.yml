@@ -3,9 +3,11 @@ sucsId: 522
 xcood: -29.214
 ycood: 6.414
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G2V
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2353-06-16'
     nadirCharge: yes
@@ -64,28 +66,32 @@ planet:
       value: Chara (Pacifica)
     type: TERRESTRIAL
     orbitalDist: 1.0
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: wet13
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.0
-    diameter: 15098
-    density: 4.681645887845
+    diameter: 15054
+    density: 4.668129986921
     dayLength: 24
     yearLength: 1.4
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 37
     water:
-      source: canon
+      source: MWDA world profiles
       value: 80
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       3135 - Chara, also known as Pacifica, has a weather system that is in constant turmoil due to planet's fast rotation, a fourteen standard hour day, and its lack of a moon to slow the rotation down. Clear skies will suddenly change to rain or thunderstorms that rage across the temperate coastal regions, while fierce blizzards and punishing downpours of freezing rain frequent the northern and southern latitudes. Following settlement, the planet soon became an agricultural paradise. Starpad, is the largest agriplex on the planet, situated just 150 kilometers south of Farhaven, the planetary capital, on the northern Azula continent. In addition to Azula and the nearby continent of Verdez, a third continent, Rojia is mostly unpopulated, and straddles the planetary equator. Rojia's location and mountainous coastlines minimize the effects of the worst weather systems, however its interior reaches are almost all desert and badlands.
@@ -93,17 +99,17 @@ planet:
       During the Succession Wars, the exports from Starpad to agriculturally poorer neighbours prompted a permanent garrison of a full battalion of troops. Despite the garrison, many Draconis Combine raids were launched against Chara. The worst of the fighting occurred on the eve of the Fourth Succession War, when the planet was briefly invaded by Combine forces and the defended by the Kell Hounds mercenary regiment. During the Jihad, Word of Blake agents attempted to poison the Starpad agriplex over the course of several raids, but they were thwarted by local defenders and a few alert civilians. The attack did destroy several crops on Verdez, though these were restored shortly after Chara became a holding of The Republic of the Sphere.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Azula
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Farhaven
       - name:
-          source: canon
-          value: Verdez
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Rojia
+      - name:
+          source: MWDA world profiles
+          value: Verdez
     event:
       - date: '2270-04-14'
         faction:

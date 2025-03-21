@@ -3,9 +3,11 @@ sucsId: 3021
 xcood: 405.006
 ycood: 601.855
 spectralType:
-  source: canon
+  source: Explorer Corps, pg. 20
   value: G2V
-primarySlot: 4
+primarySlot:
+  source: Explorer Corps, pg. 20
+  value: 4
 event:
   - date: '2549-09-20'
     nadirCharge: yes
@@ -73,24 +75,30 @@ planet:
       value: Columbus (Epsilon Pegasus)
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 4
+    sysPos:
+      source: Explorer Corps, pg. 20
+      value: 4
     icon: green51
     pressure:
-      source: canon
-      value: STANDARD
-    atmosphere: BREATHABLE
+      source: Explorer Corps, pg. 20
+      value: THIN
+    atmosphere:
+      source: Explorer Corps, pg. 20
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Explorer Corps, pg. 20
       value: 0.9
-    diameter: 13118
-    density: 4.858657981073
+    diameter: 13068
+    density: 4.840040284046
     dayLength: 24
     yearLength: 1.2
-    temperature: 40
+    temperature:
+      source: Explorer Corps, pg. 20
+      value: 13
     water: 20
     lifeForm:
-      source: canon
+      source: Explorer Corps, pg. 20
       value: MAMMAL
     desc: Columbus was settled in 2549 by deep exploration crews for the Terran Hegemony.
       The station continued as a send off point for explorers throughout the Star
@@ -104,7 +112,9 @@ planet:
       - name: 1ZT1
       - name: 1ZT0
     satellite:
-      - name: Amor
+      - name:
+          source: Explorer Corps, pg. 20
+          value: Amor
         size: large
         icon: rock12
     event:

@@ -3,9 +3,11 @@ sucsId: 892
 xcood: 94.601
 ycood: -109.868
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: M9III
-primarySlot: 5
+primarySlot:
+  source: MWDA world profiles
+  value: 5
 event:
   - date: '2465-01-07'
     nadirCharge: yes
@@ -76,28 +78,32 @@ planet:
       value: Foot Fall
     type: TERRESTRIAL
     orbitalDist: 0.04
-    sysPos: 5
+    sysPos:
+      source: MWDA world profiles
+      value: 5
     icon: green31
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.1
-    diameter: 13714
-    density: 5.632515606538
+    diameter: 13719
+    density: 5.634674622235
     dayLength: 24
     yearLength: 0.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 28
     water:
-      source: canon
-      value: 58
+      source: MWDA world profiles
+      value: 57
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: |-
       3135 - Foot Fall is a cool world with abrupt seasonal changes and enormous snowstorms can drop 60–70 centimeters of snow in a couple days. Foot Fall's two large continents are covered by rocky mountains that leave very little arable land for farming. However, what little arable land there is, is highly fertile and produces more than enough to support the current population. Foot Fall has an abundance of precious metals and iron ore in the large mountain ranges. Ulaanbaatar, is the smaller and more mountainous northern continent. Ulaanbaatar produces the bulk of the iron ore, while Hohhot, the southern continent, has large veins of precious metals. The capital city, Ganz, is the manufacturing center of the planet and is located in the Fen Fang Fu delta region on the northern coast of Hohhot. Foot Fall was settled by people of Mongolian descent, for whom the planet reminded them of home.
@@ -107,16 +113,18 @@ planet:
       During the Capellan-Republic war, Foot Fall was the center of some of the fiercest fighting between the elite units of the Republic and two Warrior Houses. Though the two Warrior Houses, with the surprising help of Free Capella units, managed to take and hold the world for three years, it was a Pyrrhic victory as one Warrior House was destroyed and the world was given back to The Republic following the signing of the treaty that ended hostilities between the two nations.
     landmass:
       - name:
-          source: canon
-          value: Ulaanbaatar
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Hohhot
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Ganz
+      - name:
+          source: MWDA world profiles
+          value: Ulaanbaatar
     satellite:
-      - name: Ankara
+      - name:
+          source: MWDA world profiles
+          value: Ankara
         size: medium
         icon: rock11
     event:
