@@ -98,9 +98,7 @@ planet:
     event:
       - date: '2741-04-29'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         hpg: B
         population: 44431.0
         socioIndustrial: C-C-A-C-C
@@ -175,9 +173,7 @@ planet:
         population: 444882083.0
       - date: '3079-01-05'
         faction:
-          source: canon
-          value:
-            - DGM
+          - DGM
       - date: '3080-01-01'
         population: 450793456.0
       - date: '3090-01-01'
@@ -188,9 +184,7 @@ planet:
         population: 477617052.0
       - date: '3120-03-26'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
         population: 486681189.0
       - date: '3128-01-01'
         socioIndustrial: B-C-A-C-A
@@ -202,9 +196,7 @@ planet:
         population: 503110217.0
       - date: '3145-11-12'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 507557125.0
   - name: Mercurius
     type: DWARF_TERRESTRIAL

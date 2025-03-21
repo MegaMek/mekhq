@@ -121,11 +121,10 @@ planet:
       - name: New Senafe Subregion D
       - name: New Senafe Subregion E
     event:
+      - date: '2108-12-05'
       - date: '2646-09-21'
         faction:
-          source: canon
-          value:
-            - OA
+          - OA
         population: 54081.0
         socioIndustrial: C-D-C-D-F
       - date: '2650-01-01'
@@ -160,17 +159,11 @@ planet:
         population: 188683.0
       - date: '2765-03-05'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '2108-12-05'
-        name: Richmond's World
       - date: '3025-01-01'
-        name: Murrain
-        message: Richmond's World renamed to Murrain
   - name: Matlalcueyeh
     type: TERRESTRIAL
     orbitalDist: 3.64

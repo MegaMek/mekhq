@@ -39,9 +39,7 @@ planet:
     event:
       - date: '2656-03-23'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 50913.0
         socioIndustrial: C-D-B-D-D
       - date: '2660-01-01'
@@ -144,9 +142,7 @@ planet:
         population: 204681544.0
       - date: '3081-07-12'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 206614622.0
       - date: '3097-01-01'
@@ -165,9 +161,7 @@ planet:
         population: 217425297.0
       - date: '3145-07-26'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 217860583.0
   - name: Vodyanoi Belt
     type: ASTEROID_BELT

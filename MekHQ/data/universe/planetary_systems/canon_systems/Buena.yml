@@ -105,9 +105,7 @@ planet:
     event:
       - date: '2390-12-02'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 50296.0
         socioIndustrial: D-D-C-D-D
       - date: '2400-01-01'
@@ -257,7 +255,7 @@ planet:
         population: 140550588.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3045-01-01'
@@ -268,7 +266,7 @@ planet:
         population: 141849620.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -295,14 +293,10 @@ planet:
         population: 152348016.0
       - date: '3146-07-07'
         faction:
-          source: canon
-          value:
-            - BC
+          - BC
       - date: '3148-01-30'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
   - name: Cabezarados
     type: ICE_GIANT
     orbitalDist: 0.9

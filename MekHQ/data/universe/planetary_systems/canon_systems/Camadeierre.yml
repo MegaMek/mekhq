@@ -180,9 +180,7 @@ planet:
     event:
       - date: '2726-01-30'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
         population: 47225.0
         socioIndustrial: D-D-A-D-B
       - date: '2730-08-09'

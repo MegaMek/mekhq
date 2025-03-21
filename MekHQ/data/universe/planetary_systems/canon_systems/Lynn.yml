@@ -60,9 +60,7 @@ planet:
     event:
       - date: '2891-12-08'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 49343.0
         socioIndustrial: B-D-A-D-F
       - date: '2893-06-05'
@@ -125,9 +123,7 @@ planet:
         population: 239028.0
       - date: '3140-12-01'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 238885.0
   - name: Noble

@@ -115,9 +115,7 @@ planet:
     event:
       - date: '2142-07-26'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 51300.0
         socioIndustrial: D-D-B-D-D
       - date: '2150-01-01'
@@ -142,9 +140,7 @@ planet:
         population: 68346702.0
       - date: '2242-10-29'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 97953915.0
       - date: '2260-01-01'
@@ -157,9 +153,7 @@ planet:
         population: 285847957.0
       - date: '2299-07-05'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 348661733.0
       - date: '2310-01-01'
@@ -172,9 +166,7 @@ planet:
         population: 655655951.0
       - date: '2341-01-02'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2350-01-01'
         population: 741519649.0
       - date: '2360-01-01'
@@ -328,7 +320,7 @@ planet:
         population: 1162453225.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3043-01-01'
@@ -337,7 +329,7 @@ planet:
         population: 1174018666.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -364,17 +356,13 @@ planet:
           value: X
       - date: '3140-08-09'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 1308828707.0
       - date: '3145-01-01'
         population: 1315126187.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Lecques
     type: ICE_GIANT
     orbitalDist: 8.32

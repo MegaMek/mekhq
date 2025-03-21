@@ -49,9 +49,7 @@ planet:
     event:
       - date: '2168-03-15'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 52630.0
         socioIndustrial: D-D-A-D-C
       - date: '2170-01-01'
@@ -70,9 +68,7 @@ planet:
         population: 6182054.0
       - date: '2235-03-14'
         faction:
-          source: canon
-          value:
-            - TamP
+          - TamP
       - date: '2240-01-01'
         population: 9979360.0
       - date: '2250-01-01'
@@ -99,9 +95,7 @@ planet:
         population: 129555407.0
       - date: '2341-12-08'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2350-01-01'
         population: 146335676.0
       - date: '2360-01-01'
@@ -253,7 +247,7 @@ planet:
         population: 384371346.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3045-01-01'
@@ -262,7 +256,7 @@ planet:
         population: 389283992.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -271,9 +265,7 @@ planet:
         population: 399458202.0
       - date: '3070-01-18'
         faction:
-          source: canon
-          value:
-            - CW
+          - CW
       - date: '3080-01-01'
         population: 404523218.0
       - date: '3090-01-01'
@@ -292,17 +284,13 @@ planet:
         hpg: X
       - date: '3140-09-23'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 412200191.0
       - date: '3145-01-01'
         population: 413108030.0
       - date: '3152-01-20'
         faction:
-          source: canon
-          value:
-            - NTamP
+          - NTamP
   - name: Heret Belt
     type: ASTEROID_BELT
     orbitalDist: 0.7

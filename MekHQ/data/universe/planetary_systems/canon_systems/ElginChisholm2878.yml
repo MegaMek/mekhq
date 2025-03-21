@@ -66,11 +66,10 @@ planet:
       - name: New Jan Amora
       - name: Nova Forreston
     event:
+      - date: '2108-12-05'
       - date: '2231-03-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 49259.0
         socioIndustrial: D-D-B-D-F
       - date: '2240-01-01'
@@ -93,9 +92,7 @@ planet:
         population: 74138069.0
       - date: '2320-02-15'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 117303206.0
       - date: '2329-01-01'
         socioIndustrial: D-C-B-B-D
@@ -195,23 +192,17 @@ planet:
         population: 2656934159.0
       - date: '2767-10-14'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 2635630468.0
       - date: '2779-10-22'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 2583466383.0
       - date: '2790-08-19'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 2527502814.0
       - date: '2800-01-01'
         population: 2480319459.0
@@ -221,9 +212,7 @@ planet:
         population: 2405977282.0
       - date: '2821-11-10'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2830-01-01'
         population: 2367384185.0
       - date: '2840-01-01'
@@ -236,6 +225,7 @@ planet:
         population: 2264775813.0
       - date: '2870-01-01'
         population: 2252409895.0
+      - date: '2878-01-01'
       - date: '2880-01-01'
         population: 2244393990.0
       - date: '2890-01-01'
@@ -270,16 +260,12 @@ planet:
         population: 1812402384.0
       - date: '3029-11-15'
         faction:
-          source: canon
-          value:
-            - TFR
+          - TFR
       - date: '3030-01-01'
         population: 1781510657.0
       - date: '3032-07-17'
         faction:
-          source: canon
-          value:
-            - FC
+          - FC
       - date: '3040-01-01'
         population: 1801575731.0
       - date: '3047-01-01'
@@ -288,30 +274,22 @@ planet:
         population: 1819681868.0
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - CM
+          - CM
       - date: '3060-01-01'
         population: 1841465437.0
       - date: '3068-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 1862392009.0
       - date: '3077-05-21'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1890916605.0
       - date: '3081-03-11'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1914127084.0
       - date: '3100-01-01'
@@ -334,16 +312,12 @@ planet:
         population: 2083526077.0
       - date: '3149-03-01'
         faction:
-          source: canon
-          value:
-            - CC
-      - date: '3151-01-01'
+          - CC
+      - date: '3151-12-31'
         faction:
           source: sucs
           value:
             - CC
-      - date: '2108-12-05'
-      - date: '2878-01-01'
   - name: Avalon
     type: TERRESTRIAL
     orbitalDist: 1.0

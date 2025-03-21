@@ -72,9 +72,7 @@ planet:
     event:
       - date: '2864-06-25'
         faction:
-          source: canon
-          value:
-            - CI
+          - CI
         hpg: X
         population: 51193.0
         socioIndustrial: C-D-A-D-F

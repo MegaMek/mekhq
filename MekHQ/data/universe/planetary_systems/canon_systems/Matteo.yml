@@ -37,9 +37,7 @@ planet:
     event:
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         hpg: A
         population: 523.0
         socioIndustrial: A-X-X-X-X

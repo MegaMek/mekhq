@@ -131,11 +131,10 @@ planet:
       - name: Tane
       - name: Goga
     event:
+      - date: '2108-12-05'
       - date: '2597-01-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 56669.0
         socioIndustrial: C-F-A-D-D
       - date: '2600-01-01'
@@ -182,22 +181,16 @@ planet:
         population: 4163322.0
       - date: '2787-10-20'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '3151-01-01'
+      - date: '3130-01-01'
+      - date: '3151-12-31'
         faction:
           source: sucs
           value:
             - FR
-      - date: '2108-12-05'
-        name: Huanghuadian
-      - date: '3130-01-01'
-        name: Tincalunas
-        message: Huanghuadian renamed to Tincalunas
   - name: Sainte-Julienne
     type: TERRESTRIAL
     orbitalDist: 3.08

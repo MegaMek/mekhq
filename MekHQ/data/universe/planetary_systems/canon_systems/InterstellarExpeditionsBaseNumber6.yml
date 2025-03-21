@@ -49,9 +49,7 @@ planet:
     event:
       - date: '3095-10-16'
         faction:
-          source: canon
-          value:
-            - IE
+          - IE
         population: 9401.0
         socioIndustrial: B-X-X-X-X
   - name: M22

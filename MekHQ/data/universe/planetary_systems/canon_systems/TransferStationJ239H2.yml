@@ -37,7 +37,7 @@ planet:
     event:
       - date: '3052-07-26'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
         population: 10094.0
@@ -56,9 +56,7 @@ planet:
         population: 7880.0
       - date: '3110-09-04'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         population: 0.0
   - name: Dyaus
     type: ICE_GIANT

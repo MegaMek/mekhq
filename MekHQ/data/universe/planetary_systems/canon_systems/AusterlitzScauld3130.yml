@@ -98,11 +98,10 @@ planet:
         size: medium
         icon: oddmoon1
     event:
+      - date: '2108-12-05'
       - date: '2450-06-18'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 47519.0
         socioIndustrial: C-D-B-D-F
       - date: '2460-01-01'
@@ -176,9 +175,7 @@ planet:
         population: 47004.0
       - date: '2779-05-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 26937.0
       - date: '2790-01-01'
@@ -201,17 +198,13 @@ planet:
         population: 1139.0
       - date: '2867-01-06'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '3087-04-13'
         faction:
-          source: canon
-          value:
-            - RT
+          - RT
         population: 50000.0
         socioIndustrial: F-F-C-D-F
       - date: '3090-01-01'
@@ -226,15 +219,11 @@ planet:
         population: 175129.0
       - date: '3130-01-01'
         population: 197754.0
+      - date: '3130-01-01'
       - date: '3140-01-01'
         population: 218006.0
       - date: '3145-01-01'
         population: 225997.0
-      - date: '2108-12-05'
-        name: Austerlitz
-      - date: '3130-01-01'
-        name: Scauld
-        message: Austerlitz renamed to Scauld
   - name: Zosim's Retreat
     type: GIANT_TERRESTRIAL
     orbitalDist: 4.48

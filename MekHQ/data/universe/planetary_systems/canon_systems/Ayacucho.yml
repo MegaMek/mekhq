@@ -50,9 +50,7 @@ planet:
     event:
       - date: '2503-11-10'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 50398.0
         socioIndustrial: C-D-A-D-F
       - date: '2510-01-01'
@@ -174,7 +172,7 @@ planet:
         population: 124839594.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3044-01-01'
@@ -183,7 +181,7 @@ planet:
         population: 126460457.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -210,14 +208,10 @@ planet:
         population: 136951886.0
       - date: '3146-07-07'
         faction:
-          source: canon
-          value:
-            - BC
+          - BC
       - date: '3148-01-30'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
   - name: Carna
     type: DWARF_TERRESTRIAL
     orbitalDist: 1.0

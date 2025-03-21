@@ -121,9 +121,7 @@ planet:
     event:
       - date: '2400-03-05'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 49369.0
         socioIndustrial: D-D-B-D-D
       - date: '2410-01-01'
@@ -287,9 +285,7 @@ planet:
         population: 1498800022.0
       - date: '3081-05-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 1499999542.0
       - date: '3092-01-01'
@@ -310,9 +306,7 @@ planet:
         population: 1537972211.0
       - date: '3145-09-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1546609016.0
   - name: Hurstbourne
     type: DWARF_TERRESTRIAL

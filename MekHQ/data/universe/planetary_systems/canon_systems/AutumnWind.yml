@@ -64,9 +64,7 @@ planet:
     event:
       - date: '2269-02-17'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 56662.0
         socioIndustrial: F-D-B-D-B
       - date: '2270-01-01'
@@ -75,9 +73,7 @@ planet:
         population: 217949.0
       - date: '2285-04-03'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2290-01-01'
         population: 622242.0
       - date: '2300-01-01'
@@ -254,9 +250,7 @@ planet:
         population: 329702384.0
       - date: '3081-06-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 331752888.0
       - date: '3100-01-01'
@@ -267,9 +261,7 @@ planet:
         population: 338725614.0
       - date: '3130-11-10'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
         population: 341309735.0
       - date: '3132-08-07'
         hpg: X
@@ -279,9 +271,7 @@ planet:
         population: 343913571.0
       - date: '3145-09-28'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 345153892.0
   - name: Hillview
     type: TERRESTRIAL

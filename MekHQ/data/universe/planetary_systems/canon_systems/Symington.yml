@@ -85,9 +85,7 @@ planet:
     event:
       - date: '2164-03-07'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 52336.0
         socioIndustrial: F-F-C-C-D
       - date: '2170-01-01'
@@ -108,9 +106,7 @@ planet:
         population: 26324577.0
       - date: '2242-05-10'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 41738758.0
       - date: '2260-01-01'
@@ -123,9 +119,7 @@ planet:
         population: 166714078.0
       - date: '2299-05-11'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 216551803.0
       - date: '2310-01-01'
@@ -138,9 +132,7 @@ planet:
         population: 466593560.0
       - date: '2341-06-28'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2350-01-01'
         population: 537340639.0
       - date: '2360-01-01'
@@ -297,7 +289,7 @@ planet:
         population: 1254789420.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3041-01-01'
@@ -306,7 +298,7 @@ planet:
         population: 1268287754.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -329,17 +321,13 @@ planet:
         population: 1381911610.0
       - date: '3140-01-25'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 1396917139.0
       - date: '3145-01-01'
         population: 1407574155.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Great Cornard
     type: ICE_GIANT
     orbitalDist: 14.0

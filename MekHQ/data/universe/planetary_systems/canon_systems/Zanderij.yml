@@ -32,9 +32,7 @@ planet:
     event:
       - date: '2707-05-18'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 52328.0
         socioIndustrial: C-D-B-F-F
       - date: '2710-01-01'
@@ -113,7 +111,7 @@ planet:
         population: 96680225.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3045-01-01'
@@ -122,14 +120,12 @@ planet:
         population: 95738881.0
       - date: '3057-12-01'
         faction:
-          source: canon
-          value:
-            - ARDC
+          - ARDC
       - date: '3060-01-01'
         population: 94702796.0
       - date: '3067-04-24'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - LA
       - date: '3070-01-01'
@@ -154,15 +150,11 @@ planet:
         population: 97584626.0
       - date: '3145-11-08'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 97721340.0
       - date: '3152-02-15'
         faction:
-          source: canon
-          value:
-            - ARL
+          - ARL
   - name: Groningen
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.9

@@ -98,9 +98,7 @@ planet:
     event:
       - date: '2146-10-29'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 44723.0
         socioIndustrial: D-C-C-C-D
       - date: '2150-01-01'
@@ -125,9 +123,7 @@ planet:
         population: 84368304.0
       - date: '2242-04-18'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 126023171.0
       - date: '2260-01-01'
@@ -144,9 +140,7 @@ planet:
         population: 647298303.0
       - date: '2319-03-19'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2320-01-01'
         population: 766587941.0
       - date: '2330-01-01'
@@ -155,9 +149,7 @@ planet:
         population: 1012802931.0
       - date: '2341-07-31'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2350-01-01'
         population: 1132632832.0
       - date: '2360-01-01'
@@ -272,9 +264,7 @@ planet:
         population: 2883896864.0
       - date: '2866-12-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2870-01-01'
         population: 2842427650.0
       - date: '2880-01-01'
@@ -329,24 +319,18 @@ planet:
         population: 2045956633.0
       - date: '3069-05-12'
         faction:
-          source: canon
-          value:
-            - DC
-            - WOB
+          - DC
+          - WOB
       - date: '3069-05-26'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3070-01-01'
         population: 2001209891.0
       - date: '3080-01-01'
         population: 2018090854.0
       - date: '3081-05-29'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 2030235798.0
       - date: '3095-01-01'
@@ -365,16 +349,12 @@ planet:
           value: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 2170921958.0
       - date: '3145-11-06'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 2191424837.0
   - name: Ēostre's Frontier
     type: TERRESTRIAL

@@ -49,9 +49,7 @@ planet:
     event:
       - date: '2635-03-11'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 49724.0
         socioIndustrial: D-D-B-D-C
       - date: '2640-01-01'
@@ -149,7 +147,7 @@ planet:
         population: 425332576.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3044-01-01'
@@ -158,7 +156,7 @@ planet:
         population: 429779117.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -185,16 +183,14 @@ planet:
         population: 450776384.0
       - date: '3145-01-01'
         population: 451227386.0
-      - date: '3151-01-01'
+      - date: '3151-12-31'
         faction:
           source: sucs
           value:
             - CJF
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
   - name: Rosario del Tala
     type: GAS_GIANT
     orbitalDist: 1.28

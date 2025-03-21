@@ -48,9 +48,7 @@ planet:
     event:
       - date: '2531-01-25'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 44423.0
         socioIndustrial: C-D-C-D-F
       - date: '2540-01-01'
@@ -168,7 +166,7 @@ planet:
         population: 62215116.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3043-01-01'
@@ -179,7 +177,7 @@ planet:
         population: 63745461.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -204,9 +202,7 @@ planet:
         population: 66101933.0
       - date: '3145-03-20'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 66181303.0
   - name: Saltwood
     type: TERRESTRIAL

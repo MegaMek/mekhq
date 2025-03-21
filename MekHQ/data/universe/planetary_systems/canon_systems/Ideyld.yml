@@ -290,9 +290,7 @@ planet:
     event:
       - date: '2244-06-18'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 59281.0
         socioIndustrial: D-D-A-D-F
       - date: '2250-01-01'
@@ -303,9 +301,7 @@ planet:
         population: 1168578.0
       - date: '2280-10-22'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 2827637.0
       - date: '2290-01-01'
         population: 6091843.0
@@ -484,9 +480,7 @@ planet:
         population: 928057209.0
       - date: '3081-02-24'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 928985730.0
       - date: '3099-01-01'
@@ -505,9 +499,7 @@ planet:
         population: 971356335.0
       - date: '3145-02-10'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 981314872.0
   - name: Mayansky's End
     type: ICE_GIANT

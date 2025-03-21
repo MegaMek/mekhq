@@ -39,11 +39,10 @@ planet:
         size: large
         icon: rock15
     event:
+      - date: '2108-12-05'
       - date: '2746-07-19'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 63303.0
         socioIndustrial: C-D-C-D-F
       - date: '2747-10-18'
@@ -64,6 +63,7 @@ planet:
         population: 21585145.0
       - date: '2820-01-01'
         population: 30757685.0
+      - date: '2822-01-01'
       - date: '2830-01-01'
         population: 40961642.0
       - date: '2840-01-01'
@@ -74,17 +74,10 @@ planet:
         population: 206794.0
       - date: '2864-06-16'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '2108-12-05'
-        name: Untran
-      - date: '2822-01-01'
-        name: Achtur
-        message: Untran renamed to Achtur
   - name: PEH-2
     type: TERRESTRIAL
     orbitalDist: 0.49

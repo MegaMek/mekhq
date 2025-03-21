@@ -93,9 +93,7 @@ planet:
     event:
       - date: '2205-11-26'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 65621.0
         socioIndustrial: D-D-C-D-D
       - date: '2210-01-01'
@@ -118,9 +116,7 @@ planet:
         population: 81928707.0
       - date: '2299-02-26'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 124688525.0
       - date: '2310-01-01'
@@ -133,9 +129,7 @@ planet:
         population: 421114509.0
       - date: '2341-01-17'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2350-01-01'
         population: 520405157.0
       - date: '2360-01-01'
@@ -286,15 +280,13 @@ planet:
         population: 1621235022.0
       - date: '3030-04-30'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 1635111123.0
       - date: '3040-01-01'
         population: 1653361962.0
       - date: '3048-10-27'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - FC
         socioIndustrial: B-B-C-B-C
@@ -302,7 +294,7 @@ planet:
         population: 1668476221.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -313,9 +305,7 @@ planet:
         population: 1729116816.0
       - date: '3081-12-03'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1760170655.0
       - date: '3100-01-01'
@@ -332,18 +322,14 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1895363740.0
       - date: '3145-08-13'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 1907532968.0
-      - date: '3152-06-01'
+      - date: '3152-12-31'
         faction:
           source: sucs
           value:

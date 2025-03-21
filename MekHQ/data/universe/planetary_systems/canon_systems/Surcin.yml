@@ -52,9 +52,7 @@ planet:
     event:
       - date: '2170-04-19'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 60442.0
         socioIndustrial: D-F-A-D-B
       - date: '2180-01-01'
@@ -71,9 +69,7 @@ planet:
         population: 11877462.0
       - date: '2235-06-09'
         faction:
-          source: canon
-          value:
-            - TamP
+          - TamP
       - date: '2240-01-01'
         population: 20714613.0
       - date: '2250-01-01'
@@ -98,9 +94,7 @@ planet:
         population: 397212244.0
       - date: '2341-07-29'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2350-01-01'
         population: 456335352.0
       - date: '2360-01-01'
@@ -256,7 +250,7 @@ planet:
         population: 878788815.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3043-01-01'
@@ -265,7 +259,7 @@ planet:
         population: 887798332.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -286,17 +280,13 @@ planet:
         population: 915659539.0
       - date: '3130-07-29'
         faction:
-          source: canon
-          value:
-            - CW
+          - CW
         population: 914744337.0
       - date: '3132-08-07'
         hpg: X
       - date: '3140-01-14'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 914744337.0
       - date: '3145-01-01'
         population: 914744337.0

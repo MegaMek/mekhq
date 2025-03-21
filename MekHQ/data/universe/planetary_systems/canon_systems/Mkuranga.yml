@@ -241,9 +241,7 @@ planet:
     event:
       - date: '2644-03-06'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 45335.0
         socioIndustrial: C-D-A-D-B
       - date: '2650-01-01'
@@ -338,7 +336,7 @@ planet:
         population: 141070779.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3042-01-01'
@@ -347,27 +345,21 @@ planet:
         population: 142061738.0
       - date: '3057-12-01'
         faction:
-          source: canon
-          value:
-            - ARDC
+          - ARDC
       - date: '3060-01-01'
         population: 143002447.0
       - date: '3067-04-24'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - LA
       - date: '3069-06-10'
         faction:
-          source: canon
-          value:
-            - LA
-            - CJF
+          - LA
+          - CJF
       - date: '3069-06-14'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3070-01-01'
         population: 144006976.0
       - date: '3080-01-01'
@@ -392,9 +384,7 @@ planet:
         population: 146974888.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Entsha Neruma
     type: ICE_GIANT
     orbitalDist: 3.92

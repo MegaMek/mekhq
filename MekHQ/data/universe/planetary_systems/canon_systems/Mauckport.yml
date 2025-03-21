@@ -45,9 +45,7 @@ planet:
     event:
       - date: '2538-12-12'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 50834.0
         socioIndustrial: C-F-A-C-D
       - date: '2540-01-01'
@@ -166,7 +164,7 @@ planet:
         population: 95482446.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3042-01-01'
@@ -179,7 +177,7 @@ planet:
         population: 96548205.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -204,11 +202,9 @@ planet:
         population: 102170442.0
       - date: '3145-04-14'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 102620982.0
-      - date: '3152-06-01'
+      - date: '3152-12-31'
         faction:
           source: sucs
           value:

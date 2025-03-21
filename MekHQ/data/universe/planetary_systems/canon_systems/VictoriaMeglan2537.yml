@@ -36,11 +36,10 @@ planet:
       - name: Worcester
       - name: Rodríguez's Point
     event:
+      - date: '2108-12-05'
       - date: '2275-08-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 40923.0
         socioIndustrial: D-D-A-C-D
       - date: '2280-01-01'
@@ -59,9 +58,7 @@ planet:
         population: 7419618.0
       - date: '2340-05-26'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 13086704.0
       - date: '2350-01-01'
         population: 21445010.0
@@ -101,6 +98,7 @@ planet:
         population: 419662010.0
       - date: '2530-01-01'
         population: 435822167.0
+      - date: '2537-01-01'
       - date: '2540-01-01'
         population: 449473236.0
       - date: '2550-01-01'
@@ -158,16 +156,12 @@ planet:
         population: 574039608.0
       - date: '2797-01-11'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2800-01-01'
         population: 575944450.0
       - date: '2801-12-13'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2810-01-01'
         population: 578394270.0
       - date: '2820-01-01'
@@ -225,7 +219,7 @@ planet:
         population: 476299082.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3049-01-01'
@@ -236,7 +230,7 @@ planet:
         population: 488307818.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -261,11 +255,6 @@ planet:
         population: 511294620.0
       - date: '3145-01-01'
         population: 513241236.0
-      - date: '2108-12-05'
-        name: Meglan
-      - date: '2537-01-01'
-        name: Victoria
-        message: Meglan renamed to Victoria
   - name: New Hottot-les-Bagues
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.42

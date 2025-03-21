@@ -74,9 +74,7 @@ planet:
     event:
       - date: '2314-02-26'
         faction:
-          source: canon
-          value:
-            - PD
+          - PD
         population: 52578.0
         socioIndustrial: D-D-A-D-B
       - date: '2320-01-01'
@@ -87,9 +85,7 @@ planet:
         population: 1090126.0
       - date: '2341-01-07'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2350-01-01'
         population: 2590903.0
       - date: '2360-01-01'
@@ -248,7 +244,7 @@ planet:
         population: 391494843.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3042-01-01'
@@ -257,7 +253,7 @@ planet:
         population: 395706329.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -284,9 +280,7 @@ planet:
         population: 417244484.0
       - date: '3145-06-24'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 420175442.0
   - name: T-1 Belt
     type: ASTEROID_BELT

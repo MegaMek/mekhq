@@ -64,9 +64,7 @@ planet:
     event:
       - date: '2642-01-17'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 53973.0
         socioIndustrial: C-D-A-C-C
       - date: '2643-01-01'
@@ -140,9 +138,7 @@ planet:
         population: 1145.0
       - date: '2925-01-17'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

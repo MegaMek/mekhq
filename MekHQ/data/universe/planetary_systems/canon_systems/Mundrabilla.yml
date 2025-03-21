@@ -71,9 +71,7 @@ planet:
     event:
       - date: '2265-01-12'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 53351.0
         socioIndustrial: F-D-B-D-D
       - date: '2270-01-01'
@@ -88,9 +86,7 @@ planet:
         population: 5202824.0
       - date: '2320-08-20'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 10162360.0
       - date: '2330-01-01'
         population: 18077833.0
@@ -261,9 +257,7 @@ planet:
         population: 517277116.0
       - date: '3081-03-24'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 522058024.0
       - date: '3100-01-01'
@@ -282,15 +276,11 @@ planet:
         population: 534845938.0
       - date: '3145-04-27'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 537741918.0
       - date: '3151-12-22'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: Bullman's Choice
     type: TERRESTRIAL
     orbitalDist: 1.76

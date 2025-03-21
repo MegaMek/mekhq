@@ -44,9 +44,7 @@ planet:
     event:
       - date: '3095-10-14'
         faction:
-          source: canon
-          value:
-            - IE
+          - IE
         population: 50000.0
         socioIndustrial: C-C-A-C-C
       - date: '3100-01-01'

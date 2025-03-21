@@ -153,9 +153,7 @@ planet:
     event:
       - date: '2720-06-08'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 53620.0
         socioIndustrial: C-D-C-D-F
       - date: '2730-08-04'
@@ -179,17 +177,13 @@ planet:
         population: 35464.0
       - date: '2808-10-03'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '3095-07-13'
         faction:
-          source: canon
-          value:
-            - IE
+          - IE
         population: 722.0
         socioIndustrial: B-X-X-X-X
   - name: BNY7

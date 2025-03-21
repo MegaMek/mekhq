@@ -69,9 +69,7 @@ planet:
     event:
       - date: '2370-12-14'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 45083.0
         socioIndustrial: C-D-B-C-F
       - date: '2380-01-01'
@@ -92,9 +90,7 @@ planet:
         population: 18488540.0
       - date: '2441-12-22'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2450-01-01'
         population: 27464214.0
       - date: '2460-01-01'
@@ -171,9 +167,7 @@ planet:
         population: 211453028.0
       - date: '2791-11-06'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2800-01-01'
         population: 206940713.0
       - date: '2810-01-01'
@@ -230,7 +224,7 @@ planet:
         population: 170895223.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3049-01-01'
@@ -239,7 +233,7 @@ planet:
         population: 171940870.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -265,14 +259,10 @@ planet:
         population: 192934478.0
       - date: '3146-07-07'
         faction:
-          source: canon
-          value:
-            - BC
+          - BC
       - date: '3147-07-10'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
   - name: Whitney
     type: TERRESTRIAL
     orbitalDist: 2.08

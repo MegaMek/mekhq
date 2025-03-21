@@ -22,7 +22,6 @@ planet:
     smallMoons: 4
     event:
       - date: '3025-01-01'
-        name: Baltazar I
   - name: Clayton
     type: TERRESTRIAL
     orbitalDist: 1.4
@@ -44,7 +43,6 @@ planet:
         icon: rock1
     event:
       - date: '3025-01-01'
-        name: Baltazar II
   - name:
       source: canon
       value: Himmels
@@ -69,11 +67,10 @@ planet:
       - name: Thuillier
       - name: Oudin's Gulf
     event:
+      - date: '2108-12-05'
       - date: '2712-09-02'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 55842.0
         socioIndustrial: C-D-A-D-D
       - date: '2720-05-09'
@@ -92,16 +89,12 @@ planet:
         population: 5187280.0
       - date: '2779-11-14'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 7515473.0
       - date: '2785-10-02'
         faction:
-          source: canon
-          value:
-            - CIR
+          - CIR
       - date: '2790-01-01'
         population: 10129750.0
       - date: '2800-01-01'
@@ -150,6 +143,7 @@ planet:
         population: 36684989.0
       - date: '3020-01-01'
         population: 36859265.0
+      - date: '3025-01-01'
       - date: '3030-01-01'
         population: 36955301.0
       - date: '3040-01-01'
@@ -166,9 +160,7 @@ planet:
         population: 36509034.0
       - date: '3081-05-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 36809639.0
       - date: '3100-01-01'
@@ -185,11 +177,6 @@ planet:
         socioIndustrial: B-D-A-C-F
       - date: '3145-01-01'
         population: 38867551.0
-      - date: '2108-12-05'
-        name: Helbrent
-      - date: '3025-01-01'
-        name: Baltazar III
-        message: Himmels renamed to Baltazar III
   - name: Chitembo
     type: ICE_GIANT
     orbitalDist: 3.92
@@ -217,7 +204,6 @@ planet:
         icon: rock16
     event:
       - date: '3025-01-01'
-        name: Baltazar IV
   - name: East Pikel
     type: TERRESTRIAL
     orbitalDist: 14.0
@@ -244,7 +230,6 @@ planet:
         icon: oddmoon3
     event:
       - date: '3025-01-01'
-        name: Baltazar V
   - name: Ardakān
     type: GAS_GIANT
     orbitalDist: 27.44
@@ -284,4 +269,3 @@ planet:
         icon: rock2
     event:
       - date: '3025-01-01'
-        name: Baltazar VI

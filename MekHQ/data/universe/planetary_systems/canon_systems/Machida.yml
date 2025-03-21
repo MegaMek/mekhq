@@ -271,9 +271,7 @@ planet:
     event:
       - date: '2452-09-16'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 48518.0
         socioIndustrial: C-D-A-D-D
       - date: '2460-11-26'
@@ -351,9 +349,7 @@ planet:
         hpg: X
       - date: '2779-10-10'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-03-14'
         hpg: B
         population: 272027614.0
@@ -417,7 +413,7 @@ planet:
         population: 191521690.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3049-01-01'
@@ -426,7 +422,7 @@ planet:
         population: 193040704.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -453,15 +449,11 @@ planet:
         population: 221185356.0
       - date: '3145-12-17'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 223140377.0
       - date: '3151-05-13'
         faction:
-          source: canon
-          value:
-            - VSM
+          - VSM
   - name: Carmenta Belt
     type: ASTEROID_BELT
     orbitalDist: 1.44
