@@ -1412,8 +1412,11 @@ public class AtBDynamicScenarioFactory {
         // if the objective is a reach edge/prevent reaching edge and the direction is
         // "destination edge" ("None").
 
+        reviewBotForceTemplateCompleteness(scenario);
+
         for (int x = 0; x < scenario.getNumBots(); x++) {
             BotForce botForce = scenario.getBotForce(x);
+
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
             boolean botForceIsHostile = botForce.getTeam() == ForceAlignment.Opposing.ordinal() ||
                     botForce.getTeam() == ForceAlignment.Third.ordinal();
@@ -1483,6 +1486,53 @@ public class AtBDynamicScenarioFactory {
         }
 
         return actualObjective;
+    }
+
+    /**
+     * Ensures that the bot force templates in the given {@link AtBDynamicScenario} are complete by
+     * checking for any missing bot forces and restoring their corresponding templates.
+     *
+     * <p>This method iterates through all the bot forces in the scenario and verifies if each one
+     * is mapped to an appropriate {@link ScenarioForceTemplate} in the force templates map. If a
+     * mapping is missing, it matches the force to its template by name and adds it to the map.</p>
+     *
+     * <p><strong>Behavior:</strong></p>
+     * <ul>
+     *   <li>Retrieves the current map of bot forces to their templates from the scenario.</li>
+     *   <li>Checks all bot forces in the scenario for missing entries in the template map.</li>
+     *   <li>Searches for the appropriate template by matching force names to template names.</li>
+     *   <li>Restores the missing templates by adding them back into the map.</li>
+     * </ul>
+     *
+     * <p><strong>Purpose:</strong></p>
+     * <p>This method was introduced to address a rare instance where bot forces would not be tracked
+     * correctly. The root cause could not be tracked down, so we implemented this method to ensure
+     * data correctness and to self-fix any issues. This also ensures that any bot forces added
+     * post-initial generation (for whatever reason) will be properly tracked.</p>
+     *
+     * @param scenario The {@link AtBDynamicScenario} whose bot force templates are being reviewed and completed.
+     */
+    private static void reviewBotForceTemplateCompleteness(AtBDynamicScenario scenario) {
+        Map<BotForce, ScenarioForceTemplate> forceTemplates = scenario.getBotForceTemplates();
+
+        ScenarioTemplate scenarioTemplate = scenario.getTemplate();
+        List<ScenarioForceTemplate> templates = scenarioTemplate.getAllBotControlledAllies();
+        templates.addAll(scenarioTemplate.getAllBotControlledHostiles());
+
+        for (BotForce force : scenario.getBotForces()) {
+            ScenarioForceTemplate forceTemplate = forceTemplates.get(force);
+
+            if (forceTemplate == null) {
+                String templateName = force.getTemplateName();
+
+                for (ScenarioForceTemplate template : templates) {
+                    if (template.getForceName().equals(templateName)) {
+                        forceTemplate = template;
+                        scenario.getBotForceTemplates().put(force, forceTemplate);
+                    }
+                }
+            }
+        }
     }
 
     /**
