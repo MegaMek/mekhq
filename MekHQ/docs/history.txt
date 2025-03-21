@@ -201,6 +201,7 @@ MEKHQ VERSION HISTORY:
 + PR #6314: Corrected Resource Bundle Reference In PrisonerRansomEventDialog
 + Fix #6313: Added Self-Correction Step to Scenario Objective Processing
 + Fix #6315: Fixed MekHQ Throwing Meks into Low Altitude Scenarios
++ PR #6319: Added Early Exit for Objective Determination Self-Correction Loop
 
 
 0.50.03 (2025-02-02 2030 UTC)
