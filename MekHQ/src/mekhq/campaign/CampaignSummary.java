@@ -44,7 +44,10 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import static mekhq.campaign.force.Force.FORCE_ORIGIN;
+import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
+import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenUsage;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrain;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrainModifier;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getCombinedSkillValues;
@@ -391,24 +394,22 @@ public class CampaignSummary {
 
         // Field Kitchens
         if (campaignOptions.isUseFatigue()) {
-            int personnelCount;
-            if (campaignOptions.isUseFieldKitchenIgnoreNonCombatants()) {
-                personnelCount = campaign.getActiveCombatPersonnel().size();
-            } else {
-                personnelCount = campaign.getActivePersonnel(true).size();
-            }
+            List<Unit> unitsInToe = campaign.getForce(FORCE_ORIGIN).getAllUnitsAsUnits(campaign.getHangar(),
+                  false);
 
-            int fieldKitchenCapacity = checkFieldKitchenCapacity(campaign);
+            int fieldKitchenCapacity = checkFieldKitchenCapacity(unitsInToe, campaignOptions.getFieldKitchenCapacity());
+            int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false),
+                  campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
+            boolean isWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
 
-            exceedsCapacity = personnelCount > fieldKitchenCapacity;
-
-            color = exceedsCapacity
+            color = isWithinCapacity
                 ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor())
                 : "";
-            closingSpan = exceedsCapacity ? CLOSING_SPAN_TAG : "";
-            colorBlindWarning = exceedsCapacity ? WARNING : "";
-            report.append(String.format("Kitchens %s(%s/%s)%s%s",
-                color, personnelCount, checkFieldKitchenCapacity(campaign), closingSpan, colorBlindWarning));
+            closingSpan = isWithinCapacity ? "" : CLOSING_SPAN_TAG;
+            colorBlindWarning = isWithinCapacity ? "" : WARNING;
+
+            report.append(String.format("Kitchens %s(%s/%s)%s%s", color, fieldKitchenUsage,
+                  fieldKitchenCapacity, closingSpan, colorBlindWarning));
         }
 
         // Hospital Beds

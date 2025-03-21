@@ -101,7 +101,6 @@ import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.GrayMonday;
 import mekhq.campaign.randomEvents.RandomEventLibraries;
@@ -161,6 +160,7 @@ import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_WEEK;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.force.Force.FORCE_ORIGIN;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
@@ -171,6 +171,10 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
+import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
+import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
+import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenUsage;
+import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.processFatigueRecovery;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_CLARION_NOTE;
 import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
@@ -4545,6 +4549,10 @@ public class Campaign implements ITechManager {
                 }
 
                 processWeeklyEdgeResets(person);
+
+                if (!person.getStatus().isMIA()) {
+                    processFatigueRecovery(this, person);
+                }
             }
 
             // Monthly events
@@ -4963,6 +4971,9 @@ public class Campaign implements ITechManager {
         // getContractMarket().processNewDay(this);
         unitMarket.processNewDay(this);
 
+
+        updateFieldKitchenCapacity();
+
         processNewDayPersonnel();
 
         // Needs to be before 'processNewDayATB' so that Dependents can't leave the moment they
@@ -4976,8 +4987,6 @@ public class Campaign implements ITechManager {
         if (campaignOptions.isUseAtB()) {
             processNewDayATB();
         }
-
-        processFatigueNewDay();
 
         if (campaignOptions.getUnitRatingMethod().isCampaignOperations()) {
             processReputationChanges();
@@ -5035,6 +5044,27 @@ public class Campaign implements ITechManager {
         // This must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
+    }
+
+    /**
+     * Updates the status of whether field kitchens are operating within their required capacity.
+     *
+     * <p>If fatigue is enabled in the campaign options, this method calculates the total available
+     * field kitchen capacity and the required field kitchen usage, then updates the
+     * {@code fieldKitchenWithinCapacity} flag to reflect whether the capacity meets the demand.
+     * If fatigue is disabled, the capacity is automatically set to {@code false}.</p>
+     */
+    private void updateFieldKitchenCapacity() {
+        if (campaignOptions.isUseFatigue()) {
+            int fieldKitchenCapacity = checkFieldKitchenCapacity(
+                  getForce(FORCE_ORIGIN).getAllUnitsAsUnits(units, false),
+                  campaignOptions.getFieldKitchenCapacity());
+            int fieldKitchenUsage = checkFieldKitchenUsage(getActivePersonnel(false),
+                  campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
+            fieldKitchenWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
+        } else {
+            fieldKitchenWithinCapacity = false;
+        }
     }
 
     /**
@@ -5211,37 +5241,6 @@ public class Campaign implements ITechManager {
         if (!graduatingPersonnel.isEmpty()) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();
             autoAwardsController.PostGraduationController(this, graduatingPersonnel, academyAttributesMap);
-        }
-    }
-
-    /**
-     * This method is responsible for handling fatigue recovery and checking if the
-     * field kitchen is within capacity.
-     * Even if fatigue is disabled, fatigue recovery is still processed to ensure
-     * that fatigued personnel are not
-     * frozen in that state.
-     */
-    private void processFatigueNewDay() {
-        // even if Fatigue is disabled, we still want to process recovery so fatigued
-        // personnel aren't frozen in that state
-        Fatigue.processFatigueRecovery(this);
-
-        // we store this value, so it only needs to be checked once per day,
-        // otherwise we would need to check it once for each active person in the
-        // campaign
-        if (campaignOptions.isUseFatigue()) {
-            int personnelCount;
-
-            if (campaignOptions.isUseFieldKitchenIgnoreNonCombatants()) {
-                personnelCount = getActiveCombatPersonnel().size();
-            } else {
-                personnelCount = getActivePersonnel().size();
-            }
-
-            personnelCount -= getCurrentPrisoners().size();
-            fieldKitchenWithinCapacity = personnelCount <= Fatigue.checkFieldKitchenCapacity(this);
-        } else {
-            fieldKitchenWithinCapacity = false;
         }
     }
 
