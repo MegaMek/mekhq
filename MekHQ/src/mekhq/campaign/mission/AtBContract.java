@@ -60,6 +60,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.randomEvents.MercenaryAuction;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractDefinition;
 import mekhq.campaign.stratcon.StratconContractInitializer;
@@ -92,7 +93,9 @@ import static megamek.client.ratgenerator.UnitTable.findTable;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
+import static megamek.common.UnitType.AEROSPACEFIGHTER;
 import static megamek.common.UnitType.MEK;
+import static megamek.common.UnitType.TANK;
 import static megamek.common.enums.SkillLevel.*;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.force.ForceType.STANDARD;
@@ -454,7 +457,7 @@ public class AtBContract extends Contract {
 
                 numUnits += switch (entity.getUnitType()) {
                     case UnitType.TANK, UnitType.VTOL, UnitType.NAVAL, UnitType.CONV_FIGHTER,
-                         UnitType.AEROSPACEFIGHTER
+                         AEROSPACEFIGHTER
                         -> campaign.getFaction().isClan() ? 0.5 : 1;
                     case UnitType.PROTOMEK -> 0.2;
                     case UnitType.BATTLE_ARMOR, UnitType.INFANTRY -> 0;
@@ -831,18 +834,15 @@ public class AtBContract extends Contract {
                 }
             }
             case 4 -> {
-                campaign.addReport("Bonus: Unit");
-                addBonusUnit(campaign, UnitType.TANK);
+                new MercenaryAuction(campaign, requiredCombatTeams, stratconCampaignState, TANK);
                 yield false;
             }
             case 5 -> {
-                campaign.addReport("Bonus: Unit");
-                addBonusUnit(campaign, UnitType.AEROSPACEFIGHTER);
+                new MercenaryAuction(campaign, requiredCombatTeams, stratconCampaignState, AEROSPACEFIGHTER);
                 yield false;
             }
             case 6 -> {
-                campaign.addReport("Bonus: Unit");
-                addBonusUnit(campaign, MEK);
+                new MercenaryAuction(campaign, requiredCombatTeams, stratconCampaignState, MEK);
                 yield false;
             }
             default -> throw new IllegalStateException(
@@ -888,7 +888,9 @@ public class AtBContract extends Contract {
      *
      * @param campaign  the campaign object to add the bonus unit to
      * @param unitType  the type of unit for the bonus
+     * @deprecated deprecated as superceded by {@link MercenaryAuction}
      */
+    @Deprecated(since = "0.50.04", forRemoval = true)
     private void addBonusUnit(Campaign campaign, int unitType) {
         // Determine faction and quality
         String faction = (randomInt(2) > 0) ? enemyCode : employerCode;
