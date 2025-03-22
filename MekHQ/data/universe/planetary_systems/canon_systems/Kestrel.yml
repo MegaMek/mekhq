@@ -3,9 +3,11 @@ sucsId: 1336
 xcood: 268.309
 ycood: -46.829
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 94'
   value: G8IV
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Davion, pg. 94'
+  value: 3
 event:
   - date: '2395-09-17'
     zenithCharge: yes
@@ -47,28 +49,32 @@ planet:
       value: Kestrel
     type: TERRESTRIAL
     orbitalDist: 1.28
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Davion, pg. 94'
+      value: 3
     icon: green53
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 94'
       value: STANDARD
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 94'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 94'
       value: 1.05
-    diameter: 15064
-    density: 4.898979485566
+    diameter: 15063
+    density: 4.898698119926
     dayLength: 17
     yearLength: 1.7
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 94'
       value: 33
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 94'
       value: 64
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 94'
       value: BIRD
     desc: Kestrel is a bountiful world with a comfortable climate, clean air, and
       abundant natural resources. The planet is considered one of the Federated Suns
@@ -86,10 +92,14 @@ planet:
       - name: Homer
       - name: Catequil's Retreat
     satellite:
-      - name: Ariel
+      - name:
+          source: 'Handbook: House Davion, pg. 94'
+          value: Ariel
         size: large
         icon: rock2
-      - name: Persephone
+      - name:
+          source: 'Handbook: House Davion, pg. 94'
+          value: Persephone
         size: medium
         icon: rock1
     event:

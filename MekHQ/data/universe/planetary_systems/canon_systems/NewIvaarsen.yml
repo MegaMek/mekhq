@@ -3,9 +3,11 @@ sucsId: 1837
 xcood: 226.948
 ycood: 34.591
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 101'
   value: K1V
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Davion, pg. 101'
+  value: 3
 event:
   - date: '2379-02-28'
     zenithCharge: yes
@@ -52,28 +54,32 @@ planet:
       value: New Ivaarsen
     type: TERRESTRIAL
     orbitalDist: 0.56
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Davion, pg. 101'
+      value: 3
     icon: green47
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 101'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 101'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 101'
       value: 1.1
-    diameter: 12244
-    density: 6.315060124613
+    diameter: 12243
+    density: 6.314323055065
     dayLength: 25
     yearLength: 1.0
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 101'
       value: 36
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 101'
       value: 62
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 101'
       value: BIRD
     desc: |-
       Settled in the 23rd century, New Ivaarsen was colonized by Nordic explorers searching for a terran-like planet comfortable for human life. New Ivaarsen was pretty close, though it always came up lacking when compared to other gems of the Inner Sphere like New Avalon and Tikonov. However, these comparisons are likely what drove the planet to become so technologically and industrially advanced.
@@ -87,7 +93,7 @@ planet:
     smallMoons: 7
     landmass:
       - capital:
-          source: canon
+          source: 'Handbook: House Davion, pg. 101'
           value: Fluute
     event:
       - date: '2170-05-28'

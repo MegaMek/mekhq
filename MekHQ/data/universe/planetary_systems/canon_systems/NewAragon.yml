@@ -3,9 +3,11 @@ sucsId: 1814
 xcood: 69.535
 ycood: -88.191
 spectralType:
-  source: canon
+  source: FedCom Civil War, pg. 191
   value: K2V
-primarySlot: 3
+primarySlot:
+  source: FedCom Civil War, pg. 191
+  value: 3
 event:
   - date: '2353-10-16'
     nadirCharge: yes
@@ -57,28 +59,32 @@ planet:
       value: New Aragon
     type: TERRESTRIAL
     orbitalDist: 0.49
-    sysPos: 3
+    sysPos:
+      source: FedCom Civil War, pg. 191
+      value: 3
     icon: green34
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 191
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 191
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 191
       value: 1.0
-    diameter: 13747
-    density: 5.108262592534
+    diameter: 13752
+    density: 5.110177805644
     dayLength: 23
     yearLength: 0.9
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 191
       value: 45
     water:
-      source: canon
+      source: FedCom Civil War, pg. 191
       value: 60
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 191
       value: AMPHIBIAN
     desc: |-
       The settlement of New Aragon was one of the most distressing chapters of the Exodus era. Developers sold land on New Aragon to settlers with the promise of fertile ground and abundant water but when they arrived they discovered that the land was mostly swampland infested with insect-like, biting, disease carrying creatures. In spite of this, the colony eventually expanded when the settlers drained the swamplands and turned it into productive farmland. The indigenous amphibious animals that have survived in preserves have also become a lucrative export for the settlers as gourmet food items.
@@ -86,16 +92,18 @@ planet:
       New Aragon is also a major medical research centre, including the preeminent New Aragon Institute for Epidemiology.
     landmass:
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 191
+          value: Dreymon
+      - name:
+          source: FedCom Civil War, pg. 191
           value: Glastonbury
         capital:
-          source: canon
+          source: FedCom Civil War, pg. 191
           value: Argos
-      - name:
-          source: canon
-          value: Dreymon
     satellite:
-      - name: Dijon
+      - name:
+          source: FedCom Civil War, pg. 191
+          value: Dijon
         size: medium
         icon: oddmoon2
     event:

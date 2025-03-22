@@ -3,7 +3,9 @@ sucsId: 1040
 xcood: -13.961
 ycood: -44.251
 spectralType: K0V
-primarySlot: 3
+primarySlot:
+  source: 25 Years of Art and Fiction, pg. 218
+  value: 3
 event:
   - date: '2435-08-29'
     zenithCharge: yes
@@ -50,28 +52,50 @@ planet:
       value: Hall
     type: TERRESTRIAL
     orbitalDist: 0.8
-    sysPos: 3
+    sysPos:
+      source: 25 Years of Art and Fiction, pg. 218
+      value: 3
     icon: wet20
-    pressure: STANDARD
-    atmosphere: BREATHABLE
+    pressure:
+      source: 25 Years of Art and Fiction, pg. 218
+      value: STANDARD
+    atmosphere:
+      source: 25 Years of Art and Fiction, pg. 218
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
-    gravity: 0.74
-    diameter: 11100
-    density: 4.6818
+    gravity:
+      source: 25 Years of Art and Fiction, pg. 218
+      value: 1.06
+    diameter: 13290
+    density: 5.605330733189
     dayLength: 22
     yearLength: 1.1
-    temperature: 37
-    water: 75
-    lifeForm: FISH
+    temperature:
+      source: 25 Years of Art and Fiction, pg. 218
+      value: 35
+    water:
+      source: 25 Years of Art and Fiction, pg. 218
+      value: 40
+    lifeForm:
+      source: 25 Years of Art and Fiction, pg. 218
+      value: REPTILE
     smallMoons: 1
     landmass:
-      - name: Dothan
-        capital: Cooper
-      - name: Athol
+      - name:
+          source: 25 Years of Art and Fiction, pg. 218
+          value: Urra
+      - name:
+          source: 25 Years of Art and Fiction, pg. 218
+          value: Wass
+        capital:
+          source: 25 Years of Art and Fiction, pg. 218
+          value: Harney
     satellite:
-      - name: Scott
+      - name:
+          source: 25 Years of Art and Fiction, pg. 218
+          value: Luanda
         size: medium
-        icon: oddmoon2
+        icon: rock12
     event:
       - date: '2270-02-01'
         faction:

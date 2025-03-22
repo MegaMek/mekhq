@@ -3,9 +3,11 @@ sucsId: 813
 xcood: 18.35
 ycood: -21.248
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K2IV
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2351-10-29'
     zenithCharge: yes
@@ -61,28 +63,32 @@ planet:
       value: Epsilon Eridani
     type: TERRESTRIAL
     orbitalDist: 1.12
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: wet1
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.06
-    diameter: 15288
-    density: 4.853406592854
+    diameter: 15318
+    density: 4.863000386681
     dayLength: 23
     yearLength: 1.5
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 34
     water:
-      source: canon
+      source: MWDA world profiles
       value: 83
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: 3135 - Epsilon Eridani is a pleasant world, if a bit damp. Frequent, but
       usually mild, rainstorms and fertile soils have transformed the southern continent
@@ -105,16 +111,18 @@ planet:
       War.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Gousha
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Parassus
         capital:
-          source: canon
+          source: Chaos March, pg. 33
           value: Madison
     satellite:
-      - name: Minori
+      - name:
+          source: MWDA world profiles
+          value: Minori
         size: medium
         icon: oddmoon3
     event:

@@ -5,7 +5,9 @@ ycood: 212.179
 spectralType:
   source: canon
   value: M9Ia
-primarySlot: 6
+primarySlot:
+  source: FedCom Civil War, pg. 201
+  value: 6
 event:
   - date: '2366-07-29'
     nadirCharge: yes
@@ -105,28 +107,32 @@ planet:
       value: Rasalgethi
     type: TERRESTRIAL
     orbitalDist: 0.07
-    sysPos: 6
+    sysPos:
+      source: FedCom Civil War, pg. 201
+      value: 6
     icon: wet1
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 201
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 201
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 201
       value: 1.0
-    diameter: 12756
-    density: 5.507320336217
+    diameter: 12758
+    density: 5.508283500317
     dayLength: 19
     yearLength: 0.3
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 201
       value: 45
     water:
-      source: canon
+      source: FedCom Civil War, pg. 201
       value: 80
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 201
       value: MAMMAL
     desc: Rasalgethi is a planet covered in water, with only 20% of the planet devoted
       to the two continents, Rasal and Karlstad. The western continent of Rasal is
@@ -141,21 +147,14 @@ planet:
     smallMoons: 3
     landmass:
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 201
           value: Karlstad
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 201
           value: Rasal
         capital:
-          source: canon
+          source: FedCom Civil War, pg. 201
           value: Rønne
-    satellite:
-      - name: King
-        size: medium
-        icon: rock10
-      - name: Bailey
-        size: medium
-        icon: oddmoon1
     event:
       - date: '2171-10-19'
         faction:

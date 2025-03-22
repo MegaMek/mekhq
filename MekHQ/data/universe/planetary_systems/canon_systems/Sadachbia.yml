@@ -3,9 +3,11 @@ sucsId: 2202
 xcood: 80.598
 ycood: 35.873
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K4V
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2352-10-04'
     nadirCharge: yes
@@ -40,28 +42,32 @@ planet:
       value: Sadachbia
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green15
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.84
-    diameter: 11430
-    density: 5.158115958239
+    diameter: 11437
+    density: 5.16137541752
     dayLength: 26
     yearLength: 0.8
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 46
     water:
-      source: canon
+      source: MWDA world profiles
       value: 63
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: AMPHIBIAN
     desc: A quiet, but hot, agricultural world with only the most modest of industrial
       capacity, most of Sadachbia‘s inland areas are little more than sun-drenched
@@ -81,33 +87,23 @@ planet:
     smallMoons: 1
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Banade
         capital:
-          source: canon
-          value: Jalna’ir
+          source: MWDA world profiles
+          value: Jalna'ir
       - name:
-          source: canon
-          value: Grangi
-      - name:
-          source: canon
-          value: Lossa
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Dharma
       - name:
-          source: canon
+          source: MWDA world profiles
+          value: Grangi
+      - name:
+          source: MWDA world profiles
+          value: Lossa
+      - name:
+          source: MWDA world profiles
           value: Shoquelle
-    satellite:
-      - name: Tumatauenga
-        size: medium
-        icon: rock10
-      - name: Kane
-        size: medium
-        icon: oddmoon3
-      - name: Tane
-        size: medium
-        icon: rock1
     event:
       - date: '2272-11-04'
         faction:

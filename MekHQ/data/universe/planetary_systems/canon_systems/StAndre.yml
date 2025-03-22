@@ -3,9 +3,11 @@ sucsId: 2388
 xcood: 65.648
 ycood: -100.649
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K7III
-primarySlot: 5
+primarySlot:
+  source: MWDA world profiles
+  value: 5
 event:
   - date: '2401-09-02'
     nadirCharge: yes
@@ -76,28 +78,32 @@ planet:
       value: St. Andre
     type: TERRESTRIAL
     orbitalDist: 0.42
-    sysPos: 5
+    sysPos:
+      source: MWDA world profiles
+      value: 5
     icon: green24
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.0
-    diameter: 11674
-    density: 6.021173577655
+    diameter: 11673
+    density: 6.020521334621
     dayLength: 26
     yearLength: 0.8
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 65
     water:
-      source: canon
+      source: MWDA world profiles
       value: 34
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       3135 - Most of St. Andre's two continents are covered in red desert. The northern continent of Ravensglade is flat and featureless. Ravensglade is cold and frozen for six months of the year because it is located above the arctic circle. Only a small portion of St. Andre's population lives on Ravensglade, its industries produces petroleum and coal, as well as a small amount of uranium. The Star League built a base on Ravensglade to protect the planet. Most of St. Andre's population resides on Georama which is larger and more hospitable than Ravensglade. It is situated in the southern and equatorial regions, with a hot desert environment. Jerome, the capital of St. Andre is located on Georama.
@@ -109,16 +115,18 @@ planet:
       During the Jihad, St. Andre was attacked on three different occasions by Word of Blake forces. The Blakists were after the Star League base that had been renovated and put to good use by the CCAF. The first two attacked used conventional methods. The third attempt involved the use of chemical weapons. The prevailing trade winds blew the deadly gas back in the faces of the attackers, decimating their ranks. When The Republic of the Sphere claimed St. Andre, the planet resisted.
     landmass:
       - name:
-          source: canon
-          value: Ravensglade
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Georama
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Jerome
+      - name:
+          source: MWDA world profiles
+          value: Ravensglade
     satellite:
-      - name: St. Michael
+      - name:
+          source: MWDA world profiles
+          value: St. Michael
         size: large
         icon: rock2
     event:

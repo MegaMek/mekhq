@@ -3,9 +3,11 @@ sucsId: 2721
 xcood: 120.192
 ycood: -257.747
 spectralType:
-  source: canon
+  source: 'Handbook: House Liao, pg. 83'
   value: F9IV
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Liao, pg. 83'
+  value: 3
 event:
   - date: '2365-06-30'
     zenithCharge: yes
@@ -48,28 +50,32 @@ planet:
       value: Warlock
     type: TERRESTRIAL
     orbitalDist: 3.08
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Liao, pg. 83'
+      value: 3
     icon: dry10
     pressure:
-      source: canon
-      value: STANDARD
-    atmosphere: BREATHABLE
+      source: 'Handbook: House Liao, pg. 83'
+      value: THIN
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 83'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 83'
       value: 1.03
-    diameter: 13271
-    density: 5.450353534791
+    diameter: 13276
+    density: 5.452334540832
     dayLength: 21
     yearLength: 5.5
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 83'
       value: 5
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 83'
       value: 12
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 83'
       value: PLANT
     desc: |-
       Warlock is an ice-bound planet that hosts numerous resorts for nobles including a winter retreat for the Liao family. It is also the site of a major naval base for St. Ives. The planet also hosts a weapons testing facility and specialised winter training centers are located on the southern continent, while military research and development centers are located on the equator. Throughout its history the Confederation has taken advantage of Warlock’s proximity to the Federated Suns’ border, and often used the planet as a staging point for raids and other covert military or Maskirovka strikes. It was also a regular target for raids by elements of the Capellan March military and other forces of the Federated Suns.
@@ -80,13 +86,15 @@ planet:
       Ceres Metals
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Warlock
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Solitude
     satellite:
-      - name: Blackguard
+      - name:
+          source: 'Handbook: House Liao, pg. 83'
+          value: Blackguard
         size: medium
         icon: oddmoon3
     event:

@@ -3,9 +3,11 @@ sucsId: 196
 xcood: 4.129
 ycood: 25.543
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K2VI
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2383-12-06'
     zenithCharge: yes
@@ -32,28 +34,32 @@ planet:
       value: Asta
     type: TERRESTRIAL
     orbitalDist: 1.12
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: wet11
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.74
-    diameter: 9925
-    density: 5.25795376249
+    diameter: 9908
+    density: 5.248828152248
     dayLength: 17
     yearLength: 1.5
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 32
     water:
-      source: canon
+      source: MWDA world profiles
       value: 77
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: BIRD
     desc: 3135 - Once a beautiful, temperate trading world for the Draconis Combine
       and Free Worlds League, and famed for the curious crystalline rock formations
@@ -79,22 +85,23 @@ planet:
       The Republic.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Balerdo
         capital:
-          source: canon
-          value: Excaliba
+          source: MWDA world profiles
+          value: Logan
       - name:
-          source: canon
-          value: Balerdo Grande
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Moolai
     satellite:
-      - name: Arowhena
+      - name:
+          source: MWDA world profiles
+          value: Arowhena
         size: large
         icon: rock6
-      - name: Eddelle
+      - name:
+          source: MWDA world profiles
+          value: Eddelle
         size: large
         icon: rock14
     event:

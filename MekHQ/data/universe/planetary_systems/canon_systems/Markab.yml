@@ -3,9 +3,11 @@ sucsId: 1613
 xcood: 97.702
 ycood: 22.756
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: M2IV
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2397-02-16'
     zenithCharge: yes
@@ -85,28 +87,32 @@ planet:
       value: Markab
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: green38
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.75
-    diameter: 9370
-    density: 5.617266797743
+    diameter: 9377
+    density: 5.621170167003
     dayLength: 24
     yearLength: 0.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 47
     water:
-      source: canon
+      source: MWDA world profiles
       value: 63
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: 3135 - One of the first worlds settled by the Azami, a fanatical Muslim
       culture originating in the northern region of Terra‘s Africa continent, known
@@ -129,15 +135,22 @@ planet:
       use it for irrigation.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Al-Qoradana
+        capital:
+          source: noncanon
+          value: Al-Pagasi
     satellite:
-      - name: Ramallah
-        size: medium
-        icon: oddmoon2
-      - name: Medecca
+      - name:
+          source: MWDA world profiles
+          value: Medecca
         size: medium
         icon: oddmoon3
+      - name:
+          source: MWDA world profiles
+          value: Ramallah
+        size: medium
+        icon: oddmoon2
     event:
       - date: '2274-03-06'
         faction:

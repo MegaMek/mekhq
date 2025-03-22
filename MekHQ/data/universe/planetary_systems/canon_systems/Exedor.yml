@@ -3,9 +3,11 @@ sucsId: 836
 xcood: -13.198
 ycood: -207.89
 spectralType:
-  source: canon
+  source: 'Objective Raids: Capellan Confederation'
   value: F2V
-primarySlot: 4
+primarySlot:
+  source: 'Objective Raids: Capellan Confederation'
+  value: 4
 planet:
   - name: Sementron
     type: TERRESTRIAL
@@ -66,28 +68,32 @@ planet:
       value: Exedor
     type: TERRESTRIAL
     orbitalDist: 2.4
-    sysPos: 4
+    sysPos:
+      source: 'Objective Raids: Capellan Confederation'
+      value: 4
     icon: green47
     pressure:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Objective Raids: Capellan Confederation'
+      value: TAINTEDCAUSTIC
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 1.15
-    diameter: 14387
-    density: 5.613281006461
+    diameter: 14392
+    density: 5.615333583503
     dayLength: 24
     yearLength: 3.9
     temperature:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 30
     water:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 53
     lifeForm:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: MAMMAL
     desc: |-
       Exedor was settled in the mid-29th century and was used to house secret personal treasures of House Liao in underground facilities, with veteran defenders.
@@ -99,10 +105,10 @@ planet:
       Exedor is home to one of the many Duchy RTC training facilities throughout the Capellan Confederation that train infantry and conventional armor crews.
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Tardess
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Sanctuary
     event:
       - date: '2692-06-20'

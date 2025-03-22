@@ -3,9 +3,11 @@ sucsId: 2772
 xcood: 503.68
 ycood: 23.77
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 103'
   value: G4III
-primarySlot: 5
+primarySlot:
+  source: 'Handbook: House Davion, pg. 103'
+  value: 5
 event:
   - date: '2358-10-03'
     zenithCharge: yes
@@ -96,28 +98,32 @@ planet:
       value: Woodbine
     type: GIANT_TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 5
+    sysPos:
+      source: 'Handbook: House Davion, pg. 103'
+      value: 5
     icon: green54
     pressure:
-      source: canon
-      value: STANDARD
-    atmosphere: TOXICPOISON
+      source: 'Handbook: House Davion, pg. 103'
+      value: VERY_HIGH
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 103'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 103'
       value: 1.14
-    diameter: 11615
-    density: 6.883067875346
+    diameter: 11627
+    density: 6.890285468336
     dayLength: 15
     yearLength: 2.0
     temperature:
-      source: canon
-      value: 21
+      source: 'Handbook: House Davion, pg. 103'
+      value: 31
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 103'
       value: 41
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 103'
       value: MAMMAL
     desc: Woodbine is the unofficial capital of the Federated Suns’ Outback. The planet
       was settled in order to take advantage of the large deposits of minerals and
@@ -128,37 +134,52 @@ planet:
       suffered numerous raids throughout its history.
     landmass:
       - name:
-          source: canon
+          source: 'Objectives: Federated Suns, p. 26'
           value: Arturro
         capital:
-          source: canon
-          value: Gastonge
+          source: 'Objectives: Federated Suns, p. 26'
+          value: Gastogne
       - name:
-          source: canon
+          source: 'Objectives: Federated Suns, p. 26'
           value: Guam
       - name:
-          source: canon
+          source: 'Objectives: Federated Suns, p. 26'
           value: Sjardijn
+
     satellite:
-      - name: Akina
+      - name:
+          source: 'Handbook: House Davion, pg. 103'
+          value: Akina
         size: medium
         icon: rock13
-      - name: Carbonvale
+      - name:
+          source: 'Handbook: House Davion, pg. 103'
+          value: Carbonvale
         size: medium
         icon: oddmoon3
-      - name: Galaga
+      - name:
+          source: 'Handbook: House Davion, pg. 103'
+          value: Galaga
         size: giant
         icon: rock2
-      - name: Ocheusti
+      - name:
+          source: 'Handbook: House Davion, pg. 103'
+          value: Ocheusti
         size: large
         icon: rock7
-      - name: Otousti
+      - name:
+          source: 'Handbook: House Davion, pg. 103'
+          value: Otousti
         size: medium
         icon: oddmoon1
-      - name: Tomb Rock
+      - name:
+          source: 'Handbook: House Davion, pg. 103'
+          value: Tomb Rock
         size: large
         icon: rock9
-      - name: Vastek Moon
+      - name:
+          source: 'Handbook: House Davion, pg. 103'
+          value: Vastek Moon
         size: large
         icon: rock8
     event:

@@ -3,9 +3,11 @@ sucsId: 1308
 xcood: 5.683
 ycood: 83.447
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: B9IV
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2365-04-30'
     nadirCharge: yes
@@ -60,28 +62,32 @@ planet:
       value: Kaus Australis
     type: TERRESTRIAL
     orbitalDist: 17.68
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: wet2
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.61
-    diameter: 11365
-    density: 3.788527573672
+    diameter: 11340
+    density: 3.780234961245
     dayLength: 22
     yearLength: 74.4
     temperature:
-      source: canon
-      value: 4
+      source: MWDA world profiles
+      value: 40
     water:
-      source: canon
+      source: MWDA world profiles
       value: 9
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: |-
       Located far from its jump point, with hardly any water to speak of, an atmosphere too thin for unassisted breathing, and blasted by all manner of solar radiation from the blue-white subgiant around which it orbits, Kaus Australis would have been completely overlooked as a potential colony site if not for trace amounts of germanium and other valuable metal deposits just beneath its rocky surface.
@@ -91,10 +97,12 @@ planet:
       Even today, Kaus Australis maintains Kaus Media as its primary customer and source of goods, their symbiosis undeterred by centuries of war or the changing of allegiances. The capital of Kaus Australis, Kaverni Bay, an underground community, is located fifty kilometers inland from the Sea of Epsilon Sagittarius. While home to a third of the planetary population—the remainder scattered in small domes and subsurface mining homesteads—visitors seeking to conduct business with the Kaus Australians are best advised to seek a Kaus Median facilitator first.
     landmass:
       - capital:
-          source: canon
+          source: MWDA world profiles
           value: Kaverni Bay
     satellite:
-      - name: Epstarius
+      - name:
+          source: MWDA world profiles
+          value: Epstarius
         size: medium
         icon: oddmoon3
     event:

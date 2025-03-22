@@ -3,9 +3,11 @@ sucsId: 2538
 xcood: 93.055
 ycood: 455.16
 spectralType:
-  source: canon
+  source: 25 Years of Art and Fiction, pg. 75
   value: A8V
-primarySlot: 2
+primarySlot:
+  source: 25 Years of Art and Fiction, pg. 75
+  value: 2
 event:
   - date: '2381-02-27'
     zenithCharge: yes
@@ -35,28 +37,32 @@ planet:
       value: Thule
     type: GIANT_TERRESTRIAL
     orbitalDist: 2.88
-    sysPos: 2
+    sysPos:
+      source: 25 Years of Art and Fiction, pg. 75
+      value: 2
     icon: green4
     pressure:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 75
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 25 Years of Art and Fiction, pg. 75
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 75
       value: 0.97
-    diameter: 15023
-    density: 4.552636129376
+    diameter: 14998
+    density: 4.545088818081
     dayLength: 13
     yearLength: 5.1
     temperature:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 75
       value: 24
     water:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 75
       value: 25
     lifeForm:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 75
       value: MAMMAL
     desc: Thule is a well-established planet with abundant natural resources and arable
       land, as well as the basic infrastructure necessary to support heavy industry,
@@ -70,19 +76,21 @@ planet:
       Clan Hells Horses in 3074.
     landmass:
       - name:
-          source: canon
+          source: 25 Years of Art and Fiction, pg. 75
           value: Akranes
       - name:
-          source: canon
+          source: 25 Years of Art and Fiction, pg. 75
           value: Husavik
       - name:
-          source: canon
+          source: 25 Years of Art and Fiction, pg. 75
           value: Vik
         capital:
-          source: canon
+          source: 25 Years of Art and Fiction, pg. 75
           value: Thule City
     satellite:
-      - name: Ultima
+      - name:
+          source: 25 Years of Art and Fiction, pg. 75
+          value: Ultima
         size: large
         icon: rock16
     event:

@@ -3,9 +3,11 @@ sucsId: 476
 xcood: -304.983
 ycood: 88.88
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 74'
   value: K1V
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 74'
+  value: 3
 event:
   - date: '2528-02-08'
     nadirCharge: yes
@@ -60,28 +62,32 @@ planet:
       value: Carlisle
     type: TERRESTRIAL
     orbitalDist: 0.56
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 74'
+      value: 3
     icon: green31
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 74'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 74'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 74'
       value: 1.03
-    diameter: 11848
-    density: 6.110823773422
+    diameter: 11847
+    density: 6.110114376679
     dayLength: 26
     yearLength: 1.0
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 74'
       value: 47
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 74'
       value: 73
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 74'
       value: MAMMAL
     desc: |-
       Carlisle is a highly industrialized terrestrial planet inside the Alarion province of the Lyran Commonwealth. The system is located far enough from the border that it has avoided much of the warfare that has plagued the Inner Sphere for centuries.
@@ -89,19 +95,21 @@ planet:
       The majority of the population is located on the continent of Worrsetgard, which also contains the capital city of New Prague. Carlisle was originally settled by German and Slovak colonists.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 74'
           value: Hollens
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 74'
           value: Hozernems
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 74'
           value: Worrsetgard
         capital:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 74'
           value: New Prague
     satellite:
-      - name: Dyson
+      - name:
+          source: 'Handbook: House Steiner, pg. 74'
+          value: Dyson
         size: giant
         icon: rock16
     event:

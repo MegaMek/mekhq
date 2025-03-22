@@ -3,9 +3,11 @@ sucsId: 65
 xcood: -57.639
 ycood: 115.993
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 88'
   value: M4V
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 88'
+  value: 3
 event:
   - date: '2389-10-31'
     zenithCharge: yes
@@ -48,28 +50,32 @@ planet:
       value: Alexandria (LC)
     type: TERRESTRIAL
     orbitalDist: 0.12
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 88'
+      value: 3
     icon: wet17
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 88'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 88'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 88'
       value: 1.07
-    diameter: 15207
-    density: 4.94541634821
+    diameter: 15206
+    density: 4.945098158016
     dayLength: 22
     yearLength: 0.5
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 88'
       value: 33
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 88'
       value: 82
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 88'
       value: REPTILE
     desc: Alexandria was once a wealthy planet covered in modern cities and was a
       cultural center with some of the most famous art collections in the entire Inner
@@ -81,13 +87,18 @@ planet:
       survived due to possessing no military value.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 88'
           value: Cairusia
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 88'
           value: Jeddasia
+        capital:
+          source: 'Handbook: House Steiner, pg. 88'
+          value: Alexandretta
     satellite:
-      - name: Sinai
+      - name:
+          source: 'Handbook: House Steiner, pg. 88'
+          value: Sinai
         size: medium
         icon: rock7
     event:

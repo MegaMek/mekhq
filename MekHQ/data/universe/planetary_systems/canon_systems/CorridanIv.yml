@@ -3,9 +3,11 @@ sucsId: 604
 xcood: -38.014
 ycood: 121.453
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G4V
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2363-08-22'
     zenithCharge: yes
@@ -79,28 +81,32 @@ planet:
       value: Corridan IV
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: green38
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.92
-    diameter: 10517
-    density: 6.178039534471
+    diameter: 10491
+    density: 6.162780346251
     dayLength: 30
     yearLength: 1.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 44
     water:
-      source: canon
+      source: MWDA world profiles
       value: 63
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       When first settled, Corridan IV promised colonists an abundance of raw materials and fertile lands, but posed just one small problem: the entire planet‘s water table was tainted by heavy metals and infested with native bacteria that rendered every living thing on the planet, from plants to animals, toxic for human consumption. Faced with starvation and the failure of their colony, the first settlers initially relied on ice ships, such as those of the Ryan Cartel.
@@ -110,19 +116,21 @@ planet:
       Today, Corridan‘s greatest exports, after water purifiers, are agricultural and ranching produce, which range from native fruits and vegetables to the beef-like meat of the Corridani grazer, a dim-witted beast roughly half again the size of a Terran buffalo. For this reason, many travelers expect a world of mainly rural plains. In fact, close to half the planetary population lives in big cities, mostly concentrated on Feyrun and Cederban. The largest of these, Rio Grande, is home to Water Pure Industries, much of the Tal family fortune, and the largest planetary spaceport. The planetary capital, New Austin, is over seventy kilometers north of Rio Grande, and boasts the planet‘s largest shipping concern, Corridani Forward, which uses its own starport.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Alorran
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Cederban
         capital:
-          source: canon
+          source: MWDA world profiles
           value: New Austin
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Fayrun
     satellite:
-      - name: Muse
+      - name:
+          source: MWDA world profiles
+          value: Muse
         size: medium
         icon: oddmoon1
     event:

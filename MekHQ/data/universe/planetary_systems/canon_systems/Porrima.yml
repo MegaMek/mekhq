@@ -3,9 +3,11 @@ sucsId: 2051
 xcood: -113.987
 ycood: 139.279
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 86'
   value: K3V
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 86'
+  value: 2
 event:
   - date: '2355-08-24'
     nadirCharge: yes
@@ -44,28 +46,32 @@ planet:
       value: Porrima
     type: TERRESTRIAL
     orbitalDist: 0.49
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 86'
+      value: 2
     icon: green17
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 86'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 86'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 86'
       value: 0.74
-    diameter: 10617
-    density: 4.880940234881
+    diameter: 10636
+    density: 4.88956323155
     dayLength: 21
     yearLength: 0.9
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 86'
       value: 50
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 86'
       value: 71
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 86'
       value: BIRD
     desc: Porrima is a world rich in resources, including ample quantities of industrial
       metals, and precious gems. Fertile soil, an abundant water supply and a warm
@@ -85,13 +91,13 @@ planet:
       continent are far enough inland that the storms have less effect on the population.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 86'
           value: Marsdentica
         capital:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 86'
           value: Allison City
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 86'
           value: Steinerheim
     event:
       - date: '2268-07-14'

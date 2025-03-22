@@ -3,9 +3,11 @@ sucsId: 68
 xcood: 66.07
 ycood: 94.935
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 28
   value: A7IV
-primarySlot: 5
+primarySlot:
+  source: Masters and Minions, pg. 28
+  value: 5
 event:
   - date: '2354-02-09'
     nadirCharge: yes
@@ -78,28 +80,32 @@ planet:
       value: Algedi
     type: TERRESTRIAL
     orbitalDist: 5.04
-    sysPos: 5
+    sysPos:
+      source: Masters and Minions, pg. 28
+      value: 5
     icon: dry3
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 28
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 28
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 28
       value: 0.9
-    diameter: 12165
-    density: 5.22179881394
+    diameter: 12139
+    density: 5.210490835078
     dayLength: 24
     yearLength: 11.4
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 28
       value: 45
     water:
-      source: canon
+      source: Masters and Minions, pg. 28
       value: 15
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 28
       value: MICROBE
     desc: |-
       A prefecture capital in the Benjamin Military district, Algedi is a barren arid world with no true night. The sun is so large that it takes up a full third of the sky during the day. Settled by the Azami long ago, who are a very independent people, this often leads to clashes between their ways and those of the Combine. The Azami very reluctantly allow Non‐Azami to enter their “Desert Paradise.” The Azami of the world have an unnatural fear of the dark because of the planets permanent daylight. Imported life‐forms adapted to desert life are flourishing on the planet. Asketen Sand Walkers and Terran Burros are commonly seen grazing on tough grasses and cacti. Efficiency on this world is very poor; only the Azami seem to have adjusted. Other people not accustomed to the planet seem to suffer from broken biological clocks. Although an important
@@ -109,13 +115,15 @@ planet:
           source: canon
           value: Algedi Primus
         capital:
-          source: canon
+          source: Masters and Minions, pg. 28
           value: Algiers
       - name:
           source: canon
           value: Algedi Secundus
     satellite:
-      - name: Mecca
+      - name:
+          source: Masters and Minions, pg. 28
+          value: Mecca
         size: medium
         icon: oddmoon3
     event:

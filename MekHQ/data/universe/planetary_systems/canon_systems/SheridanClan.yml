@@ -3,9 +3,11 @@ sucsId: 2960
 xcood: 125.943
 ycood: 1794.232
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: G0IV
-primarySlot: 1
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 1
 event:
   - date: '2803-07-04'
     nadirCharge: yes
@@ -15,28 +17,32 @@ planet:
       value: Sheridan (Clan)
     type: TERRESTRIAL
     orbitalDist: 1.76
-    sysPos: 1
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 1
     icon: wet4
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 1.0
-    diameter: 11094
-    density: 6.317757884907
+    diameter: 11109
+    density: 6.326168845684
     dayLength: 26
     yearLength: 2.6
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 35
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 80
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: MAMMAL
     desc: No description available.
     landmass:

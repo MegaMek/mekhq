@@ -5,7 +5,9 @@ ycood: 405.264
 spectralType:
   source: canon
   value: G2V
-primarySlot: 5
+primarySlot:
+  source: House Steiner
+  value: 5
 event:
   - date: '2398-01-04'
     zenithCharge: yes
@@ -87,7 +89,9 @@ planet:
       value: Treeline
     type: TERRESTRIAL
     orbitalDist: 1.0
-    sysPos: 5
+    sysPos:
+      source: House Steiner
+      value: 5
     icon: green42
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -100,7 +104,7 @@ planet:
     temperature: 38
     water: 43
     lifeForm:
-      source: canon
+      source: House Steiner
       value: PLANT
     desc: Winfield is one of the top producers of agriculture in the entire Inner
       Sphere. The planet has a warm mild climate with an exceptionally long growing
@@ -110,7 +114,9 @@ planet:
       manufacturer on the planet.
     landmass:
       - name: McGinnity's Nest
-        capital: Delray Beach
+        capital:
+          source: House Steiner
+          value: Felsonville
       - name: Proctor
       - name: Freehold
       - name: Farrell's Harbour
@@ -340,10 +346,7 @@ planet:
       - date: '3145-01-01'
         population: 164190046.0
       - date: '2108-12-05'
-        name: Treeline
       - date: '2863-01-01'
-        name: Winfield
-        message: Treeline renamed to Winfield
   - name: Honey Creek
     type: ICE_GIANT
     orbitalDist: 5.2

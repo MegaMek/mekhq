@@ -3,9 +3,11 @@ sucsId: 920
 xcood: 331.999
 ycood: 173.891
 spectralType:
-  source: canon
+  source: House Kurita
   value: K5III
-primarySlot: 5
+primarySlot:
+  source: House Kurita
+  value: 5
 event:
   - date: '2357-09-11'
     nadirCharge: yes
@@ -98,7 +100,9 @@ planet:
       value: Galedon V
     type: TERRESTRIAL
     orbitalDist: 0.49
-    sysPos: 5
+    sysPos:
+      source: House Kurita
+      value: 5
     icon: green44
     pressure:
       source: canon
@@ -119,7 +123,7 @@ planet:
       source: canon
       value: 65
     lifeForm:
-      source: canon
+      source: House Kurita
       value: MAMMAL
     desc: |-
       Galedon V is a garden world with abundant water, natural resources, and agriculture. It is one of the earliest members of the nascent Draconis Combine. Historically, it has been a prefecture and military district capital and was heavily garrisoned by the DCMS as a result.

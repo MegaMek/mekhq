@@ -3,9 +3,11 @@ sucsId: 1964
 xcood: 30.493
 ycood: -205.809
 spectralType:
-  source: canon
+  source: A Time of War, pg. 378
   value: M6V
-primarySlot: 2
+primarySlot:
+  source: A Time of War, pg. 378
+  value: 2
 event:
   - date: '2411-01-05'
     zenithCharge: yes
@@ -44,28 +46,32 @@ planet:
       value: Ovan
     type: TERRESTRIAL
     orbitalDist: 0.08
-    sysPos: 2
+    sysPos:
+      source: A Time of War, pg. 378
+      value: 2
     icon: green36
     pressure:
-      source: canon
+      source: A Time of War, pg. 378
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: A Time of War, pg. 378
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: A Time of War, pg. 378
       value: 0.91
-    diameter: 11157
-    density: 5.704377300727
+    diameter: 11184
+    density: 5.718135886317
     dayLength: 22
     yearLength: 0.4
     temperature:
-      source: canon
+      source: A Time of War, pg. 378
       value: 33
     water:
-      source: canon
+      source: A Time of War, pg. 378
       value: 24
     lifeForm:
-      source: canon
+      source: A Time of War, pg. 378
       value: REPTILE
     desc: |-
       Ovan is a Capellan "core" world, relatively close to Sian and rarely raided,mostly for lack of anything to raid. Settled in 2393 by Chinese at the behest of the Capellan government. Socially and technologically Ovan is a typical human-inhabited world. However, Environmentally speaking, Ovan is definitely abnormal.
@@ -78,10 +84,6 @@ planet:
 
       On Ovan, local nobles have come to exercise complete control over the citizenry by their ownership of all of the desalinization units, power plants and farms, and by careful appointment of family members and cronies in the bureaucracy. The nobles enforce their rule and discourage citizens from seeking aid from the Confederation by showing exceeding loyalty to Sian, which in turn looks the other way when reports of abuse by Ovan nobles are received. The nobles also abuse their rights to create military ranks by forming huge private militias, comprised primarily of gangs of club-wielding thugs, and levying taxes on their fiefs. The difference between Ovan and other Kleptocracies is that the government has learned enough moderation to make their plundering sustainable for generations.
     smallMoons: 2
-    landmass:
-      - name:
-          source: canon
-          value: .na.character
     event:
       - date: '2270-08-02'
         faction:

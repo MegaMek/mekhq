@@ -3,9 +3,11 @@ sucsId: 2157
 xcood: 95.382
 ycood: -28.74
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F8V
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2378-04-21'
     nadirCharge: yes
@@ -70,28 +72,32 @@ planet:
       value: Rio
     type: TERRESTRIAL
     orbitalDist: 1.92
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: green32
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.2
-    diameter: 12927
-    density: 6.508498872123
+    diameter: 12942
+    density: 6.516066925082
     dayLength: 25
     yearLength: 2.9
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 30
     water:
-      source: canon
+      source: MWDA world profiles
       value: 60
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: |-
       Famous for deep valleys that twist across its surface, settlers named Rio after a similar canyon in Terra‘s western hemisphere. Rio lacks significant exports and relied instead on its dramatic natural beauty to attract tourists, Tri-Vid production houses, and art colonies to boost its early economy.
@@ -107,16 +113,18 @@ planet:
       Rio only sports two continents, both which sit astride the equator: Grando and Pequeno. The capital, Reno, is on Grando.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Grando
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Reno
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Pequeno
     satellite:
-      - name: Aires
+      - name:
+          source: MWDA world profiles
+          value: Aires
         size: medium
         icon: rock4
     event:

@@ -66,7 +66,9 @@ planet:
     dayLength: 19
     yearLength: 3.9
     temperature: 30
-    water: 51
+    water:
+      source: Chaos March, pg. 16
+      value: 85
     lifeForm: AMPHIBIAN
     landmass:
       - name: Courtney's End

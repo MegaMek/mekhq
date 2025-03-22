@@ -3,9 +3,11 @@ sucsId: 2889
 xcood: 323.458
 ycood: -484.147
 spectralType:
-  source: canon
+  source: Periphery (1ed), pg. 85
   value: F4V
-primarySlot: 4
+primarySlot:
+  source: Periphery (1ed), pg. 85
+  value: 4
 planet:
   - name: Scrovegni
     type: ICE_GIANT
@@ -55,7 +57,9 @@ planet:
       value: Celano
     type: TERRESTRIAL
     orbitalDist: 2.24
-    sysPos: 4
+    sysPos:
+      source: Periphery (1ed), pg. 85
+      value: 4
     icon: wet1
     pressure:
       source: canon

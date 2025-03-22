@@ -3,9 +3,11 @@ sucsId: 2391
 xcood: 109.619
 ycood: -214.379
 spectralType:
-  source: canon
+  source: 'Handbook: House Liao, pg. 81'
   value: G8V
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Liao, pg. 81'
+  value: 3
 event:
   - date: '2373-01-14'
     zenithCharge: yes
@@ -60,28 +62,32 @@ planet:
       value: St. Ives
     type: TERRESTRIAL
     orbitalDist: 0.8
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Liao, pg. 81'
+      value: 3
     icon: green12
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 81'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 81'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 81'
       value: 1.01
-    diameter: 12791
-    density: 5.545073357946
+    diameter: 12796
+    density: 5.547093113805
     dayLength: 25
     yearLength: 1.1
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 81'
       value: 34
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 81'
       value: 67
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 81'
       value: PLANT
     desc: |-
       St. Ives is a comfortable planet which was first settled in 2197 by refugees from Hong Kong. The planet was an independent realm for much of its early history and did not recognize the rule of the Terran Alliance. In 2244 St. Ives became the capital of the fledgling St. Ives Mercantile League until eventually joining the Capellan Confederation as the capital of the St. Ives Commonality.
@@ -98,16 +104,18 @@ planet:
       Tengo Aerospace
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Liaoning
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Tian-tan
       - name:
-          source: canon
-          value: '''Zona'
+          source: 'Objective Raids: Capellan Confederation'
+          value: Zona
     satellite:
-      - name: Cochrane
+      - name:
+          source: 'Handbook: House Liao, pg. 81'
+          value: Cochrane
         size: medium
         icon: oddmoon3
     event:

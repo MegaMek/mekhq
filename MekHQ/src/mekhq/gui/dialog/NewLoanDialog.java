@@ -28,6 +28,26 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.NumberFormat;
+import java.util.Objects;
+import java.util.ResourceBundle;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
+
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -38,20 +58,6 @@ import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialTerm;
 
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.NumberFormatter;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.text.NumberFormat;
-import java.util.Objects;
-import java.util.ResourceBundle;
-
 /**
  * @author Taharqa
  */
@@ -59,17 +65,17 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
     private static final MMLogger logger = MMLogger.create(NewLoanDialog.class);
 
     private NumberFormatter numberFormatter;
-    private JFrame frame;
-    private Loan loan;
-    private Campaign campaign;
-    private int rating;
-    private Money maxCollateralValue;
+    private JFrame          frame;
+    private Loan            loan;
+    private Campaign        campaign;
+    private int             rating;
+    private Money           maxCollateralValue;
 
-    private JPanel panMain;
-    private JPanel panInfo;
-    private JPanel panBtn;
-    private JButton btnCancel;
-    private JButton btnAdd;
+    private JPanel     panMain;
+    private JPanel     panInfo;
+    private JPanel     panBtn;
+    private JButton    btnCancel;
+    private JButton    btnAdd;
     private JTextField txtName;
     private JTextField txtNumber;
 
@@ -84,10 +90,10 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
     private JButton btnPlusTenK;
     private JButton btnMinusTenK;
 
-    private JFormattedTextField txtPrincipal;
-    private JSlider sldInterest;
-    private JSlider sldCollateral;
-    private JSlider sldLength;
+    private JFormattedTextField       txtPrincipal;
+    private JSlider                   sldInterest;
+    private JSlider                   sldCollateral;
+    private JSlider                   sldLength;
     private MMComboBox<FinancialTerm> choiceSchedule;
 
     private JLabel lblAPR;
@@ -95,23 +101,25 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
     private JLabel lblYears;
     private JLabel lblSchedule;
 
-    private JLabel lblPrincipal;
-    private JLabel lblFirstPayment;
-    private JLabel lblPayAmount;
-    private JLabel lblNPayment;
-    private JLabel lblTotalPayment;
-    private JLabel lblCollateralAmount;
+    private                 JLabel         lblPrincipal;
+    private                 JLabel         lblFirstPayment;
+    private                 JLabel         lblPayAmount;
+    private                 JLabel         lblNPayment;
+    private                 JLabel         lblTotalPayment;
+    private                 JLabel         lblCollateralAmount;
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewLoanDialog",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
 
     public NewLoanDialog(final JFrame frame, final boolean modal, final Campaign campaign) {
         super(frame, modal);
-        this.frame = frame;
-        this.campaign = campaign;
+        this.frame           = frame;
+        this.campaign        = campaign;
         this.numberFormatter = new NumberFormatter(NumberFormat.getInstance());
 
-        rating = campaign.getAtBUnitRatingMod();
-        loan = Loan.getBaseLoan(rating, this.campaign.getCampaignOptions().isSimulateGrayMonday(), this.campaign.getLocalDate());
+        rating             = campaign.getAtBUnitRatingMod();
+        loan               = Loan.getBaseLoan(rating,
+              this.campaign.getCampaignOptions().isSimulateGrayMonday(),
+              this.campaign.getLocalDate());
         maxCollateralValue = this.campaign.getFinances().getMaxCollateral(this.campaign);
         initComponents();
         setLocationRelativeTo(frame);
@@ -120,18 +128,18 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
 
     private void initComponents() {
 
-        panMain = new JPanel();
-        panInfo = new JPanel();
-        panBtn = new JPanel();
-        lblAPR = new JLabel();
-        lblCollateralPct = new JLabel();
-        lblYears = new JLabel();
-        lblSchedule = new JLabel();
-        lblPrincipal = new JLabel();
-        lblFirstPayment = new JLabel();
-        lblPayAmount = new JLabel();
-        lblNPayment = new JLabel();
-        lblTotalPayment = new JLabel();
+        panMain             = new JPanel();
+        panInfo             = new JPanel();
+        panBtn              = new JPanel();
+        lblAPR              = new JLabel();
+        lblCollateralPct    = new JLabel();
+        lblYears            = new JLabel();
+        lblSchedule         = new JLabel();
+        lblPrincipal        = new JLabel();
+        lblFirstPayment     = new JLabel();
+        lblPayAmount        = new JLabel();
+        lblNPayment         = new JLabel();
+        lblTotalPayment     = new JLabel();
         lblCollateralAmount = new JLabel();
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -142,7 +150,11 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
         panMain.setLayout(new GridBagLayout());
         panBtn.setLayout(new GridLayout(0, 2));
 
-        txtName = new JTextField(loan.getInstitution());
+        if (isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().isSimulateGrayMonday())) {
+            txtName = new JTextField(resourceMap.getString("lblName.grayMonday"));
+        } else {
+            txtName = new JTextField(loan.getInstitution());
+        }
         txtName.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void changedUpdate(DocumentEvent e) {
@@ -186,53 +198,53 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
         });
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         panMain.add(new JLabel(resourceMap.getString("lblName.text")), gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         panMain.add(txtName, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         panMain.add(new JLabel(resourceMap.getString("lblReference.text")), gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         panMain.add(txtNumber, gridBagConstraints);
 
         txtPrincipal = new JFormattedTextField();
         txtPrincipal.setFormatterFactory(new DefaultFormatterFactory(numberFormatter));
         txtPrincipal.setText(loan.getPrincipal().toAmountAndSymbolString());
         txtPrincipal.setEditable(false);
-        btnPlusHundredMillion = new JButton(resourceMap.getString("btnPlus100mil.text"));
+        btnPlusHundredMillion  = new JButton(resourceMap.getString("btnPlus100mil.text"));
         btnMinusHundredMillion = new JButton(resourceMap.getString("btnMinus100mil.text"));
-        btnPlusTenMillion = new JButton(resourceMap.getString("btnPlus10mil.text"));
-        btnMinusTenMillion = new JButton(resourceMap.getString("btnMinus10mil.text"));
-        btnPlusMillion = new JButton(resourceMap.getString("btnPlus1mil.text"));
-        btnMinusMillion = new JButton(resourceMap.getString("btnMinus1mil.text"));
-        btnPlusHundredK = new JButton(resourceMap.getString("btnPlus100k.text"));
-        btnMinusHundredK = new JButton(resourceMap.getString("btnMinus100k.text"));
-        btnPlusTenK = new JButton(resourceMap.getString("btnPlus10k.text"));
-        btnMinusTenK = new JButton(resourceMap.getString("btnMinus10k.text"));
+        btnPlusTenMillion      = new JButton(resourceMap.getString("btnPlus10mil.text"));
+        btnMinusTenMillion     = new JButton(resourceMap.getString("btnMinus10mil.text"));
+        btnPlusMillion         = new JButton(resourceMap.getString("btnPlus1mil.text"));
+        btnMinusMillion        = new JButton(resourceMap.getString("btnMinus1mil.text"));
+        btnPlusHundredK        = new JButton(resourceMap.getString("btnPlus100k.text"));
+        btnMinusHundredK       = new JButton(resourceMap.getString("btnMinus100k.text"));
+        btnPlusTenK            = new JButton(resourceMap.getString("btnPlus10k.text"));
+        btnMinusTenK           = new JButton(resourceMap.getString("btnMinus10k.text"));
         checkMinusButtons();
         btnPlusHundredMillion.addActionListener(evt -> adjustPrincipal(Money.of(100_000_000)));
         btnMinusHundredMillion.addActionListener(evt -> adjustPrincipal(Money.of(-100_000_000)));
@@ -266,107 +278,107 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
         choiceSchedule.setSelectedItem(loan.getFinancialTerm());
         choiceSchedule.addActionListener(this);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 2;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         panMain.add(new JLabel(resourceMap.getString("lblPrincipal.text")), gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 2;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         panMain.add(txtPrincipal, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints        = new GridBagConstraints();
+        gridBagConstraints.gridx  = 1;
+        gridBagConstraints.gridy  = 3;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(plusPanel, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 4;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         panMain.add(new JLabel(resourceMap.getString("lblAnnualInterest.text")), gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 4;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         panMain.add(sldInterest, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 5;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         panMain.add(new JLabel(resourceMap.getString("lblCollateral.text")), gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 5;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         panMain.add(sldCollateral, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 6;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         panMain.add(new JLabel(resourceMap.getString("lblLengthYears.text")), gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 6;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         panMain.add(sldLength, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 7;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         panMain.add(new JLabel(resourceMap.getString("lblPaymentSchedule.text")), gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 7;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         panMain.add(choiceSchedule, gridBagConstraints);
 
         setUpInfo();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 8;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill      = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         panMain.add(panInfo, gridBagConstraints);
 
         btnAdd = new JButton(resourceMap.getString("btnOkay.text"));
@@ -377,10 +389,10 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
         btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
         btnCancel.setName("btnClose");
         btnCancel.addActionListener(evt -> cancel());
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx     = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.CENTER;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        gridBagConstraints.anchor    = GridBagConstraints.CENTER;
+        gridBagConstraints.insets    = new Insets(5, 5, 0, 0);
         panBtn.add(btnCancel);
 
         getContentPane().add(panMain, BorderLayout.CENTER);
@@ -389,7 +401,13 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
         pack();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewLoanDialog.class);
@@ -405,120 +423,120 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
         panInfo.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("detailsTitle.text")));
         refreshValues();
 
-        JPanel panLeft = new JPanel(new GridBagLayout());
+        JPanel panLeft  = new JPanel(new GridBagLayout());
         JPanel panRight = new JPanel(new GridBagLayout());
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.gridx  = 0;
+        gridBagConstraints.gridy  = 0;
+        gridBagConstraints.fill   = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         panLeft.add(new JLabel(resourceMap.getString("lblAPR.text")), gridBagConstraints);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.gridx  = 1;
+        gridBagConstraints.fill   = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         panLeft.add(lblAPR, gridBagConstraints);
 
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy++;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill   = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panLeft.add(new JLabel(resourceMap.getString("lblCollateralPct.text")), gridBagConstraints);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.gridx  = 1;
+        gridBagConstraints.fill   = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         panLeft.add(lblCollateralPct, gridBagConstraints);
 
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy++;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill   = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panLeft.add(new JLabel(resourceMap.getString("lblLength.text")), gridBagConstraints);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.gridx  = 1;
+        gridBagConstraints.fill   = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         panLeft.add(lblYears, gridBagConstraints);
 
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy++;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill   = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panLeft.add(new JLabel(resourceMap.getString("lblSchedule.text")), gridBagConstraints);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.gridx  = 1;
+        gridBagConstraints.fill   = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         panLeft.add(lblSchedule, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints        = new GridBagConstraints();
+        gridBagConstraints.gridx  = 0;
+        gridBagConstraints.gridy  = 0;
+        gridBagConstraints.fill   = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(2, 2, 2, 2);
         panRight.add(new JLabel(resourceMap.getString("lblPrincipalAmount.text")), gridBagConstraints);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.gridx  = 1;
+        gridBagConstraints.fill   = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         panRight.add(lblPrincipal, gridBagConstraints);
 
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy++;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill   = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panRight.add(new JLabel(resourceMap.getString("lblFirstPayment.text")), gridBagConstraints);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.gridx  = 1;
+        gridBagConstraints.fill   = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         panRight.add(lblFirstPayment, gridBagConstraints);
 
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy++;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill   = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panRight.add(new JLabel(resourceMap.getString("lblInstallmentAmount.text")), gridBagConstraints);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.gridx  = 1;
+        gridBagConstraints.fill   = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         panRight.add(lblPayAmount, gridBagConstraints);
 
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy++;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill   = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panRight.add(new JLabel(resourceMap.getString("lblNumberPayments.text")), gridBagConstraints);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.gridx  = 1;
+        gridBagConstraints.fill   = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         panRight.add(lblNPayment, gridBagConstraints);
 
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy++;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill   = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panRight.add(new JLabel(resourceMap.getString("lblTotalAmount.text")), gridBagConstraints);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.gridx  = 1;
+        gridBagConstraints.fill   = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         panRight.add(lblTotalPayment, gridBagConstraints);
 
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy++;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill   = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panRight.add(new JLabel(resourceMap.getString("lblCollateralAmount.text")), gridBagConstraints);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.gridx  = 1;
+        gridBagConstraints.fill   = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         panRight.add(lblCollateralAmount, gridBagConstraints);
 
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy++;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill   = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panRight.add(new JLabel(resourceMap.getString("lblMaxCollateral.text")), gridBagConstraints);
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.gridx  = 1;
+        gridBagConstraints.fill   = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         panRight.add(new JLabel(maxCollateralValue.toAmountAndSymbolString()), gridBagConstraints);
 
@@ -564,11 +582,10 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
 
     private void addLoan() {
         if (maxCollateralValue.isLessThan(loan.determineCollateralAmount())) {
-            JOptionPane.showMessageDialog(
-                    frame,
-                    resourceMap.getString("addLoanErrorMessage.text"),
-                    resourceMap.getString("addLoanErrorTitle.text"),
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame,
+                  resourceMap.getString("addLoanErrorMessage.text"),
+                  resourceMap.getString("addLoanErrorTitle.text"),
+                  JOptionPane.ERROR_MESSAGE);
             return;
         }
         campaign.addLoan(loan);
@@ -580,47 +597,56 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
     }
 
     private void setSliders() {
+        boolean isGrayMonday = isGrayMonday(campaign.getLocalDate(),
+              campaign.getCampaignOptions().isSimulateGrayMonday());
+
         if (campaign.getCampaignOptions().isUseLoanLimits()) {
             int[] interest = Loan.getInterestBracket(rating);
             sldInterest = new JSlider(interest[0], interest[2], loan.getRate());
+            sldInterest.setEnabled(!isGrayMonday);
+
             if (interest[2] - interest[0] > 30) {
                 sldInterest.setMajorTickSpacing(10);
             } else {
                 sldInterest.setMajorTickSpacing(5);
             }
+
             sldInterest.setPaintTicks(true);
             sldInterest.setPaintLabels(true);
 
             int[] collateral = Loan.getCollateralBracket(rating);
             sldCollateral = new JSlider(collateral[0], collateral[2], loan.getCollateral());
+
             if (collateral[2] - collateral[0] > 50) {
                 sldCollateral.setMajorTickSpacing(20);
             } else {
                 sldCollateral.setMajorTickSpacing(10);
             }
+
             sldCollateral.setPaintTicks(true);
             sldCollateral.setPaintLabels(true);
+            sldCollateral.setEnabled(!isGrayMonday);
 
             sldLength = new JSlider(1, Loan.getMaxYears(rating), loan.getYears());
-            sldLength.setMajorTickSpacing(1);
-            sldLength.setPaintTicks(true);
-            sldLength.setPaintLabels(true);
         } else {
             sldInterest = new JSlider(0, 100, loan.getRate());
             sldInterest.setMajorTickSpacing(10);
             sldInterest.setPaintTicks(true);
             sldInterest.setPaintLabels(true);
+            sldInterest.setEnabled(!isGrayMonday);
 
             sldCollateral = new JSlider(0, 300, loan.getCollateral());
             sldCollateral.setMajorTickSpacing(50);
             sldCollateral.setPaintTicks(true);
             sldCollateral.setPaintLabels(true);
+            sldCollateral.setEnabled(!isGrayMonday);
 
             sldLength = new JSlider(1, 10, loan.getYears());
-            sldLength.setMajorTickSpacing(1);
-            sldLength.setPaintTicks(true);
-            sldLength.setPaintLabels(true);
         }
+
+        sldLength.setMajorTickSpacing(1);
+        sldLength.setPaintTicks(true);
+        sldLength.setPaintLabels(true);
     }
 
     @Override

@@ -3,9 +3,11 @@ sucsId: 1709
 xcood: -64.371
 ycood: 2.798
 spectralType:
-  source: canon
+  source: 25 Years of Art and Fiction, pg. 109
   value: G3V
-primarySlot: 2
+primarySlot:
+  source: 25 Years of Art and Fiction, pg. 109
+  value: 2
 event:
   - date: '2406-12-27'
     zenithCharge: yes
@@ -35,28 +37,32 @@ planet:
       value: Milton
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 2
+    sysPos:
+      source: 25 Years of Art and Fiction, pg. 109
+      value: 2
     icon: green4
     pressure:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 109
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 25 Years of Art and Fiction, pg. 109
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 109
       value: 1.04
-    diameter: 15543
-    density: 4.710272462042
+    diameter: 15530
+    density: 4.70625691222
     dayLength: 24
     yearLength: 1.2
     temperature:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 109
       value: 41
     water:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 109
       value: 66
     lifeForm:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 109
       value: BIRD
     desc: 3135 - After the Outer Reaches Rebellion and the collapse of Terran authority
       among the far-flung colony worlds, dozens of planets suddenly found themselves
@@ -91,25 +97,29 @@ planet:
       largest spacecraft component manufacturer.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Etienne
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Paradise Foundation
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Olquia
       - name:
-          source: canon
+          source: 25 Years of Art and Fiction, pg. 109
           value: Phronx
       - name:
-          source: canon
+          source: 25 Years of Art and Fiction, pg. 109
           value: Selajia
     satellite:
-      - name: Faxon
+      - name:
+          source: 25 Years of Art and Fiction, pg. 109
+          value: Faxon
         size: large
         icon: rock14
-      - name: Paramesh
+      - name:
+          source: 25 Years of Art and Fiction, pg. 109
+          value: Paramesh
         size: medium
         icon: rock13
     event:
