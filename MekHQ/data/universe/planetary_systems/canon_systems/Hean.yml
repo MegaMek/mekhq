@@ -3,9 +3,11 @@ sucsId: 1072
 xcood: 74.697
 ycood: -14.518
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K1V
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2373-11-23'
     zenithCharge: yes
@@ -60,28 +62,32 @@ planet:
       value: Hean
     type: TERRESTRIAL
     orbitalDist: 0.56
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green8
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.8
-    diameter: 10625
-    density: 5.293080217965
+    diameter: 10623
+    density: 5.292222960974
     dayLength: 20
     yearLength: 1.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 31
     water:
-      source: canon
+      source: MWDA world profiles
       value: 70
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: AMPHIBIAN
     desc: |-
       Hean native ecology contains unusual flora and fauna. Most of Hean‘s animals use poison to hunt or defend themselves, and most of Hean‘s plants are poisonous if ingested. After scientists discovered that many of these plants and animals also contain useful medicinal compounds, pharmaceutical companies in the Federated Suns invested in Hean during the First Star League, building numerous medical facilities on the planet.
@@ -93,25 +99,10 @@ planet:
       There are a total of six continents on Hean. Chau, Hanoi, and Luan are all in the northern hemisphere, while Nghiem and Truyen fall in the southern hemisphere. The smallest continent, Taigoan, sits across the equator but, because of its temperate climate, is home to the capital city of Cadaceus.
     landmass:
       - name:
-          source: canon
-          value: Chau
-      - name:
-          source: canon
-          value: Hanoi
-      - name:
-          source: canon
-          value: Luan
-      - name:
-          source: canon
-          value: Nghiem
-      - name:
-          source: canon
-          value: Truyen
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Taigoan
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Cadaceus
     event:
       - date: '2315-02-22'

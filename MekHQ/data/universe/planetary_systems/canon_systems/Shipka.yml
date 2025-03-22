@@ -3,9 +3,11 @@ sucsId: 2315
 xcood: 80.12
 ycood: -110.657
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K9III
-primarySlot: 5
+primarySlot:
+  source: MWDA world profiles
+  value: 5
 planet:
   - name: Sinulescu
     type: GIANT_TERRESTRIAL
@@ -81,28 +83,32 @@ planet:
       value: Shipka
     type: TERRESTRIAL
     orbitalDist: 0.5
-    sysPos: 5
+    sysPos:
+      source: MWDA world profiles
+      value: 5
     icon: green16
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.0
-    diameter: 14701
-    density: 4.780914437338
+    diameter: 14700
+    density: 4.780633137201
     dayLength: 28
     yearLength: 0.8
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 48
     water:
-      source: canon
+      source: MWDA world profiles
       value: 68
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: AMPHIBIAN
     desc: |-
       3135 - Shipka was accidentally discovered by the exploration ship Mighty Munchkin that was enroute to Highspire but ended up in a system that had never been explored. Shipka‘s location made it a perfect way-station trading port. The planet's population grew rapidly with farmers, traders, crafters, and merchants looking to turn a fast profit. Cambridge, the largest of the planet‘s three continents, produces agricultural products and minerals in addition to having the largest DropPort on the planet. The capital, Shipka Commune, is located on the southwestern coast of Cambridge. While Cambridge is located in northern hemisphere, the other two continents, Hillsborough and Foxborough, are in the southern hemisphere. Hillsborough produces petroleum and precious metals. Foxborough produces timber and agricultural produce, as well as coal and shale.
@@ -112,19 +118,21 @@ planet:
       During the Jihad, Shipka was overlooked by the Word of Blake forces. When Devlin Stone demanded the world for The Republic of the Sphere, the citizens went on strike for months before the situation was finally resolved.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Cambridge
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Shipka Commune
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Foxborough
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Hillsborough
     satellite:
-      - name: Leoness
+      - name:
+          source: MWDA world profiles
+          value: Leoness
         size: medium
         icon: oddmoon2
     event:

@@ -5,7 +5,9 @@ ycood: 330.561
 spectralType:
   source: canon
   value: K7V
-primarySlot: 4
+primarySlot:
+  source: 'Operational Turning Points: Falcon Incursion'
+  value: 4
 event:
   - date: '2623-07-03'
     nadirCharge: yes
@@ -63,28 +65,32 @@ planet:
       value: Bucklands
     type: TERRESTRIAL
     orbitalDist: 0.24
-    sysPos: 4
+    sysPos:
+      source: 'Operational Turning Points: Falcon Incursion'
+      value: 4
     icon: green43
     pressure:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Operational Turning Points: Falcon Incursion'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: 1.03
-    diameter: 14768
-    density: 4.922935518331
+    diameter: 14736
+    density: 4.912168036149
     dayLength: 20
     yearLength: 0.8
     temperature:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: 32
     water:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: 50
     lifeForm:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: MAMMAL
     desc: |-
       Bucklands is breadbasket world that supplies massive amounts of food to neighboring planets. The food supplies make the planet vital to the region, even if Bucklands is regarded as a backwater planet by most Lyrans. The planet is otherwise not noteworthy, with next to no industry beyond food processing and packaging and only modest deposits of common mineral resources.

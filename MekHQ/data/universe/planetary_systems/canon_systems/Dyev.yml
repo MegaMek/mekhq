@@ -3,9 +3,11 @@ sucsId: 760
 xcood: 5.683
 ycood: 40.797
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K8III
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2354-04-24'
     zenithCharge: yes
@@ -15,28 +17,32 @@ planet:
       value: Dyev
     type: TERRESTRIAL
     orbitalDist: 0.42
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: green8
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.04
-    diameter: 11175
-    density: 6.527098299277
+    diameter: 11186
+    density: 6.533657295009
     dayLength: 25
     yearLength: 0.8
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 50
     water:
-      source: canon
+      source: MWDA world profiles
       value: 27
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       A warm, dry world chronically plagued by violent, long-lasting dust storms, Dyev was settled initially by Russian and Slavic entrepreneurs hoping to take advantage of the abundant raw metals found throughout the rugged mountains and dried-out canyons crisscrossing its surface. With the planet‘s water tied up mostly in two small oceans and a handful of meager lakes and rivers, the early colonists had to rely on ice ships for their freshwater needs. In the latter half of the twenty-fifth century, however, miners digging deep into the Tupik Chasm for a new vanadium vein instead stumbled upon a remarkable find in the form of a vast underground reservoir of fresh water. Other such subterranean lakes and seas were discovered deep below Dyev‘s surface over the following decades, mostly near the northern hemispheric canyons, and elaborate irrigation systems were devised to bring this water to the people for farming and general use. During the Amaris Crisis, the Usurper‘s troops attempted to poison these reserves to bring the people of Dyev to heel, and succeeded in irrevocably tainting a third of the underground seas before Kerensky‘s forces rolled over them during the liberation.
@@ -46,10 +52,12 @@ planet:
       The capital city of Dyev, Novaya Mensk, is located in the northern hemisphere, on the eastern shore of the Morye Syevir ocean, and serves as the commercial and administrative heart of the planet. Meanwhile, Trogport, a sprawling spaceport city just south of the larger Aleutican Ocean in the southern hemisphere, is the planet‘s primary connection to interstellar commerce. Trogport also serves as the home for a majority of the local aerospace defense forces, and as home to the headquarters offices of several local mining concerns.
     landmass:
       - capital:
-          source: canon
+          source: MWDA world profiles
           value: Novaya Mensk
     satellite:
-      - name: Uter
+      - name:
+          source: MWDA world profiles
+          value: Uter
         size: large
         icon: rock17
     event:

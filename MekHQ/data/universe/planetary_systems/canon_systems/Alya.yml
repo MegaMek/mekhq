@@ -3,9 +3,11 @@ sucsId: 110
 xcood: 26.359
 ycood: 96.629
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G2VI
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2416-09-22'
     nadirCharge: yes
@@ -37,28 +39,32 @@ planet:
       value: Alya
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green35
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.16
-    diameter: 15394
-    density: 5.263220738038
+    diameter: 15441
+    density: 5.279373843827
     dayLength: 24
     yearLength: 2.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 35
     water:
-      source: canon
+      source: MWDA world profiles
       value: 38
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: |-
       Thanks to the presence of an abnormally huge gas giant in the system‘s outermost orbit, Alya follows an elongated revolutionary cycle around its sun and has created an equally peculiar orbital path for Xanadu, Alya‘s single large moon. The effects of these eccentric orbits have created such unusual day/night and seasonal cycles for Alya that travelers to this world are given complicated native calendars and urged to use these in place of the galactic standard during their stay to minimize confusion.
@@ -68,19 +74,21 @@ planet:
       The capital city and commercial center of Alya, LeSabrea, is located on Paroasis, on the western shores of the landlocked Saline Sea, while the bulk of the planet‘s industrial might is headquartered five hundred kilometers east, in Flerise City. The southern continents of Zenishli and Desije, by comparison, are sparsely populated, covered mostly by unspoiled evergreen wilderness and a mix of rolling hills and abrupt mountain chains.
     landmass:
       - name:
-          source: canon
-          value: Paroasis
-        capital:
-          source: canon
-          value: LeSabrea
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Desije
       - name:
-          source: canon
+          source: MWDA world profiles
+          value: Paroasis
+        capital:
+          source: MWDA world profiles
+          value: LeSabrea
+      - name:
+          source: MWDA world profiles
           value: Zenishli
     satellite:
-      - name: Xanadu
+      - name:
+          source: MWDA world profiles
+          value: Xanadu
         size: giant
         icon: rock6
     event:

@@ -3,9 +3,11 @@ sucsId: 2590
 xcood: 78.315
 ycood: -159.326
 spectralType:
-  source: canon
+  source: House Liao, pg. 148
   value: G1IV
-primarySlot: 6
+primarySlot:
+  source: House Liao, pg. 148
+  value: 6
 event:
   - date: '2407-05-14'
     nadirCharge: yes
@@ -116,7 +118,9 @@ planet:
       value: Truth
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 6
+    sysPos:
+      source: House Liao, pg. 148
+      value: 6
     icon: dry4
     pressure: THIN
     atmosphere: BREATHABLE

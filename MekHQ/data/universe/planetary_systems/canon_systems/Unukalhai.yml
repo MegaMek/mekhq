@@ -3,9 +3,11 @@ sucsId: 2632
 xcood: -46.273
 ycood: 69.75
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K2V
-primarySlot: 5
+primarySlot:
+  source: MWDA world profiles
+  value: 5
 event:
   - date: '2357-08-19'
     nadirCharge: yes
@@ -110,28 +112,32 @@ planet:
       value: Unukalhai
     type: TERRESTRIAL
     orbitalDist: 0.49
-    sysPos: 5
+    sysPos:
+      source: MWDA world profiles
+      value: 5
     icon: green48
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.21
-    diameter: 12356
-    density: 6.87569667608
+    diameter: 12362
+    density: 6.878844001887
     dayLength: 17
     yearLength: 0.9
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 35
     water:
-      source: canon
+      source: MWDA world profiles
       value: 66
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       Colonists from Terra‘s turbulent Middle East region first attempted to settle Unukalhai during mankind‘s Exodus into space. Unfortunately, soon after they made planetfall these settlers detected a previously unidentified biological taint in the planet‘s air and water supplies, which rendered breathing impossible without respirators and contaminated the soil in a manner harmful to human consumption. Rather than proceed further with their colonization efforts, the original settlers moved on, eventually landing on Zebeneschamali, and relayed their findings on Unukalhai back home—or so they thought.
@@ -141,22 +147,26 @@ planet:
       In the centuries of the Succession Wars, Unukalhai was largely overlooked by invaders, primarily due to its lack of significant resources, but its proximity to Skye often made it a favored jump-off world for strikes into the Lyran realm. Thus, the cities and towns of this world were largely undamaged by the wars that followed the fall of the Star League, and even the Jihad passed it by with little more than a raid or a brief influx of troops during a stopover period of R and R. Travelers coming to this planet are advised to stop first for the requisite antitoxins at the system‘s jump point station before making landfall at the capital city and spaceport of Wanalulu, located on the southern shores of Luahali.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Awalia
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Luahali
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Wanalulu
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Lukahanna
     satellite:
-      - name: Xela
+      - name:
+          source: MWDA world profiles
+          value: Xela
         size: large
         icon: rock8
-      - name: Yordana
+      - name:
+          source: MWDA world profiles
+          value: Yordana
         size: large
         icon: rock1
     event:

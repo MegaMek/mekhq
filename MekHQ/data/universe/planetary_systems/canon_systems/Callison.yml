@@ -3,9 +3,11 @@ sucsId: 443
 xcood: -62.556
 ycood: -15.044
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G5V
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2372-11-14'
     zenithCharge: yes
@@ -35,28 +37,32 @@ planet:
       value: Callison
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: wet15
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.99
-    diameter: 12759
-    density: 5.476668799424
+    diameter: 12731
+    density: 5.464757416155
     dayLength: 21
     yearLength: 1.1
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 33
     water:
-      source: canon
+      source: MWDA world profiles
       value: 84
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: 3135 - Callison possesses abundant water, mineral, and agricultural resources.
       It was originally colonized by the Federation of Skye in the early period of
@@ -79,16 +85,15 @@ planet:
       the Sphere proved easier than most.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Grayle
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Fallosha
-      - name:
-          source: canon
-          value: Vantassa
     satellite:
-      - name: Yngve
+      - name:
+          source: MWDA world profiles
+          value: Yngve
         size: medium
         icon: rock9
     event:

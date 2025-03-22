@@ -3,9 +3,11 @@ sucsId: 1383
 xcood: -68.245
 ycood: 62.502
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K4IV
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 planet:
   - name: Imdugud
     type: TERRESTRIAL
@@ -56,42 +58,49 @@ planet:
       value: Kochab
     type: TERRESTRIAL
     orbitalDist: 0.49
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: wet15
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.92
-    diameter: 13028
-    density: 4.959065502644
+    diameter: 13033
+    density: 4.960875543191
     dayLength: 20
     yearLength: 0.9
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 44
     water:
-      source: canon
+      source: MWDA world profiles
       value: 87
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       Despite its abundance of surface water, Kochab is a remarkably dry world. It seems that the two main planetary landmasses, Dakkato and Insarria, formed almost exclusively around a series of rugged, crisscrossing mountain chains. Making matters worse is the fact that the few valleys and plains where the terrain is level and irrigated enough for farming and habitation are prone to chronic earthquakes. These drawbacks, however, did not prevent settlers from claiming this world as their own in the early days of humankind‘s expansion to the stars, or in establishing a series of cities and small towns on both continents within their first century. With few major veins of industrial materials within easy access, and the constant tectonic stresses wreaking havoc on a regular basis, settlements and industry on Kochab were kept deliberately small. This limited the planetary economy to subsistence-level only, with exports of common metals, commercial products, and native beef and pork from its ranching industry. Regarded as something of a backwater world, the Commonwealth invested very little energy into improving the lot of Kochab, and the planet was largely ignored as anything more than a convenient stop to anywhere else, until the early thirtieth century. Then the planet briefly enjoyed a boost from off-world investors and tourists that came about as a result of being the chosen filming location for the long-running Steinharts holodrama, produced by the (now-defunct) Commonwealth Nationwide (CNN) video network. Unfortunately for Kochab, fame proved a fickle mistress, and the weekly soap opera aired its last episode in 3023, the same year that CNN was folded into the expanding Donegal Broadcasting Company, which kept the series alive only in syndication. Kochab‘s slight economic boost evaporated with CNN‘s fall, and once more the planet faded into relative mediocrity, all but unknown to off-worlders, save those transferred there after the Jihad, under Devlin Stone‘s relocation mandates, or the occasional volunteer relief workers dispatched there after a particularly violent “earthquake season.”
 
       The capital and primary spaceport of Kochab, Stenton, is located on Dakkato, just south of the Dakkato Prime mountain range. Saint Jaddah (known to Steinharts fans as Matrius, hometown of the Morik clan) is located on Insarria, and today is home to the Steinharts Museum of emorabilia, a nostalgic nod to Kochab‘s all-too-brief fling with fortune and glamour.
+    ring:
+      source: MWDA world profiles
+      value: yes
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Dakkato
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Stenton
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Insarria
     satellite:
       - name: None (dust ring)

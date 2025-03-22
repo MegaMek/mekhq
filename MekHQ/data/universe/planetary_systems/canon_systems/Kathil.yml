@@ -3,9 +3,11 @@ sucsId: 1302
 xcood: 171.357
 ycood: -148.58
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 87'
   value: F4V
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Davion, pg. 87'
+  value: 3
 event:
   - date: '2387-02-10'
     zenithCharge: yes
@@ -52,28 +54,32 @@ planet:
       value: Kathil
     type: TERRESTRIAL
     orbitalDist: 2.24
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Davion, pg. 87'
+      value: 3
     icon: green9
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 87'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 87'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 87'
       value: 1.0
-    diameter: 13984
-    density: 5.03952630679
+    diameter: 13964
+    density: 5.032485372961
     dayLength: 24
     yearLength: 3.6
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 87'
       value: 30
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 87'
       value: 30
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 87'
       value: INSECT
     desc: |-
       Kathil was originally a poor agriculture world, however it has grown into one of the Star League’s key manufacturing planets and after the fall of the League it became one of the most important planets in the Federated Suns. The rise in importance of Kathil during the Star League was due to heavy industrial build up, including the McKenna Shipyards which were built in 2602 and soon after General Motors established its largest manufacturing facility on the planet.
@@ -89,19 +95,21 @@ planet:
       General Motors
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Davion, pg. 87'
           value: Hurste
       - name:
-          source: canon
+          source: 'Handbook: House Davion, pg. 87'
           value: Muran
         capital:
-          source: canon
+          source: 'Handbook: House Davion, pg. 87'
           value: District City
       - name:
-          source: canon
+          source: 'Handbook: House Davion, pg. 87'
           value: Thespia
     satellite:
-      - name: Loren’s Folly
+      - name:
+          source: 'Handbook: House Davion, pg. 87'
+          value: Loren's Folly
         size: large
         icon: rock14
     event:

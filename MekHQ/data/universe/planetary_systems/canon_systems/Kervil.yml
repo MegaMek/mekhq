@@ -3,9 +3,11 @@ sucsId: 1333
 xcood: 34.119
 ycood: 45.961
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K3V
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2380-09-04'
     nadirCharge: yes
@@ -30,28 +32,32 @@ planet:
       value: Kervil
     type: TERRESTRIAL
     orbitalDist: 0.49
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: wet2
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.26
-    diameter: 12961
-    density: 6.851979128082
+    diameter: 12942
+    density: 6.841910732262
     dayLength: 21
     yearLength: 0.9
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 24
     water:
-      source: canon
+      source: MWDA world profiles
       value: 92
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       With water covering almost all of its surface, and the remainder given over to ten large island masses and an assortment of smaller chains dominated by volcanoes, Kervil was quickly established as a mining world. Industries geared toward locating and exploiting the valuable metals churned up by lava flows arose within a decade of the planet‘s colonization. The Ozawa Mercantile Association, a collective of merchants that dominated the region before the rise of House Kurita and the Draconis Combine, took a liking to Kervil and its vast metal deposits. Through negotiations with the local government, the Association established its own offices, outposts, offshore mining rigs and orbital processing centers, maximizing the efficiency of Kervil‘s mining operations in exchange for almost exclusive access to the refined metals. When the Dragon crushed the Association, these facilities, some damaged by Kuritan attacks, came under Combine control. At the peak of the Star League, Kervil‘s metal industry and orbital refineries became a major producer of ferro-fibrous armor and endo-steel, used extensively in the manufacture of BattleMechs and other military vehicles. It was perhaps for this reason that forces sympathetic to the Outworlds Alliance attacked Kervil during the Reunification War, attempting to demolish the distribution centers on the planet‘s surface after crippling several orbital factories. A small BattleMech unit stationed on Kervil, part of the SLDF‘s 138th BattleMech Division, was all that stood between the renegade forces and total destruction. The woefully outnumbered SLDF troops put up a brave fight, first with hit-and-run attacks and later with an assault against one of the renegade DropShips, while waiting for reinforcements to arrive. Still outnumbered nearly 5 to 1, however, the defenders were forced to fall back to Fort Steel, their main base near the planetary capital of Iron City. For three days they held out against a siege by angry renegades; then the enemy troops overwhelmed them and destroyed the fort and its defenders to the last ‘Mech and soldier. This stand, likened to the battle for the Alamo on Terra, ultimately achieved its goal, as the departing renegades ran full-on into SLDF reinforcement troops on their way out of the system, losing the entire raiding force to the guns of SLDF WarShips. The brave SLDF defenders who died at the Battle of Kervil are still remembered today: Fort Steel‘s remains are a historic site open to tourists year-round. This battle, as it happens, was the only major military action seen on Kervil; even the SLDF liberation from Amaris the Usurper was comparatively bloodless. The planet was virtually ignored throughout the Succession Wars and the Jihad, save for some minor raids that destroyed the advanced armor metal plants in orbit and several military-grade metal refineries on the surface. Today, despite these losses, mining and metallurgy remain Kervil‘s greatest industries. Iron City, still the planetary capital, is located on Greater Domain, Kervil‘s largest island continent. Greater Domain and seven other large island masses—Brahn, Northland, Satella and Lesser Domain in the north and Bellas Major, Bellas Minor and Karnophia in the south—support the majority of the planet‘s population and industries. The north polar continent of Freiholt and the equatorial continent of Infernus are sparsely settled, due to the extreme cold and lack of minerals on Freiholt and the chain of active volcanoes on Infernus.
@@ -60,40 +66,21 @@ planet:
       Wakazashi Industries
     landmass:
       - name:
-          source: canon
-          value: Bellas Major
-      - name:
-          source: canon
-          value: Bellas Minor
-      - name:
-          source: canon
-          value: Brahn
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Freiholt
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Greater Domain
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Iron City
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Infernus
-      - name:
-          source: canon
-          value: Karnophia
-      - name:
-          source: canon
-          value: Lesser Domain
-      - name:
-          source: canon
-          value: Northland
-      - name:
-          source: canon
-          value: Satella
     satellite:
-      - name: Paxin
+      - name:
+          source: MWDA world profiles
+          value: Paxin
         size: medium
         icon: rock12
     event:

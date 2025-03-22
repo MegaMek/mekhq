@@ -3,9 +3,11 @@ sucsId: 484
 xcood: -96.168
 ycood: 38.985
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K1V
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2365-08-04'
     nadirCharge: yes
@@ -66,28 +68,32 @@ planet:
       value: Carsphairn
     type: TERRESTRIAL
     orbitalDist: 0.56
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: wet5
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.17
-    diameter: 16331
-    density: 5.063974290657
+    diameter: 16284
+    density: 5.049352126825
     dayLength: 22
     yearLength: 1.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 33
     water:
-      source: canon
+      source: MWDA world profiles
       value: 77
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       3135 - Carsphairn is blessed with striking and varied landscapes but cursed with violent weather systems, largely the result of the pull of three large moons. The weather varies from continuous, weeks-long spring and autumn downpours to frequent tornadoes in the summer, and crippling blizzards and ice storms in the winter. To withstand the effects of the storms, the locals built their structures low, and erected protective domes over many of their farms. Carsphairn's fertile soil sustain hybrid Terran crops and local animals. While mineral wealth has allowed for a rudimentary level of industrialization and exports. Narcisse, the planetary capital, is located on the primary continent of Gillinia. Narcisse has a large seaport as well as a spaceport, linking travelers to the other four main landmasses of Basallia, North Teslia, South Teslia, and Yddrig.
@@ -97,31 +103,25 @@ planet:
       During the Jihad, Carsphairn was raided several times by Word of Blake forces as it was an easy stop for foodstuffs to sustain their longer campaigns. This strategy forced the stationing of a permanent garrison of a mix of Lyran, Combine, and Clan Wolf warriors in the latter half of the war. Since becoming a member-world of the Republic of the Sphere, many of these garrison troops became part of Prefecture VIII militia remain on Carsphairn.
     landmass:
       - name:
-          source: canon
-          value: Basallia
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Gillinia
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Narcisse
-      - name:
-          source: canon
-          value: North Teslia
-      - name:
-          source: canon
-          value: South Teslia
-      - name:
-          source: canon
-          value: Yddrig
     satellite:
-      - name: Ammon
+      - name:
+          source: MWDA world profiles
+          value: Ammon
         size: medium
         icon: rock5
-      - name: Jael
+      - name:
+          source: MWDA world profiles
+          value: Jael
         size: large
         icon: rock8
-      - name: Zayit
+      - name:
+          source: MWDA world profiles
+          value: Zayit
         size: large
         icon: rock17
     event:

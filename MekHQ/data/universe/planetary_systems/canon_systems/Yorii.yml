@@ -3,9 +3,11 @@ sucsId: 2802
 xcood: -8.015
 ycood: 21.153
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F6V
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2375-06-09'
     nadirCharge: yes
@@ -21,28 +23,32 @@ planet:
       value: Yorii
     type: TERRESTRIAL
     orbitalDist: 1.3
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: wet6
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.12
-    diameter: 14634
-    density: 5.420059887153
+    diameter: 14578
+    density: 5.399243314313
     dayLength: 26
     yearLength: 1.9
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 40
     water:
-      source: canon
+      source: MWDA world profiles
       value: 81
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: 3135 - A large world of large oceans, diverse wildlife, and a few veins
       of mineral resources, the biggest obstacles to the colonization of Yorii were
@@ -80,19 +86,19 @@ planet:
       support a handful of major cities, with the new capital city of Shenobi on Yokohama.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Khesan
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Shokaku
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Xu-Lai
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Yokohama
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Shenobi
     event:
       - date: '2269-06-05'

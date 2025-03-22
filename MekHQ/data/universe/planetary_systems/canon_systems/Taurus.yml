@@ -3,9 +3,11 @@ sucsId: 2500
 xcood: 191.381
 ycood: -391.003
 spectralType:
-  source: canon
+  source: 'Handbook: Major Periphery States, pg. 125'
   value: G3V
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: Major Periphery States, pg. 125'
+  value: 4
 event:
   - date: '2505-11-25'
     zenithCharge: yes
@@ -64,28 +66,32 @@ planet:
       value: Taurus
     type: TERRESTRIAL
     orbitalDist: 1.0
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: Major Periphery States, pg. 125'
+      value: 4
     icon: green55
     pressure:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 125'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: Major Periphery States, pg. 125'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 125'
       value: 1.0
-    diameter: 12823
-    density: 5.504259245072
+    diameter: 12795
+    density: 5.492347279654
     dayLength: 24
     yearLength: 1.4
     temperature:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 125'
       value: 30
     water:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 125'
       value: 65
     lifeForm:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 125'
       value: MAMMAL
     desc: |-
       The first colony on Taurus was founded January 23, 2253 and the planet was the first colonized and capital of what would become the Taurian Concordat. Taurus is rich in minerals and has alwasy been a vital source of food, raw materials and manufacturing for the entire Concordat. It is the cultural, political, and industrial center of the Concordat.
@@ -95,19 +101,18 @@ planet:
       Taurus is home to a number of military industries and academies. Magna Metals is located in the city of Palermo on the Sicily continent and produces energy weapons and fusion weapons for BattleMechs, Aerospace fighters, DropShips and Small Craft. The headquarters for Taurus Territorial Industries is located in the old planetary capital of Samantha on the continent of Calderon and managed to survive the city's destruction, and still produces BattleMechs and combat vehicles, though at significantly reduced production levels. École Militaire is a premier training academy in the Concordat, unfortunately the campus was destroyed with the rest of Samantha, however the university is rebuilding in the Tulsa Flats on the Sicily continent and continues to train MechWarriors and infantry.
     landmass:
       - name:
-          source: canon
+          source: Masters and Minions, pg. 190
           value: Calderon
         capital:
-          source: canon
-          value: Samantha [destroyed 3074]
+          source: 'Handbook: Major Periphery States, pg. 125'
+          value: Samantha
       - name:
-          source: canon
-          value: Sicily
-        capital:
-          source: canon
-          value: New Chappelle [3074-?]
+          source: Masters and Minions, pg. 190
+          value: Sicilian
     satellite:
-      - name: Drusilla
+      - name:
+          source: 'Handbook: Major Periphery States, pg. 125'
+          value: Drusilla
         size: large
         icon: rock9
     event:

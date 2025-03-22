@@ -3,9 +3,11 @@ sucsId: 2684
 xcood: 92.884
 ycood: -347.978
 spectralType:
-  source: canon
+  source: 'Handbook: House Liao, pg. 85'
   value: K7IV
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Liao, pg. 85'
+  value: 2
 event:
   - date: '2762-08-31'
     zenithCharge: yes
@@ -43,28 +45,32 @@ planet:
       value: Victoria (CC)
     type: TERRESTRIAL
     orbitalDist: 0.42
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Liao, pg. 85'
+      value: 2
     icon: wet10
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 85'
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 85'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 85'
       value: 1.0
-    diameter: 12756
-    density: 5.507320336217
+    diameter: 12758
+    density: 5.508283500317
     dayLength: 24
     yearLength: 0.8
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 85'
       value: 2
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 85'
       value: 9
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 85'
       value: PLANT
     desc: |-
       Victoria's severe weather conditions, including almost-daily hailstorms, have resulted in underground dwellings with strict building codes. Victoria has developed a beautiful array of domed parks to satisfy the population's desire for sunlight. These domed parks have become a tourist attraction, bringing visitors from across the Confederation.
@@ -81,22 +87,30 @@ planet:
       Tellis Electronics
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Victoria
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Barns
     satellite:
-      - name: Jocelyn
-        size: medium
-        icon: oddmoon2
-      - name: Jennifer
-        size: medium
-        icon: oddmoon3
-      - name: Astrid
+      - name:
+          source: 'Handbook: House Liao, pg. 85'
+          value: Astrid
         size: medium
         icon: oddmoon1
-      - name: Lissete
+      - name:
+          source: 'Handbook: House Liao, pg. 85'
+          value: Jennifer
+        size: medium
+        icon: oddmoon3
+      - name:
+          source: 'Handbook: House Liao, pg. 85'
+          value: Jocelyn
+        size: medium
+        icon: oddmoon2
+      - name:
+          source: 'Handbook: House Liao, pg. 85'
+          value: Lissete
         size: medium
         icon: oddmoon2
     event:

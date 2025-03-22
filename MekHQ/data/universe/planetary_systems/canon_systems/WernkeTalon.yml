@@ -3,9 +3,11 @@ sucsId: 2746
 xcood: 248.407
 ycood: -230.887
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 91'
   value: G0V
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Davion, pg. 91'
+  value: 3
 event:
   - date: '2434-09-10'
     zenithCharge: yes
@@ -48,29 +50,33 @@ planet:
       value: Wernke (Talon)
     type: TERRESTRIAL
     orbitalDist: 1.1
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Davion, pg. 91'
+      value: 3
     icon: green14
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 91'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 91'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
-      value: 0.8
-    diameter: 9678
-    density: 5.801488202363
+      source: 'Handbook: House Davion, pg. 91'
+      value: 1.0
+    diameter: 10827
+    density: 6.49053159648
     dayLength: 23
     yearLength: 1.6
     temperature:
-      source: canon
-      value: 45
+      source: 'Handbook: House Davion, pg. 91'
+      value: 40
     water:
-      source: canon
-      value: 30
+      source: 'Handbook: House Davion, pg. 91'
+      value: 60
     lifeForm:
-      source: canon
-      value: INSECT
+      source: 'Handbook: House Davion, pg. 91'
+      value: MAMMAL
     desc: While Wernke is the settled planet in the system, its moon Talon is arguably
       more important. Talon is home to Kallon Weapon Industries, a major producer
       of ‘Mechs for the Federated Suns. Aside from the industrial plants, Talon is
@@ -79,19 +85,24 @@ planet:
       is imported from Wernke which is an arable and comfortable planet.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Davion, pg. 91'
+          value: Crimeia
+        capital:
+          source: 'Handbook: House Davion, pg. 91'
+          value: Hamish
+      - name:
+          source: 'Handbook: House Davion, pg. 91'
           value: Jal
       - name:
-          source: canon
-          value: Crimeia
-      - name:
-          source: canon
-          value: Vesper
-      - name:
-          source: canon
+          source: 'Handbook: House Davion, pg. 91'
           value: Tonkya
+      - name:
+          source: 'Handbook: House Davion, pg. 91'
+          value: Vesper
     satellite:
-      - name: Talon
+      - name:
+          source: 'Handbook: House Davion, pg. 91'
+          value: Talon
         size: medium
         icon: rock8
     event:

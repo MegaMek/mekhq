@@ -3,9 +3,11 @@ sucsId: 689
 xcood: 64.617
 ycood: -12.971
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K2III
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2712-11-24'
     nadirCharge: yes
@@ -52,28 +54,32 @@ planet:
       value: Deneb Kaitos
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: wet11
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.9
-    diameter: 10778
-    density: 5.845539618522
+    diameter: 10799
+    density: 5.856900416287
     dayLength: 23
     yearLength: 1.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 20
     water:
-      source: canon
+      source: MWDA world profiles
       value: 80
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       An unremarkable, small world blanketed by grasslands and tundra, Deneb Kaitos is famous as the home of the Deneb Light Cavalry, elite Federated Suns BattleMech regiments descended from the special forces of the First Star League. Originally settled by the Terran Hegemony, Deneb‘s population began to starve when food shipments were cut off after the fall of the First Star League. In response, the Fourth Deneb Light Cavalry, one of the Star League‘s Rapid Deployment Mixed Armed Forces (or RDMAF) regiments, did not join Kerensky‘s Exodus, and signed on with the Federated Suns military instead in exchange for food shipments to Deneb Kaitos.
@@ -83,22 +89,26 @@ planet:
       The continent of Baten is home to the capital of Cetus and is located in the northern hemisphere; the continents of Menkar and Mira straddle the equator.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Baten
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Cetus
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Menkar
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Mira
     satellite:
-      - name: Diphda
+      - name:
+          source: MWDA world profiles
+          value: Diphda
         size: medium
         icon: oddmoon2
-      - name: Shemali
+      - name:
+          source: MWDA world profiles
+          value: Shemali
         size: giant
         icon: rock7
     event:

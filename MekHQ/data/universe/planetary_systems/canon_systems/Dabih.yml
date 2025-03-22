@@ -3,9 +3,11 @@ sucsId: 645
 xcood: 59.968
 ycood: 83.504
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F0IV
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2377-03-26'
     zenithCharge: yes
@@ -19,28 +21,32 @@ planet:
       value: Dabih
     type: TERRESTRIAL
     orbitalDist: 4.48
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: green38
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.84
-    diameter: 10167
-    density: 5.790320745998
+    diameter: 10181
+    density: 5.798263029854
     dayLength: 30
     yearLength: 9.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 35
     water:
-      source: canon
+      source: MWDA world profiles
       value: 72
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: Another of the so-called Azami worlds, Dabih was settled by pilgrims of
       the Muslim faith, who were drawn to the planet‘s lush forests and large, deep
@@ -79,31 +85,31 @@ planet:
       lunar continent, Jidharo.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Garalash
       - name:
-          source: canon
-          value: Jidharo
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Ludesi
       - name:
-          source: canon
-          value: North Shakhiseh
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Zairikesh
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Barheilabad
     satellite:
-      - name: El-Arabi
+      - name:
+          source: MWDA world profiles
+          value: El-Arabi
         size: medium
         icon: rock17
-      - name: Lorial
+      - name:
+          source: MWDA world profiles
+          value: Lorial
         size: medium
         icon: oddmoon2
-      - name: Shakhi
+      - name:
+          source: MWDA world profiles
+          value: Shakhi
         size: giant
         icon: rock14
     event:

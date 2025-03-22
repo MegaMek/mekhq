@@ -3,9 +3,11 @@ sucsId: 59
 xcood: 24.813
 ycood: -64.414
 spectralType:
-  source: canon
+  source: House Liao, pg. 139
   value: K5III
-primarySlot: 5
+primarySlot:
+  source: House Liao, pg. 139
+  value: 5
 event:
   - date: '2359-07-17'
     zenithCharge: yes
@@ -84,7 +86,9 @@ planet:
       value: Aldebaran
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 5
+    sysPos:
+      source: House Liao, pg. 139
+      value: 5
     icon: green33
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -97,7 +101,7 @@ planet:
     temperature: 27
     water: 39
     lifeForm:
-      source: canon
+      source: House Liao, pg. 139
       value: MAMMAL
     desc: As of 3025 - Aldebaran is one of the oldest settled planets in the Confederation.
       It is a modest world with a moderate climate. Aldebaran has seen substantial

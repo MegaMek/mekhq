@@ -3,9 +3,11 @@ sucsId: 2530
 xcood: 74.182
 ycood: 304.712
 spectralType:
-  source: canon
+  source: House Kurita
   value: G0V
-primarySlot: 3
+primarySlot:
+  source: House Kurita
+  value: 3
 event:
   - date: '2350-08-08'
     zenithCharge: yes
@@ -47,7 +49,9 @@ planet:
       value: Thessalonika
     type: TERRESTRIAL
     orbitalDist: 1.1
-    sysPos: 3
+    sysPos:
+      source: House Kurita
+      value: 3
     icon: green21
     pressure: STANDARD
     atmosphere: TAINTEDPOISON
@@ -60,7 +64,7 @@ planet:
     temperature: 34
     water: 29
     lifeForm:
-      source: canon
+      source: House Kurita
       value: MAMMAL
     desc: Thessalonika is a relatively comfortable temperate planet with large grassy
       plains and an abundance of life, despite possessing only one relatively small
@@ -71,7 +75,7 @@ planet:
     smallMoons: 3
     landmass:
       - capital:
-          source: canon
+          source: House Kurita
           value: Tyrsis
     satellite:
       - name: Titans

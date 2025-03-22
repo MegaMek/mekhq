@@ -3,37 +3,43 @@ sucsId: 2946
 xcood: 40.343
 ycood: 1843.328
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: F7Ia
-primarySlot: 1
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 1
 planet:
   - name:
       source: canon
       value: Hellgate
     type: TERRESTRIAL
     orbitalDist: 3.64
-    sysPos: 1
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 1
     icon: green54
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 0.7
-    diameter: 10020
-    density: 4.927908801688
+    diameter: 10001
+    density: 4.918694629858
     dayLength: 28
     yearLength: 7.0
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 40
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 20
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: PLANT
     desc: No description available.
     landmass:

@@ -3,9 +3,11 @@ sucsId: 686
 xcood: 91.497
 ycood: -69.589
 spectralType:
-  source: canon
+  source: FedCom Civil War, pg. 190
   value: M2V
-primarySlot: 3
+primarySlot:
+  source: FedCom Civil War, pg. 190
+  value: 3
 event:
   - date: '2364-07-09'
     nadirCharge: yes
@@ -58,28 +60,32 @@ planet:
       value: Demeter
     type: TERRESTRIAL
     orbitalDist: 0.16
-    sysPos: 3
+    sysPos:
+      source: FedCom Civil War, pg. 190
+      value: 3
     icon: green50
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 190
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 190
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 190
       value: 1.0
-    diameter: 13097
-    density: 5.360520078823
+    diameter: 13103
+    density: 5.363162060717
     dayLength: 27
     yearLength: 0.6
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 190
       value: 35
     water:
-      source: canon
+      source: FedCom Civil War, pg. 190
       value: 50
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 190
       value: PLANT
     desc: |-
       For its early history Demeter was known for being a planetary wilderness preserve in pristine conditions. Adding to the planet's natural beauty were many naturally occurring crystalline formations, many over a mile in diameter. The flora and fauna were imported from all over the Capellan Confederation.
@@ -87,22 +93,26 @@ planet:
       Unfortunately, after being occupied by the Federated Suns in the late 26th century, Demeter became a major staging area. Large portions of the planet were covered in concrete and heavy industry.
     landmass:
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 190
           value: Bolan
         capital:
-          source: canon
+          source: FedCom Civil War, pg. 190
           value: New Demeter City
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 190
           value: Shallahandra
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 190
           value: Ulreich
     satellite:
-      - name: Desamone
+      - name:
+          source: FedCom Civil War, pg. 190
+          value: Desamone
         size: medium
         icon: rock3
-      - name: Penndel
+      - name:
+          source: FedCom Civil War, pg. 190
+          value: Penndel
         size: large
         icon: rock2
     event:

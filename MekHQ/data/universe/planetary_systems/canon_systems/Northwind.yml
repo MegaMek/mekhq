@@ -5,7 +5,9 @@ ycood: -2.891
 spectralType:
   source: canon
   value: G2IV
-primarySlot: 2
+primarySlot:
+  source: Mercenaries Supplemental, pg. 16
+  value: 2
 event:
   - date: '2356-09-28'
     zenithCharge: yes
@@ -35,28 +37,32 @@ planet:
       value: Northwind
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 2
+    sysPos:
+      source: Mercenaries Supplemental, pg. 16
+      value: 2
     icon: wet17
     pressure:
-      source: canon
+      source: Mercenaries Supplemental, pg. 16
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Mercenaries Supplemental, pg. 16
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Mercenaries Supplemental, pg. 16
       value: 1.01
-    diameter: 11420
-    density: 6.192277219041
+    diameter: 11441
+    density: 6.20377732326
     dayLength: 25
     yearLength: 2.3
     temperature:
-      source: canon
+      source: Mercenaries Supplemental, pg. 16
       value: 32
     water:
-      source: canon
+      source: Mercenaries Supplemental, pg. 16
       value: 75
     lifeForm:
-      source: canon
+      source: Mercenaries Supplemental, pg. 16
       value: REPTILE
     desc: |-
       Northwind was original colonized by the Stuart clan from Scotland. The Stuarts were joined by the remnants of the independent Scottish military, the Highlanders. In 2362, the ruling Clans of Northwind elected to create a military unit to defend their planet, the result was the Northwind Highlanders. The Highlanders acted as a garrison force of their home for centuries and eventually members from Northwind served in the Star League Defense Force, including the prestigious Black Watch. After the collapse of the Star League the Highlanders became mercenaries. The Highlanders became cut off from their homeworld in the 29th century while in the employ of the Capellan Confederation when Northwind was conquered by the Federated Suns.
@@ -68,22 +74,26 @@ planet:
       Cosara Weaponries
     landmass:
       - name:
-          source: canon
+          source: Mercenaries Supplemental, pg. 16
           value: Halidon
       - name:
-          source: canon
+          source: Mercenaries Supplemental, pg. 16
           value: Kearny
       - name:
-          source: canon
+          source: Mercenaries Supplemental, pg. 16
           value: New Lanark
         capital:
-          source: canon
+          source: Mercenaries Supplemental, pg. 16
           value: Tara
     satellite:
-      - name: Dublin
+      - name:
+          source: Mercenaries Supplemental, pg. 16
+          value: Dublin
         size: medium
         icon: oddmoon3
-      - name: Glasgow
+      - name:
+          source: Mercenaries Supplemental, pg. 16
+          value: Glasgow
         size: medium
         icon: rock16
     event:

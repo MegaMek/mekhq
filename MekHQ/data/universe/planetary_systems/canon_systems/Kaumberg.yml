@@ -3,9 +3,11 @@ sucsId: 1307
 xcood: -387.844
 ycood: 144.452
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 74'
   value: G5V
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 74'
+  value: 4
 event:
   - date: '2515-11-07'
     nadirCharge: yes
@@ -90,28 +92,32 @@ planet:
       value: Kaumberg
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 74'
+      value: 4
     icon: wet5
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 74'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 74'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 74'
       value: 1.01
     diameter: 12239
-    density: 5.799759040431
+    density: 5.799573615053
     dayLength: 27
     yearLength: 1.1
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 74'
       value: 36
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 74'
       value: 81
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 74'
       value: MAMMAL
     desc: |-
       Kaumberg is a temperate planet covered in thick forests and as such, timber makes up the primary industry and export. The planet is a garden-world with an abundance of arable land and enough excess agriculture that it exports food to surrounding worlds.
@@ -119,19 +125,21 @@ planet:
       Kaumberg was primarily settled by colonists hailing from Germany and Austria.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 74'
           value: Eingeschneit
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 74'
           value: Kuhlschrank
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 74'
           value: Regenwald
         capital:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 74'
           value: Stuttgart
     satellite:
-      - name: Grobrot
+      - name:
+          source: 'Handbook: House Steiner, pg. 74'
+          value: Grobrot
         size: medium
         icon: oddmoon1
     event:

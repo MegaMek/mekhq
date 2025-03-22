@@ -3,9 +3,11 @@ sucsId: 917
 xcood: -53.775
 ycood: 34.077
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 96
   value: F8II
-primarySlot: 6
+primarySlot:
+  source: Masters and Minions, pg. 96
+  value: 6
 event:
   - date: '2376-02-25'
     zenithCharge: yes
@@ -106,28 +108,32 @@ planet:
       value: Galatea
     type: TERRESTRIAL
     orbitalDist: 3.36
-    sysPos: 6
+    sysPos:
+      source: Masters and Minions, pg. 96
+      value: 6
     icon: green35
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 96
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 96
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Mercenaries Supplemental, pg. 10
       value: 1.0
-    diameter: 11674
-    density: 6.021173577655
+    diameter: 11673
+    density: 6.020521334621
     dayLength: 23
     yearLength: 6.3
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 96
       value: 55
     water:
-      source: canon
+      source: Masters and Minions, pg. 96
       value: 35
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 96
       value: MAMMAL
     desc: Galatea is an arid planet located just three jumps from Terra. It served
       as a major training location for the Star League Defense force and transitioned
@@ -138,13 +144,15 @@ planet:
       is located just northwest of the planet's capital Galatean City.
     landmass:
       - name:
-          source: canon
-          value: Lubbucks
+          source: Mercenaries Supplemental, pg. 10
+          value: Lubbocks
         capital:
-          source: canon
+          source: Masters and Minions, pg. 96
           value: Galatean City
     satellite:
-      - name: Galatea Minor
+      - name:
+          source: Masters and Minions, pg. 96
+          value: Galatea Minor
         size: large
         icon: rock8
     event:
