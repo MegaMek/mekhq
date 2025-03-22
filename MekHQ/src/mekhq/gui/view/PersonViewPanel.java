@@ -69,12 +69,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.awt.Color.BLACK;
-import static java.awt.Color.BLUE;
 import static java.awt.Color.RED;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
 import static mekhq.utilities.ImageUtilities.addTintToImage;
+import static org.jfree.chart.ChartColor.DARK_BLUE;
+import static org.jfree.chart.ChartColor.DARK_RED;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
@@ -581,10 +582,9 @@ public class PersonViewPanel extends JScrollablePanel {
      * current status.
      *
      * <ul>
-     *     <li>If the person is deceased, a red tint is applied.</li>
-     *     <li>If the person is retired, a blue tint is applied.</li>
-     *     <li>If the person has departed the unit, a black translucent tint is applied with 50%
-     *     transparency </li>
+     *     <li>If the person is deceased, a dark red tint is applied.</li>
+     *     <li>If the person is retired, a dark blue tint is applied.</li>
+     *     <li>If the person has departed the campaign, a black tint is applied.</li>
      * </ul>
      *
      * If the person's status does not meet any of the above conditions, their portrait will be
@@ -598,12 +598,11 @@ public class PersonViewPanel extends JScrollablePanel {
 
         PersonnelStatus status = person.getStatus();
         if (status.isDead()) {
-            portraitImageIcon = addTintToImage(portrait.getImage(100), RED);
+            portraitImageIcon = addTintToImage(portraitImageIcon.getImage(), DARK_RED);
         } else if (status.isRetired()) {
-            portraitImageIcon = addTintToImage(portrait.getImage(100), BLUE);
+            portraitImageIcon = addTintToImage(portrait.getImage(100), DARK_BLUE);
         } else if (status.isDepartedUnit()) {
-            portraitImageIcon = addTintToImage(portrait.getImage(100), BLACK,
-                  true, 0.5);
+            portraitImageIcon = addTintToImage(portrait.getImage(100), BLACK);
         }
 
         return portraitImageIcon;

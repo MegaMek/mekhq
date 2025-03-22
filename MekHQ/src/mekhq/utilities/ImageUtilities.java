@@ -101,14 +101,14 @@ public class ImageUtilities {
      * <p>This method processes the input {@link Image} and applies a tint (a blend of the
      * given color and transparency) across the image. You may specify whether the tint should
      * apply only to non-transparent areas or the entire image. Additionally, the transparency
-     * level can be customized or left as the default (75% transparency, 25% opaque).</p>
+     * level can be customized or left as the default (50% transparency, 50% opaque).</p>
      *
      * @param image              the {@link Image} to which the tint will be applied.
      * @param tint               the {@link Color} used for the tint.
      * @param nonTransparentOnly if {@code true}, applies the tint only to non-transparent areas of
      *                           the image. Otherwise, it applies the tint globally.
      * @param transparencyPercent an optional transparency level for the tint. If {@code null}, it
-     *                            defaults to 75% transparency (0.75). Must be between {@code 0.0}
+     *                            defaults to 50% transparency (0.5). Must be between {@code 0.0}
      *                            and {@code 1.0}.
      *
      * @return an {@link ImageIcon} containing the image with the applied tint.
@@ -132,7 +132,7 @@ public class ImageUtilities {
         }
 
         graphics.setColor(new Color(tint.getRed(), tint.getGreen(), tint.getBlue(),
-              getAlpha(transparencyPercent == null ? 0.75 : transparencyPercent)));
+              getAlpha(transparencyPercent == null ? 0.5 : transparencyPercent)));
         graphics.fillRect(0, 0, tintedImage.getWidth(), tintedImage.getHeight());
 
         // Clean up, so we're not leaving objects in memory everywhere if the player is jumping
