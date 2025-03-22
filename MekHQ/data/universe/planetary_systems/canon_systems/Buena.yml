@@ -3,9 +3,11 @@ sucsId: 416
 xcood: -400.433
 ycood: 35.625
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 74'
   value: G6V
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 74'
+  value: 2
 event:
   - date: '2443-11-28'
     nadirCharge: yes
@@ -35,28 +37,32 @@ planet:
       value: Buena
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 74'
+      value: 2
     icon: green44
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 74'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 74'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 74'
       value: 1.21
-    diameter: 13175
-    density: 6.478975342366
+    diameter: 13150
+    density: 6.466568872267
     dayLength: 25
     yearLength: 1.1
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 74'
       value: 31
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 74'
       value: 64
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 74'
       value: BIRD
     desc: |-
       The population centers on Buena are located on the planet's four continents, all of which are within the cooler, semi-boreal northern and southern hemispheres. The planet has a number of warm, semi-tropical islands around the equator, unfortunately due to the tides from Buena's three satellites, these islands are known to disappear for months at a time, making them unsuitable for permanent habitation.
@@ -66,28 +72,34 @@ planet:
       Buena was settled primarily by a mix of Latin-European colonists, who have retained their dominant Spanish and Italian roots.
     landmass:
       - name:
-          source: canon
-          value: Luego
-      - name:
-          source: canon
-          value: Santigo
-      - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 74'
           value: Dominika
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 74'
+          value: Luego
+      - name:
+          source: 'Handbook: House Steiner, pg. 74'
           value: Revida
         capital:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 74'
           value: Ciudad del Mar
+      - name:
+          source: 'Handbook: House Steiner, pg. 74'
+          value: Santigo
     satellite:
-      - name: Bonita
+      - name:
+          source: 'Handbook: House Steiner, pg. 74'
+          value: Bonita
         size: medium
         icon: oddmoon2
-      - name: Hermosa
+      - name:
+          source: 'Handbook: House Steiner, pg. 74'
+          value: Hermosa
         size: medium
         icon: rock4
-      - name: Inesita
+      - name:
+          source: 'Handbook: House Steiner, pg. 74'
+          value: Inesita
         size: large
         icon: rock3
     event:

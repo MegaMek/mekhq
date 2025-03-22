@@ -3,9 +3,11 @@ sucsId: 1159
 xcood: 55.052
 ycood: -245.656
 spectralType:
-  source: canon
+  source: 'Handbook: House Liao, pg. 79'
   value: G1V
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Liao, pg. 79'
+  value: 4
 planet:
   - name: God E
     type: TERRESTRIAL
@@ -66,28 +68,32 @@ planet:
       value: Hustaing
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Liao, pg. 79'
+      value: 4
     icon: green13
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 79'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 79'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 79'
       value: 1.02
-    diameter: 12596
-    density: 5.683966950095
+    diameter: 12604
+    density: 5.687388592037
     dayLength: 26
     yearLength: 2.3
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 79'
       value: 36
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 79'
       value: 45
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 79'
       value: REPTILE
     desc: Hustaing has been a quiet world with moderate resources, industry and agriculture
       for most of its history. The planet gained some prominence as the planet that
@@ -110,7 +116,9 @@ planet:
       - name: Barker
       - name: Karpenko
     satellite:
-      - name: Atria
+      - name:
+          source: 'Handbook: House Liao, pg. 79'
+          value: Atria
         size: medium
         icon: rock11
     event:

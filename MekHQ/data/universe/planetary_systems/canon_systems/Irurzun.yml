@@ -3,9 +3,11 @@ sucsId: 1211
 xcood: 187.05
 ycood: 97.538
 spectralType:
-  source: canon
+  source: House Kurita
   value: G4V
-primarySlot: 5
+primarySlot:
+  source: House Kurita
+  value: 5
 event:
   - date: '2353-07-09'
     nadirCharge: yes
@@ -85,7 +87,9 @@ planet:
       value: Irurzun
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 5
+    sysPos:
+      source: House Kurita
+      value: 5
     icon: wet1
     pressure:
       source: canon
@@ -106,7 +110,7 @@ planet:
       source: canon
       value: 81
     lifeForm:
-      source: canon
+      source: House Kurita
       value: MAMMAL
     desc: Irurzun is an important command and logistical world for the Draconis Combine.
       In spite of its hot and humid atmosphere it’s a fully self-sufficient moderately
@@ -120,7 +124,7 @@ planet:
           source: canon
           value: South Umbrian
         capital:
-          source: canon
+          source: House Kurita
           value: New Gotham City
       - name:
           source: canon

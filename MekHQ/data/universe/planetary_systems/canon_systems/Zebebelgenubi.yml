@@ -3,9 +3,11 @@ sucsId: 2826
 xcood: -52.221
 ycood: 47.517
 spectralType:
-  source: canon
+  source: Star League, pg. 179
   value: A3IV
-primarySlot: 6
+primarySlot:
+  source: Star League, pg. 179
+  value: 6
 event:
   - date: '2412-02-02'
     zenithCharge: yes
@@ -96,28 +98,32 @@ planet:
       value: Zebebelgenubi
     type: TERRESTRIAL
     orbitalDist: 12.48
-    sysPos: 6
+    sysPos:
+      source: Star League, pg. 179
+      value: 6
     icon: green40
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.92
-    diameter: 11606
-    density: 5.577801690013
+    diameter: 11599
+    density: 5.574264034366
     dayLength: 24
     yearLength: 44.1
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 41
     water:
-      source: canon
+      source: MWDA world profiles
       value: 27
     lifeForm:
-      source: canon
+      source: Star League, pg. 179
       value: PLANT
     desc: |-
       3135 - Though it orbits farther out than any other body in its system, Zebebelgenubi is a warm planet dominated by mountains that often completely surround several orphaned seas and lakes. The interior lands of all five major continents are mostly rugged wastes of rock, broken only by the occasional river that has stubbornly cut its way through over eons of history. Many of these mountain ranges are covered by petrified woodlands, fossilized remains of a long-lost era when water flowed more freely across the planet‘s surface. Only in the coastal areas is there sufficient flatland on which to build, and it is in these regions that the bulk of the planetary population has lived since the planet was first settled in the twenty-third century. But, despite its rugged frontier appearance, Zebebelgenubi soon became home to a booming electronics and robotics industry, thanks to the discovery of precious gems and industrial-grade silicon in the mountains. These industries only grew more lucrative when Zebebelgenubi became part of the Terran Hegemony and Ulsop Robotics, headquartered in the planetary capital of Gray Valley City, became the prime developer for artificially intelligent space defense system networks.
@@ -129,25 +135,27 @@ planet:
       Today, Gray Valley City remains the largest and most industrialized of Zebebelgenubi‘s cities, but it is the city of Nantucket, on the nearby Wurscht continent, that boasts the planet‘s largest spaceport—half a kilometer longer than Gray Valley‘s, to accommodate more aerodyne DropShip traffic. All three of Zebebelgenubi‘s other continents—Hershaim in the north, Valius and Zeibleria in the south—are sparsely populated, with the majority of towns and smaller settlements located on the shorelines.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Gastagne
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Gray Valley City
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Hershaim
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Valius
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Wurscht
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Zeibleria
     satellite:
-      - name: Nachteufel
+      - name:
+          source: MWDA world profiles
+          value: Nachteufel
         size: medium
         icon: rock6
     event:

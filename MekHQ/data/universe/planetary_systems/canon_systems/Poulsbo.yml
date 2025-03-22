@@ -3,9 +3,11 @@ sucsId: 2057
 xcood: -375.354
 ycood: -63.641
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 75'
   value: F4V
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 75'
+  value: 4
 event:
   - date: '2358-12-25'
     zenithCharge: yes
@@ -62,28 +64,32 @@ planet:
       value: Poulsbo
     type: TERRESTRIAL
     orbitalDist: 2.24
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 75'
+      value: 4
     icon: wet12
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 75'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 75'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 75'
       value: 0.92
-    diameter: 11075
-    density: 5.854969977688
+    diameter: 11059
+    density: 5.84638959969
     dayLength: 23
     yearLength: 3.6
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 75'
       value: 54
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 75'
       value: 80
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 75'
       value: REPTILE
     desc: |-
       Poulsbo lies on the anti-spinward edge of Lyran space, along the border shared with the Free Worlds League. Poulsbo is a tropical planet, mostly covered in vast oceans and seas. Due to a single large moon in orbit of the planet, Poulsbo’s waterways are rough and treacherous.
@@ -95,25 +101,27 @@ planet:
       Poulsbo remains a lightly settled Military Outpost, whose civilian population is mostly upset by constant Lyran politics and war.
     landmass:
       - name:
-          source: canon
-          value: Tammerfors
-        capital:
-          source: canon
-          value: Bangor Heights
-      - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 75'
           value: Bergenswald
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 75'
           value: Brusselsia
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 75'
           value: Goteborg
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 75'
           value: Mermannisk
+      - name:
+          source: 'Handbook: House Steiner, pg. 75'
+          value: Tammerfors
+        capital:
+          source: 'Handbook: House Steiner, pg. 75'
+          value: Bangor Heights
     satellite:
-      - name: Sjure
+      - name:
+          source: 'Handbook: House Steiner, pg. 75'
+          value: Sjure
         size: large
         icon: rock13
     event:

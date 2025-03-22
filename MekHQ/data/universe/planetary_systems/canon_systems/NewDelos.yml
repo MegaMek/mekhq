@@ -3,9 +3,11 @@ sucsId: 1826
 xcood: -38.009
 ycood: -140.692
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 71'
   value: G8III
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Marik, pg. 71'
+  value: 4
 event:
   - date: '2417-04-06'
     zenithCharge: yes
@@ -70,28 +72,32 @@ planet:
       value: New Delos
     type: TERRESTRIAL
     orbitalDist: 1.28
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Marik, pg. 71'
+      value: 4
     icon: wet9
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 71'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 71'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 71'
       value: 1.1
-    diameter: 11635
-    density: 6.626120370287
+    diameter: 11651
+    density: 6.635080249388
     dayLength: 22
     yearLength: 1.7
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 71'
       value: 42
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 71'
       value: 78
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 71'
       value: REPTILE
     desc: New Delos has been a pivotal world for the Free Worlds League. The planet
       was the homeworld of George Humphries, the seat of power of Anton Marik during
@@ -104,22 +110,15 @@ planet:
       since become ghost towns or have been entirely reclaimed by nature.
     landmass:
       - name:
-          source: canon
-          value: Béziers
-      - name:
-          source: canon
-          value: Mindanao
-        capital:
-          source: canon
-          value: Cienfuegos
-      - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 71'
           value: Ostrov
         capital:
-          source: canon
+          source: 'Handbook: House Marik, pg. 71'
           value: Quito
     satellite:
-      - name: Lot
+      - name:
+          source: 'Handbook: House Marik, pg. 71'
+          value: Lot
         size: large
         icon: rock12
     event:

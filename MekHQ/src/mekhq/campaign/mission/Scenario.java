@@ -554,6 +554,10 @@ public class Scenario implements IPlayerSettings {
      * @param cargoId     the UUID of the cargo being transported
      */
     public void addPlayerTransportRelationship(UUID transportId, UUID cargoId) {
+        if (!playerTransportLinkages.containsKey(transportId)) {
+            playerTransportLinkages.put(transportId, new ArrayList<>());
+        }
+
         playerTransportLinkages.get(transportId).add(cargoId);
     }
 

@@ -3,9 +3,11 @@ sucsId: 858
 xcood: 132.086
 ycood: 32.779
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F3V
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2401-03-17'
     nadirCharge: yes
@@ -38,28 +40,32 @@ planet:
       value: Fellanin II
     type: TERRESTRIAL
     orbitalDist: 1.5
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: dry3
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.96
-    diameter: 11735
-    density: 5.770975870862
+    diameter: 11713
+    density: 5.759994508991
     dayLength: 29
     yearLength: 2.2
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 34
     water:
-      source: canon
+      source: MWDA world profiles
       value: 13
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: 'On the surface, it defies explanation why anyone would wish to live on
       a world as inhospitable as Fallanin II. Sandstorms, blamed largely on the planet‘s
@@ -78,16 +84,22 @@ planet:
       Sea, the Dry Sea, Larson‘s Sea, and the Great Expanse.'
     landmass:
       - capital:
-          source: canon
+          source: MWDA world profiles
           value: Firstpoint
     satellite:
-      - name: Davius
+      - name:
+          source: MWDA world profiles
+          value: Davius
         size: medium
         icon: rock6
-      - name: Elric
+      - name:
+          source: MWDA world profiles
+          value: Elric
         size: medium
         icon: rock11
-      - name: Goliath
+      - name:
+          source: MWDA world profiles
+          value: Goliath
         size: medium
         icon: oddmoon1
     event:

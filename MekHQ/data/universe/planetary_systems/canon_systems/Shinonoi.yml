@@ -3,9 +3,11 @@ sucsId: 2313
 xcood: 79.871
 ycood: 53.979
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G3V
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2378-03-26'
     zenithCharge: yes
@@ -21,28 +23,32 @@ planet:
       value: Shinonoi
     type: TERRESTRIAL
     orbitalDist: 1.0
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: wet13
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.0
-    diameter: 11977
-    density: 5.889977583969
+    diameter: 11954
+    density: 5.878765906091
     dayLength: 25
     yearLength: 1.4
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 29
     water:
-      source: canon
+      source: MWDA world profiles
       value: 88
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: 3135 - Shinonoi is a world of fertile lands; a long, mild growing season;
       and abundant native livestock. Two of the planet‘s four major landmasses, Matsuda
@@ -81,22 +87,15 @@ planet:
       houses the bulk of the planetary defense force.
     landmass:
       - name:
-          source: canon
-          value: Jukemwa
-      - name:
-          source: canon
-          value: Kokuya
-      - name:
-          source: canon
-          value: Matsuda
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Narosi
         capital:
-          source: canon
-          value: Marimasu
+          source: MWDA world profiles
+          value: Rising Sun
     satellite:
-      - name: Janjiro
+      - name:
+          source: MWDA world profiles
+          value: Janjiro
         size: medium
         icon: rock9
     event:

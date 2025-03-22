@@ -57,7 +57,7 @@ class PrisonersNagLogicTest {
 
     @Test
     void activeContract() {
-        assertFalse(hasPrisoners(true, true));
+        assertTrue(hasPrisoners(true, true));
     }
 
     @Test
@@ -67,6 +67,6 @@ class PrisonersNagLogicTest {
 
     @Test
     void noActiveContractPrisoners() {
-        assertTrue(hasPrisoners(false, true));
+        assertFalse(hasPrisoners(false, true));
     }
 }

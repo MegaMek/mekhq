@@ -3,9 +3,11 @@ sucsId: 687
 xcood: 69.007
 ycood: -235.248
 spectralType:
-  source: canon
+  source: 'Handbook: House Liao, pg. 82'
   value: M2IV
-primarySlot: 8
+primarySlot:
+  source: 'Handbook: House Liao, pg. 82'
+  value: 8
 event:
   - date: '2350-08-29'
     zenithCharge: yes
@@ -145,28 +147,32 @@ planet:
       value: Denbar
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 8
+    sysPos:
+      source: 'Handbook: House Liao, pg. 82'
+      value: 8
     icon: green33
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 82'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 82'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 82'
       value: 0.98
     diameter: 12056
-    density: 5.712974709224
+    density: 5.712759478461
     dayLength: 20
     yearLength: 0.6
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 82'
       value: 32
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 82'
       value: 67
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 82'
       value: PLANT
     desc: |-
       Denbar has been part of the Capellan Confederation for most of its history, however it was not actually settled until the early 31st Century. Comstar exploration prior to the settlement discovered the site of a lost Star League expedition from the mid-27th century. Further investigation determined that the expedition had been investigating a mysterious signal originating from the planet. Official records indicate that Denbar has never had a permanent settlement and no trace of transmission equipment was ever found. Comstar uncovered the salvageable wreckage of two large Dropships and assorted heavy machinery near the north pole, but the remains of the expedition crew were never recovered.
@@ -174,16 +180,18 @@ planet:
       The Confederation’s eventual settlement was originally little more than a permanent base for military garrison due to the planet's strategic location but population soon expanded with refugees from the 4th Succession War.
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
+          value: Bellhaven
+      - name:
+          source: 'Objective Raids: Capellan Confederation'
           value: Lothian
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Barns
-      - name:
-          source: canon
-          value: Bellhaven
     satellite:
-      - name: Kenilworth
+      - name:
+          source: 'Handbook: House Liao, pg. 82'
+          value: Kenilworth
         size: large
         icon: rock10
     event:

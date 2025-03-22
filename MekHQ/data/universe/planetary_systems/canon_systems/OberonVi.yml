@@ -3,9 +3,11 @@ sucsId: 1916
 xcood: -111.419
 ycood: 473.251
 spectralType:
-  source: canon
+  source: Periphery (1ed), pg. 149
   value: F5III
-primarySlot: 6
+primarySlot:
+  source: Periphery (1ed), pg. 149
+  value: 6
 planet:
   - name: Oberon I
     type: ICE_GIANT
@@ -92,7 +94,9 @@ planet:
       value: Oberon VI
     type: TERRESTRIAL
     orbitalDist: 3.92
-    sysPos: 6
+    sysPos:
+      source: Periphery (1ed), pg. 149
+      value: 6
     icon: green36
     pressure:
       source: canon
@@ -107,7 +111,7 @@ planet:
     temperature: 20
     water: 35
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 149
       value: MAMMAL
     desc: No description available.
     landmass:

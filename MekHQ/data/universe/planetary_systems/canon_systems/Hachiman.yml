@@ -3,9 +3,11 @@ sucsId: 1027
 xcood: 252.799
 ycood: 152.204
 spectralType:
-  source: canon
+  source: House Kurita
   value: G8IV
-primarySlot: 4
+primarySlot:
+  source: House Kurita
+  value: 4
 event:
   - date: '2358-02-17'
     nadirCharge: yes
@@ -68,7 +70,9 @@ planet:
       value: Hachiman
     type: TERRESTRIAL
     orbitalDist: 1.28
-    sysPos: 4
+    sysPos:
+      source: House Kurita
+      value: 4
     icon: green6
     pressure:
       source: canon
@@ -89,7 +93,7 @@ planet:
       source: canon
       value: 70
     lifeForm:
-      source: canon
+      source: House Kurita
       value: MAMMAL
     desc: |-
       Hachiman is a rare planet in that it has comfortable living conditions and is blessed with an abundance of natural resources, two attributes that have made the planet attractive to both settlers and corporations. As of the 31st century Hachiman was the center of the Draconis Combine’s computer and advanced electronics industry as the headquarters of Hachiman Taro Electronics and Tanadi Computers, which makes its home in the planetary capital of Masamori.

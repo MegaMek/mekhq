@@ -3,9 +3,11 @@ sucsId: 949
 xcood: -207.85
 ycood: -26.411
 spectralType:
-  source: canon
+  source: FedCom Civil War, pg. 198
   value: M0III
-primarySlot: 3
+primarySlot:
+  source: FedCom Civil War, pg. 198
+  value: 3
 event:
   - date: '2363-02-02'
     nadirCharge: yes
@@ -52,28 +54,32 @@ planet:
       value: Giausar
     type: TERRESTRIAL
     orbitalDist: 0.5
-    sysPos: 3
+    sysPos:
+      source: FedCom Civil War, pg. 198
+      value: 3
     icon: green12
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 198
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 198
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 198
       value: 1.0
-    diameter: 14701
-    density: 4.780914437338
+    diameter: 14700
+    density: 4.780633137201
     dayLength: 15
     yearLength: 0.8
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 198
       value: 45
     water:
-      source: canon
+      source: FedCom Civil War, pg. 198
       value: 70
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 198
       value: MAMMAL
     desc: Despite being overlooked for a long time, the planet Giausar, nearly by
       accident, to be an almost perfect planet for human colonization. Giausar is
@@ -88,19 +94,23 @@ planet:
       in honor of its predominantly German descended population.
     landmass:
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 198
           value: Adelaide
         capital:
-          source: canon
+          source: FedCom Civil War, pg. 198
           value: New Munich
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 198
           value: Deception
     satellite:
-      - name: Hoffnung
+      - name:
+          source: FedCom Civil War, pg. 198
+          value: Hoffnung
         size: large
         icon: rock10
-      - name: Neues Leben
+      - name:
+          source: FedCom Civil War, pg. 198
+          value: Neues Leben
         size: medium
         icon: oddmoon1
     event:

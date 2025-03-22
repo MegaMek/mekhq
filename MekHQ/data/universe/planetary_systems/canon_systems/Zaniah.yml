@@ -3,9 +3,11 @@ sucsId: 2817
 xcood: -102.597
 ycood: 7.74
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: A3IV
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2525-01-22'
     zenithCharge: yes
@@ -45,28 +47,32 @@ planet:
       value: Zaniah
     type: TERRESTRIAL
     orbitalDist: 12.48
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green29
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.79
-    diameter: 10981
-    density: 5.079795459086
+    diameter: 10955
+    density: 5.067795519916
     dayLength: 24
     yearLength: 44.1
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 45
     water:
-      source: canon
+      source: MWDA world profiles
       value: 39
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: FISH
     desc: Though it lacks significant natural resources or major industries, and the
       locals appear to concern themselves with little more than fishing and moisture
@@ -108,7 +114,7 @@ planet:
     smallMoons: 1
     landmass:
       - capital:
-          source: canon
+          source: MWDA world profiles
           value: Starboro
     event:
       - date: '2251-12-02'

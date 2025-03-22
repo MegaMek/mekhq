@@ -3,9 +3,11 @@ sucsId: 2914
 xcood: 386.121
 ycood: -478.358
 spectralType:
-  source: canon
+  source: Periphery (1ed), pg. 85
   value: G2V
-primarySlot: 2
+primarySlot:
+  source: Periphery (1ed), pg. 85
+  value: 2
 planet:
   - name: Loki
     type: TERRESTRIAL
@@ -28,7 +30,9 @@ planet:
       value: Mirfak
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 2
+    sysPos:
+      source: Periphery (1ed), pg. 85
+      value: 2
     icon: green8
     pressure:
       source: canon

@@ -3,9 +3,11 @@ sucsId: 613
 xcood: -257.862
 ycood: 221.263
 spectralType:
-  source: canon
+  source: 'Operational Turning Points: Falcon Incursion'
   value: F4V
-primarySlot: 3
+primarySlot:
+  source: 'Operational Turning Points: Falcon Incursion'
+  value: 3
 event:
   - date: '2421-06-20'
     zenithCharge: yes
@@ -45,28 +47,32 @@ planet:
       value: Coventry
     type: TERRESTRIAL
     orbitalDist: 2.24
-    sysPos: 3
+    sysPos:
+      source: 'Operational Turning Points: Falcon Incursion'
+      value: 3
     icon: wet6
     pressure:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Operational Turning Points: Falcon Incursion'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: 1.01
-    diameter: 11417
-    density: 6.19247184231
+    diameter: 11440
+    density: 6.204689845157
     dayLength: 22
     yearLength: 3.6
     temperature:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: 35
     water:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: 80
     lifeForm:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: MAMMAL
     desc: |-
       The planet Coventry lies on the anti-spinward side of the core of Lyran space. The planet itself enjoys mild seasons and large seas, teeming with life, and fertile soil, making it well suited for large-scale agriculture.
@@ -80,22 +86,24 @@ planet:
       Coventry Metal Works, Refit Facility
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 80'
           value: Auckland
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 80'
           value: Dunnigan
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 80'
           value: Sydnallia
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 80'
           value: Veracruz
         capital:
-          source: canon
-          value: Port St. William
+          source: 'Handbook: House Steiner, pg. 80'
+          value: Port St. Williams
     satellite:
-      - name: Wellston
+      - name:
+          source: 'Operational Turning Points: Falcon Incursion'
+          value: Wellston
         size: medium
         icon: oddmoon3
     event:

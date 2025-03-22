@@ -3,9 +3,11 @@ sucsId: 790
 xcood: -39.048
 ycood: 483.083
 spectralType:
-  source: canon
+  source: 'Operational Turning Points: Red Corsair, pg. 6'
   value: F1V
-primarySlot: 9
+primarySlot:
+  source: 'Operational Turning Points: Red Corsair, pg. 6'
+  value: 9
 planet:
   - name: Berrien
     type: DWARF_TERRESTRIAL
@@ -156,28 +158,32 @@ planet:
       value: Elissa
     type: TERRESTRIAL
     orbitalDist: 2.56
-    sysPos: 9
+    sysPos:
+      source: 'Operational Turning Points: Red Corsair, pg. 6'
+      value: 9
     icon: green12
     pressure:
-      source: canon
+      source: 'Operational Turning Points: Red Corsair, pg. 6'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Operational Turning Points: Red Corsair, pg. 6'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Operational Turning Points: Red Corsair, pg. 6'
       value: 0.99
-    diameter: 12860
-    density: 5.43143418222
+    diameter: 12835
+    density: 5.420729601375
     dayLength: 27
     yearLength: 4.3
     temperature:
-      source: canon
+      source: 'Operational Turning Points: Red Corsair, pg. 6'
       value: 19
     water:
-      source: canon
+      source: 'Operational Turning Points: Red Corsair, pg. 6'
       value: 49
     lifeForm:
-      source: canon
+      source: 'Operational Turning Points: Red Corsair, pg. 6'
       value: PLANT
     desc: |-
       3055: Elissa was a primary holding of the Elysian Fields, a fief of the Oberon Confederation controlled by the Inheritors. Publicly the planet was reported as a backwater world that was being left largely undeveloped as a ‘nature preserve’ and the Elysian Fields agreed to provide the bandit Kingdom water in exchange for protection. However, the reality was that Elissa and the Elyssian Fields suffered under the regime. Elissa was heavily mined by the Confederation and the planet’s inhabitants were forced into poverty on the whims of the various pirates serving under Hendrik Grimm. The planet’s capture by the Clans in 3049, was actually a relief for much of the population.
@@ -190,7 +196,9 @@ planet:
       - name: Tala Hamza
       - name: Ortíz
     satellite:
-      - name: Miranda
+      - name:
+          source: 'Operational Turning Points: Red Corsair, pg. 6'
+          value: Miranda
         size: medium
         icon: rock5
     event:

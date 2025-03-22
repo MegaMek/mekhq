@@ -3,9 +3,11 @@ sucsId: 2321
 xcood: 41.613
 ycood: 87.121
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K6VI
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2350-09-06'
     nadirCharge: yes
@@ -42,28 +44,32 @@ planet:
       value: Shitara
     type: TERRESTRIAL
     orbitalDist: 0.42
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green54
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.19
-    diameter: 14472
-    density: 5.788268621431
+    diameter: 14460
+    density: 5.78344903977
     dayLength: 24
     yearLength: 0.8
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 36
     water:
-      source: canon
+      source: MWDA world profiles
       value: 63
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: "3135 - Founded by a group of corporations in the early days of deep-space
       colonization, Shitara, a world of large landmasses covered with arid mountains,
@@ -96,28 +102,32 @@ planet:
       outside the commercial city of Galveston.\n "
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Agito
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Hokaido
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Niijo
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Okasaki
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Hirotomi
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Zumi
     satellite:
-      - name: Naramu
+      - name:
+          source: MWDA world profiles
+          value: Naramu
         size: medium
         icon: oddmoon2
-      - name: Tenga
+      - name:
+          source: MWDA world profiles
+          value: Tenga
         size: medium
         icon: oddmoon3
     event:

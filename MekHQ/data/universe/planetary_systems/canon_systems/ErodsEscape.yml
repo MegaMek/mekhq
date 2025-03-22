@@ -3,7 +3,7 @@ sucsId: 2899
 xcood: 483.634
 ycood: -501.888
 spectralType:
-  source: canon
+  source: 'Handbook: Major Periphery States, pg. 130'
   value: G0V
 primarySlot: 5
 planet:
@@ -108,25 +108,27 @@ planet:
     sysPos: 5
     icon: green17
     pressure:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 130'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: Major Periphery States, pg. 130'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 130'
       value: 1.1
-    diameter: 13737
-    density: 5.622160889463
+    diameter: 13743
+    density: 5.624778163398
     dayLength: 24
     yearLength: 1.6
     temperature:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 130'
       value: 43
     water:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 130'
       value: 68
     lifeForm:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 130'
       value: BIRD
     desc: For most of its history Erod’s Escape has been a quiet backwater covered
       in jungles and arable lands. With the formation of the Calderon Protectorate
@@ -135,34 +137,25 @@ planet:
       expanding rapidly.
     landmass:
       - name:
-          source: canon
-          value: Boundless
-      - name:
-          source: canon
+          source: Masters and Minions, pg. 191
           value: Elysium
         capital:
-          source: canon
+          source: 'Handbook: Major Periphery States, pg. 130'
           value: Shangri-La
-      - name:
-          source: canon
-          value: Jacob’s Retreat
-      - name:
-          source: canon
-          value: Majorca
-      - name:
-          source: canon
-          value: Oahu
-      - name:
-          source: canon
-          value: Tenerife
     satellite:
-      - name: Maui
-        size: giant
-        icon: rock12
-      - name: Kauai
+      - name:
+          source: 'Handbook: Major Periphery States, pg. 130'
+          value: Kauai
         size: large
         icon: rock7
-      - name: Molokai
+      - name:
+          source: 'Handbook: Major Periphery States, pg. 130'
+          value: Maui
+        size: giant
+        icon: rock12
+      - name:
+          source: 'Handbook: Major Periphery States, pg. 130'
+          value: Molokai
         size: medium
         icon: oddmoon3
     event:

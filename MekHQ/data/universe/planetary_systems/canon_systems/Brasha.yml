@@ -3,9 +3,11 @@ sucsId: 383
 xcood: 436.566
 ycood: 194.866
 spectralType:
-  source: canon
+  source: 'Handbook: Major Periphery States, pg. 151'
   value: G4V
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: Major Periphery States, pg. 151'
+  value: 4
 event:
   - date: '2556-10-07'
     nadirCharge: yes
@@ -71,28 +73,32 @@ planet:
       value: Brasha
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: Major Periphery States, pg. 151'
+      value: 4
     icon: green23
     pressure:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 151'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: Major Periphery States, pg. 151'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 151'
       value: 1.2
-    diameter: 13013
-    density: 6.482672850817
+    diameter: 13011
+    density: 6.481601576269
     dayLength: 21
     yearLength: 1.3
     temperature:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 151'
       value: 55
     water:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 151'
       value: 20
     lifeForm:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 151'
       value: REPTILE
     desc: "Brasha is an arid world covered in vast deserts and craggy mountains. Population
       centers on the planet are primarily centered around oases that dot the northern
@@ -105,18 +111,24 @@ planet:
       and hovercraft. "
     landmass:
       - name: Fort Covington 1
-        capital: Fort Covington 1 City
+        capital:
+          source: 'Handbook: Major Periphery States, pg. 151'
+          value: Alaikum
       - name: Fort Covington 2
       - name: Fort Covington 3
       - name: Fort Covington 4
       - name: Fort Covington 5
     satellite:
-      - name: Iturea
-        size: large
-        icon: rock11
-      - name: Djerba
+      - name:
+          source: 'Handbook: Major Periphery States, pg. 151'
+          value: Djerba
         size: medium
         icon: rock2
+      - name:
+          source: 'Handbook: Major Periphery States, pg. 151'
+          value: Iturea
+        size: large
+        icon: rock11
     event:
       - date: '2538-06-01'
         faction:

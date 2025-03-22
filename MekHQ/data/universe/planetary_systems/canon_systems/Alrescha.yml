@@ -3,9 +3,11 @@ sucsId: 92
 xcood: 84.52
 ycood: -49.416
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: A3V
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2370-11-11'
     nadirCharge: yes
@@ -53,28 +55,32 @@ planet:
       value: Alrescha
     type: TERRESTRIAL
     orbitalDist: 6.72
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green9
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.8
-    diameter: 11849
-    density: 4.741443168812
+    diameter: 11853
+    density: 4.743105548197
     dayLength: 22
     yearLength: 17.5
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 30
     water:
-      source: canon
+      source: MWDA world profiles
       value: 50
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: AMPHIBIAN
     desc: |-
       3135 - Colonists settled Alrescha in the early days of the Tikonov Union, when Tikonov‘s growing population forced the Union to establish a secondary source of food and textiles. Despite trace atmospheric chemicals in Alrescha‘s young atmosphere that require filtering masks, the planet‘s warm, wet climate, fertile soil, and proximity to Tikonov met the Union‘s needs.
@@ -88,19 +94,21 @@ planet:
       The continents of Alrescha are Kaltain, Okda, and Risku; the capital of Cord is located on Riksu.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Kaltain
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Okda
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Risku
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Cord
     satellite:
-      - name: Piscium
+      - name:
+          source: MWDA world profiles
+          value: Piscium
         size: medium
         icon: rock5
     event:

@@ -3,9 +3,11 @@ sucsId: 1667
 xcood: -222.792
 ycood: 346.996
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 82'
   value: G9V
-primarySlot: 5
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 82'
+  value: 5
 event:
   - date: '2622-08-05'
     zenithCharge: yes
@@ -94,28 +96,32 @@ planet:
       value: Melissia
     type: TERRESTRIAL
     orbitalDist: 0.56
-    sysPos: 5
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 82'
+      value: 5
     icon: green53
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 82'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 82'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 82'
       value: 1.02
-    diameter: 12415
-    density: 5.74967973375
+    diameter: 12441
+    density: 5.761716982726
     dayLength: 22
     yearLength: 1.0
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 82'
       value: 35
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 82'
       value: 60
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 82'
       value: REPTILE
     desc: |-
       Melissia is covered by a massive single continent that covers an entire hemisphere and runs from pole to pole. The Continent earned the nickname Jahreszeitwunder (“Seasons of Wonder”) due to the extreme seasons experienced on the planet. The northern and southernmost latitudes in the span of a day can potentially experience the extremes of all seasons. Broad Run, a massive river, almost divides the continent in half. The Broad Run runs from the Valiant Mountains, located along the western edge of the continent and empties into a sea at the Broad Run Delta in the east. North of the Delta lies the loveless Valley, home to a vast percentage of local farmlands. The planetary capital and principal spaceport of Europa also call the Valley home. Rich deposits of titanium are located beneath the northern ice shelf. Melissia was originally discovered and settled by colonists from nearby Coventry. Melissia is a self-sufficient, modestly industrial world.
@@ -126,13 +132,15 @@ planet:
       Grumman-Cri (Built late 3070s)
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 82'
           value: Jahreszeitwunder
         capital:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 82'
           value: Europa
     satellite:
-      - name: Saratoga
+      - name:
+          source: 'Handbook: House Steiner, pg. 82'
+          value: Saratoga
         size: medium
         icon: rock5
     event:

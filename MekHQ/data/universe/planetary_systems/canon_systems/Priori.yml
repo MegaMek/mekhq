@@ -3,9 +3,11 @@ sucsId: 2957
 xcood: 3.761
 ycood: 1807.901
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: K0II
-primarySlot: 7
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 7
 event:
   - date: '2802-11-06'
     nadirCharge: yes
@@ -108,28 +110,32 @@ planet:
       value: Priori
     type: TERRESTRIAL
     orbitalDist: 1.28
-    sysPos: 7
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 7
     icon: green38
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 1.1
-    diameter: 12191
-    density: 6.310209442981
+    diameter: 12221
+    density: 6.325603042377
     dayLength: 23
     yearLength: 1.7
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 35
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 50
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: FISH
     desc: No description available.
     landmass:

@@ -3,9 +3,11 @@ sucsId: 75
 xcood: -35.935
 ycood: 45.191
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: A7IV
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2373-03-12'
     nadirCharge: yes
@@ -52,28 +54,32 @@ planet:
       value: Alkalurops
     type: TERRESTRIAL
     orbitalDist: 5.04
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green16
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.0
-    diameter: 13747
-    density: 5.108262592534
+    diameter: 13752
+    density: 5.110177805644
     dayLength: 22
     yearLength: 11.4
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 55
     water:
-      source: canon
+      source: MWDA world profiles
       value: 43
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: FISH
     desc: |-
       Alkalurops is a warm and oppressive world, plagued by frequent hurricanes and tornadoes that are the result of a thick atmosphere, cursed further by greenhouse gases that amplify the heat of its white A-class sun. These conditions have prevented the evolution of any form of surface animal life, though native fish do thrive in the deeper parts of the planet‘s two large oceans. Because of its inhospitable nature, colonization and development of Alkalurops proceeded slowly. Most settlements, founded on the northernmost continent of Vandika, were established close to pockets of natural gas and common metal veins, pumped and mined for export sale. To protect against the harsh weather and attain a degree of comfortable living, most of these early colonies were dug into the mountains and hills, and every structure was pressurized and outfitted with advanced air filters to make the interior air breathable.
@@ -81,15 +87,11 @@ planet:
       Allabad, the planetary capital, was originally one such colony, nestled into the base of the north-south-running Bagadell Mountain Chain, and much of the city today still retains the look of a modernized Pueblo Indian village. Mainly due to these living conditions, the inhabitants of Alkalurops developed a curiously insular—almost xenophobic—culture, intensely distrustful of off-worlders. Though more accepting overall of other citizens in the Lyran realm—particularly those from the Isle of Skye—Alkalurops‘s people showed little patience or hospitality to visitors from the Terran Hegemony. Even during the Star League era, when extra revenue resulting from trade with Nusakan, a key world in the Hegemony‘s computer industry, brought an influx of traders and entrepreneurs here, the natives of this world remained cold and aloof. During the Amaris crisis, the Usurper‘s troops struck at Alkalurops despite its being outside Hegemony borders, hoping to deny any liberation force the use of the planet as a staging area to reclaim Nusakan. Instead, native resistance repelled Amaris‘s troops, a pattern repeated whenever raiders and invading neighbors struck the world during the Succession Wars. With few resources worth fighting over and an inhospitable climate, however, such raids were rare, and even the FedCom Civil War and the Word of Blake Jihad passed Alkalurops over without incident. Upon the formation of The Republic, the Lyran Alliance ceded this world to Devlin Stone along with many others of the tumultuous Isle of Skye region, a situation that caused great unrest among the local populace when Stone‘s relocation directives were enacted. Ironically, the creation of the peace-loving Republic created Alkalurops‘s largest outbreak of violence as the insular natives clashed with the new population. Rioting and hate crimes left scores dead over the following decade, before Republic authorities, in conjunction with Lyran mediators, could once more restore order.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Vandika
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Allabad
-    satellite:
-      - name: Stephens
-        size: large
-        icon: rock17
     event:
       - date: '2117-02-27'
         faction:

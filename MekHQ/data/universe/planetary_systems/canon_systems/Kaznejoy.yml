@@ -3,9 +3,11 @@ sucsId: 1315
 xcood: 329.457
 ycood: 132.599
 spectralType:
-  source: canon
+  source: House Kurita
   value: F4V
-primarySlot: 5
+primarySlot:
+  source: House Kurita
+  value: 5
 event:
   - date: '2352-03-10'
     zenithCharge: yes
@@ -81,7 +83,9 @@ planet:
       value: Kaznejoy
     type: TERRESTRIAL
     orbitalDist: 2.24
-    sysPos: 5
+    sysPos:
+      source: House Kurita
+      value: 5
     icon: green21
     pressure:
       source: canon
@@ -102,7 +106,7 @@ planet:
       source: canon
       value: 25
     lifeForm:
-      source: canon
+      source: House Kurita
       value: REPTILE
     desc: Kaznejoy is an advanced world with basic heavy industry. The world is hot
       arid with few natural resources and is considered by many to be an inhospitable
@@ -115,7 +119,7 @@ planet:
           source: canon
           value: Wanaland
         capital:
-          source: canon
+          source: House Kurita
           value: Gondovia
     event:
       - date: '2170-12-04'

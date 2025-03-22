@@ -5,7 +5,9 @@ ycood: 405.242
 spectralType:
   source: canon
   value: G5V
-primarySlot: 3
+primarySlot:
+  source: House Kurita
+  value: 3
 event:
   - date: '2358-06-11'
     zenithCharge: yes
@@ -44,7 +46,9 @@ planet:
       value: Trondheim (DC)
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 3
+    sysPos:
+      source: House Kurita
+      value: 3
     icon: green46
     pressure:
       source: canon
@@ -65,7 +69,7 @@ planet:
       source: canon
       value: 37
     lifeForm:
-      source: canon
+      source: House Kurita
       value: MAMMAL
     desc: |-
       Trondheim is a volatile young planet with regular seismic activity, which usually means there are at least a handful of volcanoes erupting at any one time. These regular eruptions result in long, excessively hot, summers and short, extremely cold, winters, due to the excessive volcanic ash in the atmosphere. The extreme temperatures can make life unpleasant on Trondheim but the extremes are not to the point where the planet is uninhabitable. The benefit of the seismic activity and volcanoes is that rare metals and minerals are made easily accessible after eruptions and the planet’s mining industry has supported a number of major mining corporations for centuries. During its time in the Combine, there were a number of protests, rebellions and attempted revolutions, which often resulted in a crackdown by the DCMS and ISF. The planetary capital of Trondheim is Misby Flats.
@@ -81,7 +85,7 @@ planet:
           source: canon
           value: Fosen
         capital:
-          source: canon
+          source: House Kurita
           value: Misby Flats
       - name:
           source: canon

@@ -3,9 +3,11 @@ sucsId: 1899
 xcood: -83.252
 ycood: -133.95
 spectralType:
-  source: canon
+  source: House Marik, pg. 158
   value: F6IV
-primarySlot: 3
+primarySlot:
+  source: House Marik, pg. 158
+  value: 3
 event:
   - date: '2644-01-19'
     nadirCharge: yes
@@ -47,7 +49,9 @@ planet:
       value: Nova Roma
     type: TERRESTRIAL
     orbitalDist: 3.64
-    sysPos: 3
+    sysPos:
+      source: House Marik, pg. 158
+      value: 3
     icon: green8
     pressure: HIGH
     atmosphere: BREATHABLE
@@ -60,7 +64,7 @@ planet:
     temperature: 38
     water: 44
     lifeForm:
-      source: canon
+      source: House Marik, pg. 158
       value: REPTILE
     desc: For much of its history Nova Roma was an unimportant but successful agrarian
       world that made it through most of the Succession Wars unscathed due to its

@@ -3,9 +3,11 @@ sucsId: 2858
 xcood: -406.23
 ycood: -298.444
 spectralType:
-  source: canon
+  source: 'Handbook: Major Periphery States, pg. 166'
   value: G3IV
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: Major Periphery States, pg. 166'
+  value: 4
 planet:
   - name: Viljevo
     type: ICE_GIANT
@@ -82,28 +84,32 @@ planet:
       value: Alphard (MH)
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: Major Periphery States, pg. 166'
+      value: 4
     icon: green33
     pressure:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 166'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: Major Periphery States, pg. 166'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 166'
       value: 1.0
-    diameter: 14139
-    density: 4.961389383568
+    diameter: 14152
+    density: 4.965873816545
     dayLength: 25
     yearLength: 2.3
     temperature:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 166'
       value: 33
     water:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 166'
       value: 55
     lifeForm:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 166'
       value: MAMMAL
     desc: |-
       Alphard is the capital of the Marian Hegemony and the nation's seat of power. Alphard is an arid planet full of canyons and arroyos. There is just barely enough arable land on the northern continents for the planet to be self sufficient. Just below the surface Alphard contains vast deposits of metals and gemstones. After the formation of the Hegemony in the late 30th Century, Alphard has seen the introduction of industry picked up in the later part of the 31st Century. The planetary capital is Nova Roma, which was built in the style of ancient Rome out of the local golden sandstone, and is a matter of pride for the young Periphery nation.
@@ -115,28 +121,18 @@ planet:
       Marian Arms, Incorporated
     landmass:
       - name:
-          source: canon
+          source: Masters and Minions, pg. 200
           value: Alba
-      - name:
-          source: canon
-          value: Gaul
-      - name:
-          source: canon
-          value: Hispania
-      - name:
-          source: canon
-          value: Italia
         capital:
-          source: canon
+          source: 'Handbook: Major Periphery States, pg. 166'
           value: Nova Roma
       - name:
-          source: canon
-          value: Moesia
-      - name:
-          source: canon
-          value: Ostia
+          source: Masters and Minions, pg. 200
+          value: Gaul
     satellite:
-      - name: Romulus
+      - name:
+          source: 'Handbook: Major Periphery States, pg. 166'
+          value: Romulus
         size: medium
         icon: rock10
     event:

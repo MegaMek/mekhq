@@ -3,9 +3,11 @@ sucsId: 2123
 xcood: 39.275
 ycood: 389.766
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 112
   value: K4V
-primarySlot: 6
+primarySlot:
+  source: Masters and Minions, pg. 112
+  value: 6
 event:
   - date: '2459-06-20'
     nadirCharge: yes
@@ -117,28 +119,32 @@ planet:
       value: Rasalhague
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 6
+    sysPos:
+      source: Masters and Minions, pg. 112
+      value: 6
     icon: wet17
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 112
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 112
       value: 1.1
-    diameter: 12390
-    density: 6.229821326958
+    diameter: 12399
+    density: 6.2345032488
     dayLength: 24
     yearLength: 0.8
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 112
       value: 25
     water:
-      source: canon
+      source: Masters and Minions, pg. 112
       value: 75
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 112
       value: MAMMAL
     desc: |-
       Rasalhague was originally settled prior to the formation of the Terran Hegemony by settlers primarily hailing from Sweden and northern European countries, fleeing the poor conditions on Earth and to seek independence. What they discovered in Rasalhague was a large terran-like planet distantly orbiting its star, with a cool-temperate climate that reminded them of home. Despite hardships, including a deadly local virus, Rasalhague grew quickly and the abundant natural resources attracted corporations and heavy industry, including ‘Mech production. The planet is also home to exotic plants and animals that are especially plentiful in the equatorial tropics.
@@ -164,13 +170,15 @@ planet:
           source: canon
           value: Ophiuchi
         capital:
-          source: canon
-          value: Reykjavik
+          source: Masters and Minions, pg. 112
+          value: Rekjavik
       - name:
           source: canon
           value: Vik
     satellite:
-      - name: Sigurd
+      - name:
+          source: Masters and Minions, pg. 112
+          value: Sigurd
         size: medium
         icon: rock5
     event:

@@ -3,9 +3,11 @@ sucsId: 2257
 xcood: 117.863
 ycood: -21.246
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G2III
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2376-12-20'
     nadirCharge: yes
@@ -35,28 +37,32 @@ planet:
       value: Schedar
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green36
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.1
-    diameter: 14830
-    density: 5.203549084704
+    diameter: 14843
+    density: 5.208095814877
     dayLength: 23
     yearLength: 2.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 27
     water:
-      source: canon
+      source: MWDA world profiles
       value: 20
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: |-
       Schedar is a cool, desert world. Although the chemical constituents of its atmosphere are suitable to humans, a fine mineral dust that scars human lungs permeates the lower atmosphere and forces Schedar‘s population to use filtering masks and equipment. Many small, salty lakes pockmark the surface, and Schedar‘s native reptilian life-forms migrate between these lakes as the seasons change.
@@ -66,10 +72,12 @@ planet:
       Although the fall of the First Star League brought an end to terraforming on Schedar, Rander Communication Equipment went on to faithfully serve the Federated Suns for the duration of the Succession Wars by producing various military electronics, including communications, tracking and targeting, and countermeasure systems. Although Rander had a subsidiary on the surface of Schedar that produced civilian electronics, its military electronics were produced in an underground factory. Much of Schedar‘s population retreated into these underground complexes during the Blakist Holy War, reemerging years later when The Republic of the Sphere was founded. Rander adapted to the pacifistic Republic by mothballing its underground military factory and investing heavily in the civilian factory.
     landmass:
       - capital:
-          source: canon
+          source: MWDA world profiles
           value: Jacksonville
     satellite:
-      - name: Mali
+      - name:
+          source: MWDA world profiles
+          value: Mali
         size: medium
         icon: rock9
     event:

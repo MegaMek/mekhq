@@ -38,6 +38,7 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Hangar;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.ScenarioChangedEvent;
@@ -279,7 +280,8 @@ public class StratconRulesManager {
             availableForceIDs = availableForcePool;
         }
 
-        Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs, campaign);
+        Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs,
+              campaign.getHangar(), campaign.getAllForces());
 
         for (int scenarioIndex = 0; scenarioIndex < scenarioCount; scenarioIndex++) {
             if (autoAssignLances && availableForceIDs.isEmpty()) {
@@ -406,7 +408,8 @@ public class StratconRulesManager {
 
          // Grab the available lances and sort them by map type
          List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract, false);
-         Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs, campaign);
+         Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs,
+               campaign.getHangar(), campaign.getAllForces());
 
          // Select the target coords.
          if (scenarioCoords == null) {
@@ -1313,39 +1316,51 @@ public class StratconRulesManager {
     }
 
     /**
-     * Processes the deployment of a force to the specified coordinates on the given track.
+     * Processes the deployment of a combat force to a specified location on a track in the campaign.
      *
-     * <p>This includes revealing the deployed coordinates, identifying and revealing facilities
-     * and scenarios within the scan range, and updating necessary game states such as fatigue
-     * and force assignments. It does not include assigning the force to specific scenarios.</p>
-     *
-     * <strong>Behavior:</strong>
+     * <p>This method handles actions related to force deployment, including:</p>
      * <ul>
-     *   <li>If the force's deployment coordinates are unrevealed, fatigue is increased for the force.</li>
-     *   <li>Ensures that fatigue is increased only once during the deployment process.</li>
-     *   <li>Reveals all coordinates, facilities, and scenarios within the force's scan range.</li>
-     *   <li>Handles cloaked scenarios by activating them and updating game states as necessary.</li>
-     *   <li>Updates the track's revealed coordinates to include the deployment and adjacent areas within range.</li>
-     *   <li>Assigns the deployed force to the specified coordinates and clears their previous track assignments.</li>
+     *   <li>Revealing the deployed coordinates and all adjacent coordinates within the force's scan range.</li>
+     *   <li>Updating the visibility of facilities and scenarios in the affected area.</li>
+     *   <li>Assigning the force to the specified deployment coordinates and clearing previous track assignments.</li>
+     *   <li>Triggering any necessary events, such as deployment event handling or scenario updates.</li>
      * </ul>
      *
-     * <strong>Notes:</strong>
-     * <ul>
-     *   <li>Scout or patrol roles may increase the scan range.</li>
-     *   <li>The method uses a breadth-first search (BFS) approach to traverse the hex grid and reveal neighbors
-     *       within the scan range efficiently, avoiding redundant processing using a visited set.</li>
-     * </ul>
+     * <p>Patrol and scouting roles may extend the scan range, and fatigue is increased only once
+     * if the deployment reveals previously unrevealed coordinates.</p>
      *
-     * @param coords    The coordinates where the force is being deployed.
-     * @param forceID   The ID of the force being deployed.
-     * @param campaign  The current campaign context, used to retrieve combat teams and update game events.
-     * @param track     The current track state where the deployment is happening.
-     * @param sticky    Whether the force should be persistently assigned to the track.
-     *
-     * @throws IllegalStateException if the force or the associated combat team is missing or invalid.
+     * @param coords   The {@link StratconCoords} where the combat force is being deployed.
+     * @param forceID  The unique ID of the combat force being deployed.
+     * @param campaign The current {@link Campaign} instance representing the game's state.
+     * @param track    The {@link StratconTrackState} where the force is being deployed.
+     * @param sticky   Whether the force should remain persistently assigned to this track.
      */
     public static void processForceDeployment(StratconCoords coords, int forceID, Campaign campaign,
                                               StratconTrackState track, boolean sticky) {
+        scanNeighboringCoords(coords, forceID, campaign, track);
+
+        // the force may be located in other places on the track - clear it out
+        track.unassignForce(forceID);
+        track.assignForce(forceID, coords, campaign.getLocalDate(), sticky);
+        MekHQ.triggerEvent(new StratconDeploymentEvent(campaign.getForce(forceID)));
+    }
+
+    /**
+     * Scans neighboring coordinates around the deployment location to reveal facilities, scenarios,
+     * and coordinates within the force's scan range. Updates campaign and track states as needed.
+     *
+     * <p>This method uses a breadth-first search (BFS) approach to efficiently traverse the hex grid,
+     * marking which coordinates have been visited and ensuring no redundant operations occur. It also
+     * increases fatigue, reveals cloaked scenarios, and activates facilities or scenarios in the
+     * affected area.</p>
+     *
+     * @param coords   The {@link StratconCoords} of the initial deployment location.
+     * @param forceID  The unique ID of the force being deployed.
+     * @param campaign The current {@link Campaign} instance representing the game's state.
+     * @param track    The {@link StratconTrackState} where the deployment and scanning are being tracked.
+     */
+    private static void scanNeighboringCoords(StratconCoords coords, int forceID, Campaign campaign,
+                                              StratconTrackState track) {
         // we want to ensure we only increase Fatigue once
         boolean hasFatigueIncreased = false;
 
@@ -1398,6 +1413,10 @@ public class StratconRulesManager {
             }
         }
 
+        if (scenario != null || targetFacility != null) {
+            return;
+        }
+
         // Traverse neighboring coordinates up to the specified distance
         while (!queue.isEmpty()) {
             Pair<StratconCoords, Integer> current = queue.poll();
@@ -1435,11 +1454,6 @@ public class StratconRulesManager {
                 }
             }
         }
-
-        // the force may be located in other places on the track - clear it out
-        track.unassignForce(forceID);
-        track.assignForce(forceID, coords, campaign.getLocalDate(), sticky);
-        MekHQ.triggerEvent(new StratconDeploymentEvent(campaign.getForce(forceID)));
     }
 
     /**
@@ -1658,7 +1672,7 @@ public class StratconRulesManager {
             CLOSING_SPAN_TAG, roll, targetNumber));
         campaign.addReport(reportStatus.toString());
 
-        ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(force, campaign);
+        ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(force, campaign.getHangar());
 
         generateReinforcementInterceptionScenario(campaign, scenario, contract, track, scenarioTemplate, force);
 
@@ -1668,41 +1682,46 @@ public class StratconRulesManager {
     /**
      * Retrieves the appropriate {@link ScenarioTemplate} for an interception scenario based on the
      * provided {@link Force} and {@link Campaign}.
-     * <p>
-     * The method determines which scenario template file should be used by analyzing the primary unit
-     * type of the {@link Force} within the given {@link Campaign}. It then deserializes the template
-     * file into a {@link ScenarioTemplate} object.
-     * <p>
-     * Special cases:
+     *
+     * <p>This method determines the correct scenario template file to use by analyzing the composition
+     * of the {@link Force} within the context of the given {@link Campaign}. The selected template
+     * file is then deserialized into a {@link ScenarioTemplate} object.</p>
+     *
+     * <p><strong>Special Cases:</strong></p>
      * <ul>
-     *   <li>If the primary unit type is `CONV_FIGHTER` or `AEROSPACEFIGHTER` (and a random check passes),
-     *       a "Low-Atmosphere" template is selected.</li>
-     *   <li>If the primary unit type qualifies as an `AEROSPACEFIGHTER` or higher,
-     *       a "Space" template is selected.</li>
-     *   <li>Otherwise, the default template is used.</li>
+     *     <li>A "Space" template is chosen if all units are aerospace and a random condition is met
+     *             (1 in 3 chance).</li>
+     *     <li>A "Low-Atmosphere" template is selected if the {@link Force} contains only airborne
+     *             units but does not meet the criteria for a "Space" template.</li>
+     *     <li>A default ground template is selected if no specific cases are matched.</li>
      * </ul>
      *
      * @param force    The {@link Force} instance that the scenario is based on.
-     *                 This is used to determine the primary unit type.
-     * @param campaign The {@link Campaign} in which the interception is taking place.
-     *                 Provides context for evaluating the {@link Force}.
-     * @return A {@link ScenarioTemplate} instance based on the template file matching the logic above,
-     *         or a default template if no specific case is matched.
-     * @see ScenarioTemplate#Deserialize(String)
+     *                 The force composition is used to determine the appropriate scenario template.
+     * @param hangar   The {@link Hangar} instance from which to retrieve the {@link Unit}.
+     * @return A {@link ScenarioTemplate} instance representing the chosen scenario template file based
+     *         on the logic described, or a default template if no special conditions are satisfied.
      */
-    private static ScenarioTemplate getInterceptionScenarioTemplate(Force force, Campaign campaign) {
+    private static ScenarioTemplate getInterceptionScenarioTemplate(Force force, Hangar hangar) {
         String templateString = "data/scenariotemplates/%sReinforcements Intercepted.xml";
 
         ScenarioTemplate scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, ""));
 
-        int primaryUnitType = force.getPrimaryUnitType(campaign);
+        boolean airborneOnly = force.forceContainsOnlyAerialForces(hangar, false,
+              false);
 
-        if ((primaryUnitType == CONV_FIGHTER)
-            || (primaryUnitType == AEROSPACEFIGHTER) && (randomInt(3) == 0)) {
-            scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, "Low-Atmosphere "));
-        } else if (primaryUnitType >= AEROSPACEFIGHTER) {
-            scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, "Space "));
+        boolean aerospaceOnly = false;
+        if (airborneOnly) {
+            aerospaceOnly = force.forceContainsOnlyAerialForces(hangar, false,
+                  true);
         }
+
+        if (aerospaceOnly && (randomInt(3) == 0)) {
+            scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, "Space "));
+        } else if (airborneOnly) {
+            scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, "Low-Atmosphere "));
+        }
+
         return scenarioTemplate;
     }
 
@@ -1878,16 +1897,42 @@ public class StratconRulesManager {
     }
 
     /**
-     * A hackish worker function that takes the given list of force IDs and
-     * separates it into three
-     * sets; one of forces that can be "primary" on a ground map one of forces that
-     * can be "primary" on
-     * an atmospheric map one of forces that can be "primary" in a space map
+     * Categorizes a list of force IDs into groups based on the type of map they can primarily support.
      *
-     * @param forceIDs List of force IDs to check
-     * @return Sorted hash map
+     * <p>This overloaded method analyzes each force associated with the given force IDs in the context of
+     * the provided {@link Hangar} and a pre-resolved list of {@link Force} objects. It determines whether
+     * each force is suited for ground, atmospheric, or space maps, assigning them to the appropriate map
+     * types. Forces may belong to multiple map types based on their composition.</p>
+     *
+     * <p><strong>Behavior:</strong></p>
+     * <ul>
+     *   <li>Forces are classified into the following map types:
+     *       <ul>
+     *         <li><strong>AllGroundTerrain</strong>: Includes all forces.</li>
+     *         <li><strong>LowAtmosphere</strong>: Forces that only contain airborne units.</li>
+     *         <li><strong>Space</strong>: Forces that exclusively contain aerospace-capable units.</li>
+     *       </ul>
+     *   </li>
+     *   <li>A force can appear in multiple map types, such as both "LowAtmosphere" and "Space" for
+     *       aerospace-only forces.</li>
+     *   <li>Logs an error and continues processing if any force associated with a given ID cannot
+     *       be found in the provided list of forces.</li>
+     * </ul>
+     *
+     * @param forceIDs  A list of force IDs to classify.
+     * @param hangar    The {@link Hangar} instance containing aerial or aerospace-related information
+     *                  about forces.
+     * @param allForces A pre-resolved list of {@link Force} objects. Forces are accessed using their
+     *                  IDs as indices, providing performance benefits when compared to fetching forces
+     *                  on demand.
+     * @return A {@link Map} where each {@link MapLocation} key corresponds to a map type, and the value
+     *         is a list of force IDs that can operate in that map type.
      */
-    public static Map<MapLocation, List<Integer>> sortForcesByMapType(List<Integer> forceIDs, Campaign campaign) {
+    public static Map<MapLocation, List<Integer>> sortForcesByMapType(List<Integer> forceIDs,
+                                                                      Hangar hangar, List<Force> allForces) {
+        boolean airborneOnly;
+        boolean aerospaceOnly;
+
         Map<MapLocation, List<Integer>> retVal = new HashMap<>();
 
         retVal.put(AllGroundTerrain, new ArrayList<>());
@@ -1895,22 +1940,30 @@ public class StratconRulesManager {
         retVal.put(Space, new ArrayList<>());
 
         for (int forceID : forceIDs) {
-            switch (campaign.getForce(forceID).getPrimaryUnitType(campaign)) {
-                case BATTLE_ARMOR:
-                case INFANTRY:
-                case MEK:
-                case TANK:
-                case PROTOMEK:
-                case VTOL:
-                    retVal.get(AllGroundTerrain).add(forceID);
-                    break;
-                case AEROSPACEFIGHTER:
-                    retVal.get(Space).add(forceID);
-                    // intentional fallthrough here, ASFs can go to atmospheric maps too
-                case CONV_FIGHTER:
-                    retVal.get(LowAtmosphere).add(forceID);
-                    break;
+            Force force = allForces.get(forceID);
+
+            if (force == null) {
+                logger.error("Force ID {} is null in sortForcesByMapType", forceID);
+                continue;
             }
+
+            airborneOnly = force.forceContainsOnlyAerialForces(hangar, false,
+                  false);
+
+            aerospaceOnly = false;
+            if (airborneOnly) {
+                aerospaceOnly = force.forceContainsOnlyAerialForces(hangar, false,
+                      true);
+            }
+
+            if (aerospaceOnly) {
+                retVal.get(LowAtmosphere).add(forceID);
+                retVal.get(Space).add(forceID);
+            } else if (airborneOnly) {
+                retVal.get(LowAtmosphere).add(forceID);
+            }
+
+            retVal.get(AllGroundTerrain).add(forceID);
         }
         return retVal;
     }

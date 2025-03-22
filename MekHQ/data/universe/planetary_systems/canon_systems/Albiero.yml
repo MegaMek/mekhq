@@ -3,9 +3,11 @@ sucsId: 2882
 xcood: 150.446
 ycood: 356.782
 spectralType:
-  source: canon
+  source: House Kurita
   value: M2IV
-primarySlot: 3
+primarySlot:
+  source: House Kurita
+  value: 3
 event:
   - date: '2693-06-01'
     nadirCharge: yes
@@ -73,7 +75,9 @@ planet:
       value: Albiero
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 3
+    sysPos:
+      source: House Kurita
+      value: 3
     icon: dry14
     pressure:
       source: canon
@@ -94,7 +98,7 @@ planet:
       source: canon
       value: 12
     lifeForm:
-      source: canon
+      source: House Kurita
       value: REPTILE
     desc: Albiero is a nearly dead world whose natural resources are almost completely
       exhausted. Only the fact that the other worlds in the Albiero Prefecture are

@@ -3,9 +3,11 @@ sucsId: 2093
 xcood: 46.002
 ycood: 12.361
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K9IV
-primarySlot: 7
+primarySlot:
+  source: MWDA world profiles
+  value: 7
 event:
   - date: '2469-01-21'
     zenithCharge: yes
@@ -125,28 +127,32 @@ planet:
       value: Quentin
     type: TERRESTRIAL
     orbitalDist: 0.35
-    sysPos: 7
+    sysPos:
+      source: MWDA world profiles
+      value: 7
     icon: green31
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.74
-    diameter: 11118
-    density: 4.695834516048
+    diameter: 11096
+    density: 4.686647474425
     dayLength: 21
     yearLength: 0.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 26
     water:
-      source: canon
+      source: MWDA world profiles
       value: 53
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: AMPHIBIAN
     desc: A world of abundant raw materials, the first settlers to Quentin were actually
       employees of Terran corporations hoping to exploit such valuable resources for
@@ -174,19 +180,19 @@ planet:
       areas during the last few centuries of war.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: El Largo
       - name:
-          source: canon
+          source: MWDA world profiles
           value: El Minoro
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Gladius
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Morandi
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Prosperity Point
     event:
       - date: '2232-08-31'

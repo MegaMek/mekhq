@@ -5,7 +5,9 @@ ycood: -291.844
 spectralType:
   source: canon
   value: G2V
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Marik, pg. 74'
+  value: 2
 event:
   - date: '2503-04-28'
     nadirCharge: yes
@@ -31,28 +33,32 @@ planet:
       value: Campoleone
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Marik, pg. 74'
+      value: 2
     icon: green29
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 74'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 74'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 74'
       value: 0.85
-    diameter: 14314
-    density: 4.14911916838
+    diameter: 14355
+    density: 4.161120392651
     dayLength: 25
     yearLength: 1.2
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 74'
       value: 32
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 74'
       value: 39
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 74'
       value: PLANT
     desc: Campoleone is a cold world on the edge of the Periphery border. The planet
       is lightly populated and acts primarily as a trade center supported by subsistence-level
@@ -64,16 +70,15 @@ planet:
       come in from the tradeport.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 74'
           value: Cosenza
         capital:
-          source: canon
+          source: 'Handbook: House Marik, pg. 74'
           value: Ausapolis
-      - name:
-          source: canon
-          value: Torino Islands
     satellite:
-      - name: Lonely
+      - name:
+          source: 'Handbook: House Marik, pg. 74'
+          value: Lonely
         size: medium
         icon: rock1
     event:

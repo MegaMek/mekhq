@@ -3,9 +3,11 @@ sucsId: 2076
 xcood: 158.215
 ycood: 34.295
 spectralType:
-  source: canon
+  source: 25 Years of Art and Fiction, pg. 97
   value: K2V
-primarySlot: 4
+primarySlot:
+  source: 25 Years of Art and Fiction, pg. 97
+  value: 4
 event:
   - date: '2357-07-23'
     nadirCharge: yes
@@ -68,28 +70,32 @@ planet:
       value: Proserpina
     type: TERRESTRIAL
     orbitalDist: 0.49
-    sysPos: 4
+    sysPos:
+      source: 25 Years of Art and Fiction, pg. 97
+      value: 4
     icon: green5
     pressure:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 97
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 25 Years of Art and Fiction, pg. 97
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
-      value: 1.0
-    diameter: 12924
-    density: 5.458796744223
+      source: 25 Years of Art and Fiction, pg. 97
+      value: 0.98
+    diameter: 12769
+    density: 5.393446755704
     dayLength: 20
     yearLength: 0.9
     temperature:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 97
       value: 25
     water:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 97
       value: 67
     lifeForm:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 97
       value: REPTILE
     desc: |-
       Proserpina was one of the Core Worlds and home to several major manufacturing firms, including Guided Technologies and Bulldog Enterprises. Their factories, and many others, exploited the petrochemical and mineral resources of the planet directly and refined metals from the metal ores extracted from Proserpina before shipping the refined materials to nearby planets. After the fall of the Star League the world faced nearly constant raids by the Federated Suns. During one of these raids the defending DCMS forces used a nerve gas to destroy the invaders. As a result the planet's surface is mostly poisonous after the Succession Wars; In fact two of its five continents (Amerigo and Greater Harpago) are completely uninhabitable. In 3066, despite the passage of so many years, both the air and water on planet surface are still contaminated. However, the rich minerals of the planet and well developed industry keep the planet and its inhabitants prosperous, even if they do need to wear environmental suits and breathing masks to leave their homes.
@@ -97,25 +103,27 @@ planet:
       The location of Proserpina on the Federated Suns border requires the DCMS to keep a strong garrison on the world. To further fortify their position, the DCMS has establishing an extensive network of refit and supply facilities for defending troops. Proserpina is also known for the University of Proserpina, a military academy that has consistently turned out high-quality graduates for the DCMS.
     landmass:
       - name:
-          source: canon
-          value: Bragadin
-        capital:
-          source: canon
-          value: Conqueror’s Pride
-      - name:
-          source: canon
-          value: Greater Harpago
-      - name:
-          source: canon
-          value: Lesser Harpago
-      - name:
-          source: canon
+          source: FedCom Civil War, pg. 204
           value: Amerigo
       - name:
-          source: canon
-          value: Darwin
+          source: FedCom Civil War, pg. 204
+          value: Bragadin
+        capital:
+          source: FedCom Civil War, pg. 204
+          value: Conqueror's Pride
+      - name:
+          source: FedCom Civil War, pg. 204
+          value: Darwan
+      - name:
+          source: FedCom Civil War, pg. 204
+          value: Greater Harpago
+      - name:
+          source: FedCom Civil War, pg. 204
+          value: Lesser Harpago
     satellite:
-      - name: Taikata
+      - name:
+          source: 25 Years of Art and Fiction, pg. 97
+          value: Taikata
         size: medium
         icon: rock7
     event:

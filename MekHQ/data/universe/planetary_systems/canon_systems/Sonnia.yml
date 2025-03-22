@@ -3,9 +3,11 @@ sucsId: 2923
 xcood: 123.553
 ycood: -41.932
 spectralType:
-  source: canon
+  source: House Liao, pg. 156
   value: G6V
-primarySlot: 3
+primarySlot:
+  source: House Liao, pg. 156
+  value: 3
 planet:
   - name: Tennison
     type: DWARF_TERRESTRIAL
@@ -41,7 +43,9 @@ planet:
       value: Sonnia
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 3
+    sysPos:
+      source: House Liao, pg. 156
+      value: 3
     icon: dry16
     pressure: THIN
     atmosphere: TAINTEDPOISON
@@ -54,7 +58,7 @@ planet:
     temperature: 20
     water: 100
     lifeForm:
-      source: canon
+      source: House Liao, pg. 156
       value: MAMMAL
     desc: |-
       The tropical world of Sonnia was originally settled in the early 27th century as a resort world by Tikonov aristocracy. However, soon after nuclear science and technology industries rapidly developed after the discovery of high concentrations of fissionable material.

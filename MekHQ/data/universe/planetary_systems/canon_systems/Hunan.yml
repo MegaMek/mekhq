@@ -3,9 +3,11 @@ sucsId: 1153
 xcood: 71.209
 ycood: -95.949
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F9VII
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2354-09-06'
     nadirCharge: yes
@@ -67,28 +69,32 @@ planet:
       value: Hunan
     type: TERRESTRIAL
     orbitalDist: 3.08
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: green56
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.1
-    diameter: 15985
-    density: 4.844240566556
+    diameter: 15971
+    density: 4.840121280068
     dayLength: 29
     yearLength: 5.5
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 45
     water:
-      source: canon
+      source: MWDA world profiles
       value: 54
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: |-
       3135 - Hunan's atmosphere is tainted by tons of sulfur vapor produced by hundreds of volcanoes located on the main equatorial continent of Hell. Hell is completely devoid of life. The population of the planet lives in Kamala, the only continent that can support life. Kamala's landscape is a frozen lava flow, reddish-brown in color, with sulfurous, steam-belching geysers and half-melted purple hillsides. On the outskirts of Hunan City, the capital, the Hellfire Mountains are made up of volcanoes and hot springs that make the use of infrared scans nearly impossible and the sulfur vapors hamper radar and magscans.
@@ -98,25 +104,24 @@ planet:
       Hunan was relatively peaceful throughout its history and did not see any military action until near the end of the Jihad. A retreating Word of Blake unit that had been routed at the Battle of Sian landed on Roc. After a week, the Blakists captured one of the domed cities. A few days later, the Hunanites destroyed the dome, killing nearly all the invaders. The Fire Lizards took care of the rest.
     landmass:
       - name:
-          source: canon
-          value: Hell
+          source: MWDA world profiles
+          value: Bandar
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Kamala
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Hunan City
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Roc
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Zeka
-      - name:
-          source: canon
-          value: Bandar
     satellite:
-      - name: Nefari
+      - name:
+          source: MWDA world profiles
+          value: Nefari
         size: medium
         icon: rock1
     event:

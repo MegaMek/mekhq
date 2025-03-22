@@ -3,9 +3,11 @@ sucsId: 1359
 xcood: -39.048
 ycood: 382.78
 spectralType:
-  source: canon
+  source: House Kurita
   value: F0V
-primarySlot: 3
+primarySlot:
+  source: House Kurita
+  value: 3
 event:
   - date: '2438-05-25'
     nadirCharge: yes
@@ -61,7 +63,9 @@ planet:
       value: Kirchbach
     type: TERRESTRIAL
     orbitalDist: 2.56
-    sysPos: 3
+    sysPos:
+      source: House Kurita
+      value: 3
     icon: green46
     pressure:
       source: canon
@@ -82,7 +86,7 @@ planet:
       source: canon
       value: 31
     lifeForm:
-      source: canon
+      source: House Kurita
       value: MAMMAL
     desc: |-
       Kirchbach spent most of its history on the border between the Lyran Commonwealth and the Draconis Combine and managed to trade hands multiple times, before ultimately becoming part of the Free Rasalhague Republic, only to be captured by Clan Wolf during Operation Revival and later the Hell’s Horses. The unfortunate location of Kirchbach meant that the planet has been the site of frequent raids and invasions from the Commonwealth, Combine, Clans and due to its proximity to the Periphery, pirates, throughout its history.
@@ -99,7 +103,7 @@ planet:
           source: canon
           value: Hermagor
         capital:
-          source: canon
+          source: House Kurita
           value: New Samos
     event:
       - date: '2418-10-15'

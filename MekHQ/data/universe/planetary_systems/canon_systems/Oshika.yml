@@ -3,9 +3,11 @@ sucsId: 1952
 xcood: 239.151
 ycood: 176.676
 spectralType:
-  source: canon
+  source: House Kurita
   value: G5V
-primarySlot: 3
+primarySlot:
+  source: House Kurita
+  value: 3
 event:
   - date: '2355-05-11'
     zenithCharge: yes
@@ -45,7 +47,9 @@ planet:
       value: Oshika
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 3
+    sysPos:
+      source: House Kurita
+      value: 3
     icon: green26
     pressure:
       source: canon
@@ -66,7 +70,7 @@ planet:
       source: canon
       value: 65
     lifeForm:
-      source: canon
+      source: House Kurita
       value: MAMMAL
     desc: For most of its history, Oshika has been a prefecture capital world. As
       a result, its cities and industry (what little there is of it) are all geared
@@ -85,7 +89,7 @@ planet:
           source: canon
           value: Shinjuku
         capital:
-          source: canon
+          source: House Kurita
           value: Takadanobaba
       - name:
           source: canon

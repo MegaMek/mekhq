@@ -3,9 +3,11 @@ sucsId: 909
 xcood: -137.266
 ycood: 78.255
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 78'
   value: K3V
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 78'
+  value: 2
 event:
   - date: '2352-01-08'
     zenithCharge: yes
@@ -33,41 +35,45 @@ planet:
       value: Furillo
     type: TERRESTRIAL
     orbitalDist: 0.49
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 78'
+      value: 2
     icon: wet5
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 78'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 78'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 78'
       value: 1.12
-    diameter: 14374
-    density: 5.471607578997
+    diameter: 14379
+    density: 5.473700526821
     dayLength: 20
     yearLength: 0.9
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 78'
       value: 36
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 78'
       value: 81
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 78'
       value: MAMMAL
     desc: Due to large concentrations natural resources Furillo quickly became one
       of the most successful colonies in its region of space. Furillo is home to a
       Defiance Industries BattleMech factory and several other heavy industries.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 78'
           value: Dereka
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 78'
           value: Wilda
         capital:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 78'
           value: Telesian
     event:
       - date: '2268-12-22'

@@ -3,9 +3,11 @@ sucsId: 1395
 xcood: -20.166
 ycood: 96.371
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K1IV
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2386-01-31'
     zenithCharge: yes
@@ -74,28 +76,32 @@ planet:
       value: Konstance
     type: TERRESTRIAL
     orbitalDist: 1.28
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: green31
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.64
-    diameter: 10258
-    density: 4.403407396057
+    diameter: 10236
+    density: 4.393963490227
     dayLength: 29
     yearLength: 1.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 62
     water:
-      source: canon
+      source: MWDA world profiles
       value: 74
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: |-
       Brutally hot and muggy much of the time, Konstance suffers from an overabundance of carbon dioxide that casts a haze over the planet and traps heat from its weak, K-class sun. Once necessary to give life on this world a fighting chance, this environmental taint, already present to a much lesser degree when colonists first set foot here almost a thousand years ago, has been aggravated by centuries of human development. Despite efforts to control the greenhouse-effect problem in its infancy, the presence of large underground pockets of petrochemicals and natural gas inevitably led to a series of drilling and refining industries that helped develop Konstance, but over time added to the atmospheric pollution. Konstance thus continued to grow hotter over the centuries, to the point where the effects of this global warming have forced the local population to move into the cooler polar reaches of the planet.
@@ -105,25 +111,31 @@ planet:
       The capital city of Konstance, Ishtalia, is located on the southern polar continent of Perragea, and also doubles as the southern hemisphere‘s largest spaceport city. Its counterpart on the north polar continent of Epigaus, Lazarus Bay, also boasts the planet‘s largest submarine seaport, which ferries over half the harsh-environment workforce for local fuel producers like Axis PetroChem Unlimited.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Epigaus
         capital:
           source: canon
           value: Lazarus Bay
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Perragea
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Ishtalia
     satellite:
-      - name: Drezix
+      - name:
+          source: MWDA world profiles
+          value: Drezix
         size: large
         icon: rock2
-      - name: Esther
+      - name:
+          source: MWDA world profiles
+          value: Esther
         size: large
         icon: rock15
-      - name: Volaria
+      - name:
+          source: MWDA world profiles
+          value: Volaria
         size: medium
         icon: rock3
     event:

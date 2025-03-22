@@ -3,9 +3,11 @@ sucsId: 1381
 xcood: -18.105
 ycood: 43.9
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G6IV
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2352-03-20'
     nadirCharge: yes
@@ -36,28 +38,32 @@ planet:
       value: Ko
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: wet19
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.03
-    diameter: 12657
-    density: 5.71176157526
+    diameter: 12665
+    density: 5.715334168954
     dayLength: 28
     yearLength: 2.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 36
     water:
-      source: canon
+      source: MWDA world profiles
       value: 82
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       3135 - Once a hardy agricultural world in the Terran Hegemony, Ko continued to be a breadbasket for the people of the Draconis Combine‘s Dieron Military District after the fall of the Star League. Though some desert regions—such as the region surrounding the former capital city of Jarlton, on the equatorial continent of Hyadei—are plagued by the occasional sandstorm, much of the rest of the planet‘s main landmasses boasts fertile soil, coupled with excellent growing cycles and the ability to support both domestic and imported flora and fauna. As a result, numerous farming, fishing, and ranching industries came to call Ko their home, and before long several shipping lines and food-processing megacorporations were doing the same. By 3025, by far the largest of these was Surinami Processing, a producer of all manner of processed foods from freeze-dried survival rations to its Home Helper line of canned and boxed foods, with a special Happy Life Meals division that also provided foods for every institution from corporate cafeterias to volunteer soup kitchens. Interestingly enough, however, Surinami‘s most controversial product, the Stomach‘s Joy line of nutritional supplements, never saw widespread use in the Combine, and was ultimately the cause for the company‘s shutdown soon after Ko was captured by the Lyran Commonwealth in the Fourth Succession War.
@@ -67,25 +73,31 @@ planet:
       Ko, a part of the so-called Lyons Thumb, was returned to Draconis Combine rule during the FedCom Civil War, after Lyran forces attacked the Combine “peacekeeping garrison” at what was then the planetary capital city of Jarlton in 3062. The battle damaged much of the city, forcing the Combine to relocate the administrative centers back to the pre-Fourth War capital of Hagitasu, on the southern continent of Kyushu, where it has remained ever since. During the Jihad, Word of Blake mercenaries raided this world several times in an effort to disrupt allied logistics in the region. In one of the more notorious of these attacks, Blakist troops unleashed a virulent blight on agricultural centers across the northern Jingatu continent, sterilizing the soil and wiping out over forty percent of the local crops. Though the rest of the planetary agricultural yield made up for the loss, it would be several years before the local industries and people recovered from the disaster.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Hyadei
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Jingatu
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Kyushu
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Hagitasu
     satellite:
-      - name: Fionna
+      - name:
+          source: MWDA world profiles
+          value: Fionna
         size: medium
         icon: rock5
-      - name: Palas
+      - name:
+          source: MWDA world profiles
+          value: Palas
         size: large
         icon: rock12
-      - name: Valencia
+      - name:
+          source: MWDA world profiles
+          value: Valencia
         size: medium
         icon: oddmoon2
     event:

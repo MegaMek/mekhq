@@ -3,9 +3,11 @@ sucsId: 963
 xcood: -95.911
 ycood: 71.81
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K3IV
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2395-09-03'
     nadirCharge: yes
@@ -32,28 +34,32 @@ planet:
       value: Gladius
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: wet5
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.16
-    diameter: 11351
-    density: 7.182741789834
+    diameter: 11350
+    density: 7.182248554662
     dayLength: 24
     yearLength: 1.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 47
     water:
-      source: canon
+      source: MWDA world profiles
       value: 94
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: |-
       A tropical world covered in deep, green oceans, Gladius seemed a virtual paradise to the first colonists to set foot upon its soil. Fertile lands and an abundance of native fauna suitable for human consumption—particularly on its single, large continent of Garamond, located mostly north of the equator—made the establishment of the first settlements easy. However, the rugged terrain and thick, fast-growing tropical jungles of the interior lands limited the amount of arable space, and the relative lack of industrial metals and other rare materials limited significant industrial growth. Making matters worse over time was that fact that the Gladiusian soil easily “burned out” when used for farming; its rich nutrients expended easily under constant harvests, a matter largely attributed to the planet‘s subtle seasonal changes. Gladius‘s largest industry thus changed to tourism and hospitality as the world became known as a vacation spot—the kind of place people visited or retired to, but few actually lived in.
@@ -63,18 +69,11 @@ planet:
       The capital city, Hyacles, is located on the northern shores of Garamond, and is also home to the planet‘s largest spaceport and transoceanic port. Gladius AquaLines, the planet‘s largest cruise line operator, offers weekly cruise services out of Hyacles that can take passengers as far away as the Burmaise Isles, in the southern hemisphere. Eenticing stopovers include the eastern coastal cities of Narava and Pasadenia, world-renowned resorts known for their casinos and nightlife.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Garamond
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Hyacles
-      - name:
-          source: canon
-          value: Burmaise Isles
-    satellite:
-      - name: Wiley
-        size: medium
-        icon: oddmoon3
     event:
       - date: '2269-09-09'
         faction:

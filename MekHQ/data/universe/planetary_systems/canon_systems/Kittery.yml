@@ -3,9 +3,11 @@ sucsId: 1369
 xcood: 82.181
 ycood: -223.944
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 237
   value: G4III
-primarySlot: 3
+primarySlot:
+  source: Masters and Minions, pg. 237
+  value: 3
 event:
   - date: '2806-07-19'
     nadirCharge: yes
@@ -44,28 +46,32 @@ planet:
       value: Kittery
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 3
+    sysPos:
+      source: Masters and Minions, pg. 237
+      value: 3
     icon: green39
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 237
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 237
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 237
       value: 0.88
-    diameter: 10679
-    density: 5.763276168292
+    diameter: 10705
+    density: 5.777156451809
     dayLength: 24
     yearLength: 2.0
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 237
       value: 40
     water:
-      source: canon
+      source: Masters and Minions, pg. 237
       value: 67
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 237
       value: MAMMAL
     desc: |-
       Kittery is a warm tropical planet that resides on the border of the Capellan Confederation and the Federated Suns. The planet was captured by the Federated Suns in 3005, however Confederation resistance cells operated on the planet for many years after.
@@ -75,13 +81,17 @@ planet:
       Gortex Multi-E
     landmass:
       - capital:
-          source: canon
+          source: 'Handbook: House Davion, pg. 88'
           value: Can Fu City
     satellite:
-      - name: Ming
+      - name:
+          source: Masters and Minions, pg. 237
+          value: Ming
         size: medium
         icon: rock8
-      - name: Tai-Shan
+      - name:
+          source: Masters and Minions, pg. 237
+          value: Tai-Shan
         size: large
         icon: rock12
     event:

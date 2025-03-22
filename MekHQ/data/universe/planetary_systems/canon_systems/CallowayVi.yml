@@ -3,9 +3,11 @@ sucsId: 445
 xcood: -58.168
 ycood: -199.567
 spectralType:
-  source: canon
+  source: House Marik, pg. 157
   value: F5V
-primarySlot: 6
+primarySlot:
+  source: House Marik, pg. 157
+  value: 6
 event:
   - date: '2351-08-04'
     zenithCharge: yes
@@ -107,7 +109,9 @@ planet:
       value: Calloway VI
     type: TERRESTRIAL
     orbitalDist: 2.24
-    sysPos: 6
+    sysPos:
+      source: House Marik, pg. 157
+      value: 6
     icon: green39
     pressure:
       source: canon
@@ -128,8 +132,8 @@ planet:
       source: canon
       value: 63
     lifeForm:
-      source: canon
-      value: MAMMAL
+      source: House Marik, pg. 157
+      value: INSECT
     desc: |-
       Calloway VI is one of the most prosperous planets in the entire Inner Sphere thanks to a strong industrial base and shrewd traders. While the planet is short on raw materials and almost everything must be imported, it has not stopped the planet from being successful. In the pursuit of profit, several native species on Calloway, including the Calloway Wildebeests have been hunted to extinction.
 
