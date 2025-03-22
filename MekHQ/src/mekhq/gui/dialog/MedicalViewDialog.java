@@ -67,6 +67,22 @@ import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.Paperdoll;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.Period;
+import java.util.*;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 public class MedicalViewDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(MedicalViewDialog.class);
 
@@ -207,6 +223,7 @@ public class MedicalViewDialog extends JDialog {
         getContentPane().add(okayButton);
         pack();
         setUserPreferences();
+        setModal(true);
     }
 
     private void initComponents(Container cont) {
