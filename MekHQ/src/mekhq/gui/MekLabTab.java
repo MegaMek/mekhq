@@ -432,7 +432,7 @@ public class MekLabTab extends CampaignGuiTab {
         if (entity.getOriginalJumpMP() > 0 && !(entity instanceof Infantry)) {
             if (entity.getJumpType() == Mek.JUMP_IMPROVED) {
                 heat += Math.max(3, entity.getOriginalJumpMP() / 2);
-            } else if (entity.getJumpType() != Mek.JUMP_BOOSTER) {
+            } else {
                 heat += Math.max(3, entity.getOriginalJumpMP());
             }
             if (entity.getEngine().getEngineType() == Engine.XXL_ENGINE) {
