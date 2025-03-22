@@ -407,7 +407,7 @@ public class Resupply {
             }
 
             for (UUID unitId : force.getAllUnits(true)) {
-                Entity entity = getEntityFromUnitId(campaign, unitId);
+                Entity entity = getEntityFromUnitId(campaign.getHangar(), unitId);
 
                 if (entity == null) {
                     continue;

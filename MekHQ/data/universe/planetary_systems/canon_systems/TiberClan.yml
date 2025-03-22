@@ -3,9 +3,11 @@ sucsId: 2965
 xcood: 89.514
 ycood: 1876.731
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: G8VI
-primarySlot: 3
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 3
 event:
   - date: '2802-11-01'
     zenithCharge: yes
@@ -49,28 +51,32 @@ planet:
       value: Tiber (Clan)
     type: TERRESTRIAL
     orbitalDist: 1.28
-    sysPos: 3
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 3
     icon: green51
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 1.0
-    diameter: 11800
-    density: 5.941419412931
+    diameter: 11814
+    density: 5.948500088969
     dayLength: 19
     yearLength: 1.7
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 25
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 40
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: REPTILE
     desc: No description available.
     landmass:

@@ -3,9 +3,11 @@ sucsId: 2597
 xcood: 20.153
 ycood: 119.374
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F1IV
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2482-09-29'
     nadirCharge: yes
@@ -33,28 +35,32 @@ planet:
       value: Tsukude
     type: TERRESTRIAL
     orbitalDist: 4.48
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green37
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.01
-    diameter: 11938
-    density: 5.947359201334
+    diameter: 11936
+    density: 5.946485371872
     dayLength: 20
     yearLength: 9.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 41
     water:
-      source: canon
-      value: 57
+      source: MWDA world profiles
+      value: 56
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: FISH
     desc: |-
       A world of mild seasons, with lush, tropical forests easily covering half of its thirteen major island-continent landmasses, Tsukude looks like a virtual paradise to the casual observer. However, the first colonists quickly realized that the planet‘s native splendor was more illusion than substance. The biochemistry of the local flora and fauna, which seems to draw energy more from the nitrogen-rich atmosphere than from a carbon dioxide–oxygen cycle, was found to be incompatible with human metabolism because of its dangerously high acidity. This forced the settlers to import a good deal of their basic foodstuffs and take drastic steps to develop even subsistence-level agricultural production.
@@ -68,51 +74,44 @@ planet:
       Tsukude‘s capital, Ogawa City, is located on Ikadae, the largest of this world‘s northern island continents. Tomashita, a seaport city located on the western peninsula of the Soto island continent just southeast of Ikadae, boasts the largest of Tsukude‘s recreational fishing fleets, Green Sea Hunters. The other nine island landmasses of Tsukede, which together account for over forty percent of the planet‘s remaining surface, are Nakaru, Liam, and Domashimi in the northern hemisphere, and Opana, Yoshetsu, Weng-Li, Taris, Kyuna, and Shobenwa in the south. Small towns and seaports may be found on all of these continents, but by far the most populous are those on Ikadeae and Soto.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Domashimi
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Ikadae
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Ogawa City
       - name:
-          source: canon
-          value: Kuyuna
+          source: MWDA world profiles
+          value: Kyuna
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Liam
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Nakaru
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Opana
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Shobenwa
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Soto
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Taris
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Taris
       - name:
-          source: canon
+          source: MWDA world profiles
+          value: Weng-Li
+      - name:
+          source: MWDA world profiles
           value: Yoshetsu
-    satellite:
-      - name: O71
-        size: medium
-        icon: oddmoon2
-      - name: O72
-        size: medium
-        icon: oddmoon1
-      - name: O73
-        size: medium
-        icon: oddmoon3
     event:
       - date: '2319-04-07'
         faction:

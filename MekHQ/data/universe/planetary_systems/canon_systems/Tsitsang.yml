@@ -3,9 +3,11 @@ sucsId: 2596
 xcood: 51.95
 ycood: -108.578
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G3II
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 planet:
   - name: Þórr
     type: TERRESTRIAL
@@ -52,28 +54,32 @@ planet:
       value: Tsitsang
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green46
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.96
-    diameter: 11757
-    density: 5.710642406735
+    diameter: 11785
+    density: 5.724442680145
     dayLength: 20
     yearLength: 2.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 30
     water:
-      source: canon
+      source: MWDA world profiles
       value: 48
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: FISH
     desc: |-
       3135 - Tsitang was originally colonised when St. Andre was colonized and became the agricultural supplier to St Andre and other worlds. Tsitang has a warm and temperate climate that allows most of the continents to have more than three growing seasons annually. Tsitang was a major producer of hardwood timber, bamboo, fruit trees, and a variety of other agricultural products.
@@ -85,25 +91,31 @@ planet:
       Tsitang fell in the second wave of the Fourth Succession War to the Federated Suns. After the war, the planet continued to supply the same worlds that were now part of the Sarna March. The Capellans regained Tsitang after the fragmenting of the Sarna March in 3057. Tsitang was left almost untouched during the Jihad, becoming a refugee centre for many of the worlds they supplied with food.
     landmass:
       - name:
-          source: canon
-          value: Feng
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Fang
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Pealung
       - name:
-          source: canon
+          source: MWDA world profiles
+          value: Feng
+      - name:
+          source: MWDA world profiles
           value: Fong
     satellite:
-      - name: Pin-Wong
+      - name:
+          source: MWDA world profiles
+          value: Pin-Wong
         size: medium
         icon: oddmoon2
-      - name: Wai-Wong
+      - name:
+          source: MWDA world profiles
+          value: Wai-Wong
         size: giant
         icon: rock7
-      - name: Wei-Wong
+      - name:
+          source: MWDA world profiles
+          value: Wei-Wong
         size: medium
         icon: rock16
     event:

@@ -85,11 +85,6 @@ public final class InfirmaryTab extends CampaignGuiTab {
 
         setLayout(new GridBagLayout());
 
-        String bgImageFile = getIconPackage().getGuiElement("infirmary_background");
-        if (null != bgImageFile && !bgImageFile.isEmpty()) {
-            bgImage = Toolkit.getDefaultToolkit().createImage(bgImageFile);
-        }
-
         doctorsModel = new DocTableModel(getCampaign());
         docTable = new JTable(doctorsModel);
         docTable.setRowHeight(UIUtil.scaleForGUI(60));

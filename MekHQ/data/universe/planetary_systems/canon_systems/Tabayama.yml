@@ -3,9 +3,11 @@ sucsId: 2462
 xcood: 407.56
 ycood: 233.095
 spectralType:
-  source: canon
+  source: House Kurita
   value: F0IV
-primarySlot: 3
+primarySlot:
+  source: House Kurita
+  value: 3
 event:
   - date: '2435-08-07'
     nadirCharge: yes
@@ -52,7 +54,9 @@ planet:
       value: Tabayama
     type: TERRESTRIAL
     orbitalDist: 4.48
-    sysPos: 3
+    sysPos:
+      source: House Kurita
+      value: 3
     icon: green1
     pressure:
       source: canon
@@ -73,7 +77,7 @@ planet:
       source: canon
       value: 45
     lifeForm:
-      source: canon
+      source: House Kurita
       value: FISH
     desc: Originally an Outworlds Alliance colony populated largely by pacifistic
       farmers and miners, Tabayama was an early target during the invasion of the

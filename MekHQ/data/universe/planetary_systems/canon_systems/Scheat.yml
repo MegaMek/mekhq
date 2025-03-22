@@ -3,37 +3,43 @@ sucsId: 2256
 xcood: 168.531
 ycood: 41.83
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G0IV
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 planet:
   - name:
       source: canon
       value: Scheat
     type: TERRESTRIAL
     orbitalDist: 1.76
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: green44
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.93
-    diameter: 12631
-    density: 5.169498353746
+    diameter: 12637
+    density: 5.17190070156
     dayLength: 21
     yearLength: 2.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 38
     water:
-      source: canon
+      source: MWDA world profiles
       value: 73
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: 3135 - A world of heavy rainfall, rich soil, and basic metals, Scheat became
       an industrialized world soon after the first colonists made planetfall. Lumber
@@ -58,19 +64,26 @@ planet:
       Scheat‘s largest mining concern, is headquartered.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Kohl
+        capital:
+          source: noncanon
+          value: Tikohl
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Rhodes
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Warschen
     satellite:
-      - name: Traveler
+      - name:
+          source: MWDA world profiles
+          value: Traveler
         size: giant
         icon: rock15
-      - name: Wanderer
+      - name:
+          source: MWDA world profiles
+          value: Wanderer
         size: large
         icon: rock13
     event:

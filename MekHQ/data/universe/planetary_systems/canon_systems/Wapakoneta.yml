@@ -3,9 +3,11 @@ sucsId: 2718
 xcood: 238.316
 ycood: 69.227
 spectralType:
-  source: canon
+  source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
   value: K0V
-primarySlot: 6
+primarySlot:
+  source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
+  value: 6
 event:
   - date: '2738-11-17'
     zenithCharge: yes
@@ -90,28 +92,32 @@ planet:
       value: Wapakoneta
     type: TERRESTRIAL
     orbitalDist: 0.56
-    sysPos: 6
+    sysPos:
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
+      value: 6
     icon: wet9
     pressure:
-      source: canon
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
       value: 0.98
-    diameter: 14405
-    density: 4.80196038399
+    diameter: 14374
+    density: 4.791473202243
     dayLength: 23
     yearLength: 1.0
     temperature:
-      source: canon
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
       value: 29
     water:
-      source: canon
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
       value: 87
     lifeForm:
-      source: canon
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
       value: MAMMAL
     desc: |-
       3028 - Wapakoneta is a planet almost entirely covered in water and is famous for its many small picturesque islands and resorts. The largest and warmest continent is New Wisconsin which is home to the planetary capital and most of Wapakoneta’s population. New Wisconsin is near the equator and much of its varied landmass is covered in thick forests. The smallest continent, Little Florida, is located far to the north and is almost entirely covered in glaciers and it is home to only one permanent settlement, the port city of Tassel. The remaining three continents are largely uninhabited due to the monstrous typhoons that regularly tear across them.
@@ -123,16 +129,18 @@ planet:
       The primary export from Wapakoneta comes from the vast oceans that cover the planet. New Wisconsin’s northern coast is dotted by food processing plants that specialize in processing and freezing fish and other sea life for transport to neighboring planets, with the planet’s flash-frozen swordfin being prized by high-class restaurants on surrounding worlds. The other large industry on Wapakoneta is tourism, with dozens of vacation and resort locations across the multitude of islands. Unfortunately the tourism tends to fade when tensions are high between the Combine and Federated Suns.
     landmass:
       - name:
-          source: canon
+          source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
           value: Little Florida Island
       - name:
-          source: canon
+          source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
           value: New Wisconsin
         capital:
           source: canon
           value: Yaston
     satellite:
-      - name: Auglaize
+      - name:
+          source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
+          value: Auglaize
         size: medium
         icon: rock7
     event:

@@ -3,9 +3,11 @@ sucsId: 2827
 xcood: -77.811
 ycood: 90.165
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: M2V
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2371-05-21'
     nadirCharge: yes
@@ -19,28 +21,32 @@ planet:
       value: Zebeneschamali
     type: TERRESTRIAL
     orbitalDist: 0.16
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: green10
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.72
-    diameter: 9413
-    density: 5.360795330775
+    diameter: 9426
+    density: 5.368095121335
     dayLength: 18
     yearLength: 0.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 25
     water:
-      source: canon
+      source: MWDA world profiles
       value: 66
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: |-
       3135 - A cold world orbiting a dim red star, Zebeneschamali was initially settled by colonists from Terra‘s Middle Eastern region, who wanted nothing more than to establish a life far away from the corrupting influence of their homeworld. Though the climate of their new home was not the same as the warm, arid region from which they came, and though the planet lacked significant raw material resources beyond basic industrial metals and common chemicals, the new settlers took to their new home and established several small towns along the banks of the rivers on Kirikahmed, the planet‘s primary continent. Within a few decades, the colonial population swelled and new settlements rose across the plains and rugged landscape of Kirikahmed‘s northern reaches, and bolder adventurers turned eager eyes to the untapped expanse of the North and South Arragon continents. However, upon making survey flights over the western coast of North Arragon, the native Zebeneschamalis were shocked to discover the presence of other human settlements, apparently recently established. Originating from a failed expedition to Unukalhai, these new colonists had come to this promising world after failing to establish their own, believing Zebeneschamali to be uninhabited when they landed. The discovery and immediate reaction led to a string of violent clashes as each colonial group declared the other an invading force, but this fighting eventually died down when leaders on both sides reached an agreement on their mutual expansion.
@@ -50,22 +56,19 @@ planet:
       Today, a trace of Zebeneschamali‘s founding decades can still be seen in the slightly different cultural and religious mores of the North Arragon and Kirikahmed populations, as well as in the presence of two capital cities—one for each continent. The Kirikahmed capital and primary spaceport, which is also regarded as the primary planetary administrative center, is Ur-Kabal, while the North Arragon capital city, Jakrit, touts itself as the planet‘s second largest population center and spaceport city.
     landmass:
       - name:
-          source: canon
-          value: .na.character
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Kirikahmed
         capital:
-          source: canon
-          value: Ur-Kabal
+          source: MWDA world profiles
+          value: Jakrit;Ur-Kabal
       - name:
-          source: canon
+          source: MWDA world profiles
           value: North Arragon
         capital:
           source: canon
           value: Jakrit
       - name:
-          source: canon
+          source: MWDA world profiles
           value: South Arragon
     event:
       - date: '2160-03-01'

@@ -3,9 +3,11 @@ sucsId: 1199
 xcood: 49.622
 ycood: -18.661
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G6V
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2352-08-17'
     nadirCharge: yes
@@ -60,28 +62,32 @@ planet:
       value: Ingress
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: green29
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.0
-    diameter: 13583
-    density: 5.170183187772
+    diameter: 13588
+    density: 5.171999638193
     dayLength: 22
     yearLength: 1.1
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 29
     water:
-      source: canon
+      source: MWDA world profiles
       value: 50
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       Cloaked in extensive natural resources, Ingress was one of the first worlds colonized during the initial interstellar exodus from Terra. Clustered in towns around the planet‘s single, large ocean, settlers established some light industry near their capital of Askar, but agricultural products quickly became the world‘s dominant export. Self-sufficient from the beginning, Ingress was also one of the first worlds to seek independence from the Terran Alliance, and its well-equipped infantry fought many years before succumbing to the Terran Hegemony.
@@ -93,10 +99,12 @@ planet:
       Ingress‘s temporary military weakness made it an easy target during the Blakist Holy War. The Blakists established enormous reeducation camps on the planet, disrupting agriculture and starving over a billion people to death. Ingress‘s economy fully recovered during the Golden Age of Peace, but its population still stands at less than half of its former levels.
     landmass:
       - capital:
-          source: canon
+          source: MWDA world profiles
           value: Askar
     satellite:
-      - name: Edanu
+      - name:
+          source: MWDA world profiles
+          value: Edanu
         size: giant
         icon: rock5
     event:

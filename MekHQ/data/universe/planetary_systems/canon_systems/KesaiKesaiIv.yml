@@ -3,9 +3,11 @@ sucsId: 1334
 xcood: 370.161
 ycood: 105.677
 spectralType:
-  source: canon
+  source: FedCom Civil War, pg. 191
   value: A5II
-primarySlot: 4
+primarySlot:
+  source: FedCom Civil War, pg. 191
+  value: 4
 event:
   - date: '2360-01-15'
     zenithCharge: yes
@@ -61,28 +63,32 @@ planet:
       value: Kesai IV
     type: TERRESTRIAL
     orbitalDist: 9.88
-    sysPos: 4
+    sysPos:
+      source: FedCom Civil War, pg. 191
+      value: 4
     icon: green43
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 191
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 191
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 191
       value: 1.0
-    diameter: 11094
-    density: 6.317757884907
+    diameter: 11109
+    density: 6.326168845684
     dayLength: 23
     yearLength: 31.1
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 191
       value: 50
     water:
-      source: canon
+      source: FedCom Civil War, pg. 191
       value: 30
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 191
       value: NONE
     desc: Kesai IV is a desert planet with almost no water and no native life. The
       planet also has few natural resources and almost nothing to lend itself to human

@@ -3,9 +3,11 @@ sucsId: 640
 xcood: 105.978
 ycood: 25.03
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F9V
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2385-09-01'
     zenithCharge: yes
@@ -37,28 +39,32 @@ planet:
       value: Cylene
     type: TERRESTRIAL
     orbitalDist: 1.1
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green14
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.26
-    diameter: 12452
-    density: 7.091665637374
+    diameter: 12469
+    density: 7.101387521565
     dayLength: 20
     yearLength: 1.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 29
     water:
-      source: canon
+      source: MWDA world profiles
       value: 43
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: Cylene‘s eccentric orbit is largely attributed to the imbalance caused by
       the shattering of its large moon into three smaller satellites roughly eighty
@@ -78,25 +84,31 @@ planet:
       capital of Halcyon.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Absalom
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Halcyon
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Clytemnestra
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Graus
     satellite:
-      - name: Allestra
+      - name:
+          source: MWDA world profiles
+          value: Allestra
         size: large
         icon: rock2
-      - name: Hermione
+      - name:
+          source: MWDA world profiles
+          value: Hermione
         size: medium
         icon: oddmoon2
-      - name: Joseppe
+      - name:
+          source: MWDA world profiles
+          value: Joseppe
         size: medium
         icon: rock17
     event:

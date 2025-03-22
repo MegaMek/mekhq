@@ -10,6 +10,6 @@
 	<sharedModifiers>AlliedOfficerMek.xml</sharedModifiers>
 	<userDescription>This base is defended by well-equipped veteran troops, turrets and a commander in a Mek.
 
-        The commander will participate in scenarios on this track.</userDescription>
+The commander will participate in scenarios on this track.</userDescription>
 	<visible>true</visible>
 </StratconFacility>

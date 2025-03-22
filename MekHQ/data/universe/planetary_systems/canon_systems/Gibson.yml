@@ -3,9 +3,11 @@ sucsId: 952
 xcood: -245.811
 ycood: -215.127
 spectralType:
-  source: canon
+  source: 25 Years of Art and Fiction, pg. 215
   value: G2V
-primarySlot: 3
+primarySlot:
+  source: 25 Years of Art and Fiction, pg. 215
+  value: 3
 event:
   - date: '2352-02-20'
     nadirCharge: yes
@@ -54,28 +56,32 @@ planet:
       value: Gibson
     type: TERRESTRIAL
     orbitalDist: 1.0
-    sysPos: 3
+    sysPos:
+      source: 25 Years of Art and Fiction, pg. 215
+      value: 3
     icon: green46
     pressure:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 215
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 25 Years of Art and Fiction, pg. 215
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 215
       value: 1.0
-    diameter: 13827
-    density: 5.121475197316
+    diameter: 13774
+    density: 5.101958552032
     dayLength: 27
     yearLength: 1.4
     temperature:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 215
       value: 38
     water:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 215
       value: 59
     lifeForm:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 215
       value: MAMMAL
     desc: |-
       After heavy terraforming during early colonization Gibson became one of the most hospitable planets in the entire Free Worlds League. Semi-arid, but extremely comfortable for human life, Gibson manages to be completely self-sufficient. Due to the planet’s fertile farming land and comfortable atmosphere, Gibson was colonized by a wide diversity of peoples and religions.
@@ -87,18 +93,22 @@ planet:
       Brigadier Corporation
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 73'
           value: Matrah
         capital:
-          source: canon
+          source: 'Handbook: House Marik, pg. 73'
           value: Portent
     satellite:
-      - name: Unity
-        size: medium
-        icon: oddmoon3
-      - name: Understanding
+      - name:
+          source: 25 Years of Art and Fiction, pg. 215
+          value: Understanding
         size: medium
         icon: oddmoon2
+      - name:
+          source: 25 Years of Art and Fiction, pg. 215
+          value: Unity
+        size: medium
+        icon: oddmoon3
     event:
       - date: '2241-06-29'
         faction:

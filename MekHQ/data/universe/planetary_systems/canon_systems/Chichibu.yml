@@ -3,9 +3,11 @@ sucsId: 538
 xcood: 90.467
 ycood: 74.914
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K6V
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2357-08-02'
     nadirCharge: yes
@@ -20,28 +22,32 @@ planet:
       value: Chichibu
     type: TERRESTRIAL
     orbitalDist: 0.24
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: wet13
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.99
-    diameter: 13914
-    density: 5.014265364224
+    diameter: 13895
+    density: 5.0072425073
     dayLength: 19
     yearLength: 0.8
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 27
     water:
-      source: canon
+      source: MWDA world profiles
       value: 86
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: The first colonists to settle Chichibu perished in less than a generation,
       thanks to an undetected alien strain of smallpox that decimated the population.
@@ -74,31 +80,37 @@ planet:
       the spaceport city of Sharpendale, a major hub for planetary commerce.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Jaweena
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Remembrance
       - name:
-          source: canon
-          value: Thracen Island Chain
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Quillani
       - name:
-          source: canon
+          source: MWDA world profiles
+          value: Thracen
+      - name:
+          source: MWDA world profiles
           value: Uranday
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Vyrusia
     satellite:
-      - name: Janus
+      - name:
+          source: MWDA world profiles
+          value: Janus
         size: medium
         icon: rock9
-      - name: Kara
+      - name:
+          source: MWDA world profiles
+          value: Kara
         size: large
         icon: rock2
-      - name: Tobyn
+      - name:
+          source: MWDA world profiles
+          value: Tobyn
         size: medium
         icon: rock6
     event:

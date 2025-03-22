@@ -3,9 +3,11 @@ sucsId: 731
 xcood: -182.405
 ycood: 159.288
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 84'
   value: F0V
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 84'
+  value: 4
 event:
   - date: '2368-06-05'
     nadirCharge: yes
@@ -70,28 +72,32 @@ planet:
       value: Donegal
     type: TERRESTRIAL
     orbitalDist: 2.56
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 84'
+      value: 4
     icon: wet12
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 84'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 84'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 84'
       value: 1.01
-    diameter: 12791
-    density: 5.545073357946
+    diameter: 12796
+    density: 5.547093113805
     dayLength: 25
     yearLength: 4.3
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 84'
       value: 40
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 84'
       value: 80
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 84'
       value: REPTILE
     desc: |-
       The planet Donegal sits in the center of Lyran space. True to its place in the Commonwealth’s territory, Donegal is one of a handful of systems that formed the heart of the confederation that became the Lyran Commonwealth after the fall of the Terran Alliance.
@@ -101,22 +107,21 @@ planet:
       Donegal is the home to many major trading companies, the Supreme Court of the Commonwealth, and the Donegal Stock Exchange.
     landmass:
       - name:
-          source: canon
-          value: Albion
-        capital:
-          source: canon
-          value: Marsdenville
+          source: 'Handbook: House Steiner, pg. 84'
+          value: Dunellen
       - name:
-          source: canon
-          value: Dunellan
-      - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 84'
           value: Hinterlands
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 84'
           value: Lockenar
+        capital:
+          source: 'Objectives: Lyran Alliance, p. 22'
+          value: Marsdenville
     satellite:
-      - name: Seth's Jewel
+      - name:
+          source: 'Handbook: House Steiner, pg. 84'
+          value: Seth's Jewel
         size: large
         icon: rock14
     event:

@@ -3,9 +3,11 @@ sucsId: 211
 xcood: -43.697
 ycood: -76.821
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 61'
   value: G4II
-primarySlot: 6
+primarySlot:
+  source: 'Handbook: House Marik, pg. 61'
+  value: 6
 event:
   - date: '2388-10-11'
     zenithCharge: yes
@@ -109,28 +111,32 @@ planet:
       value: Augustine
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 6
+    sysPos:
+      source: 'Handbook: House Marik, pg. 61'
+      value: 6
     icon: green26
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 61'
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 61'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 61'
       value: 1.0
-    diameter: 11063
-    density: 6.321787401751
+    diameter: 11090
+    density: 6.337045972535
     dayLength: 19
     yearLength: 2.0
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 61'
       value: 55
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 61'
       value: 67
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 61'
       value: MAMMAL
     desc: |-
       Augustine was originally settled as a religious colony by Jesuits. However, since its founding the planet has attracted a broad range of peoples and religions and grew to be an important part of the Marik Commonwealth. Unfortunately brutal fighting during the early Succession Wars saw the population drop by more than half. Additionally the famous Seminary and much of the planet’s infrastructure was destroyed.
@@ -140,27 +146,35 @@ planet:
       The primary industries on Augustine involve extracting raw minerals from the planet and processing petrochemicals on the northern continent of Kabuko and agriculture on other two continents, Roma and Grecian.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 61'
+          value: Grecian
+      - name:
+          source: 'Handbook: House Marik, pg. 61'
           value: Kabuko
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 61'
           value: Roma
-      - name:
-          source: canon
-          value: Grecian
     satellite:
-      - name: Tagaste
-        size: medium
-        icon: oddmoon1
-      - name: Suk Arras
-        size: large
-        icon: rock4
-      - name: Numidia
-        size: large
-        icon: rock13
-      - name: Bona
+      - name:
+          source: 'Handbook: House Marik, pg. 61'
+          value: Bona
         size: medium
         icon: rock6
+      - name:
+          source: 'Handbook: House Marik, pg. 61'
+          value: Numidia
+        size: large
+        icon: rock13
+      - name:
+          source: 'Handbook: House Marik, pg. 61'
+          value: Suk Arras
+        size: large
+        icon: rock4
+      - name:
+          source: 'Handbook: House Marik, pg. 61'
+          value: Tagaste
+        size: medium
+        icon: oddmoon1
     event:
       - date: '2241-10-28'
         faction:

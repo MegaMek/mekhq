@@ -31,7 +31,6 @@ package mekhq.gui.dialog;
 import java.awt.BorderLayout;
 import java.util.Objects;
 import java.util.ResourceBundle;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -51,12 +50,12 @@ import mekhq.gui.control.EditPersonnelLogControl;
 public class EditPersonnelLogDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(EditPersonnelLogDialog.class);
 
-    private JFrame frame;
+    private JFrame   frame;
     private Campaign campaign;
-    private Person person;
+    private Person   person;
 
     private EditPersonnelLogControl editPersonnelLogControl;
-    private JButton btnOK;
+    private JButton                 btnOK;
 
     /** Creates new form EditPersonnelLogDialog */
     public EditPersonnelLogDialog(JFrame parent, boolean modal, Campaign c, Person p) {
@@ -65,8 +64,8 @@ public class EditPersonnelLogDialog extends JDialog {
         Objects.requireNonNull(p);
 
         this.frame = parent;
-        campaign = c;
-        person = p;
+        campaign   = c;
+        person     = p;
 
         initComponents();
         setLocationRelativeTo(parent);
@@ -75,7 +74,7 @@ public class EditPersonnelLogDialog extends JDialog {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelLogDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName(resourceMap.getString("dialog.name"));
@@ -94,7 +93,13 @@ public class EditPersonnelLogDialog extends JDialog {
         pack();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditPersonnelLogDialog.class);

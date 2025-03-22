@@ -5,7 +5,9 @@ ycood: -79.668
 spectralType:
   source: canon
   value: F5VII
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Liao, pg. 75'
+  value: 4
 planet:
   - name: Susan's Stand
     type: GIANT_TERRESTRIAL
@@ -68,66 +70,78 @@ planet:
       value: Gan Singh
     type: TERRESTRIAL
     orbitalDist: 3.92
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Liao, pg. 75'
+      value: 4
     icon: green3
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 75'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 75'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 75'
       value: 1.0
-    diameter: 14230
-    density: 4.935050516459
+    diameter: 14235
+    density: 4.936813509733
     dayLength: 25
     yearLength: 7.9
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 75'
       value: 30
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 75'
       value: 72
     lifeForm:
-      source: canon
-      value: MAMMAL
+      source: 'Handbook: House Liao, pg. 75'
+      value: PLANT
     desc: A largely agricultural world with impressive forests and jungles. Large
       rain forests blanket the northern hemisphere, where the majority of the planet’s
       inhabitants work and live. The planet’s equator is ringed with a number of moderately-sized
       cities.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Calcutta
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Mughal
       - name:
-          source: canon
-          value: Satara
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Jaipur
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Jhansi
       - name:
-          source: canon
+          source: MWDA world profiles
+          value: Nagpur
+      - name:
+          source: MWDA world profiles
           value: Sambalpur
       - name:
-          source: canon
-          value: Nagpur
+          source: MWDA world profiles
+          value: Satara
     satellite:
-      - name: Harl
+      - name:
+          source: 'Handbook: House Liao, pg. 75'
+          value: Hari
         size: medium
-        icon: rock7
-      - name: Kishen
+        icon: oddmoon3
+      - name:
+          source: 'Handbook: House Liao, pg. 75'
+          value: Kishen
         size: medium
         icon: rock3
-      - name: Nain
+      - name:
+          source: 'Handbook: House Liao, pg. 75'
+          value: Nain
         size: medium
         icon: oddmoon1
-      - name: Ranjit
+      - name:
+          source: 'Handbook: House Liao, pg. 75'
+          value: Ranjit
         size: large
         icon: rock4
     event:

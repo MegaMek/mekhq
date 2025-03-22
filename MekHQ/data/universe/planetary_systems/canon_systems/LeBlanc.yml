@@ -3,9 +3,11 @@ sucsId: 1470
 xcood: 207.047
 ycood: 18.309
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 100'
   value: G0III
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Davion, pg. 100'
+  value: 4
 event:
   - date: '2434-10-13'
     nadirCharge: yes
@@ -62,28 +64,32 @@ planet:
       value: Le Blanc
     type: TERRESTRIAL
     orbitalDist: 1.76
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Davion, pg. 100'
+      value: 4
     icon: dry15
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 100'
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 100'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 100'
       value: 0.82
-    diameter: 11454
-    density: 5.039395753571
+    diameter: 11445
+    density: 5.03524886534
     dayLength: 18
     yearLength: 2.6
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 100'
       value: 24
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 100'
       value: 15
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 100'
       value: NONE
     desc: Le Blanc is a small planet with lower than normal gravity and a thin atmosphere
       with just barely enough oxygen to breathe without a rebreather. Originally settled
@@ -96,14 +102,20 @@ planet:
       the 4th Succession War due to the rise of Outreach.
     landmass:
       - name: Crevasse de Gayagoy
-        capital: Augeval
+        capital:
+          source: 'Handbook: House Davion, pg. 100'
+          value: Port Paix
       - name: Larger Reid
       - name: Smaller Reid
     satellite:
-      - name: Jessen
+      - name:
+          source: 'Handbook: House Davion, pg. 100'
+          value: Jessen
         size: large
         icon: rock3
-      - name: Orones
+      - name:
+          source: 'Handbook: House Davion, pg. 100'
+          value: Orones
         size: medium
         icon: rock13
     event:

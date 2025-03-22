@@ -5,7 +5,9 @@ ycood: 1757.882
 spectralType:
   source: canon
   value: F0V
-primarySlot: 1
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 1
 event:
   - date: '2803-12-15'
     nadirCharge: yes
@@ -15,28 +17,32 @@ planet:
       value: Tranquil
     type: TERRESTRIAL
     orbitalDist: 2.56
-    sysPos: 1
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 1
     icon: green46
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 0.8
-    diameter: 10350
-    density: 5.435011024348
+    diameter: 10347
+    density: 5.433484142141
     dayLength: 23
     yearLength: 4.3
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 45
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 60
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: REPTILE
     desc: No description available.
     smallMoons: 3

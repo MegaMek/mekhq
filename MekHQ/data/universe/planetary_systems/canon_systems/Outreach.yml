@@ -3,9 +3,11 @@ sucsId: 1963
 xcood: -3.109
 ycood: -34.688
 spectralType:
-  source: canon
+  source: 'Field Manual: Mercenaries, Revised, pg. 12'
   value: K9V
-primarySlot: 2
+primarySlot:
+  source: 'Field Manual: Mercenaries, Revised, pg. 12'
+  value: 2
 event:
   - date: '2360-01-30'
     zenithCharge: yes
@@ -32,28 +34,32 @@ planet:
       value: Outreach
     type: TERRESTRIAL
     orbitalDist: 0.2
-    sysPos: 2
+    sysPos:
+      source: 'Field Manual: Mercenaries, Revised, pg. 12'
+      value: 2
     icon: wet20
     pressure:
-      source: canon
+      source: 'Field Manual: Mercenaries, Revised, pg. 12'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Field Manual: Mercenaries, Revised, pg. 12'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Field Manual: Mercenaries, Revised, pg. 12'
       value: 1.1
-    diameter: 15418
-    density: 5.014265364224
+    diameter: 15417
+    density: 5.01405795542
     dayLength: 22
     yearLength: 0.7
     temperature:
-      source: canon
+      source: 'Field Manual: Mercenaries, Revised, pg. 12'
       value: 35
     water:
-      source: canon
+      source: 'Field Manual: Mercenaries, Revised, pg. 12'
       value: 75
     lifeForm:
-      source: canon
+      source: 'Field Manual: Mercenaries, Revised, pg. 12'
       value: FISH
     desc: |-
       Outreach consists of oceans and two continents; Romulus and Remus. Romulus is the population center and home to the planet's capital city Harlech, as well as all of its major cities and commercial enterprises. Romulus is split by a mountain range known as the Ridge. The majority of the continent's countryside is filled out with small farms, forests and rolling hills. The other continent Remus is less hospitable and arid, it does not contain any major cities.
@@ -67,16 +73,18 @@ planet:
       3135 - Outreach was known as the center for the mercenary trade in the mid-thirty-first century, a site of the last of the Star League‘s Martial Olympiads that later became home of the famous Clansmen-turned-mercenary Wolf‘s Dragoons and the giant ‘Mech manufacturer GM-Blackwell. Today, however, this world is less than a shadow of its former self, reduced to a devastated, radioactive cinder that only a handful of stubborn souls still call home. Most historians claim the Word of Blake Jihad began with the assault on Outreach, in late 3067, when a surprise blitzkrieg by renegade mercenaries sacked the planetary capital of Harlech in an operation coordinated with and supported by the Blakists. A follow-up ambush from a pirate jump point by Word of Blake WarShips obliterated the planet‘s spaceborne defenses, including the Wolf‘s Dragoons fleet and both orbital battle stations. Even as the surviving elements of the most feared mercenaries in the galaxy tried desperately to regroup or withdraw, the Blakist fleet proceeded to bombard the planet with naval weapons and nuclear warheads. The continent of Remus, heart of the Dragoons‘ military industries and research, along with the Tetsuhara Proving Grounds and the main GM-Blackwell Industries factory, was completely sterilized by nuclear fire, while every major city on the opposite continent of Romulus was pummeled by the guns of both WarShips and BattleMechs. The surviving forces of the Dragoons and their allies withdrew from the holocaust, abandoning the world that had been their only real home since leaving their Clan brethren in the early 3000s. What remains of the planet now is a marginally habitable rock whose single large ocean, the Argosyan Sea, is saturated by fallout from Remus‘ devastation. Little vegetation grows on Romulus, and what farming and business still goes on to sustain the planet‘s decimated population now happens in domed or subterranean cities, where air and water purifiers imported from off-world struggle to remove the worst of the poisoned planet‘s harmful effects. The effective capital and primary spaceport on Outreach is New Kearny, a mostly subterranean city built from the ruins of Harlech, on the edge of what once was Lake Kearny, Outreach‘s largest freshwater body. Now overlooking a basin of baked-hard clay, New Kearny is home to nearly half the planetary population. The Jaime Wolf Memorial Interplanetary Spaceport, located on the city‘s outskirts, is dedicated to the founder and leader of the Wolf‘s Dragoons, who ushered in a new era for Outreach after the Fourth Succession War, and died in his fateful defense of the planet during the Jihad.
     landmass:
       - name:
-          source: canon
+          source: 'Field Manual: Mercenaries, Revised, pg. 12'
+          value: Remus
+      - name:
+          source: 'Field Manual: Mercenaries, Revised, pg. 12'
           value: Romulus
         capital:
-          source: canon
+          source: 'Field Manual: Mercenaries, Revised, pg. 12'
           value: Harlech
-      - name:
-          source: canon
-          value: Remus
     satellite:
-      - name: Cerberus
+      - name:
+          source: 'Field Manual: Mercenaries, Revised, pg. 12'
+          value: Cerberus
         size: large
         icon: rock8
     event:

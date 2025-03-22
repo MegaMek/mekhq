@@ -3,9 +3,11 @@ sucsId: 2897
 xcood: 462.322
 ycood: 100.73
 spectralType:
-  source: canon
+  source: Periphery (1ed), pg. 122
   value: F4V
-primarySlot: 5
+primarySlot:
+  source: Periphery (1ed), pg. 122
+  value: 5
 planet:
   - name: Royersford
     type: GIANT_TERRESTRIAL
@@ -77,7 +79,9 @@ planet:
       value: Dormandaine
     type: TERRESTRIAL
     orbitalDist: 2.24
-    sysPos: 5
+    sysPos:
+      source: Periphery (1ed), pg. 122
+      value: 5
     icon: green32
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -90,7 +94,7 @@ planet:
     temperature: 21
     water: 50
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 122
       value: MAMMAL
     desc: No description available.
     smallMoons: 6

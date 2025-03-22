@@ -3,9 +3,11 @@ sucsId: 2164
 xcood: 226.948
 ycood: 3.056
 spectralType:
-  source: canon
+  source: House Davion
   value: G4III
-primarySlot: 5
+primarySlot:
+  source: House Davion
+  value: 5
 event:
   - date: '2320-07-30'
     nadirCharge: no
@@ -79,7 +81,9 @@ planet:
       value: Rochester
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 5
+    sysPos:
+      source: House Davion
+      value: 5
     icon: green18
     pressure: THIN
     atmosphere: BREATHABLE
@@ -92,7 +96,7 @@ planet:
     temperature: 30
     water: 38
     lifeForm:
-      source: canon
+      source: House Davion
       value: NONE
     desc: |-
       Early colonization efforts were baffled by the lack of life on Rochester. The planet had a comfortable atmosphere and plenty of water. Unfortunately it was soon discovered, when the transplanted animals and plants began to die, that the soil contained a unique mixture of minerals that when combined resulted in a poison for most lifeforms.

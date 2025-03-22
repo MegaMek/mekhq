@@ -3,9 +3,11 @@ sucsId: 1280
 xcood: 88.409
 ycood: 142.617
 spectralType:
-  source: canon
+  source: House Kurita
   value: G5IV
-primarySlot: 4
+primarySlot:
+  source: House Kurita
+  value: 4
 event:
   - date: '2390-05-30'
     zenithCharge: yes
@@ -69,7 +71,9 @@ planet:
       value: Kajikazawa
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 4
+    sysPos:
+      source: House Kurita
+      value: 4
     icon: green38
     pressure:
       source: canon
@@ -90,7 +94,7 @@ planet:
       source: canon
       value: 71
     lifeForm:
-      source: canon
+      source: House Kurita
       value: REPTILE
     desc: Kajikazawa is a high-tech world with abundant natural resources and is a
       prefecture capital in the Benjamin Military District. The planet's close location

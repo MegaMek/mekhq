@@ -3,9 +3,11 @@ sucsId: 1541
 xcood: -102.54
 ycood: -493.873
 spectralType:
-  source: canon
+  source: Periphery (1ed), pg. 103
   value: M2V
-primarySlot: 6
+primarySlot:
+  source: Periphery (1ed), pg. 103
+  value: 6
 event:
   - date: '2719-11-12'
     zenithCharge: yes
@@ -107,7 +109,9 @@ planet:
       value: Luxen
     type: TERRESTRIAL
     orbitalDist: 0.16
-    sysPos: 6
+    sysPos:
+      source: Periphery (1ed), pg. 103
+      value: 6
     icon: green19
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -120,7 +124,7 @@ planet:
     temperature: 29
     water: 46
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 103
       value: REPTILE
     desc: 3025 - Luxen has survived the worst of the Succession Wars relatively untouched.
       It is a provincial capital and has abundant deposits of precious metals and

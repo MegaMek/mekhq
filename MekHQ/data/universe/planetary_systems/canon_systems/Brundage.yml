@@ -3,9 +3,11 @@ sucsId: 408
 xcood: 403.502
 ycood: 49.323
 spectralType:
-  source: canon
+  source: House Davion
   value: G4III
-primarySlot: 4
+primarySlot:
+  source: House Davion
+  value: 4
 event:
   - date: '2363-03-13'
     zenithCharge: yes
@@ -63,7 +65,9 @@ planet:
       value: Brundage
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 4
+    sysPos:
+      source: House Davion
+      value: 4
     icon: green1
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -76,7 +80,7 @@ planet:
     temperature: 33
     water: 39
     lifeForm:
-      source: canon
+      source: House Davion
       value: MAMMAL
     desc: Brundage is a lightly populated planet with scarce water supplies. The planet’s
       early colonists were drawn by the many mountain-ranges covering the planet and

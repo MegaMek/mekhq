@@ -5,7 +5,9 @@ ycood: -471.669
 spectralType:
   source: canon
   value: M2V
-primarySlot: 1
+primarySlot:
+  source: Periphery (1ed), pg. 104
+  value: 1
 event:
   - date: '2566-07-09'
     nadirCharge: yes
@@ -15,7 +17,9 @@ planet:
       value: Cate's Hold
     type: TERRESTRIAL
     orbitalDist: 0.16
-    sysPos: 1
+    sysPos:
+      source: Periphery (1ed), pg. 104
+      value: 1
     icon: green17
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -28,7 +32,7 @@ planet:
     temperature: 35
     water: 52
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 104
       value: MAMMAL
     desc: 3025 - Cate's Hold is a border world between the Magistracy and Concordat
       and was settled as a pleasure world similar to Hardcore and Canopus. Cate's

@@ -3,9 +3,11 @@ sucsId: 1721
 xcood: 274.256
 ycood: 84.992
 spectralType:
-  source: canon
+  source: 'Historical Turning Point: Misery, pg. 3'
   value: F2V
-primarySlot: 4
+primarySlot:
+  source: 'Historical Turning Point: Misery, pg. 3'
+  value: 4
 event:
   - date: '2350-03-16'
     nadirCharge: yes
@@ -65,28 +67,32 @@ planet:
       value: Misery
     type: TERRESTRIAL
     orbitalDist: 2.4
-    sysPos: 4
+    sysPos:
+      source: 'Historical Turning Point: Misery, pg. 3'
+      value: 4
     icon: green24
     pressure:
-      source: canon
+      source: 'Historical Turning Point: Misery, pg. 3'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Historical Turning Point: Misery, pg. 3'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Historical Turning Point: Misery, pg. 3'
       value: 1.1
-    diameter: 14363
-    density: 5.378190783943
+    diameter: 14368
+    density: 5.380160541948
     dayLength: 24
     yearLength: 3.9
     temperature:
-      source: canon
+      source: 'Historical Turning Point: Misery, pg. 3'
       value: 4
     water:
-      source: canon
+      source: 'Historical Turning Point: Misery, pg. 3'
       value: 64
     lifeForm:
-      source: canon
+      source: 'Historical Turning Point: Misery, pg. 3'
       value: MAMMAL
     desc: Misery is a frigid world near the Federated Suns and Draconis Combine border.
       Misery is an unappealing planet that primarily gets by on limited mining and
@@ -95,31 +101,43 @@ planet:
       was made famous in the early 31st Century for the large battle between Wolf’s
       Dragoon and the DCMS Ryuken.
     landmass:
-      - name: Thanlyin I
-        capital: Thanlyin I City
-      - name: Thanlyin II
-      - name: Thanlyin III
-      - name: Thanlyin IV
-      - name: Thanlyin V
+      - name:
+          source: 'Historical Turning Point: Misery, pg. 3'
+          value: Aurealis
+      - name:
+          source: 'Historical Turning Point: Misery, pg. 3'
+          value: Borealis
     satellite:
-      - name: Pain
-        size: large
-        icon: rock1
-      - name: Famine
-        size: medium
-        icon: rock10
-      - name: Pestilence
-        size: large
-        icon: rock4
-      - name: Misfortune
-        size: large
-        icon: rock8
-      - name: Fear
-        size: medium
-        icon: rock16
-      - name: Envy
+      - name:
+          source: 'Historical Turning Point: Misery, pg. 3'
+          value: Envy
         size: medium
         icon: oddmoon1
+      - name:
+          source: 'Historical Turning Point: Misery, pg. 3'
+          value: Famine
+        size: medium
+        icon: rock10
+      - name:
+          source: 'Historical Turning Point: Misery, pg. 3'
+          value: Fear
+        size: medium
+        icon: rock16
+      - name:
+          source: 'Historical Turning Point: Misery, pg. 3'
+          value: Misfortune
+        size: large
+        icon: rock8
+      - name:
+          source: 'Historical Turning Point: Misery, pg. 3'
+          value: Pain
+        size: large
+        icon: rock1
+      - name:
+          source: 'Historical Turning Point: Misery, pg. 3'
+          value: Pestilence
+        size: large
+        icon: rock4
     event:
       - date: '2310-09-28'
         faction:

@@ -3,9 +3,11 @@ sucsId: 1539
 xcood: 167.621
 ycood: 250.493
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 26
   value: G0III
-primarySlot: 4
+primarySlot:
+  source: Masters and Minions, pg. 26
+  value: 4
 event:
   - date: '2365-05-19'
     nadirCharge: yes
@@ -64,28 +66,32 @@ planet:
       value: Luthien
     type: TERRESTRIAL
     orbitalDist: 1.76
-    sysPos: 4
+    sysPos:
+      source: Masters and Minions, pg. 26
+      value: 4
     icon: green52
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 26
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 26
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 26
       value: 1.0
-    diameter: 14552
-    density: 4.850712500727
+    diameter: 14520
+    density: 4.839993685915
     dayLength: 20
     yearLength: 2.6
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 26
       value: 35
     water:
-      source: canon
+      source: Masters and Minions, pg. 26
       value: 70
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 26
       value: AMPHIBIAN
     desc: "Luthien best known as the capital and seat of power of the Draconis Combine.
       The second most noteable feature of the planet is the abundance of heavy industry,
@@ -97,33 +103,41 @@ planet:
       contrast to the rest of the planet.\n\t\t"
     landmass:
       - name:
-          source: canon
-          value: Hokkaido
-        capital:
-          source: canon
-          value: Imperial City
-      - name:
-          source: canon
+          source: 'Jihad Turning Points: Luthien'
           value: Aichi
       - name:
-          source: canon
+          source: 'Jihad Turning Points: Luthien'
+          value: Hokkaidō
+        capital:
+          source: 'Jihad Turning Points: Luthien'
+          value: Imperial City
+      - name:
+          source: 'Jihad Turning Points: Luthien'
           value: Sakura
       - name:
-          source: canon
+          source: 'Jihad Turning Points: Luthien'
           value: Shizuoka
     satellite:
-      - name: Tsu Shima
-        size: medium
-        icon: oddmoon2
-      - name: Orientalis
-        size: medium
-        icon: oddmoon1
-      - name: Hikisaku
+      - name:
+          source: Masters and Minions, pg. 26
+          value: Hikisaku
         size: medium
         icon: rock10
-      - name: Occidentalis
+      - name:
+          source: Masters and Minions, pg. 26
+          value: Occidentalis
         size: large
         icon: rock2
+      - name:
+          source: Masters and Minions, pg. 26
+          value: Orientalis
+        size: medium
+        icon: oddmoon1
+      - name:
+          source: Masters and Minions, pg. 26
+          value: Tsu Shima
+        size: medium
+        icon: oddmoon2
     event:
       - date: '2168-01-12'
         faction:

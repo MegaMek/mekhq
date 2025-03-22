@@ -5,7 +5,9 @@ ycood: -14.518
 spectralType:
   source: canon
   value: A5VI
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2357-07-13'
     zenithCharge: yes
@@ -35,28 +37,32 @@ planet:
       value: Alhena
     type: TERRESTRIAL
     orbitalDist: 9.88
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: dry7
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.91
-    diameter: 10453
-    density: 6.105541391422
+    diameter: 10464
+    density: 6.111751411384
     dayLength: 24
     yearLength: 31.1
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 40
     water:
-      source: canon
+      source: MWDA world profiles
       value: 16
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: |-
       3135 - Alhena was initially settled as a scientific outpost exploring the potential for life under even the harshest environments. Orbiting the outer sun of a binary star system, the planet has developed a peculiar orbit as a result of the interacting pull of both suns, creating a pattern where long, harsh winters follow short, but pleasant, summers. Despite the inhospitable environment, small settlements eventually rose all over the northern hemisphere, particularly along the shores of the polar Alhennian Ocean. Lacking major resources, Alhena relies heavily on off-world trade to sustain its population.
@@ -64,8 +70,8 @@ planet:
       Alhena was largely overlooked throughout the Age of War and the Star League era. Through the Succession Wars, its position near the Free Worlds League border led to several Lyran raids. During the Jihad, off-world trade was so disrupted that almost ten percent of the population died of starvation during one of the planet‘s long winters. Since its admittance into The Republic of the Sphere, Alhena has recovered somewhat, but remains reliant on off-world trade for its very survival. Focci's Point, located near the eastern shores of the Alhennian Ocean, is the capital city and primary spaceport.
     landmass:
       - capital:
-          source: canon
-          value: Focci’s Point
+          source: MWDA world profiles
+          value: Focci's Point
     event:
       - date: '2238-08-11'
         faction:

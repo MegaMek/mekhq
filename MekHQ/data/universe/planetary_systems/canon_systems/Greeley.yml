@@ -3,9 +3,11 @@ sucsId: 1001
 xcood: 449.254
 ycood: 40.273
 spectralType:
-  source: canon
+  source: House Davion
   value: K5V
-primarySlot: 2
+primarySlot:
+  source: House Davion
+  value: 2
 planet:
   - name: Bimbogami
     type: TERRESTRIAL
@@ -28,7 +30,9 @@ planet:
       value: Greeley
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 2
+    sysPos:
+      source: House Davion
+      value: 2
     icon: green32
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -41,7 +45,7 @@ planet:
     temperature: 31
     water: 41
     lifeForm:
-      source: canon
+      source: House Davion
       value: MAMMAL
     desc: |-
       Most of the landmasses on Greeley are permanently covered by arctic tundra due in equal parts to the small sun that the planet orbits and the extreme axial tilt. The planet’s tilt also ensures that even the tropical equatorial region is often blanketed in snow due to blizzards sweeping in. The planet contains modest deposits of ores and other raw materials, but not enough for significant mining activities or any level of exporting.

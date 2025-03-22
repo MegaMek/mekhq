@@ -3,9 +3,11 @@ sucsId: 624
 xcood: -68.521
 ycood: 230.614
 spectralType:
-  source: canon
+  source: FedCom Civil War, pg. 196
   value: F8II
-primarySlot: 4
+primarySlot:
+  source: FedCom Civil War, pg. 196
+  value: 4
 event:
   - date: '2381-06-18'
     zenithCharge: yes
@@ -60,28 +62,32 @@ planet:
       value: Crimond
     type: TERRESTRIAL
     orbitalDist: 3.36
-    sysPos: 4
+    sysPos:
+      source: FedCom Civil War, pg. 196
+      value: 4
     icon: green5
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 196
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 196
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
-      value: 1.03
-    diameter: 11395
-    density: 6.331168886331
+      source: FedCom Civil War, pg. 196
+      value: 1.0
+    diameter: 11247
+    density: 6.248678137061
     dayLength: 21
     yearLength: 6.3
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 196
       value: 45
     water:
-      source: canon
+      source: FedCom Civil War, pg. 196
       value: 50
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 196
       value: MAMMAL
     desc: |-
       Crimond is a comfortable planet with abundant natural resources and extensive industry, very little of it is military industry. Despite a comfortable and warm, climate, the planet does not have extensive arable land and in fact the soil is nitrogen poor and filled with minerals that are toxic to most plants, as a result Crimond struggles to feed its population and often requires imported food from nearby systems.
@@ -89,19 +95,21 @@ planet:
       The continents of Chromatisch and Metallerz have been extensively surveyed and mined for natural minerals throughout the planet’s history. However, the smaller island continent of Condor has been more or less forgotten for most of the planet’s settled history. The Star League established Fort Beauord on Condor as a perfect location for the 54th Mechanized Infantry Division to undergo harsh environment training, taking advantage of the hot dry deserts and cold, wintry mountains that dominate Condor.
     landmass:
       - name:
-          source: canon
-          value: Condor
-      - name:
-          source: canon
+          source: FedCom Civil War, pg. 196
           value: Chromatisch
         capital:
-          source: canon
+          source: FedCom Civil War, pg. 196
           value: Sol City
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 196
+          value: Condor
+      - name:
+          source: FedCom Civil War, pg. 196
           value: Metallerz
     satellite:
-      - name: Osseous
+      - name:
+          source: FedCom Civil War, pg. 196
+          value: Osseous
         size: medium
         icon: rock16
     event:
