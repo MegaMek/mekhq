@@ -53,8 +53,8 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.io.File;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 public class RankSystemsPane extends AbstractMHQScrollPane {
     private static final MMLogger logger = MMLogger.create(RankSystemsPane.class);
@@ -519,10 +519,8 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
     // endregion Button Actions
 
     public void applyToCampaign() {
-        if (isChanged()) {
-            exportUserDataRankSystems(false);
-            Ranks.reinitializeRankSystems(getCampaign());
-            getCampaign().setRankSystem(getSelectedRankSystem());
-        }
+        exportUserDataRankSystems(false);
+        Ranks.reinitializeRankSystems(getCampaign());
+        getCampaign().setRankSystem(getSelectedRankSystem());
     }
 }
