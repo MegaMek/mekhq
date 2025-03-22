@@ -343,7 +343,10 @@ public class MekLabTab extends CampaignGuiTab {
 
         int walk = entity.getOriginalWalkMP();
         int run = entity.getRunMP(MPCalculationSetting.NO_MASC);
-        int jump = entity.getOriginalJumpMP();
+        String jump = entity.getOriginalJumpMP() + "";
+        if (entity instanceof Mek mek && mek.getOriginalMechanicalJumpBoosterMP() > 0) {
+            jump += " (%d)".formatted(mek.getOriginalMechanicalJumpBoosterMP());
+        }
         int heat = entity.getHeatCapacity();
 
         double totalHeat = calculateTotalHeat();
