@@ -59,7 +59,7 @@ public class PrisonerEscapeeScenarioDialog extends MHQDialogImmersive {
     public PrisonerEscapeeScenarioDialog(Campaign campaign, StratconTrackState track, StratconCoords coords) {
         super(campaign, campaign.getSeniorAdminPerson(COMMAND), null,
             createInCharacterMessage(campaign, track, coords), createButtons(),
-            createOutOfCharacterMessage(), null, false);
+            createOutOfCharacterMessage(), null, false, null, true);
     }
 
     /**

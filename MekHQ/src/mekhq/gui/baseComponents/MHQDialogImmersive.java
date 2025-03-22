@@ -39,6 +39,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.GlossaryDialog;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 import java.awt.*;
 import java.util.ArrayList;
@@ -78,9 +79,11 @@ public class MHQDialogImmersive extends JDialog {
 
     private JPanel northPanel;
     private JPanel southPanel;
-    private JPanel buttonPanel;
     private Person leftSpeaker;
     private Person rightSpeaker;
+
+    private JSpinner spinner;
+    private int spinnerValue;
 
     private int dialogChoice;
 
@@ -103,30 +106,55 @@ public class MHQDialogImmersive extends JDialog {
         return dialogChoice;
     }
 
+    public void setDialogChoice(int dialogChoice) {
+        this.dialogChoice = dialogChoice;
+    }
+
+    public int getSpinnerValue() {
+        return spinnerValue;
+    }
+
+    public void setSpinnerValue(int spinnerValue) {
+        this.spinnerValue = spinnerValue;
+    }
+
+    protected int getPADDING() {
+        return PADDING;
+    }
+
     /**
-     * Full constructor for initializing the immersive dialog with detailed layouts.
+     * Constructs and initializes an immersive dialog with configurable layouts, speakers, actions, and messages.
+     * <p>
+     * This dialog is designed to provide a rich, immersive interface featuring optional speakers on the
+     * left and right, a central message panel with configurable width, a spinner panel, and a list of actionable buttons.
+     * An optional out-of-character message can also be displayed below the buttons.
      *
-     * @param campaign The {@link Campaign} tied to the dialog.
-     * @param leftSpeaker Optional left-side {@link Person}; {@code null} if none.
-     * @param rightSpeaker Optional right-side {@link Person}; {@code null} if none.
-     * @param centerMessage The main message displayed in the dialog's center.
-     * @param buttons The list of {@link ButtonLabelTooltipPair} actions for the dialog.
-     * @param outOfCharacterMessage Optional out-of-character message below the buttons.
-     * @param centerWidth Optional width for the center panel; defaults if null.
+     * @param campaign The {@link Campaign} instance tied to the dialog, providing contextual information.
+     * @param leftSpeaker Optional left-side {@link Person}; use {@code null} if no left speaker is present.
+     * @param rightSpeaker Optional right-side {@link Person}; use {@code null} if no right speaker is present.
+     * @param centerMessage The main {@link String} message displayed in the center panel of the dialog.
+     * @param buttons A {@link List} of {@link ButtonLabelTooltipPair} instances representing actions available
+     *                in the dialog (displayed as buttons).
+     * @param outOfCharacterMessage An optional {@link String} message displayed below the buttons;
+     *                               use {@code null} if not applicable.
+     * @param centerWidth An optional width for the center panel; uses the default value if {@code null}.
+     * @param isVerticalLayout A {@code boolean} determining the button layout:
+     *                         {@code true} for vertical stacking, {@code false} for horizontal layout.
+     * @param spinnerPanel An optional {@link JPanel} containing a spinner widget to be displayed in the center panel;
+     *                     use {@code null} if not applicable.
      */
     public MHQDialogImmersive(Campaign campaign, @Nullable Person leftSpeaker,
                               @Nullable Person rightSpeaker, String centerMessage,
                               List<ButtonLabelTooltipPair> buttons, @Nullable String outOfCharacterMessage,
-                              @Nullable Integer centerWidth, boolean isVerticalLayout) {
+                              @Nullable Integer centerWidth, boolean isVerticalLayout,
+                              @Nullable JPanel spinnerPanel, boolean isModal) {
         // Initialize
         this.campaign = campaign;
         this.leftSpeaker = leftSpeaker;
         this.rightSpeaker = rightSpeaker;
+        spinner = new JSpinner();
 
         CENTER_WIDTH = (centerWidth != null) ? centerWidth : CENTER_WIDTH;
-
-        // Set the dialog to be undecorated (removes 'X', title bar, etc.)
-        setDefaultLookAndFeelDecorated(true);
 
         // Title
         setTitle();
@@ -154,7 +182,7 @@ public class MHQDialogImmersive extends JDialog {
         }
 
         // Center box for the message
-        JPanel pnlCenter = createCenterBox(centerMessage, buttons, isVerticalLayout);
+        JPanel pnlCenter = createCenterBox(centerMessage, buttons, isVerticalLayout, spinnerPanel);
         constraints.gridx = gridx;
         constraints.gridy = 0;
         constraints.weightx = 2;
@@ -195,7 +223,7 @@ public class MHQDialogImmersive extends JDialog {
         setSize(min(screenWidth, getWidth()), (int) min(getHeight(), screenHeight * 0.8));
 
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-        setModal(true);
+        setModal(isModal);
         setLocationRelativeTo(null); // Needs to be after pack
         setResizable(false);
         setVisible(true);
@@ -226,12 +254,12 @@ public class MHQDialogImmersive extends JDialog {
      * @return A {@link JPanel} with the message displayed in the center and buttons at the bottom.
      */
     private JPanel createCenterBox(String centerMessage, List<ButtonLabelTooltipPair> buttons,
-                                   boolean isVerticalLayout) {
+                                   boolean isVerticalLayout, @Nullable JPanel spinnerPanel) {
         northPanel = new JPanel(new BorderLayout());
 
         // Buttons panel
-        buttonPanel = new JPanel();
-        populateButtonPanel(buttons, isVerticalLayout);
+        JPanel buttonPanel = populateButtonPanel(buttons, isVerticalLayout, spinnerPanel);
+
 
         // Create a JEditorPane for the center message
         JEditorPane editorPane = new JEditorPane();
@@ -247,9 +275,7 @@ public class MHQDialogImmersive extends JDialog {
         setFontScaling(editorPane, false, 1.1);
         // Add a HyperlinkListener to capture hyperlink clicks
         editorPane.addHyperlinkListener(evt -> {
-            if (evt.getEventType() == EventType.ACTIVATED) {
-                handleImmersiveHyperlinkClick(this, campaign, evt.getDescription());
-            }
+            hyperlinkEventListenerActions(evt);
         });
 
         // Wrap the JEditorPane in a JScrollPane
@@ -348,9 +374,7 @@ public class MHQDialogImmersive extends JDialog {
 
         // Add a HyperlinkListener to capture hyperlink clicks
         editorPane.addHyperlinkListener(evt -> {
-            if (evt.getEventType() == EventType.ACTIVATED) {
-                handleImmersiveHyperlinkClick(this, campaign, evt.getDescription());
-            }
+            hyperlinkEventListenerActions(evt);
         });
 
         // Add the editor pane to the panel
@@ -361,20 +385,53 @@ public class MHQDialogImmersive extends JDialog {
     }
 
     /**
-     * Populates the button panel with the provided buttons.
-     * <p>
-     * Each button in the panel represents a {@link ButtonLabelTooltipPair}, defining its displayed label
-     * and optional tooltip. Clicking a button will set the {@code dialogChoice} to the corresponding index
-     * of the button in the list and close the dialog window.
+     * Handles actions triggered by hyperlink events, such as clicks on hyperlinks.
+     * This method identifies when the event type is {@code HyperlinkEvent.EventType.ACTIVATED}
+     * and processes the event accordingly by delegating to the specified handler.
      *
-     * @param buttons A list of button label-tooltip pairs defining the content of the buttons.
+     * @param evt the {@code HyperlinkEvent} which contains details about the hyperlink interaction.
+     *            It could represent events such as entering, exiting, or activating a hyperlink.
      */
-    private void populateButtonPanel(List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout) {
+    protected void hyperlinkEventListenerActions(HyperlinkEvent evt) {
+        if (evt.getEventType() == EventType.ACTIVATED) {
+            handleImmersiveHyperlinkClick(this, campaign, evt.getDescription());
+        }
+    }
+
+    /**
+     * Populates a button panel with a list of buttons, each defined by a label and an optional tooltip.
+     * <p>
+     * This method dynamically creates buttons based on the provided {@link ButtonLabelTooltipPair} objects.
+     * Each button is added to the specified {@link JPanel} (`buttonPanel`) and arranged according to the
+     * selected layout style (`isVerticalLayout`).
+     * </p>
+     *
+     * @param buttons A {@link List} of {@link ButtonLabelTooltipPair} instances,
+     *                where each pair defines the label and tooltip for a button.
+     * @param isVerticalLayout A {@code boolean} value indicating the layout style:
+     *                         {@code true} for vertical stacking, {@code false} for horizontal arrangement.
+     */
+    protected JPanel populateButtonPanel(List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout,
+                                         @Nullable JPanel spinnerPanel) {
+        final int padding = getPADDING();
+
+        // Main container panel to hold the spinner and button panel
+        JPanel containerPanel = new JPanel();
+        containerPanel.setLayout(new BorderLayout(padding, padding));
+
+        // Add the spinner panel to the top of the container
+        if (spinnerPanel != null) {
+            containerPanel.add(spinnerPanel, BorderLayout.NORTH);
+            fetchSpinnerFromPanel(spinnerPanel);
+        }
+
+        // Create button panel
+        JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.insets = new Insets(PADDING, PADDING, PADDING, PADDING);
+        gbc.insets = new Insets(padding, padding, padding, padding);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
 
@@ -392,7 +449,7 @@ public class MHQDialogImmersive extends JDialog {
                 String tooltip = buttonStrings.btnTooltip();
                 if (label != null && tooltip != null) {
                     buttonLabel.append("<b>").append(buttonStrings.btnLabel()).append("</b>")
-                        .append("<br>").append(tooltip);
+                          .append("<br>").append(tooltip);
                 } else if (label == null && tooltip != null) {
                     buttonLabel.append(tooltip);
                 } else if (label != null) {
@@ -426,7 +483,8 @@ public class MHQDialogImmersive extends JDialog {
 
             // Add action listener
             button.addActionListener(evt -> {
-                dialogChoice = buttons.indexOf(buttonStrings);
+                setDialogChoice(buttons.indexOf(buttonStrings));
+                setSpinnerValue((int) spinner.getValue());
                 dispose();
             });
 
@@ -466,7 +524,38 @@ public class MHQDialogImmersive extends JDialog {
                 }
             }
         }
+
+        // Add the button panel to the bottom of the container
+        containerPanel.add(buttonPanel, BorderLayout.CENTER);
+
+        return containerPanel;
     }
+
+    /**
+     * Retrieves the {@link JSpinner} contained within the specified {@link JPanel}.
+     * <p>
+     * This method iterates through all components in the given panel to find and return
+     * the first instance of {@link JSpinner}. If no such spinner is found, it logs an
+     * error and returns a new, empty {@link JSpinner} as a fallback.
+     * </p>
+     *
+     * @param spinnerPanel The {@link JPanel} to search for a {@link JSpinner}.
+     *                     Must not be {@code null}.
+     * @return The {@link JSpinner} instance found in the panel; if no {@link JSpinner}
+     *         is found, a new, default {@link JSpinner} is returned.
+     */
+    private JSpinner fetchSpinnerFromPanel(JPanel spinnerPanel) {
+        for (Component component : spinnerPanel.getComponents()) {
+            if (component instanceof JSpinner) {
+                spinner = (JSpinner) component;
+            }
+        }
+
+        // Return an empty JSpinner if one isn't found and log the error
+        logger.error("No JSpinner found in the provided panel.");
+        return new JSpinner();
+    }
+
 
     /**
      * Builds a panel for displaying a speaker's image, name, and role.

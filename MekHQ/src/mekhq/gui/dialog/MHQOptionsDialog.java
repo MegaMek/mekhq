@@ -175,6 +175,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         private JCheckBox chkNewDayAstechPoolFill;
         private JCheckBox chkNewDayMedicPoolFill;
         private JCheckBox chkNewDayMRMS;
+        private JCheckBox chkNewDayOptimizeMedicalAssignments;
         private JCheckBox chkNewDayForceIconOperationalStatus;
         private MMComboBox<ForceIconOperationalStatusStyle> comboNewDayForceIconOperationalStatusStyle;
         // endregion New Day
@@ -969,6 +970,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 chkNewDayMRMS.setToolTipText(resources.getString("chkNewDayMRMS.toolTipText"));
                 chkNewDayMRMS.setName("chkNewDayMRMS");
 
+                chkNewDayOptimizeMedicalAssignments = new JCheckBox(resources.getString("chkNewDayOptimizeMedicalAssignments.text"));
+                chkNewDayOptimizeMedicalAssignments.setToolTipText(resources.getString("chkNewDayOptimizeMedicalAssignments.toolTipText"));
+                chkNewDayOptimizeMedicalAssignments.setName("chkNewDayOptimizeMedicalAssignments.text");
+
                 chkNewDayForceIconOperationalStatus = new JCheckBox(
                                 resources.getString("chkNewDayForceIconOperationalStatus.text"));
                 chkNewDayForceIconOperationalStatus
@@ -1022,6 +1027,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                 .addComponent(chkNewDayAstechPoolFill)
                                                 .addComponent(chkNewDayMedicPoolFill)
                                                 .addComponent(chkNewDayMRMS)
+                                                .addComponent(chkNewDayOptimizeMedicalAssignments)
                                                 .addComponent(chkNewDayForceIconOperationalStatus)
                                                 .addGroup(layout.createParallelGroup(Alignment.LEADING)
                                                                 .addComponent(lblNewDayForceIconOperationalStatusStyle)
@@ -1034,6 +1040,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                 .addComponent(chkNewDayAstechPoolFill)
                                                 .addComponent(chkNewDayMedicPoolFill)
                                                 .addComponent(chkNewDayMRMS)
+                                                .addComponent(chkNewDayOptimizeMedicalAssignments)
                                                 .addComponent(chkNewDayForceIconOperationalStatus)
                                                 .addGroup(layout.createSequentialGroup()
                                                                 .addComponent(lblNewDayForceIconOperationalStatusStyle)
@@ -1493,6 +1500,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 MekHQ.getMHQOptions().setNewDayAstechPoolFill(chkNewDayAstechPoolFill.isSelected());
                 MekHQ.getMHQOptions().setNewDayMedicPoolFill(chkNewDayMedicPoolFill.isSelected());
                 MekHQ.getMHQOptions().setNewDayMRMS(chkNewDayMRMS.isSelected());
+                MekHQ.getMHQOptions().setNewDayOptimizeMedicalAssignments(chkNewDayOptimizeMedicalAssignments.isSelected());
                 MekHQ.getMHQOptions()
                                 .setNewDayForceIconOperationalStatus(chkNewDayForceIconOperationalStatus.isSelected());
                 MekHQ.getMHQOptions().setNewDayForceIconOperationalStatusStyle(
@@ -1654,7 +1662,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
                 chkNewDayAstechPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayAstechPoolFill());
                 chkNewDayMedicPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayMedicPoolFill());
-                chkNewDayMRMS.setSelected(MekHQ.getMHQOptions().getNewDayMRMS());
+                chkNewDayMRMS.setSelected(MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments());
+            chkNewDayOptimizeMedicalAssignments.setSelected(MekHQ.getMHQOptions().getNewDayMRMS());
                 if (chkNewDayForceIconOperationalStatus.isSelected() != MekHQ.getMHQOptions()
                                 .getNewDayForceIconOperationalStatus()) {
                         chkNewDayForceIconOperationalStatus.doClick();
