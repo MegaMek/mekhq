@@ -28,16 +28,15 @@
  */
 package mekhq.campaign.finances;
 
-import org.joda.money.BigMoney;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
 
+import org.joda.money.BigMoney;
+
 /**
- * This class represents an quantity of money and its associated
- * currency.
+ * This class represents a quantity of money and its associated currency.
  *
  * @author Vicente Cartas Espinel (vicente.cartas at outlook.com)
  */
@@ -162,12 +161,20 @@ public class Money implements Comparable<Money> {
     }
 
     public String toAmountAndSymbolString() {
-        return CurrencyManager.getInstance().getUiAmountAndSymbolPrinter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
+        return CurrencyManager.getInstance()
+                     .getUiAmountAndSymbolPrinter()
+                     .print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
     }
 
-    @Deprecated
+    /**
+     * @since 0.50.04
+     * @deprecated use {@link #toAmountAndSymbolString()} instead
+     */
+    @Deprecated(since = "0.50.04", forRemoval = true)
     public String toAmountAndNameString() {
-        return CurrencyManager.getInstance().getUiAmountAndNamePrinter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
+        return CurrencyManager.getInstance()
+                     .getUiAmountAndNamePrinter()
+                     .print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
     }
 
     /**
@@ -177,7 +184,7 @@ public class Money implements Comparable<Money> {
         return new Money(getWrapped().withScale(0, RoundingMode.HALF_UP));
     }
 
-    //region File I/O
+    // region File I/O
     public String toXmlString() {
         return CurrencyManager.getInstance().getXmlMoneyFormatter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
     }
@@ -185,7 +192,7 @@ public class Money implements Comparable<Money> {
     public static Money fromXmlString(String xmlData) {
         return new Money(CurrencyManager.getInstance().getXmlMoneyFormatter().parseBigMoney(xmlData));
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

@@ -27,6 +27,23 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
+import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
+import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Objects;
+import java.util.ResourceBundle;
+import javax.swing.*;
+import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.JSpinner.NumberEditor;
+
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -43,51 +60,36 @@ import mekhq.campaign.personnel.enums.Profession;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 
-import javax.swing.*;
-import javax.swing.JSpinner.DefaultEditor;
-import javax.swing.JSpinner.NumberEditor;
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Objects;
-import java.util.ResourceBundle;
-
-import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
-import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
-import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
-
 /**
  * @author Jay Lawson
  */
 public class HireBulkPersonnelDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(HireBulkPersonnelDialog.class);
 
-    private static final Insets ZERO_INSETS = new Insets(0, 0, 0, 0);
+    private static final Insets ZERO_INSETS    = new Insets(0, 0, 0, 0);
     private static final Insets DEFAULT_INSETS = new Insets(5, 5, 5, 5);
 
     private final Campaign campaign;
 
-    private JComboBox<PersonTypeItem> choiceType;
-    private JComboBox<RankDisplay> choiceRanks;
+    private JComboBox<PersonTypeItem>         choiceType;
+    private JComboBox<RankDisplay>            choiceRanks;
     private DefaultComboBoxModel<RankDisplay> rankModel;
-    private JSpinner spnNumber;
-    private JTextField jtf;
+    private JSpinner                          spnNumber;
+    private JTextField                        jtf;
 
     private JSpinner minAge;
     private JSpinner maxAge;
 
     private MMComboBox<SkillLevel> skillLevel;
 
-    private boolean useAge = false;
-    private boolean useSkill = false;
-    private int minAgeVal = 18;
-    private int maxAgeVal = 99;
+    private boolean useAge    = false;
+    private boolean useSkill  = false;
+    private int     minAgeVal = 18;
+    private int     maxAgeVal = 99;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
-            "mekhq.resources.HireBulkPersonnelDialog",
-            MekHQ.getMHQOptions().getLocale());
+          "mekhq.resources.HireBulkPersonnelDialog",
+          MekHQ.getMHQOptions().getLocale());
 
     public HireBulkPersonnelDialog(final JFrame frame, final boolean modal, final Campaign campaign) {
         super(frame, modal);
@@ -103,9 +105,9 @@ public class HireBulkPersonnelDialog extends JDialog {
 
     private static GridBagConstraints newConstraints(int xPos, int yPos, int fill) {
         GridBagConstraints result = new GridBagConstraints();
-        result.gridx = xPos;
-        result.gridy = yPos;
-        result.fill = fill;
+        result.gridx  = xPos;
+        result.gridy  = yPos;
+        result.fill   = fill;
         result.anchor = GridBagConstraints.WEST;
         result.insets = DEFAULT_INSETS;
         return result;
@@ -113,13 +115,13 @@ public class HireBulkPersonnelDialog extends JDialog {
 
     private void initComponents() {
 
-        choiceType = new JComboBox<>();
+        choiceType  = new JComboBox<>();
         choiceRanks = new JComboBox<>();
 
-        JButton btnHire = new JButton(resourceMap.getString("btnHire.text"));
-        JButton btnGmHire = new JButton(resourceMap.getString("btnGmHire.text"));
-        JButton btnClose = new JButton(resourceMap.getString("btnClose.text"));
-        JPanel panButtons = new JPanel(new GridBagLayout());
+        JButton btnHire    = new JButton(resourceMap.getString("btnHire.text"));
+        JButton btnGmHire  = new JButton(resourceMap.getString("btnGmHire.text"));
+        JButton btnClose   = new JButton(resourceMap.getString("btnClose.text"));
+        JPanel  panButtons = new JPanel(new GridBagLayout());
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
@@ -131,8 +133,8 @@ public class HireBulkPersonnelDialog extends JDialog {
 
         DefaultComboBoxModel<PersonTypeItem> personTypeModel = new DefaultComboBoxModel<>();
         for (final PersonnelRole personnelRole : PersonnelRole.getPrimaryRoles()) {
-            personTypeModel.addElement(
-                    new PersonTypeItem(personnelRole.getName(campaign.getFaction().isClan()), personnelRole));
+            personTypeModel.addElement(new PersonTypeItem(personnelRole.getName(campaign.getFaction().isClan()),
+                  personnelRole));
         }
         choiceType.setModel(personTypeModel);
         choiceType.setName("choiceType");
@@ -152,12 +154,12 @@ public class HireBulkPersonnelDialog extends JDialog {
         choiceRanks.setName("choiceRanks");
         refreshRanksCombo();
 
-        gridBagConstraints = newConstraints(1, 1, GridBagConstraints.HORIZONTAL);
+        gridBagConstraints         = newConstraints(1, 1, GridBagConstraints.HORIZONTAL);
         gridBagConstraints.weightx = 1.0;
         getContentPane().add(choiceRanks, gridBagConstraints);
 
-        int sn_min = 1;
-        SpinnerNumberModel sn = new SpinnerNumberModel(1, sn_min, CampaignGUI.MAX_QUANTITY_SPINNER, 1);
+        int                sn_min = 1;
+        SpinnerNumberModel sn     = new SpinnerNumberModel(1, sn_min, CampaignGUI.MAX_QUANTITY_SPINNER, 1);
         spnNumber = new JSpinner(sn);
         spnNumber.setEditor(new NumberEditor(spnNumber, "#")); // prevent digit grouping, e.g. 1,000
         jtf = ((DefaultEditor) spnNumber.getEditor()).getTextField();
@@ -194,7 +196,7 @@ public class HireBulkPersonnelDialog extends JDialog {
 
         getContentPane().add(new JLabel(resourceMap.getString("lblNumber.text")), newConstraints(0, 2));
 
-        gridBagConstraints = newConstraints(1, 2);
+        gridBagConstraints         = newConstraints(1, 2);
         gridBagConstraints.weightx = 1.0;
         getContentPane().add(spnNumber, gridBagConstraints);
 
@@ -205,12 +207,12 @@ public class HireBulkPersonnelDialog extends JDialog {
             // Age
             JSeparator sep = new JSeparator();
 
-            gridBagConstraints = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
+            gridBagConstraints           = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
             gridBagConstraints.gridwidth = 2;
             getContentPane().add(sep, gridBagConstraints);
             ++mainGridPos;
 
-            gridBagConstraints = newConstraints(0, mainGridPos);
+            gridBagConstraints         = newConstraints(0, mainGridPos);
             gridBagConstraints.weightx = 1.0;
 
             JCheckBox ageRangeCheck = new JCheckBox(resourceMap.getString("lblAgeRange.text"));
@@ -221,7 +223,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             });
             getContentPane().add(ageRangeCheck, gridBagConstraints);
 
-            gridBagConstraints = newConstraints(1, mainGridPos);
+            gridBagConstraints         = newConstraints(1, mainGridPos);
             gridBagConstraints.weightx = 1.0;
 
             JPanel ageRangePanel = new JPanel(new GridBagLayout());
@@ -256,11 +258,11 @@ public class HireBulkPersonnelDialog extends JDialog {
             ++mainGridPos;
 
             // Skill level
-            gridBagConstraints = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
+            gridBagConstraints           = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
             gridBagConstraints.gridwidth = 2;
             ++mainGridPos;
 
-            gridBagConstraints = newConstraints(0, mainGridPos);
+            gridBagConstraints         = newConstraints(0, mainGridPos);
             gridBagConstraints.weightx = 1.0;
 
             JCheckBox skillRangeCheck = new JCheckBox(resourceMap.getString("lblSkillLevel.text"));
@@ -270,7 +272,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             });
             getContentPane().add(skillRangeCheck, gridBagConstraints);
 
-            gridBagConstraints = newConstraints(1, mainGridPos);
+            gridBagConstraints         = newConstraints(1, mainGridPos);
             gridBagConstraints.weightx = 1.0;
 
             JPanel skillRangePanel = new JPanel(new GridBagLayout());
@@ -294,7 +296,7 @@ public class HireBulkPersonnelDialog extends JDialog {
         }
 
         btnHire.addActionListener(evt -> hire(false));
-        gridBagConstraints = newConstraints(0, 0);
+        gridBagConstraints        = newConstraints(0, 0);
         gridBagConstraints.insets = ZERO_INSETS;
 
         panButtons.add(btnHire, gridBagConstraints);
@@ -311,15 +313,21 @@ public class HireBulkPersonnelDialog extends JDialog {
         btnClose.addActionListener(evt -> setVisible(false));
         panButtons.add(btnClose, gridBagConstraints);
 
-        gridBagConstraints = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
+        gridBagConstraints           = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
         gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weightx   = 1.0;
         getContentPane().add(panButtons, gridBagConstraints);
 
         pack();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(HireBulkPersonnelDialog.class);
@@ -331,16 +339,17 @@ public class HireBulkPersonnelDialog extends JDialog {
     }
 
     private void hire(boolean isGmHire) {
-        int number = (Integer) spnNumber.getModel().getValue();
+        int            number       = (Integer) spnNumber.getModel().getValue();
         PersonTypeItem selectedItem = (PersonTypeItem) choiceType.getSelectedItem();
         if (selectedItem == null) {
             logger.error("Attempted to bulk hire for null PersonnelType!");
             return;
         }
 
-        LocalDate today = campaign.getLocalDate();
+        LocalDate today             = campaign.getLocalDate();
         LocalDate earliestBirthDate = today.minusYears(maxAgeVal + 1).plusDays(1);
-        final int days = Math.toIntExact(ChronoUnit.DAYS.between(earliestBirthDate, today.minusYears(minAgeVal)));
+        final int days              = Math.toIntExact(ChronoUnit.DAYS.between(earliestBirthDate,
+              today.minusYears(minAgeVal)));
 
         while (number > 0) {
             Person person = campaign.newPerson(selectedItem.getRole());
@@ -348,11 +357,15 @@ public class HireBulkPersonnelDialog extends JDialog {
             if ((useSkill) && (!selectedItem.getRole().isCivilian()) && (!selectedItem.getRole().isAssistant())) {
                 if (skillLevel.getSelectedItem() != null) {
                     RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
-                    boolean useExtraRandomness = randomSkillPreferences.randomizeSkill();
+                    boolean                useExtraRandomness     = randomSkillPreferences.randomizeSkill();
 
                     CampaignOptions campaignOptions = campaign.getCampaignOptions();
-                    overrideSkills(campaignOptions.isAdminsHaveNegotiation(), campaignOptions.isAdminsHaveScrounge(),
-                          useExtraRandomness, person, selectedItem.getRole(), skillLevel.getSelectedItem());
+                    overrideSkills(campaignOptions.isAdminsHaveNegotiation(),
+                          campaignOptions.isAdminsHaveScrounge(),
+                          useExtraRandomness,
+                          person,
+                          selectedItem.getRole(),
+                          skillLevel.getSelectedItem());
                 }
             }
 
@@ -394,14 +407,14 @@ public class HireBulkPersonnelDialog extends JDialog {
         // Determine correct profession to pass into the loop
         final PersonnelRole role = ((PersonTypeItem) Objects.requireNonNull(choiceType.getSelectedItem())).getRole();
         rankModel.addAll(RankDisplay.getRankDisplaysForSystem(campaign.getRankSystem(),
-                Profession.getProfessionFromPersonnelRole(role)));
+              Profession.getProfessionFromPersonnelRole(role)));
 
         choiceRanks.setModel(rankModel);
         choiceRanks.setSelectedIndex(0);
     }
 
     private static class PersonTypeItem {
-        private String name;
+        private String        name;
         private PersonnelRole role;
 
         public PersonTypeItem(String name, PersonnelRole role) {
