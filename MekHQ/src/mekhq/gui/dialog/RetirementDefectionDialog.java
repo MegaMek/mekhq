@@ -41,7 +41,6 @@ import java.awt.event.ActionListener;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -555,24 +554,26 @@ public class RetirementDefectionDialog extends JDialog {
     };
 
     private void initResults() {
-        List<UUID>      unassignedMeks = new ArrayList<>();
-        List<UUID>      unassignedASF  = new ArrayList<>();
+        // This and the below code is not referenced outside of this method and neither variables are used outside
+        //  adding units to the list.
+        // List<UUID>      unassignedMeks = new ArrayList<>();
+        // List<UUID>      unassignedASF  = new ArrayList<>();
         ArrayList<UUID> availableUnits = new ArrayList<>();
         hqView.getCampaign().getHangar().forEachUnit(u -> {
             if (!u.isAvailable() && !u.isMothballing() && !u.isMothballed()) {
                 return;
             }
             availableUnits.add(u.getId());
-            if (UnitType.MEK == u.getEntity().getUnitType()) {
-                if (null == u.getCommander()) {
-                    unassignedMeks.add(u.getId());
-                }
-            }
-            if (UnitType.AEROSPACEFIGHTER == u.getEntity().getUnitType()) {
-                if (null == u.getCommander()) {
-                    unassignedASF.add(u.getId());
-                }
-            }
+            // if (UnitType.MEK == u.getEntity().getUnitType()) {
+            //     if (null == u.getCommander()) {
+            //         unassignedMeks.add(u.getId());
+            //     }
+            // }
+            // if (UnitType.AEROSPACEFIGHTER == u.getEntity().getUnitType()) {
+            //     if (null == u.getCommander()) {
+            //         unassignedASF.add(u.getId());
+            //     }
+            // }
         });
 
         for (UUID id : rdTracker.getRetirees(contract)) {
