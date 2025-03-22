@@ -141,7 +141,15 @@ public class PatientTableModel extends AbstractListModel<Person> {
                 toReturn.append("<br>");
             }
 
-            toReturn.append(injury.getFluff()).append(" (").append(injury.getTime()).append(')');
+            toReturn.append(injury.getFluff()).append(" (");
+
+            if (injury.isPermanent()) {
+                toReturn.append('\u221E');
+            } else {
+                toReturn.append(injury.getTime());
+            }
+
+            toReturn.append(')');
         }
         toReturn.append("</div></html>");
         return toReturn.toString();
