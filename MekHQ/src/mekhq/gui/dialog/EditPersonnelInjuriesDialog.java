@@ -35,7 +35,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.ResourceBundle;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -65,35 +64,34 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 public class EditPersonnelInjuriesDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(EditPersonnelInjuriesDialog.class);
 
-    private JFrame frame;
-    private Campaign campaign;
-    private Person person;
+    private JFrame           frame;
+    private Campaign         campaign;
+    private Person           person;
     private InjuryTableModel injuryModel;
 
     private JButton btnEdit;
     private JButton btnDelete;
-    private JTable injuriesTable;
+    private JTable  injuriesTable;
 
-    public EditPersonnelInjuriesDialog(final JFrame frame, final boolean modal,
-            final Campaign campaign, final Person person) {
+    public EditPersonnelInjuriesDialog(final JFrame frame, final boolean modal, final Campaign campaign, final Person person) {
         super(frame, modal);
-        this.frame = frame;
+        this.frame    = frame;
         this.campaign = campaign;
-        this.person = person;
-        injuryModel = new InjuryTableModel(person.getInjuries());
+        this.person   = person;
+        injuryModel   = new InjuryTableModel(person.getInjuries());
         initComponents();
         setLocationRelativeTo(frame);
         setUserPreferences();
     }
 
     private void initComponents() {
-        JButton btnOK = new JButton();
+        JButton btnOK  = new JButton();
         JButton btnAdd = new JButton();
-        btnEdit = new JButton();
+        btnEdit   = new JButton();
         btnDelete = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelInjuriesDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("Form.title") + " " + person.getFullName());
@@ -119,7 +117,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         injuriesTable = new JTable(injuryModel);
         injuriesTable.setName("injuriesTable");
         TableColumn column;
-        int width = 0;
+        int         width = 0;
         for (int i = 0; i < InjuryTableModel.N_COL; i++) {
             column = injuriesTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(injuryModel.getColumnWidth(i));
@@ -145,7 +143,13 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         pack();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditPersonnelInjuriesDialog.class);
@@ -207,22 +211,21 @@ public class EditPersonnelInjuriesDialog extends JDialog {
     }
 
     /**
-     * A table model for displaying parts - similar to the one in CampaignGUI, but
-     * not exactly
+     * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
      */
     public static class InjuryTableModel extends AbstractTableModel {
-        protected String[] columnNames;
+        protected String[]     columnNames;
         protected List<Injury> data;
 
-        public final static int COL_DAYS = 0;
-        public final static int COL_LOCATION = 1;
-        public final static int COL_TYPE = 2;
-        public final static int COL_FLUFF = 3;
-        public final static int COL_HITS = 4;
+        public final static int COL_DAYS      = 0;
+        public final static int COL_LOCATION  = 1;
+        public final static int COL_TYPE      = 2;
+        public final static int COL_FLUFF     = 3;
+        public final static int COL_HITS      = 4;
         public final static int COL_PERMANENT = 5;
-        public final static int COL_WORKEDON = 6;
-        public final static int COL_EXTENDED = 7;
-        public final static int N_COL = 8;
+        public final static int COL_WORKEDON  = 6;
+        public final static int COL_EXTENDED  = 7;
+        public final static int N_COL         = 8;
 
         public InjuryTableModel(List<Injury> entries) {
             data = entries;
@@ -240,26 +243,17 @@ public class EditPersonnelInjuriesDialog extends JDialog {
 
         @Override
         public String getColumnName(int column) {
-            switch (column) {
-                case COL_DAYS:
-                    return "Days Remaining";
-                case COL_LOCATION:
-                    return "Location on Body";
-                case COL_TYPE:
-                    return "Type of Injury";
-                case COL_FLUFF:
-                    return "Fluff Message";
-                case COL_HITS:
-                    return "Number of Hits";
-                case COL_PERMANENT:
-                    return "Is Permanent";
-                case COL_WORKEDON:
-                    return "Doctor Has Worked On";
-                case COL_EXTENDED:
-                    return "Was Extended Time";
-                default:
-                    return "?";
-            }
+            return switch (column) {
+                case COL_DAYS -> "Days Remaining";
+                case COL_LOCATION -> "Location on Body";
+                case COL_TYPE -> "Type of Injury";
+                case COL_FLUFF -> "Fluff Message";
+                case COL_HITS -> "Number of Hits";
+                case COL_PERMANENT -> "Is Permanent";
+                case COL_WORKEDON -> "Doctor Has Worked On";
+                case COL_EXTENDED -> "Was Extended Time";
+                default -> "?";
+            };
         }
 
         @Override
@@ -271,31 +265,17 @@ public class EditPersonnelInjuriesDialog extends JDialog {
                 entry = data.get(row);
             }
 
-            switch (col) {
-                case COL_DAYS:
-                    return Integer.toString(entry.getTime());
-                case COL_LOCATION:
-                    return entry.getLocationName();
-                case COL_TYPE:
-                    return entry.getType().getName(entry.getLocation(), entry.getHits());
-                case COL_FLUFF:
-                    return entry.getFluff();
-                case COL_HITS:
-                    return Integer.toString(entry.getHits());
-                case COL_PERMANENT:
-                    return Boolean.toString(entry.isPermanent());
-                case COL_WORKEDON:
-                    return Boolean.toString(entry.isWorkedOn());
-                case COL_EXTENDED:
-                    return Boolean.toString(entry.getExtended());
-                default:
-                    return "?";
-            }
-        }
-
-        @Override
-        public boolean isCellEditable(int row, int col) {
-            return false;
+            return switch (col) {
+                case COL_DAYS -> Integer.toString(entry.getTime());
+                case COL_LOCATION -> entry.getLocationName();
+                case COL_TYPE -> entry.getType().getName(entry.getLocation(), entry.getHits());
+                case COL_FLUFF -> entry.getFluff();
+                case COL_HITS -> Integer.toString(entry.getHits());
+                case COL_PERMANENT -> Boolean.toString(entry.isPermanent());
+                case COL_WORKEDON -> Boolean.toString(entry.isWorkedOn());
+                case COL_EXTENDED -> Boolean.toString(entry.getExtended());
+                default -> "?";
+            };
         }
 
         @Override
@@ -308,34 +288,19 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         }
 
         public int getColumnWidth(int c) {
-            switch (c) {
-                case COL_DAYS:
-                case COL_HITS:
-                case COL_PERMANENT:
-                case COL_WORKEDON:
-                case COL_EXTENDED:
-                    return 110;
-                case COL_TYPE:
-                    return 150;
-                case COL_FLUFF:
-                case COL_LOCATION:
-                    return 200;
-                default:
-                    return 50;
-            }
+            return switch (c) {
+                case COL_DAYS, COL_HITS, COL_PERMANENT, COL_WORKEDON, COL_EXTENDED -> 110;
+                case COL_TYPE -> 150;
+                case COL_FLUFF, COL_LOCATION -> 200;
+                default -> 50;
+            };
         }
 
         public int getAlignment(int col) {
-            switch (col) {
-                case COL_DAYS:
-                case COL_HITS:
-                case COL_PERMANENT:
-                case COL_WORKEDON:
-                case COL_EXTENDED:
-                    return SwingConstants.CENTER;
-                default:
-                    return SwingConstants.LEFT;
-            }
+            return switch (col) {
+                case COL_DAYS, COL_HITS, COL_PERMANENT, COL_WORKEDON, COL_EXTENDED -> SwingConstants.CENTER;
+                default -> SwingConstants.LEFT;
+            };
         }
 
         public String getTooltip(int row, int col) {
@@ -354,9 +319,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
 
         public class Renderer extends DefaultTableCellRenderer {
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus,
-                    int row, int column) {
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setOpaque(true);
                 int actualCol = table.convertColumnIndexToModel(column);

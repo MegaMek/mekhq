@@ -36,7 +36,6 @@ import java.awt.event.FocusListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ResourceBundle;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
@@ -61,13 +60,13 @@ import mekhq.gui.utilities.JMoneyTextField;
 public class AddFundsDialog extends JDialog implements FocusListener {
     private static final MMLogger logger = MMLogger.create(AddFundsDialog.class);
 
-    private JButton btnAddFunds;
-    private JMoneyTextField fundsQuantityField;
-    private JFormattedTextField descriptionField;
-    private MMComboBox<TransactionType> categoryCombo;
-    private int closedType = JOptionPane.CLOSED_OPTION;
-    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog",
-            MekHQ.getMHQOptions().getLocale());
+    private                 JMoneyTextField             fundsQuantityField;
+    private                 JFormattedTextField         descriptionField;
+    private                 MMComboBox<TransactionType> categoryCombo;
+    private                 int                         closedType  = JOptionPane.CLOSED_OPTION;
+    private final transient ResourceBundle              resourceMap = ResourceBundle.getBundle(
+          "mekhq.resources.AddFundsDialog",
+          MekHQ.getMHQOptions().getLocale());
 
     public AddFundsDialog(final JFrame frame, final boolean modal) {
         super(frame, modal);
@@ -80,7 +79,7 @@ public class AddFundsDialog extends JDialog implements FocusListener {
         setName("Form");
         setTitle(resourceMap.getString("Form.title"));
 
-        btnAddFunds = new JButton();
+        JButton btnAddFunds = new JButton();
         btnAddFunds.setText(resourceMap.getString("btnAddFunds.text"));
         btnAddFunds.setActionCommand(resourceMap.getString("btnAddFunds.actionCommand"));
         btnAddFunds.setName("btnAddFunds");
@@ -92,8 +91,14 @@ public class AddFundsDialog extends JDialog implements FocusListener {
         setLocationRelativeTo(getParent());
         pack();
     }
-
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+ 
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(AddFundsDialog.class);

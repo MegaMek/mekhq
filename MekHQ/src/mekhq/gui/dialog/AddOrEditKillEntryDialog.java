@@ -28,6 +28,25 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.WindowConstants;
+
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -38,35 +57,29 @@ import mekhq.campaign.Kill;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.time.LocalDate;
-import java.util.*;
-
 /**
  * @author Taharqa
  */
 public class AddOrEditKillEntryDialog extends JDialog {
-    private static final int ADD_OPERATION = 1;
+    private static final int ADD_OPERATION  = 1;
     private static final int EDIT_OPERATION = 2;
 
-    private final JFrame frame;
-    private final int operationType;
-    private Kill kill;
-    private LocalDate date;
-    private final int missionId;
-    private final int scenarioId;
-    private final int forceId;
-    private final Campaign campaign;
+    private final JFrame    frame;
+    private final int       operationType;
+    private       Kill      kill;
+    private       LocalDate date;
+    private final int       missionId;
+    private final int       scenarioId;
+    private final int       forceId;
+    private final Campaign  campaign;
 
-    private JTextField txtKill;
-    private JTextField txtKiller;
-    private JButton btnDate;
+    private JTextField          txtKill;
+    private JTextField          txtKiller;
+    private JButton             btnDate;
     private MMComboBox<Mission> cboMissionId;
-    private ArrayList<Integer> missionIdList;
-    private MMComboBox<String> cboScenarioId;
-    private ArrayList<Integer> scenarioIdList;
+    private ArrayList<Integer>  missionIdList;
+    private MMComboBox<String>  cboScenarioId;
+    private ArrayList<Integer>  scenarioIdList;
 
     private static final MMLogger logger = MMLogger.create(AddOrEditKillEntryDialog.class);
 
@@ -84,12 +97,12 @@ public class AddOrEditKillEntryDialog extends JDialog {
 
         campaign = c;
 
-        this.frame = parent;
-        this.kill = Objects.requireNonNull(kill);
-        this.date = this.kill.getDate();
-        this.missionId = this.kill.getMissionId();
-        this.scenarioId = this.kill.getScenarioId();
-        this.forceId = this.kill.getForceId();
+        this.frame         = parent;
+        this.kill          = Objects.requireNonNull(kill);
+        this.date          = this.kill.getDate();
+        this.missionId     = this.kill.getMissionId();
+        this.scenarioId    = this.kill.getScenarioId();
+        this.forceId       = this.kill.getForceId();
         this.operationType = operationType;
         initComponents();
         setLocationRelativeTo(parent);
@@ -104,7 +117,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         GridBagConstraints gridBagConstraints;
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditKillEntryDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         if (this.operationType == ADD_OPERATION) {
@@ -116,83 +129,83 @@ public class AddOrEditKillEntryDialog extends JDialog {
 
         JLabel lblKill = new JLabel();
         lblKill.setText(resourceMap.getString("lblKill.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(lblKill, gridBagConstraints);
 
         txtKill = new JTextField();
         txtKill.setText(kill.getWhatKilled());
         txtKill.setMinimumSize(new Dimension(150, 28));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(txtKill, gridBagConstraints);
 
         JLabel lblKiller = new JLabel();
         lblKiller.setText(resourceMap.getString("lblKiller.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(lblKiller, gridBagConstraints);
 
         txtKiller = new JTextField();
         txtKiller.setText(kill.getKilledByWhat());
         txtKiller.setMinimumSize(new Dimension(150, 28));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(txtKiller, gridBagConstraints);
 
         JLabel lblDate = new JLabel();
         lblDate.setText(resourceMap.getString("lblDate.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 2;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(lblDate, gridBagConstraints);
 
         btnDate = new JButton();
         btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         btnDate.setName("btnDate");
         btnDate.addActionListener(evt -> changeDate());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 2;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
         getContentPane().add(btnDate, gridBagConstraints);
 
         JLabel lblMissionId = new JLabel();
         lblMissionId.setText(resourceMap.getString("lblMissionId.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 3;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(lblMissionId, gridBagConstraints);
 
-        cboMissionId = new MMComboBox<>("cboMissionId");
+        cboMissionId  = new MMComboBox<>("cboMissionId");
         missionIdList = createIdList(true);
         for (int id : missionIdList) {
             if (id == 0) {
@@ -207,80 +220,91 @@ public class AddOrEditKillEntryDialog extends JDialog {
             cboMissionId.setSelectedItem(campaign.getMission(missionId));
         }
         cboMissionId.setMinimumSize(new Dimension(150, 28));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 3;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(cboMissionId, gridBagConstraints);
 
         JLabel lblScenarioId = new JLabel();
         lblScenarioId.setText(resourceMap.getString("lblScenarioId.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 4;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(lblScenarioId, gridBagConstraints);
 
-        cboScenarioId = new MMComboBox<>("cboScenarioId");
+        cboScenarioId  = new MMComboBox<>("cboScenarioId");
         scenarioIdList = createIdList(false);
         for (int id : scenarioIdList) {
             if (id == 0) {
                 cboScenarioId.addItem(null);
             } else {
-                cboScenarioId.addItem("(" + campaign.getScenario(id).getDate() + ") " + campaign.getScenario(id).getName());
+                cboScenarioId.addItem("(" +
+                                      campaign.getScenario(id).getDate() +
+                                      ") " +
+                                      campaign.getScenario(id).getName());
             }
         }
 
         // if scenarioId is valid, default to the option matching scenarioId
         if (campaign.getScenario(scenarioId) != null) {
-            cboScenarioId.setSelectedItem("(" + campaign.getScenario(scenarioId).getDate() + ") "
-                    + campaign.getScenario(scenarioId).getName());
+            cboScenarioId.setSelectedItem("(" +
+                                          campaign.getScenario(scenarioId).getDate() +
+                                          ") " +
+                                          campaign.getScenario(scenarioId).getName());
         }
         cboScenarioId.setMinimumSize(new Dimension(150, 28));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 4;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(cboScenarioId, gridBagConstraints);
 
         JButton btnOK = new JButton();
         btnOK.setText(resourceMap.getString("btnOK.text"));
         btnOK.setName("btnOK");
         btnOK.addActionListener(this::btnOKActionPerformed);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 5;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.EAST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(btnOK, gridBagConstraints);
 
         JButton btnClose = new JButton();
         btnClose.setText(resourceMap.getString("btnClose.text"));
         btnClose.setName("btnClose");
         btnClose.addActionListener(this::btnCloseActionPerformed);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 5;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(btnClose, gridBagConstraints);
 
         pack();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(AddOrEditKillEntryDialog.class);
@@ -309,11 +333,13 @@ public class AddOrEditKillEntryDialog extends JDialog {
             kill.setScenarioId(scenarioIdList.get(cboScenarioId.getSelectedIndex()));
         }
 
-        // we attempt to log the Force ID, but there is a lot of information that could potentially be missing.
+        // we attempt to log the Force ID, but there is a lot of information that could
+        // potentially be missing.
         if (forceId == -1) {
             try {
                 kill.setForceId(campaign.getPerson(kill.getPilotId()).getUnit().getForceId());
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         this.setVisible(false);

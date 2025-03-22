@@ -39,7 +39,6 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ResourceBundle;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -62,19 +61,19 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
 
     private Transaction oldTransaction;
     private Transaction newTransaction;
-    private JFrame parent;
+    private JFrame      parent;
 
-    private JMoneyTextField amountField;
-    private JTextField descriptionField;
-    private JButton dateButton;
+    private JMoneyTextField             amountField;
+    private JTextField                  descriptionField;
+    private JButton                     dateButton;
     private MMComboBox<TransactionType> categoryCombo;
 
     private JButton saveButton;
     private JButton cancelButton;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
-            "mekhq.resources.EditTransactionDialog",
-            MekHQ.getMHQOptions().getLocale());
+          "mekhq.resources.EditTransactionDialog",
+          MekHQ.getMHQOptions().getLocale());
 
     public EditTransactionDialog(JFrame parent, Transaction transaction, boolean modal) {
         super(parent, modal);
@@ -82,7 +81,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
         // it to the dialog
         oldTransaction = new Transaction(transaction);
         newTransaction = transaction;
-        this.parent = parent;
+        this.parent    = parent;
 
         initGUI();
         setTitle(resourceMap.getString("dialog.title"));
@@ -97,7 +96,13 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
         add(buildButtonPanel(), BorderLayout.SOUTH);
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditTransactionDialog.class);
@@ -112,15 +117,15 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
         JPanel panel = new JPanel();
 
         GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 0;
+        c.gridx      = 0;
+        c.gridy      = 0;
         c.gridheight = 1;
-        c.gridwidth = 1;
-        c.anchor = GridBagConstraints.BASELINE;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 0;
-        c.weighty = 0;
-        c.insets = new Insets(2, 2, 2, 2);
+        c.gridwidth  = 1;
+        c.anchor     = GridBagConstraints.BASELINE;
+        c.fill       = GridBagConstraints.HORIZONTAL;
+        c.weightx    = 0;
+        c.weighty    = 0;
+        c.insets     = new Insets(2, 2, 2, 2);
 
         GridBagLayout l = new GridBagLayout();
         panel.setLayout(l);
@@ -201,6 +206,11 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
         return oldTransaction;
     }
 
+    /**
+     * @since 0.50.04
+     * @deprecated No indicated uses
+     */
+    @Deprecated(since = "0.50.04", forRemoval = true)
     public Transaction getNewTransaction() {
         return newTransaction;
     }

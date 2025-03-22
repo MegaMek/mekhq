@@ -32,7 +32,6 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.util.ResourceBundle;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -47,16 +46,14 @@ import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 
 /**
- * Provides an editor for the number of hits sustained by a person, when
- * advanced medical rules are
- * not in use.
+ * Provides an editor for the number of hits sustained by a person, when advanced medical rules are not in use.
  */
 public class EditPersonnelHitsDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(EditPersonnelHitsDialog.class);
 
-    private Person person;
-    private JButton btnOK;
-    private JSpinner spinnerHits;
+    private Person             person;
+    private JButton            btnOK;
+    private JSpinner           spinnerHits;
     private SpinnerNumberModel spinnerModel;
 
     public EditPersonnelHitsDialog(final Frame frame, final boolean modal, final Person person) {
@@ -69,10 +66,10 @@ public class EditPersonnelHitsDialog extends JDialog {
 
     private void initComponents() {
         spinnerHits = new JSpinner();
-        btnOK = new JButton();
+        btnOK       = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelHitsDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("Form.title") + ' ' + person.getFullName());
@@ -81,9 +78,8 @@ public class EditPersonnelHitsDialog extends JDialog {
 
         spinnerModel = new SpinnerNumberModel(person.getHits(), 0, 5, 1);
         spinnerHits.setModel(spinnerModel);
-        spinnerHits.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("spinnerHits.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        spinnerHits.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
+              "spinnerHits.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         getContentPane().add(spinnerHits, BorderLayout.CENTER);
 
         btnOK.setText(resourceMap.getString("btnOK.text"));
@@ -94,7 +90,13 @@ public class EditPersonnelHitsDialog extends JDialog {
         pack();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditPersonnelHitsDialog.class);

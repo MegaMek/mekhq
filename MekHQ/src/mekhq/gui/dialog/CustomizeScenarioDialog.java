@@ -44,7 +44,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
-
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableColumn;
@@ -76,36 +75,36 @@ public class CustomizeScenarioDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(CustomizeScenarioDialog.class);
 
     // region Variable declarations
-    private JFrame frame;
-    private Scenario scenario;
-    private Mission mission;
-    private Campaign campaign;
-    private boolean newScenario;
-    private LocalDate date;
+    private JFrame                  frame;
+    private Scenario                scenario;
+    private Mission                 mission;
+    private Campaign                campaign;
+    private boolean                 newScenario;
+    private LocalDate               date;
     private ScenarioDeploymentLimit deploymentLimits;
-    private PlanetaryConditions planetaryConditions;
-    private Player player;
-    private List<BotForce> botForces;
+    private PlanetaryConditions     planetaryConditions;
+    private Player                  player;
+    private List<BotForce>          botForces;
 
     // map parameters
-    private int mapSizeX;
-    private int mapSizeY;
-    private String map;
+    private int     mapSizeX;
+    private int     mapSizeY;
+    private String  map;
     private boolean usingFixedMap;
-    private int boardType;
+    private int     boardType;
 
     // objectives
     private List<ScenarioObjective> objectives;
-    private JTable objectiveTable;
-    private ObjectiveTableModel objectiveModel;
+    private JTable                  objectiveTable;
+    private ObjectiveTableModel     objectiveModel;
 
     // loot
     private ArrayList<Loot> loots;
-    private JTable lootTable;
-    private LootTableModel lootModel;
+    private JTable          lootTable;
+    private LootTableModel  lootModel;
 
     // other forces
-    private JTable forcesTable;
+    private JTable             forcesTable;
     private BotForceTableModel forcesModel;
 
     // panels
@@ -134,11 +133,11 @@ public class CustomizeScenarioDialog extends JDialog {
     private JLabel lblMapSize;
     // end: labels
 
-    // textfields
+    // text fields
     private JTextField txtName;
 
-    // comboboxes
-    private JComboBox<String> modifierBox;
+    // combo boxes
+    private JComboBox<String>         modifierBox;
     private JComboBox<ScenarioStatus> choiceStatus;
 
     // buttons
@@ -159,13 +158,13 @@ public class CustomizeScenarioDialog extends JDialog {
 
     public CustomizeScenarioDialog(JFrame parent, boolean modal, Scenario s, Mission m, Campaign c) {
         super(parent, modal);
-        this.frame = parent;
+        this.frame   = parent;
         this.mission = m;
         if (null == s) {
-            scenario = new Scenario("New Scenario");
+            scenario    = new Scenario("New Scenario");
             newScenario = true;
         } else {
-            scenario = s;
+            scenario    = s;
             newScenario = false;
         }
         campaign = c;
@@ -200,11 +199,11 @@ public class CustomizeScenarioDialog extends JDialog {
         }
         objectiveModel = new ObjectiveTableModel(objectives);
 
-        map = scenario.getMap();
-        mapSizeX = scenario.getMapSizeX();
-        mapSizeY = scenario.getMapSizeY();
+        map           = scenario.getMap();
+        mapSizeX      = scenario.getMapSizeX();
+        mapSizeY      = scenario.getMapSizeY();
         usingFixedMap = scenario.isUsingFixedMap();
-        boardType = scenario.getBoardType();
+        boardType     = scenario.getBoardType();
 
         initComponents();
         setLocationRelativeTo(parent);
@@ -215,7 +214,7 @@ public class CustomizeScenarioDialog extends JDialog {
     private void initComponents() {
         getContentPane().setLayout(new BorderLayout());
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeScenarioDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         if (newScenario) {
@@ -226,31 +225,31 @@ public class CustomizeScenarioDialog extends JDialog {
 
         JTabbedPane panTabs = new JTabbedPane();
 
-        JPanel panBasic = new JPanel(new GridBagLayout());
+        JPanel panBasic   = new JPanel(new GridBagLayout());
         JPanel panRewards = new JPanel(new GridLayout(2, 0));
 
-        JPanel panInfo = new JPanel(new GridBagLayout());
+        JPanel panInfo  = new JPanel(new GridBagLayout());
         JPanel panWrite = new JPanel(new GridBagLayout());
-        JPanel panBtn = new JPanel(new FlowLayout());
+        JPanel panBtn   = new JPanel(new FlowLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridx     = 0;
+        gbc.gridy     = 0;
         gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor    = GridBagConstraints.NORTHWEST;
+        gbc.insets    = new Insets(5, 5, 5, 5);
         panInfo.add(new JLabel(resourceMap.getString("lblName.text")), gbc);
 
         txtName = new JTextField();
         txtName.setText(scenario.getName());
-        gbc.gridx = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx  = 1;
+        gbc.fill   = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         panInfo.add(txtName, gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
-        gbc.fill = GridBagConstraints.NONE;
+        gbc.fill   = GridBagConstraints.NONE;
         gbc.insets = new Insets(5, 5, 0, 0);
         panInfo.add(new JLabel(resourceMap.getString("lblStatus.text")), gbc);
 
@@ -258,9 +257,7 @@ public class CustomizeScenarioDialog extends JDialog {
         choiceStatus.setSelectedItem(scenario.getStatus());
         choiceStatus.setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                    final int index, final boolean isSelected,
-                    final boolean cellHasFocus) {
+            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof ScenarioStatus) {
                     list.setToolTipText(((ScenarioStatus) value).getToolTipText());
@@ -268,7 +265,7 @@ public class CustomizeScenarioDialog extends JDialog {
                 return this;
             }
         });
-        gbc.gridx = 1;
+        gbc.gridx  = 1;
         gbc.insets = new Insets(5, 5, 0, 0);
         choiceStatus.setEnabled(!scenario.getStatus().isCurrent());
         panInfo.add(choiceStatus, gbc);
@@ -276,28 +273,28 @@ public class CustomizeScenarioDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 1;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets    = new Insets(5, 5, 5, 5);
         panInfo.add(new JLabel(resourceMap.getString("lblDate.text")), gbc);
 
         btnDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         btnDate.addActionListener(evt -> changeDate());
-        gbc.gridx = 1;
+        gbc.gridx     = 1;
         gbc.gridwidth = 1;
-        gbc.insets = new Insets(5, 5, 0, 0);
+        gbc.insets    = new Insets(5, 5, 0, 0);
         panInfo.add(btnDate, gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 1;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets    = new Insets(5, 5, 5, 5);
         panInfo.add(new JLabel(resourceMap.getString("lblDeployment.text")), gbc);
 
         btnDeployment = new JButton(Utilities.getDeploymentString(player));
         btnDeployment.setEnabled(scenario.getStatus().isCurrent());
         btnDeployment.addActionListener(evt -> changeDeployment());
-        gbc.gridx = 1;
+        gbc.gridx     = 1;
         gbc.gridwidth = 1;
-        gbc.insets = new Insets(5, 5, 0, 0);
+        gbc.insets    = new Insets(5, 5, 0, 0);
         panInfo.add(btnDeployment, gbc);
 
         if (scenario.getStatus().isCurrent() && (scenario instanceof AtBDynamicScenario)) {
@@ -306,8 +303,9 @@ public class CustomizeScenarioDialog extends JDialog {
             gbc.gridwidth = 1;
 
             modifierBox = new JComboBox<>();
-            EventTiming scenarioState = scenario.getNumBots() > 0 ? EventTiming.PostForceGeneration
-                    : EventTiming.PreForceGeneration;
+            EventTiming scenarioState = scenario.getNumBots() > 0 ?
+                                              EventTiming.PostForceGeneration :
+                                              EventTiming.PreForceGeneration;
 
             for (String modifierKey : AtBScenarioModifier.getOrderedModifierKeys()) {
                 if (AtBScenarioModifier.getScenarioModifier(modifierKey).getEventTiming() == scenarioState) {
@@ -326,8 +324,8 @@ public class CustomizeScenarioDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 2;
-        gbc.weightx = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx   = 1.0;
+        gbc.fill      = GridBagConstraints.HORIZONTAL;
         panInfo.add(panDeploymentLimits, gbc);
 
         initPlanetaryConditionsPanel(resourceMap);
@@ -342,16 +340,14 @@ public class CustomizeScenarioDialog extends JDialog {
         initObjectivesPanel(resourceMap);
         panObjectives.setPreferredSize(new Dimension(400, 150));
         panObjectives.setMinimumSize(new Dimension(400, 150));
-        panObjectives.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("panObjectives.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        panObjectives.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
+              "panObjectives.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         initLootPanel(resourceMap);
         panLoot.setPreferredSize(new Dimension(400, 150));
         panLoot.setMinimumSize(new Dimension(400, 150));
-        panLoot.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("panLoot.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        panLoot.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
+              "panLoot.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         initOtherForcesPanel(resourceMap);
         panOtherForces.setPreferredSize(new Dimension(600, 300));
@@ -361,15 +357,15 @@ public class CustomizeScenarioDialog extends JDialog {
         txtDesc.setText(scenario.getDescription());
         txtDesc.setMinimumSize(new Dimension(400, 100));
         txtDesc.setPreferredSize(new Dimension(400, 250));
-        gbc = new GridBagConstraints();
+        gbc       = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 1;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.weightx   = 1.0;
+        gbc.weighty   = 1.0;
+        gbc.fill      = GridBagConstraints.BOTH;
+        gbc.anchor    = GridBagConstraints.NORTHWEST;
+        gbc.insets    = new Insets(5, 5, 5, 5);
         panWrite.add(txtDesc, gbc);
 
         if (!scenario.getStatus().isCurrent()) {
@@ -380,11 +376,11 @@ public class CustomizeScenarioDialog extends JDialog {
             gbc.gridx = 0;
             gbc.gridy++;
             gbc.gridwidth = 1;
-            gbc.weightx = 1.0;
-            gbc.weighty = 1.0;
-            gbc.fill = GridBagConstraints.BOTH;
-            gbc.anchor = GridBagConstraints.NORTHWEST;
-            gbc.insets = new Insets(5, 5, 5, 5);
+            gbc.weightx   = 1.0;
+            gbc.weighty   = 1.0;
+            gbc.fill      = GridBagConstraints.BOTH;
+            gbc.anchor    = GridBagConstraints.NORTHWEST;
+            gbc.insets    = new Insets(5, 5, 5, 5);
             panWrite.add(txtReport, gbc);
             txtReport.setEnabled(!scenario.getStatus().isCurrent());
         }
@@ -394,8 +390,8 @@ public class CustomizeScenarioDialog extends JDialog {
             btnLoad.addActionListener(this::btnLoadActionPerformed);
             panBtn.add(btnLoad);
         } else if ((mission instanceof AtBContract) &&
-                (scenario instanceof AtBDynamicScenario) &&
-                (scenario.getStatus().isCurrent())) {
+                   (scenario instanceof AtBDynamicScenario) &&
+                   (scenario.getStatus().isCurrent())) {
             JButton btnFinalize = new JButton();
 
             if (scenario.getNumBots() > 0) {
@@ -416,16 +412,16 @@ public class CustomizeScenarioDialog extends JDialog {
         btnClose.addActionListener(this::btnCloseActionPerformed);
         panBtn.add(btnClose);
 
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc         = new GridBagConstraints();
+        gbc.gridx   = 0;
+        gbc.gridy   = 0;
         gbc.weightx = 0.0;
         gbc.weighty = 1.0;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor  = GridBagConstraints.NORTHWEST;
+        gbc.fill    = GridBagConstraints.BOTH;
         panBasic.add(panInfo, gbc);
-        gbc.gridx = 1;
-        gbc.gridy = 0;
+        gbc.gridx   = 1;
+        gbc.gridy   = 0;
         gbc.weightx = 1.0;
         panBasic.add(panWrite, gbc);
 
@@ -442,7 +438,13 @@ public class CustomizeScenarioDialog extends JDialog {
         pack();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CustomizeScenarioDialog.class);
@@ -456,8 +458,8 @@ public class CustomizeScenarioDialog extends JDialog {
     private void btnOKActionPerformed(ActionEvent evt) {
         scenario.setName(txtName.getText());
         scenario.setDesc(txtDesc.getText());
-        if (!scenario.getStatus().isCurrent()
-                || (campaign.getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario))) {
+        if (!scenario.getStatus().isCurrent() ||
+            (campaign.getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario))) {
             if (txtReport != null) {
                 scenario.setReport(txtReport.getText());
             }
@@ -496,13 +498,16 @@ public class CustomizeScenarioDialog extends JDialog {
         ScenarioTemplate scenarioTemplate = ScenarioTemplate.Deserialize(file);
 
         if (scenarioTemplate == null) {
-            JOptionPane.showMessageDialog(this, "Error loading specified file. See log for details.", "Load Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                  "Error loading specified file. See log for details.",
+                  "Load Error",
+                  JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         AtBDynamicScenario scenario = AtBDynamicScenarioFactory.initializeScenarioFromTemplate(scenarioTemplate,
-                (AtBContract) mission, campaign);
+              (AtBContract) mission,
+              campaign);
         if (scenario.getDate() == null) {
             scenario.setDate(date);
         }
@@ -535,8 +540,9 @@ public class CustomizeScenarioDialog extends JDialog {
             if (scenario.getStatus().isCurrent()) {
                 if (dc.getDate().isBefore(campaign.getLocalDate())) {
                     JOptionPane.showMessageDialog(frame,
-                            "You cannot choose a date before the current date for a pending battle.", "Invalid date",
-                            JOptionPane.ERROR_MESSAGE);
+                          "You cannot choose a date before the current date for a pending battle.",
+                          "Invalid date",
+                          JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             }
@@ -554,11 +560,10 @@ public class CustomizeScenarioDialog extends JDialog {
     private void initDeployLimitPanel(ResourceBundle resourceMap) {
 
         panDeploymentLimits = new JPanel(new GridBagLayout());
-        panDeploymentLimits.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(resourceMap.getString("panDeploymentLimits.title"))));
+        panDeploymentLimits.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              BorderFactory.createTitledBorder(resourceMap.getString("panDeploymentLimits.title"))));
 
-        JPanel panButtons = new JPanel(new GridLayout(0, 2));
+        JPanel  panButtons    = new JPanel(new GridLayout(0, 2));
         JButton btnEditLimits = new JButton(resourceMap.getString("btnEditLimits.text"));
         btnEditLimits.setEnabled(scenario.getStatus().isCurrent());
         btnEditLimits.addActionListener(this::editLimits);
@@ -568,34 +573,34 @@ public class CustomizeScenarioDialog extends JDialog {
         btnRemoveLimits.addActionListener(this::removeLimits);
         panButtons.add(btnRemoveLimits);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridx     = 0;
+        gbc.gridy     = 0;
         gbc.gridwidth = 2;
-        gbc.weightx = 0.0;
-        gbc.weighty = 0.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.weightx   = 0.0;
+        gbc.weighty   = 0.0;
+        gbc.fill      = GridBagConstraints.BOTH;
+        gbc.anchor    = GridBagConstraints.NORTHWEST;
         panDeploymentLimits.add(panButtons, gbc);
 
         GridBagConstraints leftGbc = new GridBagConstraints();
-        leftGbc.gridx = 0;
-        leftGbc.gridy = 1;
+        leftGbc.gridx     = 0;
+        leftGbc.gridy     = 1;
         leftGbc.gridwidth = 1;
-        leftGbc.weightx = 0.0;
-        leftGbc.weighty = 0.0;
-        leftGbc.insets = new Insets(0, 0, 5, 10);
-        leftGbc.fill = GridBagConstraints.NONE;
-        leftGbc.anchor = GridBagConstraints.NORTHWEST;
+        leftGbc.weightx   = 0.0;
+        leftGbc.weighty   = 0.0;
+        leftGbc.insets    = new Insets(0, 0, 5, 10);
+        leftGbc.fill      = GridBagConstraints.NONE;
+        leftGbc.anchor    = GridBagConstraints.NORTHWEST;
 
         GridBagConstraints rightGbc = new GridBagConstraints();
-        rightGbc.gridx = 1;
-        rightGbc.gridy = 1;
+        rightGbc.gridx     = 1;
+        rightGbc.gridy     = 1;
         rightGbc.gridwidth = 1;
-        rightGbc.weightx = 1.0;
-        rightGbc.weighty = 0.0;
-        rightGbc.insets = new Insets(0, 10, 5, 0);
-        rightGbc.fill = GridBagConstraints.HORIZONTAL;
-        rightGbc.anchor = GridBagConstraints.NORTHWEST;
+        rightGbc.weightx   = 1.0;
+        rightGbc.weighty   = 0.0;
+        rightGbc.insets    = new Insets(0, 10, 5, 0);
+        rightGbc.fill      = GridBagConstraints.HORIZONTAL;
+        rightGbc.anchor    = GridBagConstraints.NORTHWEST;
 
         leftGbc.gridy++;
         panDeploymentLimits.add(new JLabel(resourceMap.getString("lblAllowedUnits.text")), leftGbc);
@@ -631,10 +636,12 @@ public class CustomizeScenarioDialog extends JDialog {
     private void refreshDeploymentLimits() {
         if (deploymentLimits != null) {
             lblAllowedUnitsDesc.setText("<html>" + deploymentLimits.getAllowedUnitTypeDesc() + "</html>");
-            lblQuantityLimitDesc
-                    .setText("<html>" + deploymentLimits.getQuantityLimitDesc(scenario, campaign) + "</html>");
-            lblRequiredPersonnelDesc
-                    .setText("<html>" + deploymentLimits.getRequiredPersonnelDesc(campaign) + "</html>");
+            lblQuantityLimitDesc.setText("<html>" +
+                                         deploymentLimits.getQuantityLimitDesc(scenario, campaign) +
+                                         "</html>");
+            lblRequiredPersonnelDesc.setText("<html>" +
+                                             deploymentLimits.getRequiredPersonnelDesc(campaign) +
+                                             "</html>");
             lblRequiredUnitsDesc.setText("<html>" + deploymentLimits.getRequiredUnitDesc(campaign) + "</html>");
         } else {
             lblAllowedUnitsDesc.setText("All");
@@ -658,41 +665,42 @@ public class CustomizeScenarioDialog extends JDialog {
 
     private void initPlanetaryConditionsPanel(ResourceBundle resourceMap) {
         panPlanetaryConditions = new JPanel(new GridBagLayout());
-        panPlanetaryConditions.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(resourceMap.getString("panPlanetaryConditions.title"))));
+        panPlanetaryConditions.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0,
+              0,
+              10,
+              0), BorderFactory.createTitledBorder(resourceMap.getString("panPlanetaryConditions.title"))));
 
         JButton btnPlanetaryConditions = new JButton(resourceMap.getString("btnPlanetaryConditions.text"));
         btnPlanetaryConditions.addActionListener(evt -> changePlanetaryConditions());
         btnPlanetaryConditions.setEnabled(scenario.getStatus().isCurrent());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridx     = 0;
+        gbc.gridy     = 0;
         gbc.gridwidth = 4;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.insets = new Insets(5, 0, 0, 0);
+        gbc.anchor    = GridBagConstraints.WEST;
+        gbc.fill      = GridBagConstraints.NONE;
+        gbc.insets    = new Insets(5, 0, 0, 0);
         panPlanetaryConditions.add(btnPlanetaryConditions, gbc);
 
         GridBagConstraints leftGbc = new GridBagConstraints();
-        leftGbc.gridx = 0;
-        leftGbc.gridy = 0;
+        leftGbc.gridx     = 0;
+        leftGbc.gridy     = 0;
         leftGbc.gridwidth = 1;
-        leftGbc.weightx = 0.0;
-        leftGbc.weighty = 0.0;
-        leftGbc.insets = new Insets(0, 5, 5, 5);
-        leftGbc.fill = GridBagConstraints.NONE;
-        leftGbc.anchor = GridBagConstraints.NORTHWEST;
+        leftGbc.weightx   = 0.0;
+        leftGbc.weighty   = 0.0;
+        leftGbc.insets    = new Insets(0, 5, 5, 5);
+        leftGbc.fill      = GridBagConstraints.NONE;
+        leftGbc.anchor    = GridBagConstraints.NORTHWEST;
 
         GridBagConstraints rightGbc = new GridBagConstraints();
-        rightGbc.gridx = 1;
-        rightGbc.gridy = 0;
+        rightGbc.gridx     = 1;
+        rightGbc.gridy     = 0;
         rightGbc.gridwidth = 1;
-        rightGbc.weightx = 0.0;
-        rightGbc.weighty = 0.0;
-        rightGbc.insets = new Insets(0, 5, 5, 0);
-        rightGbc.fill = GridBagConstraints.NONE;
-        rightGbc.anchor = GridBagConstraints.NORTHWEST;
+        rightGbc.weightx   = 0.0;
+        rightGbc.weighty   = 0.0;
+        rightGbc.insets    = new Insets(0, 5, 5, 0);
+        rightGbc.fill      = GridBagConstraints.NONE;
+        rightGbc.anchor    = GridBagConstraints.NORTHWEST;
 
         leftGbc.gridy++;
         panPlanetaryConditions.add(new JLabel(resourceMap.getString("lblLight.text")), leftGbc);
@@ -747,8 +755,8 @@ public class CustomizeScenarioDialog extends JDialog {
         panPlanetaryConditions.add(new JLabel(resourceMap.getString("lblTemperature.text")), leftGbc);
 
         lblTemperatureDesc = new JLabel(PlanetaryConditions.getTemperatureDisplayableName(scenario.getTemperature()));
-        rightGbc.gridx = 3;
-        rightGbc.gridy = 1;
+        rightGbc.gridx     = 3;
+        rightGbc.gridy     = 1;
         rightGbc.gridwidth = 1;
         panPlanetaryConditions.add(lblTemperatureDesc, rightGbc);
 
@@ -774,8 +782,7 @@ public class CustomizeScenarioDialog extends JDialog {
         lblFogDesc.setText(planetaryConditions.getFog().toString());
         lblWindDesc.setText(planetaryConditions.getWind().toString());
         lblGravityDesc.setText(DecimalFormat.getInstance().format(planetaryConditions.getGravity()));
-        lblTemperatureDesc
-                .setText(PlanetaryConditions.getTemperatureDisplayableName(planetaryConditions.getTemperature()));
+        lblTemperatureDesc.setText(PlanetaryConditions.getTemperatureDisplayableName(planetaryConditions.getTemperature()));
         ArrayList<String> otherConditions = new ArrayList<>();
         if (planetaryConditions.getEMI().isEMI()) {
             otherConditions.add("Electromagnetic interference");
@@ -800,41 +807,40 @@ public class CustomizeScenarioDialog extends JDialog {
 
     private void initMapPanel(ResourceBundle resourceMap) {
         panMap = new JPanel(new GridBagLayout());
-        panMap.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(resourceMap.getString("panMap.title"))));
+        panMap.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0),
+              BorderFactory.createTitledBorder(resourceMap.getString("panMap.title"))));
 
         JButton btnMapSettings = new JButton(resourceMap.getString("btnMapSettings.text"));
         btnMapSettings.addActionListener(evt -> changeMapSettings());
         btnMapSettings.setEnabled(scenario.getStatus().isCurrent());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridx     = 0;
+        gbc.gridy     = 0;
         gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.insets = new Insets(5, 0, 0, 0);
+        gbc.anchor    = GridBagConstraints.WEST;
+        gbc.fill      = GridBagConstraints.NONE;
+        gbc.insets    = new Insets(5, 0, 0, 0);
         panMap.add(btnMapSettings, gbc);
 
         GridBagConstraints leftGbc = new GridBagConstraints();
-        leftGbc.gridx = 0;
-        leftGbc.gridy = 1;
+        leftGbc.gridx     = 0;
+        leftGbc.gridy     = 1;
         leftGbc.gridwidth = 1;
-        leftGbc.weightx = 0.0;
-        leftGbc.weighty = 0.0;
-        leftGbc.insets = new Insets(0, 5, 5, 5);
-        leftGbc.fill = GridBagConstraints.NONE;
-        leftGbc.anchor = GridBagConstraints.NORTHWEST;
+        leftGbc.weightx   = 0.0;
+        leftGbc.weighty   = 0.0;
+        leftGbc.insets    = new Insets(0, 5, 5, 5);
+        leftGbc.fill      = GridBagConstraints.NONE;
+        leftGbc.anchor    = GridBagConstraints.NORTHWEST;
 
         GridBagConstraints rightGbc = new GridBagConstraints();
-        rightGbc.gridx = 1;
-        rightGbc.gridy = 1;
+        rightGbc.gridx     = 1;
+        rightGbc.gridy     = 1;
         rightGbc.gridwidth = 1;
-        rightGbc.weightx = 1.0;
-        rightGbc.weighty = 0.0;
-        rightGbc.insets = new Insets(0, 5, 5, 0);
-        rightGbc.fill = GridBagConstraints.NONE;
-        rightGbc.anchor = GridBagConstraints.NORTHWEST;
+        rightGbc.weightx   = 1.0;
+        rightGbc.weighty   = 0.0;
+        rightGbc.insets    = new Insets(0, 5, 5, 0);
+        rightGbc.fill      = GridBagConstraints.NONE;
+        rightGbc.anchor    = GridBagConstraints.NORTHWEST;
 
         panMap.add(new JLabel(resourceMap.getString("lblBoardType.text")), leftGbc);
         lblBoardType = new JLabel(Scenario.getBoardTypeName(boardType));
@@ -876,21 +882,26 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void changeMapSettings() {
-        EditMapSettingsDialog emsd = new EditMapSettingsDialog(frame, true, boardType, usingFixedMap,
-                map, mapSizeX, mapSizeY);
+        EditMapSettingsDialog emsd = new EditMapSettingsDialog(frame,
+              true,
+              boardType,
+              usingFixedMap,
+              map,
+              mapSizeX,
+              mapSizeY);
         emsd.setVisible(true);
-        boardType = emsd.getBoardType();
+        boardType     = emsd.getBoardType();
         usingFixedMap = emsd.getUsingFixedMap();
-        map = emsd.getMap();
-        mapSizeX = emsd.getMapSizeX();
-        mapSizeY = emsd.getMapSizeY();
+        map           = emsd.getMap();
+        mapSizeX      = emsd.getMapSizeX();
+        mapSizeY      = emsd.getMapSizeY();
         refreshMapSettings();
     }
 
     private void initObjectivesPanel(ResourceBundle resourceMap) {
         panObjectives = new JPanel(new BorderLayout());
 
-        JPanel panBtns = new JPanel(new GridLayout(1, 0));
+        JPanel  panBtns         = new JPanel(new GridLayout(1, 0));
         JButton btnAddObjective = new JButton(resourceMap.getString("btnAddObjective.text"));
         btnAddObjective.addActionListener(evt -> addObjective());
         btnAddObjective.setEnabled(scenario.getStatus().isCurrent());
@@ -934,8 +945,10 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void addObjective() {
-        CustomizeScenarioObjectiveDialog csod = new CustomizeScenarioObjectiveDialog(frame, true,
-                new ScenarioObjective(), getBotForceNames());
+        CustomizeScenarioObjectiveDialog csod = new CustomizeScenarioObjectiveDialog(frame,
+              true,
+              new ScenarioObjective(),
+              getBotForceNames());
         csod.setVisible(true);
         if (null != csod.getObjective()) {
             objectives.add(csod.getObjective());
@@ -946,8 +959,10 @@ public class CustomizeScenarioDialog extends JDialog {
     private void editObjective() {
         ScenarioObjective objective = objectiveModel.getObjectiveAt(objectiveTable.getSelectedRow());
         if (null != objective) {
-            CustomizeScenarioObjectiveDialog csod = new CustomizeScenarioObjectiveDialog(frame, true, objective,
-                    getBotForceNames());
+            CustomizeScenarioObjectiveDialog csod = new CustomizeScenarioObjectiveDialog(frame,
+                  true,
+                  objective,
+                  getBotForceNames());
             csod.setVisible(true);
             refreshObjectiveTable();
         }
@@ -978,7 +993,7 @@ public class CustomizeScenarioDialog extends JDialog {
     private void initLootPanel(ResourceBundle resourceMap) {
         panLoot = new JPanel(new BorderLayout());
 
-        JPanel panBtns = new JPanel(new GridLayout(1, 0));
+        JPanel  panBtns    = new JPanel(new GridLayout(1, 0));
         JButton btnAddLoot = new JButton(resourceMap.getString("btnAddLoot.text"));
         btnAddLoot.addActionListener(evt -> addLoot());
         btnAddLoot.setEnabled(scenario.getStatus().isCurrent());
@@ -1059,7 +1074,7 @@ public class CustomizeScenarioDialog extends JDialog {
     private void initOtherForcesPanel(ResourceBundle resourceMap) {
         panOtherForces = new JPanel(new BorderLayout());
 
-        JPanel panBtns = new JPanel(new GridLayout(1, 0));
+        JPanel  panBtns     = new JPanel(new GridLayout(1, 0));
         JButton btnAddForce = new JButton(resourceMap.getString("btnAddForce.text"));
         btnAddForce.addActionListener(evt -> addForce());
         btnAddForce.setEnabled(scenario.getStatus().isCurrent());
@@ -1109,9 +1124,9 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void editForce() {
-        BotForce bf = forcesModel.getBotForceAt(forcesTable.getSelectedRow());
-        String nameOld = bf.getName();
-        CustomizeBotForceDialog cbfd = new CustomizeBotForceDialog(frame, true, bf, campaign);
+        BotForce                bf      = forcesModel.getBotForceAt(forcesTable.getSelectedRow());
+        String                  nameOld = bf.getName();
+        CustomizeBotForceDialog cbfd    = new CustomizeBotForceDialog(frame, true, bf, campaign);
         cbfd.setVisible(true);
         refreshForcesTable();
         if (!bf.getName().equals(nameOld)) {
@@ -1121,9 +1136,9 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void deleteForce() {
-        BotForce bf = forcesModel.getBotForceAt(forcesTable.getSelectedRow());
-        String nameRemove = bf.getName();
-        int row = forcesTable.getSelectedRow();
+        BotForce bf         = forcesModel.getBotForceAt(forcesTable.getSelectedRow());
+        String   nameRemove = bf.getName();
+        int      row        = forcesTable.getSelectedRow();
         if (-1 != row) {
             botForces.remove(row);
             checkForceDelete(nameRemove);
@@ -1147,8 +1162,7 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     /**
-     * If a force was renamed, we need to change its name in any corresponding
-     * scenario objectives
+     * If a force was renamed, we need to change its name in any corresponding scenario objectives
      */
     private void checkForceRename(String nameOld, String nameNew) {
         for (ScenarioObjective objective : objectives) {
@@ -1171,16 +1185,15 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     /**
-     * Event handler for the 'add modifier' button.
-     *
-     * @param event
+     * @param event Event for the 'add modifier' button
      */
     private void btnAddModifierActionPerformed(ActionEvent event) {
         AtBDynamicScenario scenarioPtr = (AtBDynamicScenario) scenario;
-        AtBScenarioModifier modifierPtr = AtBScenarioModifier
-                .getScenarioModifier(modifierBox.getSelectedItem().toString());
-        EventTiming timing = scenarioPtr.getNumBots() > 0 ? EventTiming.PostForceGeneration
-                : EventTiming.PreForceGeneration;
+        AtBScenarioModifier modifierPtr = AtBScenarioModifier.getScenarioModifier(modifierBox.getSelectedItem()
+                                                                                        .toString());
+        EventTiming timing = scenarioPtr.getNumBots() > 0 ?
+                                   EventTiming.PostForceGeneration :
+                                   EventTiming.PreForceGeneration;
 
         modifierPtr.processModifier(scenarioPtr, campaign, timing);
         txtDesc.setText(txtDesc.getText() + "\n\n" + modifierPtr.getAdditionalBriefingText());

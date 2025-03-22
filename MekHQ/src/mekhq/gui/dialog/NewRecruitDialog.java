@@ -27,6 +27,23 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.util.Objects;
+import java.util.ResourceBundle;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.dialogs.PortraitChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -41,11 +58,6 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.PersonViewPanel;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.Objects;
-import java.util.ResourceBundle;
 
 /**
  * This dialog is used to both hire new pilots and to edit existing ones
@@ -73,17 +85,17 @@ public class NewRecruitDialog extends JDialog {
 
     private void refreshView() {
         scrollView.setViewportView(new PersonViewPanel(person, hqView.getCampaign(), hqView));
-        // This odd code is to make sure that the scrollbar stays at the top
-        // I can't just call it here, because it ends up getting reset somewhere later
+        // This odd code is to make sure that the scrollbar stays at the top I can't just call it here, because it
+        // ends up getting reset somewhere later
         SwingUtilities.invokeLater(() -> scrollView.getVerticalScrollBar().setValue(0));
     }
 
     private void initComponents() {
-        scrollView = new JScrollPaneWithSpeed();
+        scrollView  = new JScrollPaneWithSpeed();
         choiceRanks = new JComboBox<>();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewRecruitDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         setTitle(resourceMap.getString("Form.title"));
@@ -117,8 +129,8 @@ public class NewRecruitDialog extends JDialog {
         button.setName("btnOk");
         button.addActionListener(e -> hire());
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx  = 0;
+        gridBagConstraints.gridy  = 0;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
 
         panButtons.add(button, gridBagConstraints);
@@ -142,8 +154,10 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private JPanel createSidebar(ResourceBundle resourceMap) {
-        boolean randomizeOrigin = hqView.getCampaign().getCampaignOptions().getRandomOriginOptions()
-                .isRandomizeOrigin();
+        boolean randomizeOrigin = hqView.getCampaign()
+                                        .getCampaignOptions()
+                                        .getRandomOriginOptions()
+                                        .isRandomizeOrigin();
 
         JPanel panSidebar = new JPanel();
         panSidebar.setName("panButtons");
@@ -191,7 +205,13 @@ public class NewRecruitDialog extends JDialog {
         return panSidebar;
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewRecruitDialog.class);
@@ -223,12 +243,12 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private void randomName() {
-        String factionCode = hqView.getCampaign().getCampaignOptions().isUseOriginFactionForNames()
-                ? person.getOriginFaction().getShortName()
-                : RandomNameGenerator.getInstance().getChosenFaction();
+        String factionCode = hqView.getCampaign().getCampaignOptions().isUseOriginFactionForNames() ?
+                                   person.getOriginFaction().getShortName() :
+                                   RandomNameGenerator.getInstance().getChosenFaction();
 
-        String[] name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(
-                person.getGender(), person.isClanPersonnel(), factionCode);
+        String[] name = RandomNameGenerator.getInstance()
+                              .generateGivenNameSurnameSplit(person.getGender(), person.isClanPersonnel(), factionCode);
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
         PersonalityController.writePersonalityDescription(person);
@@ -254,8 +274,8 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private void editPerson() {
-        Gender gender = person.getGender();
-        CustomizePersonDialog npd = new CustomizePersonDialog(hqView.getFrame(), true, person, hqView.getCampaign());
+        Gender                gender = person.getGender();
+        CustomizePersonDialog npd    = new CustomizePersonDialog(hqView.getFrame(), true, person, hqView.getCampaign());
         npd.setVisible(true);
         if (gender != person.getGender()) {
             randomPortrait();
@@ -278,7 +298,7 @@ public class NewRecruitDialog extends JDialog {
     private void refreshRanksCombo() {
         DefaultComboBoxModel<RankDisplay> ranksModel = new DefaultComboBoxModel<>();
         ranksModel.addAll(RankDisplay.getRankDisplaysForSystem(person.getRankSystem(),
-                Profession.getProfessionFromPersonnelRole(person.getPrimaryRole())));
+              Profession.getProfessionFromPersonnelRole(person.getPrimaryRole())));
         choiceRanks.setModel(ranksModel);
         choiceRanks.setSelectedIndex(0);
     }

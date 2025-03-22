@@ -27,6 +27,27 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
+
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.StringUtility;
@@ -46,23 +67,17 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.PartsAcquisitionService.PartCountInfo;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author Kipsta
  */
 public class AcquisitionsDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(AcquisitionsDialog.class);
 
-    private CampaignGUI campaignGUI;
+    private CampaignGUI                   campaignGUI;
     private Map<String, AcquisitionPanel> partPanelMap = new HashMap<>();
 
-    private JPanel pnlSummary;
-    private JLabel lblSummary;
+    private JPanel  pnlSummary;
+    private JLabel  lblSummary;
     private JButton btnSummary;
 
     public AcquisitionsDialog(JFrame parent, boolean modal, CampaignGUI campaignGUI) {
@@ -85,15 +100,15 @@ public class AcquisitionsDialog extends JDialog {
 
         JPanel pnlMain = new JPanel();
         pnlMain.setLayout(new GridBagLayout());
-
+ 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill    = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.gridx   = 0;
+        gridBagConstraints.gridy   = 0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.insets  = new Insets(5, 5, 5, 5);
 
         pnlMain.add(createSummaryPanel(), gridBagConstraints);
 
@@ -103,7 +118,7 @@ public class AcquisitionsDialog extends JDialog {
             gridBagConstraints.gridy++;
 
             List<IAcquisitionWork> awList = PartsAcquisitionService.getAcquisitionMap().get(key);
-            AcquisitionPanel pnl = new AcquisitionPanel(awList, idx++);
+            AcquisitionPanel       pnl    = new AcquisitionPanel(awList, idx++);
             partPanelMap.put(key, pnl);
 
             pnlMain.add(pnl, gridBagConstraints);
@@ -137,13 +152,13 @@ public class AcquisitionsDialog extends JDialog {
         });
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridx   = 0;
+        gbc.gridy   = 0;
         gbc.weighty = 0.0;
         gbc.weightx = 1.0;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.insets = new Insets(0, 0, 10, 0);
+        gbc.fill    = GridBagConstraints.NONE;
+        gbc.anchor  = GridBagConstraints.NORTHWEST;
+        gbc.insets  = new Insets(0, 0, 10, 0);
 
         lblSummary = new JLabel();
         lblSummary.setText(generateSummaryText());
@@ -162,15 +177,17 @@ public class AcquisitionsDialog extends JDialog {
             }
         });
         btnSummary.addPropertyChangeListener("missingCount", evt -> {
-            boolean visible = (PartsAcquisitionService.getMissingCount() > 0) && (PartsAcquisitionService.getMissingCount() > PartsAcquisitionService.getUnavailableCount());
+            boolean visible = (PartsAcquisitionService.getMissingCount() > 0) &&
+                              (PartsAcquisitionService.getMissingCount() >
+                               PartsAcquisitionService.getUnavailableCount());
 
             btnSummary.setVisible(visible);
         });
 
         pnlSummary.add(btnSummary, gbc);
 
-        if ((PartsAcquisitionService.getMissingCount() == 0)
-                || (PartsAcquisitionService.getMissingCount() == PartsAcquisitionService.getUnavailableCount())) {
+        if ((PartsAcquisitionService.getMissingCount() == 0) ||
+            (PartsAcquisitionService.getMissingCount() == PartsAcquisitionService.getUnavailableCount())) {
             btnSummary.setVisible(false);
         }
 
@@ -201,8 +218,11 @@ public class AcquisitionsDialog extends JDialog {
 
         sbText.append("<br/>");
 
-        String inventoryInfo = "Inventory: " + PartsAcquisitionService.getInTransitCount() + " in transit, "
-                + PartsAcquisitionService.getOnOrderCount() + " on order";
+        String inventoryInfo = "Inventory: " +
+                               PartsAcquisitionService.getInTransitCount() +
+                               " in transit, " +
+                               PartsAcquisitionService.getOnOrderCount() +
+                               " on order";
 
         if (PartsAcquisitionService.getOmniPodCount() > 0) {
             inventoryInfo += ", " + PartsAcquisitionService.getOmniPodCount() + " OmniPod";
@@ -212,8 +232,8 @@ public class AcquisitionsDialog extends JDialog {
         sbText.append("<br/>");
 
         if (PartsAcquisitionService.getMissingTotalPrice().isPositive()) {
-            String price = "Missing item price: "
-                    + PartsAcquisitionService.getMissingTotalPrice().toAmountAndSymbolString();
+            String price = "Missing item price: " +
+                           PartsAcquisitionService.getMissingTotalPrice().toAmountAndSymbolString();
 
             sbText.append(price);
             sbText.append("<br/>");
@@ -224,7 +244,13 @@ public class AcquisitionsDialog extends JDialog {
         return sbText.toString();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(AcquisitionsDialog.class);
@@ -237,19 +263,19 @@ public class AcquisitionsDialog extends JDialog {
 
     public class AcquisitionPanel extends JPanel {
         private List<IAcquisitionWork> awList;
-        private int idx;
+        private int                    idx;
 
         private IAcquisitionWork targetWork;
-        private Part part;
-        private PartCountInfo partCountInfo = new PartCountInfo();
+        private Part             part;
+        private PartCountInfo    partCountInfo = new PartCountInfo();
 
         private JButton btnOrderAll;
         private JButton btnDepod;
-        private JLabel lblText;
+        private JLabel  lblText;
 
         public AcquisitionPanel(List<IAcquisitionWork> awList, int idx) {
             this.awList = awList;
-            this.idx = idx;
+            this.idx    = idx;
 
             setLayout(new GridBagLayout());
 
@@ -262,8 +288,11 @@ public class AcquisitionsDialog extends JDialog {
             }
 
             if (partCountInfo.getMissingCount() > 0) {
-                campaignGUI.getCampaign().getShoppingList().addShoppingItem(part.getAcquisitionWork(),
-                        partCountInfo.getMissingCount(), campaignGUI.getCampaign());
+                campaignGUI.getCampaign()
+                      .getShoppingList()
+                      .addShoppingItem(part.getAcquisitionWork(),
+                            partCountInfo.getMissingCount(),
+                            campaignGUI.getCampaign());
 
                 refresh();
             }
@@ -309,8 +338,9 @@ public class AcquisitionsDialog extends JDialog {
                 if (partCountInfo.getMissingCount() > 0) {
                     sbText.append(", ");
 
-                    sbText.append("<font color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
-                            .append("'>");
+                    sbText.append("<font color='")
+                          .append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                          .append("'>");
                     sbText.append("missing: ");
                     sbText.append(partCountInfo.getMissingCount());
                     sbText.append("</font>");
@@ -324,8 +354,13 @@ public class AcquisitionsDialog extends JDialog {
                     countModifier = ' ' + countModifier;
                 }
 
-                String inventoryInfo = "Inventory: " + partCountInfo.getInTransitCount() + countModifier
-                        + " in transit, " + partCountInfo.getOnOrderCount() + countModifier + " on order";
+                String inventoryInfo = "Inventory: " +
+                                       partCountInfo.getInTransitCount() +
+                                       countModifier +
+                                       " in transit, " +
+                                       partCountInfo.getOnOrderCount() +
+                                       countModifier +
+                                       " on order";
 
                 if (partCountInfo.getOmniPodCount() > 0) {
                     inventoryInfo += ", " + partCountInfo.getOmniPodCount() + countModifier + " OmniPod";
@@ -341,8 +376,9 @@ public class AcquisitionsDialog extends JDialog {
 
                 if (partCountInfo.getMissingCount() > 1) {
                     price = "Missing item price: " +
-                            partCountInfo.getStickerPrice().multipliedBy(partCountInfo.getMissingCount())
-                                    .toAmountAndSymbolString();
+                            partCountInfo.getStickerPrice()
+                                  .multipliedBy(partCountInfo.getMissingCount())
+                                  .toAmountAndSymbolString();
 
                     sbText.append(price);
                     sbText.append("<br/>");
@@ -350,7 +386,8 @@ public class AcquisitionsDialog extends JDialog {
 
                 if (!partCountInfo.isCanBeAcquired()) {
                     sbText.append("<br/><br/><font color='")
-                            .append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("' size='4'>");
+                          .append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                          .append("' size='4'>");
                     sbText.append(partCountInfo.getFailedMessage());
                     sbText.append("</font>");
                 }
@@ -363,34 +400,34 @@ public class AcquisitionsDialog extends JDialog {
 
         private void initComponents() {
             targetWork = awList.get(0);
-            part = targetWork.getAcquisitionPart();
+            part       = targetWork.getAcquisitionPart();
 
             partCountInfo = PartsAcquisitionService.getPartCountInfoMap().get(targetWork.getAcquisitionDisplayName());
 
             // Generate text
             GridBagConstraints gbcMain = new GridBagConstraints();
-            gbcMain.gridx = 0;
-            gbcMain.gridy = 0;
+            gbcMain.gridx   = 0;
+            gbcMain.gridy   = 0;
             gbcMain.weighty = 0.0;
             gbcMain.weightx = 0.0;
-            gbcMain.fill = GridBagConstraints.HORIZONTAL;
-            gbcMain.anchor = GridBagConstraints.NORTH;
+            gbcMain.fill    = GridBagConstraints.HORIZONTAL;
+            gbcMain.anchor  = GridBagConstraints.NORTH;
 
             Insets insetsOriginal = gbcMain.insets;
 
             // Set image
             String[] imgData = Part.findPartImage(part);
-            String imgPath = imgData[0] + imgData[1] + ".png";
+            String   imgPath = imgData[0] + imgData[1] + ".png";
 
-            Image imgTool = getToolkit().getImage(imgPath);
+            Image  imgTool = getToolkit().getImage(imgPath);
             JLabel lblIcon = new JLabel();
             lblIcon.setIcon(new ImageIcon(imgTool));
             add(lblIcon, gbcMain);
 
-            gbcMain.anchor = GridBagConstraints.NORTHWEST;
-            gbcMain.gridx = 1;
+            gbcMain.anchor  = GridBagConstraints.NORTHWEST;
+            gbcMain.gridx   = 1;
             gbcMain.weightx = 1.0;
-            gbcMain.insets = new Insets(0, 10, 0, 0);
+            gbcMain.insets  = new Insets(0, 10, 0, 0);
 
             lblText = new JLabel(generateText());
             add(lblText, gbcMain);
@@ -400,9 +437,9 @@ public class AcquisitionsDialog extends JDialog {
             add(createActionButtons(), gbcMain);
             gbcMain.gridy++;
 
-            gbcMain.gridx = 0;
+            gbcMain.gridx     = 0;
             gbcMain.gridwidth = 3;
-            gbcMain.insets = insetsOriginal;
+            gbcMain.insets    = insetsOriginal;
 
             Map<Unit, Integer> unitMap = new HashMap<>();
 
@@ -420,12 +457,12 @@ public class AcquisitionsDialog extends JDialog {
             pnlUnits.setBorder(BorderFactory.createTitledBorder("Units requiring this part (" + unitMap.size() + ')'));
 
             GridBagConstraints cUnits = new GridBagConstraints();
-            cUnits.gridx = 0;
-            cUnits.gridy = 0;
+            cUnits.gridx   = 0;
+            cUnits.gridy   = 0;
             cUnits.weighty = 0.0;
             cUnits.weightx = 1.0;
-            cUnits.fill = GridBagConstraints.HORIZONTAL;
-            cUnits.anchor = GridBagConstraints.NORTHWEST;
+            cUnits.fill    = GridBagConstraints.HORIZONTAL;
+            cUnits.anchor  = GridBagConstraints.NORTHWEST;
 
             for (Unit unit : unitMap.keySet()) {
                 int count = unitMap.get(unit);
@@ -453,26 +490,27 @@ public class AcquisitionsDialog extends JDialog {
             JPanel actionButtons = new JPanel(new GridBagLayout());
 
             GridBagConstraints gbcActions = new GridBagConstraints();
-            gbcActions.gridx = 0;
-            gbcActions.gridy = 0;
+            gbcActions.gridx   = 0;
+            gbcActions.gridy   = 0;
             gbcActions.weightx = 0.5;
-            gbcActions.insets = new Insets(10, 0, 5, 0);
-            gbcActions.fill = GridBagConstraints.NONE;
-            gbcActions.anchor = GridBagConstraints.NORTHEAST;
+            gbcActions.insets  = new Insets(10, 0, 5, 0);
+            gbcActions.fill    = GridBagConstraints.NONE;
+            gbcActions.anchor  = GridBagConstraints.NORTHEAST;
             JButton btnOrderOne;
             JButton btnOrderInBulk;
             if (partCountInfo.isCanBeAcquired()) {
-                btnOrderOne = new JButton("Order One");
+                btnOrderOne    = new JButton("Order One");
                 btnOrderInBulk = new JButton("Order in Bulk");
             } else {
-                btnOrderOne = new JButton("Order One (TN: Impossible)");
+                btnOrderOne    = new JButton("Order One (TN: Impossible)");
                 btnOrderInBulk = new JButton("Order in Bulk (TN: Impossible)");
             }
             btnOrderOne.setToolTipText("Order one item");
             btnOrderOne.setName("btnOrderOne");
             btnOrderOne.addActionListener(ev -> {
-                campaignGUI.getCampaign().getShoppingList().addShoppingItem(part.getAcquisitionWork(),
-                        1, campaignGUI.getCampaign());
+                campaignGUI.getCampaign()
+                      .getShoppingList()
+                      .addShoppingItem(part.getAcquisitionWork(), 1, campaignGUI.getCampaign());
                 refresh();
             });
             actionButtons.add(btnOrderOne, gbcActions);
@@ -483,13 +521,17 @@ public class AcquisitionsDialog extends JDialog {
             btnOrderInBulk.addActionListener(ev -> {
                 int quantity = 1;
                 PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(),
-                        true, "How Many " + part.getName() + '?', quantity,
-                        1, CampaignGUI.MAX_QUANTITY_SPINNER);
+                      true,
+                      "How Many " + part.getName() + '?',
+                      quantity,
+                      1,
+                      CampaignGUI.MAX_QUANTITY_SPINNER);
                 pcd.setVisible(true);
                 quantity = pcd.getValue();
                 if (quantity > 0) {
-                    campaignGUI.getCampaign().getShoppingList()
-                            .addShoppingItem(part.getAcquisitionWork(), quantity, campaignGUI.getCampaign());
+                    campaignGUI.getCampaign()
+                          .getShoppingList()
+                          .addShoppingItem(part.getAcquisitionWork(), quantity, campaignGUI.getCampaign());
                     refresh();
                 }
             });
@@ -536,8 +578,10 @@ public class AcquisitionsDialog extends JDialog {
 
                     // GM find the actual number required
                     for (int count = 0; count < partCountInfo.getRequiredCount(); count++) {
-                        campaignGUI.getCampaign().addReport(String.format("GM Acquiring %s. %s",
-                                actualWork.getAcquisitionName(), actualWork.find(0)));
+                        campaignGUI.getCampaign()
+                              .addReport(String.format("GM Acquiring %s. %s",
+                                    actualWork.getAcquisitionName(),
+                                    actualWork.find(0)));
                     }
 
                     Unit unit = actualWork.getUnit();

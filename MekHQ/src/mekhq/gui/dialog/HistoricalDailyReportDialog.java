@@ -35,7 +35,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.ResourceBundle;
-
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -55,22 +54,21 @@ import mekhq.gui.DailyReportLogPanel;
 public class HistoricalDailyReportDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(HistoricalDailyReportDialog.class);
 
-    private CampaignGUI gui;
-    private JPanel filterPanel;
-    private JLabel pickTimeLabel;
-    private JComboBox<Integer> pickTime;
-    private JLabel daysLabel;
+    private CampaignGUI         gui;
+    private JPanel              filterPanel;
+    private JLabel              pickTimeLabel;
+    private JComboBox<Integer>  pickTime;
+    private JLabel              daysLabel;
     private DailyReportLogPanel logPanel;
-    private JButton closeBtn;
-    private JLabel cacheInfoLabel;
+    private JButton             closeBtn;
+    private JLabel              cacheInfoLabel;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
-            "mekhq.resources.HistoricalDailyReportDialog",
-            MekHQ.getMHQOptions().getLocale());
+          "mekhq.resources.HistoricalDailyReportDialog",
+          MekHQ.getMHQOptions().getLocale());
 
     /**
-     * HistoricalDailyReportDialog - opens a dialog that shows a history of the
-     * daily log
+     * HistoricalDailyReportDialog - opens a dialog that shows a history of the daily log
      *
      * @param frame the JFrame
      * @param gui   the CampaignGUI object
@@ -93,11 +91,11 @@ public class HistoricalDailyReportDialog extends JDialog {
         if (MekHQ.getMHQOptions().getHistoricalDailyLog()) {
             pickTimeLabel = new JLabel(resourceMap.getString("pickTime.text"));
             Integer[] days = new Integer[] { 7, 30, 60, 90, MHQConstants.MAX_HISTORICAL_LOG_DAYS };
-            pickTime = new JComboBox<>(days);
-            logPanel = new DailyReportLogPanel(gui);
-            daysLabel = new JLabel(resourceMap.getString("days.text"));
-            filterPanel = new JPanel();
-            closeBtn = new JButton(resourceMap.getString("closeBtn.text"));
+            pickTime       = new JComboBox<>(days);
+            logPanel       = new DailyReportLogPanel(gui);
+            daysLabel      = new JLabel(resourceMap.getString("days.text"));
+            filterPanel    = new JPanel();
+            closeBtn       = new JButton(resourceMap.getString("closeBtn.text"));
             cacheInfoLabel = new JLabel(resourceMap.getString("cachedInformationMessage.text"));
 
             updateLogPanel((Integer) pickTime.getSelectedItem());
@@ -111,45 +109,51 @@ public class HistoricalDailyReportDialog extends JDialog {
             filterPanel.add(daysLabel);
 
             GridBagConstraints gridBag = new GridBagConstraints();
-            gridBag.fill = GridBagConstraints.HORIZONTAL;
+            gridBag.fill   = GridBagConstraints.HORIZONTAL;
             gridBag.anchor = GridBagConstraints.NORTHWEST;
-            gridBag.gridx = 0;
-            gridBag.gridy = 0;
+            gridBag.gridx  = 0;
+            gridBag.gridy  = 0;
             gridBag.insets = new Insets(15, 15, 15, 15); // add some spacing for readability
             getContentPane().add(cacheInfoLabel, gridBag);
 
-            gridBag = new GridBagConstraints();
-            gridBag.fill = GridBagConstraints.HORIZONTAL;
+            gridBag       = new GridBagConstraints();
+            gridBag.fill  = GridBagConstraints.HORIZONTAL;
             gridBag.gridx = 0;
             gridBag.gridy = 1;
             getContentPane().add(filterPanel, gridBag);
 
-            gridBag = new GridBagConstraints();
-            gridBag.fill = GridBagConstraints.BOTH;
-            gridBag.gridx = 0;
-            gridBag.gridy = 2;
+            gridBag         = new GridBagConstraints();
+            gridBag.fill    = GridBagConstraints.BOTH;
+            gridBag.gridx   = 0;
+            gridBag.gridy   = 2;
             gridBag.weightx = 1.0;
             gridBag.weighty = 1.0;
             getContentPane().add(logPanel, gridBag);
 
-            gridBag = new GridBagConstraints();
-            gridBag.fill = GridBagConstraints.HORIZONTAL;
+            gridBag        = new GridBagConstraints();
+            gridBag.fill   = GridBagConstraints.HORIZONTAL;
             gridBag.anchor = GridBagConstraints.PAGE_END;
-            gridBag.gridx = 0;
-            gridBag.gridy = 2;
+            gridBag.gridx  = 0;
+            gridBag.gridy  = 2;
             getContentPane().add(closeBtn, gridBag);
         } else {
             GridBagConstraints gridBag = new GridBagConstraints();
-            gridBag.fill = GridBagConstraints.HORIZONTAL;
+            gridBag.fill   = GridBagConstraints.HORIZONTAL;
             gridBag.anchor = GridBagConstraints.NORTHWEST;
-            gridBag.gridx = 0;
-            gridBag.gridy = 0;
+            gridBag.gridx  = 0;
+            gridBag.gridy  = 0;
             JLabel notice = new JLabel(resourceMap.getString("enableInCampaignOptions.text"));
             getContentPane().add(notice, gridBag);
         }
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(HistoricalDailyReportDialog.class);
@@ -167,9 +171,10 @@ public class HistoricalDailyReportDialog extends JDialog {
             if (ChronoUnit.DAYS.between(log.getDate(), gui.getCampaign().getLocalDate()) < days) {
                 if (!log.getDate().equals(trackDay)) {
                     logPanel.appendLog(Collections.singletonList("<hr>"));
-                    logPanel.appendLog(Collections.singletonList("<b>"
-                            + MekHQ.getMHQOptions().getDisplayFormattedDate(log.getDate())
-                            + "</b>"));
+                    logPanel.appendLog(Collections.singletonList("<b>" +
+                                                                 MekHQ.getMHQOptions()
+                                                                       .getDisplayFormattedDate(log.getDate()) +
+                                                                 "</b>"));
                     logPanel.appendLog(Collections.singletonList("<br><br>"));
                     trackDay = log.getDate();
                 }
