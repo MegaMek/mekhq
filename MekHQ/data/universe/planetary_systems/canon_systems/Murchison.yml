@@ -5,7 +5,9 @@ ycood: 19.855
 spectralType:
   source: canon
   value: G8IV
-primarySlot: 3
+primarySlot:
+  source: Star League, pg. 174
+  value: 3
 event:
   - date: '2436-07-18'
     nadirCharge: yes
@@ -56,28 +58,32 @@ planet:
       value: Murchison
     type: TERRESTRIAL
     orbitalDist: 1.28
-    sysPos: 3
+    sysPos:
+      source: Star League, pg. 174
+      value: 3
     icon: green50
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.18
-    diameter: 14228
-    density: 5.823015293492
+    diameter: 14235
+    density: 5.825677127895
     dayLength: 22
     yearLength: 1.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 47
     water:
-      source: canon
+      source: MWDA world profiles
       value: 54
     lifeForm:
-      source: canon
+      source: Star League, pg. 174
       value: MAMMAL
     desc: |-
       A large, populous world blessed with a habitable satellite (Oasis), Murchison was a colonists‘ dream when it was discovered in the early days of spaceflight. Though gravity was slightly greater and the atmosphere somewhat heavier than Terran-normal,
@@ -87,34 +93,36 @@ planet:
       spaceport of Laubenstein.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Abla
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Felkra
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Murchison City
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Haschweld
-      - name:
-          source: canon
-          value: Oasis - Rhinehold
-      - name:
-          source: canon
-          value: Oasis - Schultz
     satellite:
-      - name: Oasis
+      - name:
+          source: MWDA world profiles
+          value: Oasis
         size: medium
         icon: oddmoon3
-      - name: Shard
+      - name:
+          source: MWDA world profiles
+          value: Shard
         size: medium
         icon: rock7
-      - name: Teller
+      - name:
+          source: MWDA world profiles
+          value: Teller
         size: large
         icon: rock12
-      - name: Tinker
+      - name:
+          source: MWDA world profiles
+          value: Tinker
         size: large
         icon: rock13
     event:

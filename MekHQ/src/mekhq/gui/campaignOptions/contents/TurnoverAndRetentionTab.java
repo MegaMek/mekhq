@@ -905,6 +905,7 @@ public class TurnoverAndRetentionTab {
         options.setFatigueRate((int) spnFatigueRate.getValue());
         options.setUseInjuryFatigue(chkUseInjuryFatigue.isSelected());
         options.setFieldKitchenCapacity((int) spnFieldKitchenCapacity.getValue());
+        options.setFieldKitchenIgnoreNonCombatants(chkFieldKitchenIgnoreNonCombatants.isSelected());
         options.setFatigueLeaveThreshold((int) spnFatigueLeaveThreshold.getValue());
     }
 }

@@ -3,9 +3,11 @@ sucsId: 1060
 xcood: 261.847
 ycood: 71.038
 spectralType:
-  source: canon
+  source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
   value: G1V
-primarySlot: 2
+primarySlot:
+  source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
+  value: 2
 event:
   - date: '2376-03-01'
     nadirCharge: yes
@@ -32,28 +34,32 @@ planet:
       value: Harrow's Sun
     type: TERRESTRIAL
     orbitalDist: 1.0
-    sysPos: 2
+    sysPos:
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
+      value: 2
     icon: green35
     pressure:
-      source: canon
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
       value: 0.96
-    diameter: 14404
-    density: 4.684320350153
+    diameter: 14403
+    density: 4.68404139754
     dayLength: 16
     yearLength: 1.4
     temperature:
-      source: canon
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
       value: 32
     water:
-      source: canon
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
       value: 46
     lifeForm:
-      source: canon
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
       value: MAMMAL
     desc: |-
       3028 - Harrow's Sun is a vital part of the Federated Suns’ Draconis March border defense and as a result it has been the site of heavy fighting throughout the centuries. The planet’s southern continent of Briseis is primarily dominated by military bases. These bases have enough housing for up to a full six regimental combat teams. However, most of the time the bases are mostly empty and are managed by two brigades of light combat engineers and an armored regiment. The bases of Harrow’s Sun saw extensive use during the Operation Galahad exercises held in 3026 and 3027.
@@ -67,19 +73,23 @@ planet:
       The planet is defended by an AFFS security force located on the moon Bane and is home to a division of marines with intrasystem boarding shuttles and converted passenger DropShips and usually supported by two wings of aerospace fighters.
     landmass:
       - name:
-          source: canon
+          source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
           value: Briseis
       - name:
-          source: canon
+          source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
           value: Paris
       - name:
-          source: canon
+          source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
           value: Priam
     satellite:
-      - name: Bane
+      - name:
+          source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
+          value: Bane
         size: medium
         icon: rock1
-      - name: Boon
+      - name:
+          source: 'Operational Turning Points: Death to Mercenaries, pg. 5'
+          value: Boon
         size: large
         icon: rock3
     event:

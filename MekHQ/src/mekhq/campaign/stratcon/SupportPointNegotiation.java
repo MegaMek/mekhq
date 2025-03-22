@@ -156,7 +156,9 @@ public class SupportPointNegotiation {
             return;
         }
 
-        if (campaignState.getSupportPoints() >= maxSupportPoints) {
+        int currentSupportPoints = campaignState.getSupportPoints();
+
+        if (currentSupportPoints >= maxSupportPoints) {
             String pluralizer = (maxSupportPoints > 1) || (maxSupportPoints == 0) ? "s" : "";
 
             campaign.addReport(String.format(
@@ -172,7 +174,8 @@ public class SupportPointNegotiation {
 
         Iterator<Person> iterator = adminTransport.iterator();
 
-        while (iterator.hasNext() && negotiatedSupportPoints < maxSupportPoints) {
+        while (iterator.hasNext()
+              && ((negotiatedSupportPoints + currentSupportPoints) < maxSupportPoints)) {
             Person admin = iterator.next();
             int rollResult = Compute.d6(2);
 

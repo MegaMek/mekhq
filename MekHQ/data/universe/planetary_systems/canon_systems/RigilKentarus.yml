@@ -3,9 +3,11 @@ sucsId: 2155
 xcood: -2.852
 ycood: 2.54
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G8V
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2359-08-30'
     nadirCharge: yes
@@ -33,28 +35,32 @@ planet:
       value: Rigil Kentarus
     type: TERRESTRIAL
     orbitalDist: 0.56
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green19
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.85
-    diameter: 11042
-    density: 5.430291018786
+    diameter: 11021
+    density: 5.420015324763
     dayLength: 20
     yearLength: 1.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 28
     water:
-      source: canon
+      source: MWDA world profiles
       value: 66
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: 3135 - Rigil Kentarus was a beautiful planet, blessed with a rare inhabitable
       moon, Riken Minor, when it was discovered in the first days of Terran exploration.
@@ -85,22 +91,18 @@ planet:
       to a sizeable portion of the planetary militia.
     landmass:
       - name:
-          source: canon
-          value: Rigil Kentarus - Naskia
+          source: MWDA world profiles
+          value: Naskia
         capital:
-          source: canon
+          source: MWDA world profiles
           value: West Romaine
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Worrens
-      - name:
-          source: canon
-          value: Riken Minor - Lesser Plateau
-        capital:
-          source: canon
-          value: Destina Station
     satellite:
-      - name: Riken Minor
+      - name:
+          source: MWDA world profiles
+          value: Riken Minor
         size: large
         icon: rock11
     event:

@@ -3,9 +3,11 @@ sucsId: 202
 xcood: -191.068
 ycood: -163.776
 spectralType:
-  source: canon
+  source: 'Jihad Turning Points: Atreus, pg. 3'
   value: F4V
-primarySlot: 3
+primarySlot:
+  source: 'Jihad Turning Points: Atreus, pg. 3'
+  value: 3
 event:
   - date: '2463-05-15'
     nadirCharge: yes
@@ -45,28 +47,32 @@ planet:
       value: Atreus (FWL)
     type: TERRESTRIAL
     orbitalDist: 2.24
-    sysPos: 3
+    sysPos:
+      source: 'Jihad Turning Points: Atreus, pg. 3'
+      value: 3
     icon: green21
     pressure:
-      source: canon
+      source: 'Jihad Turning Points: Atreus, pg. 3'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Jihad Turning Points: Atreus, pg. 3'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Jihad Turning Points: Atreus, pg. 3'
       value: 1.0
-    diameter: 15526
-    density: 4.500351603704
+    diameter: 15571
+    density: 4.513327024339
     dayLength: 20
     yearLength: 3.6
     temperature:
-      source: canon
+      source: 'Jihad Turning Points: Atreus, pg. 3'
       value: 45
     water:
-      source: canon
+      source: 'Jihad Turning Points: Atreus, pg. 3'
       value: 70
     lifeForm:
-      source: canon
+      source: 'Jihad Turning Points: Atreus, pg. 3'
       value: MAMMAL
     desc: |-
       First colonized in 2160, Atreus was the furthest colony from Earth when it was originally settled. It became the capital of the Free Worlds League in 2271.
@@ -82,22 +88,24 @@ planet:
       Imperator Automatic Weaponry
     landmass:
       - name:
-          source: canon
-          value: Ionis
-        capital:
-          source: canon
-          value: Atreus City
-      - name:
-          source: canon
+          source: 'Jihad Turning Points: Atreus, pg. 3'
           value: Corin
       - name:
-          source: canon
+          source: 'Jihad Turning Points: Atreus, pg. 3'
+          value: Ionia
+        capital:
+          source: 'Jihad Turning Points: Atreus, pg. 3'
+          value: Atreus City
+      - name:
+          source: 'Jihad Turning Points: Atreus, pg. 3'
           value: Lanan
       - name:
-          source: canon
-          value: Plaltos
+          source: 'Jihad Turning Points: Atreus, pg. 3'
+          value: Paltos
     satellite:
-      - name: Wendigo
+      - name:
+          source: 'Jihad Turning Points: Atreus, pg. 3'
+          value: Wendigo
         size: large
         icon: rock3
     event:

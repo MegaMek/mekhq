@@ -3,9 +3,11 @@ sucsId: 2955
 xcood: 118.994
 ycood: 1706.832
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: A3II
-primarySlot: 1
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 1
 event:
   - date: '2802-03-04'
     nadirCharge: yes
@@ -15,28 +17,32 @@ planet:
       value: Niles (Clan)
     type: TERRESTRIAL
     orbitalDist: 12.48
-    sysPos: 1
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 1
     icon: green46
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 0.8
-    diameter: 12014
-    density: 4.698693330055
+    diameter: 11990
+    density: 4.689138935353
     dayLength: 20
     yearLength: 44.1
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 35
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 20
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: MICROBE
     desc: No description available.
     landmass:

@@ -5,7 +5,9 @@ ycood: -233.487
 spectralType:
   source: canon
   value: G2IV
-primarySlot: 3
+primarySlot:
+  source: Masters and Minions, pg. 239
+  value: 3
 planet:
   - name: Morrighan
     type: GIANT_TERRESTRIAL
@@ -48,28 +50,30 @@ planet:
       value: Tortuga Prime
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 3
+    sysPos:
+      source: Masters and Minions, pg. 239
+      value: 3
     icon: green25
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 239
       value: STANDARD
     atmosphere: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 239
       value: 0.85
-    diameter: 10109
-    density: 5.938356035871
+    diameter: 10084
+    density: 5.923683569015
     dayLength: 19
     yearLength: 2.3
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 239
       value: 30
     water:
-      source: canon
+      source: Masters and Minions, pg. 239
       value: 40
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 239
       value: PLANT
     desc: |-
       Tortuga is a planet of vast grassy plains and abundant natural resources. Unfortunately by the 31st Century most of the once abundant raw materials had been extracted and used. Tortuga is the infamous center of the Tortuga Dominions pirate realm.
@@ -83,24 +87,34 @@ planet:
           source: canon
           value: Torment
         capital:
-          source: canon
-          value: Raider’s Roost
+          source: Masters and Minions, pg. 239
+          value: Raider's Roost
     satellite:
-      - name: Barbarossa
+      - name:
+          source: Masters and Minions, pg. 239
+          value: Barbarossa
         size: large
         icon: rock13
-      - name: Kidd
+      - name:
+          source: Masters and Minions, pg. 239
+          value: Kidd
         size: medium
         icon: oddmoon2
-      - name: Wendigo
-        size: large
-        icon: rock6
-      - name: Lafleur
+      - name:
+          source: Masters and Minions, pg. 239
+          value: Lafleur
         size: large
         icon: rock7
-      - name: Pandora
+      - name:
+          source: Masters and Minions, pg. 239
+          value: Pandora
         size: large
         icon: rock16
+      - name:
+          source: Masters and Minions, pg. 239
+          value: Wendigo
+        size: large
+        icon: rock6
     event:
       - date: '2596-04-14'
         faction:

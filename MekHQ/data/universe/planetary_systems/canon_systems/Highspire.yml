@@ -3,9 +3,11 @@ sucsId: 1109
 xcood: 100.289
 ycood: -119.184
 spectralType:
-  source: canon
+  source: 'Handbook: House Liao, pg. 75'
   value: F9V
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Liao, pg. 75'
+  value: 2
 planet:
   - name: Saint Tanner
     type: TERRESTRIAL
@@ -27,28 +29,32 @@ planet:
       value: Highspire
     type: TERRESTRIAL
     orbitalDist: 1.1
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Liao, pg. 75'
+      value: 2
     icon: wet6
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 75'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 75'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 75'
       value: 0.99
-    diameter: 13181
-    density: 5.274522548279
+    diameter: 13186
+    density: 5.276407931863
     dayLength: 18
     yearLength: 1.6
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 75'
       value: 38
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 75'
       value: 78
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 75'
       value: PLANT
     desc: |-
       Highspire is a relatively comfortable temperate planet and its primary exports are timber and wood crafts. The planet has always been known for its stark contrasts between the ruling Liaos and attending nobles and the poor of the planet. Highspire was the personal holding of Romano Liao before she became Chancellor and became the personal holding of her daughter Kali Liao after the Chancellor’s death. Being a border planet between the Capellan Confederation and Federated Suns the planet has seen many raids and several invasions throughout its history.
@@ -56,13 +62,15 @@ planet:
       Highspire is home to one of the many Duchy RTC facilities throughout the Capellan Confederation and train conventional armor crews and infantry.
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Chu-Li
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Crescent
     satellite:
-      - name: Peak
+      - name:
+          source: 'Handbook: House Liao, pg. 75'
+          value: Peak
         size: medium
         icon: rock3
     event:

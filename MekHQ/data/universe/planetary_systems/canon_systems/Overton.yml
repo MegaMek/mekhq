@@ -3,9 +3,11 @@ sucsId: 1965
 xcood: 46.252
 ycood: -207.89
 spectralType:
-  source: canon
+  source: 'Objective Raids: Capellan Confederation'
   value: G4V
-primarySlot: 3
+primarySlot:
+  source: 'Objective Raids: Capellan Confederation'
+  value: 3
 event:
   - date: '2689-11-15'
     nadirCharge: yes
@@ -43,28 +45,32 @@ planet:
       value: Overton
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 3
+    sysPos:
+      source: 'Objective Raids: Capellan Confederation'
+      value: 3
     icon: wet10
     pressure:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Objective Raids: Capellan Confederation'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 1.0
-    diameter: 12927
-    density: 5.416652709834
+    diameter: 12951
+    density: 5.426502307261
     dayLength: 23
     yearLength: 1.3
     temperature:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 30
     water:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 78
     lifeForm:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: AMPHIBIAN
     desc: Overton is an unremarkable planet, with limited natural resources, agriculture
       and industry. The planet is mostly self-sufficient but is of limited strategic
@@ -73,13 +79,15 @@ planet:
       armor crews.
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Yarmouth
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Glasson
     satellite:
-      - name: Heysham
+      - name:
+          source: 'Objective Raids: Capellan Confederation'
+          value: Heysham
         size: medium
         icon: oddmoon2
     event:

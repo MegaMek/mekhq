@@ -3,9 +3,11 @@ sucsId: 2936
 xcood: -23.703
 ycood: 1896.374
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: G6III
-primarySlot: 3
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 3
 event:
   - date: '2817-04-14'
     zenithCharge: yes
@@ -57,28 +59,32 @@ planet:
       value: Barcella
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 3
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 3
     icon: green35
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 1.3
-    diameter: 12957
-    density: 7.025243472381
+    diameter: 12981
+    density: 7.038068792038
     dayLength: 24
     yearLength: 2.0
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 35
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 60
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: BIRD
     desc: No description available.
     landmass:

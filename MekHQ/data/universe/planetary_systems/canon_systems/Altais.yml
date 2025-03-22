@@ -3,9 +3,11 @@ sucsId: 98
 xcood: 37.222
 ycood: 109.811
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F2IV
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2362-02-15'
     zenithCharge: yes
@@ -15,28 +17,32 @@ planet:
       value: Altais
     type: TERRESTRIAL
     orbitalDist: 4.2
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: wet20
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.98
-    diameter: 11550
-    density: 5.9794875
+    diameter: 11534
+    density: 5.971141975805
     dayLength: 17
     yearLength: 8.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 53
     water:
-      source: canon
+      source: MWDA world profiles
       value: 81
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: AMPHIBIAN
     desc: |-
       Young, hot, and in every way cursed with an oppressive atmosphere, many feel that Altais was colonized solely out of human stubbornness and some early settler‘s thirst for a challenge. More practical critics have suggested that the plentiful metal ores constantly churned up by the planet‘s many volcanoes drew those seeking fortune through mining and manufacturing industries. In fact, the first settlers to come to Altais came during a geologically brief dormant period in its development, when the planet‘s atmosphere was much more terrestrial and its surface far less unstable. Within less than a century of the first colonies‘ establishment on Altais, however, a massive shift in the planet‘s three large tectonic plates began when a stray meteor—the remnant of a failed second planet in the Altais system—slammed into the shallow waters close to a major fault line. The shifting plates created a series of earthquakes and volcanic eruptions across the planet, destroying several cities over the next few decades.
@@ -47,24 +53,20 @@ planet:
     smallMoons: 1
     landmass:
       - name:
-          source: canon
-          value: Tanzaria
-        capital:
-          source: canon
-          value: Gaines
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Greater Elauria
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Lesser Elauria
       - name:
-          source: canon
+          source: MWDA world profiles
+          value: Tanzaria
+        capital:
+          source: MWDA world profiles
+          value: Gaines
+      - name:
+          source: MWDA world profiles
           value: Welasia
-    satellite:
-      - name: Bin Afif
-        size: medium
-        icon: rock10
     event:
       - date: '2273-07-18'
         faction:

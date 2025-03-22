@@ -3,9 +3,11 @@ sucsId: 1325
 xcood: -370.2
 ycood: -200.855
 spectralType:
-  source: canon
+  source: House Marik, pg. 163
   value: F9V
-primarySlot: 4
+primarySlot:
+  source: House Marik, pg. 163
+  value: 4
 event:
   - date: '2402-12-20'
     zenithCharge: yes
@@ -74,7 +76,9 @@ planet:
       value: Kendall
     type: TERRESTRIAL
     orbitalDist: 1.76
-    sysPos: 4
+    sysPos:
+      source: House Marik, pg. 163
+      value: 4
     icon: green13
     pressure:
       source: canon
@@ -95,7 +99,7 @@ planet:
       source: canon
       value: 57
     lifeForm:
-      source: canon
+      source: House Marik, pg. 163
       value: INSECT
     desc: |-
       Kendall is a planet with comfortable mild seasons and lighter gravity than Terra that has easily supported human life since colonists first arrived. The dominant native life is a large migratory insect that has taken little notice of human colonization of the planet. The insects create hive-like homes that are often taken over by humans when the insects move on and actually make very comfortable dwellings for several years. The principal industry on Kendall is agriculture and the planet provides foodstuffs to several neighboring systems after feeding its own population. The planet is well known for its ‘cereal wheat’ and honey which is a mix of native bee-like species and Terran bees which have been imported.

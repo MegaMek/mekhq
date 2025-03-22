@@ -5,7 +5,9 @@ ycood: 99.048
 spectralType:
   source: canon
   value: G3V
-primarySlot: 3
+primarySlot:
+  source: Periphery (1ed), pg. 120
+  value: 3
 event:
   - date: '2656-01-07'
     nadirCharge: yes
@@ -46,7 +48,9 @@ planet:
       value: Ramora
     type: TERRESTRIAL
     orbitalDist: 1.0
-    sysPos: 3
+    sysPos:
+      source: Periphery (1ed), pg. 120
+      value: 3
     icon: green31
     pressure:
       source: canon
@@ -67,7 +71,7 @@ planet:
       source: canon
       value: 54
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 120
       value: MAMMAL
     desc: Ramora is a comfortable, semi-tropical planet with special importance to
       the Outworlds Alliance as one of their premier military industrial worlds after

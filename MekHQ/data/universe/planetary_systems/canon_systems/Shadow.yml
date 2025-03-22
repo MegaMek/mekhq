@@ -3,9 +3,11 @@ sucsId: 2959
 xcood: -2.016
 ycood: 1749.942
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: B8IV
-primarySlot: 1
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 1
 event:
   - date: '2803-03-25'
     zenithCharge: yes
@@ -15,28 +17,32 @@ planet:
       value: Shadow
     type: TERRESTRIAL
     orbitalDist: 38.0
-    sysPos: 1
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 1
     icon: green10
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 0.7
-    diameter: 10578
-    density: 4.670733847219
+    diameter: 10555
+    density: 4.660614366499
     dayLength: 23
     yearLength: 234.3
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 30
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 40
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: REPTILE
     desc: No description available.
     landmass:

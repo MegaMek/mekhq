@@ -3,9 +3,11 @@ sucsId: 489
 xcood: 115.467
 ycood: -32.666
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K2IV
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2378-04-20'
     nadirCharge: yes
@@ -31,28 +33,32 @@ planet:
       value: Caselton
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green14
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.0
-    diameter: 11674
-    density: 6.021173577655
+    diameter: 11673
+    density: 6.020521334621
     dayLength: 19
     yearLength: 1.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 24
     water:
-      source: canon
+      source: MWDA world profiles
       value: 70
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: BIRD
     desc: |-
       Caselton is a highly habitable planet that closely resembles Terra in several key respects. However, Caselton‘s climate is slightly too cold and dry to support widespread agriculture, and its geology contains limited deposits of useful metals and minerals. Although self-sufficient, Caselton‘s economy has never supported significant exports and thus never attracted a large population.
@@ -62,18 +68,20 @@ planet:
       These fortifications served Caselton well in the Blakist Holy War, stopping repeated assaults by Blakist mercenaries. However, during the Golden Age of Peace, The Republic of the Sphere dismantled many of Caselton‘s defenses. The two continents are Embrasure and Merlon; the capital of Battlement is located on Embrasure.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Embrasure
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Battlement
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Merlon
     satellite:
-      - name: None (Asteroid Belt)
+      - name:
+          source: MWDA world profiles
+          value: Asteroid Belt
         size: medium
-        icon: oddmoon1
+        icon: rock4
     event:
       - date: '2172-04-21'
         faction:

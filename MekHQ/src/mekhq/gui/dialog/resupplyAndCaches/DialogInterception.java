@@ -41,8 +41,6 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 
 import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsOnlyAerialForces;
-import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsOnlyVTOLForces;
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
@@ -155,8 +153,9 @@ public class DialogInterception extends JDialog{
         String message = "";
 
         if (targetConvoy != null) {
-            if (forceContainsOnlyVTOLForces(campaign, targetConvoy)
-                || forceContainsOnlyAerialForces(campaign, targetConvoy)) {
+            if (targetConvoy.forceContainsOnlyVTOLForces(campaign.getHangar(), false)
+                || targetConvoy.forceContainsOnlyAerialForces(campaign.getHangar(), false,
+                  false)) {
                 message = getFormattedTextAt(RESOURCE_BUNDLE, "statusUpdateIntercepted.boilerplate",
                         campaign.getCommanderAddress(false),
                     getFormattedTextAt(RESOURCE_BUNDLE,"interceptionInstructions.text"));

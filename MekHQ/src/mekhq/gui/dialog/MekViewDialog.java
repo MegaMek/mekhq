@@ -31,7 +31,6 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.util.ResourceBundle;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -53,15 +52,15 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 public class MekViewDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(MekViewDialog.class);
 
-    private MekView mview;
-    private JButton btnOkay;
+    private MekView     mekView;
+    private JButton     btnOkay;
     private JScrollPane jScrollPane2;
-    private JTextPane txtMek;
+    private JTextPane   txtMek;
 
     /** Creates new form MekViewDialog */
     public MekViewDialog(JFrame parent, boolean modal, MekView mv) {
         super(parent, modal);
-        this.mview = mv;
+        this.mekView = mv;
         initComponents();
         setUserPreferences();
     }
@@ -69,11 +68,11 @@ public class MekViewDialog extends JDialog {
     private void initComponents() {
 
         jScrollPane2 = new JScrollPaneWithSpeed();
-        txtMek = new JTextPane();
-        btnOkay = new JButton();
+        txtMek       = new JTextPane();
+        btnOkay      = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekViewDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Unit View");
 
@@ -83,7 +82,7 @@ public class MekViewDialog extends JDialog {
         txtMek.setEditable(false);
         txtMek.setFont(Font.decode(resourceMap.getString("txtMek.font")));
         txtMek.setName("txtMek");
-        txtMek.setText(mview.getMekReadout());
+        txtMek.setText(mekView.getMekReadout());
         jScrollPane2.setViewportView(txtMek);
 
         btnOkay.setText(resourceMap.getString("btnOkay.text"));
@@ -96,7 +95,13 @@ public class MekViewDialog extends JDialog {
         pack();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekViewDialog.class);

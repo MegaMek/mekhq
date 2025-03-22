@@ -3,37 +3,43 @@ sucsId: 325
 xcood: 71.853
 ycood: 36.654
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: A0VI
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 planet:
   - name:
       source: canon
       value: Biham
     type: TERRESTRIAL
     orbitalDist: 15.08
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: green12
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.84
-    diameter: 13609
-    density: 4.320493798939
+    diameter: 13636
+    density: 4.329089850215
     dayLength: 21
     yearLength: 58.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 37
     water:
-      source: canon
+      source: MWDA world profiles
       value: 52
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: AMPHIBIAN
     desc: A world of modest mineral or agricultural wealth, but rich in raw hydrocarbons,
       Biham became a haven for industrial magnates who still saw a future in petrochemical
@@ -56,22 +62,26 @@ planet:
       of Hoshina.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Borellas
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Hoshina
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Siang
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Quang-tze
     satellite:
-      - name: Kyoko
+      - name:
+          source: MWDA world profiles
+          value: Kyoko
         size: medium
         icon: rock8
-      - name: Valus
+      - name:
+          source: MWDA world profiles
+          value: Valus
         size: medium
         icon: rock7
     event:

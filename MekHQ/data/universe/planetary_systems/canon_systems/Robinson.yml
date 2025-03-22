@@ -3,9 +3,11 @@ sucsId: 2160
 xcood: 232.72
 ycood: -6.482
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 102'
   value: G5IV
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Davion, pg. 102'
+  value: 3
 event:
   - date: '2389-06-14'
     zenithCharge: yes
@@ -45,28 +47,32 @@ planet:
       value: Robinson
     type: GIANT_TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Davion, pg. 102'
+      value: 3
     icon: green52
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 102'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 102'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 102'
       value: 1.0
-    diameter: 12033
-    density: 5.834599659916
+    diameter: 12039
+    density: 5.837433464064
     dayLength: 21
     yearLength: 2.0
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 102'
       value: 35
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 102'
       value: 70
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 102'
       value: MAMMAL
     desc: |-
       Robinson is a rich and comfortable planet with large tracts of arable land, vast deposits of ores and minerals and a strong industrial base. Unfortunately the planet was occupied by the Draconis Combine during the early Succession Wars and the people’s unwillingness to give in to Combine occupation resulted in the loss of much of the planet’s heavy industry. Recovery has been slow, however Robinson remains the capital of the Draconis March and is still a politically important world.
@@ -76,19 +82,21 @@ planet:
       Valiant Systems
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Davion, pg. 102'
           value: Canaan
         capital:
-          source: canon
+          source: FedCom Civil War, pg. 192
           value: Beuller
       - name:
-          source: canon
+          source: 'Handbook: House Davion, pg. 102'
           value: Megiddo
       - name:
-          source: canon
+          source: 'Handbook: House Davion, pg. 102'
           value: Solomon
     satellite:
-      - name: Bethel
+      - name:
+          source: 'Handbook: House Davion, pg. 102'
+          value: Bethel
         size: medium
         icon: rock8
     event:

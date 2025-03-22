@@ -3,9 +3,11 @@ sucsId: 2174
 xcood: 95.64
 ycood: -2.635
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F2IV
-primarySlot: 5
+primarySlot:
+  source: MWDA world profiles
+  value: 5
 event:
   - date: '2424-04-08'
     nadirCharge: yes
@@ -93,28 +95,32 @@ planet:
       value: Ronel
     type: TERRESTRIAL
     orbitalDist: 4.2
-    sysPos: 5
+    sysPos:
+      source: MWDA world profiles
+      value: 5
     icon: green3
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.3
-    diameter: 13335
-    density: 6.818034948267
+    diameter: 13367
+    density: 6.834522038621
     dayLength: 23
     yearLength: 8.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 34
     water:
-      source: canon
+      source: MWDA world profiles
       value: 30
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: |-
       Blasted by its large parent star, Ronel is an inhospitable world with significant mineral wealth. Although the Terran Hegemony never permanently settled Ronel, Hegemony mining companies sent teams of workers on multiyear assignments to drill deep into Ronel‘s broken terrain.
@@ -129,13 +135,13 @@ planet:
     smallMoons: 4
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Oxo
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Xox
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Lenor
     event:
       - date: '2240-09-16'

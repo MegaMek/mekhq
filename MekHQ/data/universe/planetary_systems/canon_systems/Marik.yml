@@ -3,9 +3,11 @@ sucsId: 1609
 xcood: -79.621
 ycood: -75.28
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 60'
   value: K0V
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Marik, pg. 60'
+  value: 2
 event:
   - date: '2352-05-11'
     nadirCharge: yes
@@ -32,28 +34,32 @@ planet:
       value: Marik
     type: TERRESTRIAL
     orbitalDist: 0.56
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Marik, pg. 60'
+      value: 2
     icon: green11
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 60'
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 60'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 60'
       value: 1.1
-    diameter: 13349
-    density: 5.786859679481
+    diameter: 13354
+    density: 5.788910331148
     dayLength: 20
     yearLength: 1.0
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 60'
       value: 40
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 60'
       value: 55
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 60'
       value: MAMMAL
     desc: |-
       The planet Marik was founded by Antonin Marik in 2139 on behalf of the Terran Alliance. The planet quickly grew into a financial and industrial leader in the region, thanks to a wealth of raw materials. The wealth of the planet Marik helped spread the Marik Commonwealth to include other nearby systems.
@@ -65,19 +71,23 @@ planet:
       Waytani Incorporated
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 60'
           value: Chavalet
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 60'
           value: Mondaria
         capital:
-          source: canon
+          source: 'Handbook: House Marik, pg. 60'
           value: Dormuth
     satellite:
-      - name: Hradcany
+      - name:
+          source: 'Handbook: House Marik, pg. 60'
+          value: Hradcany
         size: medium
         icon: rock16
-      - name: Malla Strana
+      - name:
+          source: 'Handbook: House Marik, pg. 60'
+          value: Malla Strana
         size: large
         icon: rock13
     event:

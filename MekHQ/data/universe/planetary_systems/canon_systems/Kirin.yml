@@ -3,9 +3,11 @@ sucsId: 2950
 xcood: -23.601
 ycood: 1837.315
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: M9IV
-primarySlot: 1
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 1
 event:
   - date: '2807-10-25'
     zenithCharge: yes
@@ -15,28 +17,32 @@ planet:
       value: Kirin
     type: TERRESTRIAL
     orbitalDist: 0.04
-    sysPos: 1
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 1
     icon: green31
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 0.9
-    diameter: 11832
-    density: 5.339157260812
+    diameter: 11839
+    density: 5.342344638942
     dayLength: 29
     yearLength: 0.3
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 20
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 30
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: AMPHIBIAN
     desc: No description available.
     landmass:

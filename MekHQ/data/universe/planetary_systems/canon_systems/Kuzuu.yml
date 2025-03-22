@@ -3,9 +3,11 @@ sucsId: 1428
 xcood: 23.011
 ycood: 66.624
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K6V
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2374-08-03'
     zenithCharge: yes
@@ -17,28 +19,32 @@ planet:
       value: Kuzuu
     type: TERRESTRIAL
     orbitalDist: 0.24
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: green11
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.19
-    diameter: 12102
-    density: 6.891860197642
+    diameter: 12118
+    density: 6.901071175196
     dayLength: 21
     yearLength: 0.8
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 39
     water:
-      source: canon
+      source: MWDA world profiles
       value: 63
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: Kuzuu is a quiet, mostly agricultural world known for long, reasonably mild
       seasons, particularly in its middle-latitude continents of Oahana and Entiko.
@@ -59,19 +65,21 @@ planet:
       on the industrialized northern continent of Shanaro.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Entiko
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Oahana
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Shanaro
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Arbeesi
     satellite:
-      - name: Yokohama
+      - name:
+          source: MWDA world profiles
+          value: Yokohama
         size: medium
         icon: rock13
     event:

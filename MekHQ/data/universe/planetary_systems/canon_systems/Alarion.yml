@@ -3,9 +3,11 @@ sucsId: 52
 xcood: -319.706
 ycood: 138.602
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 73'
   value: G0V
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 73'
+  value: 3
 event:
   - date: '2500-05-04'
     zenithCharge: yes
@@ -52,28 +54,32 @@ planet:
       value: Alarion
     type: TERRESTRIAL
     orbitalDist: 1.1
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 73'
+      value: 3
     icon: wet9
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 73'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 73'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 73'
       value: 0.98
     diameter: 12056
-    density: 5.712974709224
+    density: 5.712759478461
     dayLength: 21
     yearLength: 1.6
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 73'
       value: 45
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 73'
       value: 80
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 73'
       value: FISH
     desc: |-
       Due to blunders during early colonization which led to an incredible death toll to colonists and local wildlife alike from terrestrial and native diseases, strict environmental and settlement regulations were put in place on Alarion that are still in effect. While these regulations strive to preserve the ecosystem and have limited how much of Alarion can be settled, they have not stopped the planet from becoming an economic and industrial powerhouse in the Lyran Commonwealth. Alarion is home to Jumpship, Aerospace and BattleMech factories, making it a world of extreme importance to the Commonwealth.
@@ -81,16 +87,18 @@ planet:
       Alarion is primarily settled by people of German, Romanian and English descent.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 73'
           value: New Brunswick
         capital:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 73'
           value: Craiova
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 73'
           value: New Jordan
     satellite:
-      - name: Tiber
+      - name:
+          source: 'Handbook: House Steiner, pg. 73'
+          value: Tiber
         size: medium
         icon: rock6
     event:

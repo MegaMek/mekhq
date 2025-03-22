@@ -5,7 +5,9 @@ ycood: 82.416
 spectralType:
   source: canon
   value: F4V
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 planet:
   - name: Knight's Dawn
     type: TERRESTRIAL
@@ -27,28 +29,32 @@ planet:
       value: Shimonita
     type: TERRESTRIAL
     orbitalDist: 2.24
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: wet1
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.06
-    diameter: 11888
-    density: 6.284687554581
+    diameter: 11870
+    density: 6.275433774567
     dayLength: 27
     yearLength: 3.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 31
     water:
-      source: canon
+      source: MWDA world profiles
       value: 82
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: BIRD
     desc: Shimonita possesses a single large continent surrounded by islands. The
       surrounding ocean is constantly whipped into a frenzy by massive storm activity
@@ -68,16 +74,15 @@ planet:
       a few decades.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Shangai
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Irezumi City
-      - name:
-          source: canon
-          value: Kasaki Island
     satellite:
-      - name: Nagasaki
+      - name:
+          source: MWDA world profiles
+          value: Nagasaki
         size: large
         icon: rock10
     event:

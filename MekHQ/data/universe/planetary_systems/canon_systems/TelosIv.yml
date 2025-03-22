@@ -3,9 +3,11 @@ sucsId: 2511
 xcood: 43.942
 ycood: 40.273
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K7IV
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2353-11-19'
     zenithCharge: yes
@@ -75,28 +77,32 @@ planet:
       value: Telos IV
     type: TERRESTRIAL
     orbitalDist: 0.6
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: wet20
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.73
-    diameter: 10252
-    density: 4.979787142921
+    diameter: 10277
+    density: 4.991900171684
     dayLength: 26
     yearLength: 0.9
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 44
     water:
-      source: canon
+      source: MWDA world profiles
       value: 82
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: BIRD
     desc: Cursed with a weak ozone layer that lets in more than the average amount
       of solar radiation, Telos IV is a warm, dreary world of continual rainstorms
@@ -134,22 +140,24 @@ planet:
       home to a scattering of large cities and mining towns.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Dulles
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Triumph
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Fellin
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Haranshire
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Rustov
     satellite:
-      - name: Sadib
+      - name:
+          source: MWDA world profiles
+          value: Sadib
         size: large
         icon: rock7
     event:

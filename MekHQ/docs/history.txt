@@ -1,6 +1,8 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.04-SNAPSHOT
+0.50.05-SNAPSHOT
+
+0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
 + PR #5853: Remove Legacy AtB's Campaign Parts Availability System
 + PR #5868: Updated Several Scenario Effects to use SupplyCache over SupportPointUpdate
@@ -174,6 +176,37 @@ MEKHQ VERSION HISTORY:
 + PR #6263: Added Initiative Bonuses from Tactics to Princess Units
 + PR #6268: Corrected Arrival Turn Values in a Few Scenario Templates
 + Fix #6272: Fixed Typographical Error in GrayMonday Properties
++ PR #3365: Removed Infirmary Background Image
++ Fix #6267: Fixed Incorrect Tracking of Deployment Zones
++ PR #6273: Refactored Skill Overrides; Added Randomization Logic; Added AeroSpace Ronin
++ PR #6274: Fixed Field Kitchen Ignore Non-Combatants Option Not Saving
++ Fix #6276: Fixed Prisoner Nag Displaying When No Prisoners Held
++ PR #6278: Fixed Republic of the Sphere Being Incorrectly Selected as Enemy Post-Fortress Wall
++ PR #6280: Corrected Assassination Scenario Briefing
++ PR #6282: Fixed Tactics-based Commander Initiative to Not Require SPA, Edge, or Implant Options to Be Enabled
++ PR #6286: Increased Minimum Skill Requirement For Replacement Limb Procedures to Match RAW
++ PR #6291: Added Handling for When Unit Quality is Manually Set to Empty or null Quality
++ PR #6292: Added Specific Handling for Legacy Prisoner Capture Styles
++ Fix #5977: Updated Label Texts for Clarity in Campaign Options IIC
++ PR #6298: Added Employer Modifiers to Contract Negotiations
++ PR #6296: Changed Filter Panel to Display by Default in Interstellar Map Panel
++ PR #6297: Removed Timer Delay for Filter Panel in Interstellar Map Tab
++ PR #6299: Disabled Remove CVP and Remove SP Options if GM Mode is Disabled; Allowed GMs to Take SP and CVP into Negative
++ PR #6300: Fixed Support Point Generation Soft Cap
++ Fix #6302: Refit will now properly consider different qualities as "used for refit planning
++ PR #6301: Archived AtB Documentation
++ PR #6303: Fixed Deployment Turn Calculation For Mounted Reinforcements
++ PR #6304: Added Note About SP Spending to Reinforcement Dialog
++ PR #6305: Corrected Multiple Facility Errors
++ PR #6306: Add canon static planet data and sources
++ Fix #6266: Patrol lance still scouts adjacent hexes even if deployment is cancelled
++ PR #6314: Corrected Resource Bundle Reference In PrisonerRansomEventDialog
++ Fix #6313: Added Self-Correction Step to Scenario Objective Processing
++ Fix #6315: Fixed MekHQ Throwing Meks into Low Altitude Scenarios
++ PR #6319: Added Early Exit for Objective Determination Self-Correction Loop
++ PR #6323: Added MekHQ New Player Guide
++ PR #6325: Updated New Player Guide PDF
+
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment

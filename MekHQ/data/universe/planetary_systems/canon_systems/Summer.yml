@@ -3,9 +3,11 @@ sucsId: 2433
 xcood: -44.468
 ycood: 26.058
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 90'
   value: M4V
-primarySlot: 1
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 90'
+  value: 1
 event:
   - date: '2400-02-04'
     zenithCharge: yes
@@ -19,28 +21,32 @@ planet:
       value: Summer
     type: TERRESTRIAL
     orbitalDist: 0.12
-    sysPos: 1
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 90'
+      value: 1
     icon: wet17
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 90'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 90'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 90'
       value: 1.03
-    diameter: 15468
-    density: 4.687572221666
+    diameter: 15455
+    density: 4.68359018552
     dayLength: 22
     yearLength: 0.5
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 90'
       value: 42
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 90'
       value: 77
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 90'
       value: PLANT
     desc: Summer is a world of rocky hills and valleys cloaked in shadows, mostly
       barren except for swaths of purplish scrub-grass.  During the summer months
@@ -56,19 +62,21 @@ planet:
       holds the capital city of Curitiba.
     landmass:
       - name:
-          source: canon
-          value: Wessler
+          source: 'Handbook: House Steiner, pg. 90'
+          value: Aberdale
       - name:
-          source: canon
-          value: Lestrades
+          source: 'Handbook: House Steiner, pg. 90'
+          value: Lestrade
         capital:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 90'
           value: Curitiba
       - name:
-          source: canon
-          value: Aberdale
+          source: 'Handbook: House Steiner, pg. 90'
+          value: Wessler
     satellite:
-      - name: Niflheim
+      - name:
+          source: 'Handbook: House Steiner, pg. 90'
+          value: Niflheim
         size: medium
         icon: oddmoon2
     event:

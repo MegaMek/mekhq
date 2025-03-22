@@ -3,9 +3,11 @@ sucsId: 2574
 xcood: 69.265
 ycood: 7.961
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F8IV
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2358-04-15'
     nadirCharge: yes
@@ -63,28 +65,32 @@ planet:
       value: Towne
     type: TERRESTRIAL
     orbitalDist: 3.36
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green55
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.97
-    diameter: 11058
-    density: 6.14399924176
+    diameter: 11076
+    density: 6.154269659581
     dayLength: 22
     yearLength: 6.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 40
     water:
-      source: canon
+      source: MWDA world profiles
       value: 72
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: Towne is a geologically young planet with large mountains and deep oceans,
       but also features a diverse ecosphere, the epitome of which is the giant, shaggy,
@@ -108,25 +114,27 @@ planet:
       link to the galaxy at large.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Fetryl
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Gherst
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Howell
       - name:
-          source: canon
-          value: Hyborian
+          source: MWDA world profiles
+          value: Hyboria
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Port Howard
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Krom
     satellite:
-      - name: Conan
+      - name:
+          source: MWDA world profiles
+          value: Conan
         size: medium
         icon: oddmoon3
     event:

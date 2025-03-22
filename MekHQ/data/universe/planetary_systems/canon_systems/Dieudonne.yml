@@ -3,9 +3,11 @@ sucsId: 715
 xcood: -75.224
 ycood: -25.895
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 75'
   value: F3V
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Marik, pg. 75'
+  value: 2
 event:
   - date: '2404-03-17'
     zenithCharge: yes
@@ -38,28 +40,32 @@ planet:
       value: Dieudonné
     type: TERRESTRIAL
     orbitalDist: 2.4
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Marik, pg. 75'
+      value: 2
     icon: green2
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 75'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 75'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 75'
       value: 1.0
-    diameter: 12927
-    density: 5.416652709834
+    diameter: 12951
+    density: 5.426502307261
     dayLength: 23
     yearLength: 3.9
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 75'
       value: 40
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 75'
       value: 67
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 75'
       value: MAMMAL
     desc: |-
       Dieudonne is a very hospitable world with a wide variety of unique flora and fauna with a myrid of medical applications as well as being edible. The planet also contains a wealth of mineral deposits which resulted in a large number of refineries and manufacturing centers. Unfortunately battles over the centuries between first the Hegemony, Commonwealth and League and later just the League and Commonwealth took its toll and much of the heavy industry on planet was destroyed after the fall of the Star League.
@@ -67,36 +73,40 @@ planet:
       The Free Worlds League finally established full control of the planet in the mid-29th Century and continued to use the planet as linchpin for their military activities in the region of space near Terra.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 75'
           value: Normandy
         capital:
-          source: canon
+          source: 'Handbook: House Marik, pg. 75'
           value: New Bastogne
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 75'
           value: Vinci
-      - name:
-          source: canon
-          value: St. Therese
-      - name:
-          source: canon
-          value: St. Germaine
     satellite:
-      - name: Runes
+      - name:
+          source: 'Handbook: House Marik, pg. 75'
+          value: École
         size: medium
-        icon: oddmoon1
-      - name: San Palo
-        size: large
-        icon: rock15
-      - name: Mary
-        size: medium
-        icon: rock12
-      - name: Ecole
-        size: large
-        icon: rock4
-      - name: Marie Theresa
+        icon: rock14
+      - name:
+          source: 'Handbook: House Marik, pg. 75'
+          value: Marie Theresa
         size: medium
         icon: oddmoon3
+      - name:
+          source: 'Handbook: House Marik, pg. 75'
+          value: Mary
+        size: medium
+        icon: rock12
+      - name:
+          source: 'Handbook: House Marik, pg. 75'
+          value: Runes
+        size: medium
+        icon: oddmoon1
+      - name:
+          source: 'Handbook: House Marik, pg. 75'
+          value: San Palo
+        size: large
+        icon: rock15
     event:
       - date: '2220-08-12'
         faction:

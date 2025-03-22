@@ -3,9 +3,11 @@ sucsId: 1834
 xcood: 7.229
 ycood: -12.715
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G4IV
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2371-08-24'
     nadirCharge: yes
@@ -21,28 +23,32 @@ planet:
       value: New Home
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: green23
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.99
-    diameter: 11917
-    density: 5.860453700889
+    diameter: 11894
+    density: 5.849289518297
     dayLength: 25
     yearLength: 2.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 34
     water:
-      source: canon
+      source: MWDA world profiles
       value: 66
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: BIRD
     desc: 3135 - Another early Terran colony world, established during humanity‘s
       first tentative steps to the stars, the features that drew many to New Home
@@ -78,19 +84,21 @@ planet:
       resources to undo.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Arbergeiht
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Goldwynn
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Spina Planetia
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Findler
     satellite:
-      - name: Neville
+      - name:
+          source: MWDA world profiles
+          value: Neville
         size: medium
         icon: oddmoon2
     event:

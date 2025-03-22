@@ -5,7 +5,9 @@ ycood: -59.756
 spectralType:
   source: canon
   value: F9V
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2442-04-08'
     zenithCharge: yes
@@ -76,29 +78,33 @@ planet:
       value: Kansu
     type: TERRESTRIAL
     orbitalDist: 1.76
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: green38
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TOXICPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.0
     diameter: 12178
-    density: 5.770975939485
+    density: 5.770853077648
     dayLength: 18
     yearLength: 2.6
     temperature:
-      source: canon
-      value: -30
+      source: MWDA world profiles
+      value: 135
     water:
-      source: canon
+      source: MWDA world profiles
       value: 46
     lifeForm:
-      source: canon
-      value: PLANT
+      source: MWDA world profiles
+      value: NONE
     desc: |-
       Note: Planetary data is as of 3130, climate and temperature were arctic prior to 3090.
 
@@ -111,19 +117,21 @@ planet:
       By 3091, in an extreme example of a runaway greenhouse effect, the average surface temperature at the equator exceeded the 100 degrees Celsius. The "Seas of Fire", where the freshly released methane burns at the ocean's surface, remains a poignant reminder of the horrors of the Jihad. Today, the remaining population lives underground, while a small portion attempts to colonize Sheng Li to begin life anew.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
+          value: Fetid
+      - name:
+          source: MWDA world profiles
           value: Kantuene
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Raijianstad
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Matawan
-      - name:
-          source: canon
-          value: Fetid
     satellite:
-      - name: Sheng Li
+      - name:
+          source: MWDA world profiles
+          value: Sheng Li
         size: medium
         icon: oddmoon3
     event:

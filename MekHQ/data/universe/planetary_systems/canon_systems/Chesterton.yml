@@ -3,9 +3,11 @@ sucsId: 535
 xcood: 115.619
 ycood: -71.037
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 87'
   value: G9V
-primarySlot: 5
+primarySlot:
+  source: 'Handbook: House Davion, pg. 87'
+  value: 5
 event:
   - date: '2387-04-21'
     nadirCharge: yes
@@ -95,28 +97,32 @@ planet:
       value: Chesterton
     type: TERRESTRIAL
     orbitalDist: 0.56
-    sysPos: 5
+    sysPos:
+      source: 'Handbook: House Davion, pg. 87'
+      value: 5
     icon: wet16
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 87'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 87'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 87'
       value: 1.13
-    diameter: 12402
-    density: 6.420814841305
+    diameter: 12385
+    density: 6.411974728084
     dayLength: 22
     yearLength: 1.0
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 87'
       value: 31
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 87'
       value: 75
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 87'
       value: MAMMAL
     desc: Chesterton is a cool-temperate planet with above average resources and a
       wide industrial base. Unfortunately this has caused problems for the planet
@@ -127,22 +133,34 @@ planet:
       the planet was nearly restored to its former glory.
     landmass:
       - name: Smith
-        capital: L'Île-d'Anticosti
+        capital:
+          source: 'Handbook: House Davion, pg. 87'
+          value: Chesterton
       - name: Sawyer
     satellite:
-      - name: Angela
+      - name:
+          source: 'Handbook: House Davion, pg. 87'
+          value: Angela
         size: medium
         icon: oddmoon2
-      - name: Iannius
+      - name:
+          source: 'Handbook: House Davion, pg. 87'
+          value: Iannius
         size: giant
         icon: rock12
-      - name: Moira
+      - name:
+          source: 'Handbook: House Davion, pg. 87'
+          value: Moira
         size: medium
         icon: rock9
-      - name: Nochus
+      - name:
+          source: 'Handbook: House Davion, pg. 87'
+          value: Nochus
         size: medium
         icon: rock2
-      - name: Willus
+      - name:
+          source: 'Handbook: House Davion, pg. 87'
+          value: Willus
         size: medium
         icon: oddmoon3
     event:

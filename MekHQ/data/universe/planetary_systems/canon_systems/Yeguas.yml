@@ -3,9 +3,11 @@ sucsId: 2798
 xcood: -160.66
 ycood: 281.747
 spectralType:
-  source: canon
+  source: 'Operational Turning Points: Red Corsair, pg. 5'
   value: G5IV
-primarySlot: 3
+primarySlot:
+  source: 'Operational Turning Points: Red Corsair, pg. 5'
+  value: 3
 event:
   - date: '2670-04-11'
     zenithCharge: yes
@@ -53,28 +55,32 @@ planet:
       value: Yeguas
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 3
+    sysPos:
+      source: 'Operational Turning Points: Red Corsair, pg. 5'
+      value: 3
     icon: green57
     pressure:
-      source: canon
+      source: 'Operational Turning Points: Red Corsair, pg. 5'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Operational Turning Points: Red Corsair, pg. 5'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Operational Turning Points: Red Corsair, pg. 5'
       value: 0.98
-    diameter: 12904
-    density: 5.33420198285
+    diameter: 12908
+    density: 5.33566997526
     dayLength: 24
     yearLength: 2.0
     temperature:
-      source: canon
+      source: 'Operational Turning Points: Red Corsair, pg. 5'
       value: 24
     water:
-      source: canon
+      source: 'Operational Turning Points: Red Corsair, pg. 5'
       value: 69
     lifeForm:
-      source: canon
+      source: 'Operational Turning Points: Red Corsair, pg. 5'
       value: PLANT
     desc: |-
       Yegaus is a comfortable planet with abundant agriculture and natural resources and even modest industry. However, despite this it has never been a prominent planet in the Lyran Commonwealth, though its location in the nation’s interior spared Yegaus the worst of the Succession Wars. The planet is best known for its ample grasslands and highly regarded breeds of Terran horses. The planet became more prominent after the Clan Invasion put the planet on the Commonwealth’s new border with the Jade Falcons.
@@ -82,16 +88,20 @@ planet:
       Laumer City is located on the continent of Saddleback and is home to Yegaus’ wealthiest merchant families. Saddleback is primarily covered in massive farmsteads that produce ‘luxury crops’ to ship off-world and is one of three continents.
     landmass:
       - name:
-          source: canon
+          source: 'Operational Turning Points: Red Corsair, pg. 5'
           value: Saddleback
         capital:
-          source: canon
+          source: 'Operational Turning Points: Red Corsair, pg. 5'
           value: Laumer City
     satellite:
-      - name: Cue
-        size: large
-        icon: rock3
-      - name: Eight Ball
+      - name:
+          source: 'Operational Turning Points: Red Corsair, pg. 5'
+          value: Cue Ball
+        size: medium
+        icon: rock4
+      - name:
+          source: 'Operational Turning Points: Red Corsair, pg. 5'
+          value: Eight Ball
         size: medium
         icon: oddmoon3
     event:

@@ -3,9 +3,11 @@ sucsId: 192
 xcood: 73.565
 ycood: 66.743
 spectralType:
-  source: canon
+  source: FedCom Civil War, pg. 203
   value: G6IV
-primarySlot: 3
+primarySlot:
+  source: FedCom Civil War, pg. 203
+  value: 3
 event:
   - date: '2350-11-26'
     nadirCharge: yes
@@ -50,28 +52,32 @@ planet:
       value: Ashio
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 3
+    sysPos:
+      source: FedCom Civil War, pg. 203
+      value: 3
     icon: wet14
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 203
       value: STANDARD
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: FedCom Civil War, pg. 203
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 203
       value: 1.0
-    diameter: 10820
-    density: 6.486260995574
+    diameter: 10827
+    density: 6.490631456057
     dayLength: 19
     yearLength: 2.0
     temperature:
-      source: canon
-      value: 25
+      source: FedCom Civil War, pg. 203
+      value: 35
     water:
-      source: canon
+      source: FedCom Civil War, pg. 203
       value: 80
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 203
       value: MAMMAL
     desc: Ashio is an unremarkable planet, aside from being the capital of the Ashio
       Prefecture. As the capital it has significant logistical and command infrastructure.
@@ -82,27 +88,33 @@ planet:
       sending it into an ice age.
     landmass:
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 203
           value: Rhodesia
         capital:
-          source: canon
+          source: FedCom Civil War, pg. 203
           value: Iscariot
       - name:
-          source: canon
-          value: Zaire
-      - name:
-          source: canon
+          source: FedCom Civil War, pg. 203
           value: Vesuvius Prime
+      - name:
+          source: FedCom Civil War, pg. 203
+          value: Zaire
     satellite:
-      - name: Kauner
-        size: large
-        icon: rock13
-      - name: Rossi
-        size: medium
-        icon: oddmoon3
-      - name: Hyde
+      - name:
+          source: FedCom Civil War, pg. 203
+          value: Hyde
         size: large
         icon: rock8
+      - name:
+          source: FedCom Civil War, pg. 203
+          value: Kauner
+        size: large
+        icon: rock13
+      - name:
+          source: FedCom Civil War, pg. 203
+          value: Rossi
+        size: medium
+        icon: oddmoon3
     event:
       - date: '2117-08-31'
         faction:

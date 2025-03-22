@@ -3,9 +3,11 @@ sucsId: 1691
 xcood: 102.876
 ycood: -54.593
 spectralType:
-  source: canon
+  source: House Liao, pg. 155
   value: G6V
-primarySlot: 3
+primarySlot:
+  source: House Liao, pg. 155
+  value: 3
 planet:
   - name: Wuchang
     type: TERRESTRIAL
@@ -43,7 +45,9 @@ planet:
       value: Mesartim (Conway)
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 3
+    sysPos:
+      source: House Liao, pg. 155
+      value: 3
     icon: green34
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -56,7 +60,7 @@ planet:
     temperature: 21
     water: 63
     lifeForm:
-      source: canon
+      source: House Liao, pg. 155
       value: REPTILE
     desc: Mesartim is an agricultural world specialising in the production of rare
       wines. Unfortunately the Succession Wars have destroyed much of the productive

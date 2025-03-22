@@ -27,22 +27,45 @@ planet:
     orbitalDist: 0.49
     sysPos: 2
     icon: green43
-    pressure: STANDARD
-    atmosphere: BREATHABLE
+    pressure:
+      source: 25 Years of Art and Fiction, pg. 145
+      value: STANDARD
+    atmosphere:
+      source: 25 Years of Art and Fiction, pg. 145
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
-    gravity: 0.78
-    diameter: 11700
-    density: 4.6818
+    gravity:
+      source: 25 Years of Art and Fiction, pg. 145
+      value: 1.11
+    diameter: 13962
+    density: 5.58699596606
     dayLength: 20
     yearLength: 0.9
-    temperature: 21
-    water: 55
-    lifeForm: REPTILE
+    temperature:
+      source: 25 Years of Art and Fiction, pg. 145
+      value: 45
+    water:
+      source: 25 Years of Art and Fiction, pg. 145
+      value: 50
+    lifeForm:
+      source: 25 Years of Art and Fiction, pg. 145
+      value: PLANT
     landmass:
-      - name: Godunov's Folly
-        capital: Génis
-      - name: Kennedy
-      - name: Brafield
+      - name:
+          source: 25 Years of Art and Fiction, pg. 145
+          value: Granite
+        capital:
+          source: 25 Years of Art and Fiction, pg. 145
+          value: Maverick
+      - name:
+          source: 25 Years of Art and Fiction, pg. 145
+          value: Limerock
+    satellite:
+      - name:
+          source: 25 Years of Art and Fiction, pg. 145
+          value: Haven
+        size: medium
+        icon: rock11
     event:
       - date: '2432-07-30'
         faction:

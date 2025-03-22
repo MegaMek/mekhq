@@ -3,9 +3,11 @@ sucsId: 1975
 xcood: 50.695
 ycood: -124.723
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K7VI
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 planet:
   - name: Chac
     type: ICE_GIANT
@@ -42,28 +44,32 @@ planet:
       value: Palos
     type: TERRESTRIAL
     orbitalDist: 0.6
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green25
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.0
-    diameter: 14849
-    density: 4.71404520791
+    diameter: 14878
+    density: 4.723366429001
     dayLength: 26
     yearLength: 0.9
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 55
     water:
-      source: canon
+      source: MWDA world profiles
       value: 59
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       3135 - Palos is a large world, measuring nearly 15,000 kilometers at the equator. Palos was colonized in the early 23rd century and quickly became a major source of important ores and minerals. Its three continents, Cartagena, Murcia, and Valencia, cover just over 40 percent of the planet's surface. Valencia, is the largest of the three, is covered with vast woodlands and mountains. Xer, the capital city, is located on the northeastern coast, on the Iberian Peninsula. Two hundred kilometers south of Xer is the barren Docarshon Valley. Early colonists discovered rich gold deposits in Docarson Valley that played out after three centuries of mining and it is now just an ugly scar of uncontrolled exploitation. Murcia is mostly mountains and valleys covered in sparse vegetation and timber. It is the home of the planet's massive mining operations. Careful land management has allowed Murcia to continue to produce a steady supply of ore and minerals. Cartagena is the smallest of the three continents and it supplies most of the planet's food, including domesticated indigenous mammals as an alternative to beef.
@@ -73,31 +79,41 @@ planet:
       During the Fourth Succession War, Federated Suns forces landed and were immediately met by the planet's inhabitants, who showed no fear in protesting their presence. After the planet fell, the people quietly chafed under Federated Commonwealth rule until the war of 3057 that shattered the Sarna March. Palos happily returned to the Capellan Confederation. Palos nearly revolted when Devlin Stone demanded the planet be included in The Republic of the Sphere.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Cartagena
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Murcia
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Valencia
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Xer
     satellite:
-      - name: Isla Palana
+      - name:
+          source: MWDA world profiles
+          value: Isla Palana
         size: giant
         icon: rock2
-      - name: Menor
+      - name:
+          source: MWDA world profiles
+          value: Menor
         size: large
         icon: rock7
-      - name: Pinatar
+      - name:
+          source: MWDA world profiles
+          value: Pinatar
         size: medium
         icon: rock12
-      - name: Reona
+      - name:
+          source: MWDA world profiles
+          value: Reona
         size: large
         icon: rock6
-      - name: Ribera
+      - name:
+          source: MWDA world profiles
+          value: Ribera
         size: medium
         icon: oddmoon3
     event:

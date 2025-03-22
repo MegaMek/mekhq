@@ -42,6 +42,8 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
@@ -79,7 +81,8 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.gui.dialog.HireBulkPersonnelDialog.overrideSkills;
+import static megamek.common.enums.SkillLevel.*;
+import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 
 public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(UnitTableMouseAdapter.class);
@@ -216,6 +219,10 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     "Set Quality", JOptionPane.PLAIN_MESSAGE, null, possibilities,
                     PartQuality.QUALITY_D.toName(reverse));
 
+            if (quality == null || quality.isBlank()) {
+                return;
+            }
+
             PartQuality q = PartQuality.fromName(quality, reverse);
             for (Unit unit : units) {
                 if (null != unit) {
@@ -345,18 +352,18 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                 boolean fixSkillLevels = false;
 
-                SkillLevel skillLevel = SkillLevel.REGULAR;
+                SkillLevel skillLevel = REGULAR;
                 if (command.contains("ELITE")) {
-                    skillLevel = SkillLevel.ELITE;
+                    skillLevel = ELITE;
                     fixSkillLevels = true;
                 } else if (command.contains("VETERAN")) {
-                    skillLevel = SkillLevel.VETERAN;
+                    skillLevel = VETERAN;
                     fixSkillLevels = true;
                 } else if (command.contains("ULTRA_GREEN")) {
-                    skillLevel = SkillLevel.ULTRA_GREEN;
+                    skillLevel = ULTRA_GREEN;
                     fixSkillLevels = true;
                 } else if (command.contains("GREEN")) {
-                    skillLevel = SkillLevel.GREEN;
+                    skillLevel = GREEN;
                     fixSkillLevels = true;
                 }
 
@@ -366,7 +373,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                             continue;
                         }
 
-                        overrideSkills(gui.getCampaign(), person, person.getPrimaryRole(), skillLevel.ordinal());
+                        Campaign campaign = gui.getCampaign();
+                        RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
+                        boolean useExtraRandomness = randomSkillPreferences.randomizeSkill();
+
+                        // We don't care about admin settings, as we're not going to have an admin here
+                        overrideSkills(false, false, useExtraRandomness,
+                              person, person.getPrimaryRole(), skillLevel);
                     }
                 }
             }

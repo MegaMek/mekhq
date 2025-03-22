@@ -3,9 +3,11 @@ sucsId: 2017
 xcood: 206.144
 ycood: 309.913
 spectralType:
-  source: canon
+  source: House Kurita
   value: F7V
-primarySlot: 3
+primarySlot:
+  source: House Kurita
+  value: 3
 event:
   - date: '2388-09-17'
     nadirCharge: yes
@@ -55,7 +57,9 @@ planet:
       value: Pesht
     type: TERRESTRIAL
     orbitalDist: 1.3
-    sysPos: 3
+    sysPos:
+      source: House Kurita
+      value: 3
     icon: green12
     pressure:
       source: canon
@@ -76,7 +80,7 @@ planet:
       source: canon
       value: 64
     lifeForm:
-      source: canon
+      source: House Kurita
       value: MAMMAL
     desc: Pesht was discovered by early explorers from the Ozawan Merchant Clan in
       2212. The Ozawan Clan made multiple attempts over the course of several decades

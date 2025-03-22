@@ -3,9 +3,11 @@ sucsId: 672
 xcood: 54.151
 ycood: -336.258
 spectralType:
-  source: canon
+  source: 'Objective Raids: Capellan Confederation'
   value: G5V
-primarySlot: 4
+primarySlot:
+  source: 'Objective Raids: Capellan Confederation'
+  value: 4
 event:
   - date: '2638-11-13'
     nadirCharge: yes
@@ -69,28 +71,32 @@ planet:
       value: Decatur
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 4
+    sysPos:
+      source: 'Objective Raids: Capellan Confederation'
+      value: 4
     icon: wet12
     pressure:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Objective Raids: Capellan Confederation'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 0.95
-    diameter: 11400
-    density: 5.8284
+    diameter: 11427
+    density: 5.842348002115
     dayLength: 26
     yearLength: 1.3
     temperature:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 36
     water:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 80
     lifeForm:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: REPTILE
     desc: Decatur is a tropical planet with fertile soil and abundant surface water,
       though it is otherwise fairly average. Agriculture makes up the primary industry
@@ -100,10 +106,10 @@ planet:
       of Decatur and train recruits as either combat vehicle crews or unarmored infantry.
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Decatur
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Macon
     event:
       - date: '2606-08-11'

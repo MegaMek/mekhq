@@ -3,9 +3,11 @@ sucsId: 2787
 xcood: -24.309
 ycood: -4.696
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 69'
   value: A7II
-primarySlot: 8
+primarySlot:
+  source: 'Handbook: House Marik, pg. 69'
+  value: 8
 event:
   - date: '2375-06-28'
     zenithCharge: yes
@@ -148,28 +150,32 @@ planet:
       value: Alula Australis
     type: TERRESTRIAL
     orbitalDist: 5.04
-    sysPos: 8
+    sysPos:
+      source: 'Handbook: House Marik, pg. 69'
+      value: 8
     icon: wet14
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 69'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 69'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 69'
       value: 1.09
-    diameter: 13388
-    density: 5.746615362305
+    diameter: 13359
+    density: 5.734094321759
     dayLength: 19
     yearLength: 11.4
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 69'
       value: 26
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 69'
       value: 87
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 69'
       value: AMPHIBIAN
     desc: |-
       3135 - A warm and pleasant world colonized early in the first Terran exodus and claimed even before the Star League by House Marik‘s Free Worlds League, Alula Australis was a highly developed world even before it fell under the sway of the Terran Hegemony. Under the joint Free Worlds/Hegemony banner, Alula Australis benefited from the glories of the Star League era, and became a major industrial world that included among its exports industrial metals, power generation systems, electronics, and even BattleMechs. Assaulted during the Amaris Coup, this world fared better than most, and reverted to Marik control for much of the Succession Wars, though heavy raiding crippled its BattleMech-dominated industrial base by the close of the thirtieth century, sending the planet into a severe depression. The planet experienced a revival, however, when veins of rare earths and gemstones were discovered in the mountain ranges outside the planetary capital of New Horizon City in the late 2990s, and today these valuable exports form the basis for a mining and refining industry. Still in Marik hands at the time of the Blakist Jihad, Alula Australis was spared the worst of the fighting, and all three of its major landmasses—Auroria in the northern hemisphere, Hume and Locke in the southern—boast major industrial centers. New Horizon City is located on the southern peninsula of Auroria, while Sturgeon, home to the planet‘s largest chemical corporation, AA PolyChem Unlimited, dominates the central Hubbes River Valley on Hume.
@@ -177,19 +183,21 @@ planet:
       Alula Australis has the distinction of being the first planet that House Marik deployed BattleMechs on.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 69'
           value: Auroria
         capital:
-          source: canon
+          source: 'Handbook: House Marik, pg. 69'
           value: New Horizon City
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 69'
           value: Hume
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 69'
           value: Locke
     satellite:
-      - name: Caprice
+      - name:
+          source: 'Handbook: House Marik, pg. 69'
+          value: Caprice
         size: large
         icon: rock7
     event:

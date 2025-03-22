@@ -5,7 +5,9 @@ ycood: 15.463
 spectralType:
   source: canon
   value: A0VI
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2486-08-11'
     nadirCharge: yes
@@ -30,28 +32,32 @@ planet:
       value: Cor Caroli
     type: TERRESTRIAL
     orbitalDist: 15.08
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green5
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.11
-    diameter: 14135
-    density: 5.514794746452
+    diameter: 14140
+    density: 5.516728742137
     dayLength: 18
     yearLength: 58.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 50
     water:
-      source: canon
+      source: MWDA world profiles
       value: 71
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: |-
       3135 - The primary star in the Cor Caroli system is a white-hot A-class subdwarf. All the planets in the Cor Caroli system orbit the cooler, more stable F0-class secondary star. The effects of the unstable subdwarf can still be felt on the planets, with bursts of electromagnetic radiation frequently disrupting local communications and spaceborne navigational systems. With a breathable atmosphere, a biosphere suitable to human habitation, as well as a planetary surface and expansive asteroid ring that were both rich in minerals, Cor Caroli quickly attracted entrepreneurial colonists. Several early settlements on the northeastern Carboniri continent were lost in an a failed effort to transport some of the smaller iron- and nickel-rich asteroids to the surface, using specially modified mass drivers. This disaster resulted in several decades of a "mild nuclear winter". Despite this, Cor Caroli continued to expand and further industrialize, attracting the attention of the growing Federation of Skye and the Terran Hegemony.
@@ -61,21 +67,24 @@ planet:
       During the Succession Wars, Cor Caroli was raided several times by the Free World League and the Draconis Combine, damaging many of the local industries and mining operations. Despite efforts to repair these, by the mid-thirty-first century, roughly twenty percent of the planet's industry had been irrevocably lost. The Word of Blake annexed Cor Caroli during the Jihad, however unlike many planets this occurred peacefully. The planet was recaptured by Operation SCOUR in January of 3077.
 
       Corriolas, Cor Caroli's capital and largest city, is located on the northwestern continent of Ferrini. Caroli Mining Consortium, the largest of the planet's industrial mining corporations, is based in Maureen, the largest city on the southern continent of Nikallini. Cor Caroli‘s fourth landmass, the southern polar continent of Pluribi, is virtually uninhabited.
+    ring:
+      source: MWDA world profiles
+      value: yes
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Carboniri
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Ferrini
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Corriolas
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Nikallini
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Pluribi
     satellite:
       - name: 6D1

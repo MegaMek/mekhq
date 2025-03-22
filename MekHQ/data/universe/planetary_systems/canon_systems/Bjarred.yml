@@ -3,9 +3,11 @@ sucsId: 335
 xcood: 243.394
 ycood: 408.678
 spectralType:
-  source: canon
+  source: House Kurita
   value: F4V
-primarySlot: 5
+primarySlot:
+  source: House Kurita
+  value: 5
 event:
   - date: '2375-11-06'
     nadirCharge: yes
@@ -85,7 +87,9 @@ planet:
       value: Bjarred
     type: TERRESTRIAL
     orbitalDist: 2.24
-    sysPos: 5
+    sysPos:
+      source: House Kurita
+      value: 5
     icon: green9
     pressure:
       source: canon
@@ -106,7 +110,7 @@ planet:
       source: canon
       value: 39
     lifeForm:
-      source: canon
+      source: House Kurita
       value: AMPHIBIAN
     desc: Bjarred is a small world first settled in the 23rd Century by explorers
       from the Ozawa Merchant organization. The planet is a technologically advanced
@@ -126,7 +130,7 @@ planet:
           source: canon
           value: Lomma
         capital:
-          source: canon
+          source: House Kurita
           value: Oasis V
       - name:
           source: canon

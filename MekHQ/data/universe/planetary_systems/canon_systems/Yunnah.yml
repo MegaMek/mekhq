@@ -3,9 +3,11 @@ sucsId: 2807
 xcood: 27.148
 ycood: -127.003
 spectralType:
-  source: canon
+  source: 'Objective Raids: Capellan Confederation'
   value: K3III
-primarySlot: 6
+primarySlot:
+  source: 'Objective Raids: Capellan Confederation'
+  value: 6
 planet:
   - name: Shankpana
     type: TERRESTRIAL
@@ -88,28 +90,32 @@ planet:
       value: Yunnah
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 6
+    sysPos:
+      source: 'Objective Raids: Capellan Confederation'
+      value: 6
     icon: wet19
     pressure:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Objective Raids: Capellan Confederation'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 1.0
-    diameter: 11538
-    density: 6.112247095136
+    diameter: 11518
+    density: 6.101527243017
     dayLength: 17
     yearLength: 1.0
     temperature:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 43
     water:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 76
     lifeForm:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: MAMMAL
     desc: |-
       3025: Yunnah contains vast deposits of natural resources in the large mountain ranges that cover most of the planet’s land mass, however there have been few attempts to mine them and Yunnah was barely populated for most of its history. This changed in the early 31st Century when the Capellan Confederation established a large medical facility to heal injured soldiers and a massive repair and recovery facility to repair damaged war-materials. Yunnah possesses just enough agriculture to feeds its population. Some seafaring activity exists as part of a quasi-religious movement based on spiritual harmony with the elements.
@@ -118,10 +124,10 @@ planet:
     smallMoons: 1
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Burma
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Yunnah Prime
     event:
       - date: '2733-12-24'
