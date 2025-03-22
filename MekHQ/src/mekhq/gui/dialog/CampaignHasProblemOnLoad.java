@@ -66,7 +66,8 @@ public class CampaignHasProblemOnLoad extends MHQDialogImmersive {
      */
     public CampaignHasProblemOnLoad(Campaign campaign, CampaignProblemType problemType) {
         super(campaign, getSpeaker(campaign), null, createInCharacterMessage(campaign, problemType),
-            createButtons(problemType), createOutOfCharacterMessage(problemType), null, false);
+              createButtons(problemType), createOutOfCharacterMessage(problemType), null,
+              false, null, true);
     }
 
     /**
