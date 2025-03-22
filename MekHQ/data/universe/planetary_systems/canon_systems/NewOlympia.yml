@@ -3,9 +3,11 @@ sucsId: 1841
 xcood: -150.168
 ycood: -130.286
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 60'
   value: G1V
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Marik, pg. 60'
+  value: 3
 event:
   - date: '2368-05-02'
     zenithCharge: yes
@@ -56,28 +58,32 @@ planet:
       value: New Olympia
     type: TERRESTRIAL
     orbitalDist: 1.0
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Marik, pg. 60'
+      value: 3
     icon: wet14
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 60'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 60'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 60'
       value: 0.95
-    diameter: 14023
-    density: 4.757521353878
+    diameter: 14028
+    density: 4.759212311467
     dayLength: 17
     yearLength: 1.4
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 60'
       value: 35
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 60'
       value: 82
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 60'
       value: PLANT
     desc: |-
       An uneasy peace has covered New Olympia for centuries between the Olympica Province and the rest of the planet which is part of the Free Worlds League. Technically the island province is an independent realm in the middle of the Free Worlds League. This unique status as an independent region has drawn the wealthy of the Free Worlds League that are eager to live under the comforts provided at the heart of the League while avoiding the taxes imposed on most planets.
@@ -85,19 +91,18 @@ planet:
       Most industry on the planet is centered around catering to the rich individuals seeking to take advantage of the Olympica Provinces’ tax free status.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 60'
           value: New Greenland
         capital:
-          source: canon
-          value: Kasnov
-      - name:
-          source: canon
-          value: Olympica
-        capital:
-          source: canon
+          source: 'Handbook: House Marik, pg. 60'
           value: Darienbad
+      - name:
+          source: 'Handbook: House Marik, pg. 60'
+          value: Olympica Province
     satellite:
-      - name: Delphi
+      - name:
+          source: 'Handbook: House Marik, pg. 60'
+          value: Delphi
         size: medium
         icon: oddmoon2
     event:

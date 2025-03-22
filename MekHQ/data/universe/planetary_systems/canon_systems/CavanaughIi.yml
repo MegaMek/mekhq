@@ -3,9 +3,11 @@ sucsId: 497
 xcood: -307.125
 ycood: -52.558
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 77'
   value: M9II
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 77'
+  value: 4
 event:
   - date: '2390-01-27'
     zenithCharge: yes
@@ -70,28 +72,32 @@ planet:
       value: Cavanaugh II
     type: TERRESTRIAL
     orbitalDist: 0.04
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 77'
+      value: 4
     icon: wet9
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 77'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 77'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 77'
       value: 0.99
-    diameter: 11608
-    density: 6.009917658357
+    diameter: 11592
+    density: 6.001731039085
     dayLength: 20
     yearLength: 0.3
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 77'
       value: 40
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 77'
       value: 80
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 77'
       value: AMPHIBIAN
     desc: |-
       Cavanaugh II has a warm climate with fertile soil and as a result the planet is known for its agriculture. The planet has a strong industrial base which makes it mostly self-sufficient and even creates enough to send to neighboring systems, however the planet's industry has focused on consumer goods.
@@ -99,34 +105,42 @@ planet:
       Cavanaugh II was settled by a mixture of English, Welsh and Scottish colonists.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 77'
           value: Bedivere
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 77'
           value: Gareth
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 77'
           value: Gawain
         capital:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 77'
           value: Caerleon
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 77'
           value: Mordred
       - name:
-          source: canon
-          value: Tristam
+          source: 'Handbook: House Steiner, pg. 77'
+          value: Tristram
     satellite:
-      - name: Cambriae
+      - name:
+          source: 'Handbook: House Steiner, pg. 77'
+          value: Cambriae
         size: giant
         icon: rock9
-      - name: Gododin
+      - name:
+          source: 'Handbook: House Steiner, pg. 77'
+          value: Gododin
         size: large
         icon: rock15
-      - name: Nannius
-        size: large
-        icon: rock13
-      - name: Tennyson
+      - name:
+          source: 'Handbook: House Steiner, pg. 77'
+          value: Nennius
+        size: medium
+        icon: oddmoon1
+      - name:
+          source: 'Handbook: House Steiner, pg. 77'
+          value: Tennyson
         size: medium
         icon: rock1
     event:

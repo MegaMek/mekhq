@@ -52,22 +52,45 @@ planet:
     orbitalDist: 0.9
     sysPos: 3
     icon: green21
-    pressure: STANDARD
-    atmosphere: BREATHABLE
+    pressure:
+      source: 25 Years of Art and Fiction, pg. 227
+      value: STANDARD
+    atmosphere:
+      source: 25 Years of Art and Fiction, pg. 227
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
-    gravity: 1.17
-    diameter: 12000
-    density: 6.8337
+    gravity:
+      source: 25 Years of Art and Fiction, pg. 227
+      value: 1.03
+    diameter: 11274
+    density: 6.42035902813
     dayLength: 19
     yearLength: 1.3
-    temperature: 24
-    water: 44
-    lifeForm: BIRD
+    temperature:
+      source: 25 Years of Art and Fiction, pg. 227
+      value: 40
+    water:
+      source: 25 Years of Art and Fiction, pg. 227
+      value: 60
+    lifeForm:
+      source: 25 Years of Art and Fiction, pg. 227
+      value: MAMMAL
     landmass:
       - name: Seyid Sadiq
         capital: Dohuk
       - name: Kalar
       - name: Přibyslav
+    satellite:
+      - name:
+          source: 25 Years of Art and Fiction, pg. 227
+          value: Ayyub
+        size: medium
+        icon: oddmoon3
+      - name:
+          source: 25 Years of Art and Fiction, pg. 227
+          value: Seyyeb
+        size: medium
+        icon: oddmoon3
     event:
       - date: '2418-04-11'
         faction:

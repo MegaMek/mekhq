@@ -3,7 +3,9 @@ sucsId: 2179
 xcood: -462.868
 ycood: 226.327
 spectralType: F1V
-primarySlot: 4
+primarySlot:
+  source: 25 Years of Art and Fiction, pg. 47
+  value: 4
 event:
   - date: '2871-08-01'
     nadirCharge: no
@@ -78,25 +80,47 @@ planet:
       value: Rosetta
     type: TERRESTRIAL
     orbitalDist: 2.56
-    sysPos: 4
+    sysPos:
+      source: 25 Years of Art and Fiction, pg. 47
+      value: 4
     icon: green15
-    pressure: STANDARD
-    atmosphere: BREATHABLE
+    pressure:
+      source: 25 Years of Art and Fiction, pg. 47
+      value: STANDARD
+    atmosphere:
+      source: 25 Years of Art and Fiction, pg. 47
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
-    gravity: 1.17
-    diameter: 14100
-    density: 5.8284
+    gravity:
+      source: 25 Years of Art and Fiction, pg. 47
+      value: 0.89
+    diameter: 12301
+    density: 5.084678433587
     dayLength: 19
     yearLength: 4.3
-    temperature: 31
-    water: 48
-    lifeForm: AMPHIBIAN
+    temperature:
+      source: 25 Years of Art and Fiction, pg. 47
+      value: 29
+    water:
+      source: 25 Years of Art and Fiction, pg. 47
+      value: 70
+    lifeForm:
+      source: 25 Years of Art and Fiction, pg. 47
+      value: NONE
     landmass:
       - name: Inoue
-        capital: Cordelia
+        capital:
+          source: 25 Years of Art and Fiction, pg. 47
+          value: Young
       - name: Thomas's Meridian
       - name: Smith's Flats
       - name: Purcell
+    satellite:
+      - name:
+          source: 25 Years of Art and Fiction, pg. 47
+          value: n/a
+        size: medium
+        icon: oddmoon1
     event:
       - date: '2710-09-21'
         faction:

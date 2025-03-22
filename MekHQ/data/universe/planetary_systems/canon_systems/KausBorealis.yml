@@ -3,9 +3,11 @@ sucsId: 1309
 xcood: 11.373
 ycood: 96.371
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K1IV
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2488-08-09'
     nadirCharge: yes
@@ -69,28 +71,32 @@ planet:
       value: Kaus Borealis
     type: TERRESTRIAL
     orbitalDist: 1.28
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: green21
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.87
-    diameter: 9830
-    density: 6.22043685882
+    diameter: 9829
+    density: 6.220090177735
     dayLength: 20
     yearLength: 1.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 55
     water:
-      source: canon
+      source: MWDA world profiles
       value: 71
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       A hellish world of continuous volcanic activity that geologists are attributing to a severe tectonic shift of unparalleled magnitude, Kaus Borealis is a world that many feel is on death‘s door. Over 300 active volcanoes have formed in the last three centuries alone, erupting with increasing intensity that now has lava flowing freely and regularly over almost ten percent of the planet‘s surface at any given time. When first discovered, Kaus Borealis was a serene world of deep green oceans, fertile soil, hardy woodlands, abundant wildlife, and blue skies. The early colonists quickly made their paradise a home and established it as an agricultural world. Although, like most terrestrial planets, Kaus Borealis had its share of seismic disturbances, scientists thought little of them until three new volcanoes explosively emerged on the west coast of the northern continent of Lucynda in 2803, each within three months of the other. As more eruptions followed, and entire towns or farming regions were swallowed up by the earth or incinerated by tons of molten rock, a gradual exodus began, which stalled in the thirty-first century when the planet grew inexplicably silent. However, by that stage so much sulfur, methane, and ash had been thrown into the atmosphere that the ozone layer was compromised, breathing was impossible without respirators, and acid rain regularly fell from dark, yellow skies. Gone were the serene oceans, fertile soil, and hardy woodlands, and most of the native wildlife had perished. Turbulent, superheated seas and barren wastes of broken rock and charcoal now dominated the landscape, but began to give way to the first signs of rejuvenation by the time Kaus Borealis became a part of by the last 31st century.
@@ -100,22 +106,24 @@ planet:
       The capital of Kaus Borealis, Iamda, is located on the northern continent of Allysi, which lies east of Lucynda. Grand Cauldron, a newer city on the southern continent of Bellaria, is home to the largest of the planet‘s geological research facilities, the Gordon Weiss Institute of Tectonics, as well as the southern hub of the Kaus Borealis Planetary Evacuation Command. Rashatta, Kaus Borealis‘ fourth and smallest continent, located in the equatorial zones between Allysi and Rashatta, is completely lifeless, a result of the planet‘s brutal heat and the presence of no fewer than ten of its twenty largest active volcanoes.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Allysi
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Iamda
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Bellaria
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Lucynda
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Rashatta
     satellite:
-      - name: Blufisch
+      - name:
+          source: MWDA world profiles
+          value: Blufisch
         size: large
         icon: rock6
     event:

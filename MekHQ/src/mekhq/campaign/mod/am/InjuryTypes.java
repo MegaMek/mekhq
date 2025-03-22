@@ -69,7 +69,7 @@ public final class InjuryTypes {
     public static final InjuryType SEVERED_SPINE = new InjuryTypes.SeveredSpine();
 
     // Replacement Limbs
-    public static int REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5 = 4;
+    public static int REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5 = 5;
     public static Money REPLACEMENT_LIMB_COST_ARM_TYPE_5 = Money.of(200000);
     public static Money REPLACEMENT_LIMB_COST_HAND_TYPE_5 = Money.of(100000);
     public static Money REPLACEMENT_LIMB_COST_LEG_TYPE_5 = Money.of(125000);

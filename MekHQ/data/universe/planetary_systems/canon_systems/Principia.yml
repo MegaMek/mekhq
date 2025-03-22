@@ -3,9 +3,11 @@ sucsId: 2068
 xcood: -0.016
 ycood: -357.85
 spectralType:
-  source: canon
+  source: House Liao, pg. 136
   value: F5IV
-primarySlot: 4
+primarySlot:
+  source: House Liao, pg. 136
+  value: 4
 event:
   - date: '2750-04-10'
     zenithCharge: yes
@@ -63,7 +65,9 @@ planet:
       value: Principia
     type: TERRESTRIAL
     orbitalDist: 3.92
-    sysPos: 4
+    sysPos:
+      source: House Liao, pg. 136
+      value: 4
     icon: green4
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -76,7 +80,7 @@ planet:
     temperature: 38
     water: 46
     lifeForm:
-      source: canon
+      source: House Liao, pg. 136
       value: AMPHIBIAN
     desc: As of 3025 - Due to numerous raids on Sian, the Capellan judicial system
       was transplanted to Principia after the Third Succession War. This includes

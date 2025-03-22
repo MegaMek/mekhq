@@ -3,9 +3,11 @@ sucsId: 1442
 xcood: 546.474
 ycood: -173.797
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 95'
   value: G9V
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Davion, pg. 95'
+  value: 4
 planet:
   - name: Urth
     type: GIANT_TERRESTRIAL
@@ -66,28 +68,32 @@ planet:
       value: Lackland
     type: TERRESTRIAL
     orbitalDist: 0.8
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Davion, pg. 95'
+      value: 4
     icon: wet1
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 95'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 95'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 95'
       value: 1.05
-    diameter: 13140
-    density: 5.640187348733
+    diameter: 13111
+    density: 5.627909467163
     dayLength: 19
     yearLength: 1.1
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 95'
       value: 43
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 95'
       value: 91
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 95'
       value: REPTILE
     desc: |-
       Lackland’s name is appropriate - the planet is almost entirely covered with water and has no major continents, it is instead dotted with islands and archipelagos. While surveys indicate the planet has large deposits of ores and other natural resources, residents have made no significant effort to mine them. This was primarily due to the high cost due to the need for underwater dwellings to best access and mine the deposits, initial attempts quickly found that the costs far outweighed the potential profits.

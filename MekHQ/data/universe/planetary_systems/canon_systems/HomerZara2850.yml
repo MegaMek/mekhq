@@ -5,7 +5,9 @@ ycood: 1799.056
 spectralType:
   source: canon
   value: K5V
-primarySlot: 2
+primarySlot:
+  source: Warriors of Kerensky, pg. 107
+  value: 2
 event:
   - date: '2803-07-02'
     nadirCharge: yes
@@ -52,44 +54,48 @@ planet:
       value: Zara
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 2
+    sysPos:
+      source: Warriors of Kerensky, pg. 107
+      value: 2
     icon: green22
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 107
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 107
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 107
       value: 1.4
-    diameter: 13442
-    density: 7.290668831107
+    diameter: 13468
+    density: 7.304981638463
     dayLength: 24
     yearLength: 0.8
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 107
       value: 30
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 107
       value: 30
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 107
       value: AMPHIBIAN
     desc: No description available.
     smallMoons: 4
     landmass:
       - name:
-          source: canon
+          source: Warriors of Kerensky, pg. 107
           value: Amis
       - name:
-          source: canon
-          value: Ortin
-      - name:
-          source: canon
+          source: Warriors of Kerensky, pg. 107
           value: Bagrain
       - name:
-          source: canon
-          value: Fortuna
+          source: Warriors of Kerensky, pg. 107
+          value: Fortuna group
+      - name:
+          source: Warriors of Kerensky, pg. 107
+          value: Ortin
     event:
       - date: '2802-12-03'
         faction:
@@ -225,10 +231,7 @@ planet:
       - date: '3145-01-01'
         population: 44463981.0
       - date: '2108-12-05'
-        name: Zara
       - date: '2850-01-01'
-        name: Homer
-        message: Zara renamed to Homer
   - name: Fort Rodrigues
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.7

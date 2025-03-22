@@ -3,9 +3,11 @@ sucsId: 2162
 xcood: -113.791
 ycood: -15.815
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K7V
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2398-04-02'
     nadirCharge: yes
@@ -35,28 +37,32 @@ planet:
       value: Rochelle
     type: TERRESTRIAL
     orbitalDist: 0.24
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: wet21
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.74
-    diameter: 9933
-    density: 5.251055623202
+    diameter: 9918
+    density: 5.243271207215
     dayLength: 22
     yearLength: 0.8
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 40
     water:
-      source: canon
+      source: MWDA world profiles
       value: 86
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: With vast mineral resources capable of sustaining a broad industrial base,
       and further blessed by an abundant water supply and soil rich enough for planting,
@@ -95,26 +101,35 @@ planet:
       again. Rochelle‘s other continent, the southern landmass of Martinasia, however,
       remains largely abandoned, thanks to the high radiation and acid rains, lasting
       effects of the first two Succession Wars.
+    ring:
+      source: MWDA world profiles
+      value: yes
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Caredon
         capital:
-          source: canon
-          value: Arzenburg
+          source: MWDA world profiles
+          value: New Arzenburg
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Martinasia
     satellite:
-      - name: Derika
+      - name:
+          source: MWDA world profiles
+          value: Derika
         size: medium
         icon: rock10
-      - name: Nohea
+      - name:
+          source: MWDA world profiles
+          value: Nohea
         size: medium
         icon: oddmoon3
-      - name: Ululani and a dust ring
+      - name:
+          source: MWDA world profiles
+          value: Ululani
         size: medium
-        icon: oddmoon1
+        icon: rock15
     event:
       - date: '2242-07-25'
         faction:

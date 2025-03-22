@@ -3,9 +3,11 @@ sucsId: 94
 xcood: 58.344
 ycood: 278.846
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 110
   value: F8IV
-primarySlot: 5
+primarySlot:
+  source: Masters and Minions, pg. 110
+  value: 5
 event:
   - date: '2704-01-01'
     nadirCharge: yes
@@ -80,28 +82,32 @@ planet:
       value: Alshain
     type: TERRESTRIAL
     orbitalDist: 3.36
-    sysPos: 5
+    sysPos:
+      source: Masters and Minions, pg. 110
+      value: 5
     icon: wet7
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 110
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 110
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 110
       value: 1.02
-    diameter: 14847
-    density: 4.828486896978
+    diameter: 14846
+    density: 4.82824868448
     dayLength: 20
     yearLength: 6.3
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 110
       value: 32
     water:
-      source: canon
+      source: Masters and Minions, pg. 110
       value: 85
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 110
       value: REPTILE
     desc: |-
       Alshain is a comfortable temperate planet with large oceans and four continents covered in massive pine forests. Alshain has abundant natural resources which led to the establishment of a BattleMech factory and enough other low and high tech industry to make the planet almost entirely self sufficient. With the pleasant climate Alshain has little trouble supporting enough agriculture to feed the planet’s population.
@@ -109,22 +115,24 @@ planet:
       The planetary capital is Silverdale and site of the planet’s primary spaceport, the capital is located on the continent of Aquilae. After the Draconis Combine gave the Rasalhague District its freedom, Alshain became the capital of the replacement military district and many of the Rasalhague Regulars became the Ashlain Regulars. Alshain and much of the Alshain Military District were captured by Clan Ghost Bear, with the Ghost Bears making Alshain their new capital when they moved to the Inner Sphere.
     landmass:
       - name:
-          source: canon
+          source: 'Objectives: The Clans, pg. 22'
           value: Aquilae
         capital:
-          source: canon
+          source: 'Objectives: The Clans, pg. 22'
           value: Silverdale
       - name:
-          source: canon
+          source: 'Objectives: The Clans, pg. 22'
           value: Bunjil
       - name:
-          source: canon
-          value: Corvi
-      - name:
-          source: canon
+          source: 'Objectives: The Clans, pg. 22'
           value: Swan
+      - name:
+          source: 'Objectives: The Clans, pg. 22'
+          value: Corvi
     satellite:
-      - name: Lemeshko
+      - name:
+          source: Masters and Minions, pg. 110
+          value: Lemeshko
         size: medium
         icon: oddmoon2
     event:

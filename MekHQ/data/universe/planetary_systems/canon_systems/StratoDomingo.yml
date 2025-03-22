@@ -5,7 +5,9 @@ ycood: 1880.658
 spectralType:
   source: canon
   value: K6II
-primarySlot: 2
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 2
 event:
   - date: '2810-10-10'
     nadirCharge: yes
@@ -34,28 +36,32 @@ planet:
       value: Strato Domingo
     type: TERRESTRIAL
     orbitalDist: 0.42
-    sysPos: 2
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 2
     icon: green3
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 1.2
-    diameter: 14696
-    density: 5.734010538881
+    diameter: 14702
+    density: 5.736191814268
     dayLength: 20
     yearLength: 0.8
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 35
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 70
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: BIRD
     desc: No description available.
     smallMoons: 2

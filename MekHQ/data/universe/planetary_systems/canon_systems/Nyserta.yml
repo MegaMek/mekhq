@@ -3,9 +3,11 @@ sucsId: 2885
 xcood: -17.783
 ycood: 498.766
 spectralType:
-  source: canon
+  source: Periphery (1ed), pg. 127
   value: A9III
-primarySlot: 2
+primarySlot:
+  source: Periphery (1ed), pg. 127
+  value: 2
 planet:
   - name: Miyashita's Planet
     type: TERRESTRIAL
@@ -28,7 +30,9 @@ planet:
       value: Nyserta
     type: TERRESTRIAL
     orbitalDist: 4.76
-    sysPos: 2
+    sysPos:
+      source: Periphery (1ed), pg. 127
+      value: 2
     icon: green47
     pressure: HIGH
     atmosphere: TAINTEDPOISON
@@ -41,7 +45,7 @@ planet:
     temperature: 35
     water: 28
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 127
       value: PLANT
     desc: No description available.
     landmass:

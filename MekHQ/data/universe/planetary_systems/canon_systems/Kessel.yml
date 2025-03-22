@@ -3,9 +3,11 @@ sucsId: 1335
 xcood: -13.136
 ycood: 83.708
 spectralType:
-  source: canon
+  source: House Kurita
   value: G0V
-primarySlot: 2
+primarySlot:
+  source: House Kurita
+  value: 2
 event:
   - date: '2366-08-31'
     zenithCharge: yes
@@ -34,28 +36,32 @@ planet:
       value: Kessel
     type: TERRESTRIAL
     orbitalDist: 1.76
-    sysPos: 2
+    sysPos:
+      source: House Kurita
+      value: 2
     icon: wet21
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.21
-    diameter: 12842
-    density: 6.623290935421
+    diameter: 12840
+    density: 6.622418757349
     dayLength: 27
     yearLength: 2.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 42
     water:
-      source: canon
+      source: MWDA world profiles
       value: 81
     lifeForm:
-      source: canon
+      source: House Kurita
       value: MAMMAL
     desc: |-
       Under the sway of the Federation of Skye, known for shrewd business practices and a preponderance of heavy industrial might, Kessel was already a valuable manufacturing center even before the dawn of the Lyran Commonwealth. It therefore comes as little surprise that the Draconis Combine, a poor realm—economically, if not militarily—would covet such a prize so close to their border, when the Star League collapsed and war broke out across the Inner Sphere. House Kurita captured Kessel almost incidentally, during a drive toward Skye itself, and though the forces of House Steiner ultimately succeeded in driving back the Combine invaders, they never managed to reclaim several lost planets, including this one. The Combine saw great untapped potential in this mineral - and metal - rich world, with its many mining, refining, and manufacturing complexes that produced everything short of BattleMechs and DropShips. Thus, as Steiner forces continued to hit back over the centuries, making several failed attempts to retake worlds such as Kessel, the Combine took advantage of their possession, loosening industrial standards that protected the environment to increase output for their military needs. Freed of the constraints found on other former Isle of Skye worlds, or any other industrial/corporate niceties, for that matter, the industries on Kessel turned to such questionable practices as strip mining and chemical dumping. Worse still, these practices also attracted the attention of the yakuza, the dominant underworld force of the Draconis Combine. Over the centuries, the results of these trends were a poisoned biosphere and a poisoned society. Crime was rampant, and might made right, except in those areas where the well-armed and equipped nobility resided. Visitors to this world are still cautioned to keep respirators on when outside their vehicles and buildings, to protect against the still-lingering toxins in the local air.
@@ -67,22 +73,26 @@ planet:
       Kessel‘s capital city is Sverdlovsk, located on the northwestern continent of Novgorod. The southern continent, Gershtad, is home to the planet‘s largest spaceport and AtmoClean Enterprises, commissioned after the 3070s, prototype air purification plant. Northeast of Gershtad is the Lobopov continent, home to what little remains of Kessel‘s untamed wilderness, and several defunct strip-mining operations.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Gershtad
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Lobopov
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Novgorod
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Sverdlovsk
     satellite:
-      - name: Kiev
+      - name:
+          source: MWDA world profiles
+          value: Kiev
         size: giant
         icon: rock11
-      - name: Svoboda
+      - name:
+          source: MWDA world profiles
+          value: Svoboda
         size: medium
         icon: rock8
     event:

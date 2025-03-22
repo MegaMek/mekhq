@@ -3,9 +3,11 @@ sucsId: 2359
 xcood: 58.154
 ycood: -52.26
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G7III
-primarySlot: 5
+primarySlot:
+  source: MWDA world profiles
+  value: 5
 event:
   - date: '2352-04-17'
     zenithCharge: yes
@@ -96,28 +98,32 @@ planet:
       value: Slocum
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 5
+    sysPos:
+      source: MWDA world profiles
+      value: 5
     icon: green15
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.0
-    diameter: 13747
-    density: 5.108262592534
+    diameter: 13752
+    density: 5.110177805644
     dayLength: 21
     yearLength: 2.0
     temperature:
-      source: canon
-      value: 20
-    water:
-      source: canon
+      source: MWDA world profiles
       value: 53
+    water:
+      source: MWDA world profiles
+      value: 66
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       3135 - In 2351, the Sarna Supremacy attacked Slocum, then part of the Tikonov Grand Union, and committed acts of merciless savagery. Many battles and wars were fought on Slocum because it was a border world. Following formation of the Star League, it jointly administered the planet with the Capellan Confederation. A Castle Brian was built on each continent of the planet. During the Aramis Coup, Slocum suffered like never before. For eight years, they faced the atrocities of Amaris armies. In 2774, General Kerensky's armies regained control of Slocum, but they discovered that half the population had died of starvation and the ravages of war.
@@ -129,22 +135,24 @@ planet:
       During the Jihad, the Word of Blake forces invaded after they neutralized the defenders with orbital bombardments. When Devlin Stone's forces relieved the planet, once again, they found almost half of the planet‘s population was dead. Between the twin holocausts of the Amaris Coup and the Blakist Jihad, Slocum has become a ghost world, with the inhabitants fleeing as quickly as their finances allow, regardless of every effort by The Republic to remedy the situation.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Carnocial
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Kuaka
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Fewers
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Natick
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Theramule
     satellite:
-      - name: Stanza
+      - name:
+          source: MWDA world profiles
+          value: Stanza
         size: large
         icon: rock3
     event:

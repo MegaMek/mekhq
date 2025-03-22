@@ -49,6 +49,8 @@ import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
+import javax.xml.transform.Source;
+
 /**
  * This is a PlanetarySystem object that will contain information
  * about the system as well as an ArrayList of the Planet objects
@@ -82,7 +84,7 @@ public class PlanetarySystem {
 
     // the location of the primary planet for this system
     @JsonProperty("primarySlot")
-    private int primarySlot;
+    private SourceableValue<Integer> primarySlot;
 
     /**
      * a hash to keep track of dynamic planet changes
@@ -119,7 +121,7 @@ public class PlanetarySystem {
 
     public String getName(LocalDate when) {
         // if no primary slot, then just return the id
-        if (primarySlot < 1 && null != id) {
+        if (getPrimaryPlanetPosition() < 1 && null != id) {
             return id;
         }
 
@@ -343,6 +345,8 @@ public class PlanetarySystem {
         return star;
     }
 
+    public SourceableValue<Integer> getSourcedPrimarySlot() { return primarySlot; }
+
     /**
      * @return the planet object identified by the primary slot.
      *         If no primary slot is given, then this function will return the first
@@ -353,8 +357,11 @@ public class PlanetarySystem {
     }
 
     public int getPrimaryPlanetPosition() {
-        // if no primary slot (i.e., an uninhabited system) then return the first planet
-        return Math.max(primarySlot, 1);
+        if(null == getSourcedPrimarySlot()) {
+            // if no primary slot (i.e., an uninhabited system) then return the first planet
+            return 1;
+        }
+        return getSourcedPrimarySlot().getValue();
     }
 
     public Planet getPlanet(int pos) {

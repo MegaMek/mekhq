@@ -3,9 +3,11 @@ sucsId: 118
 xcood: -128.955
 ycood: -30.813
 spectralType:
-  source: canon
+  source: House Marik, pg. 160
   value: M2V
-primarySlot: 2
+primarySlot:
+  source: House Marik, pg. 160
+  value: 2
 event:
   - date: '2403-07-26'
     zenithCharge: yes
@@ -33,7 +35,9 @@ planet:
       value: Amity
     type: TERRESTRIAL
     orbitalDist: 0.16
-    sysPos: 2
+    sysPos:
+      source: House Marik, pg. 160
+      value: 2
     icon: green31
     pressure:
       source: canon
@@ -54,7 +58,7 @@ planet:
       source: canon
       value: 63
     lifeForm:
-      source: canon
+      source: House Marik, pg. 160
       value: MAMMAL
     desc: Amity has been a successful and prosperous industrial planet for most of
       its history. Unfortunately the Succession Wars took their toll on the planet

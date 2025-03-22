@@ -3,9 +3,11 @@ sucsId: 391
 xcood: 79.087
 ycood: -200.359
 spectralType:
-  source: canon
+  source: 'Handbook: House Liao, pg. 82'
   value: F9III
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Liao, pg. 82'
+  value: 4
 event:
   - date: '2383-02-22'
     zenithCharge: yes
@@ -60,28 +62,32 @@ planet:
       value: Brighton
     type: TERRESTRIAL
     orbitalDist: 3.08
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Liao, pg. 82'
+      value: 4
     icon: green41
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 82'
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 82'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 82'
       value: 1.01
-    diameter: 12991
-    density: 5.443668601663
+    diameter: 13015
+    density: 5.453666860484
     dayLength: 23
     yearLength: 5.5
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 82'
       value: 28
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 82'
       value: 23
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 82'
       value: MAMMAL
     desc: |-
       Brighton was originally settled to take advantage of the vast deposits of copper and silver ore that the planet’s initial surveying detected. The planet was independent for its early history before joining the St. Ives Mercantile Association and later the Capellan Confederation.
@@ -93,7 +99,9 @@ planet:
       - name: O'Neil's Plains
         capital: Sétanta
     satellite:
-      - name: Brazen Heart
+      - name:
+          source: 'Handbook: House Liao, pg. 82'
+          value: Brazen Heart
         size: medium
         icon: rock17
     event:

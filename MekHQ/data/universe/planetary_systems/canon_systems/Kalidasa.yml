@@ -3,9 +3,11 @@ sucsId: 1283
 xcood: -105.763
 ycood: -23.051
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 72'
   value: G1Ia
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Marik, pg. 72'
+  value: 4
 event:
   - date: '2356-01-30'
     nadirCharge: yes
@@ -61,28 +63,32 @@ planet:
       value: Kalidasa
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Marik, pg. 72'
+      value: 4
     icon: green11
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 72'
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 72'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 72'
       value: 1.1
-    diameter: 14246
-    density: 5.422533873996
+    diameter: 14251
+    density: 5.424433383045
     dayLength: 21
     yearLength: 2.3
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 72'
       value: 56
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 72'
       value: 67
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 72'
       value: PLANT
     desc: |-
       Located on the border of the Free Worlds League and Lyran Commonwealth and the site of vital manufacturing centers and a large military base, Kalidasa has been a site of countless battles between the Commonwealth and League over its history. During the 31st Century the planet was established as a trade center between the Free Worlds League and Lyran Commonwealth which resulted in a reduction of military action on Kalidasa and allowed the planet to flourish.
@@ -96,22 +102,26 @@ planet:
       Quikscell Company
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 72'
           value: Kaleen
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 72'
           value: Kalmia
         capital:
-          source: canon
+          source: 'Handbook: House Marik, pg. 72'
           value: Sakuntalem
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 72'
           value: Kumar
     satellite:
-      - name: Carbons
+      - name:
+          source: 'Handbook: House Marik, pg. 72'
+          value: Carbons
         size: giant
         icon: rock6
-      - name: Deons
+      - name:
+          source: 'Handbook: House Marik, pg. 72'
+          value: Deons
         size: medium
         icon: rock11
     event:

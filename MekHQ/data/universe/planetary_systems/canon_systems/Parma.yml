@@ -3,9 +3,11 @@ sucsId: 1989
 xcood: 359.813
 ycood: -52.26
 spectralType:
-  source: canon
+  source: House Davion
   value: F2II
-primarySlot: 5
+primarySlot:
+  source: House Davion
+  value: 5
 planet:
   - name: Aquilo
     type: ICE_GIANT
@@ -97,7 +99,9 @@ planet:
       value: Parma
     type: TERRESTRIAL
     orbitalDist: 4.2
-    sysPos: 5
+    sysPos:
+      source: House Davion
+      value: 5
     icon: green46
     pressure:
       source: canon
@@ -112,7 +116,7 @@ planet:
     temperature: 35
     water: 27
     lifeForm:
-      source: canon
+      source: House Davion
       value: REPTILE
     desc: 'Parma is a large planet with heavier gravity and a thicker atmosphere than
       Terra as well as constant high humidity. These factors combine to make for very

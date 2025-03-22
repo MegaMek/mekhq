@@ -3,9 +3,11 @@ sucsId: 53
 xcood: 71.079
 ycood: 78.532
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F0IV
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2564-01-09'
     nadirCharge: yes
@@ -40,28 +42,32 @@ planet:
       value: Albalii
     type: TERRESTRIAL
     orbitalDist: 4.48
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green40
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.81
-    diameter: 10691
-    density: 5.326059229978
+    diameter: 10689
+    density: 5.325246445966
     dayLength: 26
     yearLength: 9.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 43
     water:
-      source: canon
+      source: MWDA world profiles
       value: 52
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: The sleepy agro-world of Albalii was settled initially by Arabic colonists
       shortly after the first galactic wave of human expansion. Almost half of the
@@ -90,16 +96,16 @@ planet:
     smallMoons: 4
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Euphrates
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Omar
         capital:
-          source: canon
-          value: Saladan
+          source: MWDA world profiles
+          value: Borqa
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Sadig
     event:
       - date: '2561-11-12'

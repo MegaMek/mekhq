@@ -3,9 +3,11 @@ sucsId: 891
 xcood: 88.919
 ycood: -97.499
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F4V
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2394-12-19'
     nadirCharge: yes
@@ -69,28 +71,32 @@ planet:
       value: Foochow
     type: TERRESTRIAL
     orbitalDist: 2.24
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: wet18
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: THIN
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.7
-    diameter: 9168
-    density: 5.354914039558
+    diameter: 9177
+    density: 5.360327691857
     dayLength: 16
     yearLength: 3.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 45
     water:
-      source: canon
+      source: MWDA world profiles
       value: 80
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       3135 - Foochow is named after the capital of the Fujian province in southeast China. It was discovered almost by accident and colonized in the late 22nd century by a sizeable population escaping from China on Terra. Min-how, the only continent, is located along the equator and was mostly jungle when the colonists first landed. They spent the first 50 years fighting disease-carrying insects and large six-limbed carnivores the size of black bears called Dobars. The settlers overcame the land and were able to make it productive, even taming some of the Dobars.
@@ -100,19 +106,25 @@ planet:
       Foochow was not involved in the Jihad until one of the Warrior Houses jumped into the system. Soon after, Word of Blake employed a small mercenary force that entered the system and began a high-speed burn toward the planet. Hidden among the planet‘s moons, the Warrior House launched an aerospace assault that completely destroyed the attacking mercenaries.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Min-how
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Vashura
     satellite:
-      - name: Li-Lung
+      - name:
+          source: MWDA world profiles
+          value: Li-Lung
         size: large
         icon: rock11
-      - name: Lung-Wang
+      - name:
+          source: MWDA world profiles
+          value: Lung-Wang
         size: medium
         icon: rock7
-      - name: Pan-Lung
+      - name:
+          source: MWDA world profiles
+          value: Pan-Lung
         size: medium
         icon: oddmoon1
     event:

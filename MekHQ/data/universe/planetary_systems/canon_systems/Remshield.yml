@@ -3,9 +3,11 @@ sucsId: 2136
 xcood: 97.445
 ycood: -139.898
 spectralType:
-  source: canon
+  source: 'Objective Raids: Capellan Confederation'
   value: F9V
-primarySlot: 2
+primarySlot:
+  source: 'Objective Raids: Capellan Confederation'
+  value: 2
 event:
   - date: '2357-07-21'
     zenithCharge: yes
@@ -30,28 +32,32 @@ planet:
       value: Remshield
     type: TERRESTRIAL
     orbitalDist: 1.76
-    sysPos: 2
+    sysPos:
+      source: 'Objective Raids: Capellan Confederation'
+      value: 2
     icon: green11
     pressure:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Objective Raids: Capellan Confederation'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 0.99
-    diameter: 12579
-    density: 5.554611613637
+    diameter: 12552
+    density: 5.542743205809
     dayLength: 22
     yearLength: 2.6
     temperature:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 38
     water:
-      source: canon
-      value: 40
+      source: 'Objective Raids: Capellan Confederation'
+      value: 90
     lifeForm:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: REPTILE
     desc: Remshield is a relatively comfortable planet, however its ecology is incompatible
       with Terran-life and as a result agriculture is difficult and as a result most
@@ -63,17 +69,14 @@ planet:
       in training infantry and vehicle crews on the badlands of the Betty continent.
     landmass:
       - name:
-          source: canon
-          value: Betty
+          source: 'Objective Raids: Capellan Confederation'
+          value: Anderia
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Julia
         capital:
-          source: canon
-          value: Mineral City
-      - name:
-          source: canon
-          value: Tonya
+          source: 'Objective Raids: Capellan Confederation'
+          value: Federal Hill
     event:
       - date: '2176-05-14'
         faction:

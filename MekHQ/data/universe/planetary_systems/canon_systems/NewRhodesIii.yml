@@ -3,9 +3,11 @@ sucsId: 1845
 xcood: 102.361
 ycood: -15.815
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: M9V
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2380-06-06'
     nadirCharge: yes
@@ -21,28 +23,32 @@ planet:
       value: New Rhodes III
     type: TERRESTRIAL
     orbitalDist: 0.04
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: green54
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.7
-    diameter: 10225
-    density: 4.805203018774
+    diameter: 10231
+    density: 4.808134445054
     dayLength: 24
     yearLength: 0.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 28
     water:
-      source: canon
+      source: MWDA world profiles
       value: 60
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: AMPHIBIAN
     desc: |-
       New Rhodes III is a small, mostly desert world, unremarkable except for two things.
@@ -58,24 +64,28 @@ planet:
       As word slowly spread, New Rhodes III became a pleasure destination from across the Inner Sphere, resulting in the small capital of Xerxes being established near the southern end of the Colossii chain. However, because of the harsh conditions of most of the rest of the planet—the continents of Minos and Sparta are almost unlivable—New Rhodes III is permanent home to only desert nomads and a small scientific community; the capital is home almost exclusively to said community.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Crete
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Xerxes
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Minos
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Sparta
     satellite:
-      - name: Filerimo
-        size: large
-        icon: rock9
-      - name: Dodecanisa
+      - name:
+          source: MWDA world profiles
+          value: Dodecanisa
         size: large
         icon: rock16
+      - name:
+          source: MWDA world profiles
+          value: Filerimo
+        size: large
+        icon: rock9
     event:
       - date: '2149-11-02'
         faction:

@@ -3,9 +3,11 @@ sucsId: 1872
 xcood: 54.279
 ycood: -66.743
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G2III
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2352-03-13'
     zenithCharge: yes
@@ -69,28 +71,32 @@ planet:
       value: Ningpo
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: wet20
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.0
-    diameter: 13266
-    density: 5.306097145661
+    diameter: 13255
+    density: 5.30177108943
     dayLength: 25
     yearLength: 2.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 38
     water:
-      source: canon
+      source: MWDA world profiles
       value: 78
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: BIRD
     desc: |-
       3135 - Ningpo is a temperate world of fertile ground and beautiful seas. The planet became a moderate supplier of agricultural products to neighboring worlds like Pleione and Poznan. Ningpo has two major continents, Qingyuan and Liampo, and many islands that are home to many exotic birds. Qingyuan covers most of the northern hemisphere, and is composed of 85 percent farmland with rolling hills and dales. Ningbo, the planetary capital, is located on the southeast coast of Qingyuan. Yalosha Peninsula is located on the southwest coast of Qingyuan and flanked by a large mountain range called Yalo Rue. It is one of the most beautiful places on the planet. The mountains and the peninsula are covered with lush green forests that the timber industry has been selectively farming and using to produce some of the most beautiful furniture in the Inner Sphere. It is rumored that the Celestial Throne of the Capellan Confederation is made of Ningpo timber.
@@ -100,16 +106,18 @@ planet:
       Like other worlds, Ningpo was not immune to the effects of the Word of Blake's Jihad. Though Ningpo did not suffer a direct assault, a full generation of the planet's brightest and best was lost helping to expel the Blakists from the Confederation as many of the planet's young men and women were "volunteered" into the Confederation military.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
+          value: Liampo
+      - name:
+          source: MWDA world profiles
           value: Qingyuan
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Ningbo
-      - name:
-          source: canon
-          value: Liampo
     satellite:
-      - name: Ningxian
+      - name:
+          source: MWDA world profiles
+          value: Ningxian
         size: medium
         icon: oddmoon3
     event:

@@ -3,9 +3,11 @@ sucsId: 2425
 xcood: 42.128
 ycood: -97.499
 spectralType:
-  source: canon
+  source: 'Objective Raids: Capellan Confederation'
   value: K2IV
-primarySlot: 2
+primarySlot:
+  source: 'Objective Raids: Capellan Confederation'
+  value: 2
 event:
   - date: '2362-12-06'
     nadirCharge: yes
@@ -32,28 +34,32 @@ planet:
       value: Styk
     type: TERRESTRIAL
     orbitalDist: 1.12
-    sysPos: 2
+    sysPos:
+      source: 'Objective Raids: Capellan Confederation'
+      value: 2
     icon: wet21
     pressure:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Objective Raids: Capellan Confederation'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
-      value: 1.1
-    diameter: 13714
-    density: 5.632515606538
+      source: 'Objective Raids: Capellan Confederation'
+      value: 1.0
+    diameter: 13081
+    density: 5.372451454872
     dayLength: 24
     yearLength: 1.5
     temperature:
-      source: canon
-      value: 30
+      source: 'Objective Raids: Capellan Confederation'
+      value: 39
     water:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 78
     lifeForm:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: REPTILE
     desc: |-
       Styk is a wealthy planet with extensive heavy and light industry and the planet is a major trade hub and center of finance. As of 3025 Styk was the personal holding of Duke Pavel Ridzik, commander of the Capellan Armed Forces and in 3025 Styk accounted for 20 percent of all industrial output and 25 percent of annual interstellar trade in the Confederation, which made it the second largest industrial center and the largest interstellar trading planet in the Confederation. Styk was also home to the Confederation's third largest BattleMech production facility.
@@ -62,42 +68,35 @@ planet:
       Tao ‘Mechworks
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Burtnik
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Lorelei
       - name:
-          source: canon
-          value: Deyoung
-      - name:
-          source: canon
-          value: Shaw
-      - name:
-          source: canon
-          value: Young
-      - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Curulewski
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
+          value: Detoung
+      - name:
+          source: 'Objective Raids: Capellan Confederation'
           value: Gowan
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Panozzo North
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Panozzo South
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
+          value: Shaw
+      - name:
+          source: 'Objective Raids: Capellan Confederation'
           value: Sucherman
-    satellite:
-      - name: Dianthus
-        size: large
-        icon: rock8
-      - name: Pantheons
-        size: medium
-        icon: oddmoon1
+      - name:
+          source: 'Objective Raids: Capellan Confederation'
+          value: Young
     event:
       - date: '2176-04-06'
         faction:

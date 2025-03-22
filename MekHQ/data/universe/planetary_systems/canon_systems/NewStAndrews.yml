@@ -5,7 +5,9 @@ ycood: -107.97
 spectralType:
   source: canon
   value: F4V
-primarySlot: 4
+primarySlot:
+  source: Periphery (1ed), pg. 137
+  value: 4
 planet:
   - name: Sims
     type: TERRESTRIAL
@@ -83,7 +85,9 @@ planet:
       value: New St. Andrews
     type: TERRESTRIAL
     orbitalDist: 2.24
-    sysPos: 4
+    sysPos:
+      source: Periphery (1ed), pg. 137
+      value: 4
     icon: green54
     pressure:
       source: canon
@@ -104,8 +108,8 @@ planet:
       source: canon
       value: 58
     lifeForm:
-      source: canon
-      value: MAMMAL
+      source: Periphery (1ed), pg. 137
+      value: REPTILE
     desc: |-
       New St. Andrews is a remote Periphery world settled by four Irish Clans with a long history of relocating before finally settling on New St. Andrews. In 2294, they fled their original homeworld of Stewart prior to the planet’s absorption into the Free Worlds League. From Stewart they settled York and Lancaster before fleeing again in response to the planets’ annexation by the Protectorate of Donegal. The clans found themselves on Loxley before being displaced again when Archon Robert Marsden of the Lyran Commonwealth annexed the pastoral world. They landed on Somerset in the Rim Worlds Republic, which they hoped would be their final destination and it was for several centuries until the Amaris Coup. Fearing the destruction of the Republic, the clans again abandoned a world in the late 28th century and founded New St. Andrews. Due to the haste of the final move, the clans settled the planet with little technology an established a small agriculture-driven society on New Scotland, the planet’s northern continent.
 

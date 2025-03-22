@@ -5,7 +5,9 @@ ycood: -172.157
 spectralType:
   source: canon
   value: F6III
-primarySlot: 7
+primarySlot:
+  source: 'Handbook: House Liao, pg. 71'
+  value: 7
 event:
   - date: '2388-05-11'
     zenithCharge: yes
@@ -116,28 +118,32 @@ planet:
       value: Capella
     type: TERRESTRIAL
     orbitalDist: 3.64
-    sysPos: 7
+    sysPos:
+      source: 'Handbook: House Liao, pg. 71'
+      value: 7
     icon: green43
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 71'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 71'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 71'
       value: 1.02
-    diameter: 14436
-    density: 4.935403626374
+    diameter: 14480
+    density: 4.950412147822
     dayLength: 24
     yearLength: 7.0
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 71'
       value: 38
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 71'
       value: 60
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 71'
       value: PLANT
     desc: |-
       Capella has always been a politically important world in the region and has always held a special importance to the Capellan Confederation. Capella was the birthplace of both the original Capellan Hegemony and of the Capellan Confederation after the Aris crisis. Capella is also home of the corporate headquarters of Ceres Metals and the Capellan Commonality Bank.
@@ -152,16 +158,18 @@ planet:
       Rashpur-Owens Incorporated
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Llagarres
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Memorial City
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Pociello
     satellite:
-      - name: Nikos
+      - name:
+          source: 'Handbook: House Liao, pg. 71'
+          value: Nikos
         size: medium
         icon: oddmoon3
     event:

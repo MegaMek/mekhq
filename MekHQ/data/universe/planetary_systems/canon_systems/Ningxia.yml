@@ -3,9 +3,11 @@ sucsId: 1873
 xcood: 314.874
 ycood: 313.336
 spectralType:
-  source: canon
+  source: House Kurita
   value: K0V
-primarySlot: 3
+primarySlot:
+  source: House Kurita
+  value: 3
 event:
   - date: '2482-09-05'
     zenithCharge: yes
@@ -43,7 +45,9 @@ planet:
       value: Ningxia
     type: TERRESTRIAL
     orbitalDist: 0.8
-    sysPos: 3
+    sysPos:
+      source: House Kurita
+      value: 3
     icon: green56
     pressure:
       source: canon
@@ -64,7 +68,7 @@ planet:
       source: canon
       value: 32
     lifeForm:
-      source: canon
+      source: House Kurita
       value: REPTILE
     desc: While Ningxia has become known for its diamonds, which are perfect for industrial
       processes, the world was actually settled for its beautiful landscapes. Regarded
@@ -84,7 +88,7 @@ planet:
           source: canon
           value: Anemoi
         capital:
-          source: canon
+          source: House Kurita
           value: New Zephyrus
       - name:
           source: canon

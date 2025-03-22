@@ -3,9 +3,11 @@ sucsId: 1446
 xcood: 13.435
 ycood: 57.597
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G6IV
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2355-04-07'
     nadirCharge: yes
@@ -15,28 +17,32 @@ planet:
       value: Lambrecht
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: wet6
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
-      value: 1.04
-    diameter: 16076
-    density: 4.560701700397
+      source: MWDA world profiles
+      value: 1.03
+    diameter: 15973
+    density: 4.531571303718
     dayLength: 25
     yearLength: 2.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 33
     water:
-      source: canon
+      source: MWDA world profiles
       value: 82
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: |-
       In many respects Lambrecht was considered an ideal candidate for colonization. Abundant mineral and metal deposits, ripe for mining and refining on the surface and in the orbiting debris field from a failed moon, promised a booming industrial economy, while fertile soil, terrestrial seasons, and a biosphere suitable for human life all described a virtual paradise. The only drawback, settlers quickly learned, was that the planet was entering a stage of geological settling, stirred constantly by gravitational tides caused by its large G6-class sun. The resulting earthquakes, common all over the world, have generally been mild, but prevented the colonists from establishing large structures or concentrated cities, a trend that continues despite advances in building materials and planetwide expertise in earthquake damage-control procedures. As a result, Lambrecht‘s five island continents are dotted with small to medium-sized towns, the largest of which, the planetary capital of Middle Park, boasts a population of just 967,000.
@@ -46,24 +52,27 @@ planet:
       Even today contaminated zones still trace the sites of these major battles that heralded the fall of the Star League, and the air is tainted by toxins left over from the biochemical weapons the Amaris forces employed near the end. The Draconis Combine claimed Lambrecht after the League‘s fall and immediately tried to scavenge from the remains of the ruined fortifications and university facilities left behind by Kerensky‘s troops. In three cases, they uncovered substantial, largely undamaged catacombs beneath the collapsed ruins of the legendary Castles Brian, all three of which—including one just fifteen kilometers south of Middle Park—are major tourist attractions today.
 
       Aside from the large island continent of Galapagos in the northern hemisphere of this world, where Middle Park stands, Lambrecht‘s four other continents are Brattanios, and Falkos, in the northern hemisphere, east of Galapagos, and Phillipharos, and Shasia in the south. Shasia, dominated by tundra, is by far the least populous of these landmasses, but recent discovery of an untapped boron vein has awakened some interest in mining the metal for the possible rebirth of the high-boron industry.
+    ring:
+      source: MWDA world profiles
+      value: yes
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Brattanios
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Falkos
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Galapagos
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Middle Park
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Phillipharos
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Shasia
     satellite:
       - name: None (asteroid ring)

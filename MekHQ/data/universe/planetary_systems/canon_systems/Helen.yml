@@ -3,7 +3,7 @@ sucsId: 1083
 xcood: 57.454
 ycood: 10.034
 spectralType:
-  source: canon
+  source: Star League, pg. 173
   value: M0V
 primarySlot: 5
 event:
@@ -81,26 +81,28 @@ planet:
     sysPos: 5
     icon: green17
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.92
-    diameter: 10640
-    density: 6.059780484219
+    diameter: 10655
+    density: 6.068130560168
     dayLength: 26
     yearLength: 0.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 33
     water:
-      source: canon
+      source: MWDA world profiles
       value: 46
     lifeForm:
-      source: canon
-      value: FISH
+      source: Star League, pg. 173
+      value: MAMMAL
     desc: A lush tropical world settled by predominantly Greek colonists, Helen‘s
       great claim to fame has been its remarkably beautiful and extremely diverse
       undersea wildlife. Though land covers just over half the planet surface, broken
@@ -119,22 +121,28 @@ planet:
       Corinth, and the military capital of Montague.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Joppa
         capital:
-          source: canon
-          value: Konstance
+          source: Star League, pg. 173
+          value: Parnassus City
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Persephonie
     satellite:
-      - name: Agamemnon
+      - name:
+          source: MWDA world profiles
+          value: Agamemnon
         size: large
         icon: rock2
-      - name: Hector
+      - name:
+          source: MWDA world profiles
+          value: Hector
         size: medium
         icon: rock16
-      - name: Heracles
+      - name:
+          source: MWDA world profiles
+          value: Heracles
         size: medium
         icon: rock9
     event:

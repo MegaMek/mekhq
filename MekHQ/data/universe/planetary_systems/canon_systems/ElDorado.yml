@@ -3,9 +3,11 @@ sucsId: 780
 xcood: 266.495
 ycood: -145.054
 spectralType:
-  source: canon
+  source: A Time of War, pg. 374
   value: G0V
-primarySlot: 2
+primarySlot:
+  source: A Time of War, pg. 374
+  value: 2
 event:
   - date: '2371-03-11'
     zenithCharge: yes
@@ -32,28 +34,32 @@ planet:
       value: El Dorado
     type: TERRESTRIAL
     orbitalDist: 1.76
-    sysPos: 2
+    sysPos:
+      source: A Time of War, pg. 374
+      value: 2
     icon: wet13
     pressure:
-      source: canon
+      source: A Time of War, pg. 374
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: A Time of War, pg. 374
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: A Time of War, pg. 374
       value: 1.25
-    diameter: 13052
-    density: 6.731876711981
+    diameter: 13051
+    density: 6.731129118571
     dayLength: 23
     yearLength: 2.6
     temperature:
-      source: canon
+      source: A Time of War, pg. 374
       value: 27
     water:
-      source: canon
+      source: A Time of War, pg. 374
       value: 77
     lifeForm:
-      source: canon
+      source: A Time of War, pg. 374
       value: MAMMAL
     desc: |-
       El Dorado is an Earth-like planet with 6 major continents and large tracts of arable land. This is due to the massive bodies of fresh water, know as The Super Lakes, which are located on the largest continents of San Diego and Los Angeles.
@@ -65,28 +71,30 @@ planet:
       For much of its early history El Dorado was known for its JumpShip yards. This ended during the 1st Succession War when the Draconis Combine left the Ship Yards in ruins after a raid. The planet itself still remains heavily industrialized and is home to many renowned universities known as the "Guilded Halls". These universities have allowed El Dorado to remain a front runner in technology and manufacturing throughout the Succession Wars. Despite some losses to the Succession Wars, El Dorado is still one of the "Golden Five" core worlds in the Federated Suns.
     landmass:
       - name:
-          source: canon
-          value: San Diego
+          source: A Time of War, pg. 374
+          value: Durango
       - name:
-          source: canon
+          source: A Time of War, pg. 374
+          value: Las Vegas
+      - name:
+          source: A Time of War, pg. 374
           value: Los Angeles
         capital:
           source: canon
           value: Oro
       - name:
-          source: canon
-          value: Las Vegas
-      - name:
-          source: canon
-          value: Santa Fe
-      - name:
-          source: canon
+          source: A Time of War, pg. 374
           value: Monterrey
       - name:
-          source: canon
-          value: Durango
+          source: A Time of War, pg. 374
+          value: San Diego
+      - name:
+          source: A Time of War, pg. 374
+          value: Santa Fe
     satellite:
-      - name: Boulder
+      - name:
+          source: A Time of War, pg. 374
+          value: Boulder
         size: large
         icon: rock8
     event:

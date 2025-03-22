@@ -3,9 +3,11 @@ sucsId: 215
 xcood: -304.298
 ycood: 289.472
 spectralType:
-  source: canon
+  source: 'Operational Turning Points: Falcon Incursion'
   value: K8V
-primarySlot: 3
+primarySlot:
+  source: 'Operational Turning Points: Falcon Incursion'
+  value: 3
 event:
   - date: '2794-12-04'
     zenithCharge: yes
@@ -48,28 +50,32 @@ planet:
       value: Australia
     type: TERRESTRIAL
     orbitalDist: 0.24
-    sysPos: 3
+    sysPos:
+      source: 'Operational Turning Points: Falcon Incursion'
+      value: 3
     icon: wet1
     pressure:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Operational Turning Points: Falcon Incursion'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: 1.08
-    diameter: 11529
-    density: 6.565606587947
+    diameter: 11544
+    density: 6.57441109545
     dayLength: 23
     yearLength: 0.8
     temperature:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: 35
     water:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: 76
     lifeForm:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: MAMMAL
     desc: |-
       Australia is relatively uninhabited and most of the planet has been purposefully undeveloped in order to better protect one of the Lyran Commonwealth’s Mint and Reserve Banks. Without the Mint, the planet would have no strategic or tactical importance to the Commonwealth. The Mint is located some where near the planetary capital of Woolloomoloo, however the entrances are highly classified secrets and rumors indicate that anyone that has found an entrance and attempted to gain access has either been captured or killed. The Mint is rumored to be highly fortified, to the extent that it could withstand orbital bombardment.
@@ -82,10 +88,12 @@ planet:
           source: canon
           value: Queensland
         capital:
-          source: canon
+          source: 'Operational Turning Points: Falcon Incursion'
           value: Woolloomoloo
     satellite:
-      - name: Perth
+      - name:
+          source: 'Operational Turning Points: Falcon Incursion'
+          value: Perth
         size: medium
         icon: oddmoon3
     event:

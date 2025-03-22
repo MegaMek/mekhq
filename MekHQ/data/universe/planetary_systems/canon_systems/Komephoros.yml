@@ -3,9 +3,11 @@ sucsId: 1392
 xcood: -34.132
 ycood: 91.971
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F0VI
-primarySlot: 5
+primarySlot:
+  source: MWDA world profiles
+  value: 5
 event:
   - date: '2361-09-30'
     nadirCharge: yes
@@ -83,28 +85,32 @@ planet:
       value: Komephoros
     type: TERRESTRIAL
     orbitalDist: 4.48
-    sysPos: 5
+    sysPos:
+      source: MWDA world profiles
+      value: 5
     icon: green7
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.03
-    diameter: 13952
-    density: 5.184320313765
+    diameter: 13957
+    density: 5.186204796391
     dayLength: 23
     yearLength: 9.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 21
     water:
-      source: canon
+      source: MWDA world profiles
       value: 70
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: |-
       3135 - A somewhat cold world, colonists were drawn to Komephoros by the promise of abundant natural resources trapped beneath its partially frozen surface. Unfortunately, the first settlers sent to this world vanished without a trace, their fate unknown until a second colony ship was launched to the world nearly a decade later. Finding no sign of the original expedition‘s JumpShip, the second expedition assumed its predecessor had simply misjumped until—after setting up a settlement on the temperate shores of the equatorial Marksenia continent—a scouting party dispatched to the southern continent of Calvinar picked up a very weak, automated distress signal, originating from what appeared to be a frozen lake. Further investigation eventually uncovered the grisly remains of the first colonial expedition, which was apparently washed out in a freakish disaster caused when a rogue asteroid struck the nearby ocean with sufficient force to generate a wave that flooded the valley their settlement had been established in. When the planet then entered its three-year-long winter cycle, the newly formed lake froze over, and subsequent snowfall eventually buried even the colonists‘ DropShip from satellite scans. To this day, local legends say the lake, dubbed Luega del Condenado (Lake of the Damned), is haunted by the spirits of the lost colonists, and no modern settlements have been established within 300 kilometers of the site.
@@ -112,17 +118,17 @@ planet:
       Over the centuries after the fall of the Star League, Komephoros traded hands a few times between Houses Steiner and Kurita, with many of its mining and ore-processing facilities damaged during each shift in control. Bypassed during the Jihad, however, the planet‘s industrial infrastructure was in excellent shape when the world was ceded to Devlin Stone‘s newborn Republic. The capital city of Komephoros is located on Marksenia‘s east coast, and is also home to the planet‘s primary spaceport. Bristalle, largest city on the northern continent of Jasonri, boasts a secondary spaceport and the corporate headquarters of Kamlarr Enterprises, a subsidiary of Bannson Universal Unlimited, which runs several specialized mining rigs located throughout the north polar region.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Calvinar
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Jasonri
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Marksenia
         capital:
-          source: canon
-          value: Komephoros
+          source: MWDA world profiles
+          value: Rutilicus
     event:
       - date: '2299-06-21'
         faction:

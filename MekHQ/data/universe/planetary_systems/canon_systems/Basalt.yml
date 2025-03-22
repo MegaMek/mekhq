@@ -3,9 +3,11 @@ sucsId: 266
 xcood: 66.163
 ycood: -29.0
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G4IV
-primarySlot: 5
+primarySlot:
+  source: MWDA world profiles
+  value: 5
 event:
   - date: '2383-04-10'
     zenithCharge: yes
@@ -83,28 +85,32 @@ planet:
       value: Basalt
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 5
+    sysPos:
+      source: MWDA world profiles
+      value: 5
     icon: green31
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.5
-    diameter: 14696
-    density: 7.184489498347
+    diameter: 14684
+    density: 7.17872613715
     dayLength: 24
     yearLength: 2.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 34
     water:
-      source: canon
+      source: MWDA world profiles
       value: 60
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: |-
       3135 - Basalt is a large world with an oppressively thick atmosphere, wild lightning storms, and a high gravity field. Despite these drawbacks, Basalt is rich in rare minerals and was one of the first planets settled by Terran mining companies.
@@ -116,31 +122,37 @@ planet:
       During the Golden Age of Peace, Basalt‘s mining companies recovered enough to diversify into metals and other materials. A large tourist trade has been built centering around local arts and environmental travel, creating a prosperous economy. The five continents of Amethyst, Garnet, Opal, Topaz, and Quartz, are almost all situated along the equatorial region of Basalt. The capital, Manville, is located on Garnet.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Amethyst
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Garnet
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Manville
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Opal
       - name:
-          source: canon
-          value: Topaz
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Quartz
+      - name:
+          source: MWDA world profiles
+          value: Topaz
     satellite:
-      - name: Granite
+      - name:
+          source: MWDA world profiles
+          value: Granite
         size: large
         icon: rock3
-      - name: Marble
+      - name:
+          source: MWDA world profiles
+          value: Marble
         size: large
         icon: rock7
-      - name: Slate
+      - name:
+          source: MWDA world profiles
+          value: Slate
         size: medium
         icon: oddmoon3
     event:

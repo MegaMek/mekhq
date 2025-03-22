@@ -3,9 +3,11 @@ sucsId: 198
 xcood: 17.569
 ycood: 30.974
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F8IV
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2356-12-12'
     zenithCharge: yes
@@ -19,28 +21,32 @@ planet:
       value: Athenry
     type: TERRESTRIAL
     orbitalDist: 3.36
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: wet12
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.04
-    diameter: 11905
-    density: 6.140416313439
+    diameter: 11904
+    density: 6.139800343548
     dayLength: 17
     yearLength: 6.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 40
     water:
-      source: canon
+      source: MWDA world profiles
       value: 88
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: BIRD
     desc: 3130 - A warm world, with an oppressive atmosphere and active volcanoes
       in all four of its great island chains, Athenry resembles prehistoric Terra
@@ -83,7 +89,7 @@ planet:
           source: canon
           value: Lisbon Island Chain
         capital:
-          source: canon
+          source: MWDA world profiles
           value: New Senna
       - name:
           source: canon
@@ -92,16 +98,24 @@ planet:
           source: canon
           value: Zubeckis Island Chain
     satellite:
-      - name: Batha
+      - name:
+          source: MWDA world profiles
+          value: Batha
         size: medium
         icon: rock2
-      - name: Illusa
+      - name:
+          source: MWDA world profiles
+          value: Illusa
         size: large
         icon: rock14
-      - name: Kylos
+      - name:
+          source: MWDA world profiles
+          value: Kylos
         size: medium
         icon: oddmoon2
-      - name: Zule
+      - name:
+          source: MWDA world profiles
+          value: Zule
         size: large
         icon: rock10
     event:

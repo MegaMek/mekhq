@@ -33,7 +33,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -63,22 +62,22 @@ public class BombsDialog extends JDialog implements ActionListener {
     private static final MMLogger logger = MMLogger.create(BombsDialog.class);
 
     private BombChoicePanel bombPanel;
-    private IBomber bomber;
-    private Campaign campaign;
+    private IBomber         bomber;
+    private Campaign        campaign;
 
     private int[] bombChoices;
     private int[] bombCatalog = new int[BombType.B_NUM];
-    private int[] availBombs = new int[BombType.B_NUM];
-    private int[] typeMax = new int[BombType.B_NUM];
+    private int[] availBombs  = new int[BombType.B_NUM];
+    private int[] typeMax     = new int[BombType.B_NUM];
 
     private JButton okayButton;
     private JButton cancelButton;
 
     public BombsDialog(IBomber iBomber, Campaign campaign, JFrame parent) {
         super(parent, "Select Bombs", true);
-        this.bomber = iBomber;
+        this.bomber   = iBomber;
         this.campaign = campaign;
-        bombChoices = bomber.getBombChoices();
+        bombChoices   = bomber.getBombChoices();
 
         initGUI();
         validate();
@@ -88,17 +87,16 @@ public class BombsDialog extends JDialog implements ActionListener {
     }
 
     private void initGUI() {
-        // Using bombCatalog to store the part ID's of the bombs so don't have to keep
-        // full spare list in memory
-        // and for ease of access later
+        // Using bombCatalog to store the part ID's of the bombs so don't have to keep full spare list in memory and
+        // for ease of access later
         campaign.getWarehouse().forEachSparePart(spare -> {
-            if ((spare instanceof AmmoStorage)
-                    && (((EquipmentPart) spare).getType() instanceof BombType)
-                    && spare.isPresent()) {
-                int bombType = (BombType
-                        .getBombTypeFromInternalName(((AmmoStorage) spare).getType().getInternalName()));
+            if ((spare instanceof AmmoStorage) &&
+                (((EquipmentPart) spare).getType() instanceof BombType) &&
+                spare.isPresent()) {
+                int bombType = (BombType.getBombTypeFromInternalName(((AmmoStorage) spare).getType()
+                                                                           .getInternalName()));
                 bombCatalog[bombType] = spare.getId();
-                availBombs[bombType] = ((AmmoStorage) spare).getShots();
+                availBombs[bombType]  = ((AmmoStorage) spare).getShots();
             }
         });
 
@@ -106,10 +104,8 @@ public class BombsDialog extends JDialog implements ActionListener {
             typeMax[type] = availBombs[type] + bombChoices[type];
         }
 
-        // BombChoicePanel takes care of managing internal and external stores, so we
-        // don't need to here.
-        bombPanel = new BombChoicePanel(bomber, campaign.getGameOptions().booleanOption("at2_nukes"),
-                true, typeMax);
+        // BombChoicePanel takes care of managing internal and external stores, so we don't need to here.
+        bombPanel = new BombChoicePanel(bomber, campaign.getGameOptions().booleanOption("at2_nukes"), true, typeMax);
 
         // Set up the display of this dialog.
         JScrollPane scroller = new JScrollPaneWithSpeed(bombPanel);
@@ -135,7 +131,13 @@ public class BombsDialog extends JDialog implements ActionListener {
         return panel;
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(BombsDialog.class);
@@ -149,8 +151,7 @@ public class BombsDialog extends JDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (okayButton.equals(e.getSource())) {
-            // internal and external choices are applied by bombPanel; here we only care
-            // about the totals.
+            // internal and external choices are applied by bombPanel; here we only care about the totals.
             bombPanel.applyChoice();
             int[] newLoadout = bombPanel.getChoice();
 
@@ -176,8 +177,9 @@ public class BombsDialog extends JDialog implements ActionListener {
                         // In this case newLoadout should always be greater than 0, but check to be sure
                     } else if (bombCatalog[type] == 0 && newLoadout[type] > 0) {
                         AmmoStorage excessBombs = new AmmoStorage(0,
-                                (AmmoType) EquipmentType.get(BombType.getBombInternalName(type)), newLoadout[type],
-                                campaign);
+                              (AmmoType) EquipmentType.get(BombType.getBombInternalName(type)),
+                              newLoadout[type],
+                              campaign);
                         campaign.getQuartermaster().addPart(excessBombs, 0);
                     }
                 }

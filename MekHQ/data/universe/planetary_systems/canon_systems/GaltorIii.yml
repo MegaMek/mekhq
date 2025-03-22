@@ -3,9 +3,11 @@ sucsId: 926
 xcood: 194.121
 ycood: 73.107
 spectralType:
-  source: canon
+  source: 'Historical Turning Point: Galtor'
   value: F8V
-primarySlot: 3
+primarySlot:
+  source: 'Historical Turning Point: Galtor'
+  value: 3
 event:
   - date: '2353-02-21'
     zenithCharge: yes
@@ -59,28 +61,32 @@ planet:
       value: Galtor III
     type: TERRESTRIAL
     orbitalDist: 1.2
-    sysPos: 3
+    sysPos:
+      source: 'Historical Turning Point: Galtor'
+      value: 3
     icon: green37
     pressure:
-      source: canon
+      source: 'Historical Turning Point: Galtor'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Historical Turning Point: Galtor'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Historical Turning Point: Galtor'
       value: 1.0
-    diameter: 12927
-    density: 5.416652709834
+    diameter: 12951
+    density: 5.426502307261
     dayLength: 24
     yearLength: 1.7
     temperature:
-      source: canon
+      source: 'Historical Turning Point: Galtor'
       value: 45
     water:
-      source: canon
+      source: 'Historical Turning Point: Galtor'
       value: 70
     lifeForm:
-      source: canon
+      source: 'Historical Turning Point: Galtor'
       value: MAMMAL
     desc: Galtor III is an agriculture world that is moderately advanced with basic
       heavy industry. The planet has three continents. The first continent, Eire,
@@ -95,21 +101,28 @@ planet:
       the world supplied food to SLDF troops around the Inner Sphere.
     landmass:
       - name:
-          source: canon
+          source: 'Historical Turning Point: Galtor'
           value: Eire
         capital:
-          source: canon
+          source: 'Historical Turning Point: Galtor'
           value: New Derry
       - name:
-          source: canon
-          value: Samphire
-      - name:
-          source: canon
+          source: 'Historical Turning Point: Galtor'
           value: Ilnacullin
+      - name:
+          source: 'Historical Turning Point: Galtor'
+          value: Samphire
     satellite:
-      - name: '2'
-        size: large
-        icon: rock4
+      - name:
+          source: 'Historical Turning Point: Galtor'
+          value: Froma
+        size: medium
+        icon: rock16
+      - name:
+          source: 'Historical Turning Point: Galtor'
+          value: Temos
+        size: medium
+        icon: rock16
     event:
       - date: '2166-02-02'
         faction:

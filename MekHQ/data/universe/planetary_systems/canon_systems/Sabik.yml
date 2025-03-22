@@ -5,7 +5,9 @@ ycood: 57.082
 spectralType:
   source: canon
   value: A2V
-primarySlot: 9
+primarySlot:
+  source: Star League, pg. 177
+  value: 9
 planet:
   - name: Wajih
     type: TERRESTRIAL
@@ -150,28 +152,32 @@ planet:
       value: Sabik
     type: TERRESTRIAL
     orbitalDist: 7.0
-    sysPos: 9
+    sysPos:
+      source: Star League, pg. 177
+      value: 9
     icon: green4
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.98
-    diameter: 12773
-    density: 5.387782251364
+    diameter: 12778
+    density: 5.389828791798
     dayLength: 22
     yearLength: 18.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 44
     water:
-      source: canon
+      source: MWDA world profiles
       value: 31
     lifeForm:
-      source: canon
+      source: Star League, pg. 177
       value: PLANT
     desc: |-
       Orbitting twin stars, each between three and four times the mass of Terra‘s Sol, it‘s a miracle that a potentially life-bearing world like Sabik could exist at all. Still, aside from a breathable atmosphere and a limited supply of free water, very little about Sabik was found to recommend this world for settlement during its initial surveys. The land, almost universally rugged and dry, with abrupt cliffs and mountains, interspersed by rocky badlands and the occasional asteroid crater, supported but one form of life: an exceptionally stubborn purple-leaved plant that carpets most of its deep valleys and chasms. A disappointing lack of sizable mineral deposits, infertile soil, and high year-round temperatures kept away prospective colonists and industries.
@@ -183,8 +189,8 @@ planet:
       As of the 32nd century, this world is little more than an outpost, with no agricultural or mineral wealth worth exploiting, though some corporations have expressed an interest—as many before—in mining the hazardous asteroid belts, and using Sabik itself as a home for their local headquarters. Sabik has no continents per se, but boasts a single ocean in its northern hemisphere, Black Oasis, from which a number of minor rivers radiate across the otherwise barren surface. Mofestos is located on the northern shores of this ocean, a mere 500 kilometers from the planet‘s north pole.
     landmass:
       - capital:
-          source: canon
-          value: Mofesto
+          source: MWDA world profiles
+          value: Mofestos
     event:
       - date: '2400-04-19'
         faction:
