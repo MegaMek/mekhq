@@ -102,7 +102,9 @@ public class Refit extends Part implements IAcquisitionWork {
     private Unit   oldUnit;
     private Entity newEntity;
 
-    private int          refitClass;
+    private int refitClass;
+
+    // This needs to be converted to FLOAT and handled accordingly.
     private int          time;
     private int          timeSpent;
     private Money        cost;
@@ -127,7 +129,6 @@ public class Refit extends Part implements IAcquisitionWork {
 
     private int oldLargeCraftHeatSinks;
     private int oldLargeCraftSinkType;
-    private int newLargeCraftHeatSinks;
 
     private Person assignedTech;
 
@@ -339,14 +340,14 @@ public class Refit extends Part implements IAcquisitionWork {
                              oldUnit.getEntity().getArmorType(oldUnit.getEntity().firstArmorIndex())) &&
                             (newEntity.getArmorTechRating() == oldUnit.getEntity().getArmorTechRating());
         }
-        int                        recycledArmorPoints  = 0;
-        boolean[]                  locationHasNewStuff  = new boolean[Math.max(newEntity.locations(),
-              oldUnit.getEntity().locations())];
-        boolean[]                  locationLostOldStuff = new boolean[Math.max(newEntity.locations(),
-              oldUnit.getEntity().locations())];
-        HashMap<AmmoType, Integer> ammoNeeded           = new HashMap<>();
-        HashMap<AmmoType, Integer> ammoRemoved          = new HashMap<>();
-        ArrayList<Part>            newPartList          = new ArrayList<>();
+        int recycledArmorPoints = 0;
+        boolean[] locationHasNewStuff = new boolean[Math.max(newEntity.locations(), oldUnit.getEntity().locations())];
+        boolean[] locationLostOldStuff = new boolean[Math.max(newEntity.locations(), oldUnit.getEntity().locations())];
+        HashMap<AmmoType, Integer> ammoNeeded = new HashMap<>();
+
+        // Not used anywhere except to merge data into it but never queried against.
+        // HashMap<AmmoType, Integer> ammoRemoved          = new HashMap<>();
+        ArrayList<Part> newPartList = new ArrayList<>();
 
         // Step 1: put all the parts from the current unit into a new arraylist so they can be removed when we find a
         // match.
@@ -626,10 +627,10 @@ public class Refit extends Part implements IAcquisitionWork {
                 }
 
             } else if (newPart instanceof SpacecraftCoolingSystem) {
-                int  sinkType    = ((SpacecraftCoolingSystem) newPart).getSinkType();
+                int  sinkType               = ((SpacecraftCoolingSystem) newPart).getSinkType();
                 int  sinksToReplace;
-                Part replacement = new AeroHeatSink(0, sinkType, false, campaign);
-                newLargeCraftHeatSinks = ((SpacecraftCoolingSystem) newPart).getTotalSinks();
+                Part replacement            = new AeroHeatSink(0, sinkType, false, campaign);
+                int  newLargeCraftHeatSinks = ((SpacecraftCoolingSystem) newPart).getTotalSinks();
                 if (sinkType != oldLargeCraftSinkType) {
                     sinksToReplace = newLargeCraftHeatSinks;
                 } else {
@@ -828,9 +829,8 @@ public class Refit extends Part implements IAcquisitionWork {
                     }
                 }
             }
-            // Use bay replacement time of 1 month (30 days) for each bay to be resized,
-            // plus
-            // another month for any bays to be added or removed.
+            // Use bay replacement time of 1 month (30 days) for each bay to be resized, plus another month for any
+            // bays to be added or removed.
             time += Math.max(oldUnitBays.size(), newUnitBays.size()) * WORKMONTH;
             int deltaDoors = oldUnitBays.stream().mapToInt(Bay::getDoors).sum() -
                              newUnitBays.stream().mapToInt(Bay::getDoors).sum();
@@ -872,7 +872,7 @@ public class Refit extends Part implements IAcquisitionWork {
                     } else {
                         time += 2 * WORKHOUR;
                     }
-                    ammoRemoved.merge(type, remainingShots, Integer::sum);
+                    // ammoRemoved.merge(type, remainingShots, Integer::sum);
                 }
                 continue;
             }
@@ -1194,17 +1194,7 @@ public class Refit extends Part implements IAcquisitionWork {
             ArrayList<Part> newShoppingList = new ArrayList<>();
             for (Part part : shoppingList) {
                 part.setUnit(null);
-                if (part instanceof Armor) {
-                    /*
-                     * Taharqa: WE shouldn't be here anymore, given that I am no longer adding armor by location to
-                     * the shopping list but instead changing it all via the newArmorSupplies object, but commented
-                     * out for completeness
-                     */
-
-                    // getCampaign().getQuartermaster().addPart(part, 0);
-                    // part.setRefitUnit(oldUnit);
-                    // newUnitParts.add(part.getId());
-                } else if (part instanceof AmmoBin ammoBin) {
+                if (part instanceof AmmoBin ammoBin) {
                     // TODO: custom job ammo...
 
                     // ammo bins are free
@@ -1832,22 +1822,24 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
+     * Found in Campaign Operations under Refit Kits. Time is reduced by half is using one, no rounding.
+     *
      * @return time multiplier for this refit's current class
      */
     private float getTimeMultiplier() {
-        int timeMultiplier = switch (refitClass) {
-            case NO_CHANGE -> 0;
-            case CLASS_A -> 2;
-            case CLASS_B -> 3;
-            case CLASS_C -> 5;
-            case CLASS_D -> 8;
-            case CLASS_E -> 9;
-            case CLASS_F -> 10;
-            default -> 1;
+        float timeMultiplier = switch (refitClass) {
+            case NO_CHANGE -> 0.0f;
+            case CLASS_A -> 2.0f;
+            case CLASS_B -> 3.0f;
+            case CLASS_C -> 5.0f;
+            case CLASS_D -> 8.0f;
+            case CLASS_E -> 9.0f;
+            case CLASS_F -> 10.0f;
+            default -> 1.0f;
         };
 
         if (!customJob) {
-            timeMultiplier *= 0.5;
+            timeMultiplier *= 0.5f;
         }
 
         return timeMultiplier;
