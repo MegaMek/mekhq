@@ -3,9 +3,11 @@ sucsId: 953
 xcood: -183.072
 ycood: -12.971
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 78'
   value: K0IV
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 78'
+  value: 2
 event:
   - date: '2366-03-03'
     zenithCharge: yes
@@ -30,28 +32,32 @@ planet:
       value: Gienah
     type: TERRESTRIAL
     orbitalDist: 1.28
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 78'
+      value: 2
     icon: wet7
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 78'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 78'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 78'
       value: 1.08
-    diameter: 12960
-    density: 5.855572175271
+    diameter: 12961
+    density: 5.855950767063
     dayLength: 24
     yearLength: 1.7
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 78'
       value: 41
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 78'
       value: 77
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 78'
       value: BIRD
     desc: There are three continents that help make up the surface of Gienah. The
       Continent of Carrabesto lies in the north, with the larger landmass of Alliago
@@ -65,28 +71,36 @@ planet:
       on the continent of Carrabesto.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 78'
           value: Alliago Major
         capital:
           source: canon
           value: Ooessay
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 78'
           value: Alliago Minor
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 78'
           value: Carrabesto
     satellite:
-      - name: Corvis
+      - name:
+          source: 'Handbook: House Steiner, pg. 78'
+          value: Corvis
         size: medium
         icon: oddmoon2
-      - name: Dobry
+      - name:
+          source: 'Handbook: House Steiner, pg. 78'
+          value: Dobry
         size: large
         icon: rock1
-      - name: Mazel
+      - name:
+          source: 'Handbook: House Steiner, pg. 78'
+          value: Mazel
         size: large
         icon: rock10
-      - name: Nando
+      - name:
+          source: 'Handbook: House Steiner, pg. 78'
+          value: Nando
         size: medium
         icon: rock6
     event:

@@ -3,9 +3,11 @@ sucsId: 895
 xcood: -32.326
 ycood: 209.081
 spectralType:
-  source: canon
+  source: FedCom Civil War, pg. 197
   value: G6III
-primarySlot: 3
+primarySlot:
+  source: FedCom Civil War, pg. 197
+  value: 3
 event:
   - date: '2462-05-10'
     nadirCharge: yes
@@ -49,28 +51,32 @@ planet:
       value: Fort Loudon
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 3
+    sysPos:
+      source: FedCom Civil War, pg. 197
+      value: 3
     icon: wet18
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 197
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 197
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 197
       value: 1.0
-    diameter: 13984
-    density: 5.03952630679
+    diameter: 13964
+    density: 5.032485372961
     dayLength: 26
     yearLength: 2.0
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 197
       value: 45
     water:
-      source: canon
+      source: FedCom Civil War, pg. 197
       value: 80
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 197
       value: MAMMAL
     desc: Fort Loudon was not colonized until 2460 by the Lyran Commonwealth and was
       briefly known as simply LC/T-2395, until 2465 after the heroic actions of Captain
@@ -83,19 +89,21 @@ planet:
       that survived the Succession Wars.
     landmass:
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 197
           value: Anderssen
         capital:
-          source: canon
+          source: FedCom Civil War, pg. 197
           value: Palos
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 197
           value: Brunei
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 197
           value: Tunisonda
     satellite:
-      - name: Précis
+      - name:
+          source: FedCom Civil War, pg. 197
+          value: Précis
         size: medium
         icon: rock11
     event:

@@ -3,9 +3,11 @@ sucsId: 945
 xcood: 39.026
 ycood: -59.756
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: M9III
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2372-08-09'
     zenithCharge: yes
@@ -63,28 +65,32 @@ planet:
       value: Genoa
     type: TERRESTRIAL
     orbitalDist: 0.04
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: dry13
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.0
-    diameter: 13097
-    density: 5.360520078823
+    diameter: 13103
+    density: 5.363162060717
     dayLength: 21
     yearLength: 0.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 25
     water:
-      source: canon
+      source: MWDA world profiles
       value: 12
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: AMPHIBIAN
     desc: |-
       3135 - In 2300, seven ships carrying 100,000 colonists set out for Genoa (named after the port city in the Italian Genova Province), expecting a vibrant world rich in life, however they found a barren, dry, rocky, and only marginally habitable planet. Genoa's lush plant and plentiful animal life had died off after the planet was forced from its orbit by a passing meteor a millennia ago.
@@ -94,16 +100,18 @@ planet:
       In 2315, Genoa became a member of the Liao Protectorate before it was taken by the Terran Hegemony. After the fall of the Star League, Genoa became part of the Capellan Confederation. During the Fourth Succession War, the planet was captured and held by the Federated Commonwealth until the collapse of the Sarna March in 3057. Genoa became part of the Chaos March, refusing to bow to Capellan raiders during the Xin Sheng movement. Control was regained by the Federated Suns in the waning months of the FedCom Civil War but did not last long, during the Jihad, World of Blake forces attempted to take Genoa. The armed population fought for every inch of ground and even after three nuclear weapons were used the planet never fell; one-third of the population died before Stone’s Lament relieved the planet by annihilating the remaining Blakists. After their rescue, the majority of the population became staunch supporters of The Republic of the Sphere.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
+          value: Genova
+      - name:
+          source: MWDA world profiles
           value: Rivera
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Columbus
-      - name:
-          source: canon
-          value: Genova
     satellite:
-      - name: Sant'Andrea di Ponticello
+      - name:
+          source: MWDA world profiles
+          value: Sant'Andrea di Ponticello
         size: medium
         icon: rock14
     event:

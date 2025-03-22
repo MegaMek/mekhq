@@ -3,9 +3,11 @@ sucsId: 2964
 xcood: 85.61
 ycood: 1811.916
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: B4V
-primarySlot: 1
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 1
 event:
   - date: '2806-06-28'
     nadirCharge: yes
@@ -15,28 +17,32 @@ planet:
       value: Tathis
     type: TERRESTRIAL
     orbitalDist: 34.84
-    sysPos: 1
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 1
     icon: green55
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 0.7
-    diameter: 9761
-    density: 5.053589301721
+    diameter: 9748
+    density: 5.046673476753
     dayLength: 24
     yearLength: 205.7
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 25
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 30
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: PLANT
     desc: No description available.
     smallMoons: 1

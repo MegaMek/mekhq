@@ -3,9 +3,11 @@ sucsId: 1615
 xcood: 154.576
 ycood: -44.511
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 95'
   value: K2V
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Davion, pg. 95'
+  value: 3
 event:
   - date: '2456-02-03'
     nadirCharge: yes
@@ -44,28 +46,32 @@ planet:
       value: Marlette
     type: TERRESTRIAL
     orbitalDist: 0.49
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Davion, pg. 95'
+      value: 3
     icon: green36
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 95'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 95'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 95'
       value: 1.08
-    diameter: 12840
-    density: 5.939427119228
+    diameter: 12809
+    density: 5.925227302173
     dayLength: 20
     yearLength: 0.9
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 95'
       value: 37
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 95'
       value: 66
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 95'
       value: MAMMAL
     desc: |-
       Marlette is a prosperous and thriving planet and capital of the nascent Marlette Association of the 23rd and 24th century. The success of Marlette and its surrounding planets throughout its history have resulted in numerous raids by the Terran Hegemony, Draconis Combine, and Capellan Confederation. This has resulted in the Federated Suns setting up major military bases on Marlette to respond to issues on planet and in the region.
@@ -75,13 +81,16 @@ planet:
     smallMoons: 5
     landmass:
       - name:
-          source: canon
+          source: 'Objectives: Federated Suns, p. 21'
           value: Sanilac
+        capital:
+          source: 'Objectives: Federated Suns, p. 21'
+          value: Achemar
       - name:
-          source: canon
+          source: 'Objectives: Federated Suns, p. 21'
           value: Saginaw
       - name:
-          source: canon
+          source: 'Objectives: Federated Suns, p. 21'
           value: Flint
     event:
       - date: '2278-08-04'

@@ -3,9 +3,11 @@ sucsId: 742
 xcood: -20.939
 ycood: 66.122
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K8IV
-primarySlot: 6
+primarySlot:
+  source: MWDA world profiles
+  value: 6
 event:
   - date: '2351-11-20'
     zenithCharge: yes
@@ -92,28 +94,32 @@ planet:
       value: Dromini VI
     type: TERRESTRIAL
     orbitalDist: 0.42
-    sysPos: 6
+    sysPos:
+      source: MWDA world profiles
+      value: 6
     icon: green45
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.74
-    diameter: 11780
-    density: 4.411189565421
+    diameter: 11785
+    density: 4.412903656982
     dayLength: 23
     yearLength: 0.8
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 45
     water:
-      source: canon
+      source: MWDA world profiles
       value: 64
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: FISH
     desc: |-
       Despite an impressive ring of ice and dust replacing what might pass for a moon for more ordinary planets, Dromini IV does not look like much from orbit. Indeed, this world seems to be half shrouded in swirling gray clouds at any given time, a sign of the turbulent storm systems that constantly play about its surface. With only modest raw-material and fossil fuel resources to exploit, the local manufacturers and businesses never produced anything on Dromini that could not be found on dozens of other nearby planets, nor has the world held any great strategic significance. Nonetheless, this small industrial planet‘s location on the Combine/Lyran border made it a favored staging ground during the centuries of war following the original Star League‘s demise.
@@ -123,20 +129,26 @@ planet:
       In the 32nd century, Dromini is home to people descended originally from Davion, Steiner, Kurita, Marik, and even Clan heritage, creating a cosmopolitan society that once served as a model to others throughout The Republic. This mixture has also provided an excellent venue from which to conduct trade with the neighboring Successor States. Much of this trade is handled through Franchelco, the planetary capital city on the northern continent of Vijave, but major shipping ports and commercial centers exist on all three of Dromini IV‘s other continents, Kodersia, Epoure, and Apokayik.
     landmass:
       - name:
-          source: canon
-          value: Vijave
-        capital:
-          source: canon
-          value: Franchelco
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Apokayik
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Epoure
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Kodersia
+      - name:
+          source: MWDA world profiles
+          value: Vijave
+        capital:
+          source: MWDA world profiles
+          value: Franchelco
+    satellite:
+      - name:
+          source: MWDA world profiles
+          value: ringed world
+        size: medium
+        icon: oddmoon2
     event:
       - date: '2149-06-27'
         faction:

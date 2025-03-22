@@ -3,9 +3,11 @@ sucsId: 261
 xcood: 20.917
 ycood: -354.184
 spectralType:
-  source: canon
+  source: House Liao, pg. 133
   value: K2V
-primarySlot: 5
+primarySlot:
+  source: House Liao, pg. 133
+  value: 5
 event:
   - date: '2592-10-18'
     nadirCharge: yes
@@ -80,7 +82,9 @@ planet:
       value: Barras
     type: TERRESTRIAL
     orbitalDist: 0.49
-    sysPos: 5
+    sysPos:
+      source: House Liao, pg. 133
+      value: 5
     icon: green46
     pressure: THIN
     atmosphere: BREATHABLE
@@ -93,7 +97,7 @@ planet:
     temperature: 24
     water: 74
     lifeForm:
-      source: canon
+      source: House Liao, pg. 133
       value: MAMMAL
     desc: |-
       3025 - In 2521, Barras was captured from the Free World League and occupied by the Confederation. It was made a neutral free port of call by both the Confederation and FWL as part of the Buenos Aires Convention of 2858. It is an exception to the otherwise stringent Confederation trade restrictions imposed against the FWL in the early 29th century.

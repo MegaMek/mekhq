@@ -3,9 +3,11 @@ sucsId: 131
 xcood: -41.335
 ycood: -315.245
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 66'
   value: G0V
-primarySlot: 5
+primarySlot:
+  source: 'Handbook: House Marik, pg. 66'
+  value: 5
 event:
   - date: '2355-10-22'
     zenithCharge: yes
@@ -97,28 +99,32 @@ planet:
       value: Andurien
     type: TERRESTRIAL
     orbitalDist: 1.76
-    sysPos: 5
+    sysPos:
+      source: 'Handbook: House Marik, pg. 66'
+      value: 5
     icon: green33
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 66'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 66'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 66'
       value: 1.2
-    diameter: 16696
-    density: 5.059644256269
+    diameter: 16682
+    density: 5.055309703647
     dayLength: 20
     yearLength: 2.6
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 66'
       value: 45
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 66'
       value: 65
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 66'
       value: AMPHIBIAN
     desc: |-
       Andurien is the Capital of the Duchy of Andurien and as such suffered greatly for the Andurien Succession of the 3030s. While the planet and its infrastructure returned to previous levels, the planet was slow to recover the financial prestige it once possessed. The planet has significant industrial facilities producing a wealth of civilian and military goods. However, after the Andurien Succession, all military manufacturing was turned over to the Free Worlds League instead of being controlled by the Duchy of Andurien.
@@ -128,21 +134,25 @@ planet:
       Andurien Aerotech
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 66'
           value: Altay
         capital:
-          source: canon
+          source: 'Handbook: House Marik, pg. 66'
           value: Jojoken
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 66'
           value: Zahle
     satellite:
-      - name: Mulhacen
-        size: medium
-        icon: rock6
-      - name: Betic
+      - name:
+          source: 'Handbook: House Marik, pg. 66'
+          value: Betic
         size: medium
         icon: oddmoon1
+      - name:
+          source: 'Handbook: House Marik, pg. 66'
+          value: Mulhacen
+        size: medium
+        icon: rock6
     event:
       - date: '2195-06-13'
         faction:

@@ -5,7 +5,9 @@ ycood: -0.696
 spectralType:
   source: canon
   value: G2V
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Davion, pg. 98'
+  value: 4
 event:
   - date: '2352-04-15'
     zenithCharge: yes
@@ -68,28 +70,32 @@ planet:
       value: Addicks
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Davion, pg. 98'
+      value: 4
     icon: green13
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 98'
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 98'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 98'
       value: 1.0
-    diameter: 11232
-    density: 6.250633341891
+    diameter: 11238
+    density: 6.253697000981
     dayLength: 25
     yearLength: 1.2
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 98'
       value: 34
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 98'
       value: 62
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 98'
       value: AMPHIBIAN
     desc: |-
       Addicks is seemingly a world with two identities, thanks to two different and large groups of immigrants that initially colonized the world. Both claimed predominance over Addicks, each establishing capitals and lending their own names to the world's features. The Terran Alliance and later the Terran Hegemony, chose one to be the official naming conventions after officially taking charge of Addicks, but even today, some seven centuries later, the alternates can be found in use.
@@ -99,33 +105,41 @@ planet:
       Addicks remains an important world today, though it has lost much of its glory over the past three centuries. Early in the Succession Wars, the AFFS turned Addicks into a major military headquarters and forward logistics base, with most of the facilities constructed underground for additional protection. The world still has a strong manufacturing industry, but its once-bountiful farmlands have been poisoned by centuries of war; Addicks produces enough food to feed its population, though it no longer yields the excesses it once did. The world's capital of St. Randall on Tauken (also known as Landersia), Addicks' largest and most populous continent; together with Silesia (aka Auskel), the two continent's are home to the great majority of the world's people. Loknar (aka Sparro) is a smallish continent, one taken almost completely over by the AFFS. Bureigo (aka Frankalia), located deep in the southern hemisphere, is lightly populated, with the majority of its people clustered in ocean-side farming settlements.
     landmass:
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 187
           value: Auskel
         capital:
-          source: canon
+          source: 'Handbook: House Davion, pg. 98'
           value: St. Randall
       - name:
-          source: canon
-          value: Silesia
+          source: FedCom Civil War, pg. 187
+          value: Frankalia
       - name:
-          source: canon
-          value: Loknar
+          source: FedCom Civil War, pg. 187
+          value: Landersia
       - name:
-          source: canon
-          value: Bureigo
+          source: FedCom Civil War, pg. 187
+          value: Sparro
     satellite:
-      - name: Damocles
-        size: medium
-        icon: oddmoon3
-      - name: Grant
-        size: medium
-        icon: rock12
-      - name: Ella
-        size: medium
-        icon: oddmoon1
-      - name: Chimera
+      - name:
+          source: 'Handbook: House Davion, pg. 98'
+          value: Chimera
         size: medium
         icon: rock17
+      - name:
+          source: 'Handbook: House Davion, pg. 98'
+          value: Damocles
+        size: medium
+        icon: oddmoon3
+      - name:
+          source: 'Handbook: House Davion, pg. 98'
+          value: Ella
+        size: medium
+        icon: oddmoon1
+      - name:
+          source: 'Handbook: House Davion, pg. 98'
+          value: Grant
+        size: medium
+        icon: rock12
     event:
       - date: '2251-06-09'
         faction:

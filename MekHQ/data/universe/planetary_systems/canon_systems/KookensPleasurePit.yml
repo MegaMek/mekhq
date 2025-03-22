@@ -3,9 +3,11 @@ sucsId: 1396
 xcood: -165.238
 ycood: 345.818
 spectralType:
-  source: canon
+  source: 'Operational Turning Points: Red Corsair, pg. 4'
   value: G5V
-primarySlot: 4
+primarySlot:
+  source: 'Operational Turning Points: Red Corsair, pg. 4'
+  value: 4
 event:
   - date: '2729-10-29'
     zenithCharge: yes
@@ -66,26 +68,32 @@ planet:
       value: Kooken's Pleasure Pit
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 4
+    sysPos:
+      source: 'Operational Turning Points: Red Corsair, pg. 4'
+      value: 4
     icon: green17
     pressure:
-      source: canon
+      source: 'Operational Turning Points: Red Corsair, pg. 4'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Operational Turning Points: Red Corsair, pg. 4'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Operational Turning Points: Red Corsair, pg. 4'
       value: 1.0
-    diameter: 11667
-    density: 6.040194513243
+    diameter: 11651
+    density: 6.031831957979
     dayLength: 24
     yearLength: 1.3
     temperature:
-      source: canon
+      source: 'Operational Turning Points: Red Corsair, pg. 4'
       value: 30
-    water: 37
+    water:
+      source: 'Operational Turning Points: Red Corsair, pg. 4'
+      value: 43
     lifeForm:
-      source: canon
+      source: 'Operational Turning Points: Red Corsair, pg. 4'
       value: MAMMAL
     desc: |-
       Renamed Kooken’s Pleasure Pit in 3005, in reference to an infamous book which detailed the hedonistic life of the author, Michael Kooken, the planet was an attempt to battle organized crime in the region by providing many of the same services legally. Tourism is the planet’s only major industry and the entire economy is geared around visitors having a good time.
@@ -98,7 +106,9 @@ planet:
       - name: Bloomsburg
       - name: West Pennsboro
     satellite:
-      - name: Joy
+      - name:
+          source: 'Operational Turning Points: Red Corsair, pg. 4'
+          value: Joy
         size: large
         icon: rock9
     event:

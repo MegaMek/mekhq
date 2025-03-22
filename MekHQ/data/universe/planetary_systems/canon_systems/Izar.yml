@@ -5,7 +5,9 @@ ycood: 97.402
 spectralType:
   source: canon
   value: B5VI
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2359-08-08'
     nadirCharge: yes
@@ -21,28 +23,32 @@ planet:
       value: Izar
     type: TERRESTRIAL
     orbitalDist: 59.0
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: green37
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.84
-    diameter: 10653
-    density: 5.514257907709
+    diameter: 10679
+    density: 5.527777928321
     dayLength: 24
     yearLength: 453.2
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 29
     water:
-      source: canon
+      source: MWDA world profiles
       value: 51
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: FISH
     desc: |-
       Izar‘s parent star is actually part of a binary system that consists of a cool, orange K0 sun orbiting a blue-white B5 subgiant. Because of the substantial distance between the two stars, planets were miraculously able to form close to both stars, but only the closest world of the smaller star had developed a breathable atmosphere and enough surface water to support life when it was discovered early in man‘s journey into space. However, Izar‘s orbit, roughly half again as far from its parent star as Terra is from Sol, rendered it a cool world. In fact, with clouds and storms common—even over the interior of the larger landmasses of Celta, Eddin, Morope and Trantara—nights on Izar were particularly cold. Though this did not faze the native evergreen woods that covered most of the hilly mainlands, colonists quickly learned that the only way to make use of the world‘s fertile soil for their own crops was to encapsulate their farms beneath environmentally sealed domes.
@@ -52,25 +58,29 @@ planet:
       Apart from the planetary capital of Promise Point, Izar boasts a second major spaceport in the city of Rhyss on the southern Trantara continent.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Celta
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Eddin
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Promise Point
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Morope
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Trantara
     satellite:
-      - name: Banta
+      - name:
+          source: MWDA world profiles
+          value: Banta
         size: medium
         icon: oddmoon1
-      - name: Nunascus
+      - name:
+          source: MWDA world profiles
+          value: Nunascus
         size: large
         icon: rock7
     event:

@@ -3,9 +3,11 @@ sucsId: 167
 xcood: -78.068
 ycood: 174.436
 spectralType:
-  source: canon
+  source: A Time of War, pg. 376
   value: K2III
-primarySlot: 5
+primarySlot:
+  source: A Time of War, pg. 376
+  value: 5
 event:
   - date: '2378-07-11'
     nadirCharge: yes
@@ -85,28 +87,32 @@ planet:
       value: Arcturus
     type: TERRESTRIAL
     orbitalDist: 1.12
-    sysPos: 5
+    sysPos:
+      source: A Time of War, pg. 376
+      value: 5
     icon: green35
     pressure:
-      source: canon
+      source: A Time of War, pg. 376
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: A Time of War, pg. 376
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: A Time of War, pg. 376
       value: 1.02
-    diameter: 14696
-    density: 4.898979485566
+    diameter: 14664
+    density: 4.88828698984
     dayLength: 23
     yearLength: 1.5
     temperature:
-      source: canon
-      value: 43
+      source: A Time of War, pg. 376
+      value: 33
     water:
-      source: canon
+      source: A Time of War, pg. 376
       value: 43
     lifeForm:
-      source: canon
+      source: A Time of War, pg. 376
       value: MAMMAL
     desc: |-
       The original capital of the Lyran Commonwealth, Arcturus was a thriving world with bustling and ornate cities. However, when the capital was relocated to Tharkad, taking the government of the Commonwealth along with it, the remaining population of Arcturus moved out of the cities and into the countryside. The only remaining industrial city is Malcheema.
@@ -119,31 +125,37 @@ planet:
       Arcturan Arms Refit Facility
     landmass:
       - name:
-          source: canon
+          source: A Time of War, pg. 376
           value: Attenia
         capital:
-          source: canon
+          source: A Time of War, pg. 376
           value: Malcheema
       - name:
-          source: canon
+          source: A Time of War, pg. 376
           value: Borreus
       - name:
-          source: canon
+          source: A Time of War, pg. 376
           value: Chadrik
       - name:
-          source: canon
+          source: A Time of War, pg. 376
           value: Dustina
       - name:
-          source: canon
+          source: A Time of War, pg. 376
           value: Penrod
     satellite:
-      - name: Donegal
+      - name:
+          source: A Time of War, pg. 376
+          value: Donegal
         size: medium
         icon: rock1
-      - name: Skye
+      - name:
+          source: A Time of War, pg. 376
+          value: Skye
         size: medium
         icon: oddmoon1
-      - name: Tamar
+      - name:
+          source: A Time of War, pg. 376
+          value: Tamar
         size: large
         icon: rock16
     event:

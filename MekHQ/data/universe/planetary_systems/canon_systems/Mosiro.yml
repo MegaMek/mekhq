@@ -3,9 +3,11 @@ sucsId: 1765
 xcood: -65.144
 ycood: -280.742
 spectralType:
-  source: canon
+  source: House Marik, pg. 157
   value: K0V
-primarySlot: 3
+primarySlot:
+  source: House Marik, pg. 157
+  value: 3
 event:
   - date: '2363-06-25'
     nadirCharge: yes
@@ -44,7 +46,9 @@ planet:
       value: Mosiro
     type: TERRESTRIAL
     orbitalDist: 0.8
-    sysPos: 3
+    sysPos:
+      source: House Marik, pg. 157
+      value: 3
     icon: green49
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -57,7 +61,7 @@ planet:
     temperature: 27
     water: 30
     lifeForm:
-      source: canon
+      source: House Marik, pg. 157
       value: PLANT
     desc: |-
       Mosiro has a climate similar to that of Terra and is overall comfortable for human habitation. The population is primarily muslim and much of the architecture is styled after Northern African and Spanish construction.
@@ -69,8 +73,8 @@ planet:
     smallMoons: 6
     landmass:
       - capital:
-          source: canon
-          value: Al-Ilb
+          source: House Marik, pg. 157
+          value: al-Ibn
     event:
       - date: '2325-10-06'
         faction:

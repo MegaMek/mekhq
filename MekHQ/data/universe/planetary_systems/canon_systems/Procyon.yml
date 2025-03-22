@@ -3,7 +3,7 @@ sucsId: 2072
 xcood: -5.043
 ycood: -11.064
 spectralType:
-  source: canon
+  source: 25 Years of Art and Fiction, pg. 243
   value: F5V
 primarySlot: 3
 event:
@@ -59,25 +59,27 @@ planet:
     sysPos: 3
     icon: green18
     pressure:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 243
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 25 Years of Art and Fiction, pg. 243
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 243
       value: 0.97
-    diameter: 11363
-    density: 6.019865248944
+    diameter: 11343
+    density: 6.009469279367
     dayLength: 23
     yearLength: 2.0
     temperature:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 243
       value: 30
     water:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 243
       value: 62
     lifeForm:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 243
       value: REPTILE
     desc: |-
       Procyon was first settled in 2134 by colonists from North America. Due to the planets rugged terrain and proximity to Terra it quickly became a stronghold of the Terran Alliance and during the time of the Star League Procyon remained a major naval base. In the 28th Century it was the birthplace of Oliver Marik’s Civil War.
@@ -91,17 +93,14 @@ planet:
       3135 - The rugged, resource-rich world of Procyon was first settled in 2134 and eventually became a stronghold of the old Terran Alliance. The world became a major naval base for the Star League as a Hegemony planet, but was infamous for being the staging world from which Oliver Marik and his supporters planned the start of the Marik Civil War. After the Star League‘s collapse, the Free Worlds League seized Procyon and held it for nearly 200 years before the Capellan Confederation captured it in 2970. The Federated Commonwealth became Procyon‘s next steward after the Fourth Succession War. In early 3059, after two hellish years under the control of a former Blakist renegade named Alisendar Gyn, the Free Worlds League recaptured Procyon. Despite this frequent changing of hands, however, the natives of Procyon have retained a fairly indifferent attitude toward conquerors, clinging to most of the customs handed down from the days of the long-vanished Terran Hegemony. The greatest sign of this planetwide sense of apathy was the long-abandoned Brigadeer Corporation ‘Mech factory in the virtual ghost city of Cleveburg. Located on the pockmarked and rocky southern continent of Halbiero, this factory and its surrounding city experienced a small revival when Earthwerks finally decided to purchase and restore the decrepit complex in the 3050s. Today, Procyon is a largely agricultural world of sparsely populated farmlands and forests, though the new Earthwerks-Procyon Engineering Vehicles plant produces and exports enough industrial vehicles and ‘Mechs to form a secondary planetary industry. The less mountainous supercontinent of Greene, home to the majority of Procyon‘s small cities and large agro-plexes, is located just north of Halbiero, and extends into the planet‘s polar regions. The capital city of Guilded Halls, located on Greene, along the Wantu River, also boasts Procyon‘s largest spaceport and the nearby ruins of a Star League-era Castle Brian that was destroyed during the Amaris crisis by an orbital bombardment. Aside from Greene and Halbiero, the bulk of Procyon‘s surface land takes the form of the Unspoiled Isles, a chain of miniature island-continents stretching along the southern hemisphere, east of Halbiero. The Unspoiled Isles are heavily wooded, but dotted with the remains of abandoned cities and destroyed Castles Brian, a nearly forgotten vestige of the days of the Star League.
     landmass:
       - name:
-          source: canon
+          source: 25 Years of Art and Fiction, pg. 243
           value: Greene
         capital:
-          source: canon
+          source: 25 Years of Art and Fiction, pg. 243
           value: Guilded Halls
       - name:
-          source: canon
+          source: 25 Years of Art and Fiction, pg. 243
           value: Halbiero
-      - name:
-          source: canon
-          value: Unspoiled Isles
     event:
       - date: '2134-06-22'
         faction:

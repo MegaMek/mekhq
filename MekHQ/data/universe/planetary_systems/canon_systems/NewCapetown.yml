@@ -3,9 +3,11 @@ sucsId: 1821
 xcood: -252.057
 ycood: 260.773
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 82'
   value: K9V
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 82'
+  value: 4
 event:
   - date: '2411-08-11'
     zenithCharge: yes
@@ -63,28 +65,32 @@ planet:
       value: New Capetown
     type: TERRESTRIAL
     orbitalDist: 0.2
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 82'
+      value: 4
     icon: green43
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 82'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 82'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 82'
       value: 1.1
-    diameter: 12390
-    density: 6.229821326958
+    diameter: 12399
+    density: 6.2345032488
     dayLength: 19
     yearLength: 0.7
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 82'
       value: 29
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 82'
       value: 65
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 82'
       value: BIRD
     desc: |-
       New Capetown is a planet with an ugly past. The original colonists were primarily White Supremacists and the laws of the planet created a massive racial divide. These laws stunted the planet’s growth as outsiders to the planet were loathe to deal with New Capetown. It was not until the 3030s that the oppressive regime was toppled and the planet was brought in line with the ideals of the Lyran Commonwealth.
@@ -92,16 +98,18 @@ planet:
       New Capetown is moderately industrialized and is a comfortable temperate planet with abundant arable land. The planet is also home to the Royal New Capetown Military Academy, which is located in the planetary capital of New Hope on the mild flatlands of Pretoria.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 82'
           value: Eissia
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 82'
           value: Pretoria
         capital:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 82'
           value: New Hope
     satellite:
-      - name: Durban
+      - name:
+          source: 'Handbook: House Steiner, pg. 82'
+          value: Durban
         size: large
         icon: rock4
     event:

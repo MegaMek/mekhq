@@ -3,9 +3,11 @@ sucsId: 2159
 xcood: -185.056
 ycood: 368.82
 spectralType:
-  source: canon
+  source: FedCom Civil War, pg. 204
   value: M1VII
-primarySlot: 3
+primarySlot:
+  source: FedCom Civil War, pg. 204
+  value: 3
 event:
   - date: '2453-05-15'
     nadirCharge: yes
@@ -68,28 +70,32 @@ planet:
       value: Roadside
     type: TERRESTRIAL
     orbitalDist: 0.35
-    sysPos: 3
+    sysPos:
+      source: FedCom Civil War, pg. 204
+      value: 3
     icon: green20
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 204
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 204
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 204
       value: 1.0
-    diameter: 14701
-    density: 4.780914437338
+    diameter: 14700
+    density: 4.780633137201
     dayLength: 24
     yearLength: 0.7
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 204
       value: 40
     water:
-      source: canon
+      source: FedCom Civil War, pg. 204
       value: 40
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 204
       value: MAMMAL
     desc: Roadside is a garden world, settled in 24th century by the Lyran Commonwealth
       to keep up with the produce and livestock required to feed its growing population.
@@ -101,13 +107,15 @@ planet:
       and had other positive effects against stomach and digestive cancers.
     landmass:
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 204
           value: Columbine
         capital:
-          source: canon
+          source: FedCom Civil War, pg. 204
           value: Claremont
     satellite:
-      - name: Truk
+      - name:
+          source: FedCom Civil War, pg. 204
+          value: Truk
         size: large
         icon: rock11
     event:

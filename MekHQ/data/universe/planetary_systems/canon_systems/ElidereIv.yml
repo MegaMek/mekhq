@@ -3,9 +3,11 @@ sucsId: 789
 xcood: 279.947
 ycood: 75.955
 spectralType:
-  source: canon
+  source: House Davion
   value: F3V
-primarySlot: 4
+primarySlot:
+  source: House Davion
+  value: 4
 event:
   - date: '2359-11-24'
     nadirCharge: yes
@@ -65,7 +67,9 @@ planet:
       value: Elidere IV
     type: TERRESTRIAL
     orbitalDist: 2.4
-    sysPos: 4
+    sysPos:
+      source: House Davion
+      value: 4
     icon: green8
     pressure: THIN
     atmosphere: BREATHABLE
@@ -78,7 +82,7 @@ planet:
     temperature: 32
     water: 38
     lifeForm:
-      source: canon
+      source: House Davion
       value: MAMMAL
     desc: Elidere IV is a small drab planet with little of strategic importance. The
       planet has some small deposits of metals and oil but has little else to bring
@@ -88,7 +92,7 @@ planet:
     smallMoons: 7
     landmass:
       - capital:
-          source: canon
+          source: House Davion
           value: Jasos City
     event:
       - date: '2275-10-17'

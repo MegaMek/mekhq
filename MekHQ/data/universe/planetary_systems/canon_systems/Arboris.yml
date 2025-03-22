@@ -3,9 +3,11 @@ sucsId: 163
 xcood: 43.158
 ycood: -51.489
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K1IV
-primarySlot: 5
+primarySlot:
+  source: MWDA world profiles
+  value: 5
 planet:
   - name: Jahweh
     type: TERRESTRIAL
@@ -73,28 +75,32 @@ planet:
       value: Arboris
     type: TERRESTRIAL
     orbitalDist: 1.28
-    sysPos: 5
+    sysPos:
+      source: MWDA world profiles
+      value: 5
     icon: green27
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.98
-    diameter: 13446
-    density: 5.118220228871
+    diameter: 13451
+    density: 5.120110566631
     dayLength: 22
     yearLength: 1.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 35
     water:
-      source: canon
+      source: MWDA world profiles
       value: 67
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: "3135 - Arboris was originally colonised for its fertile soil by settlers
       from the Capellan Hegemony. Arboris has three continents - Jeruc, Silverado
@@ -120,25 +126,31 @@ planet:
       militia and Capellan forces. "
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Bandar
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Jeruc
         capital:
-          source: canon
+          source: Chaos March, pg. 27
           value: Kansas Plain
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Silverado
     satellite:
-      - name: Arbalest
+      - name:
+          source: MWDA world profiles
+          value: Arbalest
         size: giant
         icon: rock1
-      - name: Carabonis
+      - name:
+          source: MWDA world profiles
+          value: Carabonis
         size: medium
         icon: rock12
-      - name: Delenious
+      - name:
+          source: MWDA world profiles
+          value: Delenious
         size: medium
         icon: rock2
     event:

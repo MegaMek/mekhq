@@ -3,9 +3,11 @@ sucsId: 2720
 xcood: 72.103
 ycood: -408.2
 spectralType:
-  source: canon
+  source: 'Handbook: House Liao, pg. 88'
   value: F6V
-primarySlot: 6
+primarySlot:
+  source: 'Handbook: House Liao, pg. 88'
+  value: 6
 event:
   - date: '2373-03-17'
     nadirCharge: yes
@@ -116,28 +118,32 @@ planet:
       value: Ward
     type: TERRESTRIAL
     orbitalDist: 2.08
-    sysPos: 6
+    sysPos:
+      source: 'Handbook: House Liao, pg. 88'
+      value: 6
     icon: wet7
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 88'
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 88'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 88'
       value: 0.91
-    diameter: 13488
-    density: 4.73286382648
+    diameter: 13500
+    density: 4.737097163583
     dayLength: 20
     yearLength: 3.2
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 88'
       value: 34
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 88'
       value: 89
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 88'
       value: AMPHIBIAN
     desc: |-
       Ward was settled during the early Exodus from Terra by Utopians as an experimental community based on the principles of harmony and co-operative activity. Although the First Ward Constitution was scrapped in 2644 and replaced with a constitution that favored free trade and greater military activity, the original Utopian principles have survived to through the Succession Wars to a surprising degree. The First Ward Constitution remains one of the most widely studied Exodus-era historical documents.
@@ -150,7 +156,9 @@ planet:
         capital: Murakamitown
       - name: Larger Butler's Retreat
     satellite:
-      - name: Courage
+      - name:
+          source: 'Handbook: House Liao, pg. 88'
+          value: Courage
         size: medium
         icon: oddmoon1
     event:

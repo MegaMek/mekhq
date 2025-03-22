@@ -3,9 +3,11 @@ sucsId: 2931
 xcood: -122.574
 ycood: 1614.831
 spectralType:
-  source: canon
+  source: 'Historical: Operation Klondike, pg. 136'
   value: G2Ia
-primarySlot: 1
+primarySlot:
+  source: 'Historical: Operation Klondike, pg. 136'
+  value: 1
 event:
   - date: '2788-08-31'
     nadirCharge: yes
@@ -15,28 +17,32 @@ planet:
       value: Circe
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 1
+    sysPos:
+      source: 'Historical: Operation Klondike, pg. 136'
+      value: 1
     icon: green17
     pressure:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 136'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Historical: Operation Klondike, pg. 136'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 136'
       value: 0.8
-    diameter: 11469
-    density: 4.923159135105
+    diameter: 11444
+    density: 4.912556120742
     dayLength: 18
     yearLength: 2.3
     temperature:
-      source: canon
-      value: 35
+      source: 'Historical: Operation Klondike, pg. 136'
+      value: 40
     water:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 136'
       value: 50
     lifeForm:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 136'
       value: PLANT
     desc: Circe’s orbit follows a 700 year cycle that takes it from one extreme in
       the system’s life zone (the zone in which liquid water can exist) to the other.
@@ -46,19 +52,20 @@ planet:
       of toxins.
     landmass:
       - name:
-          source: canon
-          value: Circe
+          source: 'Historical: Operation Klondike, pg. 136'
+          value: Northern Habitable Zone
       - name:
-          source: canon
-          value: Fianna
-      - name:
-          source: canon
-          value: L’Isle des Aigles
+          source: 'Historical: Operation Klondike, pg. 136'
+          value: Southern Habitable Zone
     satellite:
-      - name: Aega
+      - name:
+          source: 'Historical: Operation Klondike, pg. 136'
+          value: Aega
         size: giant
         icon: rock6
-      - name: Telegonus
+      - name:
+          source: 'Historical: Operation Klondike, pg. 136'
+          value: Telegonus
         size: medium
         icon: rock11
     event:

@@ -3,9 +3,11 @@ sucsId: 2427
 xcood: 25.844
 ycood: 25.543
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F8IV
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2352-01-19'
     zenithCharge: yes
@@ -15,28 +17,32 @@ planet:
       value: Styx
     type: TERRESTRIAL
     orbitalDist: 3.36
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: wet6
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.83
-    diameter: 13022
-    density: 4.452066432836
+    diameter: 13062
+    density: 4.465646993399
     dayLength: 25
     yearLength: 6.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 29
     water:
-      source: canon
+      source: MWDA world profiles
       value: 79
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: 'Styx was aptly named by the first settlers to set up colonies on its storm-ravaged
       surface. Large oceans and the gravitational effects of its three moons are blamed
@@ -76,25 +82,31 @@ planet:
       to one of the Styx Mining Company‘s large refineries.'
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Epimethius
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Sunder Falls
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Gehenna
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Perdition
     satellite:
-      - name: Kronus
+      - name:
+          source: MWDA world profiles
+          value: Kronus
         size: medium
         icon: rock9
-      - name: Nirvana
+      - name:
+          source: MWDA world profiles
+          value: Nirvana
         size: large
         icon: rock11
-      - name: Void
+      - name:
+          source: MWDA world profiles
+          value: Void
         size: medium
         icon: oddmoon3
     event:

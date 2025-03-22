@@ -3,9 +3,11 @@ sucsId: 2948
 xcood: 49.223
 ycood: 1757.87
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: G7V
-primarySlot: 2
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 2
 event:
   - date: '2804-12-06'
     nadirCharge: yes
@@ -34,28 +36,32 @@ planet:
       value: Huntress
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 2
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 2
     icon: green2
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 1.1
-    diameter: 14088
-    density: 5.509706311467
+    diameter: 14059
+    density: 5.498437168537
     dayLength: 21
     yearLength: 1.1
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 25
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 60
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: BIRD
     desc: |-
       3065: Huntress is a planet of varied climates and two continents. Abysmal is the smaller of the two continents and is dominated by deserts and badlands. Jaguar Prime is larger and is home to most of the planet's population centers, including Lootera, the planetary capital. Jaguar Prime is home to many different climates, from desert to rain forest, plains and mountains. The continent is crossed with several mountain ranges, including the northern Jaguar's Fangs, the Fangs includes Mount Szabo which overlooks the capital city. To the eastern edge of the continent is the unimaginatively named Eastern Mountains. The continent is also home to several large bodies of water, from the Black Shikari River, to Liberation Sea and the expansive Dhuan Swamp to the south. Jaguar Prime is home to almost constant grey cloud-cover and occasional fierce storms. Jaguar Prime is home to several other cities, though they are smaller than Lootera, such as Bagera, Myer, Pahn City and New Andery.

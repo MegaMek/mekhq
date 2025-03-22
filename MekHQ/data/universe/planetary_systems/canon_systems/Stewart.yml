@@ -3,9 +3,11 @@ sucsId: 2413
 xcood: -119.184
 ycood: -51.936
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 68'
   value: G8V
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Marik, pg. 68'
+  value: 4
 event:
   - date: '2483-07-27'
     zenithCharge: yes
@@ -77,28 +79,32 @@ planet:
       value: Stewart
     type: TERRESTRIAL
     orbitalDist: 0.56
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Marik, pg. 68'
+      value: 4
     icon: wet2
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 68'
       value: STANDARD
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 68'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 68'
       value: 1.0
-    diameter: 11879
-    density: 5.917843588865
+    diameter: 11877
+    density: 5.916912823181
     dayLength: 20
     yearLength: 1.0
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 68'
       value: 45
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 68'
       value: 81
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 68'
       value: MAMMAL
     desc: |-
       The native vegetation of Stewart initially gave early settlers a difficult time as they were incompatible with human biology and the native species made it difficult for terran vegetation to live on the planet, forcing settlers to rely on expensive food imports. After some work hybrid of terran and native vegetation made farming possible on Stewart and removed the planet’s reliance on outside food sources. Efforts to alter the ecosystem of Stewart also revealed large deposits of minerals and ores which have made the planet wealthy.
@@ -110,39 +116,38 @@ planet:
       Magna Metals (Fusion engines)
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 68'
           value: Aberdeenshire
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 68'
           value: Angus
       - name:
-          source: canon
-          value: Highland
-        capital:
-          source: canon
-          value: Glencoe
-      - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 68'
           value: Lanarkshire
         capital:
           source: canon
           value: New Endinburgh
-      - name:
-          source: canon
-          value: Lothian
     satellite:
-      - name: Argyle
+      - name:
+          source: 'Handbook: House Marik, pg. 68'
+          value: Argyle
         size: medium
         icon: oddmoon2
-      - name: Leon
-        size: giant
-        icon: rock1
-      - name: Carthage
+      - name:
+          source: 'Handbook: House Marik, pg. 68'
+          value: Carthage
         size: large
         icon: rock12
-      - name: Clyde
+      - name:
+          source: 'Handbook: House Marik, pg. 68'
+          value: Clyde
         size: large
         icon: rock3
+      - name:
+          source: 'Handbook: House Marik, pg. 68'
+          value: Leon
+        size: giant
+        icon: rock1
     event:
       - date: '2259-03-28'
         faction:

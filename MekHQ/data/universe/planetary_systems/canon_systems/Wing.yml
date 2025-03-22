@@ -3,9 +3,11 @@ sucsId: 2763
 xcood: -75.224
 ycood: -10.9
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K8V
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2360-06-04'
     zenithCharge: yes
@@ -17,28 +19,32 @@ planet:
       value: Wing
     type: TERRESTRIAL
     orbitalDist: 0.24
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: green49
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.99
-    diameter: 10627
-    density: 6.542769626274
+    diameter: 10630
+    density: 6.544800940549
     dayLength: 18
     yearLength: 0.8
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 61
     water:
-      source: canon
+      source: MWDA world profiles
       value: 71
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: BIRD
     desc: The high temperatures and high atmospheric pressures at sea level prompted
       many of the early settlers who came to Wing to establish their cities and colonies
@@ -83,28 +89,36 @@ planet:
       city of Wyvern has grown.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Glyph
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Greinwald
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Sharr
         capital:
-          source: canon
-          value: Crow’s Nest
+          source: MWDA world profiles
+          value: Crow's Nest
     satellite:
-      - name: Colley
+      - name:
+          source: MWDA world profiles
+          value: Colley
         size: large
         icon: rock16
-      - name: Macon
+      - name:
+          source: MWDA world profiles
+          value: Macon
         size: large
         icon: rock17
-      - name: Sakuruta
+      - name:
+          source: MWDA world profiles
+          value: Sakuruta
         size: large
         icon: rock12
-      - name: Terell
+      - name:
+          source: MWDA world profiles
+          value: Terell
         size: large
         icon: rock14
     event:

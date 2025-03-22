@@ -22,7 +22,9 @@ planet:
     yearLength: 0.3
     temperature: 9
     water: 60
-    lifeForm: INSECT
+    lifeForm:
+      source: Periphery (1ed), pg. 147
+      value: MAMMAL
     landmass:
       - name: Brown
         capital: Old Nedlands
