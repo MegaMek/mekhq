@@ -1,5 +1,7 @@
 MEKHQ VERSION HISTORY:
 ---------------
+0.50.05-SNAPSHOT
+
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
 + PR #5853: Remove Legacy AtB's Campaign Parts Availability System
