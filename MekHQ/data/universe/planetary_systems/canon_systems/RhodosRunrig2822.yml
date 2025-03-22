@@ -32,11 +32,10 @@ planet:
         capital: Nu Wa City
       - name: Western Lowellville
     event:
+      - date: '2108-12-05'
       - date: '2601-11-08'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 50422.0
         socioIndustrial: B-D-A-D-F
       - date: '2610-01-01'
@@ -88,21 +87,15 @@ planet:
         population: 330723569.0
       - date: '2820-01-01'
         population: 11049510.0
+      - date: '2822-01-01'
       - date: '2830-01-01'
         population: 168417.0
       - date: '2837-11-25'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '2108-12-05'
-        name: Rhodos
-      - date: '2822-01-01'
-        name: Runrig
-        message: Rhodos renamed to Runrig
   - name: Álimos Belt A
     type: ASTEROID_BELT
     orbitalDist: 0.42

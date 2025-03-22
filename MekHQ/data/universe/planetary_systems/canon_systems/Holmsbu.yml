@@ -52,9 +52,7 @@ planet:
     event:
       - date: '2250-10-20'
         faction:
-          source: canon
-          value:
-            - PoR
+          - PoR
         population: 51506.0
         socioIndustrial: D-D-C-D-D
       - date: '2260-01-01'
@@ -75,10 +73,8 @@ planet:
         population: 43961063.0
       - date: '2333-11-24'
         faction:
-          source: canon
-          value:
-            - PoR
-            - DC
+          - PoR
+          - DC
       - date: '2340-01-01'
         population: 67131903.0
       - date: '2350-01-01'
@@ -87,9 +83,7 @@ planet:
         population: 135896349.0
       - date: '2367-07-30'
         faction:
-          source: canon
-          value:
-            - PoR
+          - PoR
       - date: '2370-01-01'
         population: 181207588.0
       - date: '2380-01-01'
@@ -122,9 +116,7 @@ planet:
         population: 839195555.0
       - date: '2510-07-08'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 868308361.0
       - date: '2520-01-01'
         population: 894094453.0
@@ -240,7 +232,7 @@ planet:
         population: 781632676.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-03-11'
@@ -250,7 +242,7 @@ planet:
         population: 798300351.0
       - date: '3050-03-15'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - CGB
       - date: '3060-01-01'
@@ -265,9 +257,7 @@ planet:
         population: 841667385.0
       - date: '3103-03-13'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
       - date: '3110-01-01'
         population: 850466401.0
       - date: '3119-01-01'

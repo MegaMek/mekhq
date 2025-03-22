@@ -53,9 +53,7 @@ planet:
     event:
       - date: '2443-10-12'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 45885.0
         socioIndustrial: C-C-B-D-D
       - date: '2450-01-01'
@@ -130,9 +128,7 @@ planet:
         population: 1308398945.0
       - date: '2779-09-09'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-01-01'
         population: 1319723734.0
       - date: '2790-01-01'
@@ -193,7 +189,7 @@ planet:
         population: 930892115.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3046-01-01'
@@ -202,32 +198,30 @@ planet:
         population: 940717978.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
         population: 951027890.0
       - date: '3063-04-02'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
             - LA
       - date: '3063-05-08'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - LA
       - date: '3067-11-11'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3070-01-01'
         population: 962220264.0
       - date: '3080-01-01'
@@ -252,9 +246,7 @@ planet:
         population: 1085768586.0
       - date: '3152-03-30'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
   - name: Mercury
     type: TERRESTRIAL
     orbitalDist: 0.8

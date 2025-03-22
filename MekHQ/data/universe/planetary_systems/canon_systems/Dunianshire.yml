@@ -146,9 +146,7 @@ planet:
     event:
       - date: '2715-07-13'
         faction:
-          source: canon
-          value:
-            - MOC
+          - MOC
         population: 48615.0
         socioIndustrial: C-D-B-C-D
       - date: '2720-01-01'

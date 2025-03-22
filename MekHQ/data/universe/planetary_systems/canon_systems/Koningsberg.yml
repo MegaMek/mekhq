@@ -33,9 +33,7 @@ planet:
     event:
       - date: '2891-12-20'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 43704.0
         socioIndustrial: C-D-B-D-F
       - date: '2893-09-18'
@@ -72,9 +70,7 @@ planet:
         population: 48137.0
       - date: '3025-08-03'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
       - date: '3030-01-01'
         population: 48303.0
       - date: '3040-01-01'
@@ -105,9 +101,7 @@ planet:
         population: 52980.0
       - date: '3140-03-13'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 53288.0
   - name: Ramsky's World

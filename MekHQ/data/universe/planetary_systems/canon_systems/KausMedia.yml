@@ -95,9 +95,7 @@ planet:
     event:
       - date: '2270-09-10'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 45929.0
         socioIndustrial: D-D-A-D-D
       - date: '2280-01-01'
@@ -112,9 +110,7 @@ planet:
         population: 15833487.0
       - date: '2325-07-09'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2330-01-01'
         population: 32858366.0
       - date: '2340-01-01'
@@ -282,27 +278,19 @@ planet:
         population: 2312456020.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3075-08-28'
         faction:
-          source: canon
-          value:
-            - CGB
-            - WOB
+          - CGB
+          - WOB
       - date: '3075-09-06'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 2333828780.0
       - date: '3081-07-20'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 2371470370.0
       - date: '3100-01-01'
@@ -319,16 +307,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 2492559694.0
       - date: '3145-02-27'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 2491562870.0
   - name: Cape Wardrope
     type: TERRESTRIAL

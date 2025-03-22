@@ -154,9 +154,7 @@ planet:
     event:
       - date: '2891-01-06'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 44952.0
         socioIndustrial: C-D-B-D-F
       - date: '2899-10-31'
@@ -221,9 +219,7 @@ planet:
         population: 423968.0
       - date: '3140-11-19'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 424646.0
   - name: Asgardr Belt

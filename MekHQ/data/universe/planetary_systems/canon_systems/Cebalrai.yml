@@ -111,9 +111,7 @@ planet:
     event:
       - date: '2750-12-24'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 52854.0
         socioIndustrial: C-C-C-D-D
       - date: '2760-01-01'
@@ -150,9 +148,7 @@ planet:
         population: 493769679.0
       - date: '2900-01-16'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 525550215.0
       - date: '2910-01-01'
         population: 554139848.0
@@ -180,9 +176,7 @@ planet:
         population: 646518727.0
       - date: '3025-05-18'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3030-01-01'
         population: 643610418.0
       - date: '3040-01-01'
@@ -197,27 +191,19 @@ planet:
         population: 631612100.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3075-08-21'
         faction:
-          source: canon
-          value:
-            - CGB
-            - WOB
+          - CGB
+          - WOB
       - date: '3075-09-01'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 637704774.0
       - date: '3081-04-28'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 645532424.0
       - date: '3100-01-01'
@@ -234,16 +220,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 682577068.0
       - date: '3145-02-03'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 688885752.0
   - name: Ellison's Belt I
     type: ASTEROID_BELT

@@ -39,9 +39,7 @@ planet:
     event:
       - date: '2739-03-18'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 40599.0
         socioIndustrial: D-C-C-C-D
       - date: '2740-01-01'
@@ -80,9 +78,7 @@ planet:
         population: 1050879815.0
       - date: '2900-09-12'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1129309611.0
       - date: '2910-01-01'
         population: 1193927439.0
@@ -112,22 +108,16 @@ planet:
         population: 1508311073.0
       - date: '3025-12-20'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3030-01-01'
         population: 1528579954.0
       - date: '3033-05-16'
         faction:
-          source: canon
-          value:
-            - DA
-            - FWL
+          - DA
+          - FWL
       - date: '3033-05-20'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3040-11-04'
         population: 1537312132.0
         socioIndustrial: B-B-C-A-C
@@ -141,23 +131,17 @@ planet:
         population: 1568758583.0
       - date: '3081-03-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3082-09-07'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3090-01-01'
         population: 1591830474.0
       - date: '3100-01-01'
         population: 1618151738.0
       - date: '3105-03-30'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3110-01-01'
         population: 1639652936.0
       - date: '3117-01-01'
@@ -174,9 +158,7 @@ planet:
         population: 1677466459.0
       - date: '3152-01-06'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
   - name: Dagda
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.96

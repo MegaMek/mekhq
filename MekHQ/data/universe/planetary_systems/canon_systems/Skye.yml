@@ -121,9 +121,7 @@ planet:
     event:
       - date: '2140-03-02'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 39777.0
         socioIndustrial: D-C-A-D-D
       - date: '2150-01-01'
@@ -148,9 +146,7 @@ planet:
         population: 124390302.0
       - date: '2242-07-06'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 185232718.0
       - date: '2260-01-01'
@@ -163,9 +159,7 @@ planet:
         population: 617283648.0
       - date: '2299-06-26'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 773878763.0
       - date: '2310-01-01'
@@ -178,9 +172,7 @@ planet:
         population: 1481265906.0
       - date: '2341-02-26'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2350-01-01'
         population: 1678879085.0
       - date: '2360-01-01'
@@ -333,21 +325,21 @@ planet:
       - date: '3030-03-13'
         population: 4153725755.0
         socioIndustrial: B-B-B-C-C
+      - date: '3040-01-19'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3040-04-03'
         population: 4210181270.0
         socioIndustrial:
           source: canon
           value: A-A-A-B-B
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 4258877823.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -366,9 +358,7 @@ planet:
         population: 4352893047.0
       - date: '3081-01-16'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 4413379366.0
       - date: '3097-01-01'
@@ -387,24 +377,20 @@ planet:
           value: X
       - date: '3135-04-13'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3140-01-01'
         population: 4732438895.0
       - date: '3145-01-01'
         population: 4762823631.0
       - date: '3150-03-02'
         faction:
-          source: canon
-          value:
-            - CWE
-      - date: '3151-01-01'
+          - CWE
+      - date: '3151-12-31'
         faction:
           source: sucs
           value:
             - CWE
-      - date: '3152-06-01'
+      - date: '3152-12-31'
         faction:
           source: sucs
           value:

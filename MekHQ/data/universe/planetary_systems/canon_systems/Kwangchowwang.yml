@@ -40,9 +40,7 @@ planet:
     event:
       - date: '2617-11-10'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 50747.0
         socioIndustrial: C-D-A-D-C
       - date: '2620-01-01'
@@ -83,9 +81,7 @@ planet:
         population: 138686412.0
       - date: '2779-12-08'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-01-01'
         population: 140044443.0
       - date: '2790-01-01'
@@ -148,7 +144,7 @@ planet:
         population: 97264873.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3044-01-01'
@@ -157,7 +153,7 @@ planet:
         population: 98557280.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'

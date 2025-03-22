@@ -118,16 +118,12 @@ planet:
     event:
       - date: '2301-03-08'
         faction:
-          source: canon
-          value:
-            - CCom
+          - CCom
         population: 41260.344630060397
         socioIndustrial: D-D-C-D-F
       - date: '2319-05-11'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population:
           source: canon
@@ -135,9 +131,7 @@ planet:
         socioIndustrial: X-X-X-X-X
       - date: '2600-05-23'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 45770.0
         socioIndustrial: B-D-C-D-F
       - date: '2609-01-01'
@@ -212,9 +206,7 @@ planet:
         population: 451552.0
       - date: '2899-03-30'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

@@ -54,9 +54,7 @@ planet:
     event:
       - date: '2377-07-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 49497.0
         socioIndustrial: D-D-C-D-F
       - date: '2380-01-01'
@@ -149,9 +147,7 @@ planet:
         population: 364937441.0
       - date: '2790-07-20'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 358782361.0
       - date: '2800-01-01'
         population: 353107890.0
@@ -163,9 +159,7 @@ planet:
         population: 361743800.0
       - date: '2821-10-10'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 368198516.0
       - date: '2840-01-01'
@@ -212,13 +206,11 @@ planet:
         population: 206739684.0
       - date: '3030-10-25'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 203281282.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-01-01'
@@ -229,13 +221,13 @@ planet:
         population: 208302353.0
       - date: '3050-07-25'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - CW
             - FRR
       - date: '3050-07-29'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - CW
       - date: '3060-01-01'
@@ -244,14 +236,10 @@ planet:
         population: 212446596.0
       - date: '3071-07-07'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
       - date: '3071-11-02'
         faction:
-          source: canon
-          value:
-            - CW
+          - CW
       - date: '3080-01-01'
         population: 213127514.0
       - date: '3090-01-01'
@@ -272,16 +260,12 @@ planet:
         population: 216045848.0
       - date: '3145-11-26'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 216089062.0
       - date: '3147-04-07'
         faction:
-          source: canon
-          value:
-            - CHH
-      - date: '3151-01-01'
+          - CHH
+      - date: '3151-12-31'
         faction:
           source: sucs
           value:

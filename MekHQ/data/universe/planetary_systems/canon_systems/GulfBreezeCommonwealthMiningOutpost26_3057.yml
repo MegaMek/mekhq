@@ -167,11 +167,10 @@ planet:
         size: medium
         icon: oddmoon2
     event:
+      - date: '2108-12-05'
       - date: '2494-08-08'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 56101.0
         socioIndustrial: C-D-A-C-F
       - date: '2500-01-01'
@@ -301,7 +300,7 @@ planet:
         population: 1600960245.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3049-01-01'
@@ -310,9 +309,10 @@ planet:
           value: B-A-A-B-F
       - date: '3050-01-01'
         population: 1616403472.0
+      - date: '3057-01-01'
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -341,8 +341,6 @@ planet:
         population: 1807064313.0
       - date: '3145-01-01'
         population: 1810682058.0
-      - date: '2108-12-05'
-      - date: '3057-01-01'
   - name: Nova Sdiret Nord
     type: TERRESTRIAL
     orbitalDist: 4.16

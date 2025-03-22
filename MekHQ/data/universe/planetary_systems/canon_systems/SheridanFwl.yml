@@ -314,9 +314,7 @@ planet:
     event:
       - date: '2219-12-02'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 55340.0
         socioIndustrial: D-D-B-C-D
       - date: '2220-01-01'
@@ -343,9 +341,7 @@ planet:
         population: 106626584.0
       - date: '2330-06-19'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 148564660.0
       - date: '2340-01-01'
         population: 199213862.0
@@ -445,9 +441,7 @@ planet:
         population: 1226055523.0
       - date: '2790-09-21'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1217834907.0
       - date: '2800-01-01'
         population: 1200934931.0
@@ -512,31 +506,23 @@ planet:
         population: 1091250553.0
       - date: '3068-03-30'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3070-11-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1097927525.0
       - date: '3080-01-01'
         population: 1102989625.0
       - date: '3081-05-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 1102989625.0
       - date: '3091-01-01'
         socioIndustrial: A-B-A-B-C
       - date: '3100-08-02'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 1107188960.0
       - date: '3110-01-01'
         population: 1113629315.0
@@ -550,9 +536,7 @@ planet:
         population: 1140679725.0
       - date: '3145-10-05'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 1147085451.0
   - name: Pantoliano
     type: ICE_GIANT

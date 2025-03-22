@@ -168,11 +168,10 @@ planet:
       - name: Jowett
         capital: Vorfolomeev
     event:
+      - date: '2108-12-05'
       - date: '2621-06-15'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 50333.0
         socioIndustrial: C-D-B-D-F
       - date: '2630-01-01'
@@ -243,22 +242,14 @@ planet:
         population: 233213.0
       - date: '2913-10-03'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
+      - date: '3150-01-01'
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
-      - date: '2108-12-05'
-        name: Stonarboi
-      - date: '3150-01-01'
-        name: Almotacen
-        message: Stonarboi renamed to Almotacen
+          - IND
   - name: Mendoza's Ship
     type: GAS_GIANT
     orbitalDist: 5.2

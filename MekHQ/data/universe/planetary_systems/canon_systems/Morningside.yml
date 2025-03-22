@@ -30,9 +30,7 @@ planet:
     event:
       - date: '2235-10-22'
         faction:
-          source: canon
-          value:
-            - TamP
+          - TamP
         population: 43803.0
         socioIndustrial: D-D-B-D-F
       - date: '2240-01-01'
@@ -59,9 +57,7 @@ planet:
         population: 91554612.0
       - date: '2341-05-11'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2350-01-01'
         population: 124440410.0
       - date: '2353-01-01'
@@ -218,7 +214,7 @@ planet:
         population: 841229846.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3047-01-01'
@@ -227,7 +223,7 @@ planet:
         population: 847647549.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -248,9 +244,7 @@ planet:
         population: 920360024.0
       - date: '3130-03-14'
         faction:
-          source: canon
-          value:
-            - CW
+          - CW
         population: 924603432.0
       - date: '3132-08-07'
         hpg: X
@@ -258,15 +252,11 @@ planet:
         population: 930167729.0
       - date: '3145-05-08'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 931098362.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Clementia
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.42

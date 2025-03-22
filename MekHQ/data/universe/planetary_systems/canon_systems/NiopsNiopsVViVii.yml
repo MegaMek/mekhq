@@ -173,9 +173,7 @@ planet:
     event:
       - date: '2638-12-16'
         faction:
-          source: canon
-          value:
-            - NIOPS
+          - NIOPS
         population: 49743.0
         socioIndustrial: C-D-C-D-F
       - date: '2640-01-01'
@@ -295,7 +293,7 @@ planet:
         population: 137112394.0
       - date: '3145-01-01'
         population: 137469350.0
-      - date: '3151-01-01'
+      - date: '3151-12-31'
         faction:
           source: sucs
           value:

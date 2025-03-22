@@ -28,9 +28,7 @@ planet:
     event:
       - date: '2241-11-02'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
         population: 46913.0
         socioIndustrial: D-D-A-D-F
       - date: '2250-01-01'
@@ -41,9 +39,7 @@ planet:
         population: 1073172.0
       - date: '2271-06-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2280-01-01'
         population: 2424371.0
       - date: '2290-01-01'
@@ -220,16 +216,12 @@ planet:
         population: 431414662.0
       - date: '3079-07-03'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
       - date: '3080-01-01'
         population: 434705904.0
       - date: '3086-08-15'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
       - date: '3090-01-01'
         population: 435924787.0
       - date: '3100-01-01'
@@ -248,7 +240,7 @@ planet:
         population: 437059666.0
       - date: '3145-01-01'
         population: 436622825.0
-      - date: '3151-01-01'
+      - date: '3151-12-31'
         faction:
           source: sucs
           value:

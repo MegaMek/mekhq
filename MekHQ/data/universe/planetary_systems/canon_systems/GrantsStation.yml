@@ -92,10 +92,8 @@ planet:
     event:
       - date: '2802-08-28'
         faction:
-          source: canon
-          value:
-            - CSV
-            - CW
+          - CSV
+          - CW
         hpg:
           source: canon
           value: A
@@ -115,9 +113,7 @@ planet:
         population: 1794528.0
       - date: '2864-08-08'
         faction:
-          source: canon
-          value:
-            - CLAN
+          - CLAN
       - date: '2870-01-01'
         population: 2455324.0
       - date: '2880-01-01'
@@ -166,28 +162,20 @@ planet:
         population: 7224522.0
       - date: '3072-04-01'
         faction:
-          source: canon
-          value:
-            - CSV
-            - CGS
-            - SOC
+          - CSV
+          - CGS
+          - SOC
       - date: '3072-04-27'
         faction:
-          source: canon
-          value:
-            - CSV
+          - CSV
       - date: '3075-03-06'
         faction:
-          source: canon
-          value:
-            - CSA
+          - CSA
       - date: '3080-01-01'
         population: 7327842.0
       - date: '3085-04-09'
         faction:
-          source: canon
-          value:
-            - CSA
+          - CSA
       - date: '3090-01-01'
         population: 7417789.0
       - date: '3092-01-01'

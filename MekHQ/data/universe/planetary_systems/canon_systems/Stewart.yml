@@ -151,9 +151,7 @@ planet:
     event:
       - date: '2259-03-28'
         faction:
-          source: canon
-          value:
-            - SCon
+          - SCon
         population: 45318.0
         socioIndustrial: D-D-B-D-B
       - date: '2260-01-01'
@@ -166,9 +164,7 @@ planet:
         population: 2633977.0
       - date: '2293-08-05'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2300-01-01'
         population: 6916683.0
       - date: '2310-01-01'
@@ -349,32 +345,22 @@ planet:
         population: 3012471262.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3078-07-12'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3078-07-20'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3079-05-22'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 3031812905.0
       - date: '3081-02-22'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 3067186706.0
       - date: '3100-01-01'
@@ -389,34 +375,24 @@ planet:
         population: 3189808103.0
       - date: '3134-09-22'
         faction:
-          source: canon
-          value:
-            - ROS
-            - MSC
-            - CDS
+          - ROS
+          - MSC
+          - CDS
       - date: '3134-11-01'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3138-06-05'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3140-01-01'
         population: 3183434862.0
       - date: '3145-03-28'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 3182798239.0
       - date: '3151-04-16'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: Garne
     type: DWARF_TERRESTRIAL
     orbitalDist: 2.24

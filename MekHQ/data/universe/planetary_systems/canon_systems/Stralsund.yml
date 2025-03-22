@@ -66,9 +66,7 @@ planet:
     event:
       - date: '2891-06-12'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         hpg: X
         population: 58745.0
         socioIndustrial: C-F-A-D-F
@@ -127,9 +125,7 @@ planet:
         population: 547622.0
       - date: '3140-11-15'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 549267.0
   - name: Atlantida

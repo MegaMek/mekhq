@@ -97,9 +97,7 @@ planet:
     event:
       - date: '2528-08-05'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 55123.0
         socioIndustrial: C-C-A-D-C
       - date: '2530-01-01'
@@ -218,7 +216,7 @@ planet:
         population: 399208978.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3041-01-01'
@@ -227,13 +225,13 @@ planet:
         population: 403664882.0
       - date: '3050-08-03'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - CJF
             - FC
       - date: '3050-08-12'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - CJF
       - date: '3060-01-01'
@@ -262,9 +260,7 @@ planet:
         population: 418964015.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Baker 4
     type: TERRESTRIAL
     orbitalDist: 1.6

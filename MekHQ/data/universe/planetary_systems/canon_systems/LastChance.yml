@@ -213,9 +213,7 @@ planet:
     event:
       - date: '2722-08-15'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 52833.0
         socioIndustrial: C-D-A-D-B
       - date: '2725-07-23'
@@ -232,9 +230,7 @@ planet:
         population: 3727802.0
       - date: '2779-02-19'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 5925055.0
       - date: '2790-01-01'
@@ -289,19 +285,13 @@ planet:
         population: 43489937.0
       - date: '3021-12-01'
         faction:
-          source: canon
-          value:
-            - MV
+          - MV
       - date: '3025-03-11'
         faction:
-          source: canon
-          value:
-            - MV
+          - MV
       - date: '3028-04-23'
         faction:
-          source: canon
-          value:
-            - GV
+          - GV
       - date: '3030-01-01'
         population: 43427169.0
       - date: '3040-01-01'
@@ -310,7 +300,7 @@ planet:
         socioIndustrial: B-C-B-C-A
       - date: '3049-09-05'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - CJF
       - date: '3050-01-01'
@@ -323,14 +313,10 @@ planet:
         population: 44674874.0
       - date: '3071-10-08'
         faction:
-          source: canon
-          value:
-            - CIH
+          - CIH
       - date: '3071-12-23'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
       - date: '3080-01-01'
         population: 45051723.0
       - date: '3090-01-01'
@@ -339,9 +325,7 @@ planet:
         population: 45178045.0
       - date: '3100-02-07'
         faction:
-          source: canon
-          value:
-            - TB
+          - TB
       - date: '3110-01-01'
         population: 45422666.0
       - date: '3120-01-01'
@@ -354,7 +338,7 @@ planet:
         population: 45769194.0
       - date: '3145-01-01'
         population: 45769194.0
-      - date: '3151-01-01'
+      - date: '3151-12-31'
         faction:
           source: sucs
           value:

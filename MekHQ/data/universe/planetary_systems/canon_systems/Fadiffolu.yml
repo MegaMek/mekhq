@@ -43,9 +43,7 @@ planet:
     event:
       - date: '2479-09-29'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 57051.0
         socioIndustrial: C-D-A-C-C
       - date: '2480-01-01'
@@ -170,14 +168,10 @@ planet:
         population: 280550227.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 275376028.0
       - date: '3030-01-01'
@@ -198,9 +192,7 @@ planet:
         population: 287009399.0
       - date: '3081-07-14'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 289662069.0
       - date: '3100-01-01'
@@ -221,9 +213,7 @@ planet:
         population: 296698053.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: Naran
     type: TERRESTRIAL
     orbitalDist: 0.7

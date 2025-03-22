@@ -68,18 +68,14 @@ planet:
     event:
       - date: '2305-11-04'
         faction:
-          source: canon
-          value:
-            - AG
+          - AG
         population: 56957.0
         socioIndustrial: D-C-B-F-F
       - date: '2310-01-01'
         population: 98482.0
       - date: '2319-11-08'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2320-01-01'
         population: 261472.0
       - date: '2330-01-01'

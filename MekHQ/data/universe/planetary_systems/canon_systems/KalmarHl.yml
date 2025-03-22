@@ -60,9 +60,7 @@ planet:
     event:
       - date: '2891-08-11'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 48423.0
         socioIndustrial: C-D-B-D-F
       - date: '2894-01-01'
@@ -127,9 +125,7 @@ planet:
         population: 120752.0
       - date: '3140-06-09'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 121892.0
   - name: Brismene

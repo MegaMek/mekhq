@@ -34,11 +34,10 @@ planet:
       - name: Østerbø
       - name: Gule's Madness
     event:
+      - date: '2108-12-05'
       - date: '2744-02-22'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 49846.0
         socioIndustrial: C-D-B-F-D
       - date: '2750-01-01'
@@ -59,21 +58,15 @@ planet:
         population: 52553.0
       - date: '2820-01-01'
         population: 14895.0
+      - date: '2822-01-01'
       - date: '2830-01-01'
         population: 4014.0
       - date: '2840-07-30'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '2108-12-05'
-        name: Kirkvåg
-      - date: '2822-01-01'
-        name: Toch Zu
-        message: Kirkvåg renamed to Toch Zu
   - name: Henderson
     type: TERRESTRIAL
     orbitalDist: 0.21

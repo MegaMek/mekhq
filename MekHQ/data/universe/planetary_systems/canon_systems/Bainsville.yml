@@ -96,9 +96,7 @@ planet:
     event:
       - date: '2240-12-14'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 40233.0
         socioIndustrial: D-D-C-D-C
       - date: '2250-01-01'
@@ -109,9 +107,7 @@ planet:
         population: 1182740.0
       - date: '2280-03-13'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 2766051.0
       - date: '2290-01-01'
         population: 5802034.0
@@ -291,9 +287,7 @@ planet:
         population: 845169862.0
       - date: '3081-08-18'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 843818672.0
       - date: '3100-01-01'
@@ -306,9 +300,7 @@ planet:
         population: 861726235.0
       - date: '3130-04-18'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
         population: 873176426.0
       - date: '3132-08-07'
         hpg:
@@ -318,9 +310,7 @@ planet:
         population: 887792130.0
       - date: '3145-02-24'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 896535264.0
   - name: Delos
     type: GIANT_TERRESTRIAL

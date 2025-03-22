@@ -150,9 +150,7 @@ planet:
     event:
       - date: '2385-12-05'
         faction:
-          source: canon
-          value:
-            - OA
+          - OA
         population: 59187.0
         socioIndustrial: D-D-A-D-C
       - date: '2390-01-01'
@@ -197,57 +195,43 @@ planet:
         population: 1015759.0
       - date: '2570-01-01'
         population: 1035868.0
-      - date: '2581-10-03'
-        faction:
-          source: canon
-          value:
-            - SL
-            - FS
-            - OA
-      - date: '2581-10-07'
-        faction:
-          source: canon
-          value:
-            - SL
-            - FS
-            - OA
-      - date: '2581-10-12'
-        faction:
-          source: canon
-          value:
-            - SL
-            - FS
-            - OA
-      - date: '2581-10-26'
-        faction:
-          source: canon
-          value:
-            - SL
-            - FS
-            - DC
-            - OA
-      - date: '2581-10-28'
-        faction:
-          source: canon
-          value:
-            - SL
-            - FS
-            - DC
-            - OA
-      - date: '2581-10-29'
-        faction:
-          source: canon
-          value:
-            - SL
-            - DC
-            - OA
-      - date: '2581-10-30'
-        faction:
-          source: canon
-          value:
-            - OA
       - date: '2580-01-01'
         population: 1055364.0
+      - date: '2581-10-03'
+        faction:
+          - SL
+          - FS
+          - OA
+      - date: '2581-10-07'
+        faction:
+          - SL
+          - FS
+          - OA
+      - date: '2581-10-12'
+        faction:
+          - SL
+          - FS
+          - OA
+      - date: '2581-10-26'
+        faction:
+          - SL
+          - FS
+          - DC
+          - OA
+      - date: '2581-10-28'
+        faction:
+          - SL
+          - FS
+          - DC
+          - OA
+      - date: '2581-10-29'
+        faction:
+          - SL
+          - DC
+          - OA
+      - date: '2581-10-30'
+        faction:
+          - OA
       - date: '2590-01-01'
         population: 1066722.0
       - date: '2600-01-01'
@@ -369,9 +353,7 @@ planet:
         population: 165355181.0
       - date: '3083-04-07'
         faction:
-          source: canon
-          value:
-            - RA
+          - RA
       - date: '3090-01-01'
         population: 166750015.0
       - date: '3100-01-01'

@@ -69,9 +69,7 @@ planet:
     event:
       - date: '2625-10-24'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 50262.0
         socioIndustrial: C-D-B-C-C
       - date: '2630-01-01'
@@ -184,9 +182,7 @@ planet:
         population: 240583132.0
       - date: '3081-11-18'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 243633658.0
       - date: '3093-01-01'
@@ -205,9 +201,7 @@ planet:
         population: 248953391.0
       - date: '3145-05-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 248903605.0
   - name: New Pedro González
     type: ICE_GIANT

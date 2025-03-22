@@ -92,11 +92,10 @@ planet:
         size: medium
         icon: rock16
     event:
+      - date: '2108-12-05'
       - date: '2724-12-22'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 52738.0
         socioIndustrial: C-D-A-D-D
       - date: '2726-01-30'
@@ -121,23 +120,17 @@ planet:
         population: 89929907.0
       - date: '2820-01-01'
         population: 3826424.0
+      - date: '2822-01-01'
       - date: '2830-01-01'
         population: 248157.0
       - date: '2840-01-01'
         population: 30406.0
       - date: '2841-09-23'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '2108-12-05'
-        name: Aer
-      - date: '2822-01-01'
-        name: Finnalon
-        message: Aer renamed to Finnalon
   - name: Tegliacci's Belt
     type: ASTEROID_BELT
     orbitalDist: 3.64

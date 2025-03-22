@@ -60,9 +60,7 @@ planet:
     event:
       - date: '2802-12-01'
         faction:
-          source: canon
-          value:
-            - CFM
+          - CFM
         population: 10502.0
         socioIndustrial: B-C-C-C-C
       - date: '2803-07-11'
@@ -75,9 +73,7 @@ planet:
         population: 114536.0
       - date: '2821-12-10'
         faction:
-          source: canon
-          value:
-            - CFM
+          - CFM
       - date: '2830-01-01'
         population: 284199.0
       - date: '2840-01-01'
@@ -131,31 +127,23 @@ planet:
         population: 102036.0
       - date: '3068-08-09'
         faction:
-          source: canon
-          value:
-            - CFM
-            - CCO
+          - CFM
+          - CCO
       - date: '3070-01-01'
         population: 79199.0
-      - date: '3072-02-25'
-        faction:
-          source: canon
-          value:
-            - CFM
-            - CCO
-            - CGS
-            - CSV
       - date: '3072-01-04'
         faction:
-          source: canon
-          value:
-            - CCO
-            - SOC
+          - CCO
+          - SOC
+      - date: '3072-02-25'
+        faction:
+          - CFM
+          - CCO
+          - CGS
+          - CSV
       - date: '3073-05-09'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         population: 0.0
         socioIndustrial: X-X-X-X-X
   - name: St. John's

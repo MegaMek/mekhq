@@ -53,9 +53,7 @@ planet:
     event:
       - date: '2802-06-23'
         faction:
-          source: canon
-          value:
-            - CSA
+          - CSA
         population: 11479.0
         socioIndustrial: B-C-C-C-D
       - date: '2805-02-24'
@@ -68,9 +66,7 @@ planet:
         population: 310357.0
       - date: '2821-10-22'
         faction:
-          source: canon
-          value:
-            - CSA
+          - CSA
       - date: '2830-01-01'
         population: 1056057.0
       - date: '2840-01-01'

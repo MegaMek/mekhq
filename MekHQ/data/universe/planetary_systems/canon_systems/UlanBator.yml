@@ -93,9 +93,7 @@ planet:
     event:
       - date: '2215-09-08'
         faction:
-          source: canon
-          value:
-            - SSUP
+          - SSUP
         population: 41103.0
         socioIndustrial: C-D-C-D-D
       - date: '2220-01-01'
@@ -132,9 +130,7 @@ planet:
         population: 224638112.0
       - date: '2367-07-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2370-01-01'
         population: 272068513.0
       - date: '2380-01-01'
@@ -279,15 +275,13 @@ planet:
         population: 846954120.0
       - date: '3030-11-28'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 850131053.0
       - date: '3040-01-01'
         population: 862547757.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3043-01-01'
@@ -296,9 +290,7 @@ planet:
         population: 874358537.0
       - date: '3057-10-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3060-01-01'
         population: 884117982.0
       - date: '3070-01-01'

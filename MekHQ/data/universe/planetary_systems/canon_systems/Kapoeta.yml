@@ -49,9 +49,7 @@ planet:
     event:
       - date: '2640-08-30'
         faction:
-          source: canon
-          value:
-            - AXP
+          - AXP
         population: 55062.0
         socioIndustrial: C-D-B-D-D
       - date: '2650-01-01'

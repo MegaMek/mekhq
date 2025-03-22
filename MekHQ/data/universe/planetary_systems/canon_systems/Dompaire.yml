@@ -63,9 +63,7 @@ planet:
     event:
       - date: '2680-11-05'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         hpg: B
         population: 47741.0
         socioIndustrial: C-D-A-D-C
@@ -87,9 +85,7 @@ planet:
         population: 158705180.0
       - date: '2750-03-24'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 170800943.0
       - date: '2760-01-01'
         population: 176999233.0
@@ -155,7 +151,7 @@ planet:
         population: 182563635.0
       - date: '3040-01-19'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FC
       - date: '3041-01-01'
@@ -164,13 +160,13 @@ planet:
         population: 183919616.0
       - date: '3050-08-17'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - CJF
             - FC
       - date: '3050-08-19'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - CJF
       - date: '3060-01-01'

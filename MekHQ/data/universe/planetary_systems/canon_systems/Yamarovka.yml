@@ -59,9 +59,7 @@ planet:
     event:
       - date: '2299-01-06'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 56798.0
         socioIndustrial: D-F-A-D-D
       - date: '2300-01-01'
@@ -74,9 +72,7 @@ planet:
         population: 727876.0
       - date: '2322-03-11'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2330-01-01'
         population: 1883270.0
       - date: '2340-01-01'
@@ -237,14 +233,12 @@ planet:
         population: 356336287.0
       - date: '3052-02-01'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CSJ
       - date: '3059-06-29'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3060-01-01'
         population: 358337368.0
       - date: '3070-01-01'
@@ -255,21 +249,15 @@ planet:
         population: 363825702.0
       - date: '3099-02-13'
         faction:
-          source: canon
-          value:
-            - DC
-            - CNC
-            - CGB
+          - DC
+          - CNC
+          - CGB
       - date: '3099-02-28'
         faction:
-          source: canon
-          value:
-            - CGB
+          - CGB
       - date: '3100-01-25'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 365137835.0
       - date: '3110-01-01'
         population: 364408289.0
@@ -287,9 +275,7 @@ planet:
         population: 377011207.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
   - name: New Somers
     type: GAS_GIANT
     orbitalDist: 1.12
