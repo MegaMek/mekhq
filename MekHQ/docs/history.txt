@@ -1,6 +1,13 @@
 MEKHQ VERSION HISTORY:
 ---------------
 0.50.05-SNAPSHOT
++ PR #6284: Fixed Unique Interaction when Loading Player Campaigns with Custom Rank Systems
++ PR #6285: Added Mercenary Auction Events
++ Fix #910, #3644, #4762, #6179: Added Auto-Optimize Medical Assignments Feature
++ Fix #1159: Added Right Click Display Medical History to Infirmary
++ PR #6293: Added Level Attribute To Intelligence Enum
++ PR #6295: Updated 'Immersive Dialog' System
++ PR #6335: Updated Rank Systems Version for 50.05
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
