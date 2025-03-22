@@ -3,9 +3,11 @@ sucsId: 2601
 xcood: 21.186
 ycood: -367.858
 spectralType:
-  source: canon
+  source: 'Handbook: House Liao, pg. 87'
   value: G2V
-primarySlot: 5
+primarySlot:
+  source: 'Handbook: House Liao, pg. 87'
+  value: 5
 event:
   - date: '2698-04-14'
     zenithCharge: yes
@@ -83,28 +85,32 @@ planet:
       value: Turin
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 5
+    sysPos:
+      source: 'Handbook: House Liao, pg. 87'
+      value: 5
     icon: green33
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 87'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 87'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 87'
       value: 1.02
-    diameter: 14530
-    density: 4.929683412624
+    diameter: 14535
+    density: 4.931512793303
     dayLength: 22
     yearLength: 1.2
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 87'
       value: 32
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 87'
       value: 23
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 87'
       value: REPTILE
     desc: |-
       3025 - Turin has almost endless grassy plains that provide excellent cattle pastures. The Turin colonists discovered that Terran cows could be crossbred with a Turin native animal to create a hybrid that is meatier and better tasting. However, the milk of these hybrids is indigestible to humans, so Turin's few dairies specialise in cow's and goat's milk and cheese. Turin is also famous for horse breeding, rivaling the Eridani blood lines.
@@ -112,13 +118,15 @@ planet:
       Turin is home to a Duchy RTC, which focuses on training vehicle crews and unarmored infantry. The RTC on Turin is known for its specialized jump infantry program, which is considered one of the best in the Confederation.
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Turin
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Porter
     satellite:
-      - name: Shroud
+      - name:
+          source: 'Handbook: House Liao, pg. 87'
+          value: Shroud
         size: large
         icon: rock14
     event:

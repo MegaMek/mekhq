@@ -3,9 +3,11 @@ sucsId: 690
 xcood: -37.843
 ycood: -1.621
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K0V
-primarySlot: 5
+primarySlot:
+  source: MWDA world profiles
+  value: 5
 planet:
   - name: Ninigi
     type: TERRESTRIAL
@@ -84,28 +86,32 @@ planet:
       value: Denebola
     type: TERRESTRIAL
     orbitalDist: 0.8
-    sysPos: 5
+    sysPos:
+      source: MWDA world profiles
+      value: 5
     icon: green29
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.13
-    diameter: 15030
-    density: 5.274029258109
+    diameter: 15044
+    density: 5.278789807137
     dayLength: 23
     yearLength: 1.1
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 18
     water:
-      source: canon
+      source: MWDA world profiles
       value: 67
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       3135 - Denebola V, also known as Everwood or Lyracropis, is a cool world with untouched woodlands covering almost eighty percent of its equatorial and tropical zones. Three large landmasses straddle these regions, Neurasia, Zadipos, and Slovakia. Most of the population live in cities sited along the winding rivers that cut through the forested lands. The northern and southern regions, are virtually devoid of life, as polar caps extend well into the temperate zones. Denebola was the first of the early Terran colonies to declare its independence from the Alliance, before becoming part of the Terran Hegemony. After the fall of the Star League, Denebola, due to its position on the border of the Lyran Commonwealth and the Free Worlds League, changed ownership a number of times through the centuries.
@@ -113,24 +119,17 @@ planet:
       The influx of off-world immigrants with each change of ownership, mixed with the planet's past, has resulted in a cosmopolitan melting pot that made Denebola an ideal choice for a Prefecture capital when it became part of The Republic of the Sphere. Fallen Star, the continental capital of Zadipos, is nestled on the western coast and is home to a thriving fishing community and regional defense post. New Bonn covers the entire northern edge of the large inland Lake Diamond on Neurasia, and maintains several prime logging and farming industries. The official planetary capital, St. Cameron, is located on the eastern Rhyde Peninsula of Slovakia, and is home not only to Denebola‘s largest spaceport, but also the Prefecture capital building and headquarters of the planetary militia.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Neurasia
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Slovakia
         capital:
-          source: canon
+          source: MWDA world profiles
           value: St. Cameron
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Zadipos
-    satellite:
-      - name: Yamasachihiko
-        size: medium
-        icon: oddmoon1
-      - name: Chujo Hime
-        size: medium
-        icon: oddmoon2
     event:
       - date: '2117-02-28'
         faction:

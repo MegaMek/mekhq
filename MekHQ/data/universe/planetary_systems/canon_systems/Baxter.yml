@@ -3,9 +3,11 @@ sucsId: 277
 xcood: -31.288
 ycood: 112.658
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K7II
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2355-08-08'
     nadirCharge: yes
@@ -63,28 +65,32 @@ planet:
       value: Baxter
     type: TERRESTRIAL
     orbitalDist: 0.6
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: green7
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.79
-    diameter: 12567
-    density: 4.409779342116
+    diameter: 12578
+    density: 4.413768369513
     dayLength: 21
     yearLength: 0.9
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 44
     water:
-      source: canon
+      source: MWDA world profiles
       value: 68
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: FISH
     desc: |-
       Baxter IV, the only inhabitable world in its system, is a world in turmoil. Due to an apparent near miss with a comet or rogue asteroid, the orbital path of Baxter‘s large moon, T‘Laus, has gradually grown increasingly erratic in the centuries since the first settlers came to this world. Gravitational forces have played havoc on the surface of the world below, with frequent earthquakes, powerful dust storms, and rockslides an almost daily occurrence. This shifting climate gradually turned a once-bountiful agricultural world into a giant, desolate wasteland, and is especially hard on machinery, which is constantly rocked or choked by dust. The descendants of the settlers who elected to remain today live in low structures or modified caves carved into the sides of the planet‘s many mountains and canyons, though legends today tell of a few cities that moved completely underground, only to be ripped asunder by the moon‘s tidal force. Despite the inhospitable environment, however, life has continued on this world, maintained by an economy almost entirely based on its fishing exports. Though some common industrial metals are readily accessible on the planet, there are not sufficient quantities or concentrations of these resources to support a more than sustenance-level industry, and for this reason Baxter was largely overlooked throughout its history. Scientists, however, believe that better days will one day return to Baxter IV, as the orbit of T‘Laus is expected to eventually re-stabilize. However, planetologists on Baxter appear to be uncertain as to whether such realignment is already underway, or if the moon has a few hundred more erratic orbits left to make before then.
@@ -92,19 +98,21 @@ planet:
       The capital city and primary spaceport of Baxter, Cleopolis, is located on the northern continent of Atropia. Though surrounded by a cluster of smaller cities and towns, the equatorial and southern continents of Delgado and Hermathia are more evenly populated than the Cleopolis region, thanks to fewer large mountain chains and fault lines on these two landmasses.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Atropia
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Cleopolis
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Delgado
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Hermathia
     satellite:
-      - name: T’laus
+      - name:
+          source: MWDA world profiles
+          value: T'laus
         size: medium
         icon: rock12
     event:

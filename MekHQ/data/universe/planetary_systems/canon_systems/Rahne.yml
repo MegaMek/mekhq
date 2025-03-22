@@ -3,9 +3,11 @@ sucsId: 2109
 xcood: -141.926
 ycood: 9.284
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 89'
   value: G7V
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 89'
+  value: 4
 event:
   - date: '2391-12-18'
     nadirCharge: yes
@@ -70,28 +72,32 @@ planet:
       value: Rahne
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 89'
+      value: 4
     icon: green33
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 89'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 89'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 89'
       value: 0.94
-    diameter: 10886
-    density: 6.048242744013
+    diameter: 10904
+    density: 6.058257644332
     dayLength: 20
     yearLength: 1.1
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 89'
       value: 53
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 89'
       value: 44
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 89'
       value: MAMMAL
     desc: |-
       Rahne is a small planet with very little arable land, an extremely short growing season and scarce water. To make matters worse the planet is constantly assailed by massive dust storms, which have greatly hampered efforts to tap into the mineral wealth available near the surface of the planet. The extreme weather on Rahne is caused by its massive moon Caliban, which is nearly as large as Rahne.
@@ -101,16 +107,21 @@ planet:
       Even with its extreme weather, Rahne does support native life. A prime example is the ill-tempered Toad-Fox, a deadly predator with red fur and poisonous claws. The beast comes out at night during the Storm and Calm seasons to hunt, mates during the Cold season and spends the Warm season they birth their young in burrows they dig into mountains with their massive claws.
     landmass:
       - name:
-          source: canon
-          value: Tempestia
-      - name:
-          source: canon
-          value: Tsunamus
-      - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 89'
           value: Pyrammus
+      - name:
+          source: 'Handbook: House Steiner, pg. 89'
+          value: Tempestia
+        capital:
+          source: 'Handbook: House Steiner, pg. 89'
+          value: Rahne City
+      - name:
+          source: 'Handbook: House Steiner, pg. 89'
+          value: Tsunamus
     satellite:
-      - name: Caliban
+      - name:
+          source: 'Handbook: House Steiner, pg. 89'
+          value: Caliban
         size: medium
         icon: rock13
     event:

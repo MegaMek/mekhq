@@ -3,9 +3,11 @@ sucsId: 204
 xcood: -16.034
 ycood: 51.65
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K5IV
-primarySlot: 5
+primarySlot:
+  source: MWDA world profiles
+  value: 5
 event:
   - date: '2413-01-17'
     zenithCharge: yes
@@ -95,28 +97,32 @@ planet:
       value: Atria
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 5
+    sysPos:
+      source: MWDA world profiles
+      value: 5
     icon: wet13
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.83
-    diameter: 10511
-    density: 5.568522117956
+    diameter: 10493
+    density: 5.558919350236
     dayLength: 23
     yearLength: 1.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 57
     water:
-      source: canon
+      source: MWDA world profiles
       value: 96
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: BIRD
     desc: |-
       Covered almost entirely in water, and wrapped in a thick atmosphere that traps heat and renders the few habitable island chains, near the north and south poles, only moderately so, it‘s almost impossible to believe that when scientists first came to this world, they had described it as a paradise. Though they did notice that the above-average atmospheric pressure and the comparative lack of protective ozone likely contributed to the planet‘s then-luxuriant warmth, what few colonists realized at the time was that Atria was only then coming out of the final stages of its own ice age. Before they noticed the steady planetwide rise in temperature and humidity, however, the colonists quickly discovered that the entire ecosphere was biologically incompatible with human physiology. Though blessed with an abundance of flora and fauna that included massive marine life and atranas, flightless avians nearly double the size of Terran pheasants, the human colonists could not use any of them as a food source, and thus the planet grew dependent on its neighbors for agricultural needs.
@@ -129,22 +135,32 @@ planet:
           source: canon
           value: Aitrakops
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Atria Prime
     satellite:
-      - name: Astoria
+      - name:
+          source: MWDA world profiles
+          value: Astoria
         size: large
         icon: rock4
-      - name: Delacruz
+      - name:
+          source: MWDA world profiles
+          value: Delacruz
         size: medium
         icon: oddmoon3
-      - name: Istanbul
+      - name:
+          source: MWDA world profiles
+          value: Istanbul
         size: medium
         icon: oddmoon2
-      - name: Viennes
+      - name:
+          source: MWDA world profiles
+          value: Viennes
         size: medium
         icon: rock9
-      - name: Zarpedos
+      - name:
+          source: MWDA world profiles
+          value: Zarpedos
         size: medium
         icon: rock14
     event:

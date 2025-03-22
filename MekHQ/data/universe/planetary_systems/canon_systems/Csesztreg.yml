@@ -3,7 +3,7 @@ sucsId: 630
 xcood: -69.286
 ycood: 391.313
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 143
   value: M0V
 primarySlot: 4
 event:
@@ -73,25 +73,27 @@ planet:
     sysPos: 4
     icon: green44
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 143
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 143
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 143
       value: 0.92
-    diameter: 13263
-    density: 4.91234643943
+    diameter: 13212
+    density: 4.893514654484
     dayLength: 22
     yearLength: 0.7
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 143
       value: 15
     water:
-      source: canon
+      source: Masters and Minions, pg. 143
       value: 30
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 143
       value: BIRD
     desc: |-
       Csesztreg was settled for its abundant natural resources, specifically heavy metals. These metals were vital to the Lyran economy, however colonization was daunting due to the presence of heavy metals in the water poisoning early settlers. It took a revolutionary water purification system for the planet to be safely colonized and for the mining industry to get fully established on the planet. However, despite all the mining operations, the planet did not establish any heavy industry and preferred to export all the metals for use in the factories throughout the Commonwealth. The lack of industry saved the planet from the worst of the Succession Wars but the slow decline of technology meant that the water purifiers were failing by the 3rd Succession War and the process sped up when the Draconis Combine conquered the planet. With the near collapse of the purification system the Combine used the planet as a work camp for political dissidents, most of whom died in mining accidents or from heavy metal poisoning.
@@ -99,16 +101,20 @@ planet:
       After suffering at the hands of the Combine for decades, the people of Csesztreg were unhappy to find that the Commonwealth was in no hurry to reclaim their planet and improve their situation during the 4th Succession War. As a result, the population petitioned to join the newly formed Free Rasalhague Republic when it formed. By then the advancements from the Helm Memory core allowed the FRR to rebuild and repair the water purifiers to improve the quality of life for people on the planet. The planet fell to the Wolves during Operation Revival and held the planet for more than twenty years before the Hell’s Horses captured the planet and established Csesztreg as their new capital and worked quickly to expand the manufacturing and industry on planet by bringing in prefabricated industrial units from the homeworlds. Csesztreg is also the site of the Horses’ primary genetic repository and Touman headquarters.
     landmass:
       - name:
-          source: canon
+          source: Masters and Minions, pg. 143
           value: Somogy
         capital:
-          source: canon
-          value: Budapest
+          source: Masters and Minions, pg. 143
+          value: Szrged
     satellite:
-      - name: Banjno
-        size: large
-        icon: rock3
-      - name: Egylet
+      - name:
+          source: Masters and Minions, pg. 143
+          value: Banjnok
+        size: medium
+        icon: rock4
+      - name:
+          source: Masters and Minions, pg. 143
+          value: Egylet
         size: medium
         icon: oddmoon2
     event:

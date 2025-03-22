@@ -3,9 +3,11 @@ sucsId: 2844
 xcood: 527.319
 ycood: -71.907
 spectralType:
-  source: canon
+  source: House Davion
   value: F5V
-primarySlot: 4
+primarySlot:
+  source: House Davion
+  value: 4
 event:
   - date: '2477-09-21'
     zenithCharge: yes
@@ -84,7 +86,9 @@ planet:
       value: Zolfo
     type: TERRESTRIAL
     orbitalDist: 2.24
-    sysPos: 4
+    sysPos:
+      source: House Davion
+      value: 4
     icon: green44
     pressure: THIN
     atmosphere: BREATHABLE
@@ -97,7 +101,7 @@ planet:
     temperature: 23
     water: 49
     lifeForm:
-      source: canon
+      source: House Davion
       value: MAMMAL
     desc: For most of its history Zolof has been a typical Federated Suns Outback
       planet. Poor education and a slow economy, the primary industry on Zolof was

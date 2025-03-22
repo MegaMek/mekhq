@@ -5,7 +5,9 @@ ycood: -178.455
 spectralType:
   source: canon
   value: K8V
-primarySlot: 2
+primarySlot:
+  source: 'Objective Raids: Capellan Confederation'
+  value: 2
 event:
   - date: '2380-03-29'
     zenithCharge: yes
@@ -34,28 +36,32 @@ planet:
       value: Bithinia
     type: TERRESTRIAL
     orbitalDist: 0.24
-    sysPos: 2
+    sysPos:
+      source: 'Objective Raids: Capellan Confederation'
+      value: 2
     icon: green22
     pressure:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Objective Raids: Capellan Confederation'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
-      value: 0.9
-    diameter: 10656
-    density: 5.929871453689
+      source: 'Objective Raids: Capellan Confederation'
+      value: 1.0
+    diameter: 11238
+    density: 6.253582795935
     dayLength: 17
     yearLength: 0.8
     temperature:
-      source: canon
-      value: 30
+      source: 'Objective Raids: Capellan Confederation'
+      value: 35
     water:
-      source: canon
-      value: 55
+      source: 'Objective Raids: Capellan Confederation'
+      value: 61
     lifeForm:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: REPTILE
     desc: |-
       Bithinia is one of the largest entertainment planets in the Capellan region, catering exclusively to the richest families in the Confederation and surrounding Inner Sphere states. Bithinia also has extensive iron and steel facilities located in its southern hemisphere. In the early 31st Century an underground Aerospace maintenance facility was constructed by the Capellan Confederation near the south pole.
@@ -66,27 +72,17 @@ planet:
       Bithinian Ballistics
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Chalcedon
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Cius
       - name:
-          source: canon
-          value: Nicomdeia
+          source: 'Objective Raids: Capellan Confederation'
+          value: Nicomedia
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Bithinia
-    satellite:
-      - name: Paludina
-        size: medium
-        icon: oddmoon1
-      - name: Valvata
-        size: medium
-        icon: oddmoon3
-      - name: Littorina
-        size: large
-        icon: rock3
     event:
       - date: '2270-07-23'
         faction:

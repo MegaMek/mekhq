@@ -3,9 +3,11 @@ sucsId: 2850
 xcood: 20.153
 ycood: -63.126
 spectralType:
-  source: canon
+  source: House Liao, pg. 143
   value: K4V
-primarySlot: 5
+primarySlot:
+  source: House Liao, pg. 143
+  value: 5
 event:
   - date: '2387-10-25'
     nadirCharge: yes
@@ -88,7 +90,9 @@ planet:
       value: Zurich
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 5
+    sysPos:
+      source: House Liao, pg. 143
+      value: 5
     icon: green53
     pressure: THIN
     atmosphere: BREATHABLE
@@ -101,7 +105,7 @@ planet:
     temperature: 31
     water: 20
     lifeForm:
-      source: canon
+      source: House Liao, pg. 143
       value: MAMMAL
     desc: Primarily known as a tourist attraction, Zurich lacks significant natural
       resources or strategic position and is generally lightly garrisoned. The planet

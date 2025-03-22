@@ -5,7 +5,9 @@ ycood: 175.122
 spectralType:
   source: canon
   value: K4V
-primarySlot: 2
+primarySlot:
+  source: Periphery (1ed), pg. 121
+  value: 2
 planet:
   - name: Crosbyton
     type: GIANT_TERRESTRIAL
@@ -32,7 +34,9 @@ planet:
       value: Dante
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 2
+    sysPos:
+      source: Periphery (1ed), pg. 121
+      value: 2
     icon: green4
     pressure:
       source: canon
@@ -53,8 +57,8 @@ planet:
       source: canon
       value: 42
     lifeForm:
-      source: canon
-      value: FISH
+      source: Periphery (1ed), pg. 121
+      value: AMPHIBIAN
     desc: For most of its history, Dante was a quiet agricultural world with a cool,
       but comfortable, climate and sufficient natural resources but only modest industrial
       concerns and a small population dominated by pacifists. The lack of industry

@@ -3,9 +3,11 @@ sucsId: 1056
 xcood: 41.87
 ycood: -224.443
 spectralType:
-  source: canon
+  source: 'Objective Raids: Capellan Confederation'
   value: F0V
-primarySlot: 5
+primarySlot:
+  source: 'Objective Raids: Capellan Confederation'
+  value: 5
 planet:
   - name: Summanus
     type: GIANT_TERRESTRIAL
@@ -76,28 +78,32 @@ planet:
       value: Harloc
     type: TERRESTRIAL
     orbitalDist: 2.56
-    sysPos: 5
+    sysPos:
+      source: 'Objective Raids: Capellan Confederation'
+      value: 5
     icon: green50
     pressure:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Objective Raids: Capellan Confederation'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 0.96
-    diameter: 11556
-    density: 5.850000160658
+    diameter: 11544
+    density: 5.844039727135
     dayLength: 19
     yearLength: 4.3
     temperature:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 30
     water:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 65
     lifeForm:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: MAMMAL
     desc: Harloc is not the most comfortable planet to live on, it has a thin atmosphere
       and despite centuries of being settled, the large array of deadly predators
@@ -109,10 +115,10 @@ planet:
     smallMoons: 2
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Dupree
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Harloc Prime
     event:
       - date: '2173-07-16'

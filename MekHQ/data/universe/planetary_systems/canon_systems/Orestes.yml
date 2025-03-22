@@ -3,9 +3,11 @@ sucsId: 1946
 xcood: -26.121
 ycood: 167.591
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 111
   value: A7V
-primarySlot: 3
+primarySlot:
+  source: Masters and Minions, pg. 111
+  value: 3
 event:
   - date: '2536-12-25'
     zenithCharge: yes
@@ -46,28 +48,32 @@ planet:
       value: Orestes
     type: TERRESTRIAL
     orbitalDist: 2.88
-    sysPos: 3
+    sysPos:
+      source: Masters and Minions, pg. 111
+      value: 3
     icon: green48
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 111
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 111
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 111
       value: 0.99
-    diameter: 15685
-    density: 4.449719092257
+    diameter: 15660
+    density: 4.442679705602
     dayLength: 22
     yearLength: 5.1
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 111
       value: 30
     water:
-      source: canon
+      source: Masters and Minions, pg. 111
       value: 65
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 111
       value: MAMMAL
     desc: |-
       Orestes is a temperate planet with a massive rainforest ringing the equator. The planet has ample arable land and modest natural resources to feed its heavy industries, including Odin Manufacturing, which has been creating BattleMechs since 2310. The rainforest on Orestes supports trees that stand as much as 500 meters tall and completely blanket out the sun. In this pitch-black environment the local Orestes viper lizards thrive and hunt in packs of up to 30. Even after centuries of inhabiting the planet, factory and farm workers living near the rainforest are in danger of attack from the viper lizards.
@@ -90,10 +96,14 @@ planet:
           source: canon
           value: Telemachus
     satellite:
-      - name: Parus Major
+      - name:
+          source: Masters and Minions, pg. 111
+          value: Parus Major
         size: medium
         icon: oddmoon3
-      - name: Parus Minor
+      - name:
+          source: Masters and Minions, pg. 111
+          value: Parus Minor
         size: medium
         icon: rock7
     event:

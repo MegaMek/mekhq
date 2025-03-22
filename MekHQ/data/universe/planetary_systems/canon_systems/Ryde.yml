@@ -3,9 +3,11 @@ sucsId: 2193
 xcood: -45.356
 ycood: 91.722
 spectralType:
-  source: canon
+  source: House Steiner
   value: F5V
-primarySlot: 3
+primarySlot:
+  source: House Steiner
+  value: 3
 event:
   - date: '2355-06-07'
     zenithCharge: yes
@@ -53,28 +55,32 @@ planet:
       value: Ryde
     type: TERRESTRIAL
     orbitalDist: 1.4
-    sysPos: 3
+    sysPos:
+      source: House Steiner
+      value: 3
     icon: green20
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.04
-    diameter: 12719
-    density: 5.739421599382
+    diameter: 12727
+    density: 5.742851951775
     dayLength: 23
     yearLength: 2.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 20
     water:
-      source: canon
+      source: MWDA world profiles
       value: 23
     lifeForm:
-      source: canon
+      source: House Steiner
       value: NONE
     desc: |-
       3135 - Its orbit slightly elongated by the powerful gravitational pull of three large gas giants, Ryde is a world of long, harsh winters, still tortured by the tectonic stresses of its own formation. Of its seven major landmasses—Breight, Larnea, and Lesser Dasentica in the northern hemisphere; Creos, Greater Dasentica, Kale, and Roschi in the south—only the Dasenticas and Kale are calm and warm enough to support cities. The others, too far north and south of the equator, are covered almost year-round by snow and ice, which only melt to any great extent when the local volcanoes and geysers erupt, spewing molten rock and hot gases into the sky. Though these same eruptions and the occasional earthquake also shake up the populated continents, their lessened presence and correspondingly lessened pressures gave Ryde‘s settlers relatively safe access to an abundance of geothermal energy, as well as a source for easily accessible minerals that in turn fueled a very profitable chemical industry.
@@ -85,33 +91,29 @@ planet:
     smallMoons: 1
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Breight
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Creos
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Greater Dasentica
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Kale
         capital:
-          source: canon
-          value: Heaven’s Gate
+          source: MWDA world profiles
+          value: Heaven's Gate
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Larnea
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Lesser Dasentica
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Roschi
-    satellite:
-      - name: Beaverhead
-        size: medium
-        icon: rock6
     event:
       - date: '2165-09-13'
         faction:

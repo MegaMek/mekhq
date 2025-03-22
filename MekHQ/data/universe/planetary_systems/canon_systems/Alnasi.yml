@@ -3,9 +3,11 @@ sucsId: 85
 xcood: 2.838
 ycood: 116.017
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K0III
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2448-01-26'
     nadirCharge: yes
@@ -35,28 +37,32 @@ planet:
       value: Alnasi
     type: TERRESTRIAL
     orbitalDist: 1.28
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green25
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.82
-    diameter: 13177
-    density: 4.392506988846
+    diameter: 13148
+    density: 4.382866620815
     dayLength: 21
     yearLength: 1.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 47
     water:
-      source: canon
+      source: MWDA world profiles
       value: 36
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: |-
       While Alnasi orbits a relatively cool K0 star, the planet follows an irregular orbit that results in periods of extreme hot and cold cycles of more than a thousand years. When the planet was first colonized the planet was slightly cooler than Terra and seemed to be in a receding ice-age with large glaciers at both poles and large tracts of temperate forests. As of the 32nd century the planet has heated up significantly and much of the temperate forests have been replaced by deserts.
@@ -64,28 +70,34 @@ planet:
       Despite being aware of the impending, though slow coming, temperature change that will eventually make the planet unlivable for humans Alnasi has thrived. All four continents are populated and the primary industry on planet is mining of the massive deposits of iron and other common minerals.
     landmass:
       - name:
-          source: canon
-          value: Lantilles
-        capital:
-          source: canon
-          value: Gantarius
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Hecateas
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Insarroples
       - name:
-          source: canon
+          source: MWDA world profiles
+          value: Lantilles
+        capital:
+          source: MWDA world profiles
+          value: Gantarius
+      - name:
+          source: MWDA world profiles
           value: Rowenopia
     satellite:
-      - name: Bherin
+      - name:
+          source: MWDA world profiles
+          value: Bherin
         size: large
         icon: rock10
-      - name: Kalil
+      - name:
+          source: MWDA world profiles
+          value: Kalil
         size: large
         icon: rock9
-      - name: Parada
+      - name:
+          source: MWDA world profiles
+          value: Parada
         size: large
         icon: rock17
     event:

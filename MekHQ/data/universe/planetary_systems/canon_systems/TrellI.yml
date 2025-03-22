@@ -5,7 +5,9 @@ ycood: 386.942
 spectralType:
   source: canon
   value: M2VII
-primarySlot: 1
+primarySlot:
+  source: Decision at Thunder Rift
+  value: 1
 event:
   - date: '2468-08-12'
     zenithCharge: yes
@@ -17,7 +19,9 @@ planet:
       value: Trell I
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 1
+    sysPos:
+      source: Decision at Thunder Rift
+      value: 1
     icon: wet12
     pressure:
       source: canon
@@ -25,14 +29,14 @@ planet:
     atmosphere: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Decision at Thunder Rift
       value: 0.86
-    diameter: 11566
-    density: 5.219160875497
+    diameter: 11573
+    density: 5.222294317986
     dayLength: 29
     yearLength: 0.6
     temperature:
-      source: canon
+      source: Decision at Thunder Rift
       value: 40
     water:
       source: canon
@@ -47,7 +51,9 @@ planet:
     smallMoons: 7
     landmass:
       - name: Major Marmaton
-        capital: Trell I City
+        capital:
+          source: Decision at Thunder Rift
+          value: Sarghad
       - name: Minor Marmaton
     event:
       - date: '2464-05-11'

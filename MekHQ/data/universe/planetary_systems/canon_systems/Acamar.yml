@@ -5,7 +5,9 @@ ycood: -38.565
 spectralType:
   source: canon
   value: K7V
-primarySlot: 8
+primarySlot:
+  source: MWDA world profiles
+  value: 8
 planet:
   - name: Adams
     type: GIANT_TERRESTRIAL
@@ -136,28 +138,32 @@ planet:
       value: Acamar
     type: TERRESTRIAL
     orbitalDist: 0.24
-    sysPos: 8
+    sysPos:
+      source: MWDA world profiles
+      value: 8
     icon: green32
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.0
-    diameter: 14071
-    density: 4.990815569168
+    diameter: 14076
+    density: 4.99259858967
     dayLength: 18
     yearLength: 0.8
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 20
     water:
-      source: canon
+      source: MWDA world profiles
       value: 63
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       Acamar was discovered early in the 23rd century by a Tikonov survey team. Acamar is locked in a perpetual winter as it orbits a great distance from its star. Acamar was only colonised after the discovery of vast titanium ore deposits, followed by deposits of gold and silver. As a result Acamar was coveted by the Capellan Confederation, Federated Suns, and the Free World League.
@@ -172,7 +178,7 @@ planet:
           source: canon
           value: Katenga
         capital:
-          source: canon
+          source: Chaos March, pg. 25
           value: Kalskag
       - name:
           source: canon
@@ -181,7 +187,9 @@ planet:
           source: canon
           value: Asta
     satellite:
-      - name: Aiken
+      - name:
+          source: MWDA world profiles
+          value: Aiken
         size: medium
         icon: oddmoon1
     event:

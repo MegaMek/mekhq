@@ -3,9 +3,11 @@ sucsId: 1218
 xcood: 127.168
 ycood: 307.557
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 154
   value: G8V
-primarySlot: 4
+primarySlot:
+  source: Masters and Minions, pg. 154
+  value: 4
 event:
   - date: '2388-04-24'
     nadirCharge: yes
@@ -69,28 +71,32 @@ planet:
       value: Itabaiana
     type: TERRESTRIAL
     orbitalDist: 0.56
-    sysPos: 4
+    sysPos:
+      source: Masters and Minions, pg. 154
+      value: 4
     icon: green50
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 154
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 154
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 154
       value: 0.92
-    diameter: 12208
-    density: 5.292252085833
+    diameter: 12212
+    density: 5.294138337504
     dayLength: 21
     yearLength: 1.0
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 154
       value: 25
     water:
-      source: canon
+      source: Masters and Minions, pg. 154
       value: 60
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 154
       value: AMPHIBIAN
     desc: |-
       Itabaiana is a very comfortable planet for human habitation, though it lacks any distinct geological features that dominate some planets and make them memorable. The planet has six major continents and almost all of them feature large deposits of rhenium. The Tesouras continent has mostly been mined dry over the centuries of Combine rule due to strip-mining, not only has the strip-mining removed most of the rhenium from the continent it has also destroyed the continent’s ecosystem. The only spaceport on planet is located at the planetary capital of Brasilia on the coast of the Mato Grasso continent.
@@ -98,34 +104,40 @@ planet:
       Itabaiana became the IS capital for the Diamond Sharks after they captured the planet from the Nova Cats. The Diamond Sharks expanded the manufacturing already on planet and brought the IndustriPlex-C plant to the planet, their largest planet-bound mobile factory.
     landmass:
       - name:
-          source: canon
+          source: Masters and Minions, pg. 154
           value: Arado
       - name:
-          source: canon
+          source: Masters and Minions, pg. 154
           value: Cauda do Macaco
       - name:
-          source: canon
+          source: Masters and Minions, pg. 154
           value: Cerrado
       - name:
-          source: canon
+          source: Masters and Minions, pg. 154
           value: Coelho
       - name:
-          source: canon
+          source: Masters and Minions, pg. 154
           value: Mato Grosso
         capital:
-          source: canon
+          source: Masters and Minions, pg. 154
           value: Brasilia
       - name:
-          source: canon
+          source: Masters and Minions, pg. 154
           value: Tesouras
     satellite:
-      - name: Cara dos Peixes
+      - name:
+          source: Masters and Minions, pg. 154
+          value: Cara dos Peixes
         size: medium
         icon: oddmoon1
-      - name: Diamante
+      - name:
+          source: Masters and Minions, pg. 154
+          value: Diamante
         size: large
         icon: rock4
-      - name: São Cristóvão
+      - name:
+          source: Masters and Minions, pg. 154
+          value: São Cristóvão
         size: large
         icon: rock12
     event:

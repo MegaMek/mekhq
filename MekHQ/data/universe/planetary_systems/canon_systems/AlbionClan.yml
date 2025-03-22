@@ -3,9 +3,11 @@ sucsId: 2929
 xcood: -50.167
 ycood: 1792.145
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: K1V
-primarySlot: 2
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 2
 event:
   - date: '2793-12-17'
     zenithCharge: yes
@@ -28,28 +30,32 @@ planet:
       value: Albion (Clan)
     type: TERRESTRIAL
     orbitalDist: 0.56
-    sysPos: 2
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 2
     icon: green25
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 0.8
-    diameter: 11865
-    density: 4.745917565166
+    diameter: 11856
+    density: 4.742142366615
     dayLength: 24
     yearLength: 1.0
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 25
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 60
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: REPTILE
     desc: No description available.
     landmass:

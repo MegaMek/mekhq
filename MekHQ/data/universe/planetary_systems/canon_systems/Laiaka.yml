@@ -3,9 +3,11 @@ sucsId: 1445
 xcood: -100.609
 ycood: 54.238
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: M9V
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2431-06-15'
     zenithCharge: yes
@@ -57,28 +59,32 @@ planet:
       value: Laiaka
     type: TERRESTRIAL
     orbitalDist: 0.04
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: wet17
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.98
-    diameter: 11246
-    density: 6.099811177685
+    diameter: 11268
+    density: 6.111890496328
     dayLength: 19
     yearLength: 0.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 40
     water:
-      source: canon
+      source: MWDA world profiles
       value: 88
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: |-
       Laiaka is covered in a hazy gray shroud of sulphur and carbon dioxide that blocks out the light from its dull red star and traps enough solar radiation to produce higher than expected surface temperatures. A Federation of Skye expedition discovered impressive deposits of industrial materials, including titanium and germanium, beneath the steamy surface. Mining settlements soon arose, particularly on the northern island continent of Geir. The settlers built their cities underground, making use of their expanding mining tunnels and natural subterranean caverns, some even large enough to accommodate ‘Mechs. Bunker City, the planetary capital, is located on Geir's central plains, on the shores of the Great Geir River, and features Laika‘s few surface structures, including the gantries of the Bunker City Spaceport. Yaleston is the local capital and spaceport on the southern continent of Preiska.
@@ -86,19 +92,23 @@ planet:
       As a wealthy border world, Laiaka suffered from numerous raids during the Succession Wars. Determined defenders and Laiaka's unpredictable subterranean labyrinths often thwarted these invasions, the centuries of raiding set back terraforming efforts that had commenced before the dawn of the Star League era. Laiaka‘s atmosphere returned quickly to its natural state, a steamy near-toxic hell.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Geir
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Bunker City
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Preiska
     satellite:
-      - name: Iolana
+      - name:
+          source: MWDA world profiles
+          value: Iolana
         size: large
         icon: rock12
-      - name: Wanikiya
+      - name:
+          source: MWDA world profiles
+          value: Wanikiya
         size: giant
         icon: rock16
     event:

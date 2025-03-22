@@ -5,7 +5,9 @@ ycood: 5.902
 spectralType:
   source: canon
   value: G2Ib
-primarySlot: 6
+primarySlot:
+  source: 'Handbook: House Davion, pg. 100'
+  value: 6
 planet:
   - name: Meliads
     type: GIANT_TERRESTRIAL
@@ -106,28 +108,32 @@ planet:
       value: Mallory's World
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 6
+    sysPos:
+      source: 'Handbook: House Davion, pg. 100'
+      value: 6
     icon: wet19
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 100'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 100'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 100'
       value: 1.04
-    diameter: 15833
-    density: 4.589476129063
+    diameter: 15879
+    density: 4.60277761244
     dayLength: 21
     yearLength: 2.3
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 100'
       value: 37
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 100'
       value: 80
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 100'
       value: MAMMAL
     desc: |-
       A lack of industry would normally make Mallory's World an unimportant backwater, however, its location within easy striking distance of the Draconis Combine has made it strategically important to both the Combine and the Suns throughout the world’s history.
@@ -139,24 +145,26 @@ planet:
       Most of the population lives in small cities dotting the 4 continents. There are very few large cities. However, the various population centers have been growing steadily with several erecting their own drop ports. Ironically, even though the system’s location is the cause of most of its woes, it also provides the largest portion of the planet’s economy due to constant trade. It has set itself up as a commonly used waypoint for merchants wishing to trade in both the Draconis Combine and Federated Suns.
     landmass:
       - name:
-          source: canon
-          value: Oregon
-        capital:
-          source: canon
-          value: Mallory City
-      - name:
-          source: canon
+          source: 'Handbook: House Davion, pg. 100'
           value: Joshua
       - name:
-          source: canon
+          source: 'Handbook: House Davion, pg. 100'
           value: Juniper
       - name:
-          source: canon
+          source: 'Handbook: House Davion, pg. 100'
           value: New Helen
+      - name:
+          source: 'Handbook: House Davion, pg. 100'
+          value: Oregon
+        capital:
+          source: 'Handbook: House Davion, pg. 100'
+          value: Mallory City
     satellite:
-      - name: Viktor's Moon
+      - name:
+          source: MWDA world profiles (corrected)
+          value: Dara
         size: medium
-        icon: rock14
+        icon: rock8
     event:
       - date: '2168-11-23'
         faction:

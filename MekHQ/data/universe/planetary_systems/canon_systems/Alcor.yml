@@ -3,9 +3,11 @@ sucsId: 57
 xcood: -74.708
 ycood: 28.904
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: A5V
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2388-06-09'
     zenithCharge: yes
@@ -66,28 +68,32 @@ planet:
       value: Alcor
     type: TERRESTRIAL
     orbitalDist: 3.04
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: wet4
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.01
-    diameter: 14624
-    density: 4.874905730612
+    diameter: 14592
+    density: 4.864229746215
     dayLength: 27
     yearLength: 5.5
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 46
     water:
-      source: canon
+      source: MWDA world profiles
       value: 88
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: FISH
     desc: |-
       3135 - Alcor is one of the few worlds that orbits a slightly variable star and has an atmosphere and environment capable of supporting life. The planet's remote orbit mitigate the gravitational stresses caused during the infrequent shifts of its star's outer surface. The tectonic stresses created by the star have still contributed to a number of volcanoes that line the mountain chains on the main continents of Galvinia and Fuchisa. Much of the planet's mining industry has been focused in these volcanic regions. The arable land on Alchiba is exceedingly poor in nutrients, forcing the planet to rely on trade with their neighboring systems for vital agricultural products. Ursamajorisaeti, the capital of Alcor and home of the planet's largest spaceport, is located on Galvina. Alcor has been the hub of local trade routes throughout its history. During the Succession Wars, it has been a poor staging world for raids and invasions, though it has still been the target of many.
@@ -95,16 +101,18 @@ planet:
       Alcor was overlooked during the Jihad, the only known fighting that took place in system occurred when Blakist aerospace fighters, DropShips, and JumpShips, who were intercepted here during their flight from Terra.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
+          value: Fuchisa
+      - name:
+          source: MWDA world profiles
           value: Galvinia
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Ursamajorisaeti
-      - name:
-          source: canon
-          value: Fuchisa
     satellite:
-      - name: Yahto
+      - name:
+          source: MWDA world profiles
+          value: Yahto
         size: medium
         icon: rock7
     event:

@@ -3,9 +3,11 @@ sucsId: 369
 xcood: -105.063
 ycood: -412.086
 spectralType:
-  source: canon
+  source: 25 Years of Art and Fiction, pg. 33
   value: F1V
-primarySlot: 2
+primarySlot:
+  source: 25 Years of Art and Fiction, pg. 33
+  value: 2
 planet:
   - name: New Albion
     type: TERRESTRIAL
@@ -31,28 +33,32 @@ planet:
       value: Borgan's Rift
     type: TERRESTRIAL
     orbitalDist: 2.56
-    sysPos: 2
+    sysPos:
+      source: 25 Years of Art and Fiction, pg. 33
+      value: 2
     icon: green50
     pressure:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 33
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 25 Years of Art and Fiction, pg. 33
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 33
       value: 0.91
-    diameter: 11157
-    density: 5.704377300727
+    diameter: 11184
+    density: 5.718135886317
     dayLength: 20
     yearLength: 4.3
     temperature:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 33
       value: 35
     water:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 33
       value: 53
     lifeForm:
-      source: canon
+      source: 25 Years of Art and Fiction, pg. 33
       value: MAMMAL
     desc: Borgan’s Rift is another of many worlds in the Periphery free-falling back
       into the dark ages. Long neglected due to the collapse of the Star League and

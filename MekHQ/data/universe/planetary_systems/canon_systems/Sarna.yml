@@ -3,9 +3,11 @@ sucsId: 2243
 xcood: 55.009
 ycood: -154.88
 spectralType:
-  source: canon
+  source: 'Handbook: House Liao, pg. 76'
   value: F8IV
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Liao, pg. 76'
+  value: 3
 event:
   - date: '2359-07-01'
     zenithCharge: yes
@@ -59,28 +61,32 @@ planet:
       value: Sarna
     type: TERRESTRIAL
     orbitalDist: 3.36
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Liao, pg. 76'
+      value: 3
     icon: green2
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 76'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 76'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 76'
       value: 1.03
-    diameter: 11533
-    density: 6.25328634963
+    diameter: 11554
+    density: 6.264768035832
     dayLength: 22
     yearLength: 6.3
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 76'
       value: 41
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 76'
       value: 70
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 76'
       value: REPTILE
     desc: |-
       Sarna was once the capital of the Sarna Supremacy until the Supremacy was absorbed into the Capellan Confederation and Sarna is now the capital of the Sarna Commonality. The planet was heavily industrialized and wealthy. Unfortunately, Sarna suffered tremendously during the Succession Wars, with most of its industry destroyed or relocated and its cities almost wiped out by bombing. By the late 3rd Succession War, Sarna remaining industrial capacity was centered around the mining of copper and iron ore deposits.
@@ -92,25 +98,21 @@ planet:
       Tengo Aerospace
     landmass:
       - name:
-          source: canon
-          value: Borah
-      - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Canoshal
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Jacarlos
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Sarna
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Oahu
-      - name:
-          source: canon
-          value: Yant
     satellite:
-      - name: Grace
+      - name:
+          source: 'Handbook: House Liao, pg. 76'
+          value: Grace
         size: medium
         icon: rock5
     event:

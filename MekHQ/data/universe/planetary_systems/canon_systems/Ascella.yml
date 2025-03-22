@@ -3,9 +3,11 @@ sucsId: 187
 xcood: 20.928
 ycood: 74.397
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: A4VI
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 planet:
   - name: Moirae
     type: TERRESTRIAL
@@ -28,28 +30,32 @@ planet:
       value: Ascella
     type: GIANT_TERRESTRIAL
     orbitalDist: 10.92
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green51
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.21
-    diameter: 12851
-    density: 6.633249580711
+    diameter: 12835
+    density: 6.62507445057
     dayLength: 17
     yearLength: 36.1
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 52
     water:
-      source: canon
+      source: MWDA world profiles
       value: 61
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: |-
       A rare habitable planet found orbiting a white subdwarf star that older star charts still refer to as Zeta Sagittarius, Ascella is a very young, hot, and geologically unstable world. The presence of abundant raw materials close to the surface and scattered across the floors of its shallow oceans drew settlers here in the early colonial era, despite the presence of an atmosphere still laced with ammonia and carbon dioxide. Particularly dense metals, including some highly radioactive ores, were among Ascella‘s most common natural treasures, and also help to explain the above-average gravitational field of this medium-sized world.
@@ -60,25 +66,25 @@ planet:
     smallMoons: 5
     landmass:
       - name:
-          source: canon
-          value: Askahar
+          source: MWDA world profiles
+          value: Askahr
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Tarawa
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Aytagrad
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Niejawa
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Ogleca
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Quarenir
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Saufell
     event:
       - date: '2254-12-02'

@@ -3,9 +3,11 @@ sucsId: 814
 xcood: 29.203
 ycood: -15.558
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F9V
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2367-01-04'
     nadirCharge: yes
@@ -19,28 +21,32 @@ planet:
       value: Epsilon Indi
     type: TERRESTRIAL
     orbitalDist: 1.1
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: green34
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.74
-    diameter: 10973
-    density: 4.737576088194
+    diameter: 10975
+    density: 4.738431862003
     dayLength: 27
     yearLength: 1.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 44
     water:
-      source: canon
+      source: MWDA world profiles
       value: 31
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: 3135 - Like most worlds close to Terra in the dark days leading to the Star
       League‘s fall, the once-thriving planet of Epsilon Indi suffered badly at the
@@ -70,19 +76,19 @@ planet:
     smallMoons: 1
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Boreria
         capital:
-          source: canon
+          source: MWDA world profiles
           value: New Rhodes
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Ithicasia
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Kantiles
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Surterra
     event:
       - date: '2258-10-05'

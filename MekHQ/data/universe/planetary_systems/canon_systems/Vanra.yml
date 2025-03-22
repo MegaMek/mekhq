@@ -3,9 +3,11 @@ sucsId: 2659
 xcood: -48.342
 ycood: -163.191
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 76'
   value: G5II
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Marik, pg. 76'
+  value: 4
 event:
   - date: '2391-08-05'
     nadirCharge: yes
@@ -61,28 +63,32 @@ planet:
       value: Vanra
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Marik, pg. 76'
+      value: 4
     icon: green5
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 76'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 76'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 76'
       value: 0.95
-    diameter: 10272
-    density: 6.500145266179
+    diameter: 10271
+    density: 6.499788110524
     dayLength: 25
     yearLength: 2.0
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 76'
       value: 20
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 76'
       value: 55
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 76'
       value: REPTILE
     desc: Vanra is comfortable for inhabitation, if slightly colder than Terra. The
       planet is well developed in terms of industry and technology but it does not
@@ -90,16 +96,18 @@ planet:
       sufficient on both counts. The people have Vanra have a grand military tradition.
     landmass:
       - name:
-          source: canon
+          source: 'Objectives: Free Worlds League, p. 25'
           value: Cantania
         capital:
-          source: canon
+          source: 'Objectives: Free Worlds League, p. 25'
           value: Orloff City
       - name:
-          source: canon
+          source: 'Objectives: Free Worlds League, p. 25'
           value: Modena
     satellite:
-      - name: Citadel
+      - name:
+          source: 'Objectives: Free Worlds League, p. 25'
+          value: Citadel
         size: medium
         icon: oddmoon1
     event:

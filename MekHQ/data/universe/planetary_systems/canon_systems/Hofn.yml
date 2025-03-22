@@ -3,9 +3,11 @@ sucsId: 3136
 xcood: 600.099
 ycood: 545.503
 spectralType:
-  source: canon
+  source: Interstellar Players, pg. 111
   value: G8III
-primarySlot: 4
+primarySlot:
+  source: Interstellar Players, pg. 111
+  value: 4
 event:
   - date: '2566-09-06'
     nadirCharge: yes
@@ -74,28 +76,32 @@ planet:
       value: Hofn
     type: TERRESTRIAL
     orbitalDist: 1.28
-    sysPos: 4
+    sysPos:
+      source: Interstellar Players, pg. 111
+      value: 4
     icon: wet13
     pressure:
-      source: canon
+      source: Interstellar Players, pg. 111
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Interstellar Players, pg. 111
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Interstellar Players, pg. 111
       value: 1.02
-    diameter: 11812
-    density: 6.039314312002
+    diameter: 11841
+    density: 6.053904333129
     dayLength: 27
     yearLength: 1.7
     temperature:
-      source: canon
+      source: Interstellar Players, pg. 111
       value: 34
     water:
-      source: canon
+      source: Interstellar Players, pg. 111
       value: 95
     lifeForm:
-      source: canon
+      source: Interstellar Players, pg. 111
       value: BIRD
     desc: Hofn is the warmest JarnFolk world, however it also has the harshest weather.
       Storms are a regular occurrence and winds can often reach over 300 kph. The
@@ -109,15 +115,21 @@ planet:
         capital: Ba Xian
       - name: Helleland's Felt
     satellite:
-      - name: Myvatn
-        size: medium
-        icon: oddmoon3
-      - name: Geyser
+      - name:
+          source: Interstellar Players, pg. 111
+          value: Geyser
         size: medium
         icon: oddmoon2
-      - name: Jockulsarlon
+      - name:
+          source: Interstellar Players, pg. 111
+          value: Jockulsarlon
         size: medium
         icon: rock1
+      - name:
+          source: Interstellar Players, pg. 111
+          value: Myvatn
+        size: medium
+        icon: oddmoon3
     event:
       - date: '2504-08-04'
         faction:

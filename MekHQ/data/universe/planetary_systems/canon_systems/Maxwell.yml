@@ -3,9 +3,11 @@ sucsId: 1634
 xcood: -376.942
 ycood: -114.526
 spectralType:
-  source: canon
+  source: House Marik, pg. 155
   value: F9III
-primarySlot: 5
+primarySlot:
+  source: House Marik, pg. 155
+  value: 5
 event:
   - date: '2520-01-13'
     nadirCharge: yes
@@ -80,7 +82,9 @@ planet:
       value: Maxwell
     type: TERRESTRIAL
     orbitalDist: 0.35
-    sysPos: 5
+    sysPos:
+      source: House Marik, pg. 155
+      value: 5
     icon: green16
     pressure:
       source: canon
@@ -101,7 +105,7 @@ planet:
       source: canon
       value: 63
     lifeForm:
-      source: canon
+      source: House Marik, pg. 155
       value: AMPHIBIAN
     desc: |-
       Maxwell is a world of technological gaps. On one hand the mountainous but fertile terrain has resulted in the planet being primarily rural and requires most farming to be done by hand and with farm animals. However, the planet is dotted with spaceports and warehouses for shipping agriculture off world and most of the homes are equipped with high tech communications and luxuries and most residents own hovercraft of some sort, even though standard cars and trucks are nearly useless due to the terrain.

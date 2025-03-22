@@ -5,7 +5,9 @@ ycood: -52.004
 spectralType:
   source: canon
   value: G6III
-primarySlot: 4
+primarySlot:
+  source: House Liao, pg. 155
+  value: 4
 event:
   - date: '2378-04-13'
     zenithCharge: yes
@@ -73,7 +75,9 @@ planet:
       value: Mira
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 4
+    sysPos:
+      source: House Liao, pg. 155
+      value: 4
     icon: green40
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -86,7 +90,7 @@ planet:
     temperature: 30
     water: 39
     lifeForm:
-      source: canon
+      source: House Liao, pg. 155
       value: MAMMAL
     desc: |-
       In its heyday, Mira was divided into luxury estates for Tikonov nobles and their families. However, since the fall of the Star League these estates have been converted into museums to attract offworld tourists.

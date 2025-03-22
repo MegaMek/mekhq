@@ -3,9 +3,11 @@ sucsId: 1319
 xcood: 3.096
 ycood: -10.127
 spectralType:
-  source: canon
+  source: Star League, pg. 173
   value: G6IV
-primarySlot: 5
+primarySlot:
+  source: Star League, pg. 173
+  value: 5
 event:
   - date: '2416-04-14'
     zenithCharge: yes
@@ -87,28 +89,32 @@ planet:
       value: Keid
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 5
+    sysPos:
+      source: Star League, pg. 173
+      value: 5
     icon: green11
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.94
-    diameter: 13558
-    density: 4.886002033669
+    diameter: 13539
+    density: 4.879173980153
     dayLength: 24
     yearLength: 2.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 27
     water:
-      source: canon
-      value: 73
+      source: Chaos March, pg. 42
+      value: 75
     lifeForm:
-      source: canon
+      source: Star League, pg. 173
       value: MAMMAL
     desc: |-
       Keid was one of the first planets colonized during the interstellar Exodus and remained part of the Terran Alliance until the Star League’s collapse, at which point the Confederation stepped in and occupied the planet. Keid has a pleasant climate, extensive commercial centers, military installations, training facilities, scientific research complexes and commercial ore deposits. As of 3025 Keid also had several secret Maskirovka covert operative training centers.
@@ -118,16 +124,16 @@ planet:
       3135 - One of the first worlds colonized in the first Terran exodus, Keid‘s fertile lands and predictable climate led the first settlers to establish their home as a major agricultural and food-production world. The discovery of several major deposits of rare metals and chemicals during the Star League era further enhanced Keid‘s importance to the Terran Hegemony, and several major agribusinesses, food companies, mining operations, and heavy industries established offices and facilities on Keid. The SLDF posted two Castles Brian (Forts Grisson and Settlemyer) and a naval academy on Keid, as well as the planetwide Academy of Keid, a civilian college focused on the study of metallurgy, economics, and diplomacy. During the Amaris crisis, three of the four college campuses were destroyed, along with both Castles Brian and the naval academy. Several cities, all the null-gravity factory stations established by some of the planet‘s largest industrial concerns, and a spaceborne shipyard were also obliterated by the Usurper‘s troops. Fortunately for Keid, however, Amaris‘ forces did not resort to the same use of nuclear and biological weapons they used on other Hegemony worlds, and enough of the planet‘s economic and administrative infrastructure survived the fighting to allow Keid to recover from the scars of war. Today, after centuries under Capellan rule, and later Federated Commonwealth control, Keid is home to extensive commercial and ore-mining industries that continue to thrive on all three of the planet‘s mountainous, heavily wooded continents. Ballard-Dukempic Foods, the revitalized food conglomerate with roots going back to the Star League‘s heyday, maintains its home offices in New Leningrad, the largest city on the northern continent of Keid Prime. The planet‘s largest mining community, DuGatts, is located on the southwestern continent of Mirange, and is also home to Jugens Metals Enterprises, an ore-refining and metalworking corporation that provides finished raw metals to various businesses on and off the planet. The southern polar continent of Acitaratna is less developed than the other two landmasses, largely because the extreme cold and thick glaciers make for poor settlement options. Nevertheless, Acitaratna is home to the largest of Keid‘s natural gas mining operations, located off the continent‘s farthest north shore and connected via underwater tunnel to the subterranean city of Ramey‘s Point. The planetary capital and largest spaceport on Keid is Normandy, a large industrial city two hundred kilometers northwest of New Leningrad.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Acitaratna
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Keid Prime
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Normandy
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Mirange
     event:
       - date: '2260-10-19'

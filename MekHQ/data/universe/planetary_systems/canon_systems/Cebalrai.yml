@@ -3,9 +3,11 @@ sucsId: 500
 xcood: -8.289
 ycood: 119.379
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K2III
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2805-07-17'
     nadirCharge: yes
@@ -49,28 +51,32 @@ planet:
       value: Cebalrai
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green39
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.84
-    diameter: 11753
-    density: 5.04473692704
+    diameter: 11727
+    density: 5.033706706206
     dayLength: 21
     yearLength: 1.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 53
     water:
-      source: canon
+      source: MWDA world profiles
       value: 48
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: |-
       Less than hospitable, even before the arrival of human colonists, Cebalrai was settled more as a waystation than as a home to millions of people. With a thin atmosphere and a flimsy ozone layer, this world is continuously doused by far too much solar radiation from its giant K2 star, and so the first colonists to this world—and all their descendants since—erected partially reflective domes and screens over their structures and smaller communities.
@@ -82,22 +88,24 @@ planet:
       Cebalrai‘s capital city, New Wade, is located on the north polar continent of Sarrina, and is also home to the planet‘s single major spaceport. Lennori, the planet‘s other northern continent, is only habitable into its middle latitudes, as temperatures and other solar radiation hazards closer to the equatorial zones have rendered the southern reaches and the nearby equatorial continent of Hellesdon barren desert wastes.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Dragga
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Hellesdon
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Lennori
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Sarrina
         capital:
-          source: canon
+          source: MWDA world profiles
           value: New Wade
     satellite:
-      - name: Yonas
+      - name:
+          source: MWDA world profiles
+          value: Yonas
         size: large
         icon: rock15
     event:

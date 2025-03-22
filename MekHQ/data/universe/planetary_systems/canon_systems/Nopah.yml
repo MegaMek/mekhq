@@ -3,9 +3,11 @@ sucsId: 1889
 xcood: 57.123
 ycood: -33.649
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G6IV
-primarySlot: 7
+primarySlot:
+  source: MWDA world profiles
+  value: 7
 event:
   - date: '2403-09-09'
     zenithCharge: yes
@@ -107,28 +109,32 @@ planet:
       value: Nopah
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 7
+    sysPos:
+      source: MWDA world profiles
+      value: 7
     icon: green4
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.1
-    diameter: 13914
-    density: 5.56508163562
+    diameter: 13902
+    density: 5.560444155795
     dayLength: 18
     yearLength: 2.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 34
     water:
-      source: canon
+      source: MWDA world profiles
       value: 60
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: |-
       Nopah‘s swollen, dying parent star has been a blessing to its flora, but all of the planet‘s native animal life has perished due to dramatic changes in Nopah‘s climate. Settlers from Terra recognized Nopah‘s agricultural potential but had to introduce their own insects to ensure that their crops were fertilized.
@@ -138,16 +144,16 @@ planet:
       During the Fourth Succession War, the Federated Suns leaked false reports of unguarded military supply depots and communications facilities on Nopah and several other border worlds. Reeling from House Davion‘s offensive, the Capellan Confederation focused its few counterattacks on these worlds. But the Capellans found no supplies, only front-line house and mercenary regiments from the Federated Suns. No less than three regiment-sized battles took place on Nopah, involving famous units like McCarron‘s Armored Cavalry, the Ceti Hussars, the Vegan Rangers, and the Capellan Hussars. To this day, BattleMech and tank wreckage litters hills and fields around the towns of Grinsanders, Stongton‘s Crossing, and White Hall.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Nen
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Nin
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Cocula
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Non
     event:
       - date: '2319-05-20'

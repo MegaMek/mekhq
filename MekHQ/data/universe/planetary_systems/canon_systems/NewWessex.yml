@@ -3,9 +3,11 @@ sucsId: 1859
 xcood: -12.415
 ycood: 113.43
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K2IV
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2401-06-14'
     zenithCharge: yes
@@ -58,28 +60,32 @@ planet:
       value: New Wessex
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green49
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.15
-    diameter: 13065
-    density: 6.214449571677
+    diameter: 13035
+    density: 6.200103193248
     dayLength: 20
     yearLength: 1.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 23
     water:
-      source: canon
+      source: MWDA world profiles
       value: 54
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: BIRD
     desc: |-
       Lacking major resources, save a few common industrial metals and modest agricultural produce, New Wessex would likely have been spared the worst of the Age of War and the Succession Wars if it were not for its location on the border near the Lyran Commonwealth. In the First War, Lyran troops attempting to seize the planet launched a blitzkrieg spearheaded by a small fleet of light WarShips. Intending to launch a barrage at the major cities, in hopes of eliminating all opposition outright, the Lyran fleet was instead surprised by the arrival of a Combine naval force to intercept them. In the orbital battle that followed, one Lyran battleship, crippled by a devastating broadside attack, spun into the planet‘s atmosphere, where its fusion reactors lost containment and exploded before the safeguards could engage, spilling toxic levels of radiation into the sky and raining flaming debris across the western coastline of Jarichosia, New Wessex‘s northernmost continent. Though no Lyran forces landed on New Wessex that day, the aftermath of the assault was profound, and even today incidence of lung and skin cancer on this planet remain higher than the local average.
@@ -89,22 +95,24 @@ planet:
       New Wessex is sparsely inhabited, with most of the population living in towns and cities scattered on the coastlines of the Lancombe, Jarichosia, and Toridine continents, while the south polar continent of Thelios, covered completely by a glacial ice shelf that touches the southern reaches of Lancombe, has yet to be fully explored.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Jarichosia
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Lancombe
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Hallanan
       - name:
-          source: canon
-          value: Toridine
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Thelios
+      - name:
+          source: MWDA world profiles
+          value: Toridine
     satellite:
-      - name: Juniper
+      - name:
+          source: MWDA world profiles
+          value: Juniper
         size: medium
         icon: oddmoon3
     event:

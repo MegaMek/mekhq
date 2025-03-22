@@ -5,7 +5,9 @@ ycood: 13.767
 spectralType:
   source: canon
   value: A1VI
-primarySlot: 5
+primarySlot:
+  source: MWDA world profiles
+  value: 5
 event:
   - date: '2401-03-10'
     nadirCharge: yes
@@ -84,36 +86,43 @@ planet:
       value: Algorab
     type: TERRESTRIAL
     orbitalDist: 14.04
-    sysPos: 5
+    sysPos:
+      source: MWDA world profiles
+      value: 5
     icon: dry15
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.24
-    diameter: 12651
-    density: 6.861423034726
+    diameter: 12676
+    density: 6.874781243689
     dayLength: 24
     yearLength: 52.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 62
     water:
-      source: canon
+      source: MWDA world profiles
       value: 17
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: |-
       3135 - Algorab‘s binary system was originally classified as being incapable of supporting planets. However, discovered beneath the obscuring dust cloud there were five worlds swirling about the smaller orange sun as it in turn orbited a nearby white subgiant. Due to the solar radiation blasting all five planets with incredible heat only the farthest ringed planet is inhabitable and contains shallow polar seas, an atmosphere with sufficient ozone protection, and some primitive plant-life. Algorab drew a remarkable number of colonists eager to exploit this world for its metallic and natural gas deposits. The fuel and mining industries drew many immigrants to Algorab over the decades, even though it lay far from its jump point and lacked sufficient arable land to support itself without reliance on freeze-dried foods from off-world. The planet is populated by a smattering of shielded, climate-controlled mining and refining colonies, linked to the more hospitable settlements on the shoreline of the polar seas of Niriama in the north and Vanishing Sea in the south by a system of maglev rail lines and airship cruisers. The barren wastes of rock and sand in between are inhabited by only the hardiest of settlers.
 
       Throughout the Succession Wars, Algorab was a difficult target for raids and only a few were launched against this planet. Even during the Jihad, the Word of Blake limited their actions to destroying the zenith and nadir jump recharge stations. The Republic has rebuilt Algorab‘s zenith jump station to provide a link to the planetary capital and spaceport city of Delcorvius Prime, located on the shores of the Niriaman sea
+    ring:
+      source: MWDA world profiles
+      value: yes
     landmass:
       - capital:
-          source: canon
+          source: MWDA world profiles
           value: Delcorvius Prime
     satellite:
       - name: None (dust ring)

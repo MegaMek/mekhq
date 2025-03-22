@@ -3,9 +3,11 @@ sucsId: 1415
 xcood: -7.765
 ycood: -221.268
 spectralType:
-  source: canon
+  source: 'Objective Raids: Capellan Confederation'
   value: K2V
-primarySlot: 4
+primarySlot:
+  source: 'Objective Raids: Capellan Confederation'
+  value: 4
 event:
   - date: '2730-12-18'
     zenithCharge: yes
@@ -59,28 +61,32 @@ planet:
       value: Krin
     type: TERRESTRIAL
     orbitalDist: 0.49
-    sysPos: 4
+    sysPos:
+      source: 'Objective Raids: Capellan Confederation'
+      value: 4
     icon: green31
     pressure:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Objective Raids: Capellan Confederation'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 1.07
-    diameter: 13084
-    density: 5.756565205388
+    diameter: 13073
+    density: 5.751838797597
     dayLength: 17
     yearLength: 0.9
     temperature:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 28
     water:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 52
     lifeForm:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: AMPHIBIAN
     desc: |-
       Krin is a relatively comfortable planet with a temperate to tropical climate and modest agricultural and mining concerns. Krin possesses a well established industrial core, however the planet is not home to any major military manufacturers.
@@ -88,13 +94,13 @@ planet:
       Krin is one of many planets in the Capellan Confederation that host a Duchy RTC facility. The facilities on Krin are located in the mountains of the Fairfax continent and focus on training vehicle crews and unarmored infantry.
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Auburn
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Pole
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Fairfax
     event:
       - date: '2689-12-07'

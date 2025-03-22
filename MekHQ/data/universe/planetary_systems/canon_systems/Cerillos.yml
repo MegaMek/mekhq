@@ -3,9 +3,11 @@ sucsId: 508
 xcood: -369.902
 ycood: -81.213
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 75'
   value: G0III
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Marik, pg. 75'
+  value: 3
 planet:
   - name: El Loa
     type: TERRESTRIAL
@@ -41,28 +43,32 @@ planet:
       value: Cerillos
     type: TERRESTRIAL
     orbitalDist: 1.76
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Marik, pg. 75'
+      value: 3
     icon: green30
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 75'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 75'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 75'
       value: 1.05
-    diameter: 11236
-    density: 6.600113727113
+    diameter: 11208
+    density: 6.583667122895
     dayLength: 17
     yearLength: 2.6
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 75'
       value: 47
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 75'
       value: 35
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 75'
       value: MAMMAL
     desc: |-
       Cerillos is a dry and dusty world on the edge of the Free Worlds League. The planet is part of the unofficial 'Trinity' province along with Galisteo and Sierra. Most of the inhabitants of the three worlds descend from hispanic and indian populations of southwestern North America.
@@ -70,25 +76,27 @@ planet:
       Like the other Trinity worlds, Cerillos' primary industry is farming. Both agriculture and ranching are common on Cerillos, however the lack of wealth on the Trinity worlds makes military service both a likely and respected choice for the natives of the Trinity worlds.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 75'
+          value: Alamogrodo
+      - name:
+          source: 'Handbook: House Marik, pg. 75'
           value: Las Cruces
         capital:
-          source: canon
+          source: 'Handbook: House Marik, pg. 75'
           value: Puerto Cortés
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 75'
           value: Mazatlán
       - name:
-          source: canon
-          value: Santa Rosa
-      - name:
-          source: canon
-          value: Alamogordo
-      - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 75'
           value: San Clemente
+      - name:
+          source: 'Handbook: House Marik, pg. 75'
+          value: Santa Rosa
     satellite:
-      - name: Blanca
+      - name:
+          source: 'Handbook: House Marik, pg. 75'
+          value: Blanca
         size: large
         icon: rock2
     event:

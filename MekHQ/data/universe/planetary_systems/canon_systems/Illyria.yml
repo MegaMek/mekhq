@@ -3,9 +3,11 @@ sucsId: 1182
 xcood: -439.228
 ycood: -178.11
 spectralType:
-  source: canon
+  source: Periphery (1ed), pg. 134
   value: G4V
-primarySlot: 3
+primarySlot:
+  source: Periphery (1ed), pg. 134
+  value: 3
 event:
   - date: '2453-04-01'
     zenithCharge: yes
@@ -46,7 +48,9 @@ planet:
       value: Illyria
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 3
+    sysPos:
+      source: Periphery (1ed), pg. 134
+      value: 3
     icon: green29
     pressure:
       source: canon
@@ -67,7 +71,7 @@ planet:
       source: canon
       value: 61
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 134
       value: MAMMAL
     desc: Illyria is a quiet planet in the Periphery and for centuries it was the
       capital of the small Illyrian Palatinate. The inhabitants of Illyria spent decades

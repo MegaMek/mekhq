@@ -3,9 +3,11 @@ sucsId: 1310
 xcood: 7.746
 ycood: 80.087
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K2V
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2374-03-28'
     zenithCharge: yes
@@ -19,28 +21,32 @@ planet:
       value: Kaus Media
     type: TERRESTRIAL
     orbitalDist: 0.49
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: wet16
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.19
-    diameter: 12102
-    density: 6.891860197642
+    diameter: 12118
+    density: 6.901071175196
     dayLength: 24
     yearLength: 0.9
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 32
     water:
-      source: canon
+      source: MWDA world profiles
       value: 78
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: INSECT
     desc: |-
       Kaus Media is a pleasant, terrestrial world with wide, deep oceans, expansive forests and jungles, and varied—yet normally mild—seasons. Yet, for all its natural splendor, the first colonists to explore and exploit this world quickly realized that the lack of easily reached indigenous metals and minerals would doom all efforts to develop their new home. In the search for a source for raw materials to fuel their industry, traders from Kaus Media quickly discovered that their nearest neighbor, Kaus Australis, suffered from the opposite plight, surrounded by abundant and valuable raw materials, but lacking in food and water. A trade deal blossomed into a full-fledged alliance that carried the two worlds through the Age of War and continued even with the ascendance of the Draconis Combine. Efforts by the Lyran Commonwealth to turn this alliance against the Dragon proved disastrous for the so-called ―Kaus alliance worlds during the First Succession War, when the enraged forces of the DCMS bombarded DeGuilles, the planetary capital city—and with it, the governing buildings that served both worlds. Only after surrendering the Lyran instigators and rebel leaders, and agreeing to stiff reparations and an oath of fealty, did the Kaus alliance avoid further destruction, but the entire crisis underscored the strengths and weaknesses of the symbiotic relationship now shared by these twin worlds.
@@ -48,34 +54,42 @@ planet:
       Trade between both resumed again decades after the crisis, though government was less centralized, with each tending to its own affairs from its own respective capitals. Still, in memory of the broken bond, the people of Kaus Media never built over the ruins of DeGuilles. Instead, the new planetary capital, Vanguard City, located just forty kilometers to the north on the continent of Emparos, governs the affairs of this world, and maintains a diplomatic office for the benefit of its neighbor. Several major trading companies that do business under exclusive license with both Kaus planets also call Vanguard City their home, thanks to the presence of the planet‘s largest spaceport. Aside from Emparos, Kaus Media‘s other four major continents are Romana, Hyadamos, Gaul, and Normano. All but Gaul, the planet‘s frozen south polar continent, are populated with various small and medium-sized commercial and rural towns scattered along the shores of various rivers and lakes.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Emparos
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Vanguard City
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Gaul
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Hyadamos
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Normano
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Romana
     satellite:
-      - name: Ajax
+      - name:
+          source: MWDA world profiles
+          value: Ajax
         size: large
         icon: rock10
-      - name: Nezerah
+      - name:
+          source: MWDA world profiles
+          value: Nezerah
         size: medium
         icon: rock4
-      - name: Yanu
+      - name:
+          source: MWDA world profiles
+          value: Yanu
         size: medium
         icon: oddmoon1
-      - name: Zhentil
+      - name:
+          source: MWDA world profiles
+          value: Zhentil
         size: medium
         icon: rock11
     event:

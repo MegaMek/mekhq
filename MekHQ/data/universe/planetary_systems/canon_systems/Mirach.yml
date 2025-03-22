@@ -3,9 +3,11 @@ sucsId: 1719
 xcood: 108.822
 ycood: -26.926
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: M1V
-primarySlot: 7
+primarySlot:
+  source: MWDA world profiles
+  value: 7
 event:
   - date: '2481-01-02'
     zenithCharge: yes
@@ -131,28 +133,32 @@ planet:
       value: Mirach
     type: TERRESTRIAL
     orbitalDist: 0.2
-    sysPos: 7
+    sysPos:
+      source: MWDA world profiles
+      value: 7
     icon: green9
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.8
-    diameter: 9635
-    density: 5.821378363819
+    diameter: 9646
+    density: 5.828213041034
     dayLength: 18
     yearLength: 0.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 25
     water:
-      source: canon
+      source: MWDA world profiles
       value: 60
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MICROBE
     desc: |-
       Mirach‘s sky is dominated by its huge, swollen, dying red sun. The geological record on Mirach shows that it was long a frozen, uninhabitable planet, until its parent star entered the current phase of its life cycle. As a result, the thick glaciers that once covered Mirach‘s ores and minerals have melted, and no erosion or life-forms have had a chance to cover its riches with soil.
@@ -162,25 +168,33 @@ planet:
       These episodic invasions kept Mirach from realizing its true potential, and the Blakist Holy War again set Mirach back several decades. Only under The Republic of the Sphere has Mirach‘s economy substantially raised its population‘s standard of living. Mirach‘s capital of Cingulum lies on the continent of Musasalah. Mirach‘s other major landmass is Ventrale.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Musasalah
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Cingulum
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Ventrale
     satellite:
-      - name: Arit
+      - name:
+          source: MWDA world profiles
+          value: Arit
         size: large
         icon: rock4
-      - name: Batn
+      - name:
+          source: MWDA world profiles
+          value: Batn
         size: large
         icon: rock13
-      - name: Kalb
+      - name:
+          source: MWDA world profiles
+          value: Kalb
         size: medium
         icon: oddmoon3
-      - name: Kuton
+      - name:
+          source: MWDA world profiles
+          value: Kuton
         size: medium
         icon: rock15
     event:

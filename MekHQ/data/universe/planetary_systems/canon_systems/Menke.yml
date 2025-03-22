@@ -63,26 +63,28 @@ planet:
     sysPos: 4
     icon: green17
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 79'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 79'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 79'
       value: 1.13
-    diameter: 12410
-    density: 6.400595309426
+    diameter: 12408
+    density: 6.399807132292
     dayLength: 19
     yearLength: 1.1
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 79'
       value: 42
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 79'
       value: 74
     lifeForm:
-      source: canon
-      value: MAMMAL
+      source: 'Handbook: House Liao, pg. 79'
+      value: PLANT
     desc: |-
       As of 3025 Menke is the perpetual holding of the McCarron family and the planet serves as the home base of McCarron's Armored Cavalry. Menke is part of the Duchy of Mitchel in the Capellan Confederation. Menke is a sunny, tropical planet and boasts a large civilian population that serves as a recruitment pool for the Cavalry. Menke has extensive ‘Mech repair facilities and one of the greatest concentrations of trained techs in the Confederation. The planet's southern hemisphere hosts a jungle warfare training center. One or more of the Armored Cavalry regiments are on planet at any specific time making the planet an uninviting target.
 
@@ -94,19 +96,21 @@ planet:
       Metal Industries
     landmass:
       - name:
-          source: canon
-          value: Menke Prime
-        capital:
-          source: canon
-          value: Archibald
-      - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Menke Beta
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Menke Omega
+      - name:
+          source: 'Objective Raids: Capellan Confederation'
+          value: Menke Prime
+        capital:
+          source: 'Objective Raids: Capellan Confederation'
+          value: Archibald
     satellite:
-      - name: Darbonne
+      - name:
+          source: 'Handbook: House Liao, pg. 79'
+          value: Darbonne
         size: medium
         icon: oddmoon1
     event:

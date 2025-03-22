@@ -3,9 +3,11 @@ sucsId: 882
 xcood: -67.732
 ycood: -209.973
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 65'
   value: G2IV
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Marik, pg. 65'
+  value: 2
 event:
   - date: '2396-12-24'
     nadirCharge: yes
@@ -45,28 +47,32 @@ planet:
       value: Fletcher (FWL)
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Marik, pg. 65'
+      value: 2
     icon: green3
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 65'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 65'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 65'
       value: 0.95
-    diameter: 11875
-    density: 5.648271325002
+    diameter: 11847
+    density: 5.635158545473
     dayLength: 24
     yearLength: 2.3
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 65'
       value: 35
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 65'
       value: 55
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 65'
       value: BIRD
     desc: |-
       All four continents on Fletcher are dominated by mountain ranges and the planet was colonized in order to mine these raw materials and a large industrial base was established to make use of them. Additionally during the peace of the Star League, Fletcher became widely known as a tourist attraction for its ‘winter-sports’ venues. Unfortunately the mountainous terrain also leaves Fletcher with very little arable land requiring the planet to rely heavily on imported foodstuffs.
@@ -78,22 +84,24 @@ planet:
       Fuisgon-Flame Tech
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 65'
           value: Bairiki
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 65'
           value: Koro
         capital:
           source: canon
           value: Toorance
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 65'
           value: Lautoka
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 65'
           value: Norsup
     satellite:
-      - name: Quarrel
+      - name:
+          source: 'Handbook: House Marik, pg. 65'
+          value: Quarrel
         size: large
         icon: rock6
     event:

@@ -65,9 +65,6 @@ import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TO
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_CONTRACT_END;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
-import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsMajorityVTOLForces;
-import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsOnlyAerialForces;
-import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsOnlyVTOLForces;
 import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
 import static mekhq.gui.dialog.resupplyAndCaches.DialogItinerary.itineraryDialog;
@@ -371,7 +368,7 @@ public class PerformResupply {
             convoyWeight += npcConvoyWeight;
         } else {
             for (UUID unitId : playerConvoy.getAllUnits(false)) {
-                Entity entity = getEntityFromUnitId(campaign, unitId);
+                Entity entity = getEntityFromUnitId(campaign.getHangar(), unitId);
 
                 if (entity == null) {
                     continue;
@@ -426,7 +423,8 @@ public class PerformResupply {
             }
 
             // Non-ground convoys don't get roleplay events
-            if (forceContainsOnlyVTOLForces(campaign, convoy) || forceContainsOnlyAerialForces(campaign, convoy)) {
+            if (convoy.forceContainsOnlyVTOLForces(campaign.getHangar(), false)
+                  || convoy.forceContainsOnlyAerialForces(campaign.getHangar(), false, false)) {
                 completeSuccessfulDelivery(resupply, convoyContents);
                 return;
             }
@@ -509,9 +507,11 @@ public class PerformResupply {
         String templateAddress = GENERIC;
 
         if (targetConvoy != null) {
-            if (forceContainsOnlyAerialForces(campaign, targetConvoy)) {
+            if (targetConvoy.forceContainsOnlyAerialForces(campaign.getHangar(), false,
+                  false)) {
                 templateAddress = PLAYER_AEROSPACE_CONVOY;
-            } else if (forceContainsMajorityVTOLForces(campaign, targetConvoy)) {
+            } else if (targetConvoy.forceContainsMajorityVTOLForces(campaign.getHangar(),
+                  false)) {
                 templateAddress = PLAYER_VTOL_CONVOY;
             } else {
                 templateAddress = PLAYER_CONVOY;

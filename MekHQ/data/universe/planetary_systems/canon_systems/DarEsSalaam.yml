@@ -3,9 +3,11 @@ sucsId: 663
 xcood: -194.866
 ycood: 13.391
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 77'
   value: F1VI
-primarySlot: 1
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 77'
+  value: 1
 event:
   - date: '2489-12-09'
     nadirCharge: yes
@@ -19,49 +21,54 @@ planet:
       value: Dar-es-Salaam
     type: TERRESTRIAL
     orbitalDist: 4.48
-    sysPos: 1
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 77'
+      value: 1
     icon: green5
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 77'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 77'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 77'
       value: 0.74
-    diameter: 9426
-    density: 5.50578620759
+    diameter: 9436
+    density: 5.511441277676
     dayLength: 25
     yearLength: 9.6
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 77'
       value: 59
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 77'
       value: 36
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 77'
       value: AMPHIBIAN
     desc: Dar-es-Salaam (“Heaven of Peace”) is a planet almost entirely covered in
       desert. The planet was passed over for colonization until the 25th Century when
       it attracted settlers from the Middle East and Northern Africa.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 77'
           value: Mellesse
         capital:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 77'
           value: Khadijah
-      - name:
-          source: canon
-          value: Maysun
     satellite:
-      - name: Luqman
-        size: medium
-        icon: oddmoon1
-      - name: Jibril
+      - name:
+          source: 'Handbook: House Steiner, pg. 77'
+          value: Jibril
         size: large
         icon: rock12
+      - name:
+          source: 'Handbook: House Steiner, pg. 77'
+          value: Luqman
+        size: medium
+        icon: oddmoon1
     event:
       - date: '2465-04-03'
         faction:

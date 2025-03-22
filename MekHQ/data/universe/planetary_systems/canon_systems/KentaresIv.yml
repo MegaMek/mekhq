@@ -3,9 +3,11 @@ sucsId: 1329
 xcood: 149.4
 ycood: -13.229
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 99'
   value: F5IV
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Davion, pg. 99'
+  value: 4
 event:
   - date: '2407-05-25'
     zenithCharge: yes
@@ -58,28 +60,32 @@ planet:
       value: Kentares IV
     type: TERRESTRIAL
     orbitalDist: 3.92
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Davion, pg. 99'
+      value: 4
     icon: wet10
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 99'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 99'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 99'
       value: 1.0
-    diameter: 12649
-    density: 5.56508163562
+    diameter: 12639
+    density: 5.560464137375
     dayLength: 19
     yearLength: 7.9
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 99'
       value: 35
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 99'
       value: 88
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 99'
       value: INSECT
     desc: |-
       Kentares IV is infamous for the Kentares Massacre which occurred in 2796-2797. Jinjiro Kurita, enraged by the death of his father Minoru, ordered the death of everyone on the planet. More than 90% of the population was killed during five months of systematic executions carried out by the DCMS. News of the atrocities turned the tide of the 1st Succession War, demoralizing the Combine and rallying the flagging Federated Suns.
@@ -91,7 +97,9 @@ planet:
       - name: East Earl
       - name: Francis's Rift
     satellite:
-      - name: Columbia
+      - name:
+          source: 'Handbook: House Davion, pg. 99'
+          value: Columbia
         size: giant
         icon: rock16
     event:

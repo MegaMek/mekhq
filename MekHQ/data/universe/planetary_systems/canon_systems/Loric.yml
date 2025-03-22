@@ -3,9 +3,11 @@ sucsId: 1517
 xcood: -230.35
 ycood: -38.822
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 79'
   value: K8IV
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 79'
+  value: 2
 event:
   - date: '2410-01-01'
     nadirCharge: yes
@@ -29,28 +31,32 @@ planet:
       value: Loric
     type: TERRESTRIAL
     orbitalDist: 0.42
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 79'
+      value: 2
     icon: wet20
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 79'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 79'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 79'
       value: 0.98
-    diameter: 13446
-    density: 5.118220228871
+    diameter: 13451
+    density: 5.120110566631
     dayLength: 23
     yearLength: 0.8
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 79'
       value: 47
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 79'
       value: 88
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 79'
       value: BIRD
     desc: |-
       Loric is a picturesque world covered in calm oceans, sandy beaches, rugged mountains and green river valleys. It could easily have been a vacation planet, unfortunately its position on the border between the Lyran Commonwealth and Free Worlds League has made Loric a planet of vast strategic military importance. While the planet’s population has done its best to be an un-appealing target by means of limiting general industry and completely shunning any military industries, Loric has still been the target of raids and attacks time and time again.
@@ -58,19 +64,21 @@ planet:
       The continents of Sorania and Padawa are mostly temperate and are the sites of the majority of the population centers on Loric. The southern continent of Ghanadi is arctic and almost entirely uninhabited, most of Ghanadi is set aside as a nature preserve.
     landmass:
       - name:
-          source: canon
-          value: Sorania
-        capital:
-          source: canon
-          value: Madras
+          source: 'Handbook: House Steiner, pg. 79'
+          value: Ghanadi
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 79'
           value: Padawa
       - name:
-          source: canon
-          value: Ghanadi
+          source: 'Handbook: House Steiner, pg. 79'
+          value: Sorania
+        capital:
+          source: 'Handbook: House Steiner, pg. 79'
+          value: Madras
     satellite:
-      - name: Udo
+      - name:
+          source: 'Handbook: House Steiner, pg. 79'
+          value: Udo
         size: large
         icon: rock5
     event:

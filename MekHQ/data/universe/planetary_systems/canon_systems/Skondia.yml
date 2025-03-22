@@ -3,9 +3,11 @@ sucsId: 2354
 xcood: -31.803
 ycood: 55.527
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F6V
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2363-08-20'
     zenithCharge: yes
@@ -30,28 +32,32 @@ planet:
       value: Skondia
     type: TERRESTRIAL
     orbitalDist: 2.08
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: wet15
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.08
-    diameter: 11673
-    density: 6.495848716583
+    diameter: 11679
+    density: 6.49893145718
     dayLength: 30
     yearLength: 3.2
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 50
     water:
-      source: canon
+      source: MWDA world profiles
       value: 77
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: BIRD
     desc: |-
       3135 - An abundance of rare mineral deposits and industrial-grade metals made Skondia a prize to the European and African colonists who first settled this world during humanity‘s exodus into space. Within a decade of the first settlers‘ arrival, in fact, the planet‘s first cities had already become industrial centers with dozens of businesses involved in the mining and refining of steel, titanium, and nickel-alloy materials used in everything from kitchen utensils to spacecraft and fusion engine manufacturing. Not surprisingly, this wealth soon drew the interest of the Federation of Skye.
@@ -63,22 +69,28 @@ planet:
       The capital of Skondia, Platinum City, is located on the southeastern continent of Steen. While this city boasts an impressive spaceport less than five kilometers to its north, most shipping traffic is routed through Passageway, a sprawling megalopolis on the northern continent of Edel.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Edel
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Steen
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Platinum City
     satellite:
-      - name: Tadzio
+      - name:
+          source: MWDA world profiles
+          value: Tadzio
         size: medium
         icon: rock13
-      - name: Urian
+      - name:
+          source: MWDA world profiles
+          value: Urian
         size: medium
         icon: oddmoon1
-      - name: Wilmot
+      - name:
+          source: MWDA world profiles
+          value: Wilmot
         size: medium
         icon: rock2
     event:

@@ -3,9 +3,11 @@ sucsId: 1858
 xcood: 155.862
 ycood: -405.627
 spectralType:
-  source: canon
+  source: 'Handbook: Major Periphery States, pg. 125'
   value: F5IV
-primarySlot: 6
+primarySlot:
+  source: 'Handbook: Major Periphery States, pg. 125'
+  value: 6
 event:
   - date: '2367-03-18'
     zenithCharge: yes
@@ -107,28 +109,32 @@ planet:
       value: New Vandenburg
     type: TERRESTRIAL
     orbitalDist: 3.92
-    sysPos: 6
+    sysPos:
+      source: 'Handbook: Major Periphery States, pg. 125'
+      value: 6
     icon: green33
     pressure:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 125'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: Major Periphery States, pg. 125'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 125'
       value: 1.1
-    diameter: 12773
-    density: 6.052650627909
+    diameter: 12772
+    density: 6.052378226481
     dayLength: 22
     yearLength: 7.9
     temperature:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 125'
       value: 31
     water:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 125'
       value: 68
     lifeForm:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 125'
       value: BIRD
     desc: |-
       New Vandernburg is the backbone of Taurian Concordat heavy industry. The planet was the source of heavy fighting during the Reunification Wars and strong post-war occupation. The war left an impression on the populace and they have maintained a strong fighting spirit in the centuries since and the planet is dotted with extensive fortifications to fight off any foes.
@@ -155,10 +161,14 @@ planet:
           source: canon
           value: South Holme
     satellite:
-      - name: Jefferson
+      - name:
+          source: 'Handbook: Major Periphery States, pg. 125'
+          value: Jefferson
         size: large
         icon: rock13
-      - name: Locke
+      - name:
+          source: 'Handbook: Major Periphery States, pg. 125'
+          value: Locke
         size: medium
         icon: rock4
     event:

@@ -3,9 +3,11 @@ sucsId: 2129
 xcood: -152.066
 ycood: -180.024
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 78
   value: K6III
-primarySlot: 4
+primarySlot:
+  source: Masters and Minions, pg. 78
+  value: 4
 event:
   - date: '2362-04-29'
     nadirCharge: yes
@@ -80,28 +82,32 @@ planet:
       value: Regulus
     type: TERRESTRIAL
     orbitalDist: 0.6
-    sysPos: 4
+    sysPos:
+      source: Masters and Minions, pg. 78
+      value: 4
     icon: green39
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 78
       value: STANDARD
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: Masters and Minions, pg. 78
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 78
       value: 0.95
-    diameter: 11578
-    density: 5.768000442541
+    diameter: 11576
+    density: 5.767147289372
     dayLength: 19
     yearLength: 0.9
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 78
       value: 45
     water:
-      source: canon
+      source: Masters and Minions, pg. 78
       value: 53
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 78
       value: REPTILE
     desc: |-
       Regulus originally belonged to the Selaj family, until their attempts to kill off the entire Marik line resulted in the Selaj family’s fall from power and expulsion from the Free Worlds League. While the Selaj are gone, their influence remains in the Indian styled architecture that dominates most of the cities on Regulus. Even with the seditious Selaj family removed, Regulus, as the capital of the Principality of Regulus has long been a thorn in the side of the Free Worlds League and the leading Mariks. Regulus is content to enjoy the benefits of being part of the League but is often unwilling or slow to respond to calls for support from the rest of the League.
@@ -112,19 +118,18 @@ planet:
       Magna Metals Incorporated
     landmass:
       - name:
-          source: canon
-          value: Chebbin
-      - name:
-          source: canon
+          source: Masters and Minions, pg. 78
           value: Tabar
       - name:
-          source: canon
+          source: Masters and Minions, pg. 78
           value: Tinnin
         capital:
-          source: canon
+          source: 'Handbook: House Marik, pg. 62'
           value: Regulus City
     satellite:
-      - name: Zamzama
+      - name:
+          source: Masters and Minions, pg. 78
+          value: Zamzama
         size: medium
         icon: oddmoon3
     event:

@@ -3,9 +3,11 @@ sucsId: 989
 xcood: -23.526
 ycood: -10.386
 spectralType:
-  source: canon
+  source: Star League, pg. 172
   value: G2V
-primarySlot: 4
+primarySlot:
+  source: Star League, pg. 172
+  value: 4
 event:
   - date: '2611-01-30'
     nadirCharge: yes
@@ -63,28 +65,32 @@ planet:
       value: Graham IV
     type: TERRESTRIAL
     orbitalDist: 1.0
-    sysPos: 4
+    sysPos:
+      source: Star League, pg. 172
+      value: 4
     icon: green25
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.83
-    diameter: 10107
-    density: 5.755751357956
+    diameter: 10121
+    density: 5.763446900225
     dayLength: 18
     yearLength: 1.4
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 33
     water:
-      source: canon
+      source: MWDA world profiles
       value: 61
     lifeForm:
-      source: canon
+      source: Star League, pg. 172
       value: MAMMAL
     desc: 3135 - A Terra-like world with vast metal deposits, mineral wealth, and
       fossil fuel resources, Graham IV attracted the attention of several Terran manufacturing
@@ -115,19 +121,21 @@ planet:
       New Dekirk City, serves as the planet‘s official capital in the sky.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Barvionne
-      - name:
-          source: canon
-          value: Palothica
-      - name:
-          source: canon
-          value: Orbital Habitat
         capital:
-          source: canon
-          value: New Dekirk City
+          source: Star League, pg. 172
+          value: Dekirk City (Destroyed during Amaris Coup)
+      - name:
+          source: MWDA world profiles
+          value: Palothica
+      - capital:
+          source: MWDA world profiles
+          value: New Dekirk City (orbiting space station)
     satellite:
-      - name: Krakatau
+      - name:
+          source: MWDA world profiles
+          value: Krakatau
         size: giant
         icon: rock1
     event:
