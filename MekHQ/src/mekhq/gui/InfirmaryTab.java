@@ -37,6 +37,7 @@ import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.PersonMedicalAssignmentEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.personnel.Person;
+import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.DocTableModel;
 import mekhq.gui.model.PatientTableModel;
@@ -45,6 +46,8 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.ImageObserver;
 import java.util.*;
 import java.util.List;
@@ -85,6 +88,12 @@ public final class InfirmaryTab extends CampaignGuiTab {
 
         setLayout(new GridBagLayout());
 
+        String bgImageFile = getIconPackage().getGuiElement("infirmary_background");
+        if (null != bgImageFile && !bgImageFile.isEmpty()) {
+            bgImage = Toolkit.getDefaultToolkit().createImage(bgImageFile);
+        }
+
+        // Initialize doctors list
         doctorsModel = new DocTableModel(getCampaign());
         docTable = new JTable(doctorsModel);
         docTable.setRowHeight(UIUtil.scaleForGUI(60));
@@ -145,6 +154,26 @@ public final class InfirmaryTab extends CampaignGuiTab {
         scrollAssignedPatient.setPreferredSize(new Dimension(300, 360));
         scrollAssignedPatient.setOpaque(false);
         scrollAssignedPatient.getViewport().setOpaque(false);
+        listAssignedPatient.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panAssignedPatient.title")));
+        listAssignedPatient.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    int index = listAssignedPatient.locationToIndex(e.getPoint());
+                    if (index >= 0) {
+                        listAssignedPatient.setSelectedIndex(index);
+                        Person selectedPatient = listAssignedPatient.getSelectedValue();
+                        if (selectedPatient != null) {
+                            MedicalViewDialog medicalViewDialog = new MedicalViewDialog(null,
+                                  getCampaign(), selectedPatient);
+                            medicalViewDialog.setVisible(true);
+                        }
+                    }
+                }
+            }
+        });
+
+        // Unassigned patients
         unassignedPatientModel = new PatientTableModel(getCampaign());
         listUnassignedPatient = new JList<>(unassignedPatientModel);
         listUnassignedPatient.setCellRenderer(unassignedPatientModel.getRenderer());
@@ -157,11 +186,27 @@ public final class InfirmaryTab extends CampaignGuiTab {
         scrollUnassignedPatient.setPreferredSize(new Dimension(300, 300));
         scrollUnassignedPatient.setOpaque(false);
         scrollUnassignedPatient.getViewport().setOpaque(false);
-        listAssignedPatient
-                .setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panAssignedPatient.title")));
         listUnassignedPatient
-                .setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panUnassignedPatient.title")));
+              .setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panUnassignedPatient.title")));
+        listUnassignedPatient.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    int index = listUnassignedPatient.locationToIndex(e.getPoint());
+                    if (index >= 0) {
+                        listUnassignedPatient.setSelectedIndex(index);
+                        Person selectedPatient = listUnassignedPatient.getSelectedValue();
+                        if (selectedPatient != null) {
+                            MedicalViewDialog medicalViewDialog = new MedicalViewDialog(null,
+                                  getCampaign(), selectedPatient);
+                            medicalViewDialog.setVisible(true);
+                        }
+                    }
+                }
+            }
+        });
 
+        // Add assigned patient scroll pane
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -172,6 +217,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 0.0;
         add(scrollAssignedPatient, gridBagConstraints);
 
+        // Add unassigned patient scroll pane
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -181,7 +227,29 @@ public final class InfirmaryTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(scrollUnassignedPatient, gridBagConstraints);
+
+        // Buttons for assigning and unassigning
+        btnAssignDoc = new JButton(resourceMap.getString("btnAssignDoc.text"));
+        btnAssignDoc.setToolTipText(resourceMap.getString("btnAssignDoc.toolTipText"));
+        btnAssignDoc.setEnabled(false);
+        btnAssignDoc.addActionListener(ev -> assignDoctor());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        add(btnAssignDoc, gridBagConstraints);
+
+        btnUnassignDoc = new JButton(resourceMap.getString("btnUnassignDoc.text"));
+        btnUnassignDoc.setEnabled(false);
+        btnUnassignDoc.addActionListener(ev -> unassignDoctor());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        add(btnUnassignDoc, gridBagConstraints);
     }
+
+
 
     /*
      * (non-Javadoc)
