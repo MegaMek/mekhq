@@ -31,11 +31,13 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.TargetRoll;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
+import mekhq.campaign.OptimizeInfirmaryAssignments;
 import mekhq.campaign.event.MedicPoolChangedEvent;
 import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.PersonMedicalAssignmentEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.personnel.Person;
+import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.DocTableModel;
 import mekhq.gui.model.PatientTableModel;
@@ -44,6 +46,8 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.ImageObserver;
 import java.util.*;
 import java.util.List;
@@ -55,6 +59,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
     private JTable docTable;
     private JButton btnAssignDoc;
     private JButton btnUnassignDoc;
+    private JButton btnOptimizeAssignments;
     private JList<Person> listAssignedPatient;
     private JList<Person> listUnassignedPatient;
 
@@ -79,10 +84,16 @@ public final class InfirmaryTab extends CampaignGuiTab {
     @Override
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
 
         setLayout(new GridBagLayout());
 
+        String bgImageFile = getIconPackage().getGuiElement("infirmary_background");
+        if (null != bgImageFile && !bgImageFile.isEmpty()) {
+            bgImage = Toolkit.getDefaultToolkit().createImage(bgImageFile);
+        }
+
+        // Initialize doctors list
         doctorsModel = new DocTableModel(getCampaign());
         docTable = new JTable(doctorsModel);
         docTable.setRowHeight(UIUtil.scaleForGUI(60));
@@ -104,6 +115,120 @@ public final class InfirmaryTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 1.0;
         add(scrollDocTable, gridBagConstraints);
 
+        // Create buttons
+        btnAssignDoc = new JButton(resourceMap.getString("btnAssignDoc.text"));
+        btnAssignDoc.setToolTipText(resourceMap.getString("btnAssignDoc.toolTipText"));
+        btnAssignDoc.setEnabled(false);
+        btnAssignDoc.addActionListener(ev -> assignDoctor());
+
+        btnUnassignDoc = new JButton(resourceMap.getString("btnUnassignDoc.text"));
+        btnUnassignDoc.setEnabled(false);
+        btnUnassignDoc.addActionListener(ev -> unassignDoctor());
+
+        btnOptimizeAssignments = new JButton(resourceMap.getString("btnOptimizeAssignments.text"));
+        btnOptimizeAssignments.addActionListener(ev -> new OptimizeInfirmaryAssignments(getCampaign()));
+
+        // Create a panel to group the buttons together horizontally
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        buttonPanel.add(btnAssignDoc);
+        buttonPanel.add(btnUnassignDoc);
+        buttonPanel.add(btnOptimizeAssignments);
+
+        // Add the button panel to the layout
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        add(buttonPanel, gridBagConstraints);
+
+        assignedPatientModel = new PatientTableModel(getCampaign());
+        listAssignedPatient = new JList<>(assignedPatientModel);
+        listAssignedPatient.setCellRenderer(assignedPatientModel.getRenderer());
+        listAssignedPatient.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+        listAssignedPatient.setVisibleRowCount(-1);
+        listAssignedPatient.getSelectionModel().addListSelectionListener(ev -> updateAssignDoctorEnabled());
+        listAssignedPatient.setOpaque(false);
+        JScrollPane scrollAssignedPatient = new JScrollPaneWithSpeed(listAssignedPatient);
+        scrollAssignedPatient.setMinimumSize(new Dimension(300, 360));
+        scrollAssignedPatient.setPreferredSize(new Dimension(300, 360));
+        scrollAssignedPatient.setOpaque(false);
+        scrollAssignedPatient.getViewport().setOpaque(false);
+        listAssignedPatient.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panAssignedPatient.title")));
+        listAssignedPatient.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    int index = listAssignedPatient.locationToIndex(e.getPoint());
+                    if (index >= 0) {
+                        listAssignedPatient.setSelectedIndex(index);
+                        Person selectedPatient = listAssignedPatient.getSelectedValue();
+                        if (selectedPatient != null) {
+                            MedicalViewDialog medicalViewDialog = new MedicalViewDialog(null,
+                                  getCampaign(), selectedPatient);
+                            medicalViewDialog.setVisible(true);
+                        }
+                    }
+                }
+            }
+        });
+
+        // Unassigned patients
+        unassignedPatientModel = new PatientTableModel(getCampaign());
+        listUnassignedPatient = new JList<>(unassignedPatientModel);
+        listUnassignedPatient.setCellRenderer(unassignedPatientModel.getRenderer());
+        listUnassignedPatient.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+        listUnassignedPatient.setVisibleRowCount(-1);
+        listUnassignedPatient.getSelectionModel().addListSelectionListener(ev -> updateAssignDoctorEnabled());
+        listUnassignedPatient.setOpaque(false);
+        JScrollPane scrollUnassignedPatient = new JScrollPaneWithSpeed(listUnassignedPatient);
+        scrollUnassignedPatient.setMinimumSize(new Dimension(300, 200));
+        scrollUnassignedPatient.setPreferredSize(new Dimension(300, 300));
+        scrollUnassignedPatient.setOpaque(false);
+        scrollUnassignedPatient.getViewport().setOpaque(false);
+        listUnassignedPatient
+              .setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panUnassignedPatient.title")));
+        listUnassignedPatient.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    int index = listUnassignedPatient.locationToIndex(e.getPoint());
+                    if (index >= 0) {
+                        listUnassignedPatient.setSelectedIndex(index);
+                        Person selectedPatient = listUnassignedPatient.getSelectedValue();
+                        if (selectedPatient != null) {
+                            MedicalViewDialog medicalViewDialog = new MedicalViewDialog(null,
+                                  getCampaign(), selectedPatient);
+                            medicalViewDialog.setVisible(true);
+                        }
+                    }
+                }
+            }
+        });
+
+        // Add assigned patient scroll pane
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        add(scrollAssignedPatient, gridBagConstraints);
+
+        // Add unassigned patient scroll pane
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        add(scrollUnassignedPatient, gridBagConstraints);
+
+        // Buttons for assigning and unassigning
         btnAssignDoc = new JButton(resourceMap.getString("btnAssignDoc.text"));
         btnAssignDoc.setToolTipText(resourceMap.getString("btnAssignDoc.toolTipText"));
         btnAssignDoc.setEnabled(false);
@@ -122,56 +247,9 @@ public final class InfirmaryTab extends CampaignGuiTab {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         add(btnUnassignDoc, gridBagConstraints);
-
-        assignedPatientModel = new PatientTableModel(getCampaign());
-        listAssignedPatient = new JList<>(assignedPatientModel);
-        listAssignedPatient.setCellRenderer(assignedPatientModel.getRenderer());
-        listAssignedPatient.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-        listAssignedPatient.setVisibleRowCount(-1);
-        listAssignedPatient.getSelectionModel().addListSelectionListener(ev -> updateAssignDoctorEnabled());
-        listAssignedPatient.setOpaque(false);
-        JScrollPane scrollAssignedPatient = new JScrollPaneWithSpeed(listAssignedPatient);
-        scrollAssignedPatient.setMinimumSize(new Dimension(300, 360));
-        scrollAssignedPatient.setPreferredSize(new Dimension(300, 360));
-        scrollAssignedPatient.setOpaque(false);
-        scrollAssignedPatient.getViewport().setOpaque(false);
-        unassignedPatientModel = new PatientTableModel(getCampaign());
-        listUnassignedPatient = new JList<>(unassignedPatientModel);
-        listUnassignedPatient.setCellRenderer(unassignedPatientModel.getRenderer());
-        listUnassignedPatient.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-        listUnassignedPatient.setVisibleRowCount(-1);
-        listUnassignedPatient.getSelectionModel().addListSelectionListener(ev -> updateAssignDoctorEnabled());
-        listUnassignedPatient.setOpaque(false);
-        JScrollPane scrollUnassignedPatient = new JScrollPaneWithSpeed(listUnassignedPatient);
-        scrollUnassignedPatient.setMinimumSize(new Dimension(300, 200));
-        scrollUnassignedPatient.setPreferredSize(new Dimension(300, 300));
-        scrollUnassignedPatient.setOpaque(false);
-        scrollUnassignedPatient.getViewport().setOpaque(false);
-        listAssignedPatient
-                .setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panAssignedPatient.title")));
-        listUnassignedPatient
-                .setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panUnassignedPatient.title")));
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        add(scrollAssignedPatient, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        add(scrollUnassignedPatient, gridBagConstraints);
     }
+
+
 
     /*
      * (non-Javadoc)
