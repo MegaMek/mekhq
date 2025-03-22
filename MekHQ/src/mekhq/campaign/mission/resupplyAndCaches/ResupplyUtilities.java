@@ -1,25 +1,33 @@
 /*
- * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.mission.resupplyAndCaches;
 
 import megamek.common.Compute;
-import megamek.common.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
@@ -30,9 +38,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.resupplyAndCaches.DialogAbandonedConvoy;
 
 import java.util.UUID;
-import java.util.Vector;
 
-import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.CARGO_MULTIPLIER;
@@ -40,7 +46,6 @@ import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TO
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.calculateTargetCargoTonnage;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.KIA;
-import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 /**
  * Utility class for managing resupply operations and events in MekHQ campaigns.
@@ -154,81 +159,5 @@ public class ResupplyUtilities {
         // Armor and ammo are always delivered in blocks, so cargo will never be less than the sum
         // of those blocks
         return max(RESUPPLY_AMMO_TONNAGE + RESUPPLY_ARMOR_TONNAGE, (int) Math.ceil(targetTonnage));
-    }
-
-    /**
-     * Determines if a convoy only contains VTOL or similar units.
-     *
-     * @param campaign the {@link Campaign} instance the convoy belongs to.
-     * @param convoy   the {@link Force} representing the convoy to check.
-     * @return {@code true} if the convoy only contains VTOL units, {@code false} otherwise.
-     */
-    public static boolean forceContainsOnlyVTOLForces(Campaign campaign, Force convoy) {
-        for (UUID unitId : convoy.getAllUnits(false)) {
-            Entity entity = getEntityFromUnitId(campaign, unitId);
-
-            if (entity == null) {
-                continue;
-            }
-
-            if (!entity.isAirborneVTOLorWIGE()) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Determines if a convoy contains a majority of VTOL (or similar) units.
-     *
-     * <p>This is calculated by checking if at least half of the units are VTOLs or similarly
-     * airborne types.</p>
-     *
-     * @param campaign      the {@link Campaign} instance the convoy belongs to.
-     * @param convoy  the {@link Force} representing the convoy being evaluated.
-     * @return {@code true} if the VTOL units constitute at least half of the units, {@code false} otherwise.
-     */
-    public static boolean forceContainsMajorityVTOLForces(Campaign campaign, Force convoy) {
-        Vector<UUID> allUnits = convoy.getAllUnits(false);
-        int convoySize = allUnits.size();
-        int vtolCount = 0;
-
-        for (UUID unitId : convoy.getAllUnits(false)) {
-            Entity entity = getEntityFromUnitId(campaign, unitId);
-
-            if (entity == null) {
-                continue;
-            }
-
-            if (entity.isAirborneVTOLorWIGE()) {
-                vtolCount++;
-            }
-        }
-
-        return vtolCount >= floor((double) convoySize / 2);
-    }
-
-    /**
-     * Determines if a convoy only contains aerial units, such as aerospace or conventional fighters.
-     *
-     * @param campaign the {@link Campaign} instance the convoy belongs to.
-     * @param convoy   the {@link Force} representing the convoy to check.
-     * @return {@code true} if the convoy only contains aerial units, {@code false} otherwise.
-     */
-    public static boolean forceContainsOnlyAerialForces(Campaign campaign, Force convoy) {
-        for (UUID unitId : convoy.getAllUnits(false)) {
-            Entity entity = getEntityFromUnitId(campaign, unitId);
-
-            if (entity == null) {
-                continue;
-            }
-
-            if (!entity.isAerospace() && !entity.isConventionalFighter()) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

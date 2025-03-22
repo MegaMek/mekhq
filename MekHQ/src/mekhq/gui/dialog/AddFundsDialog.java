@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
- * MegaMek is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
- * MegaMek is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.dialog;
 
@@ -27,7 +36,6 @@ import java.awt.event.FocusListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ResourceBundle;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
@@ -52,13 +60,13 @@ import mekhq.gui.utilities.JMoneyTextField;
 public class AddFundsDialog extends JDialog implements FocusListener {
     private static final MMLogger logger = MMLogger.create(AddFundsDialog.class);
 
-    private JButton btnAddFunds;
-    private JMoneyTextField fundsQuantityField;
-    private JFormattedTextField descriptionField;
-    private MMComboBox<TransactionType> categoryCombo;
-    private int closedType = JOptionPane.CLOSED_OPTION;
-    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog",
-            MekHQ.getMHQOptions().getLocale());
+    private                 JMoneyTextField             fundsQuantityField;
+    private                 JFormattedTextField         descriptionField;
+    private                 MMComboBox<TransactionType> categoryCombo;
+    private                 int                         closedType  = JOptionPane.CLOSED_OPTION;
+    private final transient ResourceBundle              resourceMap = ResourceBundle.getBundle(
+          "mekhq.resources.AddFundsDialog",
+          MekHQ.getMHQOptions().getLocale());
 
     public AddFundsDialog(final JFrame frame, final boolean modal) {
         super(frame, modal);
@@ -71,7 +79,7 @@ public class AddFundsDialog extends JDialog implements FocusListener {
         setName("Form");
         setTitle(resourceMap.getString("Form.title"));
 
-        btnAddFunds = new JButton();
+        JButton btnAddFunds = new JButton();
         btnAddFunds.setText(resourceMap.getString("btnAddFunds.text"));
         btnAddFunds.setActionCommand(resourceMap.getString("btnAddFunds.actionCommand"));
         btnAddFunds.setName("btnAddFunds");
@@ -83,8 +91,14 @@ public class AddFundsDialog extends JDialog implements FocusListener {
         setLocationRelativeTo(getParent());
         pack();
     }
-
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+ 
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(AddFundsDialog.class);

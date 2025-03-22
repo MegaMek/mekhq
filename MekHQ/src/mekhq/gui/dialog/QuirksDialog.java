@@ -1,22 +1,30 @@
 /*
- * QuirksDialog.java
- *
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.dialog;
 
@@ -26,7 +34,6 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -53,16 +60,15 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 public class QuirksDialog extends JDialog implements DialogOptionListener, ActionListener {
     private static final MMLogger logger = MMLogger.create(QuirksDialog.class);
 
-    private QuirksPanel qpanel;
+    private QuirksPanel                    quirksPanel;
     private HashMap<Integer, WeaponQuirks> h_wpnQuirks = new HashMap<>();
-    private Entity entity;
+    private Entity                         entity;
 
     private JButton okayButton;
     private JButton cancelButton;
 
     /**
-     * Handles the editing and deteling of Quirks. Utilizes the QuirksPanel from
-     * megamek for the bulk of its work.
+     * Handles the editing and deleting of Quirks. Utilizes the QuirksPanel from MegaMek for the bulk of its work.
      *
      * @param entity The {@link Entity} being edited.
      * @param parent The {@link JFrame} of the parent panel.
@@ -79,22 +85,28 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
 
     private void initGUI() {
 
-        // Set up the megamek QuirksPanel.
+        // Set up the MegaMek QuirksPanel.
         for (Mounted<?> m : entity.getWeaponList()) {
             h_wpnQuirks.put(entity.getEquipmentNum(m), m.getQuirks());
         }
-        qpanel = new QuirksPanel(entity, entity.getQuirks(), true, this, h_wpnQuirks);
-        qpanel.refreshQuirks();
+        quirksPanel = new QuirksPanel(entity, entity.getQuirks(), true, this, h_wpnQuirks);
+        quirksPanel.refreshQuirks();
 
         // Set up the display of this dialog.
-        JScrollPane scroller = new JScrollPaneWithSpeed(qpanel);
+        JScrollPane scroller = new JScrollPaneWithSpeed(quirksPanel);
         scroller.setPreferredSize(new Dimension(300, 200));
         setLayout(new BorderLayout());
         add(scroller, BorderLayout.CENTER);
         add(buildButtonPanel(), BorderLayout.SOUTH);
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(QuirksDialog.class);
@@ -123,7 +135,7 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
 
     @Override
     public void optionClicked(DialogOptionComponent dialogOptionComponent, IOption iOption, boolean b) {
-        // Not Used Included because QuriksPanel requires a DialogOptionListener
+        // Not Used Included because QuirksPanel requires a DialogOptionListener
         // interface.
     }
 
@@ -135,7 +147,7 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
     @Override
     public void actionPerformed(ActionEvent e) {
         if (okayButton.equals(e.getSource())) {
-            qpanel.setQuirks();
+            quirksPanel.setQuirks();
             setVisible(false);
         } else if (cancelButton.equals(e.getSource())) {
             setVisible(false);

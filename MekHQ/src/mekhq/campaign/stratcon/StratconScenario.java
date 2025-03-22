@@ -1,16 +1,30 @@
 /*
-* MegaMek - Copyright (C) 2020 - The MegaMek Team
-*
-* This program is free software; you can redistribute it and/or modify it under
-* the terms of the GNU General Public License as published by the Free Software
-* Foundation; either version 2 of the License, or (at your option) any later
-* version.
-*
-* This program is distributed in the hope that it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-* FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
-* details.
-*/
+ * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ */
 package mekhq.campaign.stratcon;
 
 import jakarta.xml.bind.annotation.XmlElement;
@@ -18,12 +32,15 @@ import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.adapter.DateAdapter;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.*;
+import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 
 import java.time.LocalDate;
@@ -36,6 +53,8 @@ import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.UNRESOLVED;
  * @author NickAragua
  */
 public class StratconScenario implements IStratconDisplayable {
+    private static final MMLogger logger = MMLogger.create(StratconScenario.class);
+
     /**
      * Represents the possible states of a Stratcon scenario
      */
@@ -101,6 +120,17 @@ public class StratconScenario implements IStratconDisplayable {
         if (!getBackingScenario().getForceIDs().contains(force.getId())) {
             backingScenario.addForce(force.getId(), templateID);
             force.setScenarioId(getBackingScenarioID(), campaign);
+
+            for (UUID unitID : force.getAllUnits(true)) {
+                Unit unit = campaign.getUnit(unitID);
+
+                if (unit == null) {
+                    return;
+                }
+
+                addPlayerTransportRelationships(unit);
+            }
+
             MekHQ.triggerEvent(new DeploymentChangedEvent(force, getBackingScenario()));
         }
     }
@@ -112,6 +142,9 @@ public class StratconScenario implements IStratconDisplayable {
     public void addUnit(Unit unit, String templateID, boolean useLeadership) {
         if (!backingScenario.containsPlayerUnit(unit.getId())) {
             backingScenario.addUnit(unit.getId(), templateID);
+
+            addPlayerTransportRelationships(unit);
+
             unit.setScenarioId(getBackingScenarioID());
 
             if (useLeadership) {
@@ -120,6 +153,34 @@ public class StratconScenario implements IStratconDisplayable {
             }
 
             MekHQ.triggerEvent(new DeploymentChangedEvent(unit, getBackingScenario()));
+        }
+    }
+
+    /**
+     * Establishes transport relationships between the specified unit and any assigned transport
+     * units in the campaign. Each transport assignment of the given unit is checked, and if valid
+     * transport is found, a transport relationship is added to the backing scenario.
+     *
+     * @param unit the {@code Unit} for which transport relationships will be established.
+     *             This unit will be checked for active transport assignments.
+     */
+    private void addPlayerTransportRelationships(Unit unit) {
+        for (CampaignTransportType transportType : CampaignTransportType.values()) {
+            ITransportAssignment transportAssignment = unit.getTransportAssignment(transportType);
+            if (transportAssignment != null) {
+                Unit transport = transportAssignment.getTransport();
+
+                if (transport == null) {
+                    logger.warn(
+                          "Unit {} has a transport assigned, but the transported unit doesn't exist",
+                          unit.getId());
+                    continue;
+                }
+
+                UUID transportId = transport.getId();
+
+                backingScenario.addPlayerTransportRelationship(transportId, unit.getId());
+            }
         }
     }
 
@@ -283,6 +344,24 @@ public class StratconScenario implements IStratconDisplayable {
     @XmlTransient
     public AtBDynamicScenario getBackingScenario() {
         return backingScenario;
+    }
+
+    /**
+     * Retrieves the {@link AtBContract} associated with the backing scenario.
+     *
+     * <p>If the backing scenario is null, this method will return {@code null}. Otherwise, it
+     * retrieves the associated contract through the provided campaign instance.
+     *
+     * @param campaign The {@code Campaign} instance used to obtain the contract.
+     * @return The {@code AtBContract} associated with the current backing scenario, or {@code null}
+     * if no backing scenario exists.
+     */
+    public @Nullable AtBContract getBackingContract(Campaign campaign) {
+        if (backingScenario == null) {
+            return null;
+        }
+
+        return backingScenario.getContract(campaign);
     }
 
     @XmlJavaTypeAdapter(DateAdapter.class)

@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
@@ -51,7 +60,7 @@ public class UnresolvedStratConContactsNagLogicTest {
     private StratconCampaignState stratconCampaignState;
     private StratconTrackState track;
     private LocalDate today;
-    private StratconScenario scenario1, scenario2;
+    private StratconScenario stratconScenario1, stratconScenario2;
 
     /**
      * Test setup for each test, runs before each test.
@@ -72,11 +81,11 @@ public class UnresolvedStratConContactsNagLogicTest {
         when(mockCoordinates1.toBTString()).thenReturn("MockCoordinate1");
         when(mockCoordinates2.toBTString()).thenReturn("MockCoordinate2");
 
-        scenario1 = mock(StratconScenario.class);
-        scenario2 = mock(StratconScenario.class);
+        stratconScenario1 = mock(StratconScenario.class);
+        stratconScenario2 = mock(StratconScenario.class);
 
-        when(scenario1.getCoords()).thenReturn(mockCoordinates1);
-        when(scenario2.getCoords()).thenReturn(mockCoordinates2);
+        when(stratconScenario1.getCoords()).thenReturn(mockCoordinates1);
+        when(stratconScenario2.getCoords()).thenReturn(mockCoordinates2);
 
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
         when(campaignOptions.isUseStratCon()).thenReturn(true);
@@ -85,25 +94,25 @@ public class UnresolvedStratConContactsNagLogicTest {
         when(contract.getStratconCampaignState()).thenReturn(stratconCampaignState);
         when(stratconCampaignState.getTracks()).thenReturn(List.of(track));
 
-        when(track.getScenarios()).thenReturn(Map.of(mockCoordinates1, scenario1, mockCoordinates2, scenario2));
-        when(scenario1.getCurrentState()).thenReturn(ScenarioState.UNRESOLVED);
-        when(scenario2.getCurrentState()).thenReturn(ScenarioState.UNRESOLVED);
+        when(track.getScenarios()).thenReturn(Map.of(mockCoordinates1, stratconScenario1, mockCoordinates2, stratconScenario2));
+        when(stratconScenario1.getCurrentState()).thenReturn(ScenarioState.UNRESOLVED);
+        when(stratconScenario2.getCurrentState()).thenReturn(ScenarioState.UNRESOLVED);
         when(campaign.getLocalDate()).thenReturn(today);
     }
 
     @Test
     public void noScenariosDue() {
-        when(scenario1.getDeploymentDate()).thenReturn(today.plusDays(1));
-        when(scenario2.getDeploymentDate()).thenReturn(today.plusDays(1));
+        when(stratconScenario1.getDeploymentDate()).thenReturn(today.plusDays(1));
+        when(stratconScenario2.getDeploymentDate()).thenReturn(today.plusDays(1));
 
-        assertFalse(hasUnresolvedContacts(campaign));
+        assertFalse(hasUnresolvedContacts(List.of(contract), today));
     }
 
     @Test
     public void scenariosDue() {
-        when(scenario1.getDeploymentDate()).thenReturn(today.plusDays(1));
-        when(scenario2.getDeploymentDate()).thenReturn(today);
+        when(stratconScenario1.getDeploymentDate()).thenReturn(today.plusDays(1));
+        when(stratconScenario2.getDeploymentDate()).thenReturn(today);
 
-        assertTrue(hasUnresolvedContacts(campaign));
+        assertTrue(hasUnresolvedContacts(List.of(contract), today));
     }
 }

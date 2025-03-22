@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
     <name>Convoy Interdiction</name>
+    <stratConScenarioType>CONVOY</stratConScenarioType>
     <shortBriefing>Intercept and neutralize enemy convoy.</shortBriefing>
     <detailedBriefing>An enemy convoy is on the move, and your orders are simple—hit them hard and stop at least 50% of their forces from reaching the far edge of the engagement zone. This is a direct strike, not a prolonged engagement. Destroy or cripple the convoy units with no regard for salvage or escort interference. Speed and overwhelming firepower are your greatest assets.
 

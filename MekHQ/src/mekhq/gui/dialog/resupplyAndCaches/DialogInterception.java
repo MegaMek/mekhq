@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.dialog.resupplyAndCaches;
 
@@ -32,8 +41,6 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 
 import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsOnlyAerialForces;
-import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsOnlyVTOLForces;
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
@@ -146,8 +153,9 @@ public class DialogInterception extends JDialog{
         String message = "";
 
         if (targetConvoy != null) {
-            if (forceContainsOnlyVTOLForces(campaign, targetConvoy)
-                || forceContainsOnlyAerialForces(campaign, targetConvoy)) {
+            if (targetConvoy.forceContainsOnlyVTOLForces(campaign.getHangar(), false)
+                || targetConvoy.forceContainsOnlyAerialForces(campaign.getHangar(), false,
+                  false)) {
                 message = getFormattedTextAt(RESOURCE_BUNDLE, "statusUpdateIntercepted.boilerplate",
                         campaign.getCommanderAddress(false),
                     getFormattedTextAt(RESOURCE_BUNDLE,"interceptionInstructions.text"));

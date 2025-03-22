@@ -3,9 +3,11 @@ sucsId: 2474
 xcood: -15.391
 ycood: 314.863
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 120
   value: G6V
-primarySlot: 3
+primarySlot:
+  source: Masters and Minions, pg. 120
+  value: 3
 event:
   - date: '2356-12-18'
     zenithCharge: yes
@@ -51,28 +53,32 @@ planet:
       value: Tamar
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 3
+    sysPos:
+      source: Masters and Minions, pg. 120
+      value: 3
     icon: green24
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 120
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 120
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 120
       value: 1.2
-    diameter: 16266
-    density: 5.163977794943
+    diameter: 16298
+    density: 5.17423075143
     dayLength: 23
     yearLength: 1.3
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 120
       value: 36
     water:
-      source: canon
+      source: Masters and Minions, pg. 120
       value: 32
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 120
       value: PLANT
     desc: Before being captured by Clan Wolf in 3050, Tamar was the capital of the
       Tamar Pact since its founding in the early days of space colonization. Tamar
@@ -88,7 +94,7 @@ planet:
           source: canon
           value: Dilis
         capital:
-          source: canon
+          source: Masters and Minions, pg. 120
           value: Tamar City
       - name:
           source: canon
@@ -97,12 +103,16 @@ planet:
           source: canon
           value: Zadeni
     satellite:
-      - name: Karachi
-        size: large
-        icon: rock2
-      - name: Islamabad
+      - name:
+          source: Masters and Minions, pg. 120
+          value: Islamabad
         size: medium
         icon: rock7
+      - name:
+          source: Masters and Minions, pg. 120
+          value: Karachi
+        size: large
+        icon: rock2
     event:
       - date: '2235-03-08'
         faction:

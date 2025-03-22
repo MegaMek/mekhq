@@ -3,9 +3,11 @@ sucsId: 134
 xcood: -98.231
 ycood: -84.059
 spectralType:
-  source: canon
+  source: House Marik, pg. 154
   value: G5V
-primarySlot: 2
+primarySlot:
+  source: House Marik, pg. 154
+  value: 2
 event:
   - date: '2368-10-11'
     zenithCharge: yes
@@ -44,7 +46,9 @@ planet:
       value: Angell II
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 2
+    sysPos:
+      source: House Marik, pg. 154
+      value: 2
     icon: green50
     pressure:
       source: canon
@@ -65,7 +69,7 @@ planet:
       source: canon
       value: 55
     lifeForm:
-      source: canon
+      source: House Marik, pg. 154
       value: MAMMAL
     desc: Due to contaminants in most of the water on Angell II the planet has always
       been reliant on Ice Ships and water purification to sustain its population.

@@ -3,9 +3,11 @@ sucsId: 1042
 xcood: 72.894
 ycood: -77.022
 spectralType:
-  source: canon
+  source: House Liao, pg. 154
   value: F8IV
-primarySlot: 4
+primarySlot:
+  source: House Liao, pg. 154
+  value: 4
 planet:
   - name: Halloran I
     type: TERRESTRIAL
@@ -62,28 +64,32 @@ planet:
       value: Halloran V
     type: TERRESTRIAL
     orbitalDist: 3.36
-    sysPos: 4
+    sysPos:
+      source: House Liao, pg. 154
+      value: 4
     icon: green43
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.1
-    diameter: 11781
-    density: 6.555719555642
+    diameter: 11786
+    density: 6.558715890459
     dayLength: 17
     yearLength: 6.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 24
     water:
-      source: canon
+      source: MWDA world profiles
       value: 74
     lifeForm:
-      source: canon
+      source: House Liao, pg. 154
       value: PLANT
     desc: |-
       Halloran V is a bleak and forbidding arctic planet that is still geologically active. The planet's major export is copper as the planet is composed of almost 20 percent solid copper. Its only other major export is water. However, Halloran will run out of water a century or more sooner than copper due to the rate at which they are selling icebergs to water-poor worlds. In the late 31st century planetary officials finally listened to concerns and reduced exports of the planet’s icebergs.
@@ -92,19 +98,27 @@ planet:
       Corvatti Corporation
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Chimera
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Gethin
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Newfoundland
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Sunderland
+      - name:
+          source: MWDA world profiles
+          value: Tonka Li (archipelago)
+      - name:
+          source: MWDA world profiles
+          value: Tonka Lu (archipelago)
     satellite:
-      - name: Meridian
+      - name:
+          source: MWDA world profiles
+          value: Meridian
         size: large
         icon: rock8
     event:

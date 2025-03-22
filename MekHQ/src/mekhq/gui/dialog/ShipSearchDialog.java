@@ -1,22 +1,30 @@
 /*
- * ShipSearchDialog.java
- *
  * Copyright (c) 2016 Carl Spain. All rights reserved.
+ * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.dialog;
 
@@ -26,7 +34,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ResourceBundle;
-
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -57,11 +64,11 @@ public class ShipSearchDialog extends JDialog {
 
     private JRadioButton btnDropship = new JRadioButton();
     private JRadioButton btnJumpship = new JRadioButton();
-    private JRadioButton btnWarship = new JRadioButton();
+    private JRadioButton btnWarship  = new JRadioButton();
 
     private JLabel lblDropshipTarget = new JLabel();
     private JLabel lblJumpshipTarget = new JLabel();
-    private JLabel lblWarshipTarget = new JLabel();
+    private JLabel lblWarshipTarget  = new JLabel();
 
     CampaignGUI gui;
 
@@ -75,24 +82,25 @@ public class ShipSearchDialog extends JDialog {
 
     private void init() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ShipSearchDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         setTitle(resourceMap.getString("title.text"));
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
 
         JLabel lblInstructions = new JLabel();
-        lblInstructions.setText("<html>" + String.format(resourceMap.getString("instructions.text"),
-                gui.getCampaign().getAtBConfig().getShipSearchCost().toAmountAndSymbolString())
-                + "</html>");
+        lblInstructions.setText("<html>" +
+                                String.format(resourceMap.getString("instructions.text"),
+                                      gui.getCampaign().getAtBConfig().getShipSearchCost().toAmountAndSymbolString()) +
+                                "</html>");
         contentPane.add(lblInstructions, BorderLayout.NORTH);
 
-        JPanel mainPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
+        JPanel             mainPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc       = new GridBagConstraints();
 
         gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor    = GridBagConstraints.NORTHWEST;
+        gbc.insets    = new Insets(5, 5, 5, 5);
 
         ButtonGroup group = new ButtonGroup();
         if (gui.getCampaign().getAtBConfig().shipSearchTargetBase(UnitType.DROPSHIP) != null) {
@@ -102,10 +110,10 @@ public class ShipSearchDialog extends JDialog {
             gbc.gridy = 0;
             mainPanel.add(btnDropship, gbc);
 
-            TargetRoll target = gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.DROPSHIP,
-                    gui.getCampaign());
-            lblDropshipTarget.setText("Target: " + target.getValue() + " ["
-                    + target.getDesc() + "]");
+            TargetRoll target = gui.getCampaign()
+                                      .getAtBConfig()
+                                      .shipSearchTargetRoll(UnitType.DROPSHIP, gui.getCampaign());
+            lblDropshipTarget.setText("Target: " + target.getValue() + " [" + target.getDesc() + "]");
             gbc.gridx = 0;
             gbc.gridy = 1;
             mainPanel.add(lblDropshipTarget, gbc);
@@ -118,10 +126,10 @@ public class ShipSearchDialog extends JDialog {
             gbc.gridy = 2;
             mainPanel.add(btnJumpship, gbc);
 
-            TargetRoll target = gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.JUMPSHIP,
-                    gui.getCampaign());
-            lblJumpshipTarget.setText("Target: " + target.getValue() + " ["
-                    + target.getDesc() + "]");
+            TargetRoll target = gui.getCampaign()
+                                      .getAtBConfig()
+                                      .shipSearchTargetRoll(UnitType.JUMPSHIP, gui.getCampaign());
+            lblJumpshipTarget.setText("Target: " + target.getValue() + " [" + target.getDesc() + "]");
             gbc.gridx = 0;
             gbc.gridy = 3;
             mainPanel.add(lblJumpshipTarget, gbc);
@@ -134,10 +142,10 @@ public class ShipSearchDialog extends JDialog {
             gbc.gridy = 4;
             mainPanel.add(btnWarship, gbc);
 
-            TargetRoll target = gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.WARSHIP,
-                    gui.getCampaign());
-            lblWarshipTarget.setText("Target: " + target.getValue() + " ["
-                    + target.getDesc() + "]");
+            TargetRoll target = gui.getCampaign()
+                                      .getAtBConfig()
+                                      .shipSearchTargetRoll(UnitType.WARSHIP, gui.getCampaign());
+            lblWarshipTarget.setText("Target: " + target.getValue() + " [" + target.getDesc() + "]");
             gbc.gridx = 0;
             gbc.gridy = 5;
             mainPanel.add(lblWarshipTarget, gbc);
@@ -186,8 +194,8 @@ public class ShipSearchDialog extends JDialog {
                 if ((ms == null) && (gui.getCampaign().getShipSearchResult() != null)) {
                     lblAvailable.setText("Cannot find entry for " + gui.getCampaign().getShipSearchResult());
                 } else {
-                    lblAvailable.setText(resourceMap.getString("lblAvailable.text")
-                            + gui.getCampaign().getShipSearchResult());
+                    lblAvailable.setText(resourceMap.getString("lblAvailable.text") +
+                                         gui.getCampaign().getShipSearchResult());
                 }
                 gbc.gridx = 0;
                 gbc.gridy = 8;
@@ -207,8 +215,8 @@ public class ShipSearchDialog extends JDialog {
         } else {
             button = new JButton(resourceMap.getString("btnStartSearch.text"));
             button.setToolTipText(String.format(resourceMap.getString("btnStartSearch.toolTipText"),
-                    gui.getCampaign().getAtBConfig().shipSearchCostPerWeek().toAmountAndSymbolString(),
-                    gui.getCampaign().getAtBConfig().getShipSearchLengthWeeks()));
+                  gui.getCampaign().getAtBConfig().shipSearchCostPerWeek().toAmountAndSymbolString(),
+                  gui.getCampaign().getAtBConfig().getShipSearchLengthWeeks()));
             button.addActionListener(ev -> startSearch());
             button.setEnabled(!gui.getCampaign().hasActiveContract());
         }
@@ -223,7 +231,13 @@ public class ShipSearchDialog extends JDialog {
         pack();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ShipSearchDialog.class);
@@ -244,19 +258,31 @@ public class ShipSearchDialog extends JDialog {
         }
     }
 
+    /**
+     * @since 0.50.04
+     * @deprecated No indicated users.
+     */
+    @Deprecated(since = "0.50.04", forRemoval = true)
     public TargetRoll getDSTarget() {
-        return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.DROPSHIP,
-                gui.getCampaign());
+        return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.DROPSHIP, gui.getCampaign());
     }
 
+    /**
+     * @since 0.50.04
+     * @deprecated No indicated users.
+     */
+    @Deprecated(since = "0.50.04", forRemoval = true)
     public TargetRoll getJSTarget() {
-        return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.JUMPSHIP,
-                gui.getCampaign());
+        return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.JUMPSHIP, gui.getCampaign());
     }
 
+    /**
+     * @since 0.50.04
+     * @deprecated No indicated users.
+     */
+    @Deprecated(since = "0.50.04", forRemoval = true)
     public TargetRoll getWSTarget() {
-        return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.WARSHIP,
-                gui.getCampaign());
+        return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.WARSHIP, gui.getCampaign());
     }
 
     private int getUnitType() {

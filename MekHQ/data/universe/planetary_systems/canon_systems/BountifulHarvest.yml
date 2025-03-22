@@ -3,9 +3,11 @@ sucsId: 377
 xcood: -137.281
 ycood: 261.032
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 85'
   value: F2IV
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 85'
+  value: 4
 event:
   - date: '2352-05-04'
     nadirCharge: yes
@@ -59,28 +61,32 @@ planet:
       value: Bountiful Harvest
     type: TERRESTRIAL
     orbitalDist: 4.2
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 85'
+      value: 4
     icon: wet1
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 85'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 85'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 85'
       value: 1.05
-    diameter: 12780
-    density: 5.766948959224
+    diameter: 12788
+    density: 5.770396384639
     dayLength: 25
     yearLength: 8.7
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 85'
       value: 30
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 85'
       value: 77
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 85'
       value: MAMMAL
     desc: Bountiful Harvest is one of the most productive agricultural worlds in the
       entire Inner Sphere. The planet is slightly larger than Terra and possesses
@@ -91,22 +97,27 @@ planet:
       major exporter of all types of food to surrounding systems.
     landmass:
       - name:
-          source: canon
-          value: Amber
-      - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 85'
           value: Abundance
       - name:
-          source: canon
-          value: Grandeur
+          source: 'Handbook: House Steiner, pg. 85'
+          value: Amber
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 85'
+          value: Grandeur
+        capital:
+          source: 'Handbook: House Steiner, pg. 85'
+          value: KevGlen City
+      - name:
+          source: 'Handbook: House Steiner, pg. 85'
           value: Lush
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 85'
           value: Vibrant
     satellite:
-      - name: Scarecrow
+      - name:
+          source: 'Handbook: House Steiner, pg. 85'
+          value: Scarecrow
         size: medium
         icon: rock7
     event:

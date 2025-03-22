@@ -1,22 +1,30 @@
 /*
- * ManageAssetsDialog.java
- *
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.dialog;
 
@@ -27,7 +35,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.ResourceBundle;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -59,53 +66,56 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 public class ManageAssetsDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(ManageAssetsDialog.class);
 
-    private JFrame frame;
-    private Campaign campaign;
+    private JFrame          frame;
+    private Campaign        campaign;
     private AssetTableModel assetModel;
 
-    private JButton btnAdd;
-    private JButton btnEdit;
-    private JButton btnDelete;
-    private JButton btnOK;
-    private JTable assetTable;
+    private JButton     btnAdd;
+    private JButton     btnEdit;
+    private JButton     btnDelete;
+    private JButton     btnOK;
+    private JTable      assetTable;
     private JScrollPane scrollAssetTable;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ManageAssetsDialog",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
 
     /** Creates new form EditPersonnelLogDialog */
     public ManageAssetsDialog(JFrame parent, Campaign c) {
         super(parent, true);
         this.frame = parent;
-        campaign = c;
+        campaign   = c;
         assetModel = new AssetTableModel(campaign.getFinances().getAssets());
         initComponents();
         setLocationRelativeTo(parent);
     }
 
     private void initComponents() {
-        btnOK = new JButton();
-        btnAdd = new JButton();
-        btnEdit = new JButton();
+        btnOK     = new JButton();
+        btnAdd    = new JButton();
+        btnEdit   = new JButton();
         btnDelete = new JButton();
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("dialogTitle.text"));
         getContentPane().setLayout(new BorderLayout());
 
-        JPanel panBtns = new JPanel(new GridLayout(1, 0));
+        JPanel panButtons = new JPanel(new GridLayout(1, 0));
         btnAdd.setText(resourceMap.getString("btnAddAsset.text"));
         btnAdd.addActionListener(evt -> addAsset());
-        panBtns.add(btnAdd);
+        panButtons.add(btnAdd);
+
         btnEdit.setText(resourceMap.getString("btnEditAsset.text"));
         btnEdit.setEnabled(false);
         btnEdit.addActionListener(evt -> editAsset());
-        panBtns.add(btnEdit);
+        panButtons.add(btnEdit);
+
         btnDelete.setText(resourceMap.getString("btnRemoveAsset.text"));
         btnDelete.setEnabled(false);
         btnDelete.addActionListener(evt -> deleteAsset());
-        panBtns.add(btnDelete);
-        getContentPane().add(panBtns, BorderLayout.PAGE_START);
+        panButtons.add(btnDelete);
+
+        getContentPane().add(panButtons, BorderLayout.PAGE_START);
 
         assetTable = new JTable(assetModel);
         TableColumn column;
@@ -130,7 +140,13 @@ public class ManageAssetsDialog extends JDialog {
         setUserPreferences();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ManageAssetsDialog.class);
@@ -152,7 +168,7 @@ public class ManageAssetsDialog extends JDialog {
     }
 
     private void addAsset() {
-        Asset a = new Asset();
+        Asset           a   = new Asset();
         EditAssetDialog ead = new EditAssetDialog(frame, a);
         ead.setTitle(resourceMap.getString("addAssetDialogTitle.text"));
         ead.setVisible(true);
@@ -166,8 +182,7 @@ public class ManageAssetsDialog extends JDialog {
     }
 
     private void editAsset() {
-        // TODO: fix this to use a cloned asset and the user has to confirm edits with
-        // OK
+        // TODO: fix this to use a cloned asset and the user has to confirm edits with OK
         Asset a = assetModel.getAssetAt(assetTable.getSelectedRow());
         if (null != a) {
             EditAssetDialog ead = new EditAssetDialog(frame, a);
@@ -200,23 +215,17 @@ public class ManageAssetsDialog extends JDialog {
     }
 
     /**
-     * A table model for displaying parts - similar to the one in CampaignGUI, but
-     * not exactly
+     * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
      */
     public static class AssetTableModel extends DataTableModel {
-        public final static int COL_NAME = 0;
-        public final static int COL_VALUE = 1;
+        public final static int COL_NAME     = 0;
+        public final static int COL_VALUE    = 1;
         public final static int COL_SCHEDULE = 2;
-        public final static int COL_INCOME = 3;
-        public final static int N_COL = 4;
+        public final static int COL_INCOME   = 3;
+        public final static int N_COL        = 4;
 
         public AssetTableModel(List<Asset> assets) {
             data = assets;
-        }
-
-        @Override
-        public int getRowCount() {
-            return data.size();
         }
 
         @Override
@@ -258,11 +267,6 @@ public class ManageAssetsDialog extends JDialog {
             return "?";
         }
 
-        @Override
-        public boolean isCellEditable(int row, int col) {
-            return false;
-        }
-
         public Asset getAssetAt(int row) {
             return (Asset) data.get(row);
         }
@@ -288,9 +292,7 @@ public class ManageAssetsDialog extends JDialog {
 
         public class Renderer extends DefaultTableCellRenderer {
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus,
-                    int row, int column) {
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setOpaque(true);
                 int actualCol = table.convertColumnIndexToModel(column);

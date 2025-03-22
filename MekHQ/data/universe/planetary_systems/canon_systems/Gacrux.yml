@@ -3,9 +3,11 @@ sucsId: 914
 xcood: -86.503
 ycood: 10.72
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: M4III
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2390-12-27'
     nadirCharge: yes
@@ -50,28 +52,32 @@ planet:
       value: Gacrux
     type: TERRESTRIAL
     orbitalDist: 0.12
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green55
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.87
-    diameter: 10473
-    density: 5.818685880442
+    diameter: 10490
+    density: 5.828273204797
     dayLength: 25
     yearLength: 0.5
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 33
     water:
-      source: canon
+      source: MWDA world profiles
       value: 24
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: |-
       3135 - Gacrux, is a world in a state of decline, cooling as the warmth of its star, a red giant in its final years, fades with each passing century. Colonists were drawn to Gacrux by its abundance of precious metals, industrial ores, and radioactive materials, establishing several mining and manufacturing operations. Most of these settlements were established on the shores of Praddis and Umberholdt, the planet's two large, landlocked, freshwater oceans. Fort Habersburg, the capital city, is located on the southern coast of Praddis. Gacrux prospered as an industrial world but lacked sufficient resources to feed a booming population.
@@ -83,13 +89,17 @@ planet:
       At the dawn the thirty-second century, a surgical strike from the Lyran Commonwealth apparently destroyed the secret Brotherhood of Cincinnatus base on planet. Devlin Stone‘s relocation programs and efforts to rebuild the cities and complexes destroyed during the Jihad, have made Gacrux a thriving member of The Republic of the Sphere.
     landmass:
       - capital:
-          source: canon
+          source: MWDA world profiles
           value: Fort Habersburg
     satellite:
-      - name: Macera
+      - name:
+          source: MWDA world profiles
+          value: Macera
         size: medium
         icon: oddmoon2
-      - name: Worsca
+      - name:
+          source: MWDA world profiles
+          value: Worsca
         size: large
         icon: rock15
     event:

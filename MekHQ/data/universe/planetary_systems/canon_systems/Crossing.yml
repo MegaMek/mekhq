@@ -3,9 +3,11 @@ sucsId: 627
 xcood: 253.313
 ycood: 47.262
 spectralType:
-  source: canon
+  source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
   value: G4V
-primarySlot: 4
+primarySlot:
+  source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
+  value: 4
 event:
   - date: '2377-07-14'
     zenithCharge: yes
@@ -61,28 +63,32 @@ planet:
       value: Crossing
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 4
+    sysPos:
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
+      value: 4
     icon: wet4
     pressure:
-      source: canon
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
       value: STANDARD
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
       value: 0.99
-    diameter: 16021
-    density: 4.330127018922
+    diameter: 16044
+    density: 4.336371442947
     dayLength: 11
     yearLength: 1.1
     temperature:
-      source: canon
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
       value: 37
     water:
-      source: canon
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
       value: 78
     lifeForm:
-      source: canon
+      source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
       value: INSECT
     desc: |-
       3028 - Crossing is a vital defensive planet along the Federated Suns and Draconis Combine border and the planet’s name has proven to be exceptionally fitting since it has been used for centuries as a waystation for troops and supplies moving through the Draconis March. The planet saw so much use as a logistical lynchpin that almost the entire southern continent of Charon was reserved as a military reservation for supplies and rest and recreation facilities for the AFFS.
@@ -94,25 +100,33 @@ planet:
       A large portion of the population on Crossing is made up of retired AFFS veterans and their families, with the cities of Crassus and New Rhodes made up almost entirely of retired personnel.
     landmass:
       - name:
-          source: canon
+          source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
           value: Charon
       - name:
-          source: canon
+          source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
           value: Ganse
         capital:
-          source: canon
+          source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
           value: Averrant City
     satellite:
-      - name: Journeyman
+      - name:
+          source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
+          value: Journeyman
         size: medium
         icon: rock17
-      - name: Scope
+      - name:
+          source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
+          value: Scope
         size: medium
         icon: rock10
-      - name: Trinket
+      - name:
+          source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
+          value: Trinket
         size: medium
         icon: rock15
-      - name: Wayfarer
+      - name:
+          source: 'Operational Turning Points: Death to Mercenaries, pg. 4'
+          value: Wayfarer
         size: medium
         icon: rock1
     event:

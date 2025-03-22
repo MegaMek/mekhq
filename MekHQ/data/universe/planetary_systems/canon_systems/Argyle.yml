@@ -3,9 +3,11 @@ sucsId: 171
 xcood: 255.384
 ycood: -109.174
 spectralType:
-  source: canon
+  source: 'Handbook: House Davion, pg. 93'
   value: K3IV
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Davion, pg. 93'
+  value: 3
 event:
   - date: '2351-09-22'
     nadirCharge: yes
@@ -47,28 +49,32 @@ planet:
       value: Argyle
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Davion, pg. 93'
+      value: 3
     icon: green29
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 93'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 93'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 93'
       value: 1.0
-    diameter: 12222
-    density: 5.743316121699
+    diameter: 12229
+    density: 5.746634708038
     dayLength: 21
     yearLength: 1.0
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 93'
       value: 33
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 93'
       value: 74
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 93'
       value: MAMMAL
     desc: Argyle is a comfortable temperate world with large tracts of arable land.
       Despite being a breadbasket planet, Argyle also possesses an enviable amount
@@ -79,19 +85,27 @@ planet:
       from New Avalon and other nearby worlds, including the Davion family.
     landmass:
       - capital:
-          source: canon
+          source: 'Handbook: House Davion, pg. 93'
           value: Stirling
     satellite:
-      - name: Aisillik
+      - name:
+          source: 'Handbook: House Davion, pg. 93'
+          value: Aisillik
         size: large
         icon: rock17
-      - name: Corey
+      - name:
+          source: 'Handbook: House Davion, pg. 93'
+          value: Corey
         size: large
         icon: rock8
-      - name: Jamis
+      - name:
+          source: 'Handbook: House Davion, pg. 93'
+          value: Jamis
         size: large
         icon: rock7
-      - name: Stiggin's Moon
+      - name:
+          source: 'Handbook: House Davion, pg. 93'
+          value: Stiggin's Moon
         size: medium
         icon: oddmoon1
     event:

@@ -1,24 +1,32 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.nagDialogs.UnmaintainedUnitsNagDialog;
@@ -38,8 +46,6 @@ import static org.mockito.Mockito.when;
  * It tests the different combinations of unit states and verifies the behavior of the {@code checkHanger()} method.
  */
 class UnmaintainedUnitsNagLogicTest {
-    // Mock objects for the tests
-    private Campaign campaign;
     private Hangar hangar;
     private Unit mockUnit1, mockUnit2;
 
@@ -50,13 +56,9 @@ class UnmaintainedUnitsNagLogicTest {
     @BeforeEach
     void init() {
         // Initialize the mock objects
-        campaign = mock(Campaign.class);
-        hangar = mock(Hangar.class);
+        // Mock objects for the tests
         mockUnit1 = mock(Unit.class);
         mockUnit2 = mock(Unit.class);
-
-        // When the Campaign mock calls 'getHangar()' return the 'hangar' mock
-        when(campaign.getHangar()).thenReturn(hangar);
     }
 
     /**
@@ -74,9 +76,6 @@ class UnmaintainedUnitsNagLogicTest {
 
         when(mockUnit2.isUnmaintained()).thenReturn(unit2Unmaintained);
         when(mockUnit2.isSalvage()).thenReturn(unit2Salvage);
-
-        List<Unit> units = List.of(mockUnit1, mockUnit2);
-        when(hangar.getUnits()).thenReturn(units);
     }
 
     // In the following tests the checkHanger() method is called, and its response is checked
@@ -85,60 +84,60 @@ class UnmaintainedUnitsNagLogicTest {
     @Test
     void unmaintainedUnitExistsUnit1() {
         initializeUnits(true, false, false, false);
-        assertTrue(campaignHasUnmaintainedUnits(campaign));
+        assertTrue(campaignHasUnmaintainedUnits(List.of(mockUnit1, mockUnit2)));
     }
 
     @Test
     void unmaintainedUnitExistsUnit2() {
         initializeUnits(false, false, true, false);
-        assertTrue(campaignHasUnmaintainedUnits(campaign));
+        assertTrue(campaignHasUnmaintainedUnits(List.of(mockUnit1, mockUnit2)));
     }
 
     @Test
     void unmaintainedUnitExistsButSalvageUnit1() {
         initializeUnits(true, true, true, false);
-        assertTrue(campaignHasUnmaintainedUnits(campaign));
+        assertTrue(campaignHasUnmaintainedUnits(List.of(mockUnit1, mockUnit2)));
     }
 
     @Test
     void unmaintainedUnitExistsButSalvageUnit2() {
         initializeUnits(true, false, true, true);
-        assertTrue(campaignHasUnmaintainedUnits(campaign));
+        assertTrue(campaignHasUnmaintainedUnits(List.of(mockUnit1, mockUnit2)));
     }
 
     @Test
     void unmaintainedUnitExistsButSalvageMixed() {
         initializeUnits(false, true, true, false);
-        assertTrue(campaignHasUnmaintainedUnits(campaign));
+        assertTrue(campaignHasUnmaintainedUnits(List.of(mockUnit1, mockUnit2)));
     }
 
     @Test
     void noUnmaintainedUnitExistsNoSalvage() {
         initializeUnits(false, false, false, false);
-        assertFalse(campaignHasUnmaintainedUnits(campaign));
+        assertFalse(campaignHasUnmaintainedUnits(List.of(mockUnit1, mockUnit2)));
     }
 
     @Test
     void noUnmaintainedUnitExistsAllSalvage() {
         initializeUnits(false, true, false, true);
-        assertFalse(campaignHasUnmaintainedUnits(campaign));
+        assertFalse(campaignHasUnmaintainedUnits(List.of(mockUnit1, mockUnit2)));
     }
 
     @Test
     void noUnmaintainedUnitExistsButSalvageUnit1() {
         initializeUnits(false, true, false, false);
-        assertFalse(campaignHasUnmaintainedUnits(campaign));
+        assertFalse(campaignHasUnmaintainedUnits(List.of(mockUnit1, mockUnit2)));
     }
 
     @Test
     void noUnmaintainedUnitExistsButSalvageUnit2() {
         initializeUnits(false, false, false, true);
-        assertFalse(campaignHasUnmaintainedUnits(campaign));
+        assertFalse(campaignHasUnmaintainedUnits(List.of(mockUnit1, mockUnit2)));
     }
 
     @Test
     void noUnmaintainedUnitExistsButSalvageMixed() {
         initializeUnits(false, true, false, false);
-        assertFalse(campaignHasUnmaintainedUnits(campaign));
+        assertFalse(campaignHasUnmaintainedUnits(List.of(mockUnit1, mockUnit2)));
     }
 }

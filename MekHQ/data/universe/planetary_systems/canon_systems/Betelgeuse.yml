@@ -5,7 +5,9 @@ ycood: -306.903
 spectralType:
   source: canon
   value: M2Ib
-primarySlot: 2
+primarySlot:
+  source: 'Objective Raids: Capellan Confederation'
+  value: 2
 event:
   - date: '2715-07-30'
     zenithCharge: yes
@@ -35,28 +37,32 @@ planet:
       value: Betelgeuse
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 2
+    sysPos:
+      source: 'Objective Raids: Capellan Confederation'
+      value: 2
     icon: green38
     pressure:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Objective Raids: Capellan Confederation'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 0.95
-    diameter: 13714
-    density: 4.864445296556
+    diameter: 13719
+    density: 4.866309901021
     dayLength: 24
     yearLength: 0.6
     temperature:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 35
     water:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: 43
     lifeForm:
-      source: canon
+      source: 'Objective Raids: Capellan Confederation'
       value: AMPHIBIAN
     desc: |-
       Betelgeuse is on the rimward flank of the Capellan Confederation. The Free World League has fought many battles in its attempts to capture it from the Confederation. The planet has a Mech production center and the northern hemisphere houses over 20 factory complexes that produce over 30 percent of all consumer and luxury goods in the entire Confederation. The planet is an important major source of manpower. Betelgeuse is home to the fanatically devoted Warrior House Kamata regiment who are willing to defend their planet to the last warrior.
@@ -64,13 +70,13 @@ planet:
       Betelgeuse has ample natural resources and a high level of industry, including BattleMechs, combat vehicles and heavy weaponry. The planet is home to Alddis Industries, located in the city of Kingston on the Bulwark continent, and produces combat vehicles. Firmir Weaponry is also located in Kingston and creates laser weaponry for 'Mechs and vehicles. Finally, Hellespont Industrials is also located in Kingston and produces the venerable UrbanMech for the Confederation. During the Word of Blake Jihad, several primitive 'Mech lines were opened as well. The planet is also home to one of the Confederation's many Duchy RTC training facilities, located in the hills of the Ecchi continent, the facilities train infantry, vehicle crews and aerospace pilots.
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Bulwark
         capital:
-          source: canon
-          value: Bidan
+          source: 'Objective Raids: Capellan Confederation'
+          value: Kingston
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: Ecchi
     event:
       - date: '2603-12-15'

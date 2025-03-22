@@ -1,22 +1,33 @@
 /*
- * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.randomEvents.prisoners.enums;
+
+import megamek.logging.MMLogger;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -98,6 +109,42 @@ public enum PrisonerCaptureStyle {
         return this == MEKHQ;
     }
     //endregion Boolean Comparison Methods
+
+    // region File I/O
+    /**
+     * Converts the specified string into its corresponding {@link PrisonerCaptureStyle} enum value.
+     * The method attempts to interpret the string as either the name of an enum constant or an
+     * ordinal value of the enum. If the conversion fails, the method logs an error and returns the
+     * default value {@code NONE}.
+     *
+     * @param text the string to be converted into a {@link PrisonerCaptureStyle} enum value. It can
+     *            be the name of the enum constant or its ordinal value as a string.
+     * @return the corresponding {@link PrisonerCaptureStyle} enum constant if the string matches a
+     * name or ordinal value, otherwise {@code NONE}.
+     */
+    public static PrisonerCaptureStyle fromString(String text) {
+        MMLogger logger = MMLogger.create(PrisonerCaptureStyle.class);
+
+        try {
+            return PrisonerCaptureStyle.valueOf(text.toUpperCase().replace(" ", "_"));
+        } catch (Exception ignored) {}
+
+        try {
+            return PrisonerCaptureStyle.values()[Integer.parseInt(text)];
+        } catch (Exception ignored) {}
+
+        // <50.04 compatibility handler
+        if (text.equalsIgnoreCase("ATB") || text.equalsIgnoreCase("TAHARQA")) {
+            // We return NONE here as both CAMPAIGN_OPERATIONS and MEKHQ are significant departures
+            // from either legacy option.
+            logger.info("Legacy PrisonerCaptureStyle ordinal: {} - returning {}.", text, NONE);
+            return NONE;
+        }
+
+        logger.error("Unknown PrisonerCaptureStyle ordinal: {} - returning {}.", text, NONE);
+
+        return NONE;
+    }
 
     /**
      * Converts the capture style to a localized label for display.

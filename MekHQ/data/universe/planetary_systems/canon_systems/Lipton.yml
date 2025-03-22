@@ -3,9 +3,11 @@ sucsId: 1499
 xcood: -33.864
 ycood: 6.414
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G5V
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2351-04-02'
     nadirCharge: yes
@@ -48,28 +50,32 @@ planet:
       value: Lipton
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: wet8
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.01
-    diameter: 12887
-    density: 5.531712079937
+    diameter: 12859
+    density: 5.519731174676
     dayLength: 21
     yearLength: 1.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 37
     water:
-      source: canon
+      source: MWDA world profiles
       value: 82
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: BIRD
     desc: |-
       3135 - Lipton is a quiet planet of varied landscapes, lush temperate zones, and adequate resources to support low-level industry. Lipton's early settlers were a mix of western European and North American peoples who came to enjoy their frontier life and trade with neighboring worlds. Lipton achieved self-sufficiency quickly, and became a prosperous planet. The greatest planetary export is textiles, with Redstorm Fashions Incorporated among the largest single corporations invested here. The capital of Lipton City, located on the Eastern World continent, is not home to the primary spaceport on planet. The interplanetary/suborbital traffic hub of Brannigan Field is located on Suresta, Lipton‘s equatorial island-continent, which offers connecting flights to points on the Noresta, Western and Eastern World continents.
@@ -79,22 +85,24 @@ planet:
       The Jihad saw Word of Blake mercenaries raid the planet, smashing several industrial and strategic targets, including the military base at Estoria City, former headquarters of the Fourth Alliance Guards, on the Western World continent, and the planetary capital of Lipton City. The raids temporarily disrupted trade. An economic depression took hold that lasted until Lipton was ceded to the Republic of the Sphere. Lipton has returned to being the quiet, industrious world, though it is still regarded as something of a backwater.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Eastern World
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Lipton City
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Noresta
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Suresta
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Western World
     satellite:
-      - name: Kito
+      - name:
+          source: MWDA world profiles
+          value: Kito
         size: medium
         icon: rock16
     event:

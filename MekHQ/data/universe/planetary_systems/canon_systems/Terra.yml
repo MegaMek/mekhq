@@ -3,9 +3,11 @@ sucsId: 2370
 xcood: 0.0
 ycood: 0.0
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 220
   value: G2V
-primarySlot: 3
+primarySlot:
+  source: Masters and Minions, pg. 220
+  value: 3
 event:
   - date: '2367-11-21'
     zenithCharge: yes
@@ -62,24 +64,24 @@ planet:
           value: Aphros
     event:
       - date: '2205-04-16'
-        atmosphere:
-          source: canon
-          value: BREATHABLE
-        dayLength:
-          source: canon
-          value: 48
         faction:
           - TA
         population: 10072.0
+        atmosphere:
+          source: canon
+          value: BREATHABLE
         pressure:
           source: canon
           value: STANDARD
-        temperature:
-          source: canon
-          value: 40
         water:
           source: canon
           value: 30
+        temperature:
+          source: canon
+          value: 40
+        dayLength:
+          source: canon
+          value: 48
       - date: '2210-01-01'
         population: 19256.0
       - date: '2220-01-01'
@@ -249,10 +251,10 @@ planet:
       - date: '2940-01-01'
         population: 220179.0
       - date: '2950-10-28'
+        population: 148298.0
         atmosphere:
           source: canon
           value: TOXICPOISON
-        population: 148298.0
         pressure:
           source: canon
           value: VERY_HIGH
@@ -290,27 +292,27 @@ planet:
       value: TERRESTRIAL
     orbitalDist: 1.0
     sysPos:
-      source: canon
+      source: Masters and Minions, pg. 220
       value: 3
     icon: earth
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 220
       value: STANDARD
     atmosphere:
-      source: canon
+      source: Masters and Minions, pg. 220
       value: BREATHABLE
     composition:
       source: canon
       value: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 220
       value: 1.0
     diameter:
       source: canon
-      value: 12742
+      value: 12744
     density:
       source: canon
-      value: 5.514
+      value: 5.514649961693
     dayLength:
       source: canon
       value: 24
@@ -318,13 +320,13 @@ planet:
       source: canon
       value: 1.0
     temperature:
-      source: canon
-      value: 31
+      source: Technology of Destruction, pg. po
+      value: 30
     water:
-      source: canon
-      value: 71
+      source: Technology of Destruction, pg. po
+      value: 75
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 220
       value: MAMMAL
     desc: |-
       The birthplace of humanity, Terra (or Earth), remains a leader in industry and technology over the rest of the Inner Sphere. Terra was the seat of power for the Terran Alliance and then later the Terran Hegemony and by extension the Star League.
@@ -340,37 +342,35 @@ planet:
       In addition to Terra herself, colonies exist on the Terran lunar surface, and the fourth planet in the system, Mars. At the peak of the Star League, settlements also existed on Venus, the second world, and a major shipyard was placed orbiting Titan, a moon of the gas giant Saturn, but both of these worlds are once more void of human habitation. Venus gradually reverted to its hellish environment after the fall of the League, becoming totally uninhabitable once again by the close of the thirty-first century, and the Titan shipyards were destroyed during the Jihad. The capital cities of Luna and Mars are Luna City and Koryo, respectively, though Koryo was heavily damaged in the final days of the Word of Blake‘s reign.
     landmass:
       - name:
-          source: canon
-          value: Asia
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Africa
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Antarctica
       - name:
-          source: canon
+          source: MWDA world profiles
+          value: Asia
+      - name:
+          source: MWDA world profiles
           value: Australia
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Europe
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Geneva
       - name:
-          source: canon
+          source: MWDA world profiles
           value: North America
       - name:
-          source: canon
+          source: MWDA world profiles
           value: South America
     satellite:
       - name:
-          source: canon
-          value: Luna (Luna City)
-        size:
-          source: canon
-          value: large
-        icon: rock16
+          source: Masters and Minions, pg. 220
+          value: Luna
+        size: medium
+        icon: rock6
     event:
       - date: '2086-10-31'
         faction:
@@ -702,12 +702,12 @@ planet:
           value: Koryo
     event:
       - date: '2201-10-11'
-        atmosphere:
-          source: canon
-          value: BREATHABLE
         faction:
           - TA
         population: 10282.0
+        atmosphere:
+          source: canon
+          value: BREATHABLE
         pressure: THIN
         water:
           source: canon

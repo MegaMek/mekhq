@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.dialog.nagDialogs;
 
@@ -56,23 +65,25 @@ public class DeploymentShortfallNagDialog extends AbstractMHQNagDialog {
     }
 
     /**
-     * Checks if a nag dialog should be displayed for a campaign regarding deployment shortfalls.
+     * Determines whether a nag dialog should be displayed for deployment shortfalls in the specified campaign.
      *
-     * <p>The method determines whether to show the nag dialog by verifying the following conditions:</p>
+     * <p>This method evaluates several conditions to decide if the nag dialog should be shown:</p>
      * <ul>
-     *     <li>If the campaign is using AtB rules.</li>
-     *     <li>If the nag dialog for deployment shortfall has not been ignored as per the user options.</li>
-     *     <li>If there is a deployment shortfall in the given campaign.</li>
+     *     <li>The campaign uses AtB (Against the Bot) rules.</li>
+     *     <li>The user has not ignored the nag dialog for deployment shortfalls in their options.</li>
+     *     <li>The campaign has a deployment shortfall, as determined by {@code #hasDeploymentShortfall}.</li>
      * </ul>
      *
-     * @param campaign the {@link Campaign} to check for nagging conditions
-     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
+     * @param isUseAtB A flag indicating whether the campaign is using AtB rules.
+     * @param campaign The {@link Campaign} object used to check for deployment shortfalls.
+     *
+     * @return {@code true} if the nag dialog should be displayed due to deployment shortfalls; {@code false} otherwise.
      */
-    static public boolean checkNag(Campaign campaign) {
+    public static boolean checkNag(boolean isUseAtB, Campaign campaign) {
         final String NAG_KEY = MHQConstants.NAG_SHORT_DEPLOYMENT;
 
-        return campaign.getCampaignOptions().isUseAtB()
-            && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && hasDeploymentShortfall(campaign);
+        return isUseAtB
+              && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+              && hasDeploymentShortfall(campaign);
     }
 }

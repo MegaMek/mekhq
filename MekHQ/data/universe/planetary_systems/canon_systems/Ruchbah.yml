@@ -3,37 +3,43 @@ sucsId: 2187
 xcood: 57.383
 ycood: -22.794
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F0VI
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 planet:
   - name:
       source: canon
       value: Ruchbah
     type: TERRESTRIAL
     orbitalDist: 4.48
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: green7
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.1
-    diameter: 13714
-    density: 5.632515606538
+    diameter: 13719
+    density: 5.634674622235
     dayLength: 20
     yearLength: 9.6
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 25
     water:
-      source: canon
+      source: MWDA world profiles
       value: 40
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       Ruchbah‘s surface is dominated by a single landmass and dotted with inland seas. Most of this landmass consists of rolling grasslands, hills, and tundra, ideal for grazing animals. Lit by a small subdwarf star, Ruchbah is a relatively cool world and its higher latitudes suffer bitterly cold winters, forcing both domesticated and wild herds to migrate annually. Because so much of its population follows the animal herds, the population of Ruchbah‘s capital, Rook, and other towns varies widely depending on the season.
@@ -48,7 +54,7 @@ planet:
     smallMoons: 6
     landmass:
       - capital:
-          source: canon
+          source: MWDA world profiles
           value: Rook
     event:
       - date: '2177-08-27'

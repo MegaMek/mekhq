@@ -1,34 +1,41 @@
 /*
- * RandomSkillPreferences.java
- *
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign;
-
-import java.io.PrintWriter;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
 
 /**
  * @author Jay Lawson
@@ -44,7 +51,7 @@ public class RandomSkillPreferences {
     private int[] specialAbilityBonus;
     private int combatSmallArmsBonus;
     private int supportSmallArmsBonus;
-    private int[] tacticsMod;
+    private int[] commandSkillsModifier;
     private int artilleryProb;
     private int artilleryBonus;
     private int secondSkillProb;
@@ -59,7 +66,7 @@ public class RandomSkillPreferences {
         combatSmallArmsBonus = -3;
         supportSmallArmsBonus = -10;
         specialAbilityBonus = new int[] { -10, -10, -2, 0, 1 };
-        tacticsMod = new int[] { -10, -10, -7, -4, -1 };
+        commandSkillsModifier = new int[] { -10, -10, -7, -4, -1 };
         artilleryProb = 10;
         artilleryBonus = -2;
         secondSkillProb = 0;
@@ -136,13 +143,13 @@ public class RandomSkillPreferences {
         supportSmallArmsBonus = b;
     }
 
-    public int getTacticsMod(int lvl) {
-        return tacticsMod[lvl];
+    public int getCommandSkillsModifier(int lvl) {
+        return commandSkillsModifier[lvl];
     }
 
-    public void setTacticsMod(int lvl, int bonus) {
-        if (lvl < tacticsMod.length) {
-            tacticsMod[lvl] = bonus;
+    public void setCommandSkillsMod(int lvl, int bonus) {
+        if (lvl < commandSkillsModifier.length) {
+            commandSkillsModifier[lvl] = bonus;
         }
     }
 
@@ -183,7 +190,7 @@ public class RandomSkillPreferences {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overallRecruitBonus", overallRecruitBonus);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "recruitBonuses", recruitBonuses);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "specialAbilityBonus", specialAbilityBonus);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tacticsMod", tacticsMod);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandSkillsModifier", commandSkillsModifier);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeSkill", randomizeSkill);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanBonuses", useClanBonuses);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "antiMekProb", antiMekProb);
@@ -240,10 +247,12 @@ public class RandomSkillPreferences {
                     for (int i = 0; i < values.length; i++) {
                         retVal.recruitBonuses[i] = Integer.parseInt(values[i]);
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("tacticsMod")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("commandSkillsModifier")
+                      // <50.04 compatibility handler
+                      || wn2.getNodeName().equalsIgnoreCase("tacticsMod")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
-                        retVal.tacticsMod[i] = Integer.parseInt(values[i]);
+                        retVal.commandSkillsModifier[i] = Integer.parseInt(values[i]);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("specialAbilityBonus")) {
                     String[] values = wn2.getTextContent().split(",");

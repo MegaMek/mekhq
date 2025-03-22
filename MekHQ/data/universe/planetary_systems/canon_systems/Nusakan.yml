@@ -3,9 +3,11 @@ sucsId: 1913
 xcood: -34.772
 ycood: 43.29
 spectralType:
-  source: canon
+  source: Star League, pg. 175
   value: K0V
-primarySlot: 3
+primarySlot:
+  source: Star League, pg. 175
+  value: 3
 event:
   - date: '2353-10-17'
     zenithCharge: yes
@@ -59,28 +61,32 @@ planet:
       value: Nusakan
     type: TERRESTRIAL
     orbitalDist: 0.8
-    sysPos: 3
+    sysPos:
+      source: Star League, pg. 175
+      value: 3
     icon: green22
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.08
-    diameter: 15123
-    density: 5.041008302501
+    diameter: 15090
+    density: 5.029849361948
     dayLength: 27
     yearLength: 1.1
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 27
     water:
-      source: canon
+      source: MWDA world profiles
       value: 42
     lifeForm:
-      source: canon
+      source: Star League, pg. 175
       value: AMPHIBIAN
     desc: |-
       3135 - High-grade silicon and other minerals valuable to the electronics industry made the dim, cool world of Nusakan a natural center for the computer and electronics trades, despite its low water supply and the inhospitality of its northern and southern tundra. By the time of the Star League, this planet—jointly administered by the Lyran Commonwealth and the Terran Hegemony—was a heavily industrialized world, with such major corporations as Interstellar Business Computers and Pottor Light Computers claiming headquarters in the heart of its sprawling cities. Three Castles Brian were erected on the surface, along with twice as many military bases and spaceports, to secure these important assets against any aggressor.
@@ -92,19 +98,25 @@ planet:
       Today, Nusakan is home to a thriving population and reborn computer and electronics industries. Lenzo Computing Industries, one of the biggest computer manufacturers to develop in the post-Jihad era, has headquarters in Dularam City. Though widely known as a major producer of personal computers, LCI is currently in the middle of a massive diversification that could transform it into one of the biggest manufacturing corporations in the Inner Sphere, and it has already added military-grade electronics, including BattleMech and DropShip sensor gear, to its impressive list of quality products.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Katamoros
         capital:
-          source: canon
-          value: Havana
+          source: Star League, pg. 175
+          value: Jobs City
     satellite:
-      - name: Harsholdt
+      - name:
+          source: MWDA world profiles
+          value: Harsholdt
         size: medium
         icon: rock13
-      - name: Niki
+      - name:
+          source: MWDA world profiles
+          value: Niki
         size: large
         icon: rock9
-      - name: Xanthe
+      - name:
+          source: MWDA world profiles
+          value: Xanthe
         size: large
         icon: rock6
     event:

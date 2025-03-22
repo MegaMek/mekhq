@@ -5,7 +5,9 @@ ycood: -377.374
 spectralType:
   source: canon
   value: G2V
-primarySlot: 3
+primarySlot:
+  source: Periphery (1ed), pg. 86
+  value: 3
 event:
   - date: '2402-08-12'
     zenithCharge: yes
@@ -52,7 +54,9 @@ planet:
       value: New Ganymede
     type: TERRESTRIAL
     orbitalDist: 1.0
-    sysPos: 3
+    sysPos:
+      source: Periphery (1ed), pg. 86
+      value: 3
     icon: dry18
     pressure:
       source: canon
@@ -71,7 +75,7 @@ planet:
       source: canon
       value: 15
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 86
       value: MAMMAL
     desc: New Ganymede is a barren desert world deep inside the Tuarian Concordat.
       The barren terrain is almost constantly swept by high winds which bring massive

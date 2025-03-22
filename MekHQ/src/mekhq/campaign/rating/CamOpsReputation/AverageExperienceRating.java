@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
- * MegaMek is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
- * MegaMek is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
@@ -85,25 +94,6 @@ public class AverageExperienceRating {
             modifier);
 
         return modifier;
-    }
-
-    /**
-     * Calculates a modifier for Against the Bot's various systems, based on the
-     * average skill level.
-     *
-     * @param campaign the campaign from which to calculate the ATB modifier
-     * @return the ATB modifier as an integer value
-     */
-    public static int getAtBModifier(Campaign campaign) {
-        SkillLevel averageSkillLevel = getSkillLevel(campaign, false);
-
-        return switch (averageSkillLevel) {
-            case NONE, ULTRA_GREEN -> 0;
-            case GREEN -> 1;
-            case REGULAR -> 2;
-            case VETERAN -> 3;
-            case ELITE, HEROIC, LEGENDARY -> 4;
-        };
     }
 
     /**

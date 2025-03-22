@@ -5,7 +5,9 @@ ycood: -176.369
 spectralType:
   source: canon
   value: A3III
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Davion, pg. 97'
+  value: 4
 event:
   - date: '2733-08-06'
     zenithCharge: yes
@@ -79,28 +81,32 @@ planet:
       value: Sabanillas
     type: GIANT_TERRESTRIAL
     orbitalDist: 12.48
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Davion, pg. 97'
+      value: 4
     icon: green23
     pressure:
-      source: canon
+      source: 'Handbook: House Davion, pg. 97'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 97'
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 97'
       value: 1.12
-    diameter: 20871
-    density: 3.794733192202
+    diameter: 20806
+    density: 3.782956748652
     dayLength: 18
     yearLength: 44.1
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 97'
       value: 11
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 97'
       value: 26
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 97'
       value: MICROBE
     desc: |-
       Sabanillas is yet another Federated Suns outback, lowly populated, with low industry and low technology, the planet’s economy is primarily supported by mining of rare metals, minerals and gems as well as a plentiful supply of more common ores. The planet itself is mostly lifeless and barely able to sustain any life, the human population relies substantially on imported goods. The world is almost entirely inhabited by miners and their families and has been that way for generations. Due primarily to a lack of interest in living there otherwise. However, a little known slogan for Sabanillas is “anything goes”. While the mining companies don’t pay well and the planet is not a comfortable planet to live on, they make sure the employees and their families are happy thanks to a constant supply of imported goods and other services that would be illegal on most planets.
@@ -121,13 +127,19 @@ planet:
       - name: Bebedero
       - name: New Copey
     satellite:
-      - name: Alejandro’s Moon
+      - name:
+          source: 'Handbook: House Davion, pg. 97'
+          value: Alejandro's Moon
         size: medium
         icon: rock7
-      - name: Coronado
+      - name:
+          source: 'Handbook: House Davion, pg. 97'
+          value: Coronado
         size: giant
         icon: rock12
-      - name: Prostitute Rock
+      - name:
+          source: 'Handbook: House Davion, pg. 97'
+          value: Prostitute Rock
         size: large
         icon: rock6
     event:

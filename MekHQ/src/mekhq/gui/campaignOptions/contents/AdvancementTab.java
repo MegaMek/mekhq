@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.campaignOptions.contents;
 
@@ -112,14 +121,14 @@ public class AdvancementTab {
     private JPanel pnlSkillGroups;
 
     private JPanel pnlTactics;
-    private JLabel lblTacticsGreen;
-    private JSpinner spnTacticsGreen;
-    private JLabel lblTacticsReg;
-    private JSpinner spnTacticsReg;
-    private JLabel lblTacticsVet;
-    private JSpinner spnTacticsVet;
-    private JLabel lblTacticsElite;
-    private JSpinner spnTacticsElite;
+    private JLabel lblCommandSkillsGreen;
+    private JSpinner spnCommandSkillsGreen;
+    private JLabel lblCommandSkillsReg;
+    private JSpinner spnCommandSkillsReg;
+    private JLabel lblCommandSkillsVet;
+    private JSpinner spnCommandSkillsVet;
+    private JLabel lblCommandSkillsElite;
+    private JSpinner spnCommandSkillsElite;
 
     private JPanel pnlSmallArms;
     private JLabel lblCombatSA;
@@ -508,14 +517,14 @@ public class AdvancementTab {
         pnlSkillGroups = new JPanel();
 
         pnlTactics = new JPanel();
-        lblTacticsGreen = new JLabel();
-        spnTacticsGreen = new JSpinner();
-        lblTacticsReg = new JLabel();
-        spnTacticsReg = new JSpinner();
-        lblTacticsVet = new JLabel();
-        spnTacticsVet = new JSpinner();
-        lblTacticsElite = new JLabel();
-        spnTacticsElite = new JSpinner();
+        lblCommandSkillsGreen = new JLabel();
+        spnCommandSkillsGreen = new JSpinner();
+        lblCommandSkillsReg = new JLabel();
+        spnCommandSkillsReg = new JSpinner();
+        lblCommandSkillsVet = new JLabel();
+        spnCommandSkillsVet = new JSpinner();
+        lblCommandSkillsElite = new JLabel();
+        spnCommandSkillsElite = new JSpinner();
 
         pnlSmallArms = new JPanel();
         lblCombatSA = new JLabel();
@@ -729,46 +738,46 @@ public class AdvancementTab {
      */
     private JPanel createTacticsPanel() {
         // Contents
-        lblTacticsGreen = new CampaignOptionsLabel("TacticsGreen");
-        spnTacticsGreen = new CampaignOptionsSpinner("TacticsGreen",
+        lblCommandSkillsGreen = new CampaignOptionsLabel("CommandSkillsGreen");
+        spnCommandSkillsGreen = new CampaignOptionsSpinner("CommandSkillsGreen",
             0, -10, 10, 1);
 
-        lblTacticsReg = new CampaignOptionsLabel("TacticsRegular");
-        spnTacticsReg = new CampaignOptionsSpinner("TacticsRegular",
+        lblCommandSkillsReg = new CampaignOptionsLabel("CommandSkillsRegular");
+        spnCommandSkillsReg = new CampaignOptionsSpinner("CommandSkillsRegular",
             0, -10, 10, 1);
 
-        lblTacticsVet = new CampaignOptionsLabel("TacticsVeteran");
-        spnTacticsVet = new CampaignOptionsSpinner("TacticsVeteran",
+        lblCommandSkillsVet = new CampaignOptionsLabel("CommandSkillsVeteran");
+        spnCommandSkillsVet = new CampaignOptionsSpinner("CommandSkillsVeteran",
             0, -10, 10, 1);
 
-        lblTacticsElite = new CampaignOptionsLabel("TacticsElite");
-        spnTacticsElite = new CampaignOptionsSpinner("TacticsElite",
+        lblCommandSkillsElite = new CampaignOptionsLabel("CommandSkillsElite");
+        spnCommandSkillsElite = new CampaignOptionsSpinner("CommandSkillsElite",
             0, -10, 10, 1);
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("TacticsPanel", true,
-            "TacticsPanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("CommandSkillsPanel", true,
+            "CommandSkillsPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
         layout.gridwidth = 1;
         layout.gridx = 0;
         layout.gridy = 0;
-        panel.add(lblTacticsGreen, layout);
+        panel.add(lblCommandSkillsGreen, layout);
         layout.gridx++;
-        panel.add(spnTacticsGreen, layout);
+        panel.add(spnCommandSkillsGreen, layout);
         layout.gridx++;
-        panel.add(lblTacticsReg, layout);
+        panel.add(lblCommandSkillsReg, layout);
         layout.gridx++;
-        panel.add(spnTacticsReg, layout);
+        panel.add(spnCommandSkillsReg, layout);
 
         layout.gridx = 0;
         layout.gridy++;
-        panel.add(lblTacticsVet, layout);
+        panel.add(lblCommandSkillsVet, layout);
         layout.gridx++;
-        panel.add(spnTacticsVet, layout);
+        panel.add(spnCommandSkillsVet, layout);
         layout.gridx++;
-        panel.add(lblTacticsElite, layout);
+        panel.add(lblCommandSkillsElite, layout);
         layout.gridx++;
-        panel.add(spnTacticsElite, layout);
+        panel.add(spnCommandSkillsElite, layout);
 
         return panel;
     }
@@ -818,7 +827,7 @@ public class AdvancementTab {
         // Contents
         lblArtyProb = new CampaignOptionsLabel("ArtilleryChance");
         spnArtyProb = new CampaignOptionsSpinner("ArtilleryChance",
-            0, -10, 10, 1);
+            0, 0, 100, 1);
 
         lblArtyBonus = new CampaignOptionsLabel("ArtilleryBonus");
         spnArtyBonus = new CampaignOptionsSpinner("ArtilleryBonus",
@@ -853,11 +862,11 @@ public class AdvancementTab {
         // Contents
         lblAntiMekSkill = new CampaignOptionsLabel("AntiMekChance");
         spnAntiMekSkill = new CampaignOptionsSpinner("AntiMekChance",
-            0, -10, 10, 1);
+            0, 0, 100, 1);
 
         lblSecondProb = new CampaignOptionsLabel("SecondarySkillChance");
         spnSecondProb = new CampaignOptionsSpinner("SecondarySkillChance",
-            0, -10, 10, 1);
+            0, 0, 100, 1);
 
         lblSecondBonus = new CampaignOptionsLabel("SecondarySkillBonus");
         spnSecondBonus = new CampaignOptionsSpinner("SecondarySkillBonus",
@@ -945,10 +954,10 @@ public class AdvancementTab {
         spnAbilityReg.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_REGULAR));
         spnAbilityVet.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_VETERAN));
         spnAbilityElite.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_ELITE));
-        spnTacticsGreen.setValue(skillPreferences.getTacticsMod(SkillType.EXP_GREEN));
-        spnTacticsReg.setValue(skillPreferences.getTacticsMod(SkillType.EXP_REGULAR));
-        spnTacticsVet.setValue(skillPreferences.getTacticsMod(SkillType.EXP_VETERAN));
-        spnTacticsElite.setValue(skillPreferences.getTacticsMod(SkillType.EXP_ELITE));
+        spnCommandSkillsGreen.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_GREEN));
+        spnCommandSkillsReg.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_REGULAR));
+        spnCommandSkillsVet.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_VETERAN));
+        spnCommandSkillsElite.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_ELITE));
         spnCombatSA.setValue(skillPreferences.getCombatSmallArmsBonus());
         spnSupportSA.setValue(skillPreferences.getSupportSmallArmsBonus());
         spnArtyProb.setValue(skillPreferences.getArtilleryProb());
@@ -1009,10 +1018,10 @@ public class AdvancementTab {
         skillPreferences.setArtilleryBonus((int) spnArtyBonus.getValue());
         skillPreferences.setSecondSkillProb((int) spnSecondProb.getValue());
         skillPreferences.setSecondSkillBonus((int) spnSecondBonus.getValue());
-        skillPreferences.setTacticsMod(SkillType.EXP_GREEN, (int) spnTacticsGreen.getValue());
-        skillPreferences.setTacticsMod(SkillType.EXP_REGULAR, (int) spnTacticsReg.getValue());
-        skillPreferences.setTacticsMod(SkillType.EXP_VETERAN, (int) spnTacticsVet.getValue());
-        skillPreferences.setTacticsMod(SkillType.EXP_ELITE, (int) spnTacticsElite.getValue());
+        skillPreferences.setCommandSkillsMod(SkillType.EXP_GREEN, (int) spnCommandSkillsGreen.getValue());
+        skillPreferences.setCommandSkillsMod(SkillType.EXP_REGULAR, (int) spnCommandSkillsReg.getValue());
+        skillPreferences.setCommandSkillsMod(SkillType.EXP_VETERAN, (int) spnCommandSkillsVet.getValue());
+        skillPreferences.setCommandSkillsMod(SkillType.EXP_ELITE, (int) spnCommandSkillsElite.getValue());
         skillPreferences.setCombatSmallArmsBonus((int) spnCombatSA.getValue());
         skillPreferences.setSupportSmallArmsBonus((int) spnSupportSA.getValue());
         skillPreferences.setSpecialAbilityBonus(SkillType.EXP_GREEN, (int) spnAbilityGreen.getValue());

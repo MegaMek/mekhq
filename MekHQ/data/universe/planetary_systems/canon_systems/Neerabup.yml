@@ -3,9 +3,11 @@ sucsId: 1805
 xcood: -339.188
 ycood: 333.668
 spectralType:
-  source: canon
+  source: 'Operational Turning Points: Falcon Incursion'
   value: G8V
-primarySlot: 5
+primarySlot:
+  source: 'Operational Turning Points: Falcon Incursion'
+  value: 5
 event:
   - date: '2701-07-15'
     zenithCharge: yes
@@ -78,28 +80,32 @@ planet:
       value: Neerabup
     type: TERRESTRIAL
     orbitalDist: 0.56
-    sysPos: 5
+    sysPos:
+      source: 'Operational Turning Points: Falcon Incursion'
+      value: 5
     icon: wet15
     pressure:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Operational Turning Points: Falcon Incursion'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: 1.04
-    diameter: 11319
-    density: 6.469330017676
+    diameter: 11308
+    density: 6.463171252299
     dayLength: 24
     yearLength: 1.0
     temperature:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: 41
     water:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: 85
     lifeForm:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: REPTILE
     desc: |-
       The original colonists of Neerabup were originally part of the settlers that founded the planet Australia, however the Neerabup colonists wanted to settle further from Terra, and after several near-fights broke out between the opposing groups, the soon-to-be Neerabup colonists managed to take control of two JumpShips and continue beyond Australia. Several weeks later they arrived at Neerabup with dwindling food supplies.
@@ -115,10 +121,14 @@ planet:
       - name: Powell
       - name: Nonoichi
     satellite:
-      - name: Dongara
+      - name:
+          source: 'Operational Turning Points: Falcon Incursion'
+          value: Dongara
         size: medium
         icon: rock7
-      - name: Freemantle
+      - name:
+          source: 'Operational Turning Points: Falcon Incursion'
+          value: Freemantle
         size: medium
         icon: rock15
     event:

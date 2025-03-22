@@ -3,9 +3,11 @@ sucsId: 1118
 xcood: 255.386
 ycood: -244.069
 spectralType:
-  source: canon
+  source: House Davion
   value: A1III
-primarySlot: 4
+primarySlot:
+  source: House Davion
+  value: 4
 planet:
   - name: Kumatani
     type: TERRESTRIAL
@@ -58,7 +60,9 @@ planet:
       value: Hobbs
     type: TERRESTRIAL
     orbitalDist: 14.04
-    sysPos: 4
+    sysPos:
+      source: House Davion
+      value: 4
     icon: green13
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -71,7 +75,7 @@ planet:
     temperature: 38
     water: 39
     lifeForm:
-      source: canon
+      source: House Davion
       value: MAMMAL
     desc: Hobbs is an extremely dry planet with nearly no surface water. As a result
       all the flora and fauna of Hobbs can only survive in underground cave systems
@@ -84,7 +88,7 @@ planet:
       caves.
     landmass:
       - capital:
-          source: canon
+          source: House Davion
           value: Luray Caverns
     event:
       - date: '2281-12-05'

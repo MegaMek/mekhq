@@ -3,9 +3,11 @@ sucsId: 2940
 xcood: -16.762
 ycood: 1804.928
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: G6III
-primarySlot: 2
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 2
 event:
   - date: '2808-06-24'
     nadirCharge: yes
@@ -42,28 +44,32 @@ planet:
       value: Delios
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 2
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 2
     icon: wet9
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
-      value: 0.92
-    diameter: 12724
-    density: 5.089429591384
+      source: Warriors of Kerensky, pg. 112
+      value: 0.9
+    diameter: 12575
+    density: 5.029761015219
     dayLength: 25
     yearLength: 2.0
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 30
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 80
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: REPTILE
     desc: No description available.
     landmass:

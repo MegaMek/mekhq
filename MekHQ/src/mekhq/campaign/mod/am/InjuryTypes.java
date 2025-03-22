@@ -1,28 +1,31 @@
 /*
- * Copyright (C) 2016 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.mod.am;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
 
 import megamek.common.Compute;
 import megamek.common.enums.Gender;
@@ -30,17 +33,16 @@ import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.GameEffect;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.MedicalLogEntry;
 import mekhq.campaign.log.MedicalLogger;
-import mekhq.campaign.personnel.BodyLocation;
-import mekhq.campaign.personnel.Injury;
-import mekhq.campaign.personnel.InjuryType;
-import mekhq.campaign.personnel.Modifier;
-import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.campaign.personnel.enums.ModifierValue;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+
+import java.util.*;
 
 /** Advanced Medical sub-system injury types */
 public final class InjuryTypes {
@@ -56,14 +58,22 @@ public final class InjuryTypes {
     public static final InjuryType BRUISED_KIDNEY = new InjuryTypes.BruisedKidney();
     public static final InjuryType BROKEN_LIMB = new InjuryTypes.BrokenLimb();
     public static final InjuryType BROKEN_COLLAR_BONE = new InjuryTypes.BrokenCollarBone();
-    public static final InjuryType INTERNAL_BLEEDING = new InjuryTypes.InternalBleeding();
+    public static final InjuryType INTERNAL_BLEEDING = new InternalBleeding();
     public static final InjuryType LOST_LIMB = new InjuryTypes.LostLimb();
+    public static final InjuryType REPLACEMENT_LIMB_RECOVERY = new InjuryTypes.ReplacementLimbRecovery();
     public static final InjuryType CEREBRAL_CONTUSION = new InjuryTypes.CerebralContusion();
     public static final InjuryType PUNCTURED_LUNG = new InjuryTypes.PuncturedLung();
     public static final InjuryType CTE = new InjuryTypes.Cte();
     public static final InjuryType BROKEN_BACK = new InjuryTypes.BrokenBack();
     // New injury types go here (or extend the class)
     public static final InjuryType SEVERED_SPINE = new InjuryTypes.SeveredSpine();
+
+    // Replacement Limbs
+    public static int REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5 = 5;
+    public static Money REPLACEMENT_LIMB_COST_ARM_TYPE_5 = Money.of(200000);
+    public static Money REPLACEMENT_LIMB_COST_HAND_TYPE_5 = Money.of(100000);
+    public static Money REPLACEMENT_LIMB_COST_LEG_TYPE_5 = Money.of(125000);
+    public static Money REPLACEMENT_LIMB_COST_FOOT_TYPE_5 = Money.of(50000);
 
     private static boolean registered = false;
 
@@ -89,6 +99,7 @@ public final class InjuryTypes {
             InjuryType.register(13, "am:cte", CTE);
             InjuryType.register(14, "am:broken_back", BROKEN_BACK);
             InjuryType.register("am:severed_spine", SEVERED_SPINE);
+            InjuryType.register("am:replacement_limb_recovery", REPLACEMENT_LIMB_RECOVERY);
             registered = true;
         }
     }
@@ -278,7 +289,7 @@ public final class InjuryTypes {
         }
 
         @Override
-        public boolean impliesMissingLocation(BodyLocation loc) {
+        public boolean impliesMissingLocation() {
             return true;
         }
 
@@ -312,6 +323,48 @@ public final class InjuryTypes {
                 default:
                     return Collections.emptyList();
             }
+        }
+    }
+
+    public static final class ReplacementLimbRecovery extends AMInjuryType {
+        public ReplacementLimbRecovery() {
+            recoveryTime = 42;
+            permanent = false;
+            simpleName = "Replacement Limb Recovery";
+            level = InjuryLevel.CHRONIC;
+        }
+
+        @Override
+        public boolean isValidInLocation(BodyLocation loc) {
+            return loc.isLimb();
+        }
+
+        @Override
+        public boolean impliesMissingLocation() {
+            return true;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return String.format("Replacement %s Recovery", loc.locationName());
+        }
+
+        @Override
+        public String getFluffText(BodyLocation loc, int severity, Gender gender) {
+            return "Replaced " + GenderDescriptors.HIS_HER_THEIR.getDescriptor(gender) + ' '
+                    + loc.locationName();
+        }
+
+        @Override
+        public Collection<Modifier> getModifiers(Injury inj) {
+            BodyLocation loc = inj.getLocation();
+            return switch (loc) {
+                case LEFT_ARM, LEFT_HAND, RIGHT_ARM, RIGHT_HAND ->
+                      Collections.singletonList(new Modifier(ModifierValue.GUNNERY, 6, null, InjuryType.MODTAG_INJURY));
+                case LEFT_LEG, LEFT_FOOT, RIGHT_LEG, RIGHT_FOOT ->
+                      Collections.singletonList(new Modifier(ModifierValue.PILOTING, 6, null, InjuryType.MODTAG_INJURY));
+                default -> Collections.emptyList();
+            };
         }
     }
 

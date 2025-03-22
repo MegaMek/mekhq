@@ -3,9 +3,11 @@ sucsId: 1902
 xcood: 667.892
 ycood: 61.542
 spectralType:
-  source: canon
+  source: Periphery (1ed), pg. 129
   value: F6V
-primarySlot: 8
+primarySlot:
+  source: Periphery (1ed), pg. 129
+  value: 8
 planet:
   - name: Kronos
     type: GIANT_TERRESTRIAL
@@ -116,7 +118,9 @@ planet:
       value: Novo Franklin
     type: TERRESTRIAL
     orbitalDist: 2.08
-    sysPos: 8
+    sysPos:
+      source: Periphery (1ed), pg. 129
+      value: 8
     icon: green37
     pressure: THIN
     atmosphere: BREATHABLE
@@ -129,7 +133,7 @@ planet:
     temperature: 26
     water: 47
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 129
       value: REPTILE
     desc: Novo Franklin is a hot garden planet originally settled in 2598 by refugees
       from the Outworlds Alliance fleeing from the ravages of the Reunification War.

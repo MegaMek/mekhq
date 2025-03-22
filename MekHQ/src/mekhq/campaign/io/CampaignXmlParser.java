@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2018-2025 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.io;
 
@@ -171,6 +180,10 @@ public class CampaignXmlParser {
                     }
                 } else if (xn.equalsIgnoreCase("custom")) {
                     reloadUnitData |= processCustom(retVal, wn);
+                } else if (xn.equalsIgnoreCase("campaignOptions")) {
+                    retVal.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
+                } else if (xn.equalsIgnoreCase("gameOptions")) {
+                    retVal.getGameOptions().fillFromXML(wn.getChildNodes());
                 }
             } else {
                 // If it's a text node or attribute or whatever at this level,
@@ -237,11 +250,7 @@ public class CampaignXmlParser {
                 // Okay, so what element is it?
                 String xn = wn.getNodeName();
 
-
-
-                if (xn.equalsIgnoreCase("campaignOptions")) {
-                    retVal.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
-                } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
+                if (xn.equalsIgnoreCase("randomSkillPreferences")) {
                     retVal.setRandomSkillPreferences(
                             RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn, version));
                 } else if (xn.equalsIgnoreCase("parts")) {
@@ -269,8 +278,6 @@ public class CampaignXmlParser {
                     processStoryArcNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("fameAndInfamy")) {
                     processFameAndInfamyNodes(retVal, wn);
-                } else if (xn.equalsIgnoreCase("gameOptions")) {
-                    retVal.getGameOptions().fillFromXML(wn.getChildNodes());
                 } else if (xn.equalsIgnoreCase("kills")) {
                     processKillNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("shoppingList")) {

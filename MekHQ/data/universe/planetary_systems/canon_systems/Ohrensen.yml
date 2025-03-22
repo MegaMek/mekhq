@@ -3,9 +3,11 @@ sucsId: 1927
 xcood: -16.29
 ycood: -121.76
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 77'
   value: F7II
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Marik, pg. 77'
+  value: 2
 event:
   - date: '2356-01-14'
     zenithCharge: yes
@@ -34,28 +36,32 @@ planet:
       value: Ohrensen
     type: TERRESTRIAL
     orbitalDist: 3.64
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Marik, pg. 77'
+      value: 2
     icon: green52
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 77'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 77'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 77'
       value: 0.95
-    diameter: 13477
-    density: 4.991796549028
+    diameter: 13426
+    density: 4.972754250888
     dayLength: 20
     yearLength: 7.0
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 77'
       value: 35
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 77'
       value: 61
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 77'
       value: BIRD
     desc: |-
       The planet Ohrensen was part of the Capellan Confederation for much of its history before being captured by the Free Worlds League. Unfortunately for Ohrensen, the Confederation used scorched earth tactics which did significant damage to the planet before being forced off. League rebuilding was rife with corruption, which resulted in the planet's industry and economy recovering but the average citizen was left well below the standard of living in the rest of the Free Worlds League.
@@ -63,16 +69,18 @@ planet:
       The corruption on planet has resulted in the more inhabited continent of Rossonia to be run primarily by gangs operating under the facade of legitimate businesses. While the more rural continents of Salva and Ulm are nearly lawless, with the farmers and ranchers preferring to be armed at all times.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 77'
           value: Rossonia
       - name:
-          source: canon
-          value: Ulm
-      - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 77'
           value: Salva
+      - name:
+          source: 'Handbook: House Marik, pg. 77'
+          value: Ulm
     satellite:
-      - name: Box
+      - name:
+          source: 'Handbook: House Marik, pg. 77'
+          value: Box
         size: medium
         icon: rock15
     event:

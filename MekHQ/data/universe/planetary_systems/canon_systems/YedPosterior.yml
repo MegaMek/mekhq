@@ -3,9 +3,11 @@ sucsId: 2796
 xcood: -44.212
 ycood: 119.119
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G8IV
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2359-10-08'
     zenithCharge: yes
@@ -53,39 +55,46 @@ planet:
       value: Yed Posterior
     type: TERRESTRIAL
     orbitalDist: 1.28
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: wet2
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.04
-    diameter: 12600
-    density: 5.8284
+    diameter: 12570
+    density: 5.814460740252
     dayLength: 29
     yearLength: 1.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 40
     water:
-      source: canon
+      source: MWDA world profiles
       value: 92
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: |-
       A warm world covered almost entirely in shallow, blue-green oceans, Yed Posterior would be a strikingly beautiful planet were it not for the chronic storms that ravage the northern Yeddi Island Chain, a series of twelve small landmasses that collectively account for all of the planet‘s inhabitable surface area. Because of these storms, the early colonists established several submerged outposts offshore, taking advantage of the shallow depth of the oceans in an effort to escape the worst of the driving winds and pounding rains that routinely lashed their surface settlements. However, several of these underwater habitats eventually succumbed to the same natural forces that also plagued the offshore mining rigs set up to exploit the planet‘s mineral wealth before refined construction methods developed during the Star League era led to sturdier habitat and rig designs.
 
       As a border world, Yed Posterior saw its fair share of raids and invasions during the Succession Wars as Houses Steiner and Kurita clashed over control of the Skye and Tamar regions. These raids inevitably decimated the mining interests on-planet, despite the efforts of the local marine militia and their fleet of submarines and hydrofoils. The worst battle to take place on this world, however, erupted in 3063, during the FedCom Civil War, when a Lyran intelligence failure led to a massive firefight between the Fifth Lyran Regulars and the combined might of the Fourth Davion Guards and the Seventh FedCom RCT. This action actually pushed the Davion units—previously neutral—into Victor Steiner-Davion‘s camp. The damage caused by this battle ravaged most of the cities on the largest of the Yeddi Islands, including the planetary capital of Epoch. Fortunately, however, the relatively low military value of this world spared it from further damage during the Word of Blake Jihad.
+    ring:
+      source: MWDA world profiles
+      value: yes
     landmass:
       - name:
           source: canon
           value: Yeddi Island Chain
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Epoch
     satellite:
       - name: None (dust ring)

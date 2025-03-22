@@ -1,30 +1,62 @@
+/*
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class EndContractNagLogic {
     /**
-     * Checks if any contract in the current campaign has its end date set to today.
+     * Determines if any active contract in the current campaign ends today.
+     *
+     * <p>This method checks all active contracts in the campaign to determine whether any
+     * contract's end date matches the specified date. It iterates through the list of active
+     * contracts and compares each contract's ending date with the given date.</p>
      *
      * <p>
-     * This method is used to detect whether there are any active contracts
-     * ending on the campaign's current local date. It iterates over the active
-     * contracts for the campaign and compares each contract's ending date to today's date.
+     * Note that once a contract's end date has passed, it is removed from the list of active
+     * contracts. Therefore, this method only checks contracts currently considered active.
      * </p>
      *
-     * @return {@code true} if a contract's end date matches today's date, otherwise {@code false}.
+     * @param today The current local date to check against the contracts' ending dates.
+     * @param activeContracts A list of {@link AtBContract} objects representing the campaign's active contracts.
+     *
+     * @return {@code true} if any contract ends on the specified date; {@code false} otherwise.
      */
-    public static boolean isContractEnded(Campaign campaign) {
-        LocalDate today = campaign.getLocalDate();
+    public static boolean isContractEnded(LocalDate today, List<AtBContract> activeContracts) {
+        // We can't use 'is date y after x', as once the end date has passed,
+        // the contract is removed from the list of active contracts.
 
-        // we can't use 'is date y after x', as once the end date has been passed,
-        // the contract is removed from the list of active contracts
-
-        // there is no reason to use a stream here, as there won't be enough iterations to warrant it
-        for (Contract contract : campaign.getActiveContracts()) {
+        // There is no reason to use a stream here, as there won't be enough iterations to warrant it.
+        for (Contract contract : activeContracts) {
             if (contract.getEndingDate().equals(today)) {
                 return true;
             }

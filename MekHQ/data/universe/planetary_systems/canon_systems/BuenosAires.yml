@@ -3,9 +3,11 @@ sucsId: 417
 xcood: 18.092
 ycood: -341.994
 spectralType:
-  source: canon
+  source: House Liao, pg. 134
   value: G8V
-primarySlot: 3
+primarySlot:
+  source: House Liao, pg. 134
+  value: 3
 event:
   - date: '2351-01-04'
     nadirCharge: yes
@@ -44,7 +46,9 @@ planet:
       value: Buenos Aires
     type: TERRESTRIAL
     orbitalDist: 0.8
-    sysPos: 3
+    sysPos:
+      source: House Liao, pg. 134
+      value: 3
     icon: green1
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -57,7 +61,7 @@ planet:
     temperature: 34
     water: 47
     lifeForm:
-      source: canon
+      source: House Liao, pg. 134
       value: REPTILE
     desc: |-
       The Confederation captured Buenos Aires from the Free World League during the Second Succession War and has managed to retain control despite numerous FWL attempts to retake it. Buenos Aires is an important warm-water, agricultural planet with much of the food production in subterranean and offshore/hydroponic centres through-out the southern hemisphere. The local outer-world commercial trade centres, established by FWL entrepreneurs, still operate in Buenos Aires City. The planet is garrisoned by a permanent Sian Commonality reserve regiment augmented by numerous local militia forces.

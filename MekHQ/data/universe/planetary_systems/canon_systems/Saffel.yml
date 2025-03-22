@@ -3,9 +3,11 @@ sucsId: 2206
 xcood: 25.586
 ycood: 11.846
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K3VI
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2365-08-04'
     nadirCharge: yes
@@ -49,28 +51,32 @@ planet:
       value: Saffel
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: green55
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.77
-    diameter: 9734
-    density: 5.543810044823
+    diameter: 9747
+    density: 5.551460227948
     dayLength: 21
     yearLength: 1.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 22
     water:
-      source: canon
+      source: MWDA world profiles
       value: 53
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: BIRD
     desc: When first discovered, Saffel was a rather cold world at the onset of a
       minor ice age. The first colonists were hardy folk from Terra‘s Siberian, Scandinavian
@@ -114,19 +120,21 @@ planet:
       commercial spaceport.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Awonera
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Dovejin
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Iwanji
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Sophrati
     satellite:
-      - name: Promina
+      - name:
+          source: MWDA world profiles
+          value: Promina
         size: large
         icon: rock6
     event:

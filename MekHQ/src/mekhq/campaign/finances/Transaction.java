@@ -1,23 +1,30 @@
 /*
- * Transaction.java
- *
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.finances;
 
@@ -25,13 +32,12 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -41,9 +47,9 @@ public class Transaction {
 
     // region Variable Declarations
     private TransactionType type;
-    private LocalDate date;
-    private Money amount;
-    private String description;
+    private LocalDate       date;
+    private Money           amount;
+    private String          description;
     // endregion Variable Declarations
 
     // region Constructors
@@ -52,12 +58,10 @@ public class Transaction {
     }
 
     public Transaction(final Transaction transaction) {
-        this(transaction.getType(), transaction.getDate(), transaction.getAmount(),
-                transaction.getDescription());
+        this(transaction.getType(), transaction.getDate(), transaction.getAmount(), transaction.getDescription());
     }
 
-    public Transaction(final TransactionType type, final LocalDate date, final Money amount,
-            final String description) {
+    public Transaction(final TransactionType type, final LocalDate date, final Money amount, final String description) {
         setType(type);
         setDate(date);
         setAmount(amount);
@@ -99,14 +103,27 @@ public class Transaction {
     }
     // endregion Getters/Setters
 
-    @Deprecated // I'd be better as part of the GUI class
+    /**
+     * I'd be better as part of the GUI class
+     *
+     * @since 0.50.04
+     * @deprecated - Move to GUI Class
+     */
+    @Deprecated(since = "0.50.04")
     public String updateTransaction(Transaction previousTransaction) {
         return "Edited Transaction: {" +
-                "Previous = " + previousTransaction.toString() +
-                "} -> {New = " + toString() + "}";
+               "Previous = " +
+               previousTransaction.toString() +
+               "} -> {New = " +
+               toString() +
+               "}";
     }
 
-    @Deprecated // I'd be better as part of the GUI class
+    /**
+     * @since 0.50.04
+     * @deprecated - Move to GUI Class
+     */
+    @Deprecated(since = "0.50.04")
     public String voidTransaction() {
         return "Deleted Transaction: " + toString();
     }
@@ -123,7 +140,7 @@ public class Transaction {
 
     public static Transaction generateInstanceFromXML(final Node wn) {
         final Transaction transaction = new Transaction();
-        final NodeList nl = wn.getChildNodes();
+        final NodeList    nl          = wn.getChildNodes();
         for (int x = 0; x < nl.getLength(); x++) {
             final Node wn2 = nl.item(x);
             try {
@@ -146,8 +163,13 @@ public class Transaction {
 
     @Override
     public String toString() {
-        return getType() + ", " + MekHQ.getMHQOptions().getDisplayFormattedDate(getDate())
-                + ", " + getAmount() + ", " + getDescription();
+        return getType() +
+               ", " +
+               MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()) +
+               ", " +
+               getAmount() +
+               ", " +
+               getDescription();
     }
 
     @Override
@@ -156,12 +178,11 @@ public class Transaction {
             return false;
         } else if (this == other) {
             return true;
-        } else if (other instanceof Transaction) {
-            final Transaction transaction = (Transaction) other;
-            return (getType() == transaction.getType())
-                    && getDate().equals(transaction.getDate())
-                    && getAmount().equals(transaction.getAmount())
-                    && getDescription().equals(transaction.getDescription());
+        } else if (other instanceof Transaction transaction) {
+            return (getType() == transaction.getType()) &&
+                   getDate().equals(transaction.getDate()) &&
+                   getAmount().equals(transaction.getAmount()) &&
+                   getDescription().equals(transaction.getDescription());
         } else {
             return false;
         }

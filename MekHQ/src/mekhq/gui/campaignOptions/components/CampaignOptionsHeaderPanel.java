@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.campaignOptions.components;
 
@@ -24,8 +33,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ResourceBundle;
 
-import static java.lang.Math.round;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
 /**
  * A specialized {@link JPanel} designed for headers in the campaign options dialog.
@@ -78,11 +87,7 @@ public class CampaignOptionsHeaderPanel extends JPanel {
     public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText) {
         // Load and scale the image using the provided file path
         ImageIcon imageIcon = new ImageIcon(imageAddress);
-        int width = (int) UIUtil.scaleForGUI(round(imageIcon.getIconWidth() * 0.75));
-        int height = (int) UIUtil.scaleForGUI(round(imageIcon.getIconHeight() * 0.75));
-        Image image = imageIcon.getImage();
-        Image scaledImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-        imageIcon = new ImageIcon(scaledImage);
+        imageIcon = scaleImageIconToWidth(imageIcon, UIUtil.scaleForGUI(100));
 
         // Create a JLabel to display the image in the panel
         JLabel lblImage = new JLabel(imageIcon);

@@ -3,9 +3,11 @@ sucsId: 923
 xcood: -198.236
 ycood: 108.266
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 78'
   value: M5V
-primarySlot: 1
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 78'
+  value: 1
 event:
   - date: '2364-03-28'
     zenithCharge: yes
@@ -17,28 +19,32 @@ planet:
       value: Gallery
     type: TERRESTRIAL
     orbitalDist: 0.08
-    sysPos: 1
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 78'
+      value: 1
     icon: wet4
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 78'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 78'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 78'
       value: 1.03
-    diameter: 15468
-    density: 4.687572221666
+    diameter: 15455
+    density: 4.68359018552
     dayLength: 25
     yearLength: 0.4
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 78'
       value: 27
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 78'
       value: 88
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 78'
       value: NONE
     desc: |-
       Due to a large moon and three large oceans, Gallery is covered in a nearly constant blanket of thick dark clouds and is often subject to vast storms. These conditions result in the surface of the planet being in a near perpetual twilight, with sunlight almost never breaking through the thick cloud-layer.
@@ -46,22 +52,24 @@ planet:
       When Gallery was originally settled there were no native lifeforms so the original colonists had to import plants and animals that could adapt and survive in the nearly constant darkness. What Gallery lacks in comforts, it more than makes up for in natural resources. The stormy dark climate has resulted in the populace living underground and the primary industry on the planet is mining. Due to their comfort and familiarity with underground spaces, many natives of Gallery are easily able to find jobs on other planets as miners.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 78'
           value: Axillon
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 78'
           value: Ludella
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 78'
           value: Penrodia
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 78'
           value: Tyrillia
         capital:
-          source: canon
-          value: Stockholm
+          source: 'Handbook: House Steiner, pg. 78'
+          value: New Stockholm
     satellite:
-      - name: Romaine
+      - name:
+          source: 'Handbook: House Steiner, pg. 78'
+          value: Romaine
         size: medium
         icon: oddmoon1
     event:

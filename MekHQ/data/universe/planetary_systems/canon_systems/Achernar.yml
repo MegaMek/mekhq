@@ -5,7 +5,9 @@ ycood: -32.361
 spectralType:
   source: canon
   value: F8V
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2378-03-23'
     nadirCharge: yes
@@ -30,28 +32,32 @@ planet:
       value: Achernar
     type: TERRESTRIAL
     orbitalDist: 1.2
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green38
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.9
-    diameter: 11994
-    density: 5.296114371392
+    diameter: 11968
+    density: 5.284711465846
     dayLength: 29
     yearLength: 1.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 28
     water:
-      source: canon
+      source: MWDA world profiles
       value: 30
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: |-
       3135 - First settled by the Terran Hegemony, Achernar is a self-sufficient world with a varied terrain and climate.
@@ -67,19 +73,21 @@ planet:
       The three continents of Achernar are Agnetenar, Eridanus, and Zaurak; the capital of River‘s End is located on Eridanus.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Agnetenar
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Eridanus
         capital:
-          source: canon
-          value: River’s End
+          source: MWDA world profiles
+          value: River's End
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Zaurak
     satellite:
-      - name: Ahir al Nahr
+      - name:
+          source: MWDA world profiles
+          value: Ahir al Nahr
         size: medium
         icon: oddmoon1
     event:

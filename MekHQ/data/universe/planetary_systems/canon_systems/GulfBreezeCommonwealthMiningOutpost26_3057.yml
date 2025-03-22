@@ -5,7 +5,9 @@ ycood: 203.387
 spectralType:
   source: canon
   value: G9V
-primarySlot: 5
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 81'
+  value: 5
 event:
   - date: '2501-08-03'
     nadirCharge: yes
@@ -30,7 +32,6 @@ planet:
     smallMoons: 8
     event:
       - date: '2108-12-05'
-        name: Commonwealth Mining Outpost 1
   - name: Shakopee
     type: GIANT_TERRESTRIAL
     orbitalDist: 2.24
@@ -57,7 +58,6 @@ planet:
         icon: oddmoon2
     event:
       - date: '2108-12-05'
-        name: Commonwealth Mining Outpost 2
   - name: Stratford
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.8
@@ -81,7 +81,6 @@ planet:
         icon: rock12
     event:
       - date: '2108-12-05'
-        name: Commonwealth Mining Outpost 3
   - name: Iuka
     type: TERRESTRIAL
     orbitalDist: 1.28
@@ -105,34 +104,37 @@ planet:
       - name: Marshall's Rock
     event:
       - date: '2108-12-05'
-        name: Commonwealth Mining Outpost 4
   - name:
       source: canon
       value: Commonwealth Mining Outpost
     type: TERRESTRIAL
     orbitalDist: 0.56
-    sysPos: 5
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 81'
+      value: 5
     icon: dry13
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 81'
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 81'
+      value: TOXICPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 81'
       value: 1.89
-    diameter: 20954
-    density: 6.349803146555
+    diameter: 20936
+    density: 6.344259428518
     dayLength: 22
     yearLength: 1.0
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 81'
       value: 193
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 81'
       value: 19
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 81'
       value: NONE
     desc: Gulf Breeze is originally known as Commonwealth Mining Outpost 26 (C.M.O.26).
       The focus of this mining operation was a large, lifeless, tide-locked planet.
@@ -148,9 +150,14 @@ planet:
       Mining Corporation.  With the fall of CMC the colonists decided to stay and
       make a living trading mined resources to keep the colony thriving, naming the
       system for their station.
+    ring:
+      source: 'Handbook: House Steiner, pg. 81'
+      value: yes
     landmass:
       - name: Greater New Mower
-        capital: Donar
+        capital:
+          source: 'Handbook: House Steiner, pg. 81'
+          value: Gulf Breeze Station
       - name: Old Binga
       - name: Saulė
       - name: New Green River
@@ -335,10 +342,7 @@ planet:
       - date: '3145-01-01'
         population: 1810682058.0
       - date: '2108-12-05'
-        name: Commonwealth Mining Outpost 26
       - date: '3057-01-01'
-        name: Gulf Breeze
-        message: Commonwealth Mining Outpost 26 renamed to Gulf Breeze
   - name: Nova Sdiret Nord
     type: TERRESTRIAL
     orbitalDist: 4.16
@@ -358,7 +362,6 @@ planet:
       - name: New Paintsville
     event:
       - date: '2108-12-05'
-        name: Commonwealth Mining Outpost 6
   - name: Czupiradlo
     type: GAS_GIANT
     orbitalDist: 8.0
@@ -386,7 +389,6 @@ planet:
         icon: oddmoon1
     event:
       - date: '2108-12-05'
-        name: Commonwealth Mining Outpost 7
   - name: Cache
     type: GAS_GIANT
     orbitalDist: 15.68
@@ -404,7 +406,6 @@ planet:
     smallMoons: 10
     event:
       - date: '2108-12-05'
-        name: Commonwealth Mining Outpost 8
   - name: Yates
     type: GAS_GIANT
     orbitalDist: 31.04
@@ -432,7 +433,6 @@ planet:
         icon: oddmoon3
     event:
       - date: '2108-12-05'
-        name: Commonwealth Mining Outpost 9
   - name: Goree
     type: GAS_GIANT
     orbitalDist: 61.76
@@ -474,7 +474,6 @@ planet:
         icon: rock4
     event:
       - date: '2108-12-05'
-        name: Commonwealth Mining Outpost 10
   - name: Corrigan
     type: GAS_GIANT
     orbitalDist: 123.2
@@ -516,7 +515,6 @@ planet:
         icon: oddmoon1
     event:
       - date: '2108-12-05'
-        name: Commonwealth Mining Outpost 11
   - name: Bazetta
     type: GAS_GIANT
     orbitalDist: 246.08
@@ -541,4 +539,3 @@ planet:
         icon: rock16
     event:
       - date: '2108-12-05'
-        name: Commonwealth Mining Outpost 12

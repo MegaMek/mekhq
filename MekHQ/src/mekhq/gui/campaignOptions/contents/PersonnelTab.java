@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.campaignOptions.contents;
 
@@ -33,7 +42,6 @@ import mekhq.gui.campaignOptions.components.*;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.GroupLayout.Group;
 import javax.swing.GroupLayout.ParallelGroup;
 import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JSpinner.DefaultEditor;
@@ -1182,7 +1190,9 @@ public class PersonnelTab {
      */
     private JPanel createExperienceMultipliersPanel() {
         // Contents
-        for (final SkillLevel skillLevel : Skills.SKILL_LEVELS) {
+        SkillLevel[] skillLevels = Skills.SKILL_LEVELS;
+
+        for (final SkillLevel skillLevel : skillLevels) {
             final JLabel label = new CampaignOptionsLabel("SkillLevel" + skillLevel.toString(),
                 null, true);
             label.setToolTipText(resources.getString("lblSkillLevelMultiplier.tooltip"));
@@ -1192,53 +1202,67 @@ public class PersonnelTab {
                 null, 0, 0, 100, 0.1, true);
             spinner.setToolTipText(resources.getString("lblSkillLevelMultiplier.tooltip"));
             spnSalaryExperienceMultipliers.put(skillLevel, spinner);
-
         }
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ExperienceMultipliersPanel",
-            true, "ExperienceMultipliersPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+              true, "ExperienceMultipliersPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        SkillLevel[] skillLevels = SkillLevel.values();
-        int rows = 2;
-        int columns = 4;
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[0]), layout);
+        layout.gridx++;
+        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[0]), layout);
 
-        SequentialGroup horizontalGroups = layout.createSequentialGroup();
-        ParallelGroup[] verticalGroups = new ParallelGroup[rows];
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[4]), layout);
+        layout.gridx++;
+        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[4]), layout);
 
-        for (int j = 0; j < rows; j++) {
-            verticalGroups[j] = layout.createParallelGroup(Alignment.BASELINE);
-        }
+        // new column
 
-        for (int i = 0; i < columns; i++) {
-            ParallelGroup horizontalParallelGroup = layout.createParallelGroup();
+        layout.gridx = 2;
+        layout.gridy = 0;
+        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[1]), layout);
+        layout.gridx++;
+        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[1]), layout);
 
-            for (int j = 0; j < rows; j++) {
-                int index = i * rows + j;
+        layout.gridx = 2;
+        layout.gridy++;
+        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[5]), layout);
+        layout.gridx++;
+        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[5]), layout);
 
-                SequentialGroup horizontalSequentialGroup = layout.createSequentialGroup();
-                horizontalSequentialGroup.addComponent(lblSalaryExperienceMultipliers.get(skillLevels[index]));
-                horizontalSequentialGroup.addComponent(spnSalaryExperienceMultipliers.get(skillLevels[index]));
-                if (i != (columns - 1)) {
-                    horizontalSequentialGroup.addGap(10);
-                }
+        // new column
 
-                horizontalParallelGroup.addGroup(horizontalSequentialGroup);
-                verticalGroups[j].addComponent(lblSalaryExperienceMultipliers.get(skillLevels[index]));
-                verticalGroups[j].addComponent(spnSalaryExperienceMultipliers.get(skillLevels[index]));
-            }
+        layout.gridx = 4;
+        layout.gridy = 0;
+        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[2]), layout);
+        layout.gridx++;
+        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[2]), layout);
 
-            horizontalGroups.addGroup(horizontalParallelGroup);
-        }
+        layout.gridx = 4;
+        layout.gridy++;
+        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[6]), layout);
+        layout.gridx++;
+        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[6]), layout);
 
-        layout.setHorizontalGroup(horizontalGroups);
-        SequentialGroup verticalGroup = layout.createSequentialGroup();
-        for (Group group: verticalGroups) {
-            verticalGroup.addGroup(group);
-        }
-        layout.setVerticalGroup(verticalGroup);
+        // new column
+
+        layout.gridx = 6;
+        layout.gridy = 0;
+        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[3]), layout);
+        layout.gridx++;
+        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[3]), layout);
+
+        layout.gridx = 6;
+        layout.gridy++;
+        panel.add(lblSalaryExperienceMultipliers.get(skillLevels[7]), layout);
+        layout.gridx++;
+        panel.add(spnSalaryExperienceMultipliers.get(skillLevels[7]), layout);
 
         return panel;
     }
@@ -1349,7 +1373,7 @@ public class PersonnelTab {
         }
 
         // General
-        chkUseTactics.setSelected(options.isUseTaxes());
+        chkUseTactics.setSelected(options.isUseTactics());
         chkUseInitiativeBonus.setSelected(options.isUseInitiativeBonus());
         chkUseToughness.setSelected(options.isUseToughness());
         chkUseRandomToughness.setSelected(options.isUseRandomToughness());
@@ -1446,7 +1470,7 @@ public class PersonnelTab {
         }
 
         // General
-        options.setUseTaxes(chkUseTactics.isSelected());
+        options.setUseTactics(chkUseTactics.isSelected());
         options.setUseInitiativeBonus(chkUseInitiativeBonus.isSelected());
         options.setUseToughness(chkUseToughness.isSelected());
         options.setUseRandomToughness(chkUseRandomToughness.isSelected());
@@ -1519,10 +1543,6 @@ public class PersonnelTab {
         options.setUseRandomDependentRemoval(chkUseRandomDependentRemoval.isSelected());
 
         // Salaries
-        options.setDisableSecondaryRoleSalary(chkDisableSecondaryRoleSalary.isSelected());
-        options.setSalaryAntiMekMultiplier((double) spnAntiMekSalary.getValue());
-        options.setSalarySpecialistInfantryMultiplier((double) spnSpecialistInfantrySalary.getValue());
-
         options.setDisableSecondaryRoleSalary(chkDisableSecondaryRoleSalary.isSelected());
         options.setSalaryAntiMekMultiplier((double) spnAntiMekSalary.getValue());
         options.setSalarySpecialistInfantryMultiplier((double) spnSpecialistInfantrySalary.getValue());

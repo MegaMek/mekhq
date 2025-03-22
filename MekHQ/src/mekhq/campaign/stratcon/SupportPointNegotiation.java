@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.stratcon;
 
@@ -147,7 +156,9 @@ public class SupportPointNegotiation {
             return;
         }
 
-        if (campaignState.getSupportPoints() >= maxSupportPoints) {
+        int currentSupportPoints = campaignState.getSupportPoints();
+
+        if (currentSupportPoints >= maxSupportPoints) {
             String pluralizer = (maxSupportPoints > 1) || (maxSupportPoints == 0) ? "s" : "";
 
             campaign.addReport(String.format(
@@ -163,10 +174,15 @@ public class SupportPointNegotiation {
 
         Iterator<Person> iterator = adminTransport.iterator();
 
-        while (iterator.hasNext() && negotiatedSupportPoints < maxSupportPoints) {
+        while (iterator.hasNext()
+              && ((negotiatedSupportPoints + currentSupportPoints) < maxSupportPoints)) {
             Person admin = iterator.next();
             int rollResult = Compute.d6(2);
-            negotiatedSupportPoints += calculateSupportPoints(admin, rollResult);
+
+            int adminSkill = admin.getSkill(S_ADMIN).getFinalSkillValue();
+            if (rollResult >= adminSkill) {
+                negotiatedSupportPoints ++;
+            }
             iterator.remove();
         }
 
@@ -231,28 +247,6 @@ public class SupportPointNegotiation {
     private static List<AtBContract> getSortedContractsByStartDate(List<AtBContract> activeContracts) {
         activeContracts.sort(Comparator.comparing(AtBContract::getStartDate));
         return activeContracts;
-    }
-
-    /**
-     * Calculates the number of support points based on a die roll and the skill level of a given Admin/Transport person.
-     *
-     * <p>If the dice roll meets or exceeds the admin's skill level, at least one support point is awarded,
-     * with additional support points depending on the margin of success.</p>
-     *
-     * @param admin      The {@link Person} representing the Admin/Transport personnel rolling for support points.
-     * @param rollResult The result of rolling two six-sided dice (2d6).
-     * @return The number of support points awarded based on the roll and skill level.
-     */
-    private static int calculateSupportPoints(Person admin, int rollResult) {
-        int adminSkill = admin.getSkill(S_ADMIN).getFinalSkillValue();
-        if (rollResult < adminSkill) {
-            return 0;
-        }
-
-        int points = 1; // Base success
-        int marginOfSuccess = (rollResult - adminSkill) / 4;
-        points += marginOfSuccess;
-        return points;
     }
 
     /**

@@ -1,22 +1,30 @@
 /*
- * NewContractDialog.java
- *
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.dialog;
 
@@ -31,7 +39,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemListener;
 import java.util.ResourceBundle;
-
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
@@ -60,32 +67,32 @@ import mekhq.gui.view.ContractPaymentBreakdown;
 public class NewContractDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(NewContractDialog.class);
 
-    protected JFrame frame;
-    protected Contract contract;
-    protected Campaign campaign;
-    private JComboBox<Person> cboNegotiator;
+    protected JFrame            frame;
+    protected Contract          contract;
+    protected Campaign          campaign;
+    private   JComboBox<Person> cboNegotiator;
 
-    protected JButton btnClose;
-    protected JButton btnOK;
-    protected JTextField txtName;
-    protected JTextField txtEmployer;
-    protected JTextField txtType;
+    protected JButton             btnClose;
+    protected JButton             btnOK;
+    protected JTextField          txtName;
+    protected JTextField          txtEmployer;
+    protected JTextField          txtType;
     protected MarkdownEditorPanel txtDesc;
-    protected JSuggestField suggestPlanet;
+    protected JSuggestField       suggestPlanet;
 
-    protected JButton btnDate;
-    protected JComboBox<String> choiceOverhead;
+    protected JButton                           btnDate;
+    protected JComboBox<String>                 choiceOverhead;
     protected MMComboBox<ContractCommandRights> choiceCommand;
-    protected JSpinner spnLength;
-    protected JSpinner spnMultiplier;
-    protected JSpinner spnTransport;
-    protected JSpinner spnSalvageRights;
-    protected JCheckBox checkSalvageExchange;
-    protected JSpinner spnStraightSupport;
-    protected JSpinner spnBattleLossComp;
-    protected JSpinner spnSignBonus;
-    protected JSpinner spnAdvance;
-    protected JCheckBox checkMRBC;
+    protected JSpinner                          spnLength;
+    protected JSpinner                          spnMultiplier;
+    protected JSpinner                          spnTransport;
+    protected JSpinner                          spnSalvageRights;
+    protected JCheckBox                         checkSalvageExchange;
+    protected JSpinner                          spnStraightSupport;
+    protected JSpinner                          spnBattleLossComp;
+    protected JSpinner                          spnSignBonus;
+    protected JSpinner                          spnAdvance;
+    protected JCheckBox                         checkMRBC;
 
     private ContractPaymentBreakdown contractPaymentBreakdown;
 
@@ -93,8 +100,8 @@ public class NewContractDialog extends JDialog {
     public NewContractDialog(JFrame parent, boolean modal, Campaign c) {
         super(parent, modal);
         this.frame = parent;
-        campaign = c;
-        contract = new Contract("New Contract", "New Employer");
+        campaign   = c;
+        contract   = new Contract("New Contract", "New Employer");
         contract.calculateContract(campaign);
         initComponents();
         setLocationRelativeTo(parent);
@@ -108,7 +115,7 @@ public class NewContractDialog extends JDialog {
     protected void initComponents() {
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewContractDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("Form.title"));
@@ -118,44 +125,42 @@ public class NewContractDialog extends JDialog {
         JPanel descPanel = new JPanel();
         descPanel.setLayout(new GridBagLayout());
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.gridx      = 0;
+        gridBagConstraints.gridy      = 0;
+        gridBagConstraints.weightx    = 1.0;
+        gridBagConstraints.weighty    = 1.0;
         gridBagConstraints.gridheight = 2;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor     = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill       = GridBagConstraints.BOTH;
+        gridBagConstraints.insets     = new Insets(5, 5, 5, 5);
         newContractPanel.add(descPanel, gridBagConstraints);
 
         JPanel contractPanel = new JPanel();
         contractPanel.setLayout(new GridBagLayout());
-        contractPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("contractPanel.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        contractPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
+              "contractPanel.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        gridBagConstraints         = new GridBagConstraints();
+        gridBagConstraints.gridx   = 1;
+        gridBagConstraints.gridy   = 0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill    = GridBagConstraints.BOTH;
+        gridBagConstraints.insets  = new Insets(5, 5, 5, 5);
         newContractPanel.add(contractPanel, gridBagConstraints);
 
         JPanel totalsPanel = new JPanel();
         totalsPanel.setLayout(new GridBagLayout());
-        totalsPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("totalsPanel.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        totalsPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
+              "totalsPanel.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        gridBagConstraints         = new GridBagConstraints();
+        gridBagConstraints.gridx   = 1;
+        gridBagConstraints.gridy   = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill    = GridBagConstraints.BOTH;
+        gridBagConstraints.insets  = new Insets(5, 5, 5, 5);
         newContractPanel.add(totalsPanel, gridBagConstraints);
 
         initDescPanel(resourceMap, descPanel);
@@ -167,23 +172,23 @@ public class NewContractDialog extends JDialog {
         btnOK.setText(resourceMap.getString("btnOkay.text"));
         btnOK.setName("btnOK");
         btnOK.addActionListener(this::btnOKActionPerformed);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 3;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.EAST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         newContractPanel.add(btnOK, gridBagConstraints);
 
         btnClose.setText(resourceMap.getString("btnCancel.text"));
         btnClose.setName("btnClose");
         btnClose.addActionListener(this::btnCloseActionPerformed);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 3;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         newContractPanel.add(btnClose, gridBagConstraints);
 
         JScrollPane scrollPane = new JScrollPaneWithSpeed(newContractPanel);
@@ -193,7 +198,13 @@ public class NewContractDialog extends JDialog {
         pack();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewContractDialog.class);
@@ -210,42 +221,42 @@ public class NewContractDialog extends JDialog {
         txtEmployer = new JTextField();
         JLabel lblEmployer = new JLabel();
         cboNegotiator = new JComboBox<>();
-        txtType = new JTextField();
+        txtType       = new JTextField();
         JLabel lblType = new JLabel();
-        btnOK = new JButton();
+        btnOK    = new JButton();
         btnClose = new JButton();
-        txtDesc = new MarkdownEditorPanel("Contract Description");
+        txtDesc  = new MarkdownEditorPanel("Contract Description");
         JLabel lblPlanetName = new JLabel();
 
         lblName.setText(resourceMap.getString("lblName.text"));
         lblName.setName("lblName");
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         descPanel.add(lblName, gridBagConstraints);
 
         txtName.setText(contract.getName());
         txtName.setName("txtName");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         descPanel.add(txtName, gridBagConstraints);
 
         lblPlanetName.setText(resourceMap.getString("lblPlanetName.text"));
         lblPlanetName.setName("lblPlanetName");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         descPanel.add(lblPlanetName, gridBagConstraints);
 
         suggestPlanet = new JSuggestField(this, campaign.getSystemNames());
@@ -264,94 +275,94 @@ public class NewContractDialog extends JDialog {
         suggestPlanet.addFocusListener(contractUpdateFocusListener);
         suggestPlanet.addActionListener(contractUpdateActionListener);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         descPanel.add(suggestPlanet, gridBagConstraints);
 
         lblType.setText(resourceMap.getString("lblType.text"));
         lblType.setName("lblType");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 2;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         descPanel.add(lblType, gridBagConstraints);
 
         txtType.setText(contract.getType());
         txtType.setName("txtType");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 2;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         descPanel.add(txtType, gridBagConstraints);
 
         lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
         lblEmployer.setName("lblEmployer");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 3;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         descPanel.add(lblEmployer, gridBagConstraints);
 
         txtEmployer.setText(contract.getEmployer());
         txtEmployer.setName("txtEmployer");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 3;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         descPanel.add(txtEmployer, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 4;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         descPanel.add(new JLabel("Negotiator"), gridBagConstraints);
 
         cboNegotiator.setName("cboNegotiator");
         // Add negotiators
-        for (Person p : campaign.getActivePersonnel()) {
+        for (Person p : campaign.getActivePersonnel(true)) {
             if (p.hasSkill(SkillType.S_NEG)) {
                 cboNegotiator.addItem(p);
             }
         }
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 4;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         descPanel.add(cboNegotiator, gridBagConstraints);
 
         txtDesc.setText(contract.getDescription());
         txtDesc.setPreferredSize(new Dimension(400, 200));
         txtDesc.setMinimumSize(new Dimension(400, 200));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 5;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.weighty   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor    = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         descPanel.add(txtDesc, gridBagConstraints);
     }
 
@@ -361,17 +372,17 @@ public class NewContractDialog extends JDialog {
     }
 
     protected void initContractPanel(ResourceBundle resourceMap, JPanel contractPanel) {
-        JLabel lblDate = new JLabel(resourceMap.getString("lblDate.text"));
-        JLabel lblLength = new JLabel(resourceMap.getString("lblLength.text"));
-        JLabel lblMultiplier = new JLabel(resourceMap.getString("lblMultiplier.text"));
-        JLabel lblOverhead = new JLabel(resourceMap.getString("lblOverhead.text"));
-        JLabel lblCommandRights = new JLabel(resourceMap.getString("lblCommand.text"));
-        JLabel lblTransport = new JLabel(resourceMap.getString("lblTransport.text"));
-        JLabel lblSalvageRights = new JLabel(resourceMap.getString("lblSalvageRights.text"));
+        JLabel lblDate            = new JLabel(resourceMap.getString("lblDate.text"));
+        JLabel lblLength          = new JLabel(resourceMap.getString("lblLength.text"));
+        JLabel lblMultiplier      = new JLabel(resourceMap.getString("lblMultiplier.text"));
+        JLabel lblOverhead        = new JLabel(resourceMap.getString("lblOverhead.text"));
+        JLabel lblCommandRights   = new JLabel(resourceMap.getString("lblCommand.text"));
+        JLabel lblTransport       = new JLabel(resourceMap.getString("lblTransport.text"));
+        JLabel lblSalvageRights   = new JLabel(resourceMap.getString("lblSalvageRights.text"));
         JLabel lblStraightSupport = new JLabel(resourceMap.getString("lblStraightSupport.text"));
-        JLabel lblBattleLossComp = new JLabel(resourceMap.getString("lblBattleLossComp.text"));
-        JLabel lblSignBonus = new JLabel(resourceMap.getString("lblSignBonus.text"));
-        JLabel lblAdvance = new JLabel(resourceMap.getString("lblAdvance.text"));
+        JLabel lblBattleLossComp  = new JLabel(resourceMap.getString("lblBattleLossComp.text"));
+        JLabel lblSignBonus       = new JLabel(resourceMap.getString("lblSignBonus.text"));
+        JLabel lblAdvance         = new JLabel(resourceMap.getString("lblAdvance.text"));
 
         btnDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         btnDate.setName("btnDate");
@@ -404,9 +415,7 @@ public class NewContractDialog extends JDialog {
         choiceCommand.setSelectedItem(contract.getCommandRights());
         choiceCommand.setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                    final int index, final boolean isSelected,
-                    final boolean cellHasFocus) {
+            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof ContractCommandRights) {
                     list.setToolTipText(((ContractCommandRights) value).getToolTipText());
@@ -434,239 +443,239 @@ public class NewContractDialog extends JDialog {
         spnAdvance.addChangeListener(contractUpdateChangeListener);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 0;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(checkMRBC, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 0.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(lblDate, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(btnDate, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 2;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 0.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(lblLength, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 2;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(spnLength, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 3;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 0.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(lblMultiplier, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 3;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(spnMultiplier, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 4;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 0.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(lblCommandRights, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 4;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(choiceCommand, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 5;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 0.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(lblOverhead, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 5;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(choiceOverhead, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 6;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 0.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(lblTransport, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 6;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(spnTransport, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 7;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 0.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(lblSalvageRights, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 7;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(spnSalvageRights, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 8;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(checkSalvageExchange, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 9;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 0.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(lblBattleLossComp, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 9;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(spnBattleLossComp, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 10;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 0.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(lblStraightSupport, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 10;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 10;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(spnStraightSupport, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 11;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 11;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 0.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(lblSignBonus, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 11;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 11;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(spnSignBonus, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 12;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 12;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 0.0;
+        gridBagConstraints.weighty   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(lblAdvance, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 12;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 12;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(2, 2, 2, 2);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.weighty   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets    = new Insets(2, 2, 2, 2);
         contractPanel.add(spnAdvance, gridBagConstraints);
     }
 
@@ -679,9 +688,9 @@ public class NewContractDialog extends JDialog {
         for (Mission m : campaign.getMissions()) {
             if (m.getName().equals(chosenName)) {
                 JOptionPane.showMessageDialog(frame,
-                        "There is already a mission with the name " + chosenName,
-                        "Duplicate Mission Name",
-                        JOptionPane.ERROR_MESSAGE);
+                      "There is already a mission with the name " + chosenName,
+                      "Duplicate Mission Name",
+                      JOptionPane.ERROR_MESSAGE);
                 return;
             }
         }
@@ -692,8 +701,11 @@ public class NewContractDialog extends JDialog {
         contract.setType(txtType.getText());
         contract.setDesc(txtDesc.getText());
         contract.setCommandRights(choiceCommand.getSelectedItem());
-        campaign.getFinances().credit(TransactionType.CONTRACT_PAYMENT, campaign.getLocalDate(),
-                contract.getTotalAdvanceAmount(), "Advance funds for " + contract.getName());
+        campaign.getFinances()
+              .credit(TransactionType.CONTRACT_PAYMENT,
+                    campaign.getLocalDate(),
+                    contract.getTotalAdvanceAmount(),
+                    "Advance funds for " + contract.getName());
 
         campaign.addMission(contract);
 
@@ -713,9 +725,9 @@ public class NewContractDialog extends JDialog {
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             if (campaign.getLocalDate().isAfter(dc.getDate())) {
                 JOptionPane.showMessageDialog(frame,
-                        "You cannot choose a start date before the current date.",
-                        "Invalid date",
-                        JOptionPane.ERROR_MESSAGE);
+                      "You cannot choose a start date before the current date.",
+                      "Invalid date",
+                      JOptionPane.ERROR_MESSAGE);
                 return;
             }
             contract.setStartDate(dc.getDate());
@@ -751,8 +763,8 @@ public class NewContractDialog extends JDialog {
 
     protected void doUpdateContract(Object source) {
         if (suggestPlanet.equals(source)) {
-            PlanetarySystem system = Systems.getInstance().getSystemByName(suggestPlanet.getText(),
-                    campaign.getLocalDate());
+            PlanetarySystem system = Systems.getInstance()
+                                           .getSystemByName(suggestPlanet.getText(), campaign.getLocalDate());
 
             if (system != null) {
                 contract.setSystemId(system.getId());

@@ -3,9 +3,11 @@ sucsId: 386
 xcood: 195.41
 ycood: 39.755
 spectralType:
-  source: canon
+  source: FedCom Civil War, pg. 189
   value: K7VII
-primarySlot: 5
+primarySlot:
+  source: FedCom Civil War, pg. 189
+  value: 5
 event:
   - date: '2568-08-01'
     zenithCharge: yes
@@ -79,29 +81,33 @@ planet:
       value: Breed
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.6
-    sysPos: 5
+    sysPos:
+      source: FedCom Civil War, pg. 189
+      value: 5
     icon: green4
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 189
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 189
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 189
       value: 1.3
-    diameter: 14353
-    density: 6.379314396854
+    diameter: 14337
+    density: 6.37221921037
     dayLength: 18
     yearLength: 0.9
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 189
       value: 40
     water:
-      source: canon
+      source: FedCom Civil War, pg. 189
       value: 70
     lifeForm:
-      source: canon
-      value: AMPHIBIAN
+      source: FedCom Civil War, pg. 189
+      value: REPTILE
     desc: Breed is a resource rich world originally settled by the Federated Suns.
       The planet has been a constant source of contention between the Federated Suns
       and the Draconis Combine throughout its history, with both Great Houses wanting
@@ -110,25 +116,31 @@ planet:
       though it does manage to produce enough agriculture to feed the population.
     landmass:
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 189
           value: Hindi
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 189
           value: Talicar
         capital:
-          source: canon
+          source: FedCom Civil War, pg. 189
           value: Tonston
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 189
           value: Trice
     satellite:
-      - name: Despot
+      - name:
+          source: FedCom Civil War, pg. 189
+          value: Despot
         size: medium
         icon: rock5
-      - name: Stoneface
+      - name:
+          source: FedCom Civil War, pg. 189
+          value: Stoneface
         size: medium
         icon: oddmoon1
-      - name: Zampage
+      - name:
+          source: FedCom Civil War, pg. 189
+          value: Zampage
         size: medium
         icon: oddmoon2
     event:

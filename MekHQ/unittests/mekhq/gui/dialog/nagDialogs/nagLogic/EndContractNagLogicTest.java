@@ -1,25 +1,34 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.gui.dialog.nagDialogs.EndContractNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +51,7 @@ public class EndContractNagLogicTest {
     // Mock objects for the tests
     private Campaign campaign;
     private LocalDate today;
-    private Contract contract1, contract2;
+    private AtBContract contract1, contract2;
 
     /**
      * Test setup for each test, runs before each test.
@@ -55,10 +64,8 @@ public class EndContractNagLogicTest {
         // Initialize the mock objects
         campaign = mock(Campaign.class);
         today = LocalDate.now();
-        contract1 = mock(Contract.class);
-        contract2 = mock(Contract.class);
-
-        when(campaign.getLocalDate()).thenReturn(today);
+        contract1 = mock(AtBContract.class);
+        contract2 = mock(AtBContract.class);
     }
 
     // In the following tests the isContractEnded() method is called, and its response is
@@ -66,36 +73,36 @@ public class EndContractNagLogicTest {
 
     @Test
     void noActiveContracts() {
-        when(campaign.getActiveContracts()).thenReturn(new ArrayList<>());
-        assertFalse(isContractEnded(campaign));
+        assertFalse(isContractEnded(today, new ArrayList<>()));
     }
 
     @Test
     void oneActiveContractEndsTomorrow() {
-        when(campaign.getActiveContracts()).thenReturn(List.of(contract1));
         when(contract1.getEndingDate()).thenReturn(today.plusDays(1));
-        assertFalse(isContractEnded(campaign));
+
+        assertFalse(isContractEnded(today, List.of(contract1)));
     }
 
     @Test
     void oneActiveContractEndsToday() {
-        when(campaign.getActiveContracts()).thenReturn(List.of(contract1));
         when(contract1.getEndingDate()).thenReturn(today);
-        assertTrue(isContractEnded(campaign));
+
+        assertTrue(isContractEnded(today, List.of(contract1)));
     }
 
     @Test
     void twoActiveContractsOneEndsTomorrowOneEndsToday() {
-        when(campaign.getActiveContracts()).thenReturn(List.of(contract1, contract2));
         when(contract1.getEndingDate()).thenReturn(today.plusDays(1));
         when(contract2.getEndingDate()).thenReturn(today);
-        assertTrue(isContractEnded(campaign));
+
+        assertTrue(isContractEnded(today, List.of(contract1, contract2)));
     }
 
     @Test
     void twoActiveContractsBothEndToday() {
-        when(campaign.getActiveContracts()).thenReturn(List.of(contract1, contract2));
         when(contract1.getEndingDate()).thenReturn(today);
-        assertTrue(isContractEnded(campaign));
+        when(contract2.getEndingDate()).thenReturn(today);
+
+        assertTrue(isContractEnded(today, List.of(contract1, contract2)));
     }
 }

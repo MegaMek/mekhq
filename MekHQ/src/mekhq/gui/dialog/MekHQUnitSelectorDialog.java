@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.dialog;
 
@@ -28,6 +37,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
+import mekhq.utilities.MHQInternationalization;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,7 +46,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.regex.PatternSyntaxException;
 
-import static mekhq.utilities.EntityUtilities.isUnsupportedUnitType;
+import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -134,12 +144,24 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             // Block the purchase if the unit type is unsupported
             Entity entity = selectedUnit.getEntity();
 
-            if (entity == null || isUnsupportedUnitType(entity.getUnitType())) {
+            if (entity == null || isUnsupportedEntity(entity)) {
                 final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
                     MekHQ.getMHQOptions().getLocale());
 
+                String reason;
+                if (entity == null) {
+                    reason = MHQInternationalization.getTextAt(resources.getBaseBundleName(),
+                        "mekSelectorDialog.unsupported.null");
+                } else if (entity.getUnitType() == UnitType.GUN_EMPLACEMENT) {
+                    reason = MHQInternationalization.getTextAt(resources.getBaseBundleName(),
+                        "mekSelectorDialog.unsupported.gunEmplacement");
+                } else {
+                    reason = MHQInternationalization.getTextAt(resources.getBaseBundleName(),
+                        "mekSelectorDialog.unsupported.droneOs");
+                }
+
                 campaign.addReport(String.format(
-                    resources.getString("mekSelectorDialog.unsupported.gunEmplacement"),
+                    reason,
                     spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                     CLOSING_SPAN_TAG));
 

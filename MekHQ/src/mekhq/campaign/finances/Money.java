@@ -1,36 +1,42 @@
 /*
- * Money.java
- *
  * Copyright (c) 2019 - Vicente Cartas Espinel (vicente.cartas at outlook.com). All Rights Reserved.
- * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.finances;
-
-import org.joda.money.BigMoney;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
 
+import org.joda.money.BigMoney;
+
 /**
- * This class represents an quantity of money and its associated
- * currency.
+ * This class represents a quantity of money and its associated currency.
  *
  * @author Vicente Cartas Espinel (vicente.cartas at outlook.com)
  */
@@ -155,12 +161,20 @@ public class Money implements Comparable<Money> {
     }
 
     public String toAmountAndSymbolString() {
-        return CurrencyManager.getInstance().getUiAmountAndSymbolPrinter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
+        return CurrencyManager.getInstance()
+                     .getUiAmountAndSymbolPrinter()
+                     .print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
     }
 
-    @Deprecated
+    /**
+     * @since 0.50.04
+     * @deprecated use {@link #toAmountAndSymbolString()} instead
+     */
+    @Deprecated(since = "0.50.04", forRemoval = true)
     public String toAmountAndNameString() {
-        return CurrencyManager.getInstance().getUiAmountAndNamePrinter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
+        return CurrencyManager.getInstance()
+                     .getUiAmountAndNamePrinter()
+                     .print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
     }
 
     /**
@@ -170,7 +184,7 @@ public class Money implements Comparable<Money> {
         return new Money(getWrapped().withScale(0, RoundingMode.HALF_UP));
     }
 
-    //region File I/O
+    // region File I/O
     public String toXmlString() {
         return CurrencyManager.getInstance().getXmlMoneyFormatter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
     }
@@ -178,7 +192,7 @@ public class Money implements Comparable<Money> {
     public static Money fromXmlString(String xmlData) {
         return new Money(CurrencyManager.getInstance().getXmlMoneyFormatter().parseBigMoney(xmlData));
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

@@ -3,9 +3,11 @@ sucsId: 2961
 xcood: 32.3
 ycood: 1767.809
 spectralType:
-  source: canon
+  source: 'Historical: Operation Klondike, pg. 139'
   value: G3VI
-primarySlot: 4
+primarySlot:
+  source: 'Historical: Operation Klondike, pg. 139'
+  value: 4
 event:
   - date: '2803-11-07'
     zenithCharge: yes
@@ -64,28 +66,32 @@ planet:
       value: Strana Mechty
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 4
+    sysPos:
+      source: 'Historical: Operation Klondike, pg. 139'
+      value: 4
     icon: green46
     pressure:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 139'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Historical: Operation Klondike, pg. 139'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 139'
       value: 1.1
-    diameter: 11781
-    density: 6.555719555642
+    diameter: 11786
+    density: 6.558715890459
     dayLength: 24
     yearLength: 2.3
     temperature:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 139'
       value: 25
     water:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 139'
       value: 70
     lifeForm:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 139'
       value: MAMMAL
     desc: Strana Mechty ("Land of Dreams") is the Clan shared "capital" planet. The
       planet is the site that Nicolas Kerensky and the original 800 Clan founders
@@ -95,27 +101,31 @@ planet:
       life.
     landmass:
       - name:
-          source: canon
+          source: 'Historical: Operation Klondike, pg. 139'
           value: Cameron
       - name:
-          source: canon
+          source: 'Historical: Operation Klondike, pg. 139'
+          value: Kerensky Prime
+      - name:
+          source: 'Historical: Operation Klondike, pg. 139'
           value: McKenna
       - name:
-          source: canon
+          source: 'Historical: Operation Klondike, pg. 139'
           value: Novy Terra
         capital:
           source: canon
           value: Katyusha City
-      - name:
-          source: canon
-          value: Kerensky Prime
     satellite:
-      - name: Petrograd
-        size: medium
-        icon: rock10
-      - name: Magadan
+      - name:
+          source: 'Historical: Operation Klondike, pg. 139'
+          value: Magadan
         size: large
         icon: rock1
+      - name:
+          source: 'Historical: Operation Klondike, pg. 139'
+          value: Petrograd
+        size: medium
+        icon: rock10
     event:
       - date: '2802-02-04'
         faction:

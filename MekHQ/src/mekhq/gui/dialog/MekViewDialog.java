@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
- * MegaMek is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
- * MegaMek is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.dialog;
 
@@ -22,7 +31,6 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.util.ResourceBundle;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -44,15 +52,15 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 public class MekViewDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(MekViewDialog.class);
 
-    private MekView mview;
-    private JButton btnOkay;
+    private MekView     mekView;
+    private JButton     btnOkay;
     private JScrollPane jScrollPane2;
-    private JTextPane txtMek;
+    private JTextPane   txtMek;
 
     /** Creates new form MekViewDialog */
     public MekViewDialog(JFrame parent, boolean modal, MekView mv) {
         super(parent, modal);
-        this.mview = mv;
+        this.mekView = mv;
         initComponents();
         setUserPreferences();
     }
@@ -60,11 +68,11 @@ public class MekViewDialog extends JDialog {
     private void initComponents() {
 
         jScrollPane2 = new JScrollPaneWithSpeed();
-        txtMek = new JTextPane();
-        btnOkay = new JButton();
+        txtMek       = new JTextPane();
+        btnOkay      = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekViewDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Unit View");
 
@@ -74,7 +82,7 @@ public class MekViewDialog extends JDialog {
         txtMek.setEditable(false);
         txtMek.setFont(Font.decode(resourceMap.getString("txtMek.font")));
         txtMek.setName("txtMek");
-        txtMek.setText(mview.getMekReadout());
+        txtMek.setText(mekView.getMekReadout());
         jScrollPane2.setViewportView(txtMek);
 
         btnOkay.setText(resourceMap.getString("btnOkay.text"));
@@ -87,7 +95,13 @@ public class MekViewDialog extends JDialog {
         pack();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekViewDialog.class);

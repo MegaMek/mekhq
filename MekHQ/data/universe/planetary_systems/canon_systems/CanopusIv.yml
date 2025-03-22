@@ -3,9 +3,11 @@ sucsId: 462
 xcood: -147.166
 ycood: -394.997
 spectralType:
-  source: canon
+  source: 'Handbook: Major Periphery States, pg. 98'
   value: F5IV
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: Major Periphery States, pg. 98'
+  value: 4
 event:
   - date: '2569-02-11'
     nadirCharge: yes
@@ -71,28 +73,32 @@ planet:
       value: Canopus IV
     type: TERRESTRIAL
     orbitalDist: 3.92
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: Major Periphery States, pg. 98'
+      value: 4
     icon: green22
     pressure:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 98'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: Major Periphery States, pg. 98'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 98'
       value: 1.1
-    diameter: 15262
-    density: 5.087470190692
+    diameter: 15228
+    density: 5.076272498872
     dayLength: 21
     yearLength: 7.9
     temperature:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 98'
       value: 25
     water:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 98'
       value: 60
     lifeForm:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 98'
       value: FISH
     desc: |-
       Canopus IV is a temperate planet with three continents. The most settled continent is Salonika, which was originally covered in lush forests and rolling hills, it has over time become industrialized and polluted. It is home to the three major cities on Canopus IV; the capital Crimson, Delphi the capital in the planet's early history, and Astarte. Salonika is also home to all major manufacturing centers on planet.
@@ -106,22 +112,23 @@ planet:
       Majestic Metals and Manufacturing
     landmass:
       - name:
-          source: canon
+          source: Masters and Minions, pg. 177
           value: Alinia
       - name:
-          source: canon
-          value: Obio
-      - name:
-          source: canon
+          source: Masters and Minions, pg. 177
           value: Salonika
         capital:
-          source: canon
+          source: 'Handbook: Major Periphery States, pg. 98'
           value: Crimson
     satellite:
-      - name: Cybele
+      - name:
+          source: 'Handbook: Major Periphery States, pg. 98'
+          value: Cybele
         size: medium
         icon: oddmoon2
-      - name: Inanna
+      - name:
+          source: 'Handbook: Major Periphery States, pg. 98'
+          value: Inanna
         size: medium
         icon: rock11
     event:

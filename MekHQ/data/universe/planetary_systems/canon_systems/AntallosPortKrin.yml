@@ -3,9 +3,11 @@ sucsId: 145
 xcood: 463.228
 ycood: 281.417
 spectralType:
-  source: canon
+  source: Mercenaries Supplemental II, pg. 12
   value: K4IV
-primarySlot: 3
+primarySlot:
+  source: Mercenaries Supplemental II, pg. 12
+  value: 3
 planet:
   - name: Riverhead
     type: GIANT_TERRESTRIAL
@@ -40,28 +42,32 @@ planet:
       value: Antallos (Port Krin)
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 3
+    sysPos:
+      source: Mercenaries Supplemental II, pg. 12
+      value: 3
     icon: dry11
     pressure:
-      source: canon
+      source: Mercenaries Supplemental II, pg. 12
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Mercenaries Supplemental II, pg. 12
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Mercenaries Supplemental II, pg. 12
       value: 0.92
-    diameter: 11066
-    density: 5.862661459426
+    diameter: 11047
+    density: 5.852606962101
     dayLength: 27
     yearLength: 1.0
     temperature:
-      source: canon
+      source: Mercenaries Supplemental II, pg. 12
       value: 49
     water:
-      source: canon
+      source: Mercenaries Supplemental II, pg. 12
       value: 11
     lifeForm:
-      source: canon
+      source: Mercenaries Supplemental II, pg. 12
       value: BIRD
     desc: Antallos was first settled in 2674 by a multinational trading conglomerate
       and managed by the Terran Hegemony with the Star League's blessing. Antallos
@@ -80,16 +86,20 @@ planet:
           source: canon
           value: Sea of Despair
         capital:
-          source: canon
+          source: Mercenaries Supplemental II, pg. 12
           value: Port Krin
       - name:
           source: canon
           value: Shattered Wastes
     satellite:
-      - name: Quincy
+      - name:
+          source: Mercenaries Supplemental II, pg. 12
+          value: Quincy
         size: large
         icon: rock14
-      - name: Zeke
+      - name:
+          source: Mercenaries Supplemental II, pg. 12
+          value: Zeke
         size: large
         icon: rock1
     event:

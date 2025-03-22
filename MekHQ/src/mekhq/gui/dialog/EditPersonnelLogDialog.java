@@ -1,29 +1,36 @@
 /*
- * EditPersonnelLogDialog.java
- *
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
 import java.util.Objects;
 import java.util.ResourceBundle;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -43,12 +50,12 @@ import mekhq.gui.control.EditPersonnelLogControl;
 public class EditPersonnelLogDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(EditPersonnelLogDialog.class);
 
-    private JFrame frame;
+    private JFrame   frame;
     private Campaign campaign;
-    private Person person;
+    private Person   person;
 
     private EditPersonnelLogControl editPersonnelLogControl;
-    private JButton btnOK;
+    private JButton                 btnOK;
 
     /** Creates new form EditPersonnelLogDialog */
     public EditPersonnelLogDialog(JFrame parent, boolean modal, Campaign c, Person p) {
@@ -57,8 +64,8 @@ public class EditPersonnelLogDialog extends JDialog {
         Objects.requireNonNull(p);
 
         this.frame = parent;
-        campaign = c;
-        person = p;
+        campaign   = c;
+        person     = p;
 
         initComponents();
         setLocationRelativeTo(parent);
@@ -67,7 +74,7 @@ public class EditPersonnelLogDialog extends JDialog {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelLogDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName(resourceMap.getString("dialog.name"));
@@ -86,7 +93,13 @@ public class EditPersonnelLogDialog extends JDialog {
         pack();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditPersonnelLogDialog.class);

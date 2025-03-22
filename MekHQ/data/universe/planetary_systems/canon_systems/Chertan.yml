@@ -3,9 +3,11 @@ sucsId: 534
 xcood: -74.708
 ycood: -15.558
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: A3V
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 event:
   - date: '2361-08-04'
     nadirCharge: yes
@@ -19,28 +21,32 @@ planet:
       value: Chertan
     type: TERRESTRIAL
     orbitalDist: 3.84
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: dry26
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.67
-    diameter: 10496
-    density: 4.505430366875
+    diameter: 10473
+    density: 4.495696677415
     dayLength: 20
     yearLength: 7.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 39
     water:
-      source: canon
+      source: MWDA world profiles
       value: 16
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: PLANT
     desc: |-
       3135 - Chertan is a water-poor world, blasted by a hot, white star. However, abundant mineral and metallurgical resources supported the founding of several settlements based around mining, refining, and manufacturing operations, despite the lack of arable land. The growth of nearby agricultural worlds and trade saw Chertan prosper from its export of raw materials and heavy machinery, and continued to do so until after the fall of the Star League. Theleopolis, the planetary capital and primary spaceport of Chertan, is located in the southern hemisphere just south of the Huron Sea. New Pittsburgh is located near the Eerie Sea, the northernmost of Chertan‘s three large bodies of water. Altonia, the third largest city after Theleopolis and New Pittsburgh, is located near the eastern edge of the Ontario Sea. Altonia is home to Artista Chemicals, Chertan‘s largest mineral mining and refining operation.
@@ -50,13 +56,17 @@ planet:
       During the Jihad, mercenaries employed by the Word of Blake savaged several mining towns and obliterated the spaceport at New Pittsburgh. Despite the damage, the planetary infrastructure and economy recovered following the influx of new residents relocated to Chertan under Devlin Stone‘s Relocation Act.
     landmass:
       - capital:
-          source: canon
+          source: MWDA world profiles
           value: Theleopolis
     satellite:
-      - name: Osei
+      - name:
+          source: MWDA world profiles
+          value: Osei
         size: large
         icon: rock4
-      - name: Pelipa
+      - name:
+          source: MWDA world profiles
+          value: Pelipa
         size: medium
         icon: rock7
     event:

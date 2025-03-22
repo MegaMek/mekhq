@@ -1,22 +1,33 @@
 /*
- * Copyright (c) 2016-2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.dialog;
+
+import static megamek.client.ui.WrapLayout.wordWrap;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -33,7 +44,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-
 import javax.swing.*;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.table.TableColumn;
@@ -67,8 +77,6 @@ import mekhq.service.mrms.MRMSOption;
 import mekhq.service.mrms.MRMSService;
 import mekhq.service.mrms.MRMSService.MRMSPartSet;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
-
 /**
  * @author Kipsta
  */
@@ -76,27 +84,27 @@ public class MRMSDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(MRMSDialog.class);
 
     // region Variable Declarations
-    private final JFrame frame;
-    private CampaignGUI campaignGUI;
-    private CampaignOptions campaignOptions;
+    private final JFrame          frame;
+    private       CampaignGUI     campaignGUI;
+    private       CampaignOptions campaignOptions;
 
     private MRMSMode mode;
 
-    private Unit selectedUnit;
-    private UnitTableModel unitTableModel;
-    private JTable unitTable;
+    private Unit                           selectedUnit;
+    private UnitTableModel                 unitTableModel;
+    private JTable                         unitTable;
     private TableRowSorter<UnitTableModel> unitSorter;
-    private JPanel pnlUnits;
-    private JScrollPane scrollUnitList;
-    private JButton btnSelectNone;
-    private JButton btnSelectAssigned;
-    private JButton btnSelectUnassigned;
+    private JPanel                         pnlUnits;
+    private JScrollPane                    scrollUnitList;
+    private JButton                        btnSelectNone;
+    private JButton                        btnSelectAssigned;
+    private JButton                        btnSelectUnassigned;
 
     private PartsTableModel partsTableModel;
-    private JTable partsTable;
-    private JPanel pnlParts;
-    private JScrollPane scrollPartsTable;
-    private JButton btnSelectAllParts;
+    private JTable          partsTable;
+    private JPanel          pnlParts;
+    private JScrollPane     scrollPartsTable;
+    private JButton         btnSelectAllParts;
 
     private JCheckBox useRepairBox;
     private JCheckBox useSalvageBox;
@@ -110,27 +118,25 @@ public class MRMSDialog extends JDialog {
 
     private Map<PartRepairType, MRMSOptionControl> mrmsOptionControls = null;
 
-    private List<Unit> unitList = null;
+    private List<Unit> unitList          = null;
     private List<Part> completePartsList = null;
     private List<Part> filteredPartsList = null;
 
-    private final transient ResourceBundle resources = ResourceBundle.getBundle(
-            "mekhq.resources.MRMS", MekHQ.getMHQOptions().getLocale());
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MRMS",
+          MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
     // region Constructors
-    public MRMSDialog(final JFrame frame, final boolean modal, final CampaignGUI campaignGUI,
-            final MRMSMode mode) {
+    public MRMSDialog(final JFrame frame, final boolean modal, final CampaignGUI campaignGUI, final MRMSMode mode) {
         this(frame, modal, campaignGUI, null, mode);
     }
 
-    public MRMSDialog(final JFrame frame, final boolean modal, final CampaignGUI campaignGUI,
-            final Unit selectedUnit, final MRMSMode mode) {
+    public MRMSDialog(final JFrame frame, final boolean modal, final CampaignGUI campaignGUI, final Unit selectedUnit, final MRMSMode mode) {
         super(frame, modal);
-        this.frame = frame;
-        this.campaignGUI = campaignGUI;
+        this.frame        = frame;
+        this.campaignGUI  = campaignGUI;
         this.selectedUnit = selectedUnit;
-        this.mode = mode;
+        this.mode         = mode;
 
         campaignOptions = campaignGUI.getCampaign().getCampaignOptions();
 
@@ -144,8 +150,8 @@ public class MRMSDialog extends JDialog {
                 int unitCount = unitTable.getRowCount();
 
                 for (int i = 0; i < unitCount; i++) {
-                    int rowIdx = unitTable.convertRowIndexToModel(i);
-                    Unit unit = unitTableModel.getUnit(rowIdx);
+                    int  rowIdx = unitTable.convertRowIndexToModel(i);
+                    Unit unit   = unitTableModel.getUnit(rowIdx);
 
                     if (unit == null) {
                         continue;
@@ -186,8 +192,8 @@ public class MRMSDialog extends JDialog {
         int[] selectedRows = unitTable.getSelectedRows();
 
         for (int selectedRow : selectedRows) {
-            int rowIdx = unitTable.convertRowIndexToModel(selectedRow);
-            Unit unit = unitTableModel.getUnit(rowIdx);
+            int  rowIdx = unitTable.convertRowIndexToModel(selectedRow);
+            Unit unit   = unitTableModel.getUnit(rowIdx);
 
             if (unit == null) {
                 continue;
@@ -196,7 +202,7 @@ public class MRMSDialog extends JDialog {
             selectedUnitMap.put(unit.getId().toString(), unit);
         }
 
-        int activeCount = 0;
+        int activeCount   = 0;
         int inactiveCount = 0;
 
         unitList = new ArrayList<>();
@@ -215,18 +221,17 @@ public class MRMSDialog extends JDialog {
             }
         }
 
-        btnSelectAssigned.setText(MessageFormat.format(resources.getString("btnSelectAssigned.format"),
-                activeCount));
+        btnSelectAssigned.setText(MessageFormat.format(resources.getString("btnSelectAssigned.format"), activeCount));
         btnSelectUnassigned.setText(MessageFormat.format(resources.getString("btnSelectUnassigned.format"),
-                inactiveCount));
+              inactiveCount));
 
         unitTableModel.setData(unitList);
 
         int unitCount = unitTable.getRowCount();
 
         for (int i = 0; i < unitCount; i++) {
-            int rowIdx = unitTable.convertRowIndexToModel(i);
-            Unit unit = unitTableModel.getUnit(rowIdx);
+            int  rowIdx = unitTable.convertRowIndexToModel(i);
+            Unit unit   = unitTableModel.getUnit(rowIdx);
 
             if (!selectedUnitMap.containsKey(unit.getId().toString())) {
                 continue;
@@ -251,8 +256,10 @@ public class MRMSDialog extends JDialog {
             completePartsList = new ArrayList<>();
 
             campaignGUI.getCampaign().getWarehouse().forEachSparePart(part -> {
-                if (!part.isBeingWorkedOn() && part.needsFixing() && !(part instanceof AmmoBin)
-                        && (part.getSkillMin() <= SkillType.EXP_ELITE)) {
+                if (!part.isBeingWorkedOn() &&
+                    part.needsFixing() &&
+                    !(part instanceof AmmoBin) &&
+                    (part.getSkillMin() <= SkillType.EXP_ELITE)) {
                     completePartsList.add(part);
                 }
             });
@@ -271,8 +278,7 @@ public class MRMSDialog extends JDialog {
             }
         }
 
-        btnSelectAllParts.setText(MessageFormat.format(resources.getString("btnSelectAllParts.format"),
-                quantity));
+        btnSelectAllParts.setText(MessageFormat.format(resources.getString("btnSelectAllParts.format"), quantity));
         partsTableModel.setData(filteredPartsList);
 
         int count = partsTable.getRowCount();
@@ -309,21 +315,20 @@ public class MRMSDialog extends JDialog {
 
     private GridBagConstraints createBaseConstraints(int rowIdx) {
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = rowIdx;
+        gridBagConstraints.gridx   = 0;
+        gridBagConstraints.gridy   = rowIdx;
         gridBagConstraints.weightx = 1;
         gridBagConstraints.weighty = 1;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill    = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
 
         return gridBagConstraints;
     }
 
     private JPanel createUnitsPanel() {
         pnlUnits = new JPanel(new GridBagLayout());
-        pnlUnits.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resources.getString("UnitsPanel.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        pnlUnits.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resources.getString(
+              "UnitsPanel.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         unitTableModel = new UnitTableModel(campaignGUI.getCampaign());
 
@@ -350,8 +355,10 @@ public class MRMSDialog extends JDialog {
             column.setPreferredWidth(unitTableModel.getColumnWidth(i));
             column.setCellRenderer(unitTableModel.getRenderer(false));
 
-            if ((i != UnitTableModel.COL_NAME) && (i != UnitTableModel.COL_TYPE)
-                    && (i != UnitTableModel.COL_STATUS) && (i != UnitTableModel.COL_RSTATUS)) {
+            if ((i != UnitTableModel.COL_NAME) &&
+                (i != UnitTableModel.COL_TYPE) &&
+                (i != UnitTableModel.COL_STATUS) &&
+                (i != UnitTableModel.COL_RSTATUS)) {
                 ((XTableColumnModel) unitTable.getColumnModel()).setColumnVisible(column, false);
             }
         }
@@ -364,12 +371,12 @@ public class MRMSDialog extends JDialog {
         scrollUnitList.setPreferredSize(new Dimension(350, 200));
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx   = 0;
+        gridBagConstraints.gridy   = 0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill    = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
 
         pnlUnits.add(scrollUnitList, gridBagConstraints);
 
@@ -378,12 +385,11 @@ public class MRMSDialog extends JDialog {
 
     private JPanel createPartsPanel() {
         pnlParts = new JPanel(new GridBagLayout());
-        pnlParts.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resources.getString("PartsPanel.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        pnlParts.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resources.getString(
+              "PartsPanel.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         partsTableModel = new PartsTableModel();
-        partsTable = new JTable(partsTableModel);
+        partsTable      = new JTable(partsTableModel);
         partsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         partsTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         partsTable.setColumnModel(new XTableColumnModel());
@@ -399,8 +405,10 @@ public class MRMSDialog extends JDialog {
             column.setPreferredWidth(partsTableModel.getColumnWidth(i));
             column.setCellRenderer(partsTableModel.getRenderer());
 
-            if ((i != PartsTableModel.COL_QUANTITY) && (i != PartsTableModel.COL_NAME)
-                    && (i != PartsTableModel.COL_DETAIL) && (i != PartsTableModel.COL_TECH_BASE)) {
+            if ((i != PartsTableModel.COL_QUANTITY) &&
+                (i != PartsTableModel.COL_NAME) &&
+                (i != PartsTableModel.COL_DETAIL) &&
+                (i != PartsTableModel.COL_TECH_BASE)) {
                 ((XTableColumnModel) partsTable.getColumnModel()).setColumnVisible(column, false);
             }
         }
@@ -413,12 +421,12 @@ public class MRMSDialog extends JDialog {
         scrollPartsTable.setPreferredSize(new Dimension(350, 200));
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx   = 0;
+        gridBagConstraints.gridy   = 0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill    = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
         pnlParts.add(scrollPartsTable, gridBagConstraints);
 
         return pnlParts;
@@ -426,9 +434,8 @@ public class MRMSDialog extends JDialog {
 
     private JPanel createOptionsPanel() {
         JPanel pnlOptions = new JPanel(new GridBagLayout());
-        pnlOptions.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resources.getString("OptionsPanel.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        pnlOptions.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resources.getString(
+              "OptionsPanel.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         int gridRowIdx = 0;
 
@@ -437,19 +444,19 @@ public class MRMSDialog extends JDialog {
         useRepairBox = new JCheckBox(resources.getString("useRepairBox.text"));
         useRepairBox.setToolTipText(wordWrap(resources.getString("useRepairBox.toolTipText")));
         useRepairBox.setName("useRepairBox");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = gridRowIdx++;
+        gridBagConstraints         = new GridBagConstraints();
+        gridBagConstraints.gridx   = 0;
+        gridBagConstraints.gridy   = gridRowIdx++;
         gridBagConstraints.weightx = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill    = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
         pnlOptions.add(useRepairBox, gridBagConstraints);
 
         useSalvageBox = new JCheckBox(resources.getString("useSalvageBox.text"));
         useSalvageBox.setToolTipText(wordWrap(resources.getString("useSalvageBox.toolTipText")));
         useSalvageBox.setName("useSalvageBox");
         gridBagConstraints.gridy = gridRowIdx++;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.fill  = GridBagConstraints.NONE;
         pnlOptions.add(useSalvageBox, gridBagConstraints);
 
         useExtraTimeBox = new JCheckBox(resources.getString("useExtraTimeBox.text"));
@@ -498,14 +505,14 @@ public class MRMSDialog extends JDialog {
         }
 
         JPanel pnlItems = new JPanel(new GridBagLayout());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = gridRowIdx++;
+        gridBagConstraints         = new GridBagConstraints();
+        gridBagConstraints.gridx   = 0;
+        gridBagConstraints.gridy   = gridRowIdx++;
         gridBagConstraints.weightx = 0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(10, 0, 0, 0);
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets  = new Insets(10, 0, 0, 0);
+        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill    = GridBagConstraints.NONE;
         pnlOptions.add(pnlItems, gridBagConstraints);
 
         gridRowIdx = 0;
@@ -514,11 +521,11 @@ public class MRMSDialog extends JDialog {
         itemLabel.setName("itemLabel");
         Font boldFont = new Font(itemLabel.getFont().getFontName(), Font.BOLD, itemLabel.getFont().getSize());
         itemLabel.setFont(boldFont);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = gridRowIdx++;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints        = new GridBagConstraints();
+        gridBagConstraints.gridx  = gridRowIdx++;
+        gridBagConstraints.gridy  = 0;
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.fill   = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         pnlItems.add(itemLabel, gridBagConstraints);
 
@@ -563,75 +570,124 @@ public class MRMSDialog extends JDialog {
 
         if (!getMode().isWarehouse()) {
             mrmsOptionControls.put(PartRepairType.ARMOUR,
-                    createMRMSOptionControls(PartRepairType.ARMOUR,
-                            "mrmsItemArmor.text", "mrmsItemArmor.toolTipText",
-                            "mrmsItemArmor", pnlItems, gridRowIdx++));
+                  createMRMSOptionControls(PartRepairType.ARMOUR,
+                        "mrmsItemArmor.text",
+                        "mrmsItemArmor.toolTipText",
+                        "mrmsItemArmor",
+                        pnlItems,
+                        gridRowIdx++));
 
             mrmsOptionControls.put(PartRepairType.AMMUNITION,
-                    createMRMSOptionControls(PartRepairType.AMMUNITION,
-                            "mrmsItemAmmo.text", "mrmsItemAmmo.toolTipText",
-                            "mrmsItemAmmo", pnlItems, gridRowIdx++));
+                  createMRMSOptionControls(PartRepairType.AMMUNITION,
+                        "mrmsItemAmmo.text",
+                        "mrmsItemAmmo.toolTipText",
+                        "mrmsItemAmmo",
+                        pnlItems,
+                        gridRowIdx++));
         }
 
         mrmsOptionControls.put(PartRepairType.WEAPON,
-                createMRMSOptionControls(PartRepairType.WEAPON,
-                        "mrmsItemWeapons.text", "mrmsItemWeapons.toolTipText",
-                        "mrmsItemWeapons", pnlItems, gridRowIdx++));
+              createMRMSOptionControls(PartRepairType.WEAPON,
+                    "mrmsItemWeapons.text",
+                    "mrmsItemWeapons.toolTipText",
+                    "mrmsItemWeapons",
+                    pnlItems,
+                    gridRowIdx++));
         mrmsOptionControls.put(PartRepairType.GENERAL_LOCATION,
-                createMRMSOptionControls(PartRepairType.GENERAL_LOCATION,
-                        "mrmsItemLocations.text", "mrmsItemLocations.toolTipText",
-                        "mrmsItemLocations", pnlItems, gridRowIdx++));
+              createMRMSOptionControls(PartRepairType.GENERAL_LOCATION,
+                    "mrmsItemLocations.text",
+                    "mrmsItemLocations.toolTipText",
+                    "mrmsItemLocations",
+                    pnlItems,
+                    gridRowIdx++));
         mrmsOptionControls.put(PartRepairType.ENGINE,
-                createMRMSOptionControls(PartRepairType.ENGINE,
-                        "mrmsItemEngines.text", "mrmsItemEngines.toolTipText",
-                        "mrmsItemEngines", pnlItems, gridRowIdx++));
+              createMRMSOptionControls(PartRepairType.ENGINE,
+                    "mrmsItemEngines.text",
+                    "mrmsItemEngines.toolTipText",
+                    "mrmsItemEngines",
+                    pnlItems,
+                    gridRowIdx++));
         mrmsOptionControls.put(PartRepairType.GYRO,
-                createMRMSOptionControls(PartRepairType.GYRO,
-                        "mrmsItemGyros.text", "mrmsItemGyros.toolTipText",
-                        "mrmsItemGyros", pnlItems, gridRowIdx++));
+              createMRMSOptionControls(PartRepairType.GYRO,
+                    "mrmsItemGyros.text",
+                    "mrmsItemGyros.toolTipText",
+                    "mrmsItemGyros",
+                    pnlItems,
+                    gridRowIdx++));
         mrmsOptionControls.put(PartRepairType.ACTUATOR,
-                createMRMSOptionControls(PartRepairType.ACTUATOR,
-                        "mrmsItemActuators.text", "mrmsItemActuators.toolTipText",
-                        "mrmsItemActuators", pnlItems, gridRowIdx++));
+              createMRMSOptionControls(PartRepairType.ACTUATOR,
+                    "mrmsItemActuators.text",
+                    "mrmsItemActuators.toolTipText",
+                    "mrmsItemActuators",
+                    pnlItems,
+                    gridRowIdx++));
         mrmsOptionControls.put(PartRepairType.ELECTRONICS,
-                createMRMSOptionControls(PartRepairType.ELECTRONICS,
-                        "mrmsItemHead.text", "mrmsItemHead.toolTipText",
-                        "mrmsItemHead", pnlItems, gridRowIdx++));
+              createMRMSOptionControls(PartRepairType.ELECTRONICS,
+                    "mrmsItemHead.text",
+                    "mrmsItemHead.toolTipText",
+                    "mrmsItemHead",
+                    pnlItems,
+                    gridRowIdx++));
         mrmsOptionControls.put(PartRepairType.GENERAL,
-                createMRMSOptionControls(PartRepairType.GENERAL,
-                        "mrmsItemOther.text", "mrmsItemOther.toolTipText",
-                        "mrmsItemOther", pnlItems, gridRowIdx++));
+              createMRMSOptionControls(PartRepairType.GENERAL,
+                    "mrmsItemOther.text",
+                    "mrmsItemOther.toolTipText",
+                    "mrmsItemOther",
+                    pnlItems,
+                    gridRowIdx++));
         mrmsOptionControls.put(PartRepairType.POD_SPACE,
-                createMRMSOptionControls(PartRepairType.POD_SPACE,
-                        "mrmsItemPod.text", "mrmsItemPod.toolTipText",
-                        "mrmsItemPod", pnlItems, gridRowIdx++));
+              createMRMSOptionControls(PartRepairType.POD_SPACE,
+                    "mrmsItemPod.text",
+                    "mrmsItemPod.toolTipText",
+                    "mrmsItemPod",
+                    pnlItems,
+                    gridRowIdx++));
 
         return pnlOptions;
     }
 
-    private MRMSOptionControl createMRMSOptionControls(PartRepairType type, String text, String tooltipText,
-            String activeBoxName, JPanel pnlItems,
-            int rowIdx) {
-        MRMSOption mrmsOption = campaignOptions.getMRMSOptions().stream()
-                .filter(option -> option.getType() == type)
-                .findFirst()
-                .orElse(new MRMSOption(type));
+    private MRMSOptionControl createMRMSOptionControls(PartRepairType type, String text, String tooltipText, String activeBoxName, JPanel pnlItems, int rowIdx) {
+        MRMSOption mrmsOption = campaignOptions.getMRMSOptions()
+                                      .stream()
+                                      .filter(option -> option.getType() == type)
+                                      .findFirst()
+                                      .orElse(new MRMSOption(type));
 
         int columnIdx = 0;
 
         MRMSOptionControl mrmsOptionControl = new MRMSOptionControl();
-        mrmsOptionControl.setActiveBox(createMRMSOptionItemBox(text, tooltipText, activeBoxName,
-                mrmsOption.isActive(), pnlItems, rowIdx, columnIdx++));
+        mrmsOptionControl.setActiveBox(createMRMSOptionItemBox(text,
+              tooltipText,
+              activeBoxName,
+              mrmsOption.isActive(),
+              pnlItems,
+              rowIdx,
+              columnIdx++));
         mrmsOptionControl.setMinSkillCBox(createMRMSSkillCBox(mrmsOption.getSkillMin(),
-                mrmsOption.isActive(), pnlItems, rowIdx, columnIdx++));
+              mrmsOption.isActive(),
+              pnlItems,
+              rowIdx,
+              columnIdx++));
         mrmsOptionControl.setMaxSkillCBox(createMRMSSkillCBox(mrmsOption.getSkillMax(),
-                mrmsOption.isActive(), pnlItems, rowIdx, columnIdx++));
+              mrmsOption.isActive(),
+              pnlItems,
+              rowIdx,
+              columnIdx++));
         mrmsOptionControl.setMinBTHSpn(createMRMSSkillBTHSpinner(mrmsOption.getBthMin(),
-                mrmsOption.isActive(), pnlItems, rowIdx, columnIdx++));
+              mrmsOption.isActive(),
+              pnlItems,
+              rowIdx,
+              columnIdx++));
         mrmsOptionControl.setMaxBTHSpn(createMRMSSkillBTHSpinner(mrmsOption.getBthMax(),
-                mrmsOption.isActive(), pnlItems, rowIdx, columnIdx++));
+              mrmsOption.isActive(),
+              pnlItems,
+              rowIdx,
+              columnIdx++));
         mrmsOptionControl.setMinDailyTimeSpn(createMRMSDailyTimeSpinner(mrmsOption.getDailyTimeMin(),
-            mrmsOption.isActive(), pnlItems, rowIdx, columnIdx++));
+              mrmsOption.isActive(),
+              pnlItems,
+              rowIdx,
+              columnIdx++));
 
         mrmsOptionControl.getActiveBox().addActionListener(evt -> {
             if (mrmsOptionControl.getActiveBox().isSelected()) {
@@ -652,17 +708,16 @@ public class MRMSDialog extends JDialog {
         return mrmsOptionControl;
     }
 
-    private JSpinner createMRMSSkillBTHSpinner(int selectedValue, boolean enabled,
-            JPanel pnlItems, int rowIdx, int columnIdx) {
+    private JSpinner createMRMSSkillBTHSpinner(int selectedValue, boolean enabled, JPanel pnlItems, int rowIdx, int columnIdx) {
         JSpinner skillBTHSpn = new JSpinner(new SpinnerNumberModel(selectedValue, 1, 12, 1));
         ((DefaultEditor) skillBTHSpn.getEditor()).getTextField().setEditable(false);
         skillBTHSpn.setEnabled(enabled);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = columnIdx;
-        gridBagConstraints.gridy = rowIdx;
+        gridBagConstraints.gridx  = columnIdx;
+        gridBagConstraints.gridy  = rowIdx;
         gridBagConstraints.insets = new Insets(0, 5, 0, 5);
-        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.fill   = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
 
         pnlItems.add(skillBTHSpn, gridBagConstraints);
@@ -670,17 +725,16 @@ public class MRMSDialog extends JDialog {
         return skillBTHSpn;
     }
 
-    private JSpinner createMRMSDailyTimeSpinner(int selectedValue, boolean enabled,
-                                               JPanel pnlItems, int rowIdx, int columnIdx) {
+    private JSpinner createMRMSDailyTimeSpinner(int selectedValue, boolean enabled, JPanel pnlItems, int rowIdx, int columnIdx) {
         JSpinner dailyTimeSpn = new JSpinner(new SpinnerNumberModel(selectedValue, 0, 480, 30));
         ((DefaultEditor) dailyTimeSpn.getEditor()).getTextField().setEditable(true);
         dailyTimeSpn.setEnabled(enabled);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = columnIdx;
-        gridBagConstraints.gridy = rowIdx;
+        gridBagConstraints.gridx  = columnIdx;
+        gridBagConstraints.gridy  = rowIdx;
         gridBagConstraints.insets = new Insets(0, 5, 0, 5);
-        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.fill   = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
 
         pnlItems.add(dailyTimeSpn, gridBagConstraints);
@@ -688,8 +742,7 @@ public class MRMSDialog extends JDialog {
         return dailyTimeSpn;
     }
 
-    private JComboBox<String> createMRMSSkillCBox(int selectedValue, boolean enabled,
-            JPanel pnlItems, int rowIdx, int columnIdx) {
+    private JComboBox<String> createMRMSSkillCBox(int selectedValue, boolean enabled, JPanel pnlItems, int rowIdx, int columnIdx) {
         DefaultComboBoxModel<String> skillModel = new DefaultComboBoxModel<>();
         skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_ULTRA_GREEN));
         skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_GREEN));
@@ -701,19 +754,17 @@ public class MRMSDialog extends JDialog {
         skillCBox.setEnabled(enabled);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = columnIdx;
-        gridBagConstraints.gridy = rowIdx;
+        gridBagConstraints.gridx  = columnIdx;
+        gridBagConstraints.gridy  = rowIdx;
         gridBagConstraints.insets = new Insets(0, 5, 0, 5);
-        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.fill   = GridBagConstraints.NONE;
 
         pnlItems.add(skillCBox, gridBagConstraints);
 
         return skillCBox;
     }
 
-    private JCheckBox createMRMSOptionItemBox(String text, String toolTipText, String name,
-            boolean selected, JPanel pnlItems, int rowIdx,
-            int columnIdx) {
+    private JCheckBox createMRMSOptionItemBox(String text, String toolTipText, String name, boolean selected, JPanel pnlItems, int rowIdx, int columnIdx) {
         JCheckBox optionItemBox = new JCheckBox();
         optionItemBox.setText(resources.getString(text));
         optionItemBox.setToolTipText(wordWrap(resources.getString(toolTipText)));
@@ -730,11 +781,11 @@ public class MRMSDialog extends JDialog {
         });
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = columnIdx;
-        gridBagConstraints.gridy = rowIdx;
+        gridBagConstraints.gridx  = columnIdx;
+        gridBagConstraints.gridy  = rowIdx;
         gridBagConstraints.insets = new Insets(0, 0, 0, 5);
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill   = GridBagConstraints.HORIZONTAL;
 
         pnlItems.add(optionItemBox, gridBagConstraints);
 
@@ -750,13 +801,13 @@ public class MRMSDialog extends JDialog {
     private JPanel createUnitActionButtons() {
         JPanel pnlButtons = new JPanel();
 
-        int btnIdx = 0;
+        int                btnIdx             = 0;
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = btnIdx++;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx     = btnIdx++;
+        gridBagConstraints.gridy     = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
 
         btnSelectNone = new JButton(resources.getString("btnSelectNone.text"));
         btnSelectNone.setToolTipText(wordWrap(resources.getString("btnSelectNone.toolTipText")));
@@ -778,21 +829,21 @@ public class MRMSDialog extends JDialog {
         gridBagConstraints.gridx = btnIdx++;
         pnlButtons.add(btnSelectUnassigned, gridBagConstraints);
 
-        JButton btnHideUnits = new JButton(resources.getString(pnlUnits.isVisible()
-                ? "btnHideUnits.Hide.text"
-                : "btnHideUnits.Show.text"));
-        btnHideUnits.setToolTipText(wordWrap(resources.getString(pnlUnits.isVisible()
-                ? "btnHideUnits.Hide.toolTipText"
-                : "btnHideUnits.Show.toolTipText")));
+        JButton btnHideUnits = new JButton(resources.getString(pnlUnits.isVisible() ?
+                                                                     "btnHideUnits.Hide.text" :
+                                                                     "btnHideUnits.Show.text"));
+        btnHideUnits.setToolTipText(wordWrap(resources.getString(pnlUnits.isVisible() ?
+                                                                       "btnHideUnits.Hide.toolTipText" :
+                                                                       "btnHideUnits.Show.toolTipText")));
         btnHideUnits.setName("btnHideUnits");
         btnHideUnits.addActionListener(evt -> {
             pnlUnits.setVisible(!pnlUnits.isVisible());
-            btnHideUnits.setText(resources.getString(pnlUnits.isVisible()
-                    ? "btnHideUnits.Hide.text"
-                    : "btnHideUnits.Show.text"));
-            btnHideUnits.setToolTipText(wordWrap(resources.getString(pnlUnits.isVisible()
-                    ? "btnHideUnits.Hide.toolTipText"
-                    : "btnHideUnits.Show.toolTipText")));
+            btnHideUnits.setText(resources.getString(pnlUnits.isVisible() ?
+                                                           "btnHideUnits.Hide.text" :
+                                                           "btnHideUnits.Show.text"));
+            btnHideUnits.setToolTipText(wordWrap(resources.getString(pnlUnits.isVisible() ?
+                                                                           "btnHideUnits.Hide.toolTipText" :
+                                                                           "btnHideUnits.Show.toolTipText")));
             this.pack();
         });
         gridBagConstraints.gridx = btnIdx++;
@@ -809,8 +860,8 @@ public class MRMSDialog extends JDialog {
         int unitCount = unitTable.getRowCount();
 
         for (int i = 0; i < unitCount; i++) {
-            int rowIdx = unitTable.convertRowIndexToModel(i);
-            Unit unit = unitTableModel.getUnit(rowIdx);
+            int  rowIdx = unitTable.convertRowIndexToModel(i);
+            Unit unit   = unitTableModel.getUnit(rowIdx);
 
             if ((unit == null) || (unit.getActiveCrew() == null) || unit.getActiveCrew().isEmpty()) {
                 continue;
@@ -824,8 +875,8 @@ public class MRMSDialog extends JDialog {
         int unitCount = unitTable.getRowCount();
 
         for (int i = 0; i < unitCount; i++) {
-            int rowIdx = unitTable.convertRowIndexToModel(i);
-            Unit unit = unitTableModel.getUnit(rowIdx);
+            int  rowIdx = unitTable.convertRowIndexToModel(i);
+            Unit unit   = unitTableModel.getUnit(rowIdx);
 
             if (unit == null) {
                 continue;
@@ -840,13 +891,13 @@ public class MRMSDialog extends JDialog {
     private JPanel createPartsActionButtons() {
         JPanel pnlButtons = new JPanel();
 
-        int btnIdx = 0;
+        int                btnIdx             = 0;
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = btnIdx++;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx     = btnIdx++;
+        gridBagConstraints.gridy     = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
 
         JButton btnDeselectParts = new JButton(resources.getString("btnDeselectParts.text"));
         btnDeselectParts.setToolTipText(wordWrap(resources.getString("btnDeselectParts.toolTipText")));
@@ -861,21 +912,21 @@ public class MRMSDialog extends JDialog {
         gridBagConstraints.gridx = btnIdx++;
         pnlButtons.add(btnSelectAllParts, gridBagConstraints);
 
-        JButton btnHideParts = new JButton(resources.getString(pnlParts.isVisible()
-                ? "btnHideParts.Hide.text"
-                : "btnHideParts.Show.text"));
-        btnHideParts.setToolTipText(wordWrap(resources.getString(pnlParts.isVisible()
-                ? "btnHideParts.Hide.toolTipText"
-                : "btnHideParts.Show.toolTipText")));
+        JButton btnHideParts = new JButton(resources.getString(pnlParts.isVisible() ?
+                                                                     "btnHideParts.Hide.text" :
+                                                                     "btnHideParts.Show.text"));
+        btnHideParts.setToolTipText(wordWrap(resources.getString(pnlParts.isVisible() ?
+                                                                       "btnHideParts.Hide.toolTipText" :
+                                                                       "btnHideParts.Show.toolTipText")));
         btnHideParts.setName("btnHideParts");
         btnHideParts.addActionListener(evt -> {
             pnlParts.setVisible(!pnlParts.isVisible());
-            btnHideParts.setText(resources.getString(pnlParts.isVisible()
-                    ? "btnHideParts.Hide.text"
-                    : "btnHideParts.Show.text"));
-            btnHideParts.setToolTipText(wordWrap(resources.getString(pnlParts.isVisible()
-                    ? "btnHideParts.Hide.toolTipText"
-                    : "btnHideParts.Show.toolTipText")));
+            btnHideParts.setText(resources.getString(pnlParts.isVisible() ?
+                                                           "btnHideParts.Hide.text" :
+                                                           "btnHideParts.Show.text"));
+            btnHideParts.setToolTipText(wordWrap(resources.getString(pnlParts.isVisible() ?
+                                                                           "btnHideParts.Hide.toolTipText" :
+                                                                           "btnHideParts.Show.toolTipText")));
             this.pack();
         });
         gridBagConstraints.gridx = btnIdx++;
@@ -898,14 +949,15 @@ public class MRMSDialog extends JDialog {
         int btnIdx = 0;
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = btnIdx++;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx     = btnIdx++;
+        gridBagConstraints.gridy     = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
 
-        JButton btnStart = new JButton(resources.getString(getMode().isUnits() ? "btnStart.MRMS.text"
-                : "btnStart.MR.text"));
+        JButton btnStart = new JButton(resources.getString(getMode().isUnits() ?
+                                                                 "btnStart.MRMS.text" :
+                                                                 "btnStart.MR.text"));
         btnStart.setName("btnStart");
         btnStart.addActionListener(this::btnStartMRMSActionPerformed);
         pnlButtons.add(btnStart, gridBagConstraints);
@@ -929,10 +981,10 @@ public class MRMSDialog extends JDialog {
         // Not enough Astechs to run the tech teams
         if (campaignGUI.getCampaign().requiresAdditionalAstechs()) {
             int savePrompt = JOptionPane.showConfirmDialog(null,
-                    resources.getString("NotEnoughAstechs.error"),
-                    resources.getString("NotEnoughAstechs.errorTitle"),
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.ERROR_MESSAGE);
+                  resources.getString("NotEnoughAstechs.error"),
+                  resources.getString("NotEnoughAstechs.errorTitle"),
+                  JOptionPane.YES_NO_OPTION,
+                  JOptionPane.ERROR_MESSAGE);
             if (savePrompt != JOptionPane.YES_OPTION) {
                 return;
             } else {
@@ -945,17 +997,17 @@ public class MRMSDialog extends JDialog {
 
             if ((selectedRows == null) || (selectedRows.length == 0)) {
                 JOptionPane.showMessageDialog(this,
-                        resources.getString("NoSelectedUnit.error"),
-                        resources.getString("NoSelectedUnit.errorTitle"),
-                        JOptionPane.ERROR_MESSAGE);
+                      resources.getString("NoSelectedUnit.error"),
+                      resources.getString("NoSelectedUnit.errorTitle"),
+                      JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             List<Unit> units = new ArrayList<>();
 
             for (int selectedRow : selectedRows) {
-                int rowIdx = unitTable.convertRowIndexToModel(selectedRow);
-                Unit unit = unitTableModel.getUnit(rowIdx);
+                int  rowIdx = unitTable.convertRowIndexToModel(selectedRow);
+                Unit unit   = unitTableModel.getUnit(rowIdx);
 
                 if (unit == null) {
                     continue;
@@ -965,8 +1017,10 @@ public class MRMSDialog extends JDialog {
             }
 
             if (units.isEmpty()) {
-                JOptionPane.showMessageDialog(this, resources.getString("NoUnits.error"),
-                        resources.getString("NoUnits.errorTitle"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                      resources.getString("NoUnits.error"),
+                      resources.getString("NoUnits.errorTitle"),
+                      JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -974,14 +1028,14 @@ public class MRMSDialog extends JDialog {
 
             if (!configuredOptions.isEnabled()) {
                 JOptionPane.showMessageDialog(this,
-                        resources.getString("MRMSDisabled.error"),
-                        resources.getString("MRMSDisabled.errorTitle"),
-                        JOptionPane.ERROR_MESSAGE);
+                      resources.getString("MRMSDisabled.error"),
+                      resources.getString("MRMSDisabled.errorTitle"),
+                      JOptionPane.ERROR_MESSAGE);
             } else if (!configuredOptions.isHActiveMRMSOption()) {
                 JOptionPane.showMessageDialog(this,
-                        resources.getString("NoEnabledRepairOptions.error"),
-                        resources.getString("NoEnabledRepairOptions.errorTitle"),
-                        JOptionPane.ERROR_MESSAGE);
+                      resources.getString("NoEnabledRepairOptions.error"),
+                      resources.getString("NoEnabledRepairOptions.errorTitle"),
+                      JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -993,17 +1047,17 @@ public class MRMSDialog extends JDialog {
 
             if ((selectedRows == null) || (selectedRows.length == 0)) {
                 JOptionPane.showMessageDialog(this,
-                        resources.getString("NoSelectedParts.error"),
-                        resources.getString("NoSelectedParts.errorTitle"),
-                        JOptionPane.ERROR_MESSAGE);
+                      resources.getString("NoSelectedParts.error"),
+                      resources.getString("NoSelectedParts.errorTitle"),
+                      JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             List<IPartWork> parts = new ArrayList<>();
 
             for (int selectedRow : selectedRows) {
-                int rowIdx = partsTable.convertRowIndexToModel(selectedRow);
-                Part part = partsTableModel.getPartAt(rowIdx);
+                int  rowIdx = partsTable.convertRowIndexToModel(selectedRow);
+                Part part   = partsTableModel.getPartAt(rowIdx);
 
                 if (part == null) {
                     continue;
@@ -1013,32 +1067,35 @@ public class MRMSDialog extends JDialog {
             }
 
             if (parts.isEmpty()) {
-                JOptionPane.showMessageDialog(this, resources.getString("NoParts.error"),
-                        resources.getString("NoParts.errorTitle"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                      resources.getString("NoParts.error"),
+                      resources.getString("NoParts.errorTitle"),
+                      JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             MRMSConfiguredOptions configuredOptions = new MRMSConfiguredOptions(this);
             configuredOptions.setScrapImpossible(false);
 
-            MRMSPartSet partSet = MRMSService.performWarehouseMRMS(parts,
-                    configuredOptions, campaignGUI.getCampaign());
+            MRMSPartSet partSet = MRMSService.performWarehouseMRMS(parts, configuredOptions, campaignGUI.getCampaign());
 
             String msg = resources.getString("Completed.text");
 
             if (partSet.isHasRepairs()) {
                 int count = partSet.countRepairs();
-                msg += MessageFormat.format(resources.getString((count == 1)
-                        ? "Completed.repairCount.text"
-                        : "Completed.repairCountPlural.text"), count);
+                msg += MessageFormat.format(resources.getString((count == 1) ?
+                                                                      "Completed.repairCount.text" :
+                                                                      "Completed.repairCountPlural.text"), count);
             }
 
             filterCompletePartsList(true);
 
             campaignGUI.getCampaign().addReport(msg);
 
-            JOptionPane.showMessageDialog(this, msg,
-                    resources.getString("Completed.title"), JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                  msg,
+                  resources.getString("Completed.title"),
+                  JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -1086,12 +1143,13 @@ public class MRMSDialog extends JDialog {
             if (mrmsOptionControl == null) {
                 continue;
             }
-            MRMSOption mrmsOption = new MRMSOption(partRepairType, mrmsOptionControl.getActiveBox().isSelected(),
-                    mrmsOptionControl.getMinSkillCBox().getSelectedIndex(),
-                    mrmsOptionControl.getMaxSkillCBox().getSelectedIndex(),
-                    (Integer) mrmsOptionControl.getMinBTHSpn().getValue(),
-                    (Integer) mrmsOptionControl.getMaxBTHSpn().getValue(),
-                    (Integer) mrmsOptionControl.getMinDailyTimeSpn().getValue());
+            MRMSOption mrmsOption = new MRMSOption(partRepairType,
+                  mrmsOptionControl.getActiveBox().isSelected(),
+                  mrmsOptionControl.getMinSkillCBox().getSelectedIndex(),
+                  mrmsOptionControl.getMaxSkillCBox().getSelectedIndex(),
+                  (Integer) mrmsOptionControl.getMinBTHSpn().getValue(),
+                  (Integer) mrmsOptionControl.getMaxBTHSpn().getValue(),
+                  (Integer) mrmsOptionControl.getMinDailyTimeSpn().getValue());
 
             campaignOptions.addMRMSOption(mrmsOption);
         }
@@ -1099,13 +1157,19 @@ public class MRMSDialog extends JDialog {
         MekHQ.triggerEvent(new OptionsChangedEvent(campaignGUI.getCampaign(), campaignOptions));
 
         JOptionPane.showMessageDialog(this,
-                resources.getString("DefaultOptionsSaved.text"),
-                resources.getString("DefaultOptionsSaved.title"),
-                JOptionPane.INFORMATION_MESSAGE);
+              resources.getString("DefaultOptionsSaved.text"),
+              resources.getString("DefaultOptionsSaved.title"),
+              JOptionPane.INFORMATION_MESSAGE);
     }
     // endregion Campaign Options
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MRMSDialog.class);
@@ -1153,12 +1217,12 @@ public class MRMSDialog extends JDialog {
     }
 
     public static class MRMSOptionControl {
-        private JCheckBox activeBox = null;
-        private JComboBox<String> minSkillCBox = null;
-        private JComboBox<String> maxSkillCBox = null;
-        private JSpinner minBTHSpn = null;
-        private JSpinner maxBTHSpn = null;
-        private JSpinner minDailyTimeSpn = null;
+        private JCheckBox         activeBox       = null;
+        private JComboBox<String> minSkillCBox    = null;
+        private JComboBox<String> maxSkillCBox    = null;
+        private JSpinner          minBTHSpn       = null;
+        private JSpinner          maxBTHSpn       = null;
+        private JSpinner          minDailyTimeSpn = null;
 
         public JCheckBox getActiveBox() {
             return activeBox;

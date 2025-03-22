@@ -1,19 +1,29 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.personnel;
 
@@ -24,51 +34,53 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import javax.xml.parsers.DocumentBuilder;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.codeUtilities.StringUtility;
 import megamek.common.Compute;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This is used to supply clan data needed to generate bloodnames
  * TODO : I should be part of faction, and hence I am deprecated
+ *
+ * @since 0.50.04
+ * @deprecated - Move to Faction
  */
-@Deprecated
+@Deprecated(since = "0.50.04")
 public class Clan {
     private static final MMLogger logger = MMLogger.create(Clan.class);
 
     // region Variable Declarations
     private static Map<String, Clan> allClans;
 
-    private String code;
-    private String generationCode; // this is used to enable RA name generation using CSR lists, for example
-    private String fullName;
-    private int startDate;
-    private int endDate;
-    private int abjurationDate;
+    private String            code;
+    private String            generationCode; // this is used to enable RA name generation using CSR lists, for example
+    private String            fullName;
+    private int               startDate;
+    private int               endDate;
+    private int               abjurationDate;
     private List<DatedRecord> rivals;
     private List<DatedRecord> nameChanges;
-    private boolean homeClan;
+    private boolean           homeClan;
     // endregion Variable Declarations
 
     public Clan() {
-        startDate = 2807;
-        endDate = 9999;
+        startDate      = 2807;
+        endDate        = 9999;
         abjurationDate = 0;
-        rivals = new ArrayList<>();
-        nameChanges = new ArrayList<>();
+        rivals         = new ArrayList<>();
+        nameChanges    = new ArrayList<>();
     }
 
     /**
      * @param o the object to compare to
+     *
      * @return true if they are equal, otherwise false
      */
     @Override
@@ -89,8 +101,8 @@ public class Clan {
 
     /**
      * @param code The code to get a Clan for
-     * @return the Clan object for the code, or null if there isn't a Clan with that
-     *         code
+     *
+     * @return the Clan object for the code, or null if there isn't a Clan with that code
      */
     public static Clan getClan(String code) {
         return allClans.get(code);
@@ -123,6 +135,7 @@ public class Clan {
 
     /**
      * @param year the year to get the Clan's name for
+     *
      * @return the full name of the Clan at the specified year
      */
     public String getFullName(int year) {
@@ -136,6 +149,7 @@ public class Clan {
 
     /**
      * @param year the year to determine if the Clan is active in
+     *
      * @return whether the Clan is active or not in the specified year
      */
     public boolean isActive(int year) {
@@ -158,8 +172,13 @@ public class Clan {
 
     /**
      * @param year the year to determine if the Clan has been abjured by
-     * @return whether or not the Clan has been abjured
+     *
+     * @return whether the Clan has been abjured
+     *
+     * @since 0.50.04
+     * @deprecated no indicated uses.
      */
+    @Deprecated(since = "0.50.04", forRemoval = true)
     public boolean isAbjured(int year) {
         if (abjurationDate == 0) {
             return false;
@@ -170,7 +189,8 @@ public class Clan {
 
     /**
      * @param year the year to get the Clan's rivals in
-     * @return a list of all of the Clan's rivals in the specified year
+     *
+     * @return a list of all the Clan's rivals in the specified year
      */
     public List<Clan> getRivals(int year) {
         List<Clan> retVal = new ArrayList<>();
@@ -186,7 +206,7 @@ public class Clan {
     }
 
     /**
-     * @return whether or not the Clan is a Home Clan
+     * @return whether the Clan is a Home Clan
      */
     public boolean isHomeClan() {
         return homeClan;
@@ -194,11 +214,12 @@ public class Clan {
 
     /**
      * @param year the year to get a single rival clan in
+     *
      * @return a rival clan to the current Clan
      */
     public Clan getRivalClan(int year) {
         List<Clan> rivals = getRivals(year);
-        int roll = Compute.randomInt(rivals.size() + 1);
+        int        roll   = Compute.randomInt(rivals.size() + 1);
         if (roll > rivals.size() - 1) {
             return randomClan(year, isHomeClan());
         }
@@ -207,7 +228,8 @@ public class Clan {
 
     /**
      * @param year     the year to get a random Clan for
-     * @param homeClan whether or not the Clan is a Home Clan
+     * @param homeClan whether the Clan is a Home Clan
+     *
      * @return a random Clan
      */
     public static Clan randomClan(int year, boolean homeClan) {
@@ -229,7 +251,7 @@ public class Clan {
         Document doc;
 
         try (FileInputStream fis = new FileInputStream("data/names/bloodnames/clans.xml")) { // TODO : Remove inline
-                                                                                             // file path
+            // file path
             DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
             doc = db.parse(fis);
         } catch (Exception ex) {
@@ -237,8 +259,8 @@ public class Clan {
             return;
         }
 
-        Element clanElement = doc.getDocumentElement();
-        NodeList nl = clanElement.getChildNodes();
+        Element  clanElement = doc.getDocumentElement();
+        NodeList nl          = clanElement.getChildNodes();
         clanElement.normalize();
 
         for (int i = 0; i < nl.getLength(); i++) {
@@ -271,7 +293,7 @@ public class Clan {
                     retVal.abjurationDate = Integer.parseInt(wn.getTextContent().trim());
                 } else if (wn.getNodeName().equalsIgnoreCase("nameChange")) {
                     int start = retVal.startDate;
-                    int end = retVal.endDate;
+                    int end   = retVal.endDate;
                     if (null != wn.getAttributes().getNamedItem("start")) {
                         start = Integer.parseInt(wn.getAttributes().getNamedItem("start").getTextContent().trim());
                     }
@@ -281,7 +303,7 @@ public class Clan {
                     retVal.nameChanges.add(new DatedRecord(start, end, wn.getTextContent().trim()));
                 } else if (wn.getNodeName().equalsIgnoreCase("rivals")) {
                     int start = retVal.startDate;
-                    int end = retVal.endDate;
+                    int end   = retVal.endDate;
                     if (null != wn.getAttributes().getNamedItem("start")) {
                         start = Integer.parseInt(wn.getAttributes().getNamedItem("start").getTextContent().trim());
                     }
@@ -309,8 +331,8 @@ public class Clan {
      * This holds dated records for Clan events
      */
     private static class DatedRecord {
-        private int startDate;
-        private int endDate;
+        private int    startDate;
+        private int    endDate;
         private String description;
 
         public DatedRecord(int s, int e, String d) {

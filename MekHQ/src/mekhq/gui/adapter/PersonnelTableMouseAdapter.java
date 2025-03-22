@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2019-2025 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.adapter;
 
@@ -82,6 +91,9 @@ import java.util.stream.Stream;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.finances.enums.TransactionType.MEDICAL_EXPENSES;
+import static mekhq.campaign.mod.am.InjuryTypes.*;
+import static mekhq.campaign.personnel.SkillType.S_DOCTOR;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
@@ -111,6 +123,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_GIVE_PAYMENT = "GIVE_PAYMENT";
     private static final String CMD_EDIT_INJURIES = "EDIT_INJURIES";
     private static final String CMD_REMOVE_INJURY = "REMOVE_INJURY";
+    private static final String CMD_REPLACE_MISSING_LIMB = "REPLACE_MISSING_LIMB";
     private static final String CMD_CLEAR_INJURIES = "CLEAR_INJURIES";
     private static final String CMD_CALLSIGN = "CALLSIGN";
     private static final String CMD_EDIT_PERSONNEL_LOG = "LOG";
@@ -1057,6 +1070,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
+            case CMD_REPLACE_MISSING_LIMB: {
+                replaceLimb(data[1], selectedPerson, gui.getCampaign());
+                break;
+            }
             case CMD_EDIT_INJURIES: {
                 EditPersonnelInjuriesDialog epid = new EditPersonnelInjuriesDialog(
                         gui.getFrame(), true, gui.getCampaign(), selectedPerson);
@@ -1225,6 +1242,85 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             default: {
                 break;
             }
+        }
+    }
+
+    /**
+     * Handles the limb replacement procedure for the selected person. This method determines the
+     * suitable doctors, calculates the cost of the procedure, and processes the surgery if the user
+     * accepts it.
+     *
+     * <p>If no doctors are available with sufficient skill levels, the cost of the operation
+     * is significantly increased. Once the surgery is performed, the person's injury is updated,
+     * and associated financial and unit adjustments are made.</p>
+     *
+     * @param selectedInjury  The {@link UUID} of the injury being fixed.
+     * @param selectedPerson  The {@link Person} undergoing the limb replacement procedure.
+     * @param campaign        The {@link Campaign} instance representing the current campaign,
+     *                        containing active personnel, finances, and other relevant details.
+     */
+    private void replaceLimb(String selectedInjury, Person selectedPerson, Campaign campaign) {
+        List<Person> suitableDoctors = new ArrayList<>();
+
+        for (Person person : campaign.getActivePersonnel(false)) {
+            if (person.isDoctor()) {
+                Skill skill = person.getSkill(S_DOCTOR);
+
+                if (skill != null && skill.getFinalSkillValue() >= REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5) {
+                    suitableDoctors.add(person);
+                }
+            }
+        }
+
+        for (Injury injury : selectedPerson.getInjuries()) {
+            if (injury.getUUID().toString().equals(selectedInjury)) {
+                BodyLocation location = injury.getLocation();
+
+                Money cost = switch(location) {
+                    case RIGHT_ARM, LEFT_ARM -> REPLACEMENT_LIMB_COST_ARM_TYPE_5;
+                    case RIGHT_HAND, LEFT_HAND -> REPLACEMENT_LIMB_COST_HAND_TYPE_5;
+                    case RIGHT_LEG, LEFT_LEG -> REPLACEMENT_LIMB_COST_LEG_TYPE_5;
+                    case RIGHT_FOOT, LEFT_FOOT -> REPLACEMENT_LIMB_COST_FOOT_TYPE_5;
+                    default -> Money.zero();
+                };
+
+                // Failsafe for if we have a missing location that hasn't been accounted for
+                if (Objects.equals(cost, Money.zero())) {
+                    return;
+                }
+
+                if (suitableDoctors.isEmpty()) {
+                    cost = cost.multipliedBy(10);
+                }
+
+                ReplacementLimbDialog replacementLimbDialog = new ReplacementLimbDialog(campaign,
+                      suitableDoctors, selectedPerson, cost);
+                int choice = replacementLimbDialog.getDialogChoice();
+
+                // If the user chose to decline the surgery
+                if (choice == 0) {
+                    return;
+                }
+
+                campaign.getFinances().debit(MEDICAL_EXPENSES,
+                      campaign.getLocalDate(), cost,
+                      String.format(resources.getString("replaceMissingLimb.surgery"),
+                            selectedPerson.getFullTitle()));
+
+                int hitCount = injury.getHits();
+                Injury newInjury = REPLACEMENT_LIMB_RECOVERY.newInjury(campaign, selectedPerson,
+                      location, hitCount);
+                newInjury.setWorkedOn(true);
+
+                selectedPerson.removeInjury(injury);
+                selectedPerson.addInjury(newInjury);
+                break;
+            }
+        }
+
+        Unit unit = selectedPerson.getUnit();
+        if (unit != null) {
+            unit.resetPilotAndEntity();
         }
     }
 
@@ -1562,6 +1658,31 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             popup.add(menuItem);
         }
 
+        if (oneSelected && gui.getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
+            List<Injury> missingLimbInjuries = new ArrayList<>();
+
+            for (Injury injury : person.getInjuries()) {
+                InjuryType injuryType = injury.getType();
+                if (injuryType.impliesMissingLocation() && injury.getType().isPermanent()) {
+                    missingLimbInjuries.add(injury);
+                }
+            }
+
+            if (!missingLimbInjuries.isEmpty()) {
+                JMenu subMenu = new JMenu(resources.getString("replaceMissingLimb.text"));
+
+                for (Injury injury : missingLimbInjuries) {
+                    menuItem = new JMenuItem(String.format(resources.getString("replaceMissingLimb.format"),
+                          injury.getName()));
+                    menuItem.setActionCommand(makeCommand(CMD_REPLACE_MISSING_LIMB, injury.getUUID().toString()));
+                    menuItem.addActionListener(this);
+                    subMenu.add(menuItem);
+                }
+
+                popup.add(subMenu);
+            }
+        }
+
         JMenuHelpers.addMenuIfNonEmpty(popup, new AssignPersonToUnitMenu(gui.getCampaign(), selected));
 
         if (oneSelected && person.getStatus().isActive()) {
@@ -1833,7 +1954,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             if ((oneSelected) && (StaticChecks.areAllStudents(selected))) {
-                Academy academy = EducationController.getAcademy(person.getEduAcademySet(),
+                Academy academy = getAcademy(person.getEduAcademySet(),
                         person.getEduAcademyNameInSet());
 
                 // this pile of if-statements just checks that the individual is eligible for

@@ -3,9 +3,11 @@ sucsId: 169
 xcood: 95.382
 ycood: -173.994
 spectralType:
-  source: canon
+  source: 'Handbook: House Liao, pg. 72'
   value: M1IV
-primarySlot: 8
+primarySlot:
+  source: 'Handbook: House Liao, pg. 72'
+  value: 8
 event:
   - date: '2384-09-13'
     zenithCharge: yes
@@ -159,28 +161,32 @@ planet:
       value: Ares
     type: TERRESTRIAL
     orbitalDist: 0.35
-    sysPos: 8
+    sysPos:
+      source: 'Handbook: House Liao, pg. 72'
+      value: 8
     icon: green47
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 72'
       value: STANDARD
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 72'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 72'
       value: 0.98
-    diameter: 11978
-    density: 5.756813945537
+    diameter: 11971
+    density: 5.753277883268
     dayLength: 21
     yearLength: 0.7
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 72'
       value: 42
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 72'
       value: 36
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 72'
       value: REPTILE
     desc: |-
       Ares is best known as the site of the peace conventions organised by Aleisha Liao which resulted in the Ares Conventions of Warfare. Ares was originally an independent colony before being absorbed by the Capella Commonality and later the Capellan Confederation. Ares is a prosperous small world thanks to its status as a freeport supported by on planet heavy industry that benefits greatly from local exemptions for standard import and export duties.
@@ -194,16 +200,18 @@ planet:
       Salvatore Incorporated
     landmass:
       - name:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
+          value: Anteros
+      - name:
+          source: 'Objective Raids: Capellan Confederation'
           value: Harmonia
         capital:
-          source: canon
+          source: 'Objective Raids: Capellan Confederation'
           value: New Olympia
-      - name:
-          source: canon
-          value: Anteros
     satellite:
-      - name: Aphrodite
+      - name:
+          source: 'Handbook: House Liao, pg. 72'
+          value: Aphrodite
         size: large
         icon: rock2
     event:

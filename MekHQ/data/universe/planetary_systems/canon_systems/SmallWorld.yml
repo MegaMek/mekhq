@@ -3,9 +3,11 @@ sucsId: 2360
 xcood: 51.693
 ycood: -7.025
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: M5V
-primarySlot: 5
+primarySlot:
+  source: MWDA world profiles
+  value: 5
 event:
   - date: '2387-02-14'
     nadirCharge: yes
@@ -93,28 +95,32 @@ planet:
       value: Small World
     type: TERRESTRIAL
     orbitalDist: 0.08
-    sysPos: 5
+    sysPos:
+      source: MWDA world profiles
+      value: 5
     icon: green18
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: THIN
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.04
-    diameter: 11450
-    density: 6.36182847914
+    diameter: 11469
+    density: 6.372476974252
     dayLength: 18
     yearLength: 0.4
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 24
     water:
-      source: canon
+      source: MWDA world profiles
       value: 67
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: BIRD
     desc: Having only entered its current ice age about a thousand years ago, Small
       World is a cold world, where icebergs float endlessly across over two-thirds
@@ -138,25 +144,27 @@ planet:
       Killingly and Hollonna.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Everfrost
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Gladstone
         capital:
-          source: canon
+          source: MWDA world profiles
           value: New Mariotta
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Hollonna
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Killingly
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Motherland
     satellite:
-      - name: Alfonso
+      - name:
+          source: MWDA world profiles
+          value: Alfonso
         size: medium
         icon: rock16
     event:

@@ -3,9 +3,11 @@ sucsId: 1627
 xcood: 278.405
 ycood: 129.101
 spectralType:
-  source: canon
+  source: FedCom Civil War, pg. 203
   value: G5V
-primarySlot: 3
+primarySlot:
+  source: FedCom Civil War, pg. 203
+  value: 3
 event:
   - date: '2359-05-21'
     zenithCharge: yes
@@ -50,28 +52,32 @@ planet:
       value: Matsuida
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 3
+    sysPos:
+      source: FedCom Civil War, pg. 203
+      value: 3
     icon: green36
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 203
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 203
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 203
       value: 1.0
-    diameter: 12470
-    density: 5.634526952754
+    diameter: 12471
+    density: 5.635064276739
     dayLength: 23
     yearLength: 1.3
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 203
       value: 40
     water:
-      source: canon
+      source: FedCom Civil War, pg. 203
       value: 50
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 203
       value: REPTILE
     desc: Despite looking like a 'perfect' planet on paper, Matsuida is a miserable
       plane to live on. The planet has only two continents and both are dominated
@@ -89,14 +95,17 @@ planet:
       far there has been no proof.
     landmass:
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 203
           value: Pak Chua
       - name:
-          source: canon
-          value: Pau Tu
-        capital:
-          source: canon
-          value: Mystique Bay
+          source: FedCom Civil War, pg. 203
+          value: Pao Tu
+    satellite:
+      - name:
+          source: FedCom Civil War, pg. 203
+          value: Merion
+        size: medium
+        icon: rock13
     event:
       - date: '2168-07-30'
         faction:

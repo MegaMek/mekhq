@@ -1,59 +1,64 @@
 /*
- * Copyright (c) 2010-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2010-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.dialog;
+
+import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
+import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
+import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Objects;
+import java.util.ResourceBundle;
+import javax.swing.*;
+import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.JSpinner.NumberEditor;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
-import megamek.common.options.IOption;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
-import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
-
-import javax.swing.*;
-import javax.swing.JSpinner.DefaultEditor;
-import javax.swing.JSpinner.NumberEditor;
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Objects;
-import java.util.ResourceBundle;
-
-import static mekhq.campaign.personnel.SkillType.*;
-import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
 
 /**
  * @author Jay Lawson
@@ -61,30 +66,30 @@ import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill
 public class HireBulkPersonnelDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(HireBulkPersonnelDialog.class);
 
-    private static final Insets ZERO_INSETS = new Insets(0, 0, 0, 0);
+    private static final Insets ZERO_INSETS    = new Insets(0, 0, 0, 0);
     private static final Insets DEFAULT_INSETS = new Insets(5, 5, 5, 5);
 
     private final Campaign campaign;
 
-    private JComboBox<PersonTypeItem> choiceType;
-    private JComboBox<RankDisplay> choiceRanks;
+    private JComboBox<PersonTypeItem>         choiceType;
+    private JComboBox<RankDisplay>            choiceRanks;
     private DefaultComboBoxModel<RankDisplay> rankModel;
-    private JSpinner spnNumber;
-    private JTextField jtf;
+    private JSpinner                          spnNumber;
+    private JTextField                        jtf;
 
     private JSpinner minAge;
     private JSpinner maxAge;
 
     private MMComboBox<SkillLevel> skillLevel;
 
-    private boolean useAge = false;
-    private boolean useSkill = false;
-    private int minAgeVal = 18;
-    private int maxAgeVal = 99;
+    private boolean useAge    = false;
+    private boolean useSkill  = false;
+    private int     minAgeVal = 18;
+    private int     maxAgeVal = 99;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
-            "mekhq.resources.HireBulkPersonnelDialog",
-            MekHQ.getMHQOptions().getLocale());
+          "mekhq.resources.HireBulkPersonnelDialog",
+          MekHQ.getMHQOptions().getLocale());
 
     public HireBulkPersonnelDialog(final JFrame frame, final boolean modal, final Campaign campaign) {
         super(frame, modal);
@@ -100,9 +105,9 @@ public class HireBulkPersonnelDialog extends JDialog {
 
     private static GridBagConstraints newConstraints(int xPos, int yPos, int fill) {
         GridBagConstraints result = new GridBagConstraints();
-        result.gridx = xPos;
-        result.gridy = yPos;
-        result.fill = fill;
+        result.gridx  = xPos;
+        result.gridy  = yPos;
+        result.fill   = fill;
         result.anchor = GridBagConstraints.WEST;
         result.insets = DEFAULT_INSETS;
         return result;
@@ -110,13 +115,13 @@ public class HireBulkPersonnelDialog extends JDialog {
 
     private void initComponents() {
 
-        choiceType = new JComboBox<>();
+        choiceType  = new JComboBox<>();
         choiceRanks = new JComboBox<>();
 
-        JButton btnHire = new JButton(resourceMap.getString("btnHire.text"));
-        JButton btnGmHire = new JButton(resourceMap.getString("btnGmHire.text"));
-        JButton btnClose = new JButton(resourceMap.getString("btnClose.text"));
-        JPanel panButtons = new JPanel(new GridBagLayout());
+        JButton btnHire    = new JButton(resourceMap.getString("btnHire.text"));
+        JButton btnGmHire  = new JButton(resourceMap.getString("btnGmHire.text"));
+        JButton btnClose   = new JButton(resourceMap.getString("btnClose.text"));
+        JPanel  panButtons = new JPanel(new GridBagLayout());
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
@@ -128,8 +133,8 @@ public class HireBulkPersonnelDialog extends JDialog {
 
         DefaultComboBoxModel<PersonTypeItem> personTypeModel = new DefaultComboBoxModel<>();
         for (final PersonnelRole personnelRole : PersonnelRole.getPrimaryRoles()) {
-            personTypeModel.addElement(
-                    new PersonTypeItem(personnelRole.getName(campaign.getFaction().isClan()), personnelRole));
+            personTypeModel.addElement(new PersonTypeItem(personnelRole.getName(campaign.getFaction().isClan()),
+                  personnelRole));
         }
         choiceType.setModel(personTypeModel);
         choiceType.setName("choiceType");
@@ -149,12 +154,12 @@ public class HireBulkPersonnelDialog extends JDialog {
         choiceRanks.setName("choiceRanks");
         refreshRanksCombo();
 
-        gridBagConstraints = newConstraints(1, 1, GridBagConstraints.HORIZONTAL);
+        gridBagConstraints         = newConstraints(1, 1, GridBagConstraints.HORIZONTAL);
         gridBagConstraints.weightx = 1.0;
         getContentPane().add(choiceRanks, gridBagConstraints);
 
-        int sn_min = 1;
-        SpinnerNumberModel sn = new SpinnerNumberModel(1, sn_min, CampaignGUI.MAX_QUANTITY_SPINNER, 1);
+        int                sn_min = 1;
+        SpinnerNumberModel sn     = new SpinnerNumberModel(1, sn_min, CampaignGUI.MAX_QUANTITY_SPINNER, 1);
         spnNumber = new JSpinner(sn);
         spnNumber.setEditor(new NumberEditor(spnNumber, "#")); // prevent digit grouping, e.g. 1,000
         jtf = ((DefaultEditor) spnNumber.getEditor()).getTextField();
@@ -191,7 +196,7 @@ public class HireBulkPersonnelDialog extends JDialog {
 
         getContentPane().add(new JLabel(resourceMap.getString("lblNumber.text")), newConstraints(0, 2));
 
-        gridBagConstraints = newConstraints(1, 2);
+        gridBagConstraints         = newConstraints(1, 2);
         gridBagConstraints.weightx = 1.0;
         getContentPane().add(spnNumber, gridBagConstraints);
 
@@ -202,12 +207,12 @@ public class HireBulkPersonnelDialog extends JDialog {
             // Age
             JSeparator sep = new JSeparator();
 
-            gridBagConstraints = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
+            gridBagConstraints           = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
             gridBagConstraints.gridwidth = 2;
             getContentPane().add(sep, gridBagConstraints);
             ++mainGridPos;
 
-            gridBagConstraints = newConstraints(0, mainGridPos);
+            gridBagConstraints         = newConstraints(0, mainGridPos);
             gridBagConstraints.weightx = 1.0;
 
             JCheckBox ageRangeCheck = new JCheckBox(resourceMap.getString("lblAgeRange.text"));
@@ -218,7 +223,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             });
             getContentPane().add(ageRangeCheck, gridBagConstraints);
 
-            gridBagConstraints = newConstraints(1, mainGridPos);
+            gridBagConstraints         = newConstraints(1, mainGridPos);
             gridBagConstraints.weightx = 1.0;
 
             JPanel ageRangePanel = new JPanel(new GridBagLayout());
@@ -253,11 +258,11 @@ public class HireBulkPersonnelDialog extends JDialog {
             ++mainGridPos;
 
             // Skill level
-            gridBagConstraints = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
+            gridBagConstraints           = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
             gridBagConstraints.gridwidth = 2;
             ++mainGridPos;
 
-            gridBagConstraints = newConstraints(0, mainGridPos);
+            gridBagConstraints         = newConstraints(0, mainGridPos);
             gridBagConstraints.weightx = 1.0;
 
             JCheckBox skillRangeCheck = new JCheckBox(resourceMap.getString("lblSkillLevel.text"));
@@ -267,7 +272,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             });
             getContentPane().add(skillRangeCheck, gridBagConstraints);
 
-            gridBagConstraints = newConstraints(1, mainGridPos);
+            gridBagConstraints         = newConstraints(1, mainGridPos);
             gridBagConstraints.weightx = 1.0;
 
             JPanel skillRangePanel = new JPanel(new GridBagLayout());
@@ -291,7 +296,7 @@ public class HireBulkPersonnelDialog extends JDialog {
         }
 
         btnHire.addActionListener(evt -> hire(false));
-        gridBagConstraints = newConstraints(0, 0);
+        gridBagConstraints        = newConstraints(0, 0);
         gridBagConstraints.insets = ZERO_INSETS;
 
         panButtons.add(btnHire, gridBagConstraints);
@@ -308,15 +313,21 @@ public class HireBulkPersonnelDialog extends JDialog {
         btnClose.addActionListener(evt -> setVisible(false));
         panButtons.add(btnClose, gridBagConstraints);
 
-        gridBagConstraints = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
+        gridBagConstraints           = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
         gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weightx   = 1.0;
         getContentPane().add(panButtons, gridBagConstraints);
 
         pack();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(HireBulkPersonnelDialog.class);
@@ -328,23 +339,34 @@ public class HireBulkPersonnelDialog extends JDialog {
     }
 
     private void hire(boolean isGmHire) {
-        int number = (Integer) spnNumber.getModel().getValue();
+        int            number       = (Integer) spnNumber.getModel().getValue();
         PersonTypeItem selectedItem = (PersonTypeItem) choiceType.getSelectedItem();
         if (selectedItem == null) {
             logger.error("Attempted to bulk hire for null PersonnelType!");
             return;
         }
 
-        LocalDate today = campaign.getLocalDate();
+        LocalDate today             = campaign.getLocalDate();
         LocalDate earliestBirthDate = today.minusYears(maxAgeVal + 1).plusDays(1);
-        final int days = Math.toIntExact(ChronoUnit.DAYS.between(earliestBirthDate, today.minusYears(minAgeVal)));
+        final int days              = Math.toIntExact(ChronoUnit.DAYS.between(earliestBirthDate,
+              today.minusYears(minAgeVal)));
 
         while (number > 0) {
             Person person = campaign.newPerson(selectedItem.getRole());
 
             if ((useSkill) && (!selectedItem.getRole().isCivilian()) && (!selectedItem.getRole().isAssistant())) {
-                overrideSkills(campaign, person, selectedItem.getRole(),
-                    Objects.requireNonNull(skillLevel.getSelectedItem()).ordinal());
+                if (skillLevel.getSelectedItem() != null) {
+                    RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
+                    boolean                useExtraRandomness     = randomSkillPreferences.randomizeSkill();
+
+                    CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                    overrideSkills(campaignOptions.isAdminsHaveNegotiation(),
+                          campaignOptions.isAdminsHaveScrounge(),
+                          useExtraRandomness,
+                          person,
+                          selectedItem.getRole(),
+                          skillLevel.getSelectedItem());
+                }
             }
 
             person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).getRankNumeric());
@@ -365,10 +387,10 @@ public class HireBulkPersonnelDialog extends JDialog {
                 }
             }
 
-            int experienceLevel = person.getExperienceLevel(campaign, false);
+            SkillLevel actualSkillLevel = person.getSkillLevel(campaign, false);
 
-            reRollLoyalty(person, experienceLevel);
-            reRollAdvantages(campaign, person, experienceLevel);
+            reRollLoyalty(person, actualSkillLevel);
+            reRollAdvantages(campaign, person, actualSkillLevel);
 
             if (!campaign.recruitPerson(person, isGmHire)) {
                 number = 0;
@@ -378,167 +400,6 @@ public class HireBulkPersonnelDialog extends JDialog {
         }
     }
 
-    /**
-     * Re-rolls the SPAs of a person based on their experience level.
-     *
-     * @param campaign       The current campaign.
-     * @param person         The person whose advantages are being re-rolled.
-     * @param experienceLevel The experience level of the person.
-     */
-    public static void reRollAdvantages(Campaign campaign, Person person, int experienceLevel) {
-        Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);
-
-        for (IOption option : Collections.list(options)) {
-            person.getOptions().getOption(option.getName()).clearValue();
-        }
-
-        if (experienceLevel > 0) {
-            AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
-            specialAbilityGenerator.setSkillPreferences(new RandomSkillPreferences());
-            specialAbilityGenerator.generateSpecialAbilities(campaign, person, experienceLevel);
-        }
-    }
-
-    /**
-     * Re-rolls the loyalty of a person based on their experience level.
-     *
-     * @param person         The person whose loyalty is being re-rolled.
-     * @param experienceLevel The experience level of the person.
-     */
-    public static void reRollLoyalty(Person person, int experienceLevel) {
-        if (experienceLevel <= 0) {
-            person.setLoyalty(Compute.d6(3) + 2);
-        } else if (experienceLevel == 1) {
-            person.setLoyalty(Compute.d6(3) + 1);
-        } else {
-            person.setLoyalty(Compute.d6(3));
-        }
-    }
-
-    /**
-     * Replaces the skills for a {@link Person} based on their primary role and desired experience level.
-     *
-     * @param campaign    The current campaign
-     * @param person      The {@link Person} to add default skills.
-     * @param primaryRole The primary role of the person
-     * @param expLvl      The experience level of the person (e.g.
-     *                    {@link SkillType#EXP_GREEN}).
-     */
-    public static void overrideSkills(Campaign campaign, Person person, PersonnelRole primaryRole,
-                                      int expLvl) {
-        switch (primaryRole) {
-            case MEKWARRIOR:
-                addSkillFixedExperienceLevel(person, S_PILOT_MEK, expLvl);
-                addSkillFixedExperienceLevel(person, S_GUN_MEK, expLvl);
-                break;
-            case LAM_PILOT:
-                addSkillFixedExperienceLevel(person, S_PILOT_MEK, expLvl);
-                addSkillFixedExperienceLevel(person, S_GUN_MEK, expLvl);
-                addSkillFixedExperienceLevel(person, S_PILOT_AERO, expLvl);
-                addSkillFixedExperienceLevel(person, S_GUN_AERO, expLvl);
-                break;
-            case GROUND_VEHICLE_DRIVER:
-                addSkillFixedExperienceLevel(person, S_PILOT_GVEE, expLvl);
-                addSkillFixedExperienceLevel(person, S_GUN_VEE, expLvl);
-                break;
-            case NAVAL_VEHICLE_DRIVER:
-                addSkillFixedExperienceLevel(person, S_PILOT_NVEE, expLvl);
-                addSkillFixedExperienceLevel(person, S_GUN_VEE, expLvl);
-                break;
-            case VTOL_PILOT:
-                addSkillFixedExperienceLevel(person, S_PILOT_VTOL, expLvl);
-                addSkillFixedExperienceLevel(person, S_GUN_VEE, expLvl);
-                break;
-            case VEHICLE_GUNNER:
-                addSkillFixedExperienceLevel(person, S_GUN_VEE, expLvl);
-                break;
-            case VEHICLE_CREW, MECHANIC:
-                addSkillFixedExperienceLevel(person, S_TECH_MECHANIC, expLvl);
-                break;
-            case AEROSPACE_PILOT:
-                addSkillFixedExperienceLevel(person, S_PILOT_AERO, expLvl);
-                addSkillFixedExperienceLevel(person, S_GUN_AERO, expLvl);
-                break;
-            case CONVENTIONAL_AIRCRAFT_PILOT:
-                addSkillFixedExperienceLevel(person, S_PILOT_JET, expLvl);
-                addSkillFixedExperienceLevel(person, S_GUN_JET, expLvl);
-                break;
-            case PROTOMEK_PILOT:
-                addSkillFixedExperienceLevel(person, S_GUN_PROTO, expLvl);
-                break;
-            case BATTLE_ARMOUR:
-                addSkillFixedExperienceLevel(person, S_GUN_BA, expLvl);
-                addSkillFixedExperienceLevel(person, S_ANTI_MEK, expLvl);
-                addSkillFixedExperienceLevel(person, S_SMALL_ARMS, expLvl);
-                break;
-            case SOLDIER:
-                addSkillFixedExperienceLevel(person, S_SMALL_ARMS, expLvl);
-                if (Utilities.rollProbability(new RandomSkillPreferences().getAntiMekProb())) {
-                    addSkillFixedExperienceLevel(person, S_ANTI_MEK, expLvl);
-                }
-                break;
-            case VESSEL_PILOT:
-                addSkillFixedExperienceLevel(person, S_PILOT_SPACE, expLvl);
-                break;
-            case VESSEL_GUNNER:
-                addSkillFixedExperienceLevel(person, S_GUN_SPACE, expLvl);
-                break;
-            case VESSEL_CREW:
-                addSkillFixedExperienceLevel(person, S_TECH_VESSEL, expLvl);
-                break;
-            case VESSEL_NAVIGATOR:
-                addSkillFixedExperienceLevel(person, S_NAV, expLvl);
-                break;
-            case MEK_TECH:
-                addSkillFixedExperienceLevel(person, S_TECH_MEK, expLvl);
-                break;
-            case AERO_TEK:
-                addSkillFixedExperienceLevel(person, S_TECH_AERO, expLvl);
-                break;
-            case BA_TECH:
-                addSkillFixedExperienceLevel(person, S_TECH_BA, expLvl);
-                break;
-            case DOCTOR:
-                addSkillFixedExperienceLevel(person, S_DOCTOR, expLvl);
-                break;
-            case ADMINISTRATOR_COMMAND:
-            case ADMINISTRATOR_LOGISTICS:
-            case ADMINISTRATOR_TRANSPORT:
-            case ADMINISTRATOR_HR:
-                addSkillFixedExperienceLevel(person, S_ADMIN, expLvl);
-
-                if (campaign.getCampaignOptions().isAdminsHaveNegotiation()) {
-                    addSkillFixedExperienceLevel(person, S_NEG, expLvl);
-                }
-
-                if (campaign.getCampaignOptions().isAdminsHaveScrounge()) {
-                    addSkillFixedExperienceLevel(person, S_SCROUNGE, expLvl);
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-    /**
-     * Adds a skill to a person with a fixed experience level.
-     * If the person already has the specified skill, the bonus value will be
-     * retained.
-     *
-     * @param person        The Person to add the skill to.
-     * @param skill         The name of the skill to add.
-     * @param experienceLvl The experience level for the skill.
-     */
-    private static void addSkillFixedExperienceLevel(Person person, String skill, int experienceLvl) {
-        int bonus = 0;
-
-        if (person.hasSkill(skill)) {
-            bonus = person.getSkill(skill).getBonus();
-        }
-
-        addSkill(person, skill, experienceLvl, bonus);
-    }
-
     private void refreshRanksCombo() {
         // Clear everything and start over! Wee!
         rankModel.removeAllElements();
@@ -546,14 +407,14 @@ public class HireBulkPersonnelDialog extends JDialog {
         // Determine correct profession to pass into the loop
         final PersonnelRole role = ((PersonTypeItem) Objects.requireNonNull(choiceType.getSelectedItem())).getRole();
         rankModel.addAll(RankDisplay.getRankDisplaysForSystem(campaign.getRankSystem(),
-                Profession.getProfessionFromPersonnelRole(role)));
+              Profession.getProfessionFromPersonnelRole(role)));
 
         choiceRanks.setModel(rankModel);
         choiceRanks.setSelectedIndex(0);
     }
 
     private static class PersonTypeItem {
-        private String name;
+        private String        name;
         private PersonnelRole role;
 
         public PersonTypeItem(String name, PersonnelRole role) {

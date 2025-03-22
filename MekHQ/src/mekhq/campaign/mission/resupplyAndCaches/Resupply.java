@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.mission.resupplyAndCaches;
 
@@ -40,6 +49,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static java.lang.Math.floor;
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.common.MiscType.F_SPONSON_TURRET;
@@ -86,6 +96,7 @@ public class Resupply {
     private Money convoyContentsValueCalculated;
 
     public static final int CARGO_MULTIPLIER = 4;
+    public static final int CARGO_MINIMUM_WEIGHT = 4;
     public static final int RESUPPLY_AMMO_TONNAGE = 1;
     public static final int RESUPPLY_ARMOR_TONNAGE = 5;
     final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
@@ -396,7 +407,7 @@ public class Resupply {
             }
 
             for (UUID unitId : force.getAllUnits(true)) {
-                Entity entity = getEntityFromUnitId(campaign, unitId);
+                Entity entity = getEntityFromUnitId(campaign.getHangar(), unitId);
 
                 if (entity == null) {
                     continue;
@@ -422,7 +433,7 @@ public class Resupply {
         final int TONNAGE_DIVIDER = 125;
         final double dropSize = baseTonnage / TONNAGE_DIVIDER;
 
-        return (int) round(dropSize);
+        return (int) max(CARGO_MINIMUM_WEIGHT, round(dropSize));
     }
 
     /**

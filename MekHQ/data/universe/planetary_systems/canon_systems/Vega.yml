@@ -3,9 +3,11 @@ sucsId: 2667
 xcood: -3.63
 ycood: 106.615
 spectralType:
-  source: canon
+  source: House Kurita
   value: A0V
-primarySlot: 7
+primarySlot:
+  source: House Kurita
+  value: 7
 event:
   - date: '2356-03-24'
     nadirCharge: yes
@@ -103,28 +105,32 @@ planet:
       value: Vega
     type: TERRESTRIAL
     orbitalDist: 8.12
-    sysPos: 7
+    sysPos:
+      source: House Kurita
+      value: 7
     icon: green57
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.98
-    diameter: 15370
-    density: 4.455120791384
+    diameter: 15414
+    density: 4.467959383739
     dayLength: 15
     yearLength: 23.2
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 45
     water:
-      source: canon
+      source: MWDA world profiles
       value: 21
     lifeForm:
-      source: canon
+      source: House Kurita
       value: NONE
     desc: |-
       Had this world formed around a different star, experts believed that Vega VII could have been a paradise. When first discovered in the earlier days of mankind‘s exploration of the stars, Vega was something of a surprise, sporting vast mineral and metallic resources as well as an ocean of drinkable water, habitable temperate and polar zones, and an atmosphere that could be readily terraformed. Within fifty years after its discovery and the arrival of the first settlers—mostly from mining corporations and other industrial enterprises—Vega was a living, breathing world, albeit a warm and dry one. By the time of the Draconis Combine‘s ascendance, Vega was home to a variety of light and medium industries, producing everything from personal computers to armored vehicle components and advanced medical equipment. Strict adherence to local pollution laws allowed the industries tothrive without damaging the terraforming efforts to clean up the native atmosphere, which allowed for the importing of off-world life-forms such as Terran horses and camels, favored modes of transportation among the Vegans. Because of its industrial importance, House Kurita established Vega as a regional capital world, and it served as a military base many times during various wars over the years.
@@ -134,18 +140,21 @@ planet:
       Nasew is home to Cosby Myomer Research, a myomer testing and manufacturing firm and one-time BattleMech producer known in the past for Machiavellian business practices. Damaged by Blakist saboteurs during the Jihad, Cosby was saved from oblivion only through the aid of a Combine business reclamation effort.
 
       Vega‘s biggest tourist attraction by far, even over the site of the Treaty of Vega signing, is the so-called Pyramids of New Egypt, located on the rocky, arid plains of Forsair. Created during the Star League era for an eccentric megabillionaire who believed in the pantheistic religion of Terra‘s ancient Egyptian civilization, the Pyramids remain the biggest draw for off-worlders and treasure seekers on Vega. Over the centuries, the influx of tourists became so heavy that a commercial port city dubbed New Egypt has indeed grown around the Pyramids.
+    ring:
+      source: MWDA world profiles
+      value: yes
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Forsair
       - name:
-          source: canon
+          source: MWDA world profiles
           value: North Nanturo
         capital:
-          source: canon
+          source: House Kurita
           value: Neucason
       - name:
-          source: canon
+          source: MWDA world profiles
           value: South Nanturo
     satellite:
       - name: None (asteroid ring)

@@ -1,22 +1,30 @@
 /*
- * RefitNameDialog.java
- *
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.gui.dialog;
 
@@ -26,7 +34,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ResourceBundle;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -48,22 +55,22 @@ import mekhq.campaign.parts.Refit;
 public class RefitNameDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(RefitNameDialog.class);
 
-    private JFrame frame;
-    private Refit refit;
+    private JFrame  frame;
+    private Refit   refit;
     private boolean cancelled;
 
-    private JButton btnCancel;
-    private JButton btnOK;
-    private JLabel lblChassis;
+    private JButton    btnCancel;
+    private JButton    btnOK;
+    private JLabel     lblChassis;
     private JTextField txtChassis;
-    private JLabel lblModel;
+    private JLabel     lblModel;
     private JTextField txtModel;
 
     public RefitNameDialog(final JFrame frame, final boolean modal, final Refit refit) {
         super(frame, modal);
         this.frame = frame;
         this.refit = refit;
-        cancelled = false;
+        cancelled  = false;
         initComponents();
         setLocationRelativeTo(frame);
         setUserPreferences();
@@ -73,13 +80,13 @@ public class RefitNameDialog extends JDialog {
 
         txtChassis = new JTextField();
         lblChassis = new JLabel();
-        txtModel = new JTextField();
-        lblModel = new JLabel();
-        btnOK = new JButton();
-        btnCancel = new JButton();
+        txtModel   = new JTextField();
+        lblModel   = new JLabel();
+        btnOK      = new JButton();
+        btnCancel  = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RefitNameDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("Form.title"));
@@ -87,11 +94,11 @@ public class RefitNameDialog extends JDialog {
 
         lblChassis.setText(resourceMap.getString("lblChassis.text"));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(lblChassis, gridBagConstraints);
 
         txtChassis.setText(refit.getNewEntity().getChassis());
@@ -101,63 +108,69 @@ public class RefitNameDialog extends JDialog {
             txtChassis.setEditable(false);
             txtChassis.setEnabled(false);
         }
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(txtChassis, gridBagConstraints);
 
         lblModel.setText(resourceMap.getString("lblModel.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(lblModel, gridBagConstraints);
 
         txtModel.setText(refit.getNewEntity().getModel());
         txtModel.setMinimumSize(new Dimension(150, 28));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(txtModel, gridBagConstraints);
 
         btnOK.setText(resourceMap.getString("btnOK.text"));
         btnOK.setName("btnOK");
         btnOK.addActionListener(this::btnOKActionPerformed);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 2;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.EAST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(btnOK, gridBagConstraints);
 
         btnCancel.setText(resourceMap.getString("btnCancel.text"));
         btnCancel.setName("btnClose");
         btnCancel.addActionListener(this::btnCloseActionPerformed);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 2;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(btnCancel, gridBagConstraints);
 
         pack();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(RefitNameDialog.class);
@@ -170,7 +183,7 @@ public class RefitNameDialog extends JDialog {
 
     private void btnOKActionPerformed(ActionEvent evt) {
         String chassis = txtChassis.getText().trim();
-        String model = txtModel.getText().trim();
+        String model   = txtModel.getText().trim();
         if (chassis.isEmpty()) {
             chassis = refit.getOriginalEntity().getChassis();
         }
@@ -182,9 +195,9 @@ public class RefitNameDialog extends JDialog {
         refit.getNewEntity().setModel(model);
         if (null != MekSummaryCache.getInstance().getMek(refit.getNewEntity().getShortNameRaw())) {
             JOptionPane.showMessageDialog(null,
-                    "There is already a unit in the database with this name.\nPlease select a different name.",
-                    "Name already in use",
-                    JOptionPane.ERROR_MESSAGE);
+                  "There is already a unit in the database with this name.\nPlease select a different name.",
+                  "Name already in use",
+                  JOptionPane.ERROR_MESSAGE);
             return;
         }
         this.setVisible(false);

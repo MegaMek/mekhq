@@ -1,20 +1,29 @@
 /**
- * Copyright (c) 2025-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
- *  This file is part of MekHQ.
+ * This file is part of MekHQ.
  *
- *  MekHQ is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
- *  MekHQ is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU General Public License for more details.
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 
 package mekhq.campaign.enums;
@@ -29,12 +38,12 @@ import mekhq.campaign.unit.enums.TransporterType;
  * assigned a transport (another unit).
  * The different transport types primarily differ
  * in the Transporters they allow.
+ *
  * @see Unit
  * @see TransporterType
  */
-public enum CampaignTransportType
-{
-    //region Enum declarations
+public enum CampaignTransportType {
+    // region Enum declarations
     // ORDER MATTERS! This enum's order is used for prioritizing
     // which transport assignment should be used when loading
     // units in the MegaMek lobby.
@@ -44,6 +53,7 @@ public enum CampaignTransportType
      * Ship transports are intended to be used for long-term travel or space combat
      * and only allow units to be transported in long-term Transporters like Bays or
      * Docking Collars.
+     *
      * @see Bay
      * @see DockingCollar
      */
@@ -51,21 +61,24 @@ public enum CampaignTransportType
     /**
      * Units assigned a tactical transport, if both units are in the battle
      * the unit will attempt to load onto the transport when deployed into battle.
-     * Tactical Transporters are meant to represent short-term transport - Infantry in
-     * an Infantry compartment, or Battle Armor on Battle Armor Handles. It still allows
+     * Tactical Transporters are meant to represent short-term transport - Infantry
+     * in
+     * an Infantry compartment, or Battle Armor on Battle Armor Handles. It still
+     * allows
      * units to be loaded into bays though for tactical Dropship assaults.
+     *
      * @see InfantryCompartment
      * @see BattleArmorHandles
      */
     TACTICAL_TRANSPORT(TransportAssignment.class, TacticalTransportedUnitsSummary.class),
 
     /**
-     * Units assigned a tow transports will, if both deployed to battle, automatically
+     * Units assigned a tow transports will, if both deployed to battle,
+     * automatically
      * set the unit as being towed.
      */
     TOW_TRANSPORT(TransportAssignment.class, TowTransportedUnitsSummary.class);
     // endregion Enum declarations
-
 
     // region Variable declarations
     private final Class<? extends ITransportAssignment> transportAssignmentType;
@@ -73,46 +86,61 @@ public enum CampaignTransportType
     // endregion Variable declarations
 
     // region Constructors
-    CampaignTransportType(Class<? extends ITransportAssignment> transportAssignmentType, Class<? extends AbstractTransportedUnitsSummary> transportedUnitsSummaryType) {
+    CampaignTransportType(Class<? extends ITransportAssignment> transportAssignmentType,
+            Class<? extends AbstractTransportedUnitsSummary> transportedUnitsSummaryType) {
         this.transportAssignmentType = transportAssignmentType;
         this.transportedUnitsSummaryType = transportedUnitsSummaryType;
     }
     // endregion Constructors
 
-
     // region Boolean Comparison Methods
 
     /**
      * Is this a Ship Transport?
+     *
      * @return true if this is a SHIP_TRANSPORT
      */
-    public boolean isShipTransport() { return this == SHIP_TRANSPORT; }
+    public boolean isShipTransport() {
+        return this == SHIP_TRANSPORT;
+    }
 
     /**
      * Is this a Tactical Transport?
+     *
      * @return true if this is a TACTICAL_TRANSPORT
      */
-    public boolean isTacticalTransport() { return this == TACTICAL_TRANSPORT; }
+    public boolean isTacticalTransport() {
+        return this == TACTICAL_TRANSPORT;
+    }
 
     /**
      * Is this a Tow Transport?
+     *
      * @return true if this is a TOW_TRANSPORT
      */
-    public boolean isTowTransport() { return this == TOW_TRANSPORT; }
+    public boolean isTowTransport() {
+        return this == TOW_TRANSPORT;
+    }
     // endregion Boolean Comparison Methods
 
     // region Getters
 
     /**
      * Different Transport Types use different transport assignments.
+     *
      * @return Transport Assignment class used by this transport type
      */
-    public Class<? extends ITransportAssignment> getTransportAssignmentType() { return transportAssignmentType; }
+    public Class<? extends ITransportAssignment> getTransportAssignmentType() {
+        return transportAssignmentType;
+    }
 
     /**
      * Different Transport Types use different transported units summaries.
+     *
      * @return Transported Unit Summary used by this transport type
      */
-    public Class<? extends AbstractTransportedUnitsSummary> getTransportedUnitsSummaryType() { return transportedUnitsSummaryType; }
+    public Class<? extends AbstractTransportedUnitsSummary> getTransportedUnitsSummaryType() {
+        return transportedUnitsSummaryType;
+    }
     // endregion Getters
 }

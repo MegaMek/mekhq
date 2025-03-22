@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
  *
  * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
  */
 package mekhq.campaign.mission.resupplyAndCaches;
 
@@ -56,9 +65,6 @@ import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TO
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_CONTRACT_END;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
-import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsMajorityVTOLForces;
-import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsOnlyAerialForces;
-import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsOnlyVTOLForces;
 import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
 import static mekhq.gui.dialog.resupplyAndCaches.DialogItinerary.itineraryDialog;
@@ -157,6 +163,16 @@ public class PerformResupply {
 
             // Then allow the player to pick a focus
             new DialogResupplyFocus(resupply);
+
+            final List<Part> partsPool = resupply.getPartsPool();
+            final List<Part> armorPool = resupply.getArmorPool();
+            final List<Part> ammoBinPool = resupply.getAmmoBinPool();
+
+            // If all three pools are empty, there is no reason to continue. We still want the above
+            // dialog triggered, as it tells the user why the pools might be empty.
+            if (partsPool.isEmpty() && armorPool.isEmpty() && ammoBinPool.isEmpty()) {
+                return;
+            }
         }
 
         // With the focus chosen, we determine the contents of the convoy
@@ -182,12 +198,7 @@ public class PerformResupply {
 
         logger.info("totalTonnage: {}", totalTonnage);
 
-
-        // This shouldn't occur, but we include it as insurance.
         if (resupply.getConvoyContents().isEmpty()) {
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "convoyUnsuccessful.text",
-                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                CLOSING_SPAN_TAG));
             return;
         }
 
@@ -357,7 +368,7 @@ public class PerformResupply {
             convoyWeight += npcConvoyWeight;
         } else {
             for (UUID unitId : playerConvoy.getAllUnits(false)) {
-                Entity entity = getEntityFromUnitId(campaign, unitId);
+                Entity entity = getEntityFromUnitId(campaign.getHangar(), unitId);
 
                 if (entity == null) {
                     continue;
@@ -369,7 +380,7 @@ public class PerformResupply {
 
         interceptionChance += (int) Math.ceil(convoyWeight / INTERCEPTION_LOAD_INFLUENCE);
         // There is always a 1in10 chance of Interception, no matter how stealthy the convoy.
-        interceptionChance = Math.max(0, interceptionChance);
+        interceptionChance = Math.max(1, interceptionChance);
 
         // With interception chance calculated, we check to see whether an interception or event has occurred.
         if (Compute.randomInt(10) < interceptionChance) {
@@ -412,7 +423,8 @@ public class PerformResupply {
             }
 
             // Non-ground convoys don't get roleplay events
-            if (forceContainsOnlyVTOLForces(campaign, convoy) || forceContainsOnlyAerialForces(campaign, convoy)) {
+            if (convoy.forceContainsOnlyVTOLForces(campaign.getHangar(), false)
+                  || convoy.forceContainsOnlyAerialForces(campaign.getHangar(), false, false)) {
                 completeSuccessfulDelivery(resupply, convoyContents);
                 return;
             }
@@ -495,9 +507,11 @@ public class PerformResupply {
         String templateAddress = GENERIC;
 
         if (targetConvoy != null) {
-            if (forceContainsOnlyAerialForces(campaign, targetConvoy)) {
+            if (targetConvoy.forceContainsOnlyAerialForces(campaign.getHangar(), false,
+                  false)) {
                 templateAddress = PLAYER_AEROSPACE_CONVOY;
-            } else if (forceContainsMajorityVTOLForces(campaign, targetConvoy)) {
+            } else if (targetConvoy.forceContainsMajorityVTOLForces(campaign.getHangar(),
+                  false)) {
                 templateAddress = PLAYER_VTOL_CONVOY;
             } else {
                 templateAddress = PLAYER_CONVOY;

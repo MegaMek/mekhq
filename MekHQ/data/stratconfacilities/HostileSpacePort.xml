@@ -1,7 +1,7 @@
 <StratconFacility>
 	<bvBudgetModifier>0.15</bvBudgetModifier>
 	<capturedDefinition>AlliedSpacePort.xml</capturedDefinition>
-	<displayableName>SpacePort</displayableName>
+	<displayableName>Space Port</displayableName>
 	<localModifiers>HostileBVBudgetIncrease.xml</localModifiers>
 	<sharedModifiers>HostileBVBudgetIncrease.xml</sharedModifiers>
 	<facilityType>SpacePort</facilityType>

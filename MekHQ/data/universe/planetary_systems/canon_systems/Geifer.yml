@@ -3,9 +3,11 @@ sucsId: 942
 xcood: 37.535
 ycood: -186.266
 spectralType:
-  source: canon
+  source: 'Handbook: House Liao, pg. 72'
   value: G9V
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Liao, pg. 72'
+  value: 3
 planet:
   - name: Svarog
     type: TERRESTRIAL
@@ -41,28 +43,32 @@ planet:
       value: Geifer
     type: TERRESTRIAL
     orbitalDist: 0.8
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Liao, pg. 72'
+      value: 3
     icon: green31
     pressure:
-      source: canon
+      source: 'Handbook: House Liao, pg. 72'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 72'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 72'
       value: 0.99
-    diameter: 12293
-    density: 5.686568528492
+    diameter: 12264
+    density: 5.673057242123
     dayLength: 29
     yearLength: 1.1
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 72'
       value: 31
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 72'
       value: 62
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 72'
       value: MAMMAL
     desc: |-
       Geifer is the site of the massive Capellan Republic Library, which was a massive facility with a wealth of knowledge. Unfortunately it suffered a great deal of damage in both the Second and Third Succession Wars. While much of the information was lost by the late Third Succession War, the remaining information was some of the most comprehensive in the settled world, primarily covering physical sciences and languages.
@@ -72,12 +78,16 @@ planet:
       - name: Pierce
         capital: Stevens
     satellite:
-      - name: Mushu
-        size: giant
-        icon: rock10
-      - name: Dabney
+      - name:
+          source: 'Handbook: House Liao, pg. 72'
+          value: Dabney
         size: large
         icon: rock12
+      - name:
+          source: 'Handbook: House Liao, pg. 72'
+          value: Mushu
+        size: giant
+        icon: rock10
     event:
       - date: '2179-02-06'
         faction:
