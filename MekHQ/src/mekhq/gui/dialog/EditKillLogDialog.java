@@ -31,7 +31,6 @@ package mekhq.gui.dialog;
 import java.awt.BorderLayout;
 import java.util.Objects;
 import java.util.ResourceBundle;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -51,21 +50,21 @@ import mekhq.gui.control.EditKillLogControl;
 public class EditKillLogDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(EditKillLogDialog.class);
 
-    private JFrame frame;
+    private JFrame   frame;
     private Campaign campaign;
-    private Person person;
+    private Person   person;
 
     private EditKillLogControl editKillLogControl;
-    private JButton btnOK;
+    private JButton            btnOK;
 
     public EditKillLogDialog(JFrame parent, boolean modal, Campaign campaign, Person person) {
         super(parent, modal);
         Objects.requireNonNull(campaign);
         Objects.requireNonNull(person);
 
-        this.frame = parent;
+        this.frame    = parent;
         this.campaign = campaign;
-        this.person = person;
+        this.person   = person;
 
         initComponents();
         setLocationRelativeTo(parent);
@@ -74,7 +73,7 @@ public class EditKillLogDialog extends JDialog {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditKillLogDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName(resourceMap.getString("dialog.name"));
@@ -93,7 +92,13 @@ public class EditKillLogDialog extends JDialog {
         pack();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditKillLogDialog.class);

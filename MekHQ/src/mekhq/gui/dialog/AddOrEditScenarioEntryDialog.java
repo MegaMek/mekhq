@@ -37,7 +37,6 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -58,22 +57,22 @@ import mekhq.campaign.log.ServiceLogEntry;
 public class AddOrEditScenarioEntryDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(AddOrEditScenarioEntryDialog.class);
 
-    private static final int ADD_OPERATION = 1;
+    private static final int ADD_OPERATION  = 1;
     private static final int EDIT_OPERATION = 2;
 
-    private JFrame frame;
-    private int operationType;
-    private LogEntry entry;
+    private JFrame    frame;
+    private int       operationType;
+    private LogEntry  entry;
     private LocalDate originalDate;
-    private String originalDescription;
+    private String    originalDescription;
     private LocalDate newDate;
 
-    private JPanel panMain;
-    private JButton btnDate;
+    private JPanel     panMain;
+    private JButton    btnDate;
     private JTextField txtDesc;
-    private JPanel panBtn;
-    private JButton btnOK;
-    private JButton btnClose;
+    private JPanel     panBtn;
+    private JButton    btnOK;
+    private JButton    btnClose;
 
     public AddOrEditScenarioEntryDialog(JFrame parent, boolean modal, LocalDate entryDate) {
         this(parent, modal, ADD_OPERATION, new ServiceLogEntry(entryDate, ""));
@@ -87,12 +86,12 @@ public class AddOrEditScenarioEntryDialog extends JDialog {
         super(parent, modal);
         Objects.requireNonNull(entry);
 
-        this.frame = parent;
+        this.frame         = parent;
         this.operationType = operationType;
-        this.entry = entry;
+        this.entry         = entry;
 
-        newDate = this.entry.getDate();
-        originalDate = this.entry.getDate();
+        newDate             = this.entry.getDate();
+        originalDate        = this.entry.getDate();
         originalDescription = this.entry.getDesc();
 
         initComponents();
@@ -106,24 +105,26 @@ public class AddOrEditScenarioEntryDialog extends JDialog {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditScenarioEntryDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         GridBagConstraints gridBagConstraints;
 
         panMain = new JPanel();
         btnDate = new JButton();
         txtDesc = new JTextField();
 
-        panBtn = new JPanel();
-        btnOK = new JButton();
+        panBtn   = new JPanel();
+        btnOK    = new JButton();
         btnClose = new JButton();
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
+
         if (this.operationType == ADD_OPERATION) {
             setTitle(resourceMap.getString("dialogAdd.title"));
         } else {
             setTitle(resourceMap.getString("dialogEdit.title"));
         }
+
         getContentPane().setLayout(new BorderLayout());
         panMain.setLayout(new GridBagLayout());
         panBtn.setLayout(new GridLayout(0, 2));
@@ -131,14 +132,14 @@ public class AddOrEditScenarioEntryDialog extends JDialog {
         btnDate = new JButton();
         btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(newDate));
         btnDate.addActionListener(evt -> changeDate());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints         = new GridBagConstraints();
+        gridBagConstraints.gridx   = 0;
+        gridBagConstraints.gridy   = 0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill    = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets  = new Insets(5, 5, 5, 5);
         panMain.add(btnDate, gridBagConstraints);
 
         txtDesc.setText(entry.getDesc());
@@ -147,14 +148,14 @@ public class AddOrEditScenarioEntryDialog extends JDialog {
         txtDesc.setColumns(30);
         txtDesc.grabFocus();
         txtDesc.addActionListener(this::btnOKActionPerformed);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints         = new GridBagConstraints();
+        gridBagConstraints.gridx   = 0;
+        gridBagConstraints.gridy   = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill    = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets  = new Insets(5, 5, 5, 5);
         panMain.add(txtDesc, gridBagConstraints);
 
         btnOK.setText(resourceMap.getString("btnOkay.text"));
@@ -172,7 +173,13 @@ public class AddOrEditScenarioEntryDialog extends JDialog {
         pack();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(AddOrEditScenarioEntryDialog.class);

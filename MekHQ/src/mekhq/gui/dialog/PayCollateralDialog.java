@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
-
 import javax.swing.*;
 
 import megamek.client.ui.preferences.JWindowPreference;
@@ -58,36 +57,34 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
- * A dialog to decide how you want to pay off collateral when you
- * default on a loan
+ * A dialog to decide how you want to pay off collateral when you default on a loan
  *
  * @author Taharqa
  */
 public class PayCollateralDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(PayCollateralDialog.class);
 
-    private JFrame frame;
+    private JFrame   frame;
     private Campaign campaign;
-    private boolean cancelled;
-    private boolean paid;
-    private Loan loan;
+    private boolean  cancelled;
+    private boolean  paid;
+    private Loan     loan;
 
-    private Map<JCheckBox, UUID> unitBoxes;
-    private ArrayList<JCheckBox> assetBoxes;
+    private Map<JCheckBox, UUID>  unitBoxes;
+    private ArrayList<JCheckBox>  assetBoxes;
     private Map<JSlider, Integer> partSliders;
-    private JProgressBar barAmount;
-    private JButton btnPay;
-    private JButton btnDontPay;
-    private JButton btnCancel;
+    private JProgressBar          barAmount;
+    private JButton               btnPay;
+    private JButton               btnDontPay;
+    private JButton               btnCancel;
 
-    public PayCollateralDialog(final JFrame frame, final boolean modal, final Campaign campaign,
-            final Loan loan) {
+    public PayCollateralDialog(final JFrame frame, final boolean modal, final Campaign campaign, final Loan loan) {
         super(frame, modal);
-        this.frame = frame;
+        this.frame    = frame;
         this.campaign = campaign;
-        this.loan = loan;
-        cancelled = false;
-        paid = false;
+        this.loan     = loan;
+        cancelled     = false;
+        paid          = false;
         initComponents();
         setLocationRelativeTo(frame);
         setUserPreferences();
@@ -95,11 +92,11 @@ public class PayCollateralDialog extends JDialog {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PayCollateralDialog",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
 
         JTabbedPane panMain = new JTabbedPane();
-        JPanel panInfo = new JPanel(new GridLayout(1, 0));
-        JPanel panBtn = new JPanel(new GridLayout(0, 3));
+        JPanel      panInfo = new JPanel(new GridLayout(1, 0));
+        JPanel      panBtn  = new JPanel(new GridLayout(0, 3));
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("Form.title"));
@@ -109,20 +106,20 @@ public class PayCollateralDialog extends JDialog {
         barAmount.setValue(0);
         barAmount.setStringPainted(true);
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.gridx   = 0;
+        gridBagConstraints.gridy   = 0;
+        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill    = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
         panInfo.add(barAmount, gridBagConstraints);
 
         unitBoxes = new LinkedHashMap<>();
-        JCheckBox box;
-        int i = 0;
-        int j = 0;
-        JPanel pnlUnits = new JPanel(new GridBagLayout());
-        Collection<Unit> units = campaign.getHangar().getUnits();
+        JCheckBox        box;
+        int              i        = 0;
+        int              j        = 0;
+        JPanel           pnlUnits = new JPanel(new GridBagLayout());
+        Collection<Unit> units    = campaign.getHangar().getUnits();
         for (Unit u : units) {
             j++;
             box = new JCheckBox(u.getName() + " (" + u.getSellValue().toAmountAndSymbolString() + ")");
@@ -130,11 +127,11 @@ public class PayCollateralDialog extends JDialog {
             box.setEnabled(u.isPresent() && !u.isDeployed());
             box.addItemListener(evt -> updateAmount());
             unitBoxes.put(box, u.getId());
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = i;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints         = new GridBagConstraints();
+            gridBagConstraints.gridx   = 0;
+            gridBagConstraints.gridy   = i;
+            gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
+            gridBagConstraints.fill    = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
             if (j == units.size()) {
                 gridBagConstraints.weighty = 1.0;
@@ -152,13 +149,13 @@ public class PayCollateralDialog extends JDialog {
         JPanel pnlParts = new JPanel(new GridBagLayout());
         i = 0;
         j = 0;
-        JSlider partSlider;
+        JSlider    partSlider;
         List<Part> spareParts = campaign.getWarehouse().getSpareParts();
         for (Part p : spareParts) {
             j++;
             int quantity = p.getQuantity();
-            if (p instanceof AmmoStorage) {
-                quantity = ((AmmoStorage) p).getQuantity();
+            if (p instanceof AmmoStorage ammoStorage) {
+                quantity = ammoStorage.getQuantity();
             }
             partSlider = new JSlider(JSlider.HORIZONTAL, 0, quantity, 0);
             // TODO: deal with armors
@@ -171,23 +168,28 @@ public class PayCollateralDialog extends JDialog {
             partSlider.addChangeListener(e -> updateAmount());
             partSlider.setEnabled(p.isPresent() && !p.isReservedForRefit() && !p.isReservedForReplacement());
             partSliders.put(partSlider, p.getId());
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = i;
+            gridBagConstraints           = new GridBagConstraints();
+            gridBagConstraints.gridx     = 0;
+            gridBagConstraints.gridy     = i;
             gridBagConstraints.gridwidth = 1;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-            gridBagConstraints.weightx = 0.0;
+            gridBagConstraints.anchor    = GridBagConstraints.NORTHWEST;
+            gridBagConstraints.fill      = GridBagConstraints.NONE;
+            gridBagConstraints.insets    = new Insets(5, 5, 0, 0);
+            gridBagConstraints.weightx   = 0.0;
             if (j == spareParts.size()) {
                 gridBagConstraints.weighty = 1.0;
             }
             pnlParts.add(partSlider, gridBagConstraints);
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.gridx   = 1;
+            gridBagConstraints.fill    = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
-            pnlParts.add(new JLabel("<html>" + p.getName() + "<br>" + p.getDetails() + ", "
-                    + p.getActualValue().toAmountAndSymbolString() + "</html>"), gridBagConstraints);
+            pnlParts.add(new JLabel("<html>" +
+                                    p.getName() +
+                                    "<br>" +
+                                    p.getDetails() +
+                                    ", " +
+                                    p.getActualValue().toAmountAndSymbolString() +
+                                    "</html>"), gridBagConstraints);
             i++;
         }
         JScrollPane scrParts = new JScrollPaneWithSpeed();
@@ -215,8 +217,8 @@ public class PayCollateralDialog extends JDialog {
         panBtn.add(btnCancel);
 
         assetBoxes = new ArrayList<>();
-        i = 0;
-        j = 0;
+        i          = 0;
+        j          = 0;
         JPanel pnlAssets = new JPanel(new GridBagLayout());
         for (Asset a : campaign.getFinances().getAssets()) {
             j++;
@@ -224,11 +226,11 @@ public class PayCollateralDialog extends JDialog {
             box.setSelected(false);
             box.addItemListener(evt -> updateAmount());
             assetBoxes.add(box);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = i;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints         = new GridBagConstraints();
+            gridBagConstraints.gridx   = 0;
+            gridBagConstraints.gridy   = i;
+            gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
+            gridBagConstraints.fill    = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
             if (j == (campaign.getFinances().getAssets().size())) {
                 gridBagConstraints.weighty = 1.0;
@@ -252,7 +254,13 @@ public class PayCollateralDialog extends JDialog {
         pack();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PayCollateralDialog.class);
@@ -294,8 +302,10 @@ public class PayCollateralDialog extends JDialog {
         for (Map.Entry<JSlider, Integer> m : partSliders.entrySet()) {
             int quantity = m.getKey().getValue();
             if (quantity > 0) {
-                amount = amount
-                        .plus(campaign.getWarehouse().getPart(m.getValue()).getActualValue().multipliedBy(quantity));
+                amount = amount.plus(campaign.getWarehouse()
+                                           .getPart(m.getValue())
+                                           .getActualValue()
+                                           .multipliedBy(quantity));
             }
         }
 
@@ -308,17 +318,10 @@ public class PayCollateralDialog extends JDialog {
 
         int percent = 0;
         if (loan.determineCollateralAmount().isPositive()) {
-            percent = amount
-                    .multipliedBy(100)
-                    .dividedBy(loan.determineCollateralAmount())
-                    .getAmount().intValue();
+            percent = amount.multipliedBy(100).dividedBy(loan.determineCollateralAmount()).getAmount().intValue();
         }
 
-        if (percent < 100) {
-            btnPay.setEnabled(false);
-        } else {
-            btnPay.setEnabled(true);
-        }
+        btnPay.setEnabled(percent >= 100);
         barAmount.setValue(percent);
         barAmount.setString(amount.toAmountString() + "/" + loan.determineCollateralAmount().toAmountString());
     }

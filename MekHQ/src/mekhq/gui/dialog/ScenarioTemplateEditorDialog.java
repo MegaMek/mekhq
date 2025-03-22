@@ -43,8 +43,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
-
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
@@ -84,9 +82,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
     private final Dimension spinnerSize = new Dimension(55, 25);
 
-    private final static String ADD_FORCE_COMMAND = "ADDFORCE";
-    private final static String REMOVE_FORCE_COMMAND = "REMOVE_FORCE_";
-    private final static String EDIT_FORCE_COMMAND = "EDIT_FORCE_";
+    private final static String ADD_FORCE_COMMAND     = "ADDFORCE";
+    private final static String REMOVE_FORCE_COMMAND  = "REMOVE_FORCE_";
+    private final static String EDIT_FORCE_COMMAND    = "EDIT_FORCE_";
     private final static String SAVE_TEMPLATE_COMMAND = "SAVE_TEMPLATE";
     private final static String LOAD_TEMPLATE_COMMAND = "LOAD_TEMPLATE";
 
@@ -95,53 +93,53 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     // controls which need to be accessible across the lifetime of this dialog
     JComboBox<String> cboAlignment;
     JComboBox<String> cboGenerationMethod;
-    JSpinner spnMultiplier;
-    JList<String> lstDeployZones;
+    JSpinner          spnMultiplier;
+    JList<String>     lstDeployZones;
     JComboBox<String> cboDestinationZone;
-    JSpinner spnRetreatThreshold;
+    JSpinner          spnRetreatThreshold;
     JComboBox<String> cboUnitType;
-    JCheckBox chkReinforce;
-    JCheckBox chkContributesToBV;
-    JCheckBox chkContributesToUnitCount;
-    JTextField txtForceName;
+    JCheckBox         chkReinforce;
+    JCheckBox         chkContributesToBV;
+    JCheckBox         chkContributesToUnitCount;
+    JTextField        txtForceName;
     JComboBox<String> cboSyncForceName;
     JComboBox<String> cboSyncDeploymentType;
-    JSpinner spnArrivalTurn;
-    JSpinner spnFixedUnitCount;
+    JSpinner          spnArrivalTurn;
+    JSpinner          spnFixedUnitCount;
     JComboBox<String> cboMaxWeightClass;
     JComboBox<String> cboMinWeightClass;
-    JCheckBox chkContributesToMapSize;
-    JSpinner spnGenerationOrder;
-    JCheckBox chkAllowAeroBombs;
-    JCheckBox chkUseArtillery;
-    JSpinner spnStartingAltitude;
-    JCheckBox chkOffBoard;
+    JCheckBox         chkContributesToMapSize;
+    JSpinner          spnGenerationOrder;
+    JCheckBox         chkAllowAeroBombs;
+    JCheckBox         chkUseArtillery;
+    JSpinner          spnStartingAltitude;
+    JCheckBox         chkOffBoard;
 
-    JPanel panForceList;
-    JTextField txtScenarioName;
-    JTextArea txtScenarioBriefing;
-    JTextArea txtLongBriefing;
-    JTextField txtBaseWidth;
-    JList<String> lstAllowedTerrainTypes;
-    JTextField txtBaseHeight;
-    JTextField txtXIncrement;
-    JTextField txtYIncrement;
-    JCheckBox chkAllowRotation;
-    JCheckBox chkUseAtBSizing;
-    JRadioButton btnAllowAllMapTypes;
-    JRadioButton btnUseSpaceMap;
-    JRadioButton btnUseSpecificMapTypes;
-    JRadioButton btnUseLowAtmosphereMap;
-    JComboBox<String> modifierBox;
-    JList<String> selectedModifiersList;
+    JPanel                   panForceList;
+    JTextField               txtScenarioName;
+    JTextArea                txtScenarioBriefing;
+    JTextArea                txtLongBriefing;
+    JTextField               txtBaseWidth;
+    JList<String>            lstAllowedTerrainTypes;
+    JTextField               txtBaseHeight;
+    JTextField               txtXIncrement;
+    JTextField               txtYIncrement;
+    JCheckBox                chkAllowRotation;
+    JCheckBox                chkUseAtBSizing;
+    JRadioButton             btnAllowAllMapTypes;
+    JRadioButton             btnUseSpaceMap;
+    JRadioButton             btnUseSpecificMapTypes;
+    JRadioButton             btnUseLowAtmosphereMap;
+    JComboBox<String>        modifierBox;
+    JList<String>            selectedModifiersList;
     JList<ScenarioObjective> objectiveList;
-    JScrollPane objectiveScrollPane;
-    JButton btnRemoveObjective;
-    JList<String> lstMuls;
+    JScrollPane              objectiveScrollPane;
+    JButton                  btnRemoveObjective;
+    JList<String>            lstMuls;
 
     AbstractScrollablePanel globalPanel;
 
-    JPanel forcedPanel;
+    JPanel      forcedPanel;
     JScrollPane forceScrollPane;
 
     // the scenario template we're working on
@@ -160,10 +158,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     }
 
     /**
-     * Constructor. Creates a new instance of this dialog with the given parent
-     * JFrame.
-     *
-     * @param parent
+     * @param parent Creates a new instance of this dialog with the given parent JFrame.
      */
     public ScenarioTemplateEditorDialog(JFrame parent) {
         super(parent, true);
@@ -205,7 +200,13 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         updateObjectiveList();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ScenarioTemplateEditorDialog.class);
@@ -225,7 +226,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         JLabel lblScenarioName = new JLabel("Scenario Name:");
 
         gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.anchor = GridBagConstraints.WEST;
+        gbc.anchor    = GridBagConstraints.WEST;
         globalPanel.add(lblScenarioName, gbc);
 
         txtScenarioName = new JTextField(80);
@@ -260,7 +261,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
     private void setupObjectiveEditUI(GridBagConstraints gbc) {
         gbc.gridy++;
-        gbc.gridwidth = 1;
+        gbc.gridwidth  = 1;
         gbc.gridheight = 1;
 
         JPanel pnlObjectiveEdit = new JPanel();
@@ -284,8 +285,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         });
 
         objectiveList = new JList<>();
-        objectiveList.addListSelectionListener(
-                e -> btnRemoveObjective.setEnabled(!objectiveList.getSelectedValuesList().isEmpty()));
+        objectiveList.addListSelectionListener(e -> btnRemoveObjective.setEnabled(!objectiveList.getSelectedValuesList()
+                                                                                         .isEmpty()));
         objectiveList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         objectiveList.setVisibleRowCount(5);
         objectiveList.setFixedCellWidth(400);
@@ -301,13 +302,13 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         localGbc.gridy = 0;
         pnlObjectiveEdit.add(lblObjectives, localGbc);
 
-        localGbc.gridx = 1;
-        localGbc.gridy = 1;
+        localGbc.gridx      = 1;
+        localGbc.gridy      = 1;
         localGbc.gridheight = GridBagConstraints.REMAINDER;
         pnlObjectiveEdit.add(objectiveScrollPane, localGbc);
 
-        localGbc.gridx = 2;
-        localGbc.gridy = 2;
+        localGbc.gridx      = 2;
+        localGbc.gridy      = 2;
         localGbc.gridheight = 1;
         pnlObjectiveEdit.add(btnAddEditObjective, localGbc);
         localGbc.gridy = 3;
@@ -320,13 +321,12 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     }
 
     /**
-     * Worker function that sets up top-level headers for the force template editor
-     * section.
+     * Worker function that sets up top-level headers for the force template editor section.
      *
      * @param gbc
      */
     private void setupForceEditorHeaders(GridBagConstraints gbc) {
-        gbc.gridx = 0;
+        gbc.gridx     = 0;
         gbc.gridwidth = 1;
 
         JLabel lblForces = new JLabel("Participating Forces:");
@@ -358,8 +358,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
         GridBagConstraints gbc = new GridBagConstraints();
 
-        gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridx  = 0;
+        gbc.gridy  = 1;
         gbc.anchor = GridBagConstraints.WEST;
         JLabel lblForceAlignment = new JLabel("Force Alignment:");
         forcedPanel.add(lblForceAlignment, gbc);
@@ -382,8 +382,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         forcedPanel.add(cboGenerationMethod, gbc);
 
         JLabel lblMultiplier = new JLabel("Scaling Multiplier:");
-        lblMultiplier
-                .setToolTipText("For scaling force generation methods, multiplies the metric being scaled against.");
+        lblMultiplier.setToolTipText("For scaling force generation methods, multiplies the metric being scaled against.");
         gbc.gridx = 0;
         gbc.gridy++;
         forcedPanel.add(lblMultiplier, gbc);
@@ -419,7 +418,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         forcedPanel.add(lblCanReinforceLinked, gbc);
 
         chkReinforce = new JCheckBox();
-        gbc.gridx = 1;
+        gbc.gridx    = 1;
         forcedPanel.add(chkReinforce, gbc);
 
         JLabel lblContributesToBV = new JLabel("Contributes to BV:");
@@ -428,7 +427,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         forcedPanel.add(lblContributesToBV, gbc);
 
         chkContributesToBV = new JCheckBox();
-        gbc.gridx = 1;
+        gbc.gridx          = 1;
         forcedPanel.add(chkContributesToBV, gbc);
 
         JLabel lblContributesToUnitCount = new JLabel("Contributes to Unit Count:");
@@ -437,23 +436,23 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         forcedPanel.add(lblContributesToUnitCount, gbc);
 
         chkContributesToUnitCount = new JCheckBox();
-        gbc.gridx = 1;
+        gbc.gridx                 = 1;
         forcedPanel.add(chkContributesToUnitCount, gbc);
 
         JLabel lblForceID = new JLabel("Force ID:");
         lblForceID.setToolTipText(
-                "The identifier for this force. Used to synchronize the properties of other forces to this one.");
+              "The identifier for this force. Used to synchronize the properties of other forces to this one.");
         gbc.gridx = 0;
         gbc.gridy++;
         forcedPanel.add(lblForceID, gbc);
 
         txtForceName = new JTextField(10);
-        gbc.gridx = 1;
+        gbc.gridx    = 1;
         forcedPanel.add(txtForceName, gbc);
 
         JLabel lblSyncDeployment = new JLabel("Synchronized Deployment:");
-        lblSyncDeployment
-                .setToolTipText("Whether or not, and how, to synchronize the deployment of this force with another.");
+        lblSyncDeployment.setToolTipText(
+              "Whether or not, and how, to synchronize the deployment of this force with another.");
         gbc.gridx = 0;
         gbc.gridy++;
         forcedPanel.add(lblSyncDeployment, gbc);
@@ -463,7 +462,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         ItemListener syncDeploymentChangeListener = evt -> syncDeploymentChangeHandler();
         cboSyncDeploymentType.addItemListener(syncDeploymentChangeListener);
 
-        gbc.gridx = 1;
+        gbc.gridx  = 1;
         gbc.anchor = GridBagConstraints.WEST;
         forcedPanel.add(cboSyncDeploymentType, gbc);
 
@@ -478,14 +477,14 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         forcedPanel.add(lblFixedMul, gbc);
 
         lstMuls = new JList<>();
-        DefaultListModel<String> mulModel = new DefaultListModel<>();
-        JScrollPane scrMulList = new JScrollPaneWithSpeed(lstMuls);
-        File mulDir = new File(MHQConstants.STRATCON_MUL_FILES_DIRECTORY);
+        DefaultListModel<String> mulModel   = new DefaultListModel<>();
+        JScrollPane              scrMulList = new JScrollPaneWithSpeed(lstMuls);
+        File                     mulDir     = new File(MHQConstants.STRATCON_MUL_FILES_DIRECTORY);
 
         if (mulDir.exists() && mulDir.isDirectory()) {
-            for (String mul : mulDir.list((d, s) -> {
+            for (String mul : Objects.requireNonNull(mulDir.list((d, s) -> {
                 return s.toLowerCase().endsWith(".mul");
-            })) {
+            }))) {
                 mulModel.addElement(mul);
             }
         }
@@ -500,8 +499,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             zoneModel.addElement(s);
         }
 
-        gbc.gridx = 2;
-        gbc.gridy = 0;
+        gbc.gridx  = 2;
+        gbc.gridy  = 0;
         gbc.anchor = GridBagConstraints.WEST;
 
         JLabel lblDeploymentZones = new JLabel("Possible Deployment Zones");
@@ -509,25 +508,22 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
         lstDeployZones = new JList<>();
         lstDeployZones.setModel(zoneModel);
-        gbc.gridy = 1;
+        gbc.gridy      = 1;
         gbc.gridheight = GridBagConstraints.REMAINDER;
         forcedPanel.add(lstDeployZones, gbc);
 
         JLabel lblAllowedUnitTypes = new JLabel("Unit Type:");
         lblAllowedUnitTypes.setToolTipText(
-                "The type of unit. If player-supplied, indicates a limitation on the type of unit the player can deploy.");
-        gbc.gridx = 3;
-        gbc.gridy = 1;
+              "The type of unit. If player-supplied, indicates a limitation on the type of unit the player can deploy.");
+        gbc.gridx      = 3;
+        gbc.gridy      = 1;
         gbc.gridheight = 1;
         forcedPanel.add(lblAllowedUnitTypes, gbc);
 
         cboUnitType = new JComboBox<>();
-        cboUnitType.addItem(
-                ScenarioForceTemplate.SPECIAL_UNIT_TYPES.get(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX));
-        cboUnitType
-                .addItem(ScenarioForceTemplate.SPECIAL_UNIT_TYPES.get(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX));
-        cboUnitType.addItem(
-                ScenarioForceTemplate.SPECIAL_UNIT_TYPES.get(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS));
+        cboUnitType.addItem(ScenarioForceTemplate.SPECIAL_UNIT_TYPES.get(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX));
+        cboUnitType.addItem(ScenarioForceTemplate.SPECIAL_UNIT_TYPES.get(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX));
+        cboUnitType.addItem(ScenarioForceTemplate.SPECIAL_UNIT_TYPES.get(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS));
 
         for (int unitTypeID = 0; unitTypeID < UnitType.SIZE; unitTypeID++) {
             cboUnitType.addItem(UnitType.getTypeDisplayableName(unitTypeID));
@@ -541,21 +537,22 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
         JLabel lblArrivalTurn = new JLabel("Arrival Turn:");
         lblArrivalTurn.setToolTipText(
-                "The turn on which this force arrives. Enter -1 for staggered arrival, -2 for staggered arrival by lance, -3 for 'as reinforcements' arrival time.");
+              "The turn on which this force arrives. Enter -1 for staggered arrival, -2 for staggered arrival by lance, -3 for 'as reinforcements' arrival time.");
         gbc.gridy++;
         gbc.gridx--;
         forcedPanel.add(lblArrivalTurn, gbc);
 
-        spnArrivalTurn = new JSpinner(
-                new SpinnerNumberModel(0, ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS, 100, 1));
+        spnArrivalTurn = new JSpinner(new SpinnerNumberModel(0,
+              ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS,
+              100,
+              1));
         gbc.gridx++;
         forcedPanel.add(spnArrivalTurn, gbc);
 
         JLabel lblFixedUnitCount = new JLabel("Fixed Unit Count:");
         lblFixedUnitCount.setToolTipText(
-                "How many units in the force, if using the fixed unit count generation method. -1 indicates a lance, appropriate to the owner's faction.\n"
-                        +
-                        "If player-supplied, indicates an upper bound on the number of units the player can deploy.");
+              "How many units in the force, if using the fixed unit count generation method. -1 indicates a lance, appropriate to the owner's faction.\n" +
+              "If player-supplied, indicates an upper bound on the number of units the player can deploy.");
         gbc.gridy++;
         gbc.gridx--;
         forcedPanel.add(lblFixedUnitCount, gbc);
@@ -601,7 +598,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
         JLabel lblGenerationOrder = new JLabel("Generation Order:");
         lblGenerationOrder.setToolTipText(
-                "Controls when this force will be generated related to other forces. Higher numbers will be generated later.");
+              "Controls when this force will be generated related to other forces. Higher numbers will be generated later.");
         gbc.gridy++;
         gbc.gridx--;
         forcedPanel.add(lblGenerationOrder, gbc);
@@ -622,7 +619,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
         JLabel lblStartingAltitude = new JLabel("Start Altitude:");
         lblStartingAltitude.setToolTipText(
-                "Starting elevation for VTOLs or altitude for aeros/ground units. Ignored in space. Use with caution as it may lead to splattering.");
+              "Starting elevation for VTOLs or altitude for aeros/ground units. Ignored in space. Use with caution as it may lead to splattering.");
         gbc.gridy++;
         gbc.gridx--;
         forcedPanel.add(lblStartingAltitude, gbc);
@@ -640,10 +637,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridx++;
         forcedPanel.add(chkUseArtillery, gbc);
 
-        JLabel lblOffboard = new JLabel("Deploy Offboard:");
+        JLabel lblOffBoard = new JLabel("Deploy Off board:");
         gbc.gridx--;
         gbc.gridy++;
-        forcedPanel.add(lblOffboard, gbc);
+        forcedPanel.add(lblOffBoard, gbc);
 
         chkOffBoard = new JCheckBox();
         gbc.gridx++;
@@ -660,8 +657,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     }
 
     /**
-     * Helper function that loads the given force template into the force editor
-     * interface.
+     * Helper function that loads the given force template into the force editor interface.
      *
      * @param forceTemplate The force template.
      */
@@ -685,8 +681,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         }
 
         lstDeployZones.setSelectedIndices(deploymentZones);
-        cboUnitType
-                .setSelectedIndex(forceTemplate.getAllowedUnitType() + ScenarioForceTemplate.SPECIAL_UNIT_TYPES.size());
+        cboUnitType.setSelectedIndex(forceTemplate.getAllowedUnitType() +
+                                     ScenarioForceTemplate.SPECIAL_UNIT_TYPES.size());
         spnArrivalTurn.setValue(forceTemplate.getArrivalTurn());
         spnFixedUnitCount.setValue(forceTemplate.getFixedUnitCount());
         cboMaxWeightClass.setSelectedIndex(forceTemplate.getMaxWeightClass());
@@ -700,8 +696,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     }
 
     /**
-     * Worker function called when initializing the dialog to place the force
-     * template list on the content pane.
+     * Worker function called when initializing the dialog to place the force template list on the content pane.
      *
      * @param gbc Grid bag constraints.
      */
@@ -733,8 +728,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         JPanel pnlMapParameters = new JPanel();
         pnlMapParameters.setLayout(new GridBagLayout());
         GridBagConstraints localGbc = new GridBagConstraints();
-        localGbc.gridx = 0;
-        localGbc.gridy = 0;
+        localGbc.gridx  = 0;
+        localGbc.gridy  = 0;
         localGbc.anchor = GridBagConstraints.WEST;
 
         JLabel lblMapParameters = new JLabel("Scenario Map Parameters:");
@@ -794,8 +789,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         localGbc.gridy++;
         localGbc.gridx = 0;
         JLabel lblUseAtBSizing = new JLabel("Use AtB Base Dimensions:");
-        lblUseAtBSizing
-                .setToolTipText("Use the AtB Map Sizes table to determine the base width and height of the map.");
+        lblUseAtBSizing.setToolTipText("Use the AtB Map Sizes table to determine the base width and height of the map.");
         pnlMapParameters.add(lblUseAtBSizing, localGbc);
 
         localGbc.gridx++;
@@ -859,15 +853,15 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         }
 
         localGbc.gridx++;
-        localGbc.gridy = 1;
-        localGbc.gridheight = GridBagConstraints.RELATIVE;
+        localGbc.gridy         = 1;
+        localGbc.gridheight    = GridBagConstraints.RELATIVE;
         lstAllowedTerrainTypes = new JList<>();
         DefaultListModel<String> terrainTypeModel = new DefaultListModel<>();
         Map<String, StratconBiomeManifest.MapTypeList> mapTypes = StratconBiomeManifest.getInstance()
-                .getBiomeMapTypes();
-        List<String> keys = mapTypes.keySet().stream().sorted().collect(Collectors.toList());
+                                                                        .getBiomeMapTypes();
+        List<String>  keys    = mapTypes.keySet().stream().sorted().toList();
         List<Integer> indexes = new ArrayList<>();
-        int i = 0;
+        int           i       = 0;
         for (String terrainType : keys) {
             terrainTypeModel.addElement(terrainType);
             if (scenarioTemplate.mapParameters.getAllowedTerrainType().contains(terrainType)) {
@@ -945,12 +939,12 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      */
     private void renderForceList() {
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
+        gbc.gridx      = 0;
+        gbc.gridy      = 0;
+        gbc.gridwidth  = 1;
         gbc.gridheight = 1;
-        gbc.ipadx = 5;
-        gbc.ipady = 5;
+        gbc.ipadx      = 5;
+        gbc.ipady      = 5;
 
         panForceList.removeAll();
 
@@ -959,7 +953,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         }
 
         gbc.gridy++;
-        gbc.gridx = 0;
         // headers
         JLabel lblGenerationOrder = new JLabel("Order");
         lblGenerationOrder.setBorder(new LineBorder(Color.GRAY));
@@ -1030,7 +1023,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridx++;
         panForceList.add(lblContributesToUnitCountHeader, gbc);
 
-        JLabel lblMapSizeHeader = new JLabel("+ Mapsize?");
+        JLabel lblMapSizeHeader = new JLabel("+ Map size?");
         lblMapSizeHeader.setBorder(new LineBorder(Color.GRAY));
         gbc.gridx++;
         panForceList.add(lblMapSizeHeader, gbc);
@@ -1053,8 +1046,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             gbc.gridx++;
             panForceList.add(lblForceAlignment, gbc);
 
-            JLabel lblGenerationMethod = new JLabel(
-                    ScenarioForceTemplate.FORCE_GENERATION_METHODS[sft.getGenerationMethod()]);
+            JLabel lblGenerationMethod = new JLabel(ScenarioForceTemplate.FORCE_GENERATION_METHODS[sft.getGenerationMethod()]);
             gbc.gridx++;
             panForceList.add(lblGenerationMethod, gbc);
 
@@ -1062,13 +1054,12 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             gbc.gridx++;
 
             if (!sft.isPlayerForce() &&
-                    (sft.getGenerationMethod() != ScenarioForceTemplate.ForceGenerationMethod.FixedUnitCount
-                            .ordinal())) {
+                (sft.getGenerationMethod() != ScenarioForceTemplate.ForceGenerationMethod.FixedUnitCount.ordinal())) {
                 lblMultiplier.setText(((Double) sft.getForceMultiplier()).toString());
                 panForceList.add(lblMultiplier, gbc);
             } else if (!sft.isPlayerForce() &&
-                    (sft.getGenerationMethod() == ScenarioForceTemplate.ForceGenerationMethod.FixedUnitCount
-                            .ordinal())) {
+                       (sft.getGenerationMethod() ==
+                        ScenarioForceTemplate.ForceGenerationMethod.FixedUnitCount.ordinal())) {
 
                 if (sft.getFixedUnitCount() >= 0) {
                     lblMultiplier.setText(Integer.toString(sft.getFixedUnitCount()));
@@ -1078,8 +1069,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
                 panForceList.add(lblMultiplier, gbc);
             }
 
-            JLabel lblDeploymentZones = new JLabel();
-            StringBuilder dzBuilder = new StringBuilder();
+            JLabel        lblDeploymentZones = new JLabel();
+            StringBuilder dzBuilder          = new StringBuilder();
 
             if (!sft.getDeploymentZones().isEmpty()) {
                 dzBuilder.append("<html>");
@@ -1089,8 +1080,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
                 }
                 dzBuilder.append("</html>");
             } else {
-                dzBuilder.append(
-                        ScenarioForceTemplate.FORCE_DEPLOYMENT_SYNC_TYPES[sft.getSyncDeploymentType().ordinal()]);
+                dzBuilder.append(ScenarioForceTemplate.FORCE_DEPLOYMENT_SYNC_TYPES[sft.getSyncDeploymentType()
+                                                                                         .ordinal()]);
                 dzBuilder.append(" as ");
                 dzBuilder.append(sft.getSyncedForceName());
             }
@@ -1099,8 +1090,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             gbc.gridx++;
             panForceList.add(lblDeploymentZones, gbc);
 
-            JLabel lblDestinationZones = new JLabel(
-                    ScenarioForceTemplate.BOT_DESTINATION_ZONES[sft.getDestinationZone()]);
+            JLabel lblDestinationZones = new JLabel(ScenarioForceTemplate.BOT_DESTINATION_ZONES[sft.getDestinationZone()]);
             gbc.gridx++;
             panForceList.add(lblDestinationZones, gbc);
 
@@ -1120,9 +1110,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
                 panForceList.add(lblWeightClass, gbc);
             }
 
-            JLabel lblArrivalTurn = new JLabel(sft.getArrivalTurn() < 0
-                    ? ScenarioForceTemplate.SPECIAL_ARRIVAL_TURNS.get(sft.getArrivalTurn())
-                    : Integer.toString(sft.getArrivalTurn()));
+            JLabel lblArrivalTurn = new JLabel(sft.getArrivalTurn() < 0 ?
+                                                     ScenarioForceTemplate.SPECIAL_ARRIVAL_TURNS.get(sft.getArrivalTurn()) :
+                                                     Integer.toString(sft.getArrivalTurn()));
             gbc.gridx++;
             panForceList.add(lblArrivalTurn, gbc);
 
@@ -1164,35 +1154,41 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     }
 
     /**
-     * Event handler for when the Add force button is pressed.
-     * Adds a new force with the currently selected parameters to the scenario
-     * template.
+     * Event handler for when the Add force button is pressed. Adds a new force with the currently selected parameters
+     * to the scenario template.
      */
     private void addForceButtonHandler() {
         String validationResult = validateAddForce();
 
         if (!validationResult.isEmpty()) {
-            JOptionPane.showMessageDialog(this, validationResult, "Invalid Force Configuration",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                  validationResult,
+                  "Invalid Force Configuration",
+                  JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        int forceAlignment = cboAlignment.getSelectedIndex();
-        int generationMethod = cboGenerationMethod.getSelectedIndex();
-        double forceMultiplier = (double) spnMultiplier.getValue();
+        int    forceAlignment   = cboAlignment.getSelectedIndex();
+        int    generationMethod = cboGenerationMethod.getSelectedIndex();
+        double forceMultiplier  = (double) spnMultiplier.getValue();
 
         List<Integer> deploymentZones = new ArrayList<>();
         for (int x : lstDeployZones.getSelectedIndices()) {
             deploymentZones.add(x);
         }
 
-        int destinationZone = destinationZoneMapping.get(cboDestinationZone.getSelectedIndex());
+        int destinationZone  = destinationZoneMapping.get(cboDestinationZone.getSelectedIndex());
         int retreatThreshold = (int) spnRetreatThreshold.getValue();
 
         int allowedUnitType = cboUnitType.getSelectedIndex() - ScenarioForceTemplate.SPECIAL_UNIT_TYPES.size();
 
-        ScenarioForceTemplate sft = new ScenarioForceTemplate(forceAlignment, generationMethod, forceMultiplier,
-                null, destinationZone, retreatThreshold, allowedUnitType);
+        ScenarioForceTemplate sft = new ScenarioForceTemplate(forceAlignment,
+              generationMethod,
+              forceMultiplier,
+              null,
+              destinationZone,
+              retreatThreshold,
+              allowedUnitType);
         sft.setCanReinforceLinked(chkReinforce.isSelected());
         sft.setContributesToBV(chkContributesToBV.isSelected());
         sft.setContributesToUnitCount(chkContributesToUnitCount.isSelected());
@@ -1216,7 +1212,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         // zones.
         // otherwise, set the synced force name
         if (sft.getSyncDeploymentType() != SynchronizedDeploymentType.None) {
-            sft.setSyncedForceName(cboSyncForceName.getSelectedItem().toString());
+            sft.setSyncedForceName(Objects.requireNonNull(cboSyncForceName.getSelectedItem()).toString());
         } else {
             sft.setDeploymentZones(deploymentZones);
         }
@@ -1231,23 +1227,21 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     }
 
     /**
-     * Function that performs validation when the 'Add' button is clicked for a
-     * force
-     * and informs the user of any nonsense configuration they may have specified.
+     * Function that performs validation when the 'Add' button is clicked for a force and informs the user of any
+     * nonsense configuration they may have specified.
      *
      * @return Validation message for display.
      */
     private String validateAddForce() {
         StringBuilder valBuilder = new StringBuilder();
 
-        if (SynchronizedDeploymentType.values()[cboSyncDeploymentType
-                .getSelectedIndex()] == SynchronizedDeploymentType.None &&
-                lstDeployZones.getSelectedIndices().length == 0) {
+        if (SynchronizedDeploymentType.values()[cboSyncDeploymentType.getSelectedIndex()] ==
+            SynchronizedDeploymentType.None && lstDeployZones.getSelectedIndices().length == 0) {
             valBuilder.append("Force needs to be synced or have explicit deployment zones");
         }
 
         if (txtForceName.getText().isBlank()) {
-            if (valBuilder.length() > 0) {
+            if (!valBuilder.isEmpty()) {
                 valBuilder.append("\n");
             }
 
@@ -1255,8 +1249,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         }
 
         if ((cboAlignment.getSelectedIndex() != ForceAlignment.Player.ordinal()) &&
-                (cboGenerationMethod.getSelectedIndex() == ForceGenerationMethod.PlayerSupplied.ordinal())) {
-            if (valBuilder.length() > 0) {
+            (cboGenerationMethod.getSelectedIndex() == ForceGenerationMethod.PlayerSupplied.ordinal())) {
+            if (!valBuilder.isEmpty()) {
                 valBuilder.append("\n");
             }
 
@@ -1264,7 +1258,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         }
 
         if (chkOffBoard.isSelected() && !chkUseArtillery.isSelected()) {
-            if (valBuilder.length() > 0) {
+            if (!valBuilder.isEmpty()) {
                 valBuilder.append("\n");
             }
 
@@ -1272,7 +1266,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         }
 
         if (cboMinWeightClass.getSelectedIndex() > cboMaxWeightClass.getSelectedIndex()) {
-            if (valBuilder.length() > 0) {
+            if (!valBuilder.isEmpty()) {
                 valBuilder.append("\n");
             }
 
@@ -1293,11 +1287,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     }
 
     /**
-     * Event handler for when the "Remove" button is pressed for a particular force
-     * template.
+     * Event handler for when the "Remove" button is pressed for a particular force template.
      *
-     * @param command The command string containing the index of the force to
-     *                remove.
+     * @param command The command string containing the index of the force to remove.
      */
     private void deleteForceButtonHandler(String command) {
         String forceIndex = command.substring(REMOVE_FORCE_COMMAND.length());
@@ -1310,8 +1302,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     }
 
     /**
-     * Event handler for when the "Edit" button is pressed for a particular force
-     * template.
+     * Event handler for when the "Edit" button is pressed for a particular force template.
      *
      * @param command The command string containing the index of the force to edit.
      */
@@ -1321,8 +1312,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     }
 
     /**
-     * Worker method that updates the "Force Sync" list
-     * and sets the relevant dropdowns to active or inactive
+     * Worker method that updates the "Force Sync" list and sets the relevant dropdowns to active or inactive
      */
     private void updateForceSyncList() {
         cboSyncForceName.removeAllItems();
@@ -1336,10 +1326,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     }
 
     /**
-     * Event handler for when the "Use AtB sizing" checkbox's state changes.
-     * Disables the base height/width
-     * textboxes if it is selected, as their values are meaningless in that
-     * situation.
+     * Event handler for when the "Use AtB sizing" checkboxes state changes. Disables the base height/width textboxes if
+     * it is selected, as their values are meaningless in that situation.
      */
     private void atbSizingCheckboxChangeHandler() {
         txtBaseWidth.setEnabled(!chkUseAtBSizing.isSelected());
@@ -1347,9 +1335,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     }
 
     /**
-     * Event handler for when the "allow all map types" checkbox's state changes.
-     * Disables/enables the
-     * explicit map type selector.
+     * Event handler for when the "allow all map types" checkboxes state changes. Disables/enables the explicit map type
+     * selector.
      */
     private void mapTypeChangeHandler() {
         if (lstAllowedTerrainTypes != null) {
@@ -1358,21 +1345,21 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     }
 
     /**
-     * Event handler for when the force alignment/generation method is changed.
-     * Enables or disables some controls based on whether or not the force is a
-     * player deployed force,
-     * or an enemy force.
+     * Event handler for when the force alignment/generation method is changed. Enables or disables some controls based
+     * on whether the force is a player deployed force, or an enemy force.
      */
     private void forceAlignmentChangeHandler() {
         boolean isPlayerForce = Objects.equals(cboAlignment.getSelectedItem(),
-                ScenarioForceTemplate.FORCE_ALIGNMENTS[0]) &&
-                Objects.equals(cboGenerationMethod.getSelectedItem(),
-                        ScenarioForceTemplate.FORCE_GENERATION_METHODS[0]);
+              ScenarioForceTemplate.FORCE_ALIGNMENTS[0]) &&
+                                Objects.equals(cboGenerationMethod.getSelectedItem(),
+                                      ScenarioForceTemplate.FORCE_GENERATION_METHODS[0]);
 
-        boolean isEnemyForce = (cboAlignment.getSelectedIndex() == ScenarioForceTemplate.ForceAlignment.Opposing
-                .ordinal()) ||
-                (cboAlignment.getSelectedIndex() == ScenarioForceTemplate.ForceAlignment.Third.ordinal()) ||
-                (cboAlignment.getSelectedIndex() == ScenarioForceTemplate.ForceAlignment.PlanetOwner.ordinal());
+        boolean isEnemyForce = (cboAlignment.getSelectedIndex() ==
+                                ScenarioForceTemplate.ForceAlignment.Opposing.ordinal()) ||
+                               (cboAlignment.getSelectedIndex() ==
+                                ScenarioForceTemplate.ForceAlignment.Third.ordinal()) ||
+                               (cboAlignment.getSelectedIndex() ==
+                                ScenarioForceTemplate.ForceAlignment.PlanetOwner.ordinal());
 
         spnMultiplier.setEnabled(!isPlayerForce);
         spnRetreatThreshold.setEnabled(!isPlayerForce);
@@ -1384,19 +1371,17 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         chkContributesToUnitCount.setSelected(!isEnemyForce);
         chkContributesToMapSize.setSelected(true);
 
-        spnMultiplier
-                .setEnabled(cboGenerationMethod.getSelectedIndex() != ForceGenerationMethod.FixedUnitCount.ordinal());
+        spnMultiplier.setEnabled(cboGenerationMethod.getSelectedIndex() !=
+                                 ForceGenerationMethod.FixedUnitCount.ordinal());
     }
 
     /**
-     * Event handler for when the force sync dropdown changes value.
-     * Enables or disables the "force to sync" and "deployment zone" UI elements as
-     * appropriate.
+     * Event handler for when the force sync dropdown changes value. Enables or disables the "force to sync" and
+     * "deployment zone" UI elements as appropriate.
      */
     private void syncDeploymentChangeHandler() {
-        SynchronizedDeploymentType syncDeploymentType = SynchronizedDeploymentType.values()[cboSyncDeploymentType
-                .getSelectedIndex()];
-        boolean syncForceDeployment = syncDeploymentType != SynchronizedDeploymentType.None;
+        SynchronizedDeploymentType syncDeploymentType  = SynchronizedDeploymentType.values()[cboSyncDeploymentType.getSelectedIndex()];
+        boolean                    syncForceDeployment = syncDeploymentType != SynchronizedDeploymentType.None;
 
         cboSyncForceName.setEnabled(syncForceDeployment);
         lstDeployZones.setEnabled(!syncForceDeployment);
@@ -1406,14 +1391,14 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     }
 
     /**
-     * Event handler for when the unit type dropdown changes value.
-     * Enables or disables the "allow aero bombs" UI element as appropriate.
+     * Event handler for when the unit type dropdown changes value. Enables or disables the "allow aero bombs" UI
+     * element as appropriate.
      */
     private void unitTypeChangeHandler() {
         int selectedItem = cboUnitType.getSelectedIndex() - ScenarioForceTemplate.SPECIAL_UNIT_TYPES.size();
         boolean isAero = selectedItem == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX ||
-                selectedItem == UnitType.CONV_FIGHTER ||
-                selectedItem == UnitType.AEROSPACEFIGHTER;
+                         selectedItem == UnitType.CONV_FIGHTER ||
+                         selectedItem == UnitType.AEROSPACEFIGHTER;
 
         chkAllowAeroBombs.setEnabled(isAero);
     }
@@ -1422,8 +1407,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * Event handler for the "Save" button.
      */
     private void saveTemplateButtonHandler() {
-        scenarioTemplate.name = txtScenarioName.getText();
-        scenarioTemplate.shortBriefing = txtScenarioBriefing.getText();
+        scenarioTemplate.name             = txtScenarioName.getText();
+        scenarioTemplate.shortBriefing    = txtScenarioBriefing.getText();
         scenarioTemplate.detailedBriefing = txtLongBriefing.getText();
 
         scenarioTemplate.mapParameters.allowedTerrainTypes.clear();
@@ -1448,16 +1433,13 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             scenarioTemplate.mapParameters.setMapLocation(ScenarioMapParameters.MapLocation.SpecificGroundTerrain);
         }
 
-        File file = FileDialogs.saveScenarioTemplate((JFrame) getOwner(), scenarioTemplate).orElse(null);
-        if (file != null) {
-            scenarioTemplate.Serialize(file);
-        }
+        FileDialogs.saveScenarioTemplate((JFrame) getOwner(), scenarioTemplate)
+              .ifPresent(file -> scenarioTemplate.Serialize(file));
     }
 
     /**
-     * Event handler for when the load button is cleared. Invokes deserialization
-     * functionality
-     * for user-selected file, then reloads all UI elements.
+     * Event handler for when the load button is cleared. Invokes deserialization functionality for user-selected file,
+     * then reloads all UI elements.
      */
     private void loadTemplateButtonHandler() {
         File file = FileDialogs.openScenarioTemplate((JFrame) getOwner()).orElse(null);
@@ -1468,8 +1450,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         scenarioTemplate = ScenarioTemplate.Deserialize(file);
 
         if (scenarioTemplate == null) {
-            JOptionPane.showMessageDialog(this, "Error loading specified file. See log for details.", "Load Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                  "Error loading specified file. See log for details.",
+                  "Load Error",
+                  JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -1482,8 +1466,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     }
 
     /**
-     * General event handler for button clicks on this dialog.
-     * Examines the action command and invokes appropriate method.
+     * General event handler for button clicks on this dialog. Examines the action command and invokes appropriate
+     * method.
      */
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -1504,7 +1488,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * Event handler for the "Add" button next to the fixed modifier dropdown.
      */
     public void addModifierHandler() {
-        scenarioTemplate.scenarioModifiers.add(modifierBox.getSelectedItem().toString());
+        scenarioTemplate.scenarioModifiers.add(Objects.requireNonNull(modifierBox.getSelectedItem()).toString());
         reloadSelectedModifiers();
     }
 

@@ -1,6 +1,8 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.04-SNAPSHOT
+0.50.05-SNAPSHOT
+
+0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
 + PR #5853: Remove Legacy AtB's Campaign Parts Availability System
 + PR #5868: Updated Several Scenario Effects to use SupplyCache over SupportPointUpdate
@@ -202,6 +204,8 @@ MEKHQ VERSION HISTORY:
 + Fix #6313: Added Self-Correction Step to Scenario Objective Processing
 + Fix #6315: Fixed MekHQ Throwing Meks into Low Altitude Scenarios
 + PR #6319: Added Early Exit for Objective Determination Self-Correction Loop
++ PR #6323: Added MekHQ New Player Guide
++ PR #6325: Updated New Player Guide PDF
 
 
 0.50.03 (2025-02-02 2030 UTC)
