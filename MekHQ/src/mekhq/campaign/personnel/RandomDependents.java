@@ -263,10 +263,8 @@ public class RandomDependents {
 
                     campaign.recruitPerson(dependent, FREE, true, false);
 
-                    String role = getFormattedTextAt(RESOURCE_BUNDLE, "dependent.singular");
-
                     campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "dependentJoinsForce.report",
-                        dependent.getFullName(), role));
+                        dependent.getFullName()));
 
                     dependentCount++;
                 }
