@@ -105,23 +105,23 @@ public class Refit extends Part implements IAcquisitionWork {
     private int refitClass;
 
     // This needs to be converted to FLOAT and handled accordingly.
-    private int          time;
-    private int          timeSpent;
-    private Money        cost;
-    private boolean      failedCheck;
-    private boolean      customJob;
-    private boolean      isRefurbishing;
-    private boolean      isSavingFile;
-    private boolean      kitFound;
-    private boolean      replacingLocations;
-    private StringJoiner errorStrings;
+    private       int          time;
+    private       int          timeSpent;
+    private       Money        cost;
+    private       boolean      failedCheck;
+    private       boolean      customJob;
+    private       boolean      isRefurbishing;
+    private       boolean      isSavingFile;
+    private       boolean      kitFound;
+    private       boolean      replacingLocations;
+    private final StringJoiner errorStrings;
 
-    private List<Part> oldUnitParts;
-    private List<Part> newUnitParts;
-    private List<Part> shoppingList;
-    private List<Part> oldIntegratedHeatSinks;
-    private List<Part> newIntegratedHeatSinks;
-    private Set<Part>  largeCraftBinsToChange;
+    private final List<Part> oldUnitParts;
+    private       List<Part> newUnitParts;
+    private       List<Part> shoppingList;
+    private final List<Part> oldIntegratedHeatSinks;
+    private final List<Part> newIntegratedHeatSinks;
+    private final Set<Part>  largeCraftBinsToChange;
 
     private int     armorNeeded;
     private Armor   newArmorSupplies;
@@ -165,11 +165,9 @@ public class Refit extends Part implements IAcquisitionWork {
         newEntity.setOwner(oldUnit.getEntity().getOwner());
         newEntity.setGame(oldUnit.getEntity().getGame());
         if (newEntity.getClass() == SmallCraft.class) { // SmallCraft but not subclasses
-            // Entity.setGame() will add a Single Hex ECM part to SmallCraft that otherwise
-            // has no ECM. This is required for MegaMek, but causes SmallCraft to be
-            // overweight when
-            // refitting in MekHQ. Work-around is to remove the ECM part early during a
-            // refit.
+            // Entity.setGame() will add a Single Hex ECM part to SmallCraft that otherwise has no ECM. This is
+            // required for MegaMek, but causes SmallCraft to be overweight when refitting in MekHQ. Work-around is
+            // to remove the ECM part early during a refit.
             // Ref: https://github.com/MegaMek/mekhq/issues/1970
             newEntity.removeMisc(BattleArmor.SINGLE_HEX_ECM);
         }
@@ -179,6 +177,7 @@ public class Refit extends Part implements IAcquisitionWork {
         replacingLocations = false;
         campaign           = oldUnit.getCampaign();
         calculate();
+
         if (customJob) {
             suggestNewName();
         }
@@ -340,10 +339,12 @@ public class Refit extends Part implements IAcquisitionWork {
                              oldUnit.getEntity().getArmorType(oldUnit.getEntity().firstArmorIndex())) &&
                             (newEntity.getArmorTechRating() == oldUnit.getEntity().getArmorTechRating());
         }
-        int recycledArmorPoints = 0;
-        boolean[] locationHasNewStuff = new boolean[Math.max(newEntity.locations(), oldUnit.getEntity().locations())];
-        boolean[] locationLostOldStuff = new boolean[Math.max(newEntity.locations(), oldUnit.getEntity().locations())];
-        HashMap<AmmoType, Integer> ammoNeeded = new HashMap<>();
+        int                        recycledArmorPoints  = 0;
+        boolean[]                  locationHasNewStuff  = new boolean[Math.max(newEntity.locations(),
+              oldUnit.getEntity().locations())];
+        boolean[]                  locationLostOldStuff = new boolean[Math.max(newEntity.locations(),
+              oldUnit.getEntity().locations())];
+        HashMap<AmmoType, Integer> ammoNeeded           = new HashMap<>();
 
         // Not used anywhere except to merge data into it but never queried against.
         // HashMap<AmmoType, Integer> ammoRemoved          = new HashMap<>();
@@ -353,9 +354,9 @@ public class Refit extends Part implements IAcquisitionWork {
         // match.
 
         for (Part p : oldUnit.getParts()) {
-            if (p instanceof SpacecraftCoolingSystem) {
-                oldLargeCraftHeatSinks = ((SpacecraftCoolingSystem) p).getTotalSinks();
-                oldLargeCraftSinkType  = ((SpacecraftCoolingSystem) p).getSinkType();
+            if (p instanceof SpacecraftCoolingSystem spacecraftCoolingSystem) {
+                oldLargeCraftHeatSinks = spacecraftCoolingSystem.getTotalSinks();
+                oldLargeCraftSinkType  = spacecraftCoolingSystem.getSinkType();
             }
             if ((!isOmniRefit || p.isOmniPodded()) || (p instanceof TransportBayPart)) {
                 oldUnitParts.add(p);
@@ -394,14 +395,14 @@ public class Refit extends Part implements IAcquisitionWork {
                 // tracked appropriately - it should unload to the warehouse later in the process and then reload in
                 // the correct quantity. For that we must make sure the bin doesn't get dropped off the old parts
                 // list here.
-                if ((oldPart instanceof LargeCraftAmmoBin) &&
-                    (newPart instanceof LargeCraftAmmoBin) &&
-                    ((LargeCraftAmmoBin) oldPart).getType().equals(((LargeCraftAmmoBin) newPart).getType())) {
+                if ((oldPart instanceof LargeCraftAmmoBin oldLargeCraftAmmoBin) &&
+                    (newPart instanceof LargeCraftAmmoBin newLargeCraftAmmoBin) &&
+                    oldLargeCraftAmmoBin.getType().equals(newLargeCraftAmmoBin.getType())) {
                     largeCraftBinsToChange.add(oldPart);
                 }
 
-                boolean acceptableReplacement = (oldPart instanceof MissingPart) &&
-                                                ((MissingPart) oldPart).isAcceptableReplacement(newPart, true);
+                boolean acceptableReplacement = (oldPart instanceof MissingPart oldMissingPart) &&
+                                                oldMissingPart.isAcceptableReplacement(newPart, true);
                 // We're not going to require replacing the life support system just because
                 // the number of bay personnel changes.
                 boolean aeroLifeSupportIssue = (oldPart instanceof AeroLifeSupport) &&
@@ -410,11 +411,11 @@ public class Refit extends Part implements IAcquisitionWork {
                 if (acceptableReplacement || oldPart.isSamePartType(newPart) || aeroLifeSupportIssue) {
 
                     // need a special check for location and armor amount for armor
-                    if ((oldPart instanceof Armor) &&
-                        (newPart instanceof Armor) &&
+                    if ((oldPart instanceof Armor oldArmorPart) &&
+                        (newPart instanceof Armor newArmorPart) &&
                         (oldPart.getLocation() != newPart.getLocation() ||
-                         ((Armor) oldPart).isRearMounted() != ((Armor) newPart).isRearMounted() ||
-                         ((Armor) oldPart).getTotalAmount() != ((Armor) newPart).getTotalAmount())) {
+                         oldArmorPart.isRearMounted() != newArmorPart.isRearMounted() ||
+                         oldArmorPart.getTotalAmount() != newArmorPart.getTotalAmount())) {
                         // Not the same armor
                         continue;
                     }
@@ -423,17 +424,18 @@ public class Refit extends Part implements IAcquisitionWork {
                         (oldPart.getLocation() != newPart.getLocation())) {
                         continue;
                     }
-                    if (newPart instanceof EquipmentPart) {
+
+                    if (newPart instanceof EquipmentPart newEquipmentPart) {
                         // check the location to see if this moved. If so ... we actually handle
                         // this in the next loop, not this one.
                         int     loc  = newPart.getLocation();
-                        boolean rear = ((EquipmentPart) newPart).isRearFacing();
-                        boolean oldIsDifferent = (oldPart instanceof EquipmentPart) &&
+                        boolean rear = newEquipmentPart.isRearFacing();
+                        boolean oldIsDifferent = (oldPart instanceof EquipmentPart oldEquipmentPart) &&
                                                  (oldPart.getLocation() != loc ||
-                                                  ((EquipmentPart) oldPart).isRearFacing() != rear);
-                        boolean oldIsDifferentMissing = (oldPart instanceof MissingEquipmentPart) &&
+                                                  oldEquipmentPart.isRearFacing() != rear);
+                        boolean oldIsDifferentMissing = (oldPart instanceof MissingEquipmentPart oldMissingEquipmentPart) &&
                                                         (oldPart.getLocation() != loc ||
-                                                         ((MissingEquipmentPart) oldPart).isRearFacing() != rear);
+                                                         oldMissingEquipmentPart.isRearFacing() != rear);
                         if (oldIsDifferent || oldIsDifferentMissing) {
                             continue;
                         }
@@ -464,21 +466,21 @@ public class Refit extends Part implements IAcquisitionWork {
                     continue;
                 }
 
-                boolean acceptableReplacement = (oldPart instanceof MissingPart) &&
-                                                ((MissingPart) oldPart).isAcceptableReplacement(newPart, true);
-                // We're not going to require replacing the life support system just because
-                // the number of bay personnel changes.
+                boolean acceptableReplacement = (oldPart instanceof MissingPart oldMissingPart) &&
+                                                oldMissingPart.isAcceptableReplacement(newPart, true);
+                // We're not going to require replacing the life support system just because the number of bay
+                // personnel changes.
                 boolean aeroLifeSupportIssue = (oldPart instanceof AeroLifeSupport) &&
                                                (newPart instanceof AeroLifeSupport) &&
                                                !crewSizeChanged();
                 if (acceptableReplacement || oldPart.isSamePartType(newPart) || aeroLifeSupportIssue) {
 
                     // need a special check for location and armor amount for armor
-                    if ((oldPart instanceof Armor) &&
-                        (newPart instanceof Armor) &&
+                    if ((oldPart instanceof Armor oldArmorPart) &&
+                        (newPart instanceof Armor newArmorPart) &&
                         ((oldPart.getLocation() != newPart.getLocation()) ||
-                         ((Armor) oldPart).isRearMounted() != ((Armor) newPart).isRearMounted() ||
-                         ((Armor) oldPart).getTotalAmount() != ((Armor) newPart).getTotalAmount())) {
+                         oldArmorPart.isRearMounted() != newArmorPart.isRearMounted() ||
+                         oldArmorPart.getTotalAmount() != newArmorPart.getTotalAmount())) {
                         continue;
                     }
 
@@ -488,17 +490,17 @@ public class Refit extends Part implements IAcquisitionWork {
                         continue;
                     }
 
-                    if (newPart instanceof EquipmentPart) {
+                    if (newPart instanceof EquipmentPart newEquipmentPart) {
                         // check the location to see if this moved. If so, then don't break, but
                         // save this in case we fail to find equipment in the same location.
                         int     loc  = newPart.getLocation();
-                        boolean rear = ((EquipmentPart) newPart).isRearFacing();
-                        boolean oldIsDifferent = (oldPart instanceof EquipmentPart) &&
+                        boolean rear = newEquipmentPart.isRearFacing();
+                        boolean oldIsDifferent = (oldPart instanceof EquipmentPart oldEquipmentPart) &&
                                                  ((oldPart.getLocation() != loc) ||
-                                                  (((EquipmentPart) oldPart).isRearFacing() != rear));
-                        boolean oldIsDifferentMissing = (oldPart instanceof MissingEquipmentPart) &&
+                                                  (oldEquipmentPart.isRearFacing() != rear));
+                        boolean oldIsDifferentMissing = (oldPart instanceof MissingEquipmentPart oldMissingEquipmentPart) &&
                                                         ((oldPart.getLocation() != loc) ||
-                                                         (((MissingEquipmentPart) oldPart).isRearFacing() != rear));
+                                                         (oldMissingEquipmentPart.isRearFacing() != rear));
                         if (oldIsDifferent || oldIsDifferentMissing) {
                             movedPart = oldPart;
                             moveIndex = index;
@@ -568,9 +570,9 @@ public class Refit extends Part implements IAcquisitionWork {
             }
 
             /* ADD TIMES AND COSTS */
-            if (newPart instanceof MissingPart) {
+            if (newPart instanceof MissingPart newMissingPart) {
                 time += newPart.getBaseTime();
-                Part replacement = ((MissingPart) newPart).findReplacement(true);
+                Part replacement = newMissingPart.findReplacement(true);
                 // check quantity
                 // TODO : the one weakness here is that we will not pick up damaged parts
                 if ((null != replacement) && (null == partQuantity.get(replacement))) {
@@ -589,21 +591,21 @@ public class Refit extends Part implements IAcquisitionWork {
                     }
 
                 } else {
-                    replacement = ((MissingPart) newPart).getNewPart();
+                    replacement = newMissingPart.getNewPart();
                     // set entity for variable cost items
                     replacement.setUnit(newUnit);
                     cost = cost.plus(replacement.getActualValue());
                     shoppingList.add(newPart);
                 }
 
-            } else if (newPart instanceof Armor) {
+            } else if (newPart instanceof Armor newArmorPart) {
                 // armor always gets added to the shopping list - it will be checked for
                 // differently
                 // NOT ANYMORE - I think this is overkill, lets just reuse existing armor parts
-                int totalAmount = ((Armor) newPart).getTotalAmount();
-                time += totalAmount * ((Armor) newPart).getBaseTimeFor(newEntity);
+                int totalAmount = newArmorPart.getTotalAmount();
+                time += totalAmount * newArmorPart.getBaseTimeFor(newEntity);
                 armorNeeded += totalAmount;
-                armorType   = ((Armor) newPart).getType();
+                armorType   = newArmorPart.getType();
                 armorIsClan = newPart.isClanTechBase();
 
             } else if (newPart instanceof AmmoBin ammoBin) {
@@ -626,11 +628,11 @@ public class Refit extends Part implements IAcquisitionWork {
                     time += 2 * WORKHOUR;
                 }
 
-            } else if (newPart instanceof SpacecraftCoolingSystem) {
-                int  sinkType               = ((SpacecraftCoolingSystem) newPart).getSinkType();
+            } else if (newPart instanceof SpacecraftCoolingSystem spacecraftCoolingSystem) {
+                int  sinkType               = spacecraftCoolingSystem.getSinkType();
                 int  sinksToReplace;
                 Part replacement            = new AeroHeatSink(0, sinkType, false, campaign);
-                int  newLargeCraftHeatSinks = ((SpacecraftCoolingSystem) newPart).getTotalSinks();
+                int  newLargeCraftHeatSinks = spacecraftCoolingSystem.getTotalSinks();
                 if (sinkType != oldLargeCraftSinkType) {
                     sinksToReplace = newLargeCraftHeatSinks;
                 } else {
@@ -930,12 +932,9 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         /*
-         * Figure out how many untracked heat sinks are needed to complete the refit or
-         * will
-         * be removed. These are engine integrated heat sinks for Meks or ASFs that
-         * change
-         * the heat sink type or heat sinks required for energy weapons for vehicles and
-         * conventional fighters.
+         * Figure out how many untracked heat sinks are needed to complete the refit or will be removed. These are
+         * engine integrated heat sinks for Meks or ASFs that change the heat sink type or heat sinks required for
+         * energy weapons for vehicles and conventional fighters.
          */
         if ((newEntity instanceof Mek) || ((newEntity instanceof Aero) && !(newEntity instanceof ConvFighter))) {
             Part oldHeatSink      = getHeatSinkPart(oldUnit.getEntity());
@@ -943,15 +942,13 @@ public class Refit extends Part implements IAcquisitionWork {
             int  oldHeatSinkCount = untrackedHeatSinkCount(oldUnit.getEntity());
             int  newHeatSinkCount = untrackedHeatSinkCount(newEntity);
             if (oldHeatSink.isSamePartType(newHeatSink)) {
-                // If the number changes we need to add them to either the warehouse at the end
-                // of
-                // refit or the shopping list at the beginning.
+                // If the number changes we need to add them to either the warehouse at the end of refit or the
+                // shopping list at the beginning.
                 for (int i = 0; i < oldHeatSinkCount - newHeatSinkCount; i++) {
                     oldIntegratedHeatSinks.add(oldHeatSink.clone());
                 }
                 for (int i = 0; i < newHeatSinkCount - oldHeatSinkCount; i++) {
-                    // Heat sink added for supply chain tracking purposes and removed from refit
-                    // later
+                    // Heat sink added for supply chain tracking purposes and removed from refit later
                     newIntegratedHeatSinks.add(newHeatSink.getMissingPart());
                 }
             } else {
@@ -959,8 +956,7 @@ public class Refit extends Part implements IAcquisitionWork {
                     oldIntegratedHeatSinks.add(oldHeatSink.clone());
                 }
                 for (int i = 0; i < newHeatSinkCount; i++) {
-                    // Heat sink added for supply chain tracking purposes and removed from refit
-                    // later
+                    // Heat sink added for supply chain tracking purposes and removed from refit later
                     newIntegratedHeatSinks.add(newHeatSink.getMissingPart());
                 }
                 updateRefitClass(CLASS_D);
@@ -968,9 +964,8 @@ public class Refit extends Part implements IAcquisitionWork {
         } else if ((newEntity instanceof Tank) || (newEntity instanceof ConvFighter)) {
             int oldHeatSinkCount = untrackedHeatSinkCount(oldUnit.getEntity());
             int newHeatSinkCount = untrackedHeatSinkCount(newEntity);
-            // We're only concerned with heat sinks that have to be installed in excess of
-            // what may
-            // be provided by the engine.
+            // We're only concerned with heat sinks that have to be installed in excess of what may be provided by
+            // the engine.
             if (oldUnit.getEntity().hasEngine()) {
                 oldHeatSinkCount = Math.max(0,
                       oldHeatSinkCount - oldUnit.getEntity().getEngine().getWeightFreeEngineHeatSinks());
@@ -979,12 +974,11 @@ public class Refit extends Part implements IAcquisitionWork {
                 newHeatSinkCount = Math.max(0, newHeatSinkCount - newEntity.getEngine().getWeightFreeEngineHeatSinks());
             }
             if (oldHeatSinkCount != newHeatSinkCount) {
-                Part heatSinkPart = getHeatSinkPart(newEntity); // only single HS allowed, so they have to be of the
-                // same type
+                // only single HS allowed, so they have to be of the same type
+                Part heatSinkPart = getHeatSinkPart(newEntity);
                 heatSinkPart.setOmniPodded(isOmniRefit);
                 for (int i = oldHeatSinkCount; i < newHeatSinkCount; i++) {
-                    // Heat sink added for supply chain tracking purposes and removed from refit
-                    // later
+                    // Heat sink added for supply chain tracking purposes and removed from refit later
                     newIntegratedHeatSinks.add(heatSinkPart.getMissingPart());
                 }
                 for (int i = newHeatSinkCount; i < oldHeatSinkCount; i++) {
@@ -1005,8 +999,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 newUnitParts.add(replacement);
                 // adjust quantity
                 partQuantity.put(replacement, partQuantity.get(replacement) - 1);
-                // If the quantity is now 0 set usedForRefitPlanning flag so findReplacement
-                // ignores this item
+                // If the quantity is now 0 set usedForRefitPlanning flag so findReplacement ignores this item
                 if (partQuantity.get(replacement) == 0) {
                     replacement.setUsedForRefitPlanning(true);
                     plannedReplacementParts.add(replacement);
