@@ -27,18 +27,6 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.gui.dialog.MissionEndPrisonerDefectorDialog;
-import mekhq.gui.dialog.MissionEndPrisonerDialog;
-
-import java.time.LocalDate;
-import java.util.List;
-
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.common.Compute.randomInt;
@@ -50,6 +38,18 @@ import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.MAX_CRI
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.mission.Contract;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.gui.dialog.MissionEndPrisonerDefectorDialog;
+import mekhq.gui.dialog.MissionEndPrisonerDialog;
 
 /**
  * Handles events involving prisoners at the end of a mission.
@@ -63,7 +63,7 @@ public class PrisonerMissionEndEvent {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
     private final Campaign campaign;
-    private final AtBContract contract;
+    private final Contract contract;
     private boolean isSuccess;
     private boolean isAllied;
 
@@ -80,7 +80,7 @@ public class PrisonerMissionEndEvent {
      *                and finances.
      * @param contract The current mission contract related to this event.
      */
-    public PrisonerMissionEndEvent(Campaign campaign, AtBContract contract) {
+    public PrisonerMissionEndEvent(Campaign campaign, Contract contract) {
         this.campaign = campaign;
         this.contract = contract;
     }
