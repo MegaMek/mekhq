@@ -27,6 +27,19 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.awt.FlowLayout;
+import java.util.List;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkEvent.EventType;
+
 import megamek.client.ui.swing.MekViewPanel;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Entity;
@@ -35,15 +48,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.templates.TROView;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.MHQDialogImmersive;
-
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkEvent.EventType;
-import java.awt.*;
-import java.util.List;
-
-import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * A dialog for handling mercenary unit auctions in the campaign.
@@ -123,12 +127,12 @@ public class MercenaryAuctionDialog extends MHQDialogImmersive {
      * @return A {@link List} of {@link ButtonLabelTooltipPair} objects for the dialog.
      */
     private static List<ButtonLabelTooltipPair> createButtons() {
-        ButtonLabelTooltipPair btnConfirm = new ButtonLabelTooltipPair(
-              getFormattedTextAt(RESOURCE_BUNDLE, "confirm.button"), null);
         ButtonLabelTooltipPair btnCancel = new ButtonLabelTooltipPair(
               getFormattedTextAt(RESOURCE_BUNDLE, "cancel.button"), null);
+        ButtonLabelTooltipPair btnConfirm = new ButtonLabelTooltipPair(
+              getFormattedTextAt(RESOURCE_BUNDLE, "confirm.button"), null);
 
-        return List.of(btnConfirm, btnCancel);
+        return List.of(btnCancel, btnConfirm);
     }
 
     /**
