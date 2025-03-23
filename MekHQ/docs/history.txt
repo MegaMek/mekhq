@@ -15,6 +15,10 @@ MEKHQ VERSION HISTORY:
 + Fix #6316: Refactored Injury Description Logic In Patient Table Model
 + Fix #6336: Fixed Prisoners Check Logic in NagController
 + Fix #6337: Deploying to an Allied Facility No Longer Blocks Scanning
++ Fix #6343: Updated Allied Air Garrison Spawn Location
++ PR #6347: Allow Jump Jets and Mek Mechanical Boosters
++ PR #6348: Allow setting MekHQ Options from splash screen
++ Fix #6333: Stopped Factions from Traveling Back in Time to Invade the Inner Sphere Before Their Inception
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times

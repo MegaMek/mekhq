@@ -98,9 +98,11 @@ public class NagController {
         }
 
         final List<Person> activePersonnel = campaign.getActivePersonnel(false);
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final int doctorCapacity = campaignOptions.getMaximumPatients();
 
         // Untreated personnel
-        if (UntreatedPersonnelNagDialog.checkNag(activePersonnel)) {
+        if (UntreatedPersonnelNagDialog.checkNag(activePersonnel, doctorCapacity)) {
             UntreatedPersonnelNagDialog untreatedPersonnelNagDialog = new UntreatedPersonnelNagDialog(campaign);
             if (untreatedPersonnelNagDialog.wasAdvanceDayCanceled()) {
                 return true;
@@ -135,7 +137,6 @@ public class NagController {
 
         // Unmaintained Units
         final Collection<Unit> units = campaign.getUnits();
-        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final boolean isCheckMaintenance = campaignOptions.isCheckMaintenance();
 
         if (UnmaintainedUnitsNagDialog.checkNag(units, isCheckMaintenance)) {
