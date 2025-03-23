@@ -45,6 +45,7 @@ import mekhq.campaign.storyarc.StoryArcStub;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
 import mekhq.gui.dialog.DataLoadingDialog;
+import mekhq.gui.dialog.MHQOptionsDialog;
 import mekhq.gui.dialog.StoryArcSelectionDialog;
 
 import javax.swing.*;
@@ -177,6 +178,11 @@ public class StartupScreenPanel extends AbstractMHQPanel {
                 }
             });
         });
+
+        MegaMekButton btnMHQOptions = new MegaMekButton(resources.getString("MHQOptions.text"),
+              UIComponents.MainMenuButton.getComp(), true);
+        btnMHQOptions.addActionListener(evt -> new MHQOptionsDialog(getFrame()).setVisible(true));
+
         MegaMekButton btnQuit = new MegaMekButton(resources.getString("Quit.text"),
                 UIComponents.MainMenuButton.getComp(), true);
         btnQuit.addActionListener(evt -> System.exit(0));
@@ -208,6 +214,8 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         btnLoadLastCampaign.setPreferredSize(minButtonDim);
         btnLoadStoryArc.setMinimumSize(minButtonDim);
         btnLoadStoryArc.setPreferredSize(minButtonDim);
+        btnMHQOptions.setMinimumSize(minButtonDim);
+        btnMHQOptions.setPreferredSize(minButtonDim);
         btnQuit.setMinimumSize(minButtonDim);
         btnQuit.setPreferredSize(minButtonDim);
 
@@ -246,6 +254,8 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         add(btnLoadLastCampaign, c);
         c.gridy++;
         add(btnLoadStoryArc, c);
+        c.gridy++;
+        add(btnMHQOptions, c);
         c.gridy++;
         add(btnQuit, c);
 

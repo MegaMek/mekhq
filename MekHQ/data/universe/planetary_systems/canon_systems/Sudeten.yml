@@ -3,9 +3,11 @@ sucsId: 2428
 xcood: -83.471
 ycood: 292.084
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 133
   value: K5V
-primarySlot: 4
+primarySlot:
+  source: Masters and Minions, pg. 133
+  value: 4
 event:
   - date: '2686-09-27'
     zenithCharge: yes
@@ -73,28 +75,32 @@ planet:
       value: Sudeten
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 4
+    sysPos:
+      source: Masters and Minions, pg. 133
+      value: 4
     icon: green17
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 133
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 133
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 133
       value: 1.0
-    diameter: 12355
-    density: 5.715216410197
+    diameter: 12326
+    density: 5.701620872879
     dayLength: 23
     yearLength: 0.8
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 133
       value: 30
     water:
-      source: canon
+      source: Masters and Minions, pg. 133
       value: 70
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 133
       value: MAMMAL
     desc: Sudeten is a comfortable, cool-temperate world that was a holding of the
       Lyran Commonwealth for most of its history. Sudeten has abundant natural resources
@@ -105,22 +111,23 @@ planet:
       in the Inner Sphere.
     landmass:
       - name:
-          source: canon
+          source: Masters and Minions, pg. 133
           value: Dargoth
         capital:
-          source: canon
-          value: Hammer
+          source: Masters and Minions, pg. 133
+          value: Hammarr
       - name:
-          source: canon
+          source: Masters and Minions, pg. 133
           value: Holcomb
-      - name:
-          source: canon
-          value: Jarho Islands
     satellite:
-      - name: Saar
+      - name:
+          source: Masters and Minions, pg. 133
+          value: Saar
         size: large
         icon: rock17
-      - name: Sule
+      - name:
+          source: Masters and Minions, pg. 133
+          value: Sule
         size: large
         icon: rock12
     event:

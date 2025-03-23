@@ -27,18 +27,18 @@
  */
 package mekhq.gui.dialog;
 
+import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.MHQDialogImmersive;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public class MissionEndPrisonerDialog extends MHQDialogImmersive {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
@@ -57,7 +57,8 @@ public class MissionEndPrisonerDialog extends MHQDialogImmersive {
         super(campaign, getSpeaker(campaign), null,
             createInCharacterMessage(campaign, ransom, isAllied, isSuccess, isGoodEvent),
             createButtons(isAllied, isSuccess, isGoodEvent),
-            createOutOfCharacterMessage(isAllied, isSuccess, isGoodEvent), null, false);
+            createOutOfCharacterMessage(isAllied, isSuccess, isGoodEvent), null,
+              false, null, true);
     }
 
     /**
@@ -83,15 +84,15 @@ public class MissionEndPrisonerDialog extends MHQDialogImmersive {
                 || (isAllied && !isSuccess && isGoodEvent);
 
         if (isRansom) {
+            if (isAllied) {
+                ButtonLabelTooltipPair btnDecline = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "decline.button"), null);
+                buttons.add(btnDecline);
+            }
+
             ButtonLabelTooltipPair btnAccept = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
                 "accept.button"), null);
             buttons.add(btnAccept);
-
-            if (isAllied) {
-                ButtonLabelTooltipPair btnDecline = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
-                    "decline.button"), null);
-                buttons.add(btnDecline);
-            }
         }
 
         if (!isAllied) {

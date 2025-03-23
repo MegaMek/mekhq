@@ -3,9 +3,11 @@ sucsId: 2517
 xcood: 22.495
 ycood: -33.623
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G8V
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 planet:
   - name: Asphodel-Norwood
     type: TERRESTRIAL
@@ -28,28 +30,32 @@ planet:
       value: Terra Firma
     type: TERRESTRIAL
     orbitalDist: 0.56
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: wet15
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.2
-    diameter: 14348
-    density: 5.872155534261
+    diameter: 14355
+    density: 5.874854088803
     dayLength: 19
     yearLength: 1.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 32
     water:
-      source: canon
+      source: MWDA world profiles
       value: 79
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: Blessed with huge tracts of untamed forests, extensive mineral resources,
       and mountainous reaches, Terra Firma, in many ways, was considered a twin to
@@ -89,16 +95,18 @@ planet:
       that are once more on the rise in Reniki‘s open plains.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Reniki
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Rusalaia
         capital:
-          source: canon
-          value: Aserlitz
+          source: MWDA world profiles
+          value: Freinze
     satellite:
-      - name: Tybalt
+      - name:
+          source: MWDA world profiles
+          value: Tybalt
         size: medium
         icon: rock5
     event:

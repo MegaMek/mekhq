@@ -3,9 +3,11 @@ sucsId: 2933
 xcood: -133.451
 ycood: 1613.747
 spectralType:
-  source: canon
+  source: 'Historical: Operation Klondike, pg. 138'
   value: F4Ib
-primarySlot: 1
+primarySlot:
+  source: 'Historical: Operation Klondike, pg. 138'
+  value: 1
 event:
   - date: '2789-04-01'
     nadirCharge: yes
@@ -17,28 +19,32 @@ planet:
       value: Eden
     type: TERRESTRIAL
     orbitalDist: 3.92
-    sysPos: 1
+    sysPos:
+      source: 'Historical: Operation Klondike, pg. 138'
+      value: 1
     icon: green18
     pressure:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 138'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Historical: Operation Klondike, pg. 138'
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 138'
       value: 1.1
-    diameter: 11054
-    density: 6.99451494346
+    diameter: 11053
+    density: 6.99388978774
     dayLength: 19
     yearLength: 7.9
     temperature:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 138'
       value: 30
     water:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 138'
       value: 40
     lifeForm:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 138'
       value: MAMMAL
     desc: Eden is home to Novy Moscva, which was the capital city of the Star League
       in Exile. Most of the settlements on Eden are contained within 20’ of the equator,
@@ -50,22 +56,29 @@ planet:
       Aleksandr Kerensky’s wife.
     landmass:
       - name:
-          source: canon
+          source: 'Historical: Operation Klondike, pg. 138'
+          value: Amur
+      - name:
+          source: 'Historical: Operation Klondike, pg. 138'
           value: Irkutsk
       - name:
-          source: canon
+          source: 'Historical: Operation Klondike, pg. 138'
           value: Noruff
         capital:
           source: canon
           value: Novy Moscva
       - name:
-          source: canon
+          source: 'Historical: Operation Klondike, pg. 138'
           value: Yakut
     satellite:
-      - name: Adam
+      - name:
+          source: 'Historical: Operation Klondike, pg. 138'
+          value: Adam
         size: medium
         icon: oddmoon1
-      - name: Eve
+      - name:
+          source: 'Historical: Operation Klondike, pg. 138'
+          value: Eve
         size: large
         icon: rock1
     event:

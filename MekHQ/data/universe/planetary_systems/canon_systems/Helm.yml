@@ -3,9 +3,11 @@ sucsId: 1090
 xcood: -133.614
 ycood: -58.208
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 68'
   value: K4IV
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Marik, pg. 68'
+  value: 4
 planet:
   - name: Eventus Bonus
     type: TERRESTRIAL
@@ -75,28 +77,32 @@ planet:
       value: Helm
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Marik, pg. 68'
+      value: 4
     icon: green18
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 68'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 68'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 68'
       value: 0.95
-    diameter: 12600
-    density: 5.2795
+    diameter: 12623
+    density: 5.289033256731
     dayLength: 27
     yearLength: 1.0
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 68'
       value: 30
     water:
-      source: canon
-      value: 58
+      source: 'Handbook: House Marik, pg. 68'
+      value: 57
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 68'
       value: REPTILE
     desc: |-
       Helm has played a crucial role in the history of the Inner Sphere despite being a cold and uninviting backwater. During the time of the Star League the city of Freeport was home to the Star League Defense Force’s Fleet provisioning center. The planetary facilities were upgraded to include a Castle Brian with significant stores of provisions and war material. After the fall of the League this resulted in both Marik and Kurita forces arriving on planet to secure these assets for themselves. However, the Castle Brian was well hidden and though the Combine held the planet they were unable to find the resources and rumors led them to believe that the stockpiles had been taken on Kerensky’s Exodus or the Free Worlds League had already taken them.
@@ -110,7 +116,7 @@ planet:
     smallMoons: 4
     landmass:
       - capital:
-          source: canon
+          source: 'Handbook: House Marik, pg. 68'
           value: Helmdown
     event:
       - date: '2259-03-31'

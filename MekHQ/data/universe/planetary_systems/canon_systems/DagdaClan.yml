@@ -3,9 +3,11 @@ sucsId: 2932
 xcood: -132.266
 ycood: 1603.856
 spectralType:
-  source: canon
+  source: 'Historical: Operation Klondike, pg. 137'
   value: K4V
-primarySlot: 3
+primarySlot:
+  source: 'Historical: Operation Klondike, pg. 137'
+  value: 3
 event:
   - date: '2787-06-15'
     nadirCharge: yes
@@ -48,28 +50,32 @@ planet:
       value: Dagda (Clan)
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 3
+    sysPos:
+      source: 'Historical: Operation Klondike, pg. 137'
+      value: 3
     icon: green6
     pressure:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 137'
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Historical: Operation Klondike, pg. 137'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 137'
       value: 1.1
-    diameter: 11202
-    density: 6.896684741599
+    diameter: 11205
+    density: 6.898777148015
     dayLength: 23
     yearLength: 0.8
     temperature:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 137'
       value: 25
     water:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 137'
       value: 60
     lifeForm:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 137'
       value: MAMMAL
     desc: |-
       Dagda was the first of the Pentagon Worlds settled by the Star League in Exile. The planet is rich in minerals and was the primary source of many raw materials for the Star League in Exile.
@@ -77,28 +83,32 @@ planet:
       The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.
     landmass:
       - name:
-          source: canon
-          value: Riva
-      - name:
-          source: canon
-          value: Garda
-      - name:
-          source: canon
+          source: 'Historical: Operation Klondike, pg. 137'
           value: Dratha
       - name:
-          source: canon
+          source: 'Historical: Operation Klondike, pg. 137'
+          value: Garda
+      - name:
+          source: 'Historical: Operation Klondike, pg. 137'
+          value: Riva
+      - name:
+          source: 'Historical: Operation Klondike, pg. 137'
           value: Salò
       - name:
-          source: canon
+          source: 'Historical: Operation Klondike, pg. 137'
           value: San Biagio
       - name:
-          source: canon
+          source: 'Historical: Operation Klondike, pg. 137'
           value: Tenno
     satellite:
-      - name: Aine
+      - name:
+          source: 'Historical: Operation Klondike, pg. 137'
+          value: Aine
         size: large
         icon: rock11
-      - name: Mebd
+      - name:
+          source: 'Historical: Operation Klondike, pg. 137'
+          value: Mebd
         size: giant
         icon: rock4
     event:

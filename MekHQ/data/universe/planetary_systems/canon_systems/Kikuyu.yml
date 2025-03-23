@@ -3,9 +3,11 @@ sucsId: 1348
 xcood: -203.689
 ycood: 366.491
 spectralType:
-  source: canon
+  source: FedCom Civil War, pg. 200
   value: G7V
-primarySlot: 3
+primarySlot:
+  source: FedCom Civil War, pg. 200
+  value: 3
 event:
   - date: '2543-01-10'
     nadirCharge: yes
@@ -58,28 +60,32 @@ planet:
       value: Kikuyu
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 3
+    sysPos:
+      source: FedCom Civil War, pg. 200
+      value: 3
     icon: green43
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 200
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 200
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 200
       value: 1.0
-    diameter: 12000
-    density: 5.8284
+    diameter: 12029
+    density: 5.842348002115
     dayLength: 24
     yearLength: 1.3
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 200
       value: 60
     water:
-      source: canon
+      source: FedCom Civil War, pg. 200
       value: 50
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 200
       value: MAMMAL
     desc: Kikuyu was colonized shortly after the collapse of the Terran Alliance by
       settlers from Asutralia, Tasmania and New Zealand on Earth. Kikuyu is predominantly
@@ -95,22 +101,10 @@ planet:
     smallMoons: 2
     landmass:
       - name:
-          source: canon
-          value: Auckland Archipelago
-        capital:
-          source: canon
-          value: Willington
-      - name:
-          source: canon
-          value: New Tasmania Archipelago
-        capital:
-          source: canon
-          value: New Hobart
-      - name:
-          source: canon
+          source: FedCom Civil War, pg. 200
           value: Queensland
         capital:
-          source: canon
+          source: FedCom Civil War, pg. 200
           value: New Sydney
     event:
       - date: '2537-11-04'

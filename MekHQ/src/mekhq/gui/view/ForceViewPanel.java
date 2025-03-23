@@ -27,6 +27,21 @@
  */
 package mekhq.gui.view;
 
+import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextPane;
+
 import megamek.client.ui.Messages;
 import megamek.common.Entity;
 import megamek.common.UnitType;
@@ -42,13 +57,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.utilities.ReportingUtilities;
-
-import javax.swing.*;
-import java.awt.*;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-import java.util.UUID;
 
 /**
  * A custom panel that gets filled in with goodies from a Force record
@@ -174,9 +182,10 @@ public class ForceViewPanel extends JScrollablePanel {
         }
 
         for (UUID uid : force.getAllUnits(false)) {
+            bv = force.getTotalBV(campaign, true);
+
             Unit u = campaign.getUnit(uid);
             if (null != u) {
-                bv += u.getEntity().calculateBattleValue(true, !u.hasPilot());
                 cost = cost.plus(u.getEntity().getCost(true));
                 ton += u.getEntity().getWeight();
                 String utype = UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
@@ -521,14 +530,16 @@ public class ForceViewPanel extends JScrollablePanel {
             }
         }
 
-        if (campaign.getCampaignOptions().isUseFatigue() && (person.getEffectiveFatigue(campaign) > 0)) {
+        int effectiveFatigue = getEffectiveFatigue(person.getFatigue(), person.isClanPersonnel(),
+              person.getSkillLevel(campaign, false), campaign.getFieldKitchenWithinCapacity());
+        if (campaign.getCampaignOptions().isUseFatigue() && (effectiveFatigue > 0)) {
             isFatigued = true;
             if (isInjured) {
                 toReturn.append(',');
             }
             toReturn.append(' ');
 
-            String fatigueMessage = person.getEffectiveFatigue(campaign) + " fatigue";
+            String fatigueMessage = effectiveFatigue + " fatigue";
 
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
                 MekHQ.getMHQOptions().getFontColorWarningHexColor(), fatigueMessage));
@@ -544,7 +555,7 @@ public class ForceViewPanel extends JScrollablePanel {
 
     public String getForceSummary(Unit unit) {
         String toReturn = "<html><font size='4'><b>" + unit.getName() + "</b></font><br/>";
-        toReturn += "<font><b>BV:</b> " + unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) + "<br/>";
+        toReturn += "<font><b>BV:</b> " + unit.getEntity().calculateBattleValue() + "<br/>";
         toReturn += unit.getStatus();
         Entity entity = unit.getEntity();
         if (entity.hasNavalC3()) {

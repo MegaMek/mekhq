@@ -3,9 +3,11 @@ sucsId: 467
 xcood: 8.003
 ycood: -41.409
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F6VI
-primarySlot: 6
+primarySlot:
+  source: MWDA world profiles
+  value: 6
 event:
   - date: '2352-05-28'
     zenithCharge: yes
@@ -96,28 +98,32 @@ planet:
       value: Capolla
     type: TERRESTRIAL
     orbitalDist: 3.64
-    sysPos: 6
+    sysPos:
+      source: MWDA world profiles
+      value: 6
     icon: wet17
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.83
-    diameter: 10229
-    density: 5.683349087664
+    diameter: 10246
+    density: 5.692827099086
     dayLength: 22
     yearLength: 7.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 33
     water:
-      source: canon
+      source: MWDA world profiles
       value: 77
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: BIRD
     desc: 3135 - A small world, with jungles covering much of its four main landmasses,
       Capolla‘s rich metal ore deposits and other raw materials drew many settlers
@@ -152,22 +158,21 @@ planet:
       break-up.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Dominus
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Stockdale
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Konowalchuk
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Matlabor
-      - name:
-          source: canon
-          value: New Australia
     satellite:
-      - name: Nobel
+      - name:
+          source: MWDA world profiles
+          value: Nobel
         size: medium
         icon: rock11
     event:

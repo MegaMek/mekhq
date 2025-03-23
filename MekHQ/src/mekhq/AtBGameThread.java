@@ -277,7 +277,7 @@ public class AtBGameThread extends GameThread {
                     int deploymentRound = entity.getDeployRound();
                     if (!(scenario instanceof AtBDynamicScenario)) {
                         int speed = entity.getWalkMP();
-                        if (entity.getJumpMP() > 0) {
+                        if (entity.getAnyTypeMaxJumpMP() > 0) {
                             if (entity instanceof Infantry) {
                                 speed = entity.getJumpMP();
                             } else {
@@ -336,7 +336,7 @@ public class AtBGameThread extends GameThread {
                     int deploymentRound = entity.getDeployRound();
                     if (!(scenario instanceof AtBDynamicScenario)) {
                         int speed = entity.getWalkMP();
-                        if (entity.getJumpMP() > 0) {
+                        if (entity.getAnyTypeMaxJumpMP() > 0) {
                             if (entity instanceof Infantry) {
                                 speed = entity.getJumpMP();
                             } else {
@@ -739,6 +739,7 @@ public class AtBGameThread extends GameThread {
             entity.setOwner(botClient.getLocalPlayer());
             String fName = String.format(forceName, lanceName, forceIdLance);
             entity.setForceString(fName);
+            entity.setStartingPos(botForce.getStartingPos());
             entities.add(entity);
             i++;
 

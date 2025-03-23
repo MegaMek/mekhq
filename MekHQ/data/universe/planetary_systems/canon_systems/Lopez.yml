@@ -5,7 +5,9 @@ ycood: -330.395
 spectralType:
   source: canon
   value: M0V
-primarySlot: 1
+primarySlot:
+  source: 'Handbook: House Marik, pg. 67'
+  value: 1
 event:
   - date: '2748-02-16'
     nadirCharge: yes
@@ -17,28 +19,32 @@ planet:
       value: Lopez
     type: TERRESTRIAL
     orbitalDist: 0.2
-    sysPos: 1
+    sysPos:
+      source: 'Handbook: House Marik, pg. 67'
+      value: 1
     icon: green53
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 67'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 67'
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 67'
       value: 0.85
-    diameter: 9975
-    density: 5.98003716103
+    diameter: 9982
+    density: 5.98423062949
     dayLength: 22
     yearLength: 0.7
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 67'
       value: 50
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 67'
       value: 25
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 67'
       value: REPTILE
     desc: |-
       Lopez is a unique planet existing in a binary system. The fact that the planet supports life continues to baffle scientists. Due to a high amount of CO2 in the atmosphere, humans require rebreathing apparatus to walk around outside. However the unique atmosphere makes the planet’s vegetation thrive and the planet is also home to many strange native species including the dragon-like branth, which inhabit the Miyama Jungles.
@@ -55,12 +61,8 @@ planet:
           source: canon
           value: Puebla
         capital:
-          source: canon
+          source: 'Handbook: House Marik, pg. 67'
           value: Orton
-    satellite:
-      - name: Yamamoto
-        size: medium
-        icon: oddmoon1
     event:
       - date: '2746-08-25'
         faction:

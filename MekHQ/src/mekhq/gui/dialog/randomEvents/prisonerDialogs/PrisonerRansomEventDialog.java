@@ -46,7 +46,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
  * messaging and allows the player to accept or decline the offer.</p>
  */
 public class PrisonerRansomEventDialog extends MHQDialogImmersive {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerRansomEvent";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
     /**
      * Creates a dialog to present a ransom offer for prisoners.
@@ -60,9 +60,8 @@ public class PrisonerRansomEventDialog extends MHQDialogImmersive {
     public PrisonerRansomEventDialog(Campaign campaign, List<Person> prisoners, Money payment, boolean isFriendlyPOWs) {
         super(campaign, campaign.getSeniorAdminPerson(COMMAND), null, createInCharacterMessage(campaign,
                 payment, prisoners, isFriendlyPOWs), createButtons(), createOutOfCharacterMessage(isFriendlyPOWs),
-            null, false);
+            null, false, null, false);
 
-        setModal(false);
         setAlwaysOnTop(true);
     }
 

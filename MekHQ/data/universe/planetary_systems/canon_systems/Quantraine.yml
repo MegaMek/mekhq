@@ -5,7 +5,9 @@ ycood: 205.207
 spectralType:
   source: canon
   value: G4V
-primarySlot: 4
+primarySlot:
+  source: Periphery (1ed), pg. 121
+  value: 4
 event:
   - date: '2555-12-19'
     zenithCharge: yes
@@ -81,7 +83,9 @@ planet:
       value: Quantraine
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 4
+    sysPos:
+      source: Periphery (1ed), pg. 121
+      value: 4
     icon: green49
     pressure: HIGH
     atmosphere: BREATHABLE
@@ -94,8 +98,8 @@ planet:
     temperature: 47
     water: 32
     lifeForm:
-      source: canon
-      value: BIRD
+      source: Periphery (1ed), pg. 121
+      value: AMPHIBIAN
     desc: No description available.
     landmass:
       - name: New Saint-Luc-de-Bellechasse

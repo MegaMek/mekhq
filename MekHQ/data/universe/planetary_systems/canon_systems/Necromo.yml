@@ -3,9 +3,11 @@ sucsId: 1804
 xcood: 102.876
 ycood: -188.465
 spectralType:
-  source: canon
+  source: 'Handbook: House Liao, pg. 73'
   value: M5V
-primarySlot: 10
+primarySlot:
+  source: 'Handbook: House Liao, pg. 73'
+  value: 10
 event:
   - date: '2361-11-19'
     nadirCharge: yes
@@ -169,28 +171,32 @@ planet:
       value: Necromo
     type: TERRESTRIAL
     orbitalDist: 0.08
-    sysPos: 10
+    sysPos:
+      source: 'Handbook: House Liao, pg. 73'
+      value: 10
     icon: dry4
     pressure:
-      source: canon
-      value: STANDARD
-    atmosphere: BREATHABLE
+      source: 'Handbook: House Liao, pg. 73'
+      value: THIN
+    atmosphere:
+      source: 'Handbook: House Liao, pg. 73'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Liao, pg. 73'
       value: 1.03
-    diameter: 14117
-    density: 5.123682902475
+    diameter: 14122
+    density: 5.125566796547
     dayLength: 25
     yearLength: 0.4
     temperature:
-      source: canon
+      source: 'Handbook: House Liao, pg. 73'
       value: 39
     water:
-      source: canon
+      source: 'Handbook: House Liao, pg. 73'
       value: 12
     lifeForm:
-      source: canon
+      source: 'Handbook: House Liao, pg. 73'
       value: MAMMAL
     desc: |-
       As of 3025 Necromo was populated by only 5,000 people, all of which were employed at the secret Capellan Dropship repair facilities. In order to keep the repair facilities secure only the most loyal workers were selected and even then their families were not allowed to follow them to Necromo, however workers never remained more than 3 months on planet. In 3055 the Aris Memorial Yards were relocated into orbit around Necromo and the Maskirova finally allowed people to live on the planet.
@@ -198,10 +204,12 @@ planet:
       Necromo is overall a comfortable planet to live despite arid conditions. The planet is primarily covered in rolling hills and forests. Almost the entire population lives inside the domed capital of Landing place.
     landmass:
       - capital:
-          source: canon
+          source: 'Handbook: House Liao, pg. 73'
           value: Landingplace
     satellite:
-      - name: Acorna
+      - name:
+          source: 'Handbook: House Liao, pg. 73'
+          value: Acorna
         size: medium
         icon: oddmoon2
     event:

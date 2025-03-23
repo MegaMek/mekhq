@@ -3,9 +3,11 @@ sucsId: 166
 xcood: -170.389
 ycood: 226.576
 spectralType:
-  source: canon
+  source: 'Operational Turning Points: Red Corsair, pg. 5'
   value: G3V
-primarySlot: 4
+primarySlot:
+  source: 'Operational Turning Points: Red Corsair, pg. 5'
+  value: 4
 event:
   - date: '2351-10-24'
     nadirCharge: yes
@@ -76,28 +78,32 @@ planet:
       value: Arc-Royal
     type: TERRESTRIAL
     orbitalDist: 1.0
-    sysPos: 4
+    sysPos:
+      source: 'Operational Turning Points: Red Corsair, pg. 5'
+      value: 4
     icon: green39
     pressure:
-      source: canon
+      source: 'Operational Turning Points: Red Corsair, pg. 5'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Operational Turning Points: Red Corsair, pg. 5'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Operational Turning Points: Red Corsair, pg. 5'
       value: 1.01
-    diameter: 13979
-    density: 5.073694556857
+    diameter: 13984
+    density: 5.07560906494
     dayLength: 26
     yearLength: 1.4
     temperature:
-      source: canon
+      source: 'Operational Turning Points: Red Corsair, pg. 5'
       value: 32
     water:
-      source: canon
+      source: 'Operational Turning Points: Red Corsair, pg. 5'
       value: 74
     lifeForm:
-      source: canon
+      source: 'Operational Turning Points: Red Corsair, pg. 5'
       value: MAMMAL
     desc: |-
       Arc-Royal is a pleasant world with a mild climate and mild weather. While the planet is highly developed and industrialized, these efforts were confined to certain areas and as a result Arc-Royal’s wilderness is largely untouched. The Arc-Royal MechWorks BattleMech facility is located in the city of New Hannover in the rolling hills of the Gutheim continent. ComTech manufacturing was built in the 3070s as a joint venture between ComStar, the Lyran Alliance and the Kell family. While most of the plant's output goes to ComStar, most of the profits go to the Alliance and the Kells. The plant is located around the volcanic Mount Zugspitze on the Gerechtland continent. Finally there are the Kell Refit Facilities, also located in New Hannover, which began as simple refit facilities but expanded to manufacturing with support from the Wolf's Dragoons.
@@ -114,22 +120,26 @@ planet:
       Wolf Clan Sites 1-4
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 84'
           value: Gerechtland
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 84'
           value: Grunwald
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 84'
           value: Gutheim
         capital:
-          source: canon
-          value: Old Connaught, Wolf City
+          source: 'Handbook: House Steiner, pg. 84'
+          value: Old Connaught
     satellite:
-      - name: Deven
+      - name:
+          source: 'Operational Turning Points: Red Corsair, pg. 5'
+          value: Deven
         size: large
         icon: rock5
-      - name: Thorwald
+      - name:
+          source: 'Operational Turning Points: Red Corsair, pg. 5'
+          value: Thorwald
         size: large
         icon: rock2
     event:

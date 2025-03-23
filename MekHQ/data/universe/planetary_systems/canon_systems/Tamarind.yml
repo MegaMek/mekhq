@@ -3,9 +3,11 @@ sucsId: 2475
 xcood: -268.942
 ycood: -83.292
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 70'
   value: K2IV
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Marik, pg. 70'
+  value: 4
 event:
   - date: '2353-02-06'
     nadirCharge: yes
@@ -69,28 +71,32 @@ planet:
       value: Tamarind
     type: TERRESTRIAL
     orbitalDist: 1.12
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Marik, pg. 70'
+      value: 4
     icon: green6
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 70'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 70'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 70'
       value: 1.0
-    diameter: 14387
-    density: 4.881113918662
+    diameter: 14392
+    density: 4.882898768264
     dayLength: 25
     yearLength: 1.5
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 70'
       value: 38
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 70'
       value: 61
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 70'
       value: REPTILE
     desc: |-
       Tamarind was in a state of near collapse in the early 31st Century due to mismanagement by the then Prime-Minister. Under the leadership of Therese Marik the planet’s fortunes turned around and within 30 years the planet’s debts have been paid off and where there were once food shortages, the planet can once agin fully sustain itself and produces enough extra to trade with surrounding planets.. Tamarind’s primary industries are textiles and light engineer, complemented by agriculture and some mining. The planet is also known as a center of Art, with many works selling for high prices across the League.
@@ -104,18 +110,22 @@ planet:
           source: canon
           value: Dhofar
         capital:
-          source: canon
-          value: Zanzibar
+          source: 'Handbook: House Marik, pg. 70'
+          value: Padaron City
       - name:
           source: canon
           value: Moan
     satellite:
-      - name: Teteli
-        size: medium
-        icon: rock16
-      - name: Tamarin
+      - name:
+          source: 'Handbook: House Marik, pg. 70'
+          value: Tamarin
         size: medium
         icon: oddmoon2
+      - name:
+          source: 'Handbook: House Marik, pg. 70'
+          value: Teteli
+        size: medium
+        icon: rock16
     event:
       - date: '2341-11-19'
         faction:

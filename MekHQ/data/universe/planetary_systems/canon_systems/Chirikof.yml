@@ -5,7 +5,9 @@ ycood: -233.463
 spectralType:
   source: canon
   value: F8IV
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Davion, pg. 93'
+  value: 4
 event:
   - date: '2364-11-12'
     nadirCharge: yes
@@ -68,28 +70,32 @@ planet:
       value: Chirikof
     type: TERRESTRIAL
     orbitalDist: 3.36
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Davion, pg. 93'
+      value: 4
     icon: green7
     pressure:
-      source: canon
-      value: HIGH
-    atmosphere: BREATHABLE
+      source: 'Handbook: House Davion, pg. 93'
+      value: VERY_HIGH
+    atmosphere:
+      source: 'Handbook: House Davion, pg. 93'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Davion, pg. 93'
       value: 1.1
-    diameter: 12267
-    density: 6.271679974381
+    diameter: 12296
+    density: 6.286696220205
     dayLength: 21
     yearLength: 6.3
     temperature:
-      source: canon
+      source: 'Handbook: House Davion, pg. 93'
       value: 22
     water:
-      source: canon
+      source: 'Handbook: House Davion, pg. 93'
       value: 22
     lifeForm:
-      source: canon
+      source: 'Handbook: House Davion, pg. 93'
       value: MAMMAL
     desc: |-
       Chirikof was first colonized in the 24th century as a mining colony, despite the harsh living conditions. However, terraforming efforts made the planet more habitable and farms and ranches sprang up to reduce the planet’s reliance on imported food. Industries popped up to support the growing population and soon, the Federated Suns expansion deeper rimward, Chirikof was perfectly positioned to become a vital trade point. Military presence also grew on the planet at the same time to ward of raids and pirate attacks. The planet has since been a key military and trade world in the Federated Suns and has been prosperous as a result.
@@ -110,10 +116,14 @@ planet:
           source: canon
           value: Moody
     satellite:
-      - name: Madden
+      - name:
+          source: 'Handbook: House Davion, pg. 93'
+          value: Madden
         size: medium
         icon: oddmoon3
-      - name: Pietrikof
+      - name:
+          source: 'Handbook: House Davion, pg. 93'
+          value: Pietrikof
         size: large
         icon: rock3
     event:

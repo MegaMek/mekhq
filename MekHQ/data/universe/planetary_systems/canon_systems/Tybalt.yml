@@ -3,9 +3,11 @@ sucsId: 2609
 xcood: 89.951
 ycood: -20.467
 spectralType:
-  source: canon
+  source: Technology of Destruction, pg. po
   value: G3V
-primarySlot: 3
+primarySlot:
+  source: Technology of Destruction, pg. po
+  value: 3
 event:
   - date: '2366-03-24'
     nadirCharge: yes
@@ -65,28 +67,32 @@ planet:
       value: Tybalt
     type: TERRESTRIAL
     orbitalDist: 1.0
-    sysPos: 3
+    sysPos:
+      source: Technology of Destruction, pg. po
+      value: 3
     icon: green24
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Technology of Destruction, pg. po
       value: 1.0
-    diameter: 13247
-    density: 5.301094618458
+    diameter: 13252
+    density: 5.303070252024
     dayLength: 24
     yearLength: 1.4
     temperature:
-      source: canon
+      source: Technology of Destruction, pg. po
       value: 28
     water:
-      source: canon
+      source: Technology of Destruction, pg. po
       value: 60
     lifeForm:
-      source: canon
+      source: Technology of Destruction, pg. po
       value: BIRD
     desc: |-
       Possessing small, shallow oceans, Tybalt‘s surface is dominated by eleven mountainous continents. Tybalt is wracked by tectonic activity, which has raised steep mountain ranges on all of its landmasses. Only one continent, Titania, is old and worn enough by erosion to be widely habitable. Although settlers have eked out livings as herders, trappers, and prospectors on nearly all of Tybalt‘s continents, its only significant population has always been located in or near MacBeth, Tybalt‘s capital and spaceport, which is located on Titania.
@@ -96,10 +102,10 @@ planet:
       With no substantial industry or natural resources, the Blakists largely overlooked Tybalt during their Holy War. Since the founding of The Republic of the Sphere, the old Jolassa factories have been retooled and reopened to manufacture heavy construction, cargo, and civilian transport vehicles.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Titania
         capital:
-          source: canon
+          source: MWDA world profiles
           value: MacBeth
     event:
       - date: '2245-10-19'

@@ -3,9 +3,11 @@ sucsId: 2968
 xcood: 7.675
 ycood: 1912.177
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: G8VI
-primarySlot: 3
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 3
 event:
   - date: '2803-03-07'
     nadirCharge: yes
@@ -55,28 +57,32 @@ planet:
       value: Vinton
     type: TERRESTRIAL
     orbitalDist: 1.28
-    sysPos: 3
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 3
     icon: green11
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 1.1
-    diameter: 13714
-    density: 5.632515606538
+    diameter: 13719
+    density: 5.634674622235
     dayLength: 23
     yearLength: 1.7
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 30
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 60
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: REPTILE
     desc: No description available.
     landmass:

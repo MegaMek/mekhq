@@ -5,7 +5,9 @@ ycood: 140.809
 spectralType:
   source: canon
   value: M3V
-primarySlot: 8
+primarySlot:
+  source: Periphery (1ed), pg. 120
+  value: 8
 event:
   - date: '2630-01-27'
     nadirCharge: yes
@@ -134,7 +136,9 @@ planet:
       value: Lushann
     type: TERRESTRIAL
     orbitalDist: 0.12
-    sysPos: 8
+    sysPos:
+      source: Periphery (1ed), pg. 120
+      value: 8
     icon: green46
     pressure:
       source: canon
@@ -155,7 +159,7 @@ planet:
       source: canon
       value: 45
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 120
       value: MAMMAL
     desc: Lushann is a semi-arctic planet, which was primarily settled to take advantage
       of the abundant oil deposits in the planet. In fact, almost two-thirds of the

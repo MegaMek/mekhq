@@ -3,9 +3,11 @@ sucsId: 688
 xcood: 41.097
 ycood: 26.058
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F6VI
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 planet:
   - name: Chai
     type: GIANT_TERRESTRIAL
@@ -25,28 +27,32 @@ planet:
       value: Deneb Algedi
     type: TERRESTRIAL
     orbitalDist: 3.64
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green47
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.74
-    diameter: 9658
-    density: 5.366376587186
+    diameter: 9674
+    density: 5.37546703668
     dayLength: 19
     yearLength: 7.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 33
     water:
-      source: canon
+      source: MWDA world profiles
       value: 42
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: BIRD
     desc: 'A fairly dry world, with deserts covering more than two-thirds of its surface
       land, Deneb Algedi wasn‘t exactly seen as a paradise when it was discovered
@@ -81,21 +87,14 @@ planet:
       maintain several installations, barracks and weapons test ranges there.'
     landmass:
       - name:
-          source: canon
-          value: Batambu Chain
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Librios
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Nueva Santiago
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Ombanwe
-    satellite:
-      - name: None
-        size: medium
-        icon: rock7
     event:
       - date: '2227-03-04'
         faction:

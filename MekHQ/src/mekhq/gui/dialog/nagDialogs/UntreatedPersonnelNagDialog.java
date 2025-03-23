@@ -27,15 +27,15 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UntreatedPersonnelNagLogic.campaignHasUntreatedInjuries;
+
+import java.util.List;
+
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
-
-import java.util.List;
-
-import static mekhq.gui.dialog.nagDialogs.nagLogic.UntreatedPersonnelNagLogic.campaignHasUntreatedInjuries;
 
 /**
  * A nag dialog that alerts the user about untreated injuries within the campaign's personnel.
@@ -76,13 +76,14 @@ public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
      * </ul>
      *
      * @param activePersonnel A {@link List} of active personnel in the campaign.
-     * @return {@code true} if the nag dialog should be displayed due to untreated injuries,
-     *         {@code false} otherwise.
+     * @param doctorCapacity The maximum number of patients each doctor can medicate.
+     *
+     * @return {@code true} if the nag dialog should be displayed due to untreated injuries, {@code false} otherwise.
      */
-    public static boolean checkNag(List<Person> activePersonnel) {
+    public static boolean checkNag(List<Person> activePersonnel, int doctorCapacity) {
         final String NAG_KEY = MHQConstants.NAG_UNTREATED_PERSONNEL;
 
         return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && campaignHasUntreatedInjuries(activePersonnel);
+            && campaignHasUntreatedInjuries(activePersonnel, doctorCapacity);
     }
 }

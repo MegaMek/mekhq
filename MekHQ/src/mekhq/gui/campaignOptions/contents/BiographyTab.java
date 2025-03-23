@@ -27,6 +27,20 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.client.generator.RandomGenderGenerator.getPercentFemale;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
+import javax.swing.*;
+
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.baseComponents.MMComboBox;
@@ -42,16 +56,15 @@ import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.gui.campaignOptions.components.*;
+import mekhq.campaign.universe.Systems;
+import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
+import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
+import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
+import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.gui.panes.RankSystemsPane;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.*;
-
-import static megamek.client.generator.RandomGenderGenerator.getPercentFemale;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
 /**
  * The `BiographyTab` class is responsible for managing the biography-related settings in the campaign options tab
@@ -74,6 +87,7 @@ public class BiographyTab {
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
 
     private Campaign campaign;
+    private GeneralTab generalTab;
     private CampaignOptions campaignOptions;
     private RandomOriginOptions randomOriginOptions;
 
@@ -178,11 +192,13 @@ public class BiographyTab {
     /**
      * Constructs the `BiographyTab` and initializes the campaign and its dependent options.
      *
-     * @param campaign The current `Campaign` object to which the BiographyTab is linked.
-     *                 The campaign options and origin options are derived from this object.
+     * @param campaign             The current `Campaign` object to which the BiographyTab is linked. The campaign
+     *                             options and origin options are derived from this object.
+     * @param generalTab           The currently active General Tab.
      */
-    public BiographyTab(Campaign campaign) {
+    public BiographyTab(Campaign campaign, GeneralTab generalTab) {
         this.campaign = campaign;
+        this.generalTab = generalTab;
         this.campaignOptions = campaign.getCampaignOptions();
         this.randomOriginOptions = campaignOptions.getRandomOriginOptions();
 
@@ -581,7 +597,7 @@ public class BiographyTab {
 
         lblSpecifiedSystem = new CampaignOptionsLabel("SpecifiedSystem");
         comboSpecifiedSystem.setModel(new DefaultComboBoxModel<>(getPlanetarySystems(
-              chkSpecifiedSystemFactionSpecific.isSelected() ? campaign.getFaction() : null)));
+              chkSpecifiedSystemFactionSpecific.isSelected() ? generalTab.getFaction() : null)));
         comboSpecifiedSystem.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -589,7 +605,7 @@ public class BiographyTab {
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PlanetarySystem) {
-                    setText(((PlanetarySystem) value).getName(campaign.getLocalDate()));
+                    setText(((PlanetarySystem) value).getName(generalTab.getDate()));
                 }
                 return this;
             }
@@ -615,7 +631,7 @@ public class BiographyTab {
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof Planet) {
-                    setText(((Planet) value).getName(campaign.getLocalDate()));
+                    setText(((Planet) value).getName(generalTab.getDate()));
                 }
                 return this;
             }
@@ -735,7 +751,7 @@ public class BiographyTab {
         comboSpecifiedSystem.removeAllItems();
 
         comboSpecifiedSystem.setModel(new DefaultComboBoxModel<>(getPlanetarySystems(
-            chkSpecifiedSystemFactionSpecific.isSelected() ? campaign.getFaction() : null)));
+            chkSpecifiedSystemFactionSpecific.isSelected() ? generalTab.getFaction() : null)));
 
         restoreComboSpecifiedPlanet();
     }
@@ -752,13 +768,13 @@ public class BiographyTab {
 
         // Filter systems
         for (PlanetarySystem planetarySystem : systems) {
-            if ((faction == null) || planetarySystem.getFactionSet(campaign.getLocalDate()).contains(faction)) {
+            if ((faction == null) || planetarySystem.getFactionSet(generalTab.getDate()).contains(faction)) {
                 filteredSystems.add(planetarySystem);
             }
         }
 
         // Sort systems
-        filteredSystems.sort(Comparator.comparing(p -> p.getName(campaign.getLocalDate())));
+        filteredSystems.sort(Comparator.comparing(p -> p.getName(generalTab.getDate())));
 
         // Convert to array
         return filteredSystems.toArray(new PlanetarySystem[0]);
@@ -1421,7 +1437,9 @@ public class BiographyTab {
         originOptions.setRandomizeAroundSpecifiedPlanet(chkRandomizeAroundSpecifiedPlanet.isSelected());
 
         Planet selectedPlanet = comboSpecifiedPlanet.getSelectedItem();
-        originOptions.setSpecifiedPlanet(selectedPlanet);
+        originOptions.setSpecifiedPlanet(selectedPlanet == null
+                                               ? Systems.getInstance().getSystemById("Terra").getPrimaryPlanet()
+                                               : selectedPlanet);
 
         originOptions.setOriginSearchRadius((int) spnOriginSearchRadius.getValue());
         originOptions.setOriginDistanceScale((double) spnOriginDistanceScale.getValue());

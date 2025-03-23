@@ -3,9 +3,11 @@ sucsId: 2942
 xcood: -22.586
 ycood: 1779.374
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: B0III
-primarySlot: 2
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 2
 event:
   - date: '2809-06-15'
     nadirCharge: yes
@@ -31,28 +33,32 @@ planet:
       value: Gatekeeper
     type: TERRESTRIAL
     orbitalDist: 343.0
-    sysPos: 2
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 2
     icon: dry23
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 0.8
-    diameter: 10435
-    density: 5.402514211573
+    diameter: 10421
+    density: 5.395107422819
     dayLength: 22
     yearLength: 6352.5
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 20
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 10
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: PLANT
     desc: No description available.
     landmass:

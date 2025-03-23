@@ -3,9 +3,11 @@ sucsId: 2947
 xcood: 39.368
 ycood: 1879.723
 spectralType:
-  source: canon
+  source: Warriors of Kerensky, pg. 112
   value: A2V
-primarySlot: 2
+primarySlot:
+  source: Warriors of Kerensky, pg. 112
+  value: 2
 event:
   - date: '2814-05-09'
     zenithCharge: yes
@@ -30,28 +32,32 @@ planet:
       value: Hoard
     type: TERRESTRIAL
     orbitalDist: 7.0
-    sysPos: 2
+    sysPos:
+      source: Warriors of Kerensky, pg. 112
+      value: 2
     icon: green29
     pressure:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Warriors of Kerensky, pg. 112
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 0.8
-    diameter: 11562
-    density: 4.844801467879
+    diameter: 11583
+    density: 4.853665850582
     dayLength: 21
     yearLength: 18.6
     temperature:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 15
     water:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: 50
     lifeForm:
-      source: canon
+      source: Warriors of Kerensky, pg. 112
       value: PLANT
     desc: No description available.
     smallMoons: 3

@@ -163,6 +163,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NEW_DAY_ASTECH_POOL_FILL = "newDayAstechPoolFill";
     public static final String NEW_DAY_MEDIC_POOL_FILL = "newDayMedicPoolFill";
     public static final String NEW_DAY_MRMS = "newDayMRMS";
+    public static final String NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS = "NewDayOptimizeMedicalAssignments";
     public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS = "newDayForceIconOperationalStatus";
     public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE = "newDayForceIconOperationalStatusStyle";
     // endregion New Day
@@ -188,6 +189,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_UNMAINTAINED_UNITS = "nagUnmaintainedUnits";
     public static final String NAG_PREGNANT_COMBATANT = "nagPregnantCombatant";
     public static final String NAG_PRISONERS = "nagPrisoners";
+    public static final String NAG_ADMIN_STRAIN = "nagAdminStrain";
     public static final String NAG_UNTREATED_PERSONNEL = "nagUntreatedPersonnel";
     public static final String NAG_NO_COMMANDER = "nagNoCommander";
     public static final String NAG_CONTRACT_ENDED = "nagContractEnded";

@@ -3,9 +3,11 @@ sucsId: 1209
 xcood: -46.531
 ycood: -56.396
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 70'
   value: G5III
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Marik, pg. 70'
+  value: 3
 event:
   - date: '2372-09-24'
     nadirCharge: yes
@@ -51,28 +53,32 @@ planet:
       value: Irian
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Marik, pg. 70'
+      value: 3
     icon: green30
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 70'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 70'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 70'
       value: 0.95
-    diameter: 11254
-    density: 5.949665661747
+    diameter: 11238
+    density: 5.940978744771
     dayLength: 29
     yearLength: 2.0
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 70'
       value: 43
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 70'
       value: 71
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 70'
       value: PLANT
     desc: |-
       The planet Irian is unique in its ownership and governance. Officially the planet is a Corporate Fief of Irian Technologies and the government is a unique conglomerate of government and business. The planet itself is prosperous and is comparable to many provincial capitals in the Free Worlds League in terms of wealth and prosperity and the planet is diversely industrialized with factories servicing the various branches of the IrTech Conglomerate. While the military factories suffered during the Succession Wars, the rest of IrTech remained prosperous and the corporation refused to relocate their military factories, instead deciding to repair and rebuild when they had the chance.
@@ -80,19 +86,27 @@ planet:
       Irian’s terrain is best described as bland. The planet’s terrain is dominated by low rolling hills with sparse vegetation and the climate is adequate for human habitation.
     landmass:
       - name:
-          source: canon
-          value: Indran
-      - name:
-          source: canon
-          value: Hathor
-      - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 70'
           value: Bruin
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 70'
+          value: Hathor
+        capital:
+          source: MWDA world profiles
+          value: Kentwood (since 3075)
+      - name:
+          source: 'Handbook: House Marik, pg. 70'
+          value: Indran
+        capital:
+          source: MWDA world profiles
+          value: Kirin River (destroyed in 3075)
+      - name:
+          source: 'Handbook: House Marik, pg. 70'
           value: Kriess
     satellite:
-      - name: Prospero
+      - name:
+          source: 'Handbook: House Marik, pg. 70'
+          value: Prospero
         size: large
         icon: rock10
     event:

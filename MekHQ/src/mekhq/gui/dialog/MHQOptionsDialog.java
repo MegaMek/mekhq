@@ -175,6 +175,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         private JCheckBox chkNewDayAstechPoolFill;
         private JCheckBox chkNewDayMedicPoolFill;
         private JCheckBox chkNewDayMRMS;
+        private JCheckBox chkNewDayOptimizeMedicalAssignments;
         private JCheckBox chkNewDayForceIconOperationalStatus;
         private MMComboBox<ForceIconOperationalStatusStyle> comboNewDayForceIconOperationalStatusStyle;
         // endregion New Day
@@ -189,6 +190,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         private JCheckBox optionUnmaintainedUnitsNag;
         private JCheckBox optionPregnantCombatantNag;
         private JCheckBox optionPrisonersNag;
+        private JCheckBox optionAdminStrainNag;
         private JCheckBox optionUntreatedPersonnelNag;
         private JCheckBox optionNoCommanderNag;
         private JCheckBox optionContractEndedNag;
@@ -968,6 +970,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 chkNewDayMRMS.setToolTipText(resources.getString("chkNewDayMRMS.toolTipText"));
                 chkNewDayMRMS.setName("chkNewDayMRMS");
 
+                chkNewDayOptimizeMedicalAssignments = new JCheckBox(resources.getString("chkNewDayOptimizeMedicalAssignments.text"));
+                chkNewDayOptimizeMedicalAssignments.setToolTipText(resources.getString("chkNewDayOptimizeMedicalAssignments.toolTipText"));
+                chkNewDayOptimizeMedicalAssignments.setName("chkNewDayOptimizeMedicalAssignments.text");
+
                 chkNewDayForceIconOperationalStatus = new JCheckBox(
                                 resources.getString("chkNewDayForceIconOperationalStatus.text"));
                 chkNewDayForceIconOperationalStatus
@@ -1021,6 +1027,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                 .addComponent(chkNewDayAstechPoolFill)
                                                 .addComponent(chkNewDayMedicPoolFill)
                                                 .addComponent(chkNewDayMRMS)
+                                                .addComponent(chkNewDayOptimizeMedicalAssignments)
                                                 .addComponent(chkNewDayForceIconOperationalStatus)
                                                 .addGroup(layout.createParallelGroup(Alignment.LEADING)
                                                                 .addComponent(lblNewDayForceIconOperationalStatusStyle)
@@ -1033,6 +1040,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                 .addComponent(chkNewDayAstechPoolFill)
                                                 .addComponent(chkNewDayMedicPoolFill)
                                                 .addComponent(chkNewDayMRMS)
+                                                .addComponent(chkNewDayOptimizeMedicalAssignments)
                                                 .addComponent(chkNewDayForceIconOperationalStatus)
                                                 .addGroup(layout.createSequentialGroup()
                                                                 .addComponent(lblNewDayForceIconOperationalStatusStyle)
@@ -1091,6 +1099,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 optionPrisonersNag = new JCheckBox(resources.getString("optionPrisonersNag.text"));
                 optionPrisonersNag.setToolTipText(resources.getString("optionPrisonersNag.toolTipText"));
                 optionPrisonersNag.setName("optionPrisonersNag");
+
+                optionAdminStrainNag = new JCheckBox(resources.getString("optionAdminStrainNag.text"));
+                optionAdminStrainNag.setToolTipText(resources.getString("optionAdminStrainNag.toolTipText"));
+                optionAdminStrainNag.setName("optionAdminStrainNag");
 
                 optionUntreatedPersonnelNag = new JCheckBox(resources.getString("optionUntreatedPersonnelNag.text"));
                 optionUntreatedPersonnelNag
@@ -1171,6 +1183,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                 .addComponent(optionUnmaintainedUnitsNag)
                                                 .addComponent(optionPregnantCombatantNag)
                                                 .addComponent(optionPrisonersNag)
+                                                .addComponent(optionAdminStrainNag)
                                                 .addComponent(optionUntreatedPersonnelNag)
                                                 .addComponent(optionNoCommanderNag)
                                                 .addComponent(optionContractEndedNag)
@@ -1190,6 +1203,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                 .addComponent(optionUnmaintainedUnitsNag)
                                                 .addComponent(optionPregnantCombatantNag)
                                                 .addComponent(optionPrisonersNag)
+                                                .addComponent(optionAdminStrainNag)
                                                 .addComponent(optionUntreatedPersonnelNag)
                                                 .addComponent(optionNoCommanderNag)
                                                 .addComponent(optionContractEndedNag)
@@ -1486,6 +1500,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 MekHQ.getMHQOptions().setNewDayAstechPoolFill(chkNewDayAstechPoolFill.isSelected());
                 MekHQ.getMHQOptions().setNewDayMedicPoolFill(chkNewDayMedicPoolFill.isSelected());
                 MekHQ.getMHQOptions().setNewDayMRMS(chkNewDayMRMS.isSelected());
+                MekHQ.getMHQOptions().setNewDayOptimizeMedicalAssignments(chkNewDayOptimizeMedicalAssignments.isSelected());
                 MekHQ.getMHQOptions()
                                 .setNewDayForceIconOperationalStatus(chkNewDayForceIconOperationalStatus.isSelected());
                 MekHQ.getMHQOptions().setNewDayForceIconOperationalStatusStyle(
@@ -1499,7 +1514,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                 optionUnmaintainedUnitsNag.isSelected());
                 MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_PREGNANT_COMBATANT,
                                 optionPregnantCombatantNag.isSelected());
-                MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_PRISONERS, optionPrisonersNag.isSelected());
+                MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_PRISONERS,
+                      optionPrisonersNag.isSelected());
+                MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_ADMIN_STRAIN,
+                      optionAdminStrainNag.isSelected());
                 MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_UNTREATED_PERSONNEL,
                                 optionUntreatedPersonnelNag.isSelected());
                 MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_NO_COMMANDER,
@@ -1644,7 +1662,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
                 chkNewDayAstechPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayAstechPoolFill());
                 chkNewDayMedicPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayMedicPoolFill());
-                chkNewDayMRMS.setSelected(MekHQ.getMHQOptions().getNewDayMRMS());
+                chkNewDayMRMS.setSelected(MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments());
+            chkNewDayOptimizeMedicalAssignments.setSelected(MekHQ.getMHQOptions().getNewDayMRMS());
                 if (chkNewDayForceIconOperationalStatus.isSelected() != MekHQ.getMHQOptions()
                                 .getNewDayForceIconOperationalStatus()) {
                         chkNewDayForceIconOperationalStatus.doClick();
@@ -1661,6 +1680,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 optionPregnantCombatantNag.setSelected(
                                 MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_PREGNANT_COMBATANT));
                 optionPrisonersNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_PRISONERS));
+                optionAdminStrainNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_ADMIN_STRAIN));
                 optionUntreatedPersonnelNag.setSelected(
                                 MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_UNTREATED_PERSONNEL));
                 optionNoCommanderNag

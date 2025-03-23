@@ -3,9 +3,11 @@ sucsId: 2841
 xcood: 15.246
 ycood: -83.285
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 73'
   value: F7III
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Marik, pg. 73'
+  value: 2
 event:
   - date: '2406-08-08'
     nadirCharge: yes
@@ -33,28 +35,32 @@ planet:
       value: Zion
     type: TERRESTRIAL
     orbitalDist: 3.64
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Marik, pg. 73'
+      value: 2
     icon: green31
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 73'
       value: THIN
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 73'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 73'
       value: 1.1
-    diameter: 13079
-    density: 5.909541723301
+    diameter: 13080
+    density: 5.91002536667
     dayLength: 20
     yearLength: 7.0
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 73'
       value: 51
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 73'
       value: 35
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 73'
       value: REPTILE
     desc: Zion spent much of its history suffering under the oppressive Capellan Confederation
       and the majority of the population were happy to see the planet come under the
@@ -67,22 +73,20 @@ planet:
       despite small terrorist groups continuing to carry out attacks, preventing the
       official return of civilian government to the planet.
     landmass:
-      - name:
-          source: canon
-          value: Mondaria
-      - name:
-          source: canon
-          value: Chavalet
-      - name:
-          source: canon
+      - capital:
+          source: 'Handbook: House Marik, pg. 73'
           value: Beersheba
     satellite:
-      - name: Talit
-        size: medium
-        icon: rock14
-      - name: Bimah
+      - name:
+          source: 'Handbook: House Marik, pg. 73'
+          value: Bimah
         size: large
         icon: rock4
+      - name:
+          source: 'Handbook: House Marik, pg. 73'
+          value: Talit
+        size: medium
+        icon: rock14
     event:
       - date: '2268-04-11'
         faction:

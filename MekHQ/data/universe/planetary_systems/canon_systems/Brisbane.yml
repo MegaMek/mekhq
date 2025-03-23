@@ -5,7 +5,9 @@ ycood: -398.782
 spectralType:
   source: canon
   value: G2V
-primarySlot: 3
+primarySlot:
+  source: Periphery (1ed), pg. 85
+  value: 3
 event:
   - date: '2812-05-11'
     nadirCharge: yes
@@ -43,7 +45,9 @@ planet:
       value: Brisbane
     type: TERRESTRIAL
     orbitalDist: 1.0
-    sysPos: 3
+    sysPos:
+      source: Periphery (1ed), pg. 85
+      value: 3
     icon: green29
     pressure: HIGH
     atmosphere: TAINTEDPOISON
@@ -56,7 +60,7 @@ planet:
     temperature: 32
     water: 37
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 85
       value: MAMMAL
     desc: Brisbane is a water-rich world located along the fuzzy border between the
       Magistracy of Canopus and the Taurian Concordat. As a result the planet has

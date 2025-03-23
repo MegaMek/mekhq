@@ -3,9 +3,11 @@ sucsId: 2027
 xcood: 20.153
 ycood: 39.24
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K9IV
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2419-12-08'
     zenithCharge: yes
@@ -65,28 +67,32 @@ planet:
       value: Pike IV
     type: TERRESTRIAL
     orbitalDist: 0.35
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: green46
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: HIGH
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.97
-    diameter: 10792
-    density: 6.303610217274
+    diameter: 10803
+    density: 6.31005209605
     dayLength: 19
     yearLength: 0.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 38
     water:
-      source: canon
+      source: MWDA world profiles
       value: 37
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: High atmospheric pressure and scarce surface water made colonizing Pike
       IV a difficult prospect, but not one the early settlers were unwilling to tackle.
@@ -129,24 +135,20 @@ planet:
       is located on Erubis, on a plateau three hundred kilometers northwest of Paramus.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Blight
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Erubis
         capital:
-          source: canon
-          value: Stratopolis
+          source: MWDA world profiles
+          value: Rolfshire;Stratopolis
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Karasia
         capital:
           source: canon
           value: Rolfshire
-    satellite:
-      - name: None
-        size: medium
-        icon: rock1
     event:
       - date: '2242-12-25'
         faction:

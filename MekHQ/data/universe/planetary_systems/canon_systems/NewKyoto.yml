@@ -3,9 +3,11 @@ sucsId: 1838
 xcood: -125.729
 ycood: 11.811
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 89'
   value: G5V
-primarySlot: 3
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 89'
+  value: 3
 event:
   - date: '2353-02-13'
     zenithCharge: yes
@@ -46,28 +48,32 @@ planet:
       value: New Kyoto
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 3
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 89'
+      value: 3
     icon: wet2
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 89'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 89'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 89'
       value: 1.04
-    diameter: 14992
-    density: 4.87559520176
+    diameter: 14991
+    density: 4.87533063479
     dayLength: 26
     yearLength: 1.3
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 89'
       value: 36
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 89'
       value: 81
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 89'
       value: MAMMAL
     desc: |-
       New Kyoto is a temperate planet with a wide range of native life. Unfortunately for early colonists the native life was extremely resistant to imported species, with most imported wildlife and fauna either being killed off by native creatures or dying of native diseases. However, colonists were eventually able to overcome these issues and successfully introduced foreign species. There is still a ban for the export of any wildlife or fauna from New Kyoto.
@@ -77,34 +83,44 @@ planet:
       3135 - Visitors to New Kyoto are often struck by the heavy Japanese influence in the local culture. Indeed, this exotic—yet terrestrial—world once boasted itself as a major center of the Buddhist faith in the Lyran Commonwealth, and the temple in Tooshodai-ji possesses the Inner Sphere‘s largest Amida Buddha sculpture (over 110 meters in height). These obvious cultural influences have often led travelers to New Kyoto to suspect that the planet‘s history includes a lingering occupation or long-standing allegiance to the Draconis Combine but, in fact, neither of the above applies. Settled during humanity's first exodus into space, New Kyoto‘s colonists hailed from Terra‘s eastern Asia region, particularly from the nations surrounding the Sea of Japan. The Japanese segment of the colonial population, by far the most numerous, took an active role in shaping the early social structures on this world, even going so far as to style the planetary ruler a Daimyo (warlord). Life in the early days was difficult, primarily due to the virulence of native life-forms. Many of New Kyoto‘s fiercest native predators, such as the vicious ki-rian or the unstoppable armor bear, claimed hundreds of lives before widespread hunting protocols brought their numbers under control. Even today, people are strongly advised never to travel alone and unarmed in the wild reaches of this world, and export of the local fauna is strictly prohibited. New Kyoto‘s ample resources and fertile soil spawned the formation of numerous heavy industries, including the development of myomers, advanced electronics, and military-grade lasers. The Kyoto College, exclusively devoted to the study of myomer technology for military as well as medical applications, was arguably one of the most prestigious of its kind throughout the Succession Wars era, while Doering Electronics and RAMTech Industries were once among the chief military suppliers to the Federation of Skye and the Lyran Commonwealth. Through the centuries of conflict that followed the fall of the Star League, New Kyoto was the target of several raids by the nearby Free Worlds League. It remained a Lyran holding all the way into the Jihad years, when fighting between the Commonwealth and renegade Free Worlds‘ troops savaged the world. Kyoto College, along with the neighboring city of Yonei, and Doering Electronics‘ Kawnaku City factory were all leveled in that hellish conflict, along with half the RAMTech laser facilities in the capital and spaceport city of Hirihito. Despite the damage, the vast industrial base of this world and an influx of off-world residents enabled it to recover quickly after joining Devlin Stone‘s Republic of the Sphere. Government subsidies even allowed for the reconstruction of the Kyoto College and the RAMTech facilities, and the planet‘s exports once more include a host of industrial and military-grade lasers and myomer products. Marker Electronics, a local manufacturer of communications systems and sensors, has since risen to inherit the role once played by Deoring Electronics, supplying vital equipment both to The Republic‘s military forces and to its industrial and aerospace sectors. New Kyoto‘s capital city of Hirihito and the temple of Tooshodai-ji are both located on the northern continent of Asharu. The city of New Yonei is located on Kalasaka, the larger of the planet‘s equatorial landmasses, along with one of the largest planetary reservations for the now-endangered ki-rian population. Koshimatu, the smaller equatorial continent, is home to RAMTech‘s corporate headquarters, in the city of Oshaktu, while Kawnaku and Marker Electronics may be found on the southern island continent of Zuishami.
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 89'
           value: Asharu
         capital:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 89'
           value: Hirihito
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 89'
           value: Kalasaka
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 89'
           value: Koshimatu
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 89'
           value: Zuishami
     satellite:
-      - name: Eun
+      - name:
+          source: 'Handbook: House Steiner, pg. 89'
+          value: Eun
         size: large
         icon: rock7
-      - name: Ishiko
+      - name:
+          source: 'Handbook: House Steiner, pg. 89'
+          value: Ishiko
         size: large
         icon: rock5
-      - name: Le
+      - name:
+          source: 'Handbook: House Steiner, pg. 89'
+          value: Le
         size: medium
         icon: oddmoon2
-      - name: Taka
+      - name:
+          source: 'Handbook: House Steiner, pg. 89'
+          value: Taka
         size: medium
         icon: oddmoon1
-      - name: Wing-Chiu
+      - name:
+          source: 'Handbook: House Steiner, pg. 89'
+          value: Wing-Chiu
         size: large
         icon: rock8
     event:

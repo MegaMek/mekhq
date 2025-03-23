@@ -3,9 +3,11 @@ sucsId: 453
 xcood: -153.871
 ycood: -233.875
 spectralType:
-  source: canon
+  source: 'Handbook: House Marik, pg. 77'
   value: M0III
-primarySlot: 1
+primarySlot:
+  source: 'Handbook: House Marik, pg. 77'
+  value: 1
 event:
   - date: '2743-03-20'
     zenithCharge: yes
@@ -19,28 +21,32 @@ planet:
       value: Camlann (FWL)
     type: TERRESTRIAL
     orbitalDist: 0.35
-    sysPos: 1
+    sysPos:
+      source: 'Handbook: House Marik, pg. 77'
+      value: 1
     icon: green54
     pressure:
-      source: canon
+      source: 'Handbook: House Marik, pg. 77'
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Marik, pg. 77'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Marik, pg. 77'
       value: 0.81
-    diameter: 13231
-    density: 4.302822993604
+    diameter: 13230
+    density: 4.302553564022
     dayLength: 22
     yearLength: 0.7
     temperature:
-      source: canon
+      source: 'Handbook: House Marik, pg. 77'
       value: 38
     water:
-      source: canon
+      source: 'Handbook: House Marik, pg. 77'
       value: 60
     lifeForm:
-      source: canon
+      source: 'Handbook: House Marik, pg. 77'
       value: REPTILE
     desc: |-
       Camlann is important to the Free Worlds League after the ruling in Federal League courts that allowed the planet to become independent from the Regulus Province. Since then hundreds of planets in the League have declared themselves independent and have greatly affected political importance of some regions.
@@ -49,20 +55,20 @@ planet:
     smallMoons: 5
     landmass:
       - name:
-          source: canon
-          value: Dolorous Garde
-      - name:
-          source: canon
-          value: Cameliard
-      - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 77'
           value: Badon
       - name:
-          source: canon
-          value: Sauvage
+          source: 'Handbook: House Marik, pg. 77'
+          value: Cameliard
       - name:
-          source: canon
+          source: 'Handbook: House Marik, pg. 77'
+          value: Dolorous Garde
+      - name:
+          source: 'Handbook: House Marik, pg. 77'
           value: Joyous Garde
+      - name:
+          source: 'Handbook: House Marik, pg. 77'
+          value: Sauvage
     event:
       - date: '2718-12-26'
         faction:

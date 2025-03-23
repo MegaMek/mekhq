@@ -3,9 +3,11 @@ sucsId: 2090
 xcood: 481.369
 ycood: 156.414
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 166
   value: F4IV
-primarySlot: 4
+primarySlot:
+  source: Masters and Minions, pg. 166
+  value: 4
 event:
   - date: '2449-10-15'
     zenithCharge: yes
@@ -60,28 +62,32 @@ planet:
       value: Quatre Belle
     type: TERRESTRIAL
     orbitalDist: 3.92
-    sysPos: 4
+    sysPos:
+      source: Masters and Minions, pg. 166
+      value: 4
     icon: wet2
     pressure:
-      source: canon
+      source: Masters and Minions, pg. 166
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Masters and Minions, pg. 166
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Masters and Minions, pg. 166
       value: 0.9
-    diameter: 12567
-    density: 5.029059925917
+    diameter: 12572
+    density: 5.030975740322
     dayLength: 25
     yearLength: 7.9
     temperature:
-      source: canon
+      source: Masters and Minions, pg. 166
       value: 35
     water:
-      source: canon
+      source: Masters and Minions, pg. 166
       value: 85
     lifeForm:
-      source: canon
+      source: Masters and Minions, pg. 166
       value: MAMMAL
     desc: Quatre Belle is a pleasant breadbasket world with abundant natural resources.
       As with most of the interior Outworlds Alliance planets, Quatre Belle’s industrial
@@ -94,51 +100,24 @@ planet:
       Quatre Belle Shipyards already in orbit around Pluto.
     landmass:
       - name:
-          source: canon
-          value: Agni
-      - name:
-          source: canon
-          value: Aryaman
-      - name:
-          source: canon
-          value: Indra
-      - name:
-          source: canon
-          value: Prithvi
-      - name:
-          source: canon
-          value: Rudra
-      - name:
-          source: canon
-          value: Shiva
-        capital:
-          source: canon
-          value: Belle
-      - name:
-          source: canon
-          value: Soma
-      - name:
-          source: canon
-          value: Varuna
-      - name:
-          source: canon
-          value: Vishnu
+          source: Masters and Minions, pg. 166
+          value: Alamance
     satellite:
-      - name: Gaia
+      - name:
+          source: Masters and Minions, pg. 166
+          value: Gaia
         size: medium
         icon: rock3
-      - name: Isis
+      - name:
+          source: Masters and Minions, pg. 166
+          value: Isis
         size: large
         icon: rock17
-      - name: Pluto
+      - name:
+          source: Masters and Minions, pg. 166
+          value: Pluto
         size: medium
         icon: rock2
-      - name: Name Unknown
-        size: medium
-        icon: oddmoon2
-      - name: Name Unknown
-        size: medium
-        icon: rock14
     event:
       - date: '2409-11-06'
         faction:

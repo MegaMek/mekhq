@@ -5,7 +5,9 @@ ycood: -390.095
 spectralType:
   source: canon
   value: G3V
-primarySlot: 5
+primarySlot:
+  source: Periphery (1ed), pg. 104
+  value: 5
 event:
   - date: '2764-11-04'
     zenithCharge: yes
@@ -104,7 +106,9 @@ planet:
       value: Vixen
     type: TERRESTRIAL
     orbitalDist: 1.0
-    sysPos: 5
+    sysPos:
+      source: Periphery (1ed), pg. 104
+      value: 5
     icon: green41
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -117,7 +121,7 @@ planet:
     temperature: 22
     water: 51
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 104
       value: MAMMAL
     desc: 3025 – Vixen was not settled until the early 3020s and was colonized by
       a handful of corporations intent on making the cool-temperate world into a pleasure

@@ -3,9 +3,11 @@ sucsId: 2928
 xcood: -115.655
 ycood: 1608.8
 spectralType:
-  source: canon
+  source: 'Historical: Operation Klondike, pg. 134'
   value: G7V
-primarySlot: 1
+primarySlot:
+  source: 'Historical: Operation Klondike, pg. 134'
+  value: 1
 event:
   - date: '2792-01-23'
     zenithCharge: yes
@@ -15,28 +17,32 @@ planet:
       value: Arcadia (Clan)
     type: TERRESTRIAL
     orbitalDist: 0.63
-    sysPos: 1
+    sysPos:
+      source: 'Historical: Operation Klondike, pg. 134'
+      value: 1
     icon: green27
     pressure:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 134'
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Historical: Operation Klondike, pg. 134'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 134'
       value: 1.5
-    diameter: 15275
-    density: 6.892822384636
+    diameter: 15284
+    density: 6.896947728679
     dayLength: 24
     yearLength: 1.1
     temperature:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 134'
       value: 30
     water:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 134'
       value: 50
     lifeForm:
-      source: canon
+      source: 'Historical: Operation Klondike, pg. 134'
       value: MAMMAL
     desc: Arcadia was the first world scouted and colonized by members of the first
       SLDF exodus. In the time between the second exodus and the Clan’s return, the
@@ -47,18 +53,20 @@ planet:
       by the clouds in its thin atmosphere.
     landmass:
       - name:
-          source: canon
+          source: 'Historical: Operation Klondike, pg. 134'
           value: East Arcadia
       - name:
-          source: canon
-          value: West Arcadia
-      - name:
-          source: canon
+          source: 'Historical: Operation Klondike, pg. 134'
           value: Rechlan
+      - name:
+          source: 'Historical: Operation Klondike, pg. 134'
+          value: West Arcadia
     satellite:
-      - name: Aeaea [Liny]
+      - name:
+          source: 'Historical: Operation Klondike, pg. 134'
+          value: Aeaea
         size: medium
-        icon: oddmoon2
+        icon: oddmoon3
     event:
       - date: '2786-02-15'
         faction:

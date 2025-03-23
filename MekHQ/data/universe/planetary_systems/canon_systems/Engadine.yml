@@ -3,9 +3,11 @@ sucsId: 805
 xcood: -351.28
 ycood: 354.868
 spectralType:
-  source: canon
+  source: 'Operational Turning Points: Falcon Incursion'
   value: M0V
-primarySlot: 6
+primarySlot:
+  source: 'Operational Turning Points: Falcon Incursion'
+  value: 6
 event:
   - date: '2658-10-24'
     nadirCharge: yes
@@ -91,28 +93,32 @@ planet:
       value: Engadine
     type: TERRESTRIAL
     orbitalDist: 0.2
-    sysPos: 6
+    sysPos:
+      source: 'Operational Turning Points: Falcon Incursion'
+      value: 6
     icon: green25
     pressure:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Operational Turning Points: Falcon Incursion'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: 0.95
-    diameter: 12912
-    density: 5.166867904849
+    diameter: 12917
+    density: 5.168709142093
     dayLength: 27
     yearLength: 0.7
     temperature:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: 23
     water:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: 70
     lifeForm:
-      source: canon
+      source: 'Operational Turning Points: Falcon Incursion'
       value: MAMMAL
     desc: |-
       Engadine was originally settled by the Rim Worlds Republic as an exile colony for political dissidents and non-violent criminals that Republic’s government did not want mixing with the rest of the nation’s populace. Engadine is a cool planet and large portions of it spend all year covered in ice, with near-constant light snowfall. The harsh temperatures hardened the original exiles/colonists into rough survivalists. The planet only became slightly more settled several decades later, after a routine inspection by a Rim Worlds Republic official decided the planet was a paradise and built a large personal compound, which later expanded into a popular resort.
@@ -127,7 +133,9 @@ planet:
       - name: Wilson's Stand Gamma
       - name: Wilson's Stand Delta
     satellite:
-      - name: Garlyn
+      - name:
+          source: 'Operational Turning Points: Falcon Incursion'
+          value: Garlyn
         size: giant
         icon: rock17
     event:

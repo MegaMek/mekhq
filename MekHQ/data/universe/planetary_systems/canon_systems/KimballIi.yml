@@ -3,9 +3,11 @@ sucsId: 1354
 xcood: -35.677
 ycood: 99.733
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G1V
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2361-06-29'
     zenithCharge: yes
@@ -40,28 +42,32 @@ planet:
       value: Kimball II
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green48
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.1
-    diameter: 12958
-    density: 5.994169540222
+    diameter: 12927
+    density: 5.979918108508
     dayLength: 18
     yearLength: 2.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 57
     water:
-      source: canon
+      source: MWDA world profiles
       value: 74
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: BIRD
     desc: |-
       3135 - Kimball II is the more heavily populated of two inhabited worlds in the Kimball system. Both the system and the worlds take their name from Lorenzo Kimball, a wealthy twenty-first-century industrial magnate from Terra‘s North American continent, whose family settled the system for the abundance of rich metallic resources on the planets and in the local asteroid belt. Though the Kimballs largely resided on Terra, members of that distinguished family financed and led the expeditions to establish colonies on Kimball II and IV. Kimball II, by far the more hospitable world—if a bit warm—boasted ample water and agricultural resources on two of its four main continents, compared to water-poor Kimball IV‘s murky atmosphere of nitrogen and carbon dioxide. Thus, the bulk of the Kimball family‘s efforts went toward developing Kimball II. Rich veins of metal ores, particularly on the rocky desert land masses of Vanassay and Warsaw—both of which straddle the equator—made them an ideal haven for mining and refining operations. Meanwhile, the fertile northern and southern continents—Hestelle and Triasha, respectively, became the basis for sufficient farming and ranching to sustain the population of both worlds. Kimball II‘s exports, which mostly consisted of various industrial, and military-grade metals and metal parts for heavy agricultural, industrial, and military machinery, complemented the bauxite mining exports of Kimball IV, quickly establishing the Kimball family‘s dominance of the industrial metal trade in the region. This prosperity carried the Kimballs into their alliance with the Igota family of Thorin, an alliance that ultimately spawned the star-spanning corporate empire known today as Ceres Metals.
@@ -71,23 +77,14 @@ planet:
       The Combine agreed to cede Kimball II to Devlin Stone‘s Republic of the Sphere only after first securing favored trading rights over the planet‘s output, an issue that raised the ire of the Lyran Alliance, which claimed that its prior dominion of the world through much of its history made it a Lyran territory. A compromise was eventually reached that granted both Successor States access to this industrial planet‘s exports, and allowed The Republic to plant its flag in the capital and spaceport city of Lorenzopolis, on the southern continent, Triasha. Lorenzopolis is also home to a branch office of the still-active Ceres Metals corporation.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Hestelle
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Triasha
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Lorenzopolis
-      - name:
-          source: canon
-          value: Vanassay
-      - name:
-          source: canon
-          value: Warsaw
-      - name:
-          source: canon
-          value: .na.character
     event:
       - date: '2239-01-05'
         faction:

@@ -3,9 +3,11 @@ sucsId: 1850
 xcood: -2.852
 ycood: -152.286
 spectralType:
-  source: canon
+  source: House Liao, pg. 148
   value: K4V
-primarySlot: 5
+primarySlot:
+  source: House Liao, pg. 148
+  value: 5
 event:
   - date: '2426-05-31'
     zenithCharge: yes
@@ -78,7 +80,9 @@ planet:
       value: Tsinghai (New Sarna)
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 5
+    sysPos:
+      source: House Liao, pg. 148
+      value: 5
     icon: green23
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -91,7 +95,7 @@ planet:
     temperature: 30
     water: 39
     lifeForm:
-      source: canon
+      source: House Liao, pg. 148
       value: PLANT
     desc: |-
       Tsinghai, formerly New Sarna, was originally a provincial capital in the old Sarna Supremacy. With the formation of the Capellan Confederation, Tsinghai transitioned to a economy based on mining and grew to become a regional exporter of uranium and other fissionable materials. As the Succession Wars dragged on Tsinghai slowly became a planet-wide industrial complex as Sarna's commercial activities relocated here for protection. It is a modest planet with a temperate climate and is known primarily for its excellent wines.

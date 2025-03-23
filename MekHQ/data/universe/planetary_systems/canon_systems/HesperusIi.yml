@@ -3,9 +3,11 @@ sucsId: 1104
 xcood: -123.603
 ycood: 46.734
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 88'
   value: F2IV
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 88'
+  value: 2
 event:
   - date: '2366-09-29'
     nadirCharge: yes
@@ -32,28 +34,32 @@ planet:
       value: Hesperus II
     type: TERRESTRIAL
     orbitalDist: 4.2
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 88'
+      value: 2
     icon: green50
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 88'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 88'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 88'
       value: 1.01
-    diameter: 14624
-    density: 4.874905730612
+    diameter: 14592
+    density: 4.864229746215
     dayLength: 26
     yearLength: 8.7
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 88'
       value: 85
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 88'
       value: 40
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 88'
       value: REPTILE
     desc: |-
       Hesperus II is a haggard and craggy looking planet. All four major continents are covered in high mountain peaks and rugged canyons. The planet has very little arable land and is hotter than many settled worlds. All considered it has little to suggest itself as a liveable planet. The exception is the massive amounts of raw materials in the mountain ranges and most importantly, the massive ‘Mech factories which have made Hesperus II the premier planet for ‘Mech production in the Inner Sphere. Almost the entire population of Hesperus II works at or is involved in work at the Defiance ‘Mech Factories.
@@ -65,22 +71,24 @@ planet:
       Doering Electronics
     landmass:
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 88'
           value: East Barrens
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 88'
           value: North Whitman
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 88'
           value: South Whitman
         capital:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 88'
           value: Maria's Elegy
       - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 88'
           value: West Barrens
     satellite:
-      - name: Hesperus II-Alpha
+      - name:
+          source: 'Handbook: House Steiner, pg. 88'
+          value: Hesperus II-Alpha
         size: medium
         icon: rock16
     event:

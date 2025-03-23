@@ -27,6 +27,20 @@
  */
 package mekhq.gui.campaignOptions;
 
+import static java.lang.Math.round;
+import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createSubTabs;
+
+import java.time.LocalDate;
+import java.util.Map;
+import java.util.ResourceBundle;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+
 import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.MekHQ;
@@ -40,17 +54,6 @@ import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.contents.*;
-
-import javax.swing.*;
-import java.time.LocalDate;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import static java.lang.Math.round;
-import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
-import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
-import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createSubTabs;
 
 /**
  * The {@code CampaignOptionsPane} class represents a tabbed pane used for displaying
@@ -213,7 +216,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         personnelTab.loadValuesFromCampaignOptions();
 
         // Biography
-        biographyTab = new BiographyTab(campaign);
+        biographyTab = new BiographyTab(campaign, generalTab);
 
         JTabbedPane biographyContentTabs = createSubTabs(Map.of(
             "biographyGeneralTab", biographyTab.createGeneralTab(),
@@ -445,6 +448,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         if (preset == null) {
             recalculateCombatTeams(campaign);
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign, options));
+
+            options.updateGameOptionsFromCampaignOptions(campaign.getGameOptions());
+            MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
         }
     }
 

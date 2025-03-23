@@ -3,9 +3,11 @@ sucsId: 513
 xcood: -198.534
 ycood: 340.642
 spectralType:
-  source: canon
+  source: House Steiner
   value: G0IV
-primarySlot: 2
+primarySlot:
+  source: House Steiner
+  value: 2
 event:
   - date: '2417-07-08'
     zenithCharge: yes
@@ -41,7 +43,9 @@ planet:
       value: Chahar
     type: TERRESTRIAL
     orbitalDist: 1.76
-    sysPos: 2
+    sysPos:
+      source: House Steiner
+      value: 2
     icon: green42
     pressure:
       source: canon
@@ -56,7 +60,7 @@ planet:
     temperature: 44
     water: 23
     lifeForm:
-      source: canon
+      source: House Steiner
       value: NONE
     desc: |-
       Chahar was first colonized in the late 24th Century, despite the planet having a comfortable temperate climate and large oceans it was originally a lifeless planet. However, this quickly caused issues for the colonies on Chahar as they were completely dependent on food from surrounding systems.
@@ -64,7 +68,7 @@ planet:
       The capital city of Chahar is Benares, which is considered sacred to Lyran Hindu believers.
     landmass:
       - capital:
-          source: canon
+          source: House Steiner
           value: Benares
     event:
       - date: '2409-06-26'

@@ -3,9 +3,11 @@ sucsId: 276
 xcood: 432.196
 ycood: -150.01
 spectralType:
-  source: canon
+  source: House Davion
   value: K5IV
-primarySlot: 3
+primarySlot:
+  source: House Davion
+  value: 3
 event:
   - date: '2504-11-19'
     nadirCharge: yes
@@ -47,7 +49,9 @@ planet:
       value: Baxley
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 3
+    sysPos:
+      source: House Davion
+      value: 3
     icon: green2
     pressure: THIN
     atmosphere: TAINTEDPOISON
@@ -60,7 +64,7 @@ planet:
     temperature: 23
     water: 70
     lifeForm:
-      source: canon
+      source: House Davion
       value: REPTILE
     desc: |-
       Baxley is one of the poorest worlds in the Federated Suns and also has the worst education system as well. The planet is primarily agrarian, however crops yield barely enough to sustain the planet and the only other industry on planet involves mining the modest mineral deposits of Baxley. The planet is primarily arid and only has a small band capable of sustaining human life.

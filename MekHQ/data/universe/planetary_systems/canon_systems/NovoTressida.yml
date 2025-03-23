@@ -3,7 +3,7 @@ sucsId: 1903
 xcood: -172.349
 ycood: -493.212
 spectralType:
-  source: canon
+  source: Masters and Minions, pg. 144
   value: M5V
 primarySlot: 3
 event:
@@ -58,20 +58,31 @@ planet:
     orbitalDist: 0.08
     sysPos: 3
     icon: green51
-    pressure: STANDARD
+    pressure:
+      source: Masters and Minions, pg. 144
+      value: VACUUM
     atmosphere: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
-    gravity: 0.63
-    diameter: 11100
-    density: 4.0
+    gravity:
+      source: Masters and Minions, pg. 144
+      value: 0.75
+    diameter: 12094
+    density: 4.358153359245
     dayLength: 22
     yearLength: 0.4
-    temperature: 29
-    water: 34
+    temperature:
+      source: Masters and Minions, pg. 144
+      value: -270
+    water:
+      source: Masters and Minions, pg. 144
+      value: 15
     lifeForm:
-      source: canon
-      value: MAMMAL
+      source: Masters and Minions, pg. 144
+      value: NONE
     desc: No description available.
+    ring:
+      source: Masters and Minions, pg. 144
+      value: yes
     smallMoons: 1
     landmass:
       - name: Lenzburg

@@ -33,25 +33,27 @@ planet:
     sysPos: 2
     icon: wet9
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 200
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 200
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
-      value: 0.9
-    diameter: 12165
-    density: 5.22179881394
+      source: FedCom Civil War, pg. 200
+      value: 1.0
+    diameter: 12795
+    density: 5.49233958876
     dayLength: 25
     yearLength: 1.0
     temperature:
-      source: canon
-      value: 37
+      source: FedCom Civil War, pg. 200
+      value: 50
     water:
-      source: canon
+      source: FedCom Civil War, pg. 200
       value: 80
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 200
       value: FISH
     desc: 3135 - Muphrid, like many worlds immediately coreward and anti-spinward
       of Terra, such as Skye and Caledonia, was initially settled largely by Irish
@@ -90,24 +92,17 @@ planet:
       MacArthur, and Mechanicsburg.
     landmass:
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 200
           value: MacArthur
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 200
           value: Ridgeway
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 200
           value: Shamrock
         capital:
-          source: canon
+          source: FedCom Civil War, pg. 200
           value: New Dublin
-    satellite:
-      - name: Argeni
-        size: medium
-        icon: rock15
-      - name: Insada
-        size: giant
-        icon: rock8
     event:
       - date: '2227-05-03'
         faction:

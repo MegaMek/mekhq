@@ -3,9 +3,11 @@ sucsId: 90
 xcood: 502.785
 ycood: 152.898
 spectralType:
-  source: canon
+  source: 'Handbook: Major Periphery States, pg. 150'
   value: K5V
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: Major Periphery States, pg. 150'
+  value: 4
 event:
   - date: '2500-04-05'
     nadirCharge: yes
@@ -89,28 +91,32 @@ planet:
       value: Alpheratz
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: Major Periphery States, pg. 150'
+      value: 4
     icon: green57
     pressure:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 150'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: Major Periphery States, pg. 150'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 150'
       value: 1.0
-    diameter: 15098
-    density: 4.681645887845
+    diameter: 15054
+    density: 4.668129986921
     dayLength: 19
     yearLength: 0.8
     temperature:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 150'
       value: 30
     water:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 150'
       value: 70
     lifeForm:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 150'
       value: MAMMAL
     desc: Alpheratz is the planetary capital of the Outworlds Alliance. Unlike most
       Alliance worlds Alpheratz is heavily populated and contains the majority of
@@ -118,19 +124,21 @@ planet:
       industry.
     landmass:
       - name:
-          source: canon
-          value: Northern Continent
+          source: Masters and Minions, pg. 165
+          value: North Continent
         capital:
-          source: canon
-          value: Famindas [destroyed 3071]
+          source: 'Handbook: Major Periphery States, pg. 150'
+          value: Famindas (destroyed in 3071)
       - name:
-          source: canon
-          value: Southern Continent
+          source: Masters and Minions, pg. 165
+          value: South Continent
         capital:
-          source: canon
-          value: Carolinas
+          source: Masters and Minions, pg. 165
+          value: Carolinas (since 3071)
     satellite:
-      - name: Aisha
+      - name:
+          source: 'Handbook: Major Periphery States, pg. 150'
+          value: Aisha
         size: large
         icon: rock12
     event:

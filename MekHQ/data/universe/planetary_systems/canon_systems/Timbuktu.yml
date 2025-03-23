@@ -3,9 +3,11 @@ sucsId: 2547
 xcood: -446.638
 ycood: 154.763
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 75'
   value: K0V
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 75'
+  value: 2
 event:
   - date: '2530-01-04'
     zenithCharge: yes
@@ -30,28 +32,32 @@ planet:
       value: Timbuktu
     type: TERRESTRIAL
     orbitalDist: 0.56
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 75'
+      value: 2
     icon: green2
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 75'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 75'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 75'
       value: 0.94
-    diameter: 13023
-    density: 5.093262199871
+    diameter: 12996
+    density: 5.082879268403
     dayLength: 20
     yearLength: 1.0
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 75'
       value: 52
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 75'
       value: 63
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 75'
       value: PLANT
     desc: |-
       Over its history, Timbuktu's position on the Periphery border has resulted in it being the target of numerous pirate raids. Timbuktu is located relatively close to its sun and as a result most of the planet is covered in badlands and desert. The planet can barely grow enough agriculture to sustain its population and is overall a resource poor world. The only raw materials that can be found are located in the volcanic southern continent of Hades. The planets capital, Greene, is located on the northern super-continent Saharius. Saharius is covered in a mix of grasslands and desert wastes.
@@ -59,13 +65,10 @@ planet:
       Timbuktu has been a staging ground used by the Lyran Commonwealth to coordinate anti-piracy actions from the fringes of the realm. In later years, Timbuktu became a stop-over for merchants looking to trade with the Rim Collection.
     landmass:
       - name:
-          source: canon
-          value: Hades
-      - name:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 75'
           value: Saharius
         capital:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 75'
           value: Greene
     event:
       - date: '2509-06-17'
