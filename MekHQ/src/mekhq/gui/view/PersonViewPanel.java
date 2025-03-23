@@ -28,6 +28,7 @@
 package mekhq.gui.view;
 
 import megamek.codeUtilities.MathUtility;
+import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;
@@ -42,6 +43,7 @@ import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -66,9 +68,14 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.awt.Color.BLACK;
+import static java.awt.Color.RED;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
+import static mekhq.utilities.ImageUtilities.addTintToImage;
+import static org.jfree.chart.ChartColor.DARK_BLUE;
+import static org.jfree.chart.ChartColor.DARK_RED;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 
 /**
@@ -376,7 +383,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
             if (i % MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW == 0) {
                 rowRibbonsBox = Box.createHorizontalBox();
-                rowRibbonsBox.setBackground(Color.RED);
+                rowRibbonsBox.setBackground(RED);
             }
             try {
                 int maximumTiers = award.getNumberOfRibbonFiles();
@@ -557,8 +564,9 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblPortrait = new JLabel();
         lblPortrait.setName("lblPortrait");
 
-        lblPortrait.setIcon(person.getPortrait().getImageIcon(100));
+        ImageIcon portraitImageIcon = getPortraitImageIcon();
 
+        lblPortrait.setIcon(portraitImageIcon);
         GridBagConstraints gbc_lblPortrait = new GridBagConstraints();
         gbc_lblPortrait.gridx = 0;
         gbc_lblPortrait.gridy = 0;
@@ -568,6 +576,37 @@ public class PersonViewPanel extends JScrollablePanel {
         pnlPortrait.add(lblPortrait, gbc_lblPortrait);
 
         return pnlPortrait;
+    }
+
+    /**
+     * Retrieves a tinted {@link ImageIcon} representation of the person's portrait based on their
+     * current status.
+     *
+     * <ul>
+     *     <li>If the person is deceased, a dark red tint is applied.</li>
+     *     <li>If the person is retired, a dark blue tint is applied.</li>
+     *     <li>If the person has departed the campaign, a black tint is applied.</li>
+     * </ul>
+     *
+     * If the person's status does not meet any of the above conditions, their portrait will be
+     * returned without any modifications.
+     *
+     * @return a tinted {@link ImageIcon} representing the person's portrait.
+     */
+    private ImageIcon getPortraitImageIcon() {
+        Portrait portrait = person.getPortrait();
+        ImageIcon portraitImageIcon = portrait.getImageIcon(100);
+
+        PersonnelStatus status = person.getStatus();
+        if (status.isDead()) {
+            portraitImageIcon = addTintToImage(portraitImageIcon.getImage(), DARK_RED);
+        } else if (status.isRetired()) {
+            portraitImageIcon = addTintToImage(portrait.getImage(100), DARK_BLUE);
+        } else if (status.isDepartedUnit()) {
+            portraitImageIcon = addTintToImage(portrait.getImage(100), BLACK);
+        }
+
+        return portraitImageIcon;
     }
 
     private JPanel fillInfo() {
