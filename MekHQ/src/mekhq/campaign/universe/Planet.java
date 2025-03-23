@@ -389,9 +389,9 @@ public class Planet {
      * This class tracks the current {@link PlanetaryEvent}.
      */
     class CurrentEvents {
-        private LocalDate lastUpdated;
-        private PlanetaryEvent planetaryEvent;
-        private Map.Entry<LocalDate, PlanetaryEvent> nextEvent;
+        private LocalDate                                      lastUpdated;
+        private PlanetaryEvent                                 planetaryEvent;
+        private Map.Entry<LocalDate, PlanetaryEvent>           nextEvent;
         private Iterator<Map.Entry<LocalDate, PlanetaryEvent>> eventStream;
 
         private void initialize(LocalDate now) {
