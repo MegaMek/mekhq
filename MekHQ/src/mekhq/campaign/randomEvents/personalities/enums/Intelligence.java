@@ -55,31 +55,31 @@ public enum Intelligence {
     // region Enum Declarations
     // Although we no longer use the descriptive names for intelligence traits, we've kept them
     // here as it avoids needing to create a handler for old characters
-    BRAIN_DEAD(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE),
-    UNINTELLIGENT(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE),
-    FOOLISH(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE),
-    SIMPLE(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE),
-    SLOW(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE),
-    UNINSPIRED(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE),
-    DULL(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE),
-    DIMWITTED(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE),
-    OBTUSE(IntelligenceComparison.BELOW_AVERAGE),
-    LIMITED_INSIGHT(IntelligenceComparison.BELOW_AVERAGE),
-    UNDER_PERFORMING(IntelligenceComparison.SLIGHTLY_BELOW_AVERAGE),
-    BELOW_AVERAGE(IntelligenceComparison.AVERAGE),
-    AVERAGE(IntelligenceComparison.AVERAGE),
-    ABOVE_AVERAGE(IntelligenceComparison.AVERAGE),
-    STUDIOUS(IntelligenceComparison.SLIGHTLY_ABOVE_AVERAGE),
-    DISCERNING(IntelligenceComparison.ABOVE_AVERAGE),
-    SHARP(IntelligenceComparison.SIGNIFICANTLY_ABOVE_AVERAGE),
-    QUICK_WITTED(IntelligenceComparison.SIGNIFICANTLY_ABOVE_AVERAGE),
-    PERCEPTIVE(IntelligenceComparison.SIGNIFICANTLY_ABOVE_AVERAGE),
-    BRIGHT(IntelligenceComparison.VASTLY_ABOVE_AVERAGE),
-    CLEVER(IntelligenceComparison.VASTLY_ABOVE_AVERAGE),
-    INTELLECTUAL(IntelligenceComparison.VASTLY_ABOVE_AVERAGE),
-    BRILLIANT(IntelligenceComparison.VASTLY_ABOVE_AVERAGE),
-    EXCEPTIONAL(IntelligenceComparison.VASTLY_ABOVE_AVERAGE),
-    GENIUS(IntelligenceComparison.VASTLY_ABOVE_AVERAGE);
+    BRAIN_DEAD(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE, 0),
+    UNINTELLIGENT(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE, 1),
+    FOOLISH(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE, 2),
+    SIMPLE(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE, 3),
+    SLOW(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE, 4),
+    UNINSPIRED(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE, 5),
+    DULL(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE, 6),
+    DIMWITTED(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE, 7),
+    OBTUSE(IntelligenceComparison.BELOW_AVERAGE, 8),
+    LIMITED_INSIGHT(IntelligenceComparison.BELOW_AVERAGE, 9),
+    UNDER_PERFORMING(IntelligenceComparison.SLIGHTLY_BELOW_AVERAGE, 10),
+    BELOW_AVERAGE(IntelligenceComparison.AVERAGE, 11),
+    AVERAGE(IntelligenceComparison.AVERAGE, 12),
+    ABOVE_AVERAGE(IntelligenceComparison.AVERAGE, 13),
+    STUDIOUS(IntelligenceComparison.SLIGHTLY_ABOVE_AVERAGE, 14),
+    DISCERNING(IntelligenceComparison.ABOVE_AVERAGE, 15),
+    SHARP(IntelligenceComparison.SIGNIFICANTLY_ABOVE_AVERAGE, 16),
+    QUICK_WITTED(IntelligenceComparison.SIGNIFICANTLY_ABOVE_AVERAGE, 17),
+    PERCEPTIVE(IntelligenceComparison.SIGNIFICANTLY_ABOVE_AVERAGE, 18),
+    BRIGHT(IntelligenceComparison.VASTLY_ABOVE_AVERAGE, 19),
+    CLEVER(IntelligenceComparison.VASTLY_ABOVE_AVERAGE, 20),
+    INTELLECTUAL(IntelligenceComparison.VASTLY_ABOVE_AVERAGE, 21),
+    BRILLIANT(IntelligenceComparison.VASTLY_ABOVE_AVERAGE, 22),
+    EXCEPTIONAL(IntelligenceComparison.VASTLY_ABOVE_AVERAGE, 23),
+    GENIUS(IntelligenceComparison.VASTLY_ABOVE_AVERAGE, 24);
 
     /**
      * Enum representing different levels of intelligence comparison. Used when fetching the
@@ -104,6 +104,7 @@ public enum Intelligence {
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
     private final IntelligenceComparison comparison;
+    private final int level;
 
     /**
      * Defines the number of individual description variants available for each trait.
@@ -116,9 +117,12 @@ public enum Intelligence {
      *
      * @param comparison the {@link IntelligenceComparison} enum value to associate with this
      *                  {@link Intelligence} enum value
+     * @param level The integer score associated with this {@link Intelligence} enum value
+
      */
-    Intelligence(IntelligenceComparison comparison) {
+    Intelligence(IntelligenceComparison comparison, int level) {
         this.comparison = comparison;
+        this.level = level;
     }
 
     /**
@@ -127,6 +131,13 @@ public enum Intelligence {
      */
     public IntelligenceComparison getComparison() {
         return comparison;
+    }
+
+    /**
+     * Retrieves the intelligence rating associated with this {@link Intelligence} enum.
+     */
+    public int getLevel() {
+        return level;
     }
 
     /**
@@ -196,6 +207,15 @@ public enum Intelligence {
     // endregion Boolean Comparison Methods
 
     /**
+     * Evaluates 'intelligence score', an int representation of how intelligent a character is.
+     *
+     * @return The calculated intelligence score.
+     */
+    public int getIntelligenceScore() {
+        return this.level - (Intelligence.values().length / 2);
+    }
+
+    /**
      * Converts a given string to its corresponding {@code Intelligence} enumeration value.
      * The method first attempts to parse the string as the name of an {@code Intelligence} enum value.
      * If that fails, it attempts to parse the string as an integer representing the ordinal of an
@@ -227,15 +247,5 @@ public enum Intelligence {
     @Override
     public String toString() {
         return getLabel();
-    }
-
-    /**
-     * Evaluates 'intelligence score', an int representation of how intelligent a
-     * character is.
-     *
-     * @return The calculated intelligence score.
-     */
-    public int getIntelligenceScore() {
-        return this.ordinal() - (Intelligence.values().length / 2);
     }
 }

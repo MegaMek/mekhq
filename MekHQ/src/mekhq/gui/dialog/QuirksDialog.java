@@ -34,7 +34,6 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -61,16 +60,15 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 public class QuirksDialog extends JDialog implements DialogOptionListener, ActionListener {
     private static final MMLogger logger = MMLogger.create(QuirksDialog.class);
 
-    private QuirksPanel qpanel;
+    private QuirksPanel                    quirksPanel;
     private HashMap<Integer, WeaponQuirks> h_wpnQuirks = new HashMap<>();
-    private Entity entity;
+    private Entity                         entity;
 
     private JButton okayButton;
     private JButton cancelButton;
 
     /**
-     * Handles the editing and deteling of Quirks. Utilizes the QuirksPanel from
-     * megamek for the bulk of its work.
+     * Handles the editing and deleting of Quirks. Utilizes the QuirksPanel from MegaMek for the bulk of its work.
      *
      * @param entity The {@link Entity} being edited.
      * @param parent The {@link JFrame} of the parent panel.
@@ -87,22 +85,28 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
 
     private void initGUI() {
 
-        // Set up the megamek QuirksPanel.
+        // Set up the MegaMek QuirksPanel.
         for (Mounted<?> m : entity.getWeaponList()) {
             h_wpnQuirks.put(entity.getEquipmentNum(m), m.getQuirks());
         }
-        qpanel = new QuirksPanel(entity, entity.getQuirks(), true, this, h_wpnQuirks);
-        qpanel.refreshQuirks();
+        quirksPanel = new QuirksPanel(entity, entity.getQuirks(), true, this, h_wpnQuirks);
+        quirksPanel.refreshQuirks();
 
         // Set up the display of this dialog.
-        JScrollPane scroller = new JScrollPaneWithSpeed(qpanel);
+        JScrollPane scroller = new JScrollPaneWithSpeed(quirksPanel);
         scroller.setPreferredSize(new Dimension(300, 200));
         setLayout(new BorderLayout());
         add(scroller, BorderLayout.CENTER);
         add(buildButtonPanel(), BorderLayout.SOUTH);
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(QuirksDialog.class);
@@ -131,7 +135,7 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
 
     @Override
     public void optionClicked(DialogOptionComponent dialogOptionComponent, IOption iOption, boolean b) {
-        // Not Used Included because QuriksPanel requires a DialogOptionListener
+        // Not Used Included because QuirksPanel requires a DialogOptionListener
         // interface.
     }
 
@@ -143,7 +147,7 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
     @Override
     public void actionPerformed(ActionEvent e) {
         if (okayButton.equals(e.getSource())) {
-            qpanel.setQuirks();
+            quirksPanel.setQuirks();
             setVisible(false);
         } else if (cancelButton.equals(e.getSource())) {
             setVisible(false);

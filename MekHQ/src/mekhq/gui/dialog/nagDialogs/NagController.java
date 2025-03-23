@@ -27,18 +27,18 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrainModifier;
+
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
-
-import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrainModifier;
 
 /**
  * A controller class responsible for managing and triggering daily nag dialogs in the campaign.
@@ -204,7 +204,7 @@ public class NagController {
 
         // Prisoners of War
         final boolean hasActiveContract = campaign.hasActiveContract();
-        final boolean hasPrisoners = campaign.getCurrentPrisoners().isEmpty();
+        final boolean hasPrisoners = !campaign.getCurrentPrisoners().isEmpty();
 
         if (PrisonersNagDialog.checkNag(hasActiveContract, hasPrisoners)) {
             PrisonersNagDialog prisonersNagDialog = new PrisonersNagDialog(campaign);
