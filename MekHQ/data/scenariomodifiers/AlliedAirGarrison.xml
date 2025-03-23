@@ -25,7 +25,8 @@
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>75</retreatThreshold>
 		<startingAltitude>5</startingAltitude>
-		<syncDeploymentType>None</syncDeploymentType>
+		<syncDeploymentType>Opposite</syncDeploymentType>
+        <syncedForceName>Player</syncedForceName>
 		<useArtillery>false</useArtillery>
 	</forceDefinition>
 </AtBScenarioModifier>
