@@ -30,7 +30,8 @@ MEKHQ VERSION HISTORY:
 + PR #6361: Improved Immersive Dialog Behavior 
 + PR #6360: Fixed Force Type Changing Being Unavailable in Non-StratCon, Non-AtB Campaigns 
 + PR #6359: Fixed Missing Scenarios 
-+ PR #6358: Fixed Fatigue Status Report Update Messages 
++ PR #6358: Fixed Fatigue Status Report Update Messages
++ PR #6372: Enabled MekHQ Prisoner Capture Style for Non-AtB, Non-StratCon Campaigns
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
