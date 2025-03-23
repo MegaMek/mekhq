@@ -444,6 +444,31 @@ public class Force {
     }
 
     /**
+     * Retrieves all units associated with the current force as {@link Unit} objects.
+     *
+     * <p>This method converts the list of unit IDs from the force into a list of
+     * {@link Unit} objects by fetching them from the provided {@link Hangar}.
+     * Units are only included if they can be successfully resolved from the hangar.</p>
+     *
+     * @param hangar             the {@link Hangar} containing the units to retrieve.
+     * @param standardForcesOnly a flag indicating whether to include only standard forces.
+     *                           If {@code true}, only units belonging to standard forces are returned.
+     * @return a list of {@link Unit} objects associated with the force.
+     */
+    public List<Unit> getAllUnitsAsUnits(Hangar hangar, boolean standardForcesOnly) {
+        List<Unit> allUnits = new ArrayList<>();
+
+        for (UUID unitId : getAllUnits(standardForcesOnly)) {
+            Unit unit = hangar.getUnit(unitId);
+            if (unit != null) {
+                allUnits.add(unit);
+            }
+        }
+
+        return allUnits;
+    }
+
+    /**
      * Add a unit id to the units vector. In general, this
      * should not be called directly to add unid because they will
      * not be assigned a force id. Use {@link Campaign#addUnitToForce(Unit, int)}

@@ -54,6 +54,8 @@ import java.util.Comparator;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
+
 public enum PersonnelTableModelColumn {
     // region Enum Declarations
     PERSON("PersonnelTableModelColumn.PERSON.text"),
@@ -736,7 +738,8 @@ public enum PersonnelTableModelColumn {
             case TOUGHNESS:
                 return Integer.toString(person.getToughness());
             case FATIGUE:
-                return Integer.toString(person.getEffectiveFatigue(campaign));
+                return Integer.toString(getEffectiveFatigue(person.getFatigue(), person.isClanPersonnel(),
+                      person.getSkillLevel(campaign, false), campaign.getFieldKitchenWithinCapacity()));
             case EDGE:
                 return Integer.toString(person.getEdge());
             case SPA_COUNT:
