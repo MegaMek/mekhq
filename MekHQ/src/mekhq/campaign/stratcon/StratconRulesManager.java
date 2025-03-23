@@ -1957,7 +1957,13 @@ public class StratconRulesManager {
         retVal.put(Space, new ArrayList<>());
 
         for (int forceID : forceIDs) {
-            Force force = allForces.get(forceID);
+            Force force = null;
+            for (Force individualForce : allForces) {
+                if (individualForce.getId() == forceID) {
+                    force = individualForce;
+                    break;
+                }
+            }
 
             if (force == null) {
                 logger.error("Force ID {} is null in sortForcesByMapType", forceID);
