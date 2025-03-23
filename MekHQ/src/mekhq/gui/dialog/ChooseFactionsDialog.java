@@ -68,16 +68,7 @@ public class ChooseFactionsDialog extends JDialog {
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseFactionsDialog",
           MekHQ.getMHQOptions().getLocale());
-
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public ChooseFactionsDialog(final JFrame frame, final LocalDate date, final List<String> defaults) {
-        this(frame, true, date, defaults);
-    }
-
+    
     public ChooseFactionsDialog(final JFrame frame, final boolean modal, final LocalDate date, final List<String> defaults) {
         super(frame, modal);
         this.date    = Objects.requireNonNull(date);

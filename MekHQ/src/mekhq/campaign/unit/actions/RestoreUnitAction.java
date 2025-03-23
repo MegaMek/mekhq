@@ -60,16 +60,14 @@ public class RestoreUnitAction implements IUnitAction {
     private final IEntityCopyFactory entityCopyFactory;
 
     /**
-     * Creates a new {@code RestoreUnitAction} instance using
-     * the default means of creating entity copies.
+     * Creates a new {@code RestoreUnitAction} instance using the default means of creating entity copies.
      */
     public RestoreUnitAction() {
         this(new FileSystemEntityCopyFactory());
     }
 
     /**
-     * Creates a new {@code RestoreUnitAction} instance using
-     * the provided {@link IEntityCopyFactory}.
+     * Creates a new {@code RestoreUnitAction} instance using the provided {@link IEntityCopyFactory}.
      *
      * @param entityCopyFactory The factory to create entity copies with.
      */
@@ -108,7 +106,7 @@ public class RestoreUnitAction implements IUnitAction {
         newEntity.setOwner(campaign.getPlayer());
         newEntity.setGame(campaign.getGame());
         newEntity.setExternalIdAsString(unit.getId().toString());
-        campaign.getGame().addEntity(newEntity.getId(), newEntity);
+        campaign.getGame().addEntity(newEntity);
 
         copyC3Networks(oldEntity, newEntity);
 
@@ -223,8 +221,7 @@ public class RestoreUnitAction implements IUnitAction {
             // TODO: Make this less painful. We just want to fix hips and shoulders.
             Entity entity = unit.getEntity();
             if (entity instanceof Mek) {
-                for (int loc : new int[] {
-                        Mek.LOC_CLEG, Mek.LOC_LLEG, Mek.LOC_RLEG, Mek.LOC_LARM, Mek.LOC_RARM }) {
+                for (int loc : new int[] { Mek.LOC_CLEG, Mek.LOC_LLEG, Mek.LOC_RLEG, Mek.LOC_LARM, Mek.LOC_RARM }) {
                     int numberOfCriticals = entity.getNumberOfCriticals(loc);
                     for (int crit = 0; crit < numberOfCriticals; ++crit) {
                         CriticalSlot slot = entity.getCritical(loc, crit);
@@ -246,6 +243,7 @@ public class RestoreUnitAction implements IUnitAction {
          * Gets a copy of the entity.
          *
          * @param entity The entity to copy.
+         *
          * @return A copy of the entity, or {@code null} if a copy could not be made.
          */
         @Nullable
@@ -253,14 +251,14 @@ public class RestoreUnitAction implements IUnitAction {
     }
 
     /**
-     * Gets a copy of the entity from the file system, via {@link MekSummaryCache}
-     * and {@link MekFileParser}.
+     * Gets a copy of the entity from the file system, via {@link MekSummaryCache} and {@link MekFileParser}.
      */
     private static class FileSystemEntityCopyFactory implements IEntityCopyFactory {
         /**
          * Get a copy of the entity from the {@link MekSummaryCache}.
          *
          * @param entity The entity to copy.
+         *
          * @return A copy of the entity, or {@code null} if a copy could not be made.
          */
         @Override

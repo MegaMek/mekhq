@@ -135,29 +135,6 @@ public class CampaignPreset {
               new HashMap<>());
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated - no indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public CampaignPreset(final Campaign campaign) {
-        this(campaign.getName(),
-              "",
-              true,
-              campaign.getLocalDate(),
-              campaign.getFaction(),
-              campaign.getCurrentSystem().getPrimaryPlanet(),
-              campaign.getRankSystem(),
-              2,
-              campaign.isGM(),
-              null,
-              campaign.getGameOptions(),
-              campaign.getCampaignOptions(),
-              campaign.getRandomSkillPreferences(),
-              SkillType.getSkillHash(),
-              SpecialAbility.getSpecialAbilities());
-    }
-
     public CampaignPreset(final String title, final String description, final boolean userData, final @Nullable LocalDate date, final @Nullable Faction faction, final @Nullable Planet planet, final @Nullable RankSystem rankSystem, final int contractCount, final boolean gm, final @Nullable CompanyGenerationOptions companyGenerationOptions, final @Nullable GameOptions gameOptions, final @Nullable CampaignOptions campaignOptions, final @Nullable RandomSkillPreferences randomSkillPreferences, final Map<String, SkillType> skills, final Map<String, SpecialAbility> specialAbilities) {
         this.userData = userData;
 
@@ -319,39 +296,7 @@ public class CampaignPreset {
 
         return presets;
     }
-
-    /**
-     * @since 50.04
-     * @deprecated This method is scheduled to be removed following the next milestone
-     */
-    @Deprecated(since = "50.04", forRemoval = true)
-    public void applyContinuousToCampaign(final Campaign campaign) {
-        if (getGameOptions() != null) {
-            campaign.setGameOptions(getGameOptions());
-            if (getCampaignOptions() == null) {
-                campaign.getCampaignOptions().updateCampaignOptionsFromGameOptions(campaign.getGameOptions());
-                MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
-            }
-        }
-
-        if (getCampaignOptions() != null) {
-            campaign.setCampaignOptions(getCampaignOptions());
-            MekHQ.triggerEvent(new OptionsChangedEvent(campaign, getCampaignOptions()));
-        }
-
-        if (getRandomSkillPreferences() != null) {
-            campaign.setRandomSkillPreferences(getRandomSkillPreferences());
-        }
-
-        if (!getSkills().isEmpty()) {
-            SkillType.setSkillHash(getSkills());
-        }
-
-        if (!getSpecialAbilities().isEmpty()) {
-            SpecialAbility.setSpecialAbilities(getSpecialAbilities());
-        }
-    }
-
+    
     // region File I/O
     public void writeToFile(final JFrame frame, @Nullable File file) {
         if (file == null) {

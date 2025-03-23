@@ -492,19 +492,6 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * Is not used.
-     *
-     * @since 0.50.04
-     * @deprecated No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public static boolean isMinorPower(final String factionCode) {
-        // TODO : Windchild move me to AtBContractMarket
-        final Faction faction = Factions.getInstance().getFaction(factionCode);
-        return !faction.isMajorOrSuperPower() && !faction.isClan();
-    }
-
-    /**
      * Checks and updates the morale which depends on various conditions such as the rout end date, skill levels,
      * victories, defeats, etc. This method also updates the enemy status based on the morale level.
      *
@@ -735,15 +722,6 @@ public class AtBContract extends Contract {
         }
 
         return min(repairLocation, Unit.SITE_FACTORY_CONDITIONS);
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated Not in use
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void addMoraleMod(int mod) {
-        moraleMod += mod;
     }
 
     public int getScore() {
@@ -1625,16 +1603,7 @@ public class AtBContract extends Contract {
     public void addPlayerMinorBreaches(int num) {
         playerMinorBreaches += num;
     }
-
-    /**
-     * @since 0.50.04
-     * @deprecated - Not in use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void addEmployerMinorBreach() {
-        employerMinorBreaches++;
-    }
-
+    
     public void addEmployerMinorBreaches(int num) {
         employerMinorBreaches += num;
     }

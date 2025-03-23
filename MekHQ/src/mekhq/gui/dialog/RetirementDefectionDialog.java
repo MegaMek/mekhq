@@ -801,22 +801,7 @@ public class RetirementDefectionDialog extends JDialog {
     public Map<UUID, UUID> getUnitAssignments() {
         return unitAssignments;
     }
-
-    /**
-     * Returns a {@link Map} containing the {@link TargetRoll} objects associated with the {@link UUID} keys.
-     * <p>
-     * If this returns empty, it means nobody is eligible for retirement/resignation
-     *
-     * @return a {@link Map} of {@link UUID} keys mapped to {@link TargetRoll} values
-     *
-     * @since 0.50.04
-     * @deprecated - No indicated users.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public Map<UUID, TargetRoll> getTargetRolls() {
-        return targetRolls;
-    }
-
+    
     public boolean wasAborted() {
         return aborted;
     }

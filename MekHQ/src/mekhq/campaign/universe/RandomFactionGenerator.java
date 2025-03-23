@@ -43,23 +43,21 @@ import java.util.stream.Collectors;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
-import megamek.common.event.Subscribe;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.OptionsChangedEvent;
 
 /**
  * @author Neoancient
  *       <p>
  *       Uses Factions and Planets to weighted lists of potential employers and enemies for contract generation. Also
  *       finds a suitable planet for the action.
- *                                                                                                               TODO : Account for the de facto alliance of the invading Clans and
- *                                                                                                               the
- *                                                                                                               TODO : Fortress Republic in a way that doesn't involve hard-coding
- *                                                                                                               them here.
+ *                                                                                                                           TODO : Account for the de facto alliance of the invading Clans and
+ *                                                                                                                           the
+ *                                                                                                                           TODO : Fortress Republic in a way that doesn't involve hard-coding
+ *                                                                                                                           them here.
  */
 public class RandomFactionGenerator {
     private static final MMLogger logger = MMLogger.create(RandomFactionGenerator.class);
@@ -122,45 +120,8 @@ public class RandomFactionGenerator {
         borderTracker.setDate(date);
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setSearchCenter(double x, double y) {
-        borderTracker.setRegionCenter(x, y);
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setSearchCenter(Planet p) {
-        borderTracker.setRegionCenter(p.getX(), p.getY());
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setSearchRadius(double radius) {
-        borderTracker.setRegionRadius(radius);
-    }
-
     public FactionHints getFactionHints() {
         return factionHints;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    @Subscribe
-    public void handleCampaignOptionsChanged(OptionsChangedEvent event) {
-        borderTracker.setRegionRadius(event.getOptions().getContractSearchRadius());
     }
 
     public void dispose() {

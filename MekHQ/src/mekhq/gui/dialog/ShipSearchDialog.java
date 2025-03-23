@@ -257,34 +257,7 @@ public class ShipSearchDialog extends JDialog {
             logger.error("Failed to set user preferences", ex);
         }
     }
-
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated users.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public TargetRoll getDSTarget() {
-        return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.DROPSHIP, gui.getCampaign());
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated users.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public TargetRoll getJSTarget() {
-        return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.JUMPSHIP, gui.getCampaign());
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated users.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public TargetRoll getWSTarget() {
-        return gui.getCampaign().getAtBConfig().shipSearchTargetRoll(UnitType.WARSHIP, gui.getCampaign());
-    }
-
+    
     private int getUnitType() {
         if (btnJumpship.isSelected()) {
             return UnitType.JUMPSHIP;

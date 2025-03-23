@@ -437,15 +437,6 @@ public class Unit implements ITechnology {
         transportedUnitsSummaries.add(transportedUnitType);
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated of use
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    private void fixTransportedUnitReferences(AbstractTransportedUnitsSummary currentTransportedUnits, Set<Unit> newTransportedUnits) {
-        currentTransportedUnits.replaceTransportedUnits(newTransportedUnits);
-    }
-
     public void setEntity(Entity en) {
         // if there is already an entity, then make sure this
         // one gets some of the same things set
@@ -649,23 +640,6 @@ public class Unit implements ITechnology {
      */
     public void addShipTransportedUnit(Unit unit) {
         addTransportedUnit(CampaignTransportType.SHIP_TRANSPORT, unit);
-    }
-
-    /**
-     * Adds a unit to a specific bay on our unit.
-     *
-     * @param unit      The unit being transported by this instance.
-     * @param bayNumber The bay which will contain the unit.
-     *
-     * @since 0.50.04
-     * @deprecated No indication of use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void addShipTransportedUnit(Unit unit, int bayNumber) {
-        Objects.requireNonNull(unit);
-
-        unit.setTransportShipAssignment(new TransportShipAssignment(this, bayNumber));
-        addShipTransportedUnit(unit);
     }
 
     /**
@@ -1046,42 +1020,6 @@ public class Unit implements ITechnology {
         parts.remove(part);
     }
 
-    /**
-     * @param m - A Mounted class to find crits for
-     *
-     * @return the number of crits existing for this Mounted
-     *
-     * @since 0.50.04
-     * @deprecated No indication of use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public int getCrits(Mounted<?> m) {
-        // TODO: I should probably just add this method to Entity in MM
-        // For the above, Mounted would probably be even better than Entity
-        int hits = 0;
-        for (int loc = 0; loc < entity.locations(); loc++) {
-            for (int i = 0; i < entity.getNumberOfCriticals(loc); i++) {
-                CriticalSlot slot = entity.getCritical(loc, i);
-                // ignore empty & system slots
-                if ((slot == null) || (slot.getType() != CriticalSlot.TYPE_EQUIPMENT)) {
-                    continue;
-                }
-                Mounted<?> m1 = slot.getMount();
-                Mounted<?> m2 = slot.getMount2();
-                if (slot.getIndex() == -1) {
-                    if ((m.equals(m1) || m.equals(m2)) && (slot.isHit() || slot.isDestroyed())) {
-                        hits++;
-                    }
-                } else {
-                    if (entity.getEquipmentNum(m) == slot.getIndex() && (slot.isHit() || slot.isDestroyed())) {
-                        hits++;
-                    }
-                }
-            }
-        }
-        return hits;
-    }
-
     public boolean hasPilot() {
         return null != entity.getCrew();
     }
@@ -1095,24 +1033,6 @@ public class Unit implements ITechnology {
                    entity.getCrew().getPiloting();
         }
         return "NO PILOT";
-    }
-
-    /**
-     * produce a string in HTML that can be embedded in larger reports
-     *
-     * @since 0.50.04
-     * @deprecated No indication of use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public String getDescHTML() {
-        String toReturn = "<b>" + getName() + "</b><br/>";
-        toReturn += getPilotDesc() + "<br/>";
-        if (isDeployed()) {
-            toReturn += "DEPLOYED!<br/>";
-        } else {
-            toReturn += "Site: " + getCurrentSiteName() + "<br/>";
-        }
-        return toReturn;
     }
 
     public TargetRoll getSiteMod() {
@@ -1417,52 +1337,6 @@ public class Unit implements ITechnology {
 
     public boolean isDamaged() {
         return getDamageState() != Entity.DMG_NONE;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated no indication of use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public String getHeatSinkTypeString(int year) {
-        EquipmentFlag heatSinkType           = MiscType.F_HEAT_SINK;
-        boolean       heatSinkIsClanTechBase = false;
-
-        for (Mounted<?> mounted : getEntity().getEquipment()) {
-            // Also goes through heat sinks inside the engine
-            EquipmentType etype      = mounted.getType();
-            boolean       isHeatSink = false;
-
-            if (etype instanceof MiscType) {
-                if (etype.hasFlag(MiscType.F_LASER_HEAT_SINK)) {
-                    heatSinkType = MiscType.F_LASER_HEAT_SINK;
-                    isHeatSink   = true;
-                } else if (etype.hasFlag(MiscType.F_DOUBLE_HEAT_SINK)) {
-                    heatSinkType = MiscType.F_DOUBLE_HEAT_SINK;
-                    isHeatSink   = true;
-                } else if (etype.hasFlag(MiscType.F_HEAT_SINK)) {
-                    isHeatSink = true;
-                }
-            }
-
-            if (isHeatSink) {
-                if (TechConstants.getTechName(etype.getTechLevel(year)).equals("Clan")) {
-                    heatSinkIsClanTechBase = true;
-                }
-                break;
-            }
-        }
-
-        String heatSinkTypeString = heatSinkIsClanTechBase ? "(CL) " : "(IS) ";
-        if (heatSinkType.equals(MiscType.F_LASER_HEAT_SINK)) {
-            heatSinkTypeString += "Laser Heat Sink";
-        } else if (heatSinkType.equals(MiscType.F_DOUBLE_HEAT_SINK)) {
-            heatSinkTypeString += "Double Heat Sink";
-        } else {
-            heatSinkTypeString += "Heat Sink";
-        }
-
-        return heatSinkTypeString;
     }
 
     public Money getSellValue() {
@@ -2282,18 +2156,6 @@ public class Unit implements ITechnology {
         getShipTransportedUnitsSummary().unloadFromTransportShip(unit);
     }
 
-    /**
-     * Bay unloading utility used when removing a bay-equipped Transport unit This removes all units assigned to the
-     * transport from it
-     *
-     * @since 0.50.04
-     * @deprecated no indications of use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void unloadTransportShip() {
-        getShipTransportedUnitsSummary().clearTransportedUnits(campaign);
-    }
-
     // Transport Assignments
 
     /**
@@ -2335,21 +2197,6 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * Returns the current capacity for the provided transporter type
-     *
-     * @param transporterType class of Transporter
-     *
-     * @return capacity
-     *
-     * @since 0.50.04
-     * @deprecated No indication of use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public double getCurrentTacticalTransportCapacity(TransporterType transporterType) {
-        return getTacticalTransportedUnitsSummary().getCurrentTransportCapacity(transporterType);
-    }
-
-    /**
      * Returns the current capacity
      *
      * @param campaignTransportType type (enum) being checked
@@ -2371,20 +2218,6 @@ public class Unit implements ITechnology {
      */
     public void setCurrentShipTransportCapacity(TransporterType transporterType, double capacity) {
         getShipTransportedUnitsSummary().setCurrentTransportCapacity(transporterType, capacity);
-    }
-
-    /**
-     * Set the transport capacity for the specified transporter type to a specific capacity
-     *
-     * @param transporterType type (Enum) of transporter we want to set the capacity
-     * @param capacity        how much this transporter should be able to transport
-     *
-     * @since 0.50.04
-     * @deprecated No indications of use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setCurrentTacticalTransportCapacity(TransporterType transporterType, double capacity) {
-        getTacticalTransportedUnitsSummary().setCurrentTransportCapacity(transporterType, capacity);
     }
 
     /**
@@ -2411,38 +2244,12 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * @return the set of units being transported by this unit.
-     *
-     * @since 0.50.04
-     * @deprecated No indications of use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public Set<Unit> getTacticalTransportedUnits() {
-        return getTacticalTransportedUnitsSummary().getTransportedUnits();
-    }
-
-    /**
      * Adds a unit to our set of transported units.
      *
      * @param transportedUnit The unit being transported by this instance.
      */
     private void addTacticalTransportedUnit(Unit transportedUnit) {
         getTacticalTransportedUnitsSummary().addTransportedUnit(Objects.requireNonNull(transportedUnit));
-    }
-
-    /**
-     * Removes a unit from our set of transported units.
-     *
-     * @param unit The unit to remove from our set of transported units.
-     *
-     * @return True if the unit was removed, otherwise false.
-     *
-     * @since 0.50.04
-     * @deprecated No indications of use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    private boolean removeTacticalTransportedUnit(Unit unit) {
-        return getTacticalTransportedUnitsSummary().removeTransportedUnit(unit);
     }
 
     /**
@@ -2467,27 +2274,6 @@ public class Unit implements ITechnology {
      */
     public Set<Unit> loadTacticalTransport(TransporterType transporterType, Set<Unit> units) {
         return getTacticalTransportedUnitsSummary().loadTransport(units, null, transporterType);
-    }
-
-    /**
-     * Transporter loading utility used when assigning units to transport units For each passed-in unit, this will
-     * assign the unit to the specified bay, or the type of Transporter if one isn't provided. Once in the MM lobby,
-     * will be used to actually load the unit into a bay on the transport.
-     *
-     * @param transportedUnit     Unit we wish to load
-     * @param transportedLocation specific bay (Transporter), or null
-     * @param transporterType     type (Enum) of bay or Transporter
-     *
-     * @return the old transport of the unit, or an empty set if none
-     *
-     * @since 0.50.04
-     * @deprecated No indications of use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public @Nullable Unit loadTacticalTransport(Unit transportedUnit, @Nullable Transporter transportedLocation, TransporterType transporterType) {
-        return getTacticalTransportedUnitsSummary().loadTransport(transportedLocation,
-              transporterType,
-              transportedUnit);
     }
 
     /**
@@ -2519,64 +2305,6 @@ public class Unit implements ITechnology {
         getTransportedUnitsSummary(campaignTransportType).clearTransportedUnits(campaign);
     }
     // End Transport Assignments
-
-    /*
-     * @since 0.50.04
-     * @deprecated No indications of use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public double getUnitCostMultiplier() {
-        double multiplier = 1.0;
-        if (!isRepairable()) {
-            // if the unit is not repairable, set it as equal to its parts separately this is not RAW, but not really
-            // a way to make that work and this makes more sense, although we might want to adjust it downward because
-            // of the labor cost of salvaging
-            return 1.0;
-        }
-        double tonnage = 100;
-        if (entity instanceof Mek && ((Mek) entity).isIndustrial()) {
-            tonnage = 400;
-        } else if (entity instanceof VTOL) {
-            tonnage = 30;
-        } else if (entity instanceof Tank) {
-            if (entity.getMovementMode() == EntityMovementMode.WHEELED ||
-                entity.getMovementMode() == EntityMovementMode.NAVAL) {
-                tonnage = 200;
-            } else if (entity.getMovementMode() == EntityMovementMode.HOVER ||
-                       entity.getMovementMode() == EntityMovementMode.SUBMARINE) {
-                tonnage = 50;
-            } else if (entity.getMovementMode() == EntityMovementMode.HYDROFOIL) {
-                tonnage = 75;
-            } else if (entity.getMovementMode() == EntityMovementMode.WIGE) {
-                tonnage = 25;
-            }
-        } else if (entity instanceof Dropship) {
-            if (entity.isSpheroid()) {
-                multiplier = 28;
-            } else {
-                multiplier = 36;
-            }
-        } else if (entity instanceof SmallCraft) {
-            tonnage = 50;
-        } else if (entity instanceof SpaceStation) {
-            multiplier = 5;
-        } else if (entity instanceof Warship) {
-            multiplier = 2;
-        } else if (entity instanceof Jumpship) {
-            multiplier = 1.25;
-        } else if (entity instanceof Aero) {
-            tonnage = 200;
-        }
-
-        if (!(entity instanceof Infantry) && !(entity instanceof Dropship) && !(entity instanceof Jumpship)) {
-            multiplier = 1 + (entity.getWeight() / tonnage);
-        }
-
-        if (entity.isOmni()) {
-            multiplier *= 1.25;
-        }
-        return multiplier;
-    }
 
     public Money getBuyCost() {
         Money cost = Money.of((getEntity() instanceof Infantry) ?
@@ -2965,20 +2693,6 @@ public class Unit implements ITechnology {
             }
         }
         return quirkString.toString().isBlank() ? null : "<html>" + quirkString + "</html>";
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated No indications of use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void acquireQuirk(String name, Object value) {
-        for (Enumeration<IOption> i = getEntity().getQuirks().getOptions(); i.hasMoreElements(); ) {
-            IOption ability = i.nextElement();
-            if (ability.getName().equals(name)) {
-                ability.setValue(value);
-            }
-        }
     }
 
     /**
@@ -5966,17 +5680,6 @@ public class Unit implements ITechnology {
         return drivers.stream().filter(person -> entity instanceof Infantry).collect(Collectors.toList());
     }
 
-    /**
-     * Retrieves a list of uninjured soldiers or battle armor assigned to the unit.
-     *
-     * @since 0.50.04
-     * @deprecated No indications of use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public List<Person> getUninjuredInfantry() {
-        return getAllInfantry().stream().filter(person -> person.getHits() == 0).collect(Collectors.toList());
-    }
-
     public List<Person> getActiveCrew() {
         List<Person> crew = new ArrayList<>();
         for (Person p : drivers) {
@@ -6259,16 +5962,7 @@ public class Unit implements ITechnology {
     public double getMaintainedPct() {
         return (daysActivelyMaintained / daysSinceMaintenance);
     }
-
-    /**
-     * @since 0.50.04
-     * @deprecated No indications of use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public boolean isFullyMaintained() {
-        return daysActivelyMaintained == daysSinceMaintenance;
-    }
-
+    
     public int getAstechsMaintained() {
         return (int) Math.floor(astechDaysMaintained / daysSinceMaintenance);
     }

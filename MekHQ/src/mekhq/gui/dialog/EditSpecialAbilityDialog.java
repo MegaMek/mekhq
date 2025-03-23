@@ -426,52 +426,16 @@ public class EditSpecialAbilityDialog extends JDialog {
         return allSPAs;
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setAllSPAs(Map<String, SpecialAbility> allSPAs) {
-        this.allSPAs = allSPAs;
-    }
-
     public Vector<String> getPrerequisiteAbilities() {
         return prerequisiteAbilities;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setPrerequisiteAbilities(Vector<String> prerequisiteAbilities) {
-        this.prerequisiteAbilities = prerequisiteAbilities;
     }
 
     public Vector<String> getInvalidAbilities() {
         return invalidAbilities;
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setInvalidAbilities(Vector<String> invalidAbilities) {
-        this.invalidAbilities = invalidAbilities;
-    }
-
     public Vector<String> getRemoveAbilities() {
         return removeAbilities;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setRemoveAbilities(Vector<String> removeAbilities) {
-        this.removeAbilities = removeAbilities;
     }
     // endregion Getters/Setters
 

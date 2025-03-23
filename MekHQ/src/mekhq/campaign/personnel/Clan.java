@@ -169,24 +169,7 @@ public class Clan {
     public int getEndDate() {
         return endDate;
     }
-
-    /**
-     * @param year the year to determine if the Clan has been abjured by
-     *
-     * @return whether the Clan has been abjured
-     *
-     * @since 0.50.04
-     * @deprecated no indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public boolean isAbjured(int year) {
-        if (abjurationDate == 0) {
-            return false;
-        } else {
-            return abjurationDate < year;
-        }
-    }
-
+    
     /**
      * @param year the year to get the Clan's rivals in
      *

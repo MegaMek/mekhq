@@ -205,16 +205,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
     public Transaction getOldTransaction() {
         return oldTransaction;
     }
-
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated uses
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public Transaction getNewTransaction() {
-        return newTransaction;
-    }
-
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         if (saveButton.equals(e.getSource())) {

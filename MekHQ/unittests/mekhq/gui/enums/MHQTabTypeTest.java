@@ -27,23 +27,22 @@
  */
 package mekhq.gui.enums;
 
-import mekhq.MekHQ;
-import mekhq.gui.*;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.event.KeyEvent;
 import java.util.ResourceBundle;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
+import mekhq.MekHQ;
+import org.junit.jupiter.api.Test;
 
 public class MHQTabTypeTest {
     //region Variable Declarations
     private static final MHQTabType[] types = MHQTabType.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Getters
@@ -189,62 +188,6 @@ public class MHQTabTypeTest {
         }
     }
     //endregion Boolean Comparison Methods
-
-    /**
-     * This test is disabled because it will run through all the GUI tabs and initialize them, which
-     * is not a quick process. This also requires lots more mock handling to actually go through
-     * the initializations too.
-     */
-    @Disabled
-    @Test
-    public void testCreateTab() {
-        final MekHQ mockMekHQ = mock(MekHQ.class);
-        final CampaignGUI gui = new CampaignGUI(mockMekHQ);
-        for (final MHQTabType mhqTabType : types) {
-            final CampaignGuiTab tab = mhqTabType.createTab(gui);
-            switch (mhqTabType) {
-                case COMMAND_CENTER:
-                    assertInstanceOf(CommandCenterTab.class, tab);
-                    break;
-                case TOE:
-                    assertInstanceOf(TOETab.class, tab);
-                    break;
-                case BRIEFING_ROOM:
-                    assertInstanceOf(BriefingTab.class, tab);
-                    break;
-                case INTERSTELLAR_MAP:
-                    assertInstanceOf(MapTab.class, tab);
-                    break;
-                case PERSONNEL:
-                    assertInstanceOf(PersonnelTab.class, tab);
-                    break;
-                case HANGAR:
-                    assertInstanceOf(HangarTab.class, tab);
-                    break;
-                case WAREHOUSE:
-                    assertInstanceOf(WarehouseTab.class, tab);
-                    break;
-                case REPAIR_BAY:
-                    assertInstanceOf(RepairTab.class, tab);
-                    break;
-                case INFIRMARY:
-                    assertInstanceOf(InfirmaryTab.class, tab);
-                    break;
-                case FINANCES:
-                    assertInstanceOf(FinancesTab.class, tab);
-                    break;
-                case MEK_LAB:
-                    assertInstanceOf(MekLabTab.class, tab);
-                    break;
-                case STRAT_CON:
-                    assertInstanceOf(StratconTab.class, tab);
-                    break;
-                default:
-                    assertNull(tab);
-                    break;
-            }
-        }
-    }
 
     @Test
     public void testToStringOverride() {

@@ -480,17 +480,6 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * @return the overviewLoadingValue
-     *
-     * @since 0.50.04
-     * @deprecated - Not shown in use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public boolean isOverviewLoadingValue() {
-        return overviewLoadingValue;
-    }
-
-    /**
      * @param overviewLoadingValue the overviewLoadingValue to set
      */
     public void setOverviewLoadingValue(boolean overviewLoadingValue) {
@@ -751,24 +740,6 @@ public class Campaign implements ITechManager {
      */
     public List<Person> getPersonnelWhoAdvancedInXP() {
         return personnelWhoAdvancedInXP;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated Uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public List<String> getTurnoverRetirementInformation() {
-        return turnoverRetirementInformation;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated Uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setTurnoverRetirementInformation(final List<String> turnoverRetirementInformation) {
-        this.turnoverRetirementInformation = turnoverRetirementInformation;
     }
 
     /**
@@ -1740,18 +1711,6 @@ public class Campaign implements ITechManager {
         return getHangar().getUnits().stream().filter(unit -> !unit.isMothballed() && !unit.isSalvage()).toList();
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated Not shonw in use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public Collection<Unit> getLargeCraftAndWarShips() {
-        return getHangar().getUnits()
-                     .stream()
-                     .filter(unit -> (unit.getEntity().isLargeCraft()) || (unit.getEntity().isWarShip()))
-                     .collect(Collectors.toList());
-    }
-
     public List<Entity> getEntities() {
         return getUnits().stream().map(Unit::getEntity).collect(Collectors.toList());
     }
@@ -1888,15 +1847,6 @@ public class Campaign implements ITechManager {
 
     public Boolean getFieldKitchenWithinCapacity() {
         return fieldKitchenWithinCapacity;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated Not shown in use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setFieldKitchenWithinCapacity(final Boolean fieldKitchenWithinCapacity) {
-        this.fieldKitchenWithinCapacity = fieldKitchenWithinCapacity;
     }
     // endregion Person Creation
 
@@ -2491,19 +2441,6 @@ public class Campaign implements ITechManager {
      */
     public List<Person> getFriendlyPrisoners() {
         return getPersonnel().stream().filter(p -> p.getStatus().isPoW()).collect(Collectors.toList());
-    }
-
-    /**
-     * Provides a filtered list of personnel including only Persons with the AWOL status.
-     *
-     * @return a {@link Person} <code>List</code> containing all active personnel
-     *
-     * @since 0.50.04
-     * @deprecated - Not shown in use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public List<Person> getAwolPersonnel() {
-        return getPersonnel().stream().filter(p -> p.getStatus().isAwol()).collect(Collectors.toList());
     }
 
     /**
@@ -4939,30 +4876,6 @@ public class Campaign implements ITechManager {
         person.changeAutoAwardSupportPoints((int) (score * multiplier));
     }
 
-    /**
-     * Retrieves the date of birth of the youngest child among the provided list of children.
-     *
-     * @param children the list children
-     *
-     * @return the date of birth of the youngest child
-     *
-     * @since 0.50.04
-     * @deprecated - Not shown in use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    private LocalDate getYoungestChildDateOfBirth(List<Person> children) {
-        LocalDate youngestChildBirthDate = LocalDate.MIN;
-
-        for (Person child : children) {
-            LocalDate dateOfBirth = child.getDateOfBirth();
-            if (dateOfBirth.isAfter(youngestChildBirthDate)) {
-                youngestChildBirthDate = dateOfBirth;
-            }
-        }
-
-        return youngestChildBirthDate;
-    }
-
     public void processNewDayUnits() {
         // need to loop through units twice, the first time to do all maintenance and
         // the second time to do whatever else. Otherwise, maintenance minutes might
@@ -5873,15 +5786,6 @@ public class Campaign implements ITechManager {
         setFaction(Factions.getInstance().getFaction(factionCode));
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated - No indicated uses
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public Faction getRetainerEmployer() {
-        return Factions.getInstance().getFaction(getRetainerEmployerCode());
-    }
-
     public String getRetainerEmployerCode() {
         return retainerEmployerCode;
     }
@@ -6040,15 +5944,6 @@ public class Campaign implements ITechManager {
 
     public void setUnitIcon(final StandardForceIcon unitIcon) {
         this.unitIcon = unitIcon;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated - No indicated use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void addFunds(final Money quantity) {
-        addFunds(TransactionType.MISCELLANEOUS, quantity, null);
     }
 
     public void addFunds(final TransactionType type, final Money quantity, @Nullable String description) {
@@ -6486,38 +6381,6 @@ public class Campaign implements ITechManager {
 
     public void setRankSystemDirect(final RankSystem rankSystem) {
         this.rankSystem = rankSystem;
-    }
-
-    /**
-     * Returns the highest ranked person from the given list of personnel.
-     *
-     * @param personnel          the list of personnel from which to find the highest ranked person
-     * @param useSkillTiebreaker determines whether to use an experience level tiebreaker when comparing ranks (true -
-     *                           use skill tiebreaker, false - do not use skill tiebreaker)
-     *
-     * @return the highest ranked person from the list, or null if the provided personnel list is empty
-     *
-     * @since 0.50.04
-     * @deprecated No indicated Use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public Person getHighestRankedPerson(List<Person> personnel, boolean useSkillTiebreaker) {
-        Person highestRankedPerson = null;
-
-        if (!personnel.isEmpty()) {
-            for (Person person : personnel) {
-                if (useSkillTiebreaker) {
-                    if (person.outRanksUsingSkillTiebreaker(this, highestRankedPerson)) {
-                        highestRankedPerson = person;
-                    }
-                } else {
-                    if (person.outRanks(highestRankedPerson)) {
-                        highestRankedPerson = person;
-                    }
-                }
-            }
-        }
-        return highestRankedPerson;
     }
     // endregion Ranks
 
@@ -7641,15 +7504,6 @@ public class Campaign implements ITechManager {
         return cmdrStrategy;
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated - No indicated Uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public int getUnitRatingAsInteger() {
-        return getAtBUnitRatingMod();
-    }
-
     public RandomSkillPreferences getRandomSkillPreferences() {
         return rskillPrefs;
     }
@@ -8392,34 +8246,6 @@ public class Campaign implements ITechManager {
                       "'>You do not have enough funds to pay off " +
                       loan +
                       "</font>");
-        }
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated - No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setHealingTimeOptions(int newHeal, int newNaturalHeal) {
-        // we need to check the current values and then if necessary change the times for all personnel, giving them
-        // credit for their current waiting time
-        int currentHeal        = getCampaignOptions().getHealingWaitingPeriod();
-        int currentNaturalHeal = getCampaignOptions().getNaturalHealingWaitingPeriod();
-
-        getCampaignOptions().setHealingWaitingPeriod(newHeal);
-        getCampaignOptions().setNaturalHealingWaitingPeriod(newNaturalHeal);
-
-        int healDiff    = newHeal - currentHeal;
-        int naturalDiff = newNaturalHeal - currentNaturalHeal;
-
-        if (healDiff != 0 || naturalDiff != 0) {
-            for (Person p : getPersonnel()) {
-                if (p.getDoctorId() != null) {
-                    p.setDaysToWaitForHealing(max(p.getDaysToWaitForHealing() + healDiff, 1));
-                } else {
-                    p.setDaysToWaitForHealing(max(p.getDaysToWaitForHealing() + naturalDiff, 1));
-                }
-            }
         }
     }
 

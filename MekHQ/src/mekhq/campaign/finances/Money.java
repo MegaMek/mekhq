@@ -165,18 +165,7 @@ public class Money implements Comparable<Money> {
                      .getUiAmountAndSymbolPrinter()
                      .print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
     }
-
-    /**
-     * @since 0.50.04
-     * @deprecated use {@link #toAmountAndSymbolString()} instead
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public String toAmountAndNameString() {
-        return CurrencyManager.getInstance()
-                     .getUiAmountAndNamePrinter()
-                     .print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
-    }
-
+    
     /**
      * @return a new money object, rounded to use a scale of 0 with no trailing 0's
      */

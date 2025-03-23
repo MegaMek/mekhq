@@ -2425,18 +2425,6 @@ public class CampaignGUI extends JPanel {
         MekHQ.triggerEvent(new DeploymentChangedEvent(u, s));
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated - Only located used is reciprocal
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void undeployForces(Vector<Force> forces) {
-        for (Force force : forces) {
-            undeployForce(force);
-            undeployForces(force.getSubForces());
-        }
-    }
-
     public void undeployForce(Force f) {
         undeployForce(f, true);
     }
@@ -2483,55 +2471,6 @@ public class CampaignGUI extends JPanel {
     }
 
     // region Subscriptions
-
-    /**
-     * @since 0.50.04
-     * @deprecated no known uses
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    @Subscribe
-    public void handleDayEnding(DayEndingEvent dayEndingEvent) {
-        if (triggerDailyNags(getCampaign())) {
-            dayEndingEvent.cancel();
-            return;
-        }
-
-        // Compulsory New Day Blockers
-        if (checkForOverdueLoans(dayEndingEvent)) {
-            return;
-        }
-
-        if (checkForDueScenarios(dayEndingEvent)) {
-            return;
-        }
-
-        // Optional New Day Blocker
-        if (getCampaign().getCampaignOptions().isUseRandomRetirement()) {
-            int turnoverPrompt = getCampaign().checkTurnoverPrompt();
-
-            switch (turnoverPrompt) {
-                case -1:
-                    // the user wasn't presented with the dialog
-                    break;
-                case 0:
-                    // the user launched the turnover dialog
-                    if (!showRetirementDefectionDialog()) {
-                        dayEndingEvent.cancel();
-                        return;
-                    }
-                case 1:
-                    // the user picked 'Advance Day Regardless'
-                    break;
-                case 2:
-                    // the user canceled
-                    dayEndingEvent.cancel();
-                    return;
-                default:
-                    throw new IllegalStateException("Unexpected value in mekhq/gui/CampaignGUI.java/handleDayEnding: " +
-                                                    turnoverPrompt);
-            }
-        }
-    }
 
     /**
      * Checks if there are any due instances of the {@link Scenario} class. If the {@code checkScenariosDue()} method of
@@ -2581,21 +2520,6 @@ public class CampaignGUI extends JPanel {
         return false;
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated no indicated uses
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    @Subscribe
-    public void handleNewDay(NewDayEvent evt) {
-        refreshCalendar();
-        refreshLocation();
-        refreshFunds();
-        refreshPartsAvailability();
-
-        refreshAllTabs();
-    }
-
     @Subscribe
     public void handle(final OptionsChangedEvent evt) {
         if (!getCampaign().getCampaignOptions().isUseStratCon() && (getTab(MHQTabType.STRAT_CON) != null)) {
@@ -2639,41 +2563,7 @@ public class CampaignGUI extends JPanel {
     public void handle(MedicPoolChangedEvent ev) {
         refreshTempMedics();
     }
-
-    /**
-     * @since 0.50.04
-     * @deprecated no indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    @Subscribe
-    public void handleLocationChanged(LocationChangedEvent ev) {
-        refreshLocation();
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated no indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    @Subscribe
-    public void handleMissionChanged(MissionEvent ev) {
-        refreshPartsAvailability();
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated - No indicated Uses.
-     */
-    @Subscribe
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void handlePersonUpdate(PersonEvent ev) {
-        // only bother recalculating AtB parts availability if a logistics admin has been changed
-        // refreshPartsAvailability cuts out early with a "use AtB" check so it's not necessary here
-        if (ev.getPerson().hasRole(PersonnelRole.ADMINISTRATOR_LOGISTICS)) {
-            refreshPartsAvailability();
-        }
-    }
-
+    
     @Subscribe
     public void handle(final MHQOptionsChangedEvent evt) {
         miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());

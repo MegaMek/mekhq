@@ -167,15 +167,6 @@ public class Planet {
         return gravity;
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public Double getDensity() {
-        return (null == getSourcedDensity()) ? 0.0 : getSourcedDensity().getValue();
-    }
-
     public SourceableValue<Double> getSourcedDensity() {
         return density;
     }
@@ -186,15 +177,6 @@ public class Planet {
 
     public SourceableValue<Double> getSourcedDiameter() {
         return diameter;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public String getGravityText() {
-        return null != getGravity() ? getGravity() + "g" : "unknown";
     }
 
     public Double getOrbitRadius() {
@@ -229,27 +211,9 @@ public class Planet {
         return null != landMasses ? new ArrayList<>(landMasses) : null;
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public Double getDayLength(LocalDate when) {
-        return (null == getSourcedDayLength(when)) ? null : getSourcedDayLength(when).getValue();
-    }
-
     public SourceableValue<Double> getSourcedDayLength(LocalDate when) {
         // yes day length can change because Venus
         return getEventData(when, dayLength, e -> e.dayLength);
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public Double getYearLength() {
-        return (null == getSourcedYearLength()) ? null : getSourcedYearLength().getValue();
     }
 
     public SourceableValue<Double> getSourcedYearLength() {
@@ -336,23 +300,6 @@ public class Planet {
         return new ArrayList<>(events.values());
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public List<PlanetaryEvent> getCustomEvents() {
-        List<PlanetaryEvent> customEvents = new ArrayList<>();
-        if (events != null) {
-            for (PlanetaryEvent event : events.values()) {
-                if (event.custom) {
-                    customEvents.add(event);
-                }
-            }
-        }
-        return Collections.unmodifiableList(customEvents);
-    }
-
     protected <T> T getEventData(LocalDate when, T defaultValue, EventGetter<T> getter) {
         if ((null == when) || (null == events) || (null == getter)) {
             return defaultValue;
@@ -376,11 +323,10 @@ public class Planet {
     /**
      * This method signals that the internal cache of event data should be refreshed. This should be called when any
      * field on a planetary event is updated, or if any events are added and/or removed.
-     *
-     * @since 0.50.04
-     * @deprecated shows no usage
+     * <p>
+     * This is a utility function for the purpose of clearing events. It currently shows no uses HOWEVER it still has a
+     * purpose.
      */
-    @Deprecated(since = "0.50.04", forRemoval = true)
     public synchronized void refreshEvents() {
         currentEvents = null;
     }
@@ -440,29 +386,6 @@ public class Planet {
         }
     }
 
-    /**
-     * @return events for this year. Never returns <i>null</i>.
-     *
-     * @since 0.50.04
-     * @deprecated - No uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public List<PlanetaryEvent> getEvents(int year) {
-        if (null == events) {
-            return Collections.emptyList();
-        }
-        List<PlanetaryEvent> result = new ArrayList<>();
-        for (LocalDate date : events.navigableKeySet()) {
-            if (date.getYear() > year) {
-                break;
-            }
-            if (date.getYear() == year) {
-                result.add(events.get(date));
-            }
-        }
-        return result;
-    }
-
     public String getName(LocalDate when) {
         return getSourcedName(when).getValue();
     }
@@ -492,31 +415,12 @@ public class Planet {
         return getEventData(when, null, e -> e.socioIndustrial);
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public String getSocioIndustrialText(LocalDate when) {
-        SocioIndustrialData sid = getSocioIndustrial(when);
-        return null != sid ? sid.toString() : "";
-    }
-
     public HPGRating getHPG(LocalDate when) {
         return (null == getSourcedHPG(when)) ? HPGRating.X : getSourcedHPG(when).getValue();
     }
 
     public SourceableValue<HPGRating> getSourcedHPG(LocalDate when) {
         return getEventData(when, null, e -> e.hpg);
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public String getHPGClass(LocalDate when) {
-        return getHPG(when).toString();
     }
 
     public Long getPopulation(LocalDate when) {
@@ -533,24 +437,6 @@ public class Planet {
 
     public SourceableValue<LifeForm> getSourcedLifeForm(LocalDate when) {
         return getEventData(when, lifeForm, e -> e.lifeForm);
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public String getLifeFormName(LocalDate when) {
-        return getLifeForm(when).name;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public Integer getPercentWater(LocalDate when) {
-        return (null == getSourcedPercentWater(when)) ? null : getSourcedPercentWater(when).getValue();
     }
 
     public SourceableValue<Integer> getSourcedPercentWater(LocalDate when) {
@@ -573,39 +459,12 @@ public class Planet {
         return getEventData(when, pressure, e -> e.pressure);
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public String getPressureName(LocalDate when) {
-        return getPressure(when).toString();
-    }
-
     public Atmosphere getAtmosphere(LocalDate when) {
         return (null == getSourcedAtmosphere(when)) ? Atmosphere.NONE : getSourcedAtmosphere(when).getValue();
     }
 
     public SourceableValue<Atmosphere> getSourcedAtmosphere(LocalDate when) {
         return getEventData(when, atmosphere, e -> e.atmosphere);
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public String getAtmosphereName(LocalDate when) {
-        return getAtmosphere(when).name;
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public String getComposition(LocalDate when) {
-        return (null == getSourcedComposition(when)) ? null : getSourcedComposition(when).getValue();
     }
 
     public SourceableValue<String> getSourcedComposition(LocalDate when) {
@@ -637,36 +496,12 @@ public class Planet {
         return getFactionsFrom(currentFactions);
     }
 
-    /**
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public String getShortDesc(LocalDate when) {
-        return getShortName(when) + " (" + getFactionDesc(when) + ")";
-    }
-
     public String getFactionDesc(LocalDate when) {
         String toReturn = Faction.getFactionNames(getFactionSet(when), when.getYear());
         if (toReturn.isEmpty()) {
             toReturn = "Uncolonized";
         }
         return toReturn;
-    }
-
-    /**
-     * Checks whether a hiring hall exists on the planet on the specified date
-     *
-     * @param when Date to check for existence of hiring hall
-     *
-     * @return True if a hiring hall exists on the given date; otherwise false.
-     *
-     * @since 0.50.04
-     * @deprecated shows no usage
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public boolean isHiringHall(LocalDate when) {
-        return !getHiringHallLevel(when).isNone();
     }
 
     /**
@@ -983,30 +818,6 @@ public class Planet {
                 }
             }
             return current;
-        }
-
-        /**
-         * @since 0.50.04
-         * @deprecated shows no usage
-         */
-        @Deprecated(since = "0.50.04", forRemoval = true)
-        public void replaceDataFrom(PlanetaryEvent other) {
-            faction         = other.faction;
-            hpg             = other.hpg;
-            lifeForm        = other.lifeForm;
-            message         = other.message;
-            name            = other.name;
-            percentWater    = other.percentWater;
-            shortName       = other.shortName;
-            socioIndustrial = other.socioIndustrial;
-            hiringHall      = other.hiringHall;
-            temperature     = other.temperature;
-            pressure        = other.pressure;
-            atmosphere      = other.atmosphere;
-            composition     = other.composition;
-            population      = other.population;
-            dayLength       = other.dayLength;
-            custom          = (other.custom || custom);
         }
 
         /** @return <code>true</code> if the event doesn't contain any change */

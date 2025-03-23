@@ -246,16 +246,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
         super.loadFieldsFromXmlNode(wn);
     }
-
-    /**
-     * @since 0.50.04
-     * @deprecated - No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public EnumSet<AmmoType.Munitions> getMunitionType() {
-        return getType().getMunitionType();
-    }
-
+    
     @Override
     public String getStatus() {
         String toReturn = "Fully Loaded";

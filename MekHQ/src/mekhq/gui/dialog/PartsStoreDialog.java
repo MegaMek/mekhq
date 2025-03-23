@@ -943,21 +943,7 @@ public class PartsStoreDialog extends JDialog {
         public Part getPartAt(int row) {
             return data.get(row).getPart();
         }
-
-        /**
-         * @since 0.50.04
-         * @deprecated no indicated uses
-         */
-        @Deprecated(since = "0.50.04", forRemoval = true)
-        public Part[] getPartstAt(int[] rows) {
-            Part[] parts = new Part[rows.length];
-            for (int i = 0; i < rows.length; i++) {
-                int row = rows[i];
-                parts[i] = data.get(row).getPart();
-            }
-            return parts;
-        }
-
+        
         public int getColumnWidth(int c) {
             return switch (c) {
                 case COL_NAME, COL_DETAIL -> 100;

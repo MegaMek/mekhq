@@ -2439,28 +2439,6 @@ public class CampaignOptions {
         this.randomMarriageMethod = randomMarriageMethod;
     }
 
-    /**
-     * @return whether to use random same-sex marriages
-     *
-     * @since 0.50.04
-     * @deprecated - No indicated replacement. No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public boolean isUseRandomSameSexMarriages() {
-        return useRandomSameSexMarriages;
-    }
-
-    /**
-     * @param useRandomSameSexMarriages whether to use random same-sex marriages
-     *
-     * @since 0.50.04
-     * @deprecated - No indicated replacement. No indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setUseRandomSameSexMarriages(final boolean useRandomSameSexMarriages) {
-        this.useRandomSameSexMarriages = useRandomSameSexMarriages;
-    }
-
     public boolean isUseRandomClanPersonnelMarriages() {
         return useRandomClanPersonnelMarriages;
     }
@@ -3750,16 +3728,7 @@ public class CampaignOptions {
     public boolean isFactionIntroDate() {
         return factionIntroDate;
     }
-
-    /**
-     * @since 0.50.04
-     * @deprecated no indicated uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    public void setFactionIntroDate(final boolean factionIntroDate) {
-        this.factionIntroDate = factionIntroDate;
-    }
-
+    
     public boolean isUseAmmoByType() {
         return useAmmoByType;
     }

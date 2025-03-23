@@ -99,20 +99,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
     final static String OBJECTIVEPANEL = "Objective Status";
     final static String PREVIEWPANEL   = "Preview";
 
-    /**
-     * @since 0.50.04
-     * @deprecated Showing no uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    final static String[] panelOrder = { UNITSPANEL,
-          PILOTPANEL,
-          SALVAGEPANEL,
-          PRISONERPANEL,
-          KILLSPANEL,
-          REWARDPANEL,
-          OBJECTIVEPANEL,
-          PREVIEWPANEL };
-
     private       Campaign campaign;
     private final JFrame   frame;
 
@@ -1344,24 +1330,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                   tracker.playerHasBattlefieldControl());
         }
     }
-
-    /**
-     * Something changed about units OR salvage, we need to update the objective panel.
-     *
-     * @since 0.50.04
-     * @deprecated Showing no uses.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    private void recheckObjectives() {
-        for (ScenarioObjective objective : objectiveCheckboxes.keySet()) {
-            for (JCheckBox checkBox : objectiveCheckboxes.get(objective)) {
-                checkBox.setSelected(objectiveProcessor.getQualifyingObjectiveUnits()
-                                           .get(objective)
-                                           .contains(checkBox.getActionCommand()));
-            }
-        }
-    }
-
+    
     /**
      * Updates the final panel with information taken from the other ones.
      */
