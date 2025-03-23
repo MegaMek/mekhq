@@ -69,7 +69,7 @@ public class PrisonerEventResultsDialog extends MHQDialogImmersive {
                                       int choiceIndex, boolean isSuccessful, String eventReport) {
         super(campaign, speaker, null, createInCharacterMessage(campaign, event,
                 choiceIndex, isSuccessful), createButtons(isSuccessful), eventReport,
-            null, false);
+            null, false, null, true);
     }
 
     /**

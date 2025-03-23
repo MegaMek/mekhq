@@ -27,46 +27,6 @@
  */
 package mekhq.campaign.stratcon;
 
-import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Entity;
-import megamek.common.Minefield;
-import megamek.common.TargetRoll;
-import megamek.common.annotations.Nullable;
-import megamek.common.enums.SkillLevel;
-import megamek.common.event.Subscribe;
-import megamek.logging.MMLogger;
-import mekhq.MHQConstants;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
-import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.event.NewDayEvent;
-import mekhq.campaign.event.ScenarioChangedEvent;
-import mekhq.campaign.event.StratconDeploymentEvent;
-import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.*;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
-import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
-import mekhq.campaign.mission.atb.AtBScenarioModifier;
-import mekhq.campaign.mission.enums.*;
-import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache;
-import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache.CacheType;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
-import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
-import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
-import mekhq.campaign.unit.Unit;
-import org.apache.commons.math3.util.Pair;
-
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
@@ -74,7 +34,11 @@ import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.Coords.ALL_DIRECTIONS;
-import static megamek.common.UnitType.*;
+import static megamek.common.UnitType.AEROSPACEFIGHTER;
+import static megamek.common.UnitType.CONV_FIGHTER;
+import static megamek.common.UnitType.DROPSHIP;
+import static megamek.common.UnitType.JUMPSHIP;
+import static megamek.common.UnitType.MEK;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.icons.enums.OperationalStatus.determineLayeredForceIconOperationalStatus;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.finalizeScenario;
@@ -96,6 +60,58 @@ import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsT
 import static mekhq.campaign.stratcon.StratconScenarioFactory.convertSpecificUnitTypeToGeneral;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
+import megamek.codeUtilities.ObjectUtility;
+import megamek.common.Entity;
+import megamek.common.Minefield;
+import megamek.common.TargetRoll;
+import megamek.common.annotations.Nullable;
+import megamek.common.enums.SkillLevel;
+import megamek.common.event.Subscribe;
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.Hangar;
+import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.event.NewDayEvent;
+import mekhq.campaign.event.ScenarioChangedEvent;
+import mekhq.campaign.event.StratconDeploymentEvent;
+import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
+import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.mission.atb.AtBScenarioModifier;
+import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.enums.ScenarioType;
+import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache;
+import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache.CacheType;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Skill;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
+import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
+import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
+import mekhq.campaign.unit.Unit;
+import org.apache.commons.math3.util.Pair;
 
 /**
  * This class contains "rules" logic for the AtB-Stratcon state
@@ -1413,7 +1429,8 @@ public class StratconRulesManager {
             }
         }
 
-        if (scenario != null || targetFacility != null) {
+        if ((scenario != null)
+            || (targetFacility != null && !targetFacility.isOwnerAlliedToPlayer())) {
             return;
         }
 

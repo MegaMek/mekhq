@@ -38,10 +38,11 @@ import static megamek.client.ratgenerator.UnitTable.findTable;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
+import static megamek.common.UnitType.AEROSPACEFIGHTER;
 import static megamek.common.UnitType.MEK;
+import static megamek.common.UnitType.TANK;
 import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.REGULAR;
-import static megamek.common.enums.SkillLevel.VETERAN;
 import static megamek.common.enums.SkillLevel.parseFromInteger;
 import static megamek.common.enums.SkillLevel.parseFromString;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
@@ -54,11 +55,6 @@ import static mekhq.campaign.mission.enums.AtBMoraleLevel.ADVANCING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
-import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
-import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
-import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
-import static mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT;
-import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_A;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_ASTAR;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_B;
@@ -94,7 +90,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
-import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.RATGenerator;
@@ -111,7 +106,6 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.CombatTeam;
@@ -124,8 +118,9 @@ import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
-import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.randomEvents.MercenaryAuction;
+import mekhq.campaign.randomEvents.RoninOffer;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractDefinition;
 import mekhq.campaign.stratcon.StratconContractInitializer;
@@ -476,11 +471,9 @@ public class AtBContract extends Contract {
                 }
 
                 numUnits += switch (entity.getUnitType()) {
-                    case UnitType.TANK,
-                         UnitType.VTOL,
-                         UnitType.NAVAL,
-                         UnitType.CONV_FIGHTER,
-                         UnitType.AEROSPACEFIGHTER -> campaign.getFaction().isClan() ? 0.5 : 1;
+                    case TANK, UnitType.VTOL, UnitType.NAVAL, UnitType.CONV_FIGHTER,
+                         AEROSPACEFIGHTER
+                        -> campaign.getFaction().isClan() ? 0.5 : 1;
                     case UnitType.PROTOMEK -> 0.2;
                     case UnitType.BATTLE_ARMOR, UnitType.INFANTRY -> 0;
                     default -> 1; // All other unit types
@@ -813,19 +806,19 @@ public class AtBContract extends Contract {
                     }
                 } else {
                     campaign.addReport("Bonus: Ronin");
-                    recruitRonin(campaign);
+                    new RoninOffer(campaign, stratconCampaignState, requiredCombatTeams);
                 }
                 yield false;
             }
             case 2 -> {
                 campaign.addReport("Bonus: Ronin");
-                recruitRonin(campaign);
+                new RoninOffer(campaign, stratconCampaignState, requiredCombatTeams);
                 yield false;
             }
             case 3 -> { // Resupply
                 if (campaignOptions.isUseAtB() && !campaignOptions.isUseStratCon()) {
                     campaign.addReport("Bonus: Ronin");
-                    recruitRonin(campaign);
+                    new RoninOffer(campaign, stratconCampaignState, requiredCombatTeams);
                     yield false;
                 } else {
                     if (isPostScenario) {
@@ -838,18 +831,15 @@ public class AtBContract extends Contract {
                 }
             }
             case 4 -> {
-                campaign.addReport("Bonus: Unit");
-                addBonusUnit(campaign, UnitType.TANK);
+                new MercenaryAuction(campaign, requiredCombatTeams, stratconCampaignState, TANK);
                 yield false;
             }
             case 5 -> {
-                campaign.addReport("Bonus: Unit");
-                addBonusUnit(campaign, UnitType.AEROSPACEFIGHTER);
+                new MercenaryAuction(campaign, requiredCombatTeams, stratconCampaignState, AEROSPACEFIGHTER);
                 yield false;
             }
             case 6 -> {
-                campaign.addReport("Bonus: Unit");
-                addBonusUnit(campaign, MEK);
+                new MercenaryAuction(campaign, requiredCombatTeams, stratconCampaignState, MEK);
                 yield false;
             }
             default -> throw new IllegalStateException(
@@ -858,46 +848,13 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * Generates a Ronin and adds them to the personnel roster.
-     *
-     * <p>
-     * This method creates a new Ronin with either the "MEKWARRIOR" or "AEROSPACE_PILOT" role, depending on a random
-     * roll; sets their skills based on predefined preferences and randomization; re-rolls their loyalty and advantages;
-     * assigns a random callsign; and finally adds them to the campaign's personnel roster.
-     * </p>
-     *
-     * <p>
-     * Administrator settings are not applied in this method, as the Ronin will not be an admin.
-     * </p>
-     *
-     * @param campaign the current {@link Campaign} in which the Ronin will be recruited.
-     */
-    private static void recruitRonin(Campaign campaign) {
-        int roll = randomInt(5);
-
-        PersonnelRole role  = roll == 0 ? AEROSPACE_PILOT : MEKWARRIOR;
-        Person        ronin = campaign.newPerson(role);
-
-        RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
-        boolean                useExtraRandomness     = randomSkillPreferences.randomizeSkill();
-
-        // We don't care about admin settings, as we're not going to have an admin here
-        overrideSkills(false, false, useExtraRandomness, ronin, role, VETERAN);
-
-        SkillLevel skillLevel = ronin.getSkillLevel(campaign, false);
-        reRollLoyalty(ronin, skillLevel);
-        reRollAdvantages(campaign, ronin, skillLevel);
-        ronin.setCallsign(RandomCallsignGenerator.getInstance().generate());
-
-        campaign.recruitPerson(ronin, true);
-    }
-
-    /**
      * Generates a bonus unit for a given campaign and unit type.
      *
-     * @param campaign the campaign object to add the bonus unit to
-     * @param unitType the type of unit for the bonus
+     * @param campaign  the campaign object to add the bonus unit to
+     * @param unitType  the type of unit for the bonus
+     * @deprecated deprecated as superceded by {@link MercenaryAuction}
      */
+    @Deprecated(since = "0.50.04", forRemoval = true)
     private void addBonusUnit(Campaign campaign, int unitType) {
         // Determine faction and quality
         String faction = (randomInt(2) > 0) ? enemyCode : employerCode;
