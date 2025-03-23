@@ -44,7 +44,7 @@ public class PrisonersNagLogic {
      * @return {@code true} if there are prisoners in the campaign and no active contract; {@code false} otherwise.
      */
     public static boolean hasPrisoners(boolean hasActiveContract, boolean hasPrisoners) {
-        if (!hasActiveContract) {
+        if (hasActiveContract) {
             return false;
         }
 
