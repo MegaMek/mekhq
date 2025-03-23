@@ -31,6 +31,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static mekhq.campaign.personnel.Skill.getCountDownMaxValue;
 import static mekhq.campaign.personnel.Skill.getCountUpMaxValue;
+import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.personalityQuirksSortedAlphabetically;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -954,7 +955,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             panDemog.add(labelPersonalityQuirk, gridBagConstraints);
 
-            comboPersonalityQuirk = new MMComboBox<>("comboPersonalityQuirk", PersonalityQuirk.values());
+            comboPersonalityQuirk = new MMComboBox<>("comboPersonalityQuirk", personalityQuirksSortedAlphabetically());
             comboPersonalityQuirk.setSelectedItem(person.getPersonalityQuirk());
 
             gridBagConstraints.gridx     = 1;
