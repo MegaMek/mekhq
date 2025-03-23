@@ -390,11 +390,12 @@ public class Planet {
      */
     class CurrentEvents {
         private LocalDate                                      lastUpdated;
-        private PlanetaryEvent                                 planetaryEvent = new PlanetaryEvent();
+        private PlanetaryEvent                                 planetaryEvent;
         private Map.Entry<LocalDate, PlanetaryEvent>           nextEvent;
         private Iterator<Map.Entry<LocalDate, PlanetaryEvent>> eventStream;
 
         private void initialize(LocalDate now) {
+            planetaryEvent = new PlanetaryEvent();
             lastUpdated = now;
             if (events != null) {
                 eventStream = events.entrySet().iterator();
