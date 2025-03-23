@@ -19,6 +19,18 @@ MEKHQ VERSION HISTORY:
 + PR #6347: Allow Jump Jets and Mek Mechanical Boosters
 + PR #6348: Allow setting MekHQ Options from splash screen
 + Fix #6333: Stopped Factions from Traveling Back in Time to Invade the Inner Sphere Before Their Inception
++ PR #6371: Removed Player Deployment Zone "ANY" From Scenario Templates 
++ PR #6370: Sorted Personality Quirks Alphabetically in Quirk Picker 
++ PR #6369: Fixed Logic Error In Prisoners Nag Yet Again 
++ PR #6368: Updated Date and Faction Handling in Campaign Options IIC
++ PR #6366: Updated BV Display in TO&E to Account for C3
++ PR #6365: Added Tooltips to SPA Purchase Dropdown
++ PR #6364: Updated Untreated Injuries Nag Dialog to Account for AutoInfirmary
++ PR #6363: Changed Default Value for Advance Day Selection 
++ PR #6361: Improved Immersive Dialog Behavior 
++ PR #6360: Fixed Force Type Changing Being Unavailable in Non-StratCon, Non-AtB Campaigns 
++ PR #6359: Fixed Missing Scenarios 
++ PR #6358: Fixed Fatigue Status Report Update Messages 
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
