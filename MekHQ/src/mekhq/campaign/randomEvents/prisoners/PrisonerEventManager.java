@@ -27,6 +27,25 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static java.lang.Math.round;
+import static java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.campaign.force.ForceType.SECURITY;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.Entity;
@@ -46,21 +65,6 @@ import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerEventDialog;
 import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerEventResultsDialog;
 import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerWarningDialog;
 import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerWarningResultsDialog;
-
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.*;
-
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-import static java.lang.Math.round;
-import static java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
-import static mekhq.campaign.force.ForceType.SECURITY;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * Manages prisoner-related events and warnings during a campaign.
@@ -140,7 +144,7 @@ public class PrisonerEventManager {
             return;
         }
 
-        if (!campaign.hasActiveAtBContract(false)) {
+        if (!campaign.hasActiveContract()) {
             return;
         }
 
