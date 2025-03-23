@@ -32,7 +32,6 @@ The victor will control the battlefield at the end of the engagement, securing s
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>0</deploymentZone>
                     <deploymentZone>1</deploymentZone>
                     <deploymentZone>2</deploymentZone>
                     <deploymentZone>3</deploymentZone>

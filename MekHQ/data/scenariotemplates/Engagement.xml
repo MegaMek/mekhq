@@ -32,7 +32,6 @@ Strike hard, eliminate the opposition, and take control. Victory is absolute, or
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>0</deploymentZone>
                     <deploymentZone>1</deploymentZone>
                     <deploymentZone>2</deploymentZone>
                     <deploymentZone>3</deploymentZone>
