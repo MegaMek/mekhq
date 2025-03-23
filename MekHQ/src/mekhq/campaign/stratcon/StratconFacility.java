@@ -27,6 +27,13 @@
  */
 package mekhq.campaign.stratcon;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
+import javax.xml.transform.Source;
+
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Unmarshaller;
@@ -34,13 +41,6 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import megamek.logging.MMLogger;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.utilities.MHQXMLUtility;
-
-import javax.xml.transform.Source;
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
 
 /**
  * This represents a facility in the StratCon context
@@ -139,6 +139,14 @@ public class StratconFacility implements Cloneable {
 
     public void setOwner(ForceAlignment owner) {
         this.owner = owner;
+    }
+
+    /**
+     * @return {@code true} if the facility owner is either allied to the player or is the player themselves,
+     *         {@code false} otherwise.
+     */
+    public boolean isOwnerAlliedToPlayer() {
+        return owner == ForceAlignment.Allied || owner == ForceAlignment.Player;
     }
 
     public String getFormattedDisplayableName() {
