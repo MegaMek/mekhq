@@ -27,19 +27,32 @@
  */
 package mekhq.gui.baseComponents;
 
+import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
+import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
+import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.ResourceBundle;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
 import megamek.client.ui.swing.util.UIUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.personnel.Person;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ResourceBundle;
-
-import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
-import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
 /**
  * An abstract base class for displaying a nag dialog within MekHQ.
@@ -81,7 +94,7 @@ public abstract class AbstractMHQNagDialog extends JDialog {
     /**
      * Indicates whether the user selected the "Advance Day" option.
      */
-    private boolean advanceDaySelected = true;
+    private boolean advanceDaySelected = false;
 
     protected final transient ResourceBundle resources = ResourceBundle.getBundle(
         "mekhq.resources.GUI", MekHQ.getMHQOptions().getLocale());
