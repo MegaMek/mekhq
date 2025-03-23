@@ -123,7 +123,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
         for (Entity en : allyEntities) {
             int speed = en.getWalkMP();
 
-            if (en.getJumpMP() > 0) {
+            if (en.getAnyTypeMaxJumpMP() > 0) {
                 if (en instanceof Infantry) {
                     speed = en.getJumpMP();
                 } else {
@@ -137,7 +137,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
         for (Entity en : enemyEntities) {
             int speed = en.getWalkMP();
 
-            if (en.getJumpMP() > 0) {
+            if (en.getAnyTypeMaxJumpMP() > 0) {
                 if (en instanceof Infantry) {
                     speed = en.getJumpMP();
                 } else {

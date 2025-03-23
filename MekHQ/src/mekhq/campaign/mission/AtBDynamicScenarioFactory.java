@@ -4201,7 +4201,7 @@ public class AtBDynamicScenarioFactory {
     private static int calculateAtBSpeed(Entity entity) {
         int speed = entity.getWalkMP(); // Get the base walk MP of the entity
 
-        if (entity.getJumpMP() > 0) {
+        if (entity.getAnyTypeMaxJumpMP() > 0) {
             // If the entity has jump capability, adjust the speed
             if (entity instanceof Infantry) {
                 // For infantry, use jump MP instead of walk MP
