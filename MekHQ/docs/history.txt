@@ -8,6 +8,13 @@ MEKHQ VERSION HISTORY:
 + PR #6293: Added Level Attribute To Intelligence Enum
 + PR #6295: Updated 'Immersive Dialog' System
 + PR #6335: Updated Rank Systems Version for 50.05
++ PR #6168: Improved the Distinguishing of Brand New Parts Handling
++ Fix #6265: Refactored Fatigue and Addressed Fatigue Use of Vessel Crews
++ PR #6277: Enhanced Ronin Event
++ Fix #6324: Added Status-Based Tinted Personnel Portraits
++ Fix #6316: Refactored Injury Description Logic In Patient Table Model
++ Fix #6336: Fixed Prisoners Check Logic in NagController
++ Fix #6337: Deploying to an Allied Facility No Longer Blocks Scanning
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
