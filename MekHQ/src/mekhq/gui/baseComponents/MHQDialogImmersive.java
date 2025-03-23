@@ -27,6 +27,29 @@
  */
 package mekhq.gui.baseComponents;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkEvent.EventType;
+
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -37,22 +60,6 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.GlossaryDialog;
-
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkEvent.EventType;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-import static megamek.client.ui.WrapLayout.wordWrap;
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.campaign.force.Force.FORCE_NONE;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * An immersive dialog used in MekHQ to display interactions between speakers,
@@ -85,7 +92,7 @@ public class MHQDialogImmersive extends JDialog {
     private JSpinner spinner;
     private int spinnerValue;
 
-    private int dialogChoice;
+    private int dialogChoice = 0;
 
     private static final MMLogger logger = MMLogger.create(MHQDialogImmersive.class);
 
@@ -124,17 +131,18 @@ public class MHQDialogImmersive extends JDialog {
 
     /**
      * Constructs and initializes an immersive dialog with configurable layouts, speakers, actions, and messages.
-     * <p>
-     * This dialog is designed to provide a rich, immersive interface featuring optional speakers on the
+     *
+     * <p>This dialog is designed to provide a rich, immersive interface featuring optional speakers on the
      * left and right, a central message panel with configurable width, a spinner panel, and a list of actionable buttons.
-     * An optional out-of-character message can also be displayed below the buttons.
+     * An optional out-of-character message can also be displayed below the buttons.</p>
      *
      * @param campaign The {@link Campaign} instance tied to the dialog, providing contextual information.
      * @param leftSpeaker Optional left-side {@link Person}; use {@code null} if no left speaker is present.
      * @param rightSpeaker Optional right-side {@link Person}; use {@code null} if no right speaker is present.
      * @param centerMessage The main {@link String} message displayed in the center panel of the dialog.
      * @param buttons A {@link List} of {@link ButtonLabelTooltipPair} instances representing actions available
-     *                in the dialog (displayed as buttons).
+     *                in the dialog (displayed as buttons). The default option is used if the user closes or cancels
+     *                the dialog.
      * @param outOfCharacterMessage An optional {@link String} message displayed below the buttons;
      *                               use {@code null} if not applicable.
      * @param centerWidth An optional width for the center panel; uses the default value if {@code null}.
@@ -222,7 +230,7 @@ public class MHQDialogImmersive extends JDialog {
         int screenWidth = screenSize.width;
         setSize(min(screenWidth, getWidth()), (int) min(getHeight(), screenHeight * 0.8));
 
-        setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setModal(isModal);
         setLocationRelativeTo(null); // Needs to be after pack
         setResizable(false);
