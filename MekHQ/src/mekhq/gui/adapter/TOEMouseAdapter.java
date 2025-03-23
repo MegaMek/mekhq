@@ -27,6 +27,27 @@
  */
 package mekhq.gui.adapter;
 
+import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
+import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
+import static mekhq.campaign.enums.CampaignTransportType.TOW_TRANSPORT;
+import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
+import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_FALSE;
+import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
+import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_TRUE;
+import static mekhq.campaign.force.ForceType.CONVOY;
+import static mekhq.campaign.force.ForceType.SECURITY;
+import static mekhq.campaign.force.ForceType.STANDARD;
+import static mekhq.campaign.force.ForceType.SUPPORT;
+
+import java.awt.event.ActionEvent;
+import java.util.*;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JTree;
+import javax.swing.tree.TreePath;
+
 import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.common.EntityWeightClass;
 import megamek.common.GunEmplacement;
@@ -64,21 +85,6 @@ import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
 import mekhq.utilities.MHQInternationalization;
-
-import javax.swing.*;
-import javax.swing.tree.TreePath;
-import java.awt.event.ActionEvent;
-import java.util.*;
-
-import static mekhq.campaign.enums.CampaignTransportType.*;
-import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
-import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_FALSE;
-import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
-import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_TRUE;
-import static mekhq.campaign.force.ForceType.CONVOY;
-import static mekhq.campaign.force.ForceType.SECURITY;
-import static mekhq.campaign.force.ForceType.STANDARD;
-import static mekhq.campaign.force.ForceType.SUPPORT;
 
 public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(TOEMouseAdapter.class);
@@ -1092,30 +1098,30 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
 
+            menu = new JMenu("Change Force Type");
+
+            menuItem = new JMenuItem("Make Standard Force");
+            menuItem.setActionCommand(COMMAND_CHANGE_FORCE_TYPE_STANDARD + forceIds);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+
+            menuItem = new JMenuItem("Make Support Force");
+            menuItem.setActionCommand(COMMAND_CHANGE_FORCE_TYPE_SUPPORT + forceIds);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+
+            menuItem = new JMenuItem("Make Convoy Force");
+            menuItem.setActionCommand(COMMAND_CHANGE_FORCE_TYPE_CONVOY + forceIds);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+
+            menuItem = new JMenuItem("Make Security Force");
+            menuItem.setActionCommand(COMMAND_CHANGE_FORCE_TYPE_SECURITY + forceIds);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+            popup.add(menu);
+
             if (gui.getCampaign().getCampaignOptions().isUseAtB()) {
-                menu = new JMenu("Change Force Type");
-
-                menuItem = new JMenuItem("Make Standard Force");
-                menuItem.setActionCommand(COMMAND_CHANGE_FORCE_TYPE_STANDARD + forceIds);
-                menuItem.addActionListener(this);
-                menu.add(menuItem);
-
-                menuItem = new JMenuItem("Make Support Force");
-                menuItem.setActionCommand(COMMAND_CHANGE_FORCE_TYPE_SUPPORT + forceIds);
-                menuItem.addActionListener(this);
-                menu.add(menuItem);
-
-                menuItem = new JMenuItem("Make Convoy Force");
-                menuItem.setActionCommand(COMMAND_CHANGE_FORCE_TYPE_CONVOY + forceIds);
-                menuItem.addActionListener(this);
-                menu.add(menuItem);
-
-                menuItem = new JMenuItem("Make Security Force");
-                menuItem.setActionCommand(COMMAND_CHANGE_FORCE_TYPE_SECURITY + forceIds);
-                menuItem.addActionListener(this);
-                menu.add(menuItem);
-                popup.add(menu);
-
                 JMenuItem optionStrategicForceOverride = new JMenuItem((force.isCombatTeam() ?
                     "Never" : "Always") + " Consider Force a Combat Team");
                 optionStrategicForceOverride.setActionCommand(COMMAND_CHANGE_STRATEGIC_FORCE_OVERRIDE + forceIds);
