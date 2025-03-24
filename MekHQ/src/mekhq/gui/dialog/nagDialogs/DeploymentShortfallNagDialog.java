@@ -90,10 +90,8 @@ public class DeploymentShortfallNagDialog {
                 MekHQ.getMHQOptions().setNagDialogIgnore(NAG_SHORT_DEPLOYMENT, true);
                 cancelAdvanceDay = false;
             }
-            default -> throw new IllegalStateException("Unexpected value in " +
-                                                             getClass().getSimpleName() +
-                                                             ": " +
-                                                             choiceIndex);
+            default ->
+                  throw new IllegalStateException("Unexpected value in DeploymentShortfallNagDialog: " + choiceIndex);
         }
     }
 
