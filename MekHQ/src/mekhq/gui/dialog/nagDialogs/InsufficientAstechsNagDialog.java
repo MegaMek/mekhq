@@ -27,7 +27,7 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import static mekhq.MHQConstants.NAG_ADMIN_STRAIN;
+import static mekhq.MHQConstants.NAG_INSUFFICIENT_ASTECHS;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAstechsNagLogic.hasAsTechsNeeded;
@@ -36,7 +36,6 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import java.util.ArrayList;
 import java.util.List;
 
-import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -99,7 +98,7 @@ public class InsufficientAstechsNagDialog {
             case CHOICE_CANCEL -> cancelAdvanceDay = true;
             case CHOICE_CONTINUE -> cancelAdvanceDay = false;
             case CHOICE_SUPPRESS -> {
-                MekHQ.getMHQOptions().setNagDialogIgnore(NAG_ADMIN_STRAIN, true);
+                MekHQ.getMHQOptions().setNagDialogIgnore(NAG_INSUFFICIENT_ASTECHS, true);
                 cancelAdvanceDay = false;
             }
             default ->
@@ -196,7 +195,7 @@ public class InsufficientAstechsNagDialog {
      * @return {@code true} if the nag dialog should be displayed due to insufficient AsTechs, {@code false} otherwise.
      */
     public static boolean checkNag(int asTechsNeeded) {
-        final String NAG_KEY = MHQConstants.NAG_INSUFFICIENT_ASTECHS;
+        final String NAG_KEY = NAG_INSUFFICIENT_ASTECHS;
 
         return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) && hasAsTechsNeeded(asTechsNeeded);
     }
