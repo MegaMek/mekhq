@@ -4314,7 +4314,11 @@ public class AtBDynamicScenarioFactory {
      */
     private static void deployArtilleryOffBoard(List<Entity> entityList) {
         OffBoardDirection direction = OffBoardDirection.getDirection(randomInt(4));
-        int distance = (randomInt(2) + 1) * 17;
+
+        // Set distance to max of 1/2 the 1-turn flight time distance in boards so that Counter-Battery
+        // duels don't require interminable waiting.
+        // TODO: add logic for own ranges, strategic targets, and enemy off-board artillery assets.
+        int distance = (randomInt(4) + 1) * 17;
 
         for (Entity entity : entityList) {
             entity.setOffBoard(distance, direction);
