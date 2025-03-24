@@ -65,7 +65,6 @@ public class EndContractNagDialog {
     private final int CHOICE_CONTINUE = 1;
     private final int CHOICE_SUPPRESS = 2;
 
-    private final Campaign campaign;
     private boolean cancelAdvanceDay;
 
     /**
@@ -80,8 +79,6 @@ public class EndContractNagDialog {
      * @param campaign The {@link Campaign} that the nag dialog is tied to.
      */
     public EndContractNagDialog(final Campaign campaign) {
-        this.campaign = campaign;
-
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
               campaign.getSeniorAdminPerson(COMMAND),
               null,
