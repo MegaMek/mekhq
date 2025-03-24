@@ -36,15 +36,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.UUID;
 
-import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
-import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerDescription;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
- * The {@code DialogRoleplayEvent} class handles the creation and display of roleplay event dialogs
- * for convoy missions in MekHQ. These dialogs provide narrative elements to enhance the immersion
- * of convoy missions by using dynamic content, player convoy details, and localized text.
+ * The {@code DialogRoleplayEvent} class handles the creation and display of roleplay event dialogs for convoy missions
+ * in MekHQ. These dialogs provide narrative elements to enhance the immersion of convoy missions by using dynamic
+ * content, player convoy details, and localized text.
  */
 public class DialogRoleplayEvent extends JDialog {
     final int LEFT_WIDTH = UIUtil.scaleForGUI(200);
@@ -54,8 +54,8 @@ public class DialogRoleplayEvent extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Resupply";
 
     /**
-     * Displays a roleplay event dialog for a player convoy. The dialog is used to present messages related
-     * to narrative events that occur during convoy missions, accompanied by speaker details for immersion.
+     * Displays a roleplay event dialog for a player convoy. The dialog is used to present messages related to narrative
+     * events that occur during convoy missions, accompanied by speaker details for immersion.
      *
      * <p>This method performs the following steps:</p>
      * <ol>
@@ -82,12 +82,12 @@ public class DialogRoleplayEvent extends JDialog {
      *
      * <p>The dialog is modal to ensure the player engages with it before resuming other actions.</p>
      *
-     * @param campaign      the {@link Campaign} instance, providing context for accessing relevant personnel
-     *                      and dynamic game data like the player commander address.
-     * @param playerConvoy  the {@link Force} instance representing the player's convoy. This is used to retrieve
-     *                      the force commander and the convoy's name if no commander is available.
-     * @param eventText     the narrative text describing the roleplay event. This string may include formatting
-     *                      placeholders ({@code %s}) to dynamically incorporate campaign-specific details.
+     * @param campaign     the {@link Campaign} instance, providing context for accessing relevant personnel and dynamic
+     *                     game data like the player commander address.
+     * @param playerConvoy the {@link Force} instance representing the player's convoy. This is used to retrieve the
+     *                     force commander and the convoy's name if no commander is available.
+     * @param eventText    the narrative text describing the roleplay event. This string may include formatting
+     *                     placeholders ({@code %s}) to dynamically incorporate campaign-specific details.
      */
     public DialogRoleplayEvent(Campaign campaign, Force playerConvoy, String eventText) {
         setTitle(getFormattedTextAt(RESOURCE_BUNDLE, "incomingTransmission.title"));
@@ -126,9 +126,10 @@ public class DialogRoleplayEvent extends JDialog {
 
         // Speaker description (below the icon)
         StringBuilder speakerDescription = getSpeakerDescription(campaign, speaker, speakerName);
-        JLabel leftDescription = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                LEFT_WIDTH, speakerDescription));
+        JLabel leftDescription = new JLabel(String.format(
+              "<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              LEFT_WIDTH,
+              speakerDescription));
         leftDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Add the image and description to the leftBox
@@ -146,9 +147,10 @@ public class DialogRoleplayEvent extends JDialog {
         JPanel rightBox = new JPanel(new BorderLayout());
         rightBox.setBorder(BorderFactory.createEtchedBorder());
 
-        JLabel rightDescription = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                RIGHT_WIDTH, eventText));
+        JLabel rightDescription = new JLabel(String.format(
+              "<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              RIGHT_WIDTH,
+              eventText));
         rightBox.add(rightDescription);
 
         // Add rightBox to mainPanel
@@ -173,10 +175,9 @@ public class DialogRoleplayEvent extends JDialog {
 
         // New panel (to be added below the button panel)
         JPanel infoPanel = new JPanel(new BorderLayout());
-        JLabel lblInfo = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                RIGHT_WIDTH + LEFT_WIDTH,
-                getFormattedTextAt(RESOURCE_BUNDLE, "documentation.prompt")));
+        JLabel lblInfo = new JLabel(String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              RIGHT_WIDTH + LEFT_WIDTH,
+              getFormattedTextAt(RESOURCE_BUNDLE, "documentation.prompt")));
         lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
         infoPanel.add(lblInfo, BorderLayout.CENTER);
         infoPanel.setBorder(BorderFactory.createEtchedBorder());

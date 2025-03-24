@@ -32,7 +32,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Factions;
-import mekhq.gui.baseComponents.MHQDialogImmersive;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
 import javax.swing.*;
 import java.awt.*;
@@ -44,14 +44,20 @@ import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
-public class GrayMondayDialog extends MHQDialogImmersive {
+public class GrayMondayDialog extends ImmersiveDialogCore {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.GrayMonday";
 
     public GrayMondayDialog(Campaign campaign, Person speaker, boolean isClarionNote, int eventIndex) {
-        super(campaign, speaker, null,
-            createInCharacterMessage(campaign, isClarionNote, eventIndex),
-            createButtons(), createOutOfCharacterMessage(), null, false,
-              null, true);
+        super(campaign,
+              speaker,
+              null,
+              createInCharacterMessage(campaign, isClarionNote, eventIndex),
+              createButtons(),
+              createOutOfCharacterMessage(),
+              null,
+              false,
+              null,
+              true);
     }
 
     /**
@@ -63,8 +69,8 @@ public class GrayMondayDialog extends MHQDialogImmersive {
      * @return a list of {@link ButtonLabelTooltipPair} representing the dialog's buttons
      */
     private static List<ButtonLabelTooltipPair> createButtons() {
-        ButtonLabelTooltipPair btnConfirm = new ButtonLabelTooltipPair(
-            getFormattedTextAt(RESOURCE_BUNDLE, "confirm.button"), null);
+        ButtonLabelTooltipPair btnConfirm = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
+              "confirm.button"), null);
 
         return List.of(btnConfirm);
     }
@@ -76,6 +82,7 @@ public class GrayMondayDialog extends MHQDialogImmersive {
      * specialization within the campaign. If no such person exists, this method returns {@code null}.</p>
      *
      * @param campaign the {@link Campaign} containing personnel data
+     *
      * @return a {@link Person} representing the left speaker, or {@code null} if no suitable speaker is available
      */
     private static @Nullable Person getSpeaker(Campaign campaign) {
@@ -86,8 +93,7 @@ public class GrayMondayDialog extends MHQDialogImmersive {
         String commanderAddress = campaign.getCommanderAddress(false);
         String eventType = isClarionNote ? "clarionNote" : "grayMonday";
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, eventType + "Event" + eventIndex + ".message",
-            commanderAddress);
+        return getFormattedTextAt(RESOURCE_BUNDLE, eventType + "Event" + eventIndex + ".message", commanderAddress);
     }
 
 
@@ -138,9 +144,10 @@ public class GrayMondayDialog extends MHQDialogImmersive {
 
         // Speaker description (below the icon)
         StringBuilder speakerDescription = getSpeakerDescription(campaign, speaker, speakerName);
-        JLabel leftDescription = new JLabel(
-            String.format("<html><div style='width:%dpx; text-align:center;'>%s</div></html>",
-                IMAGE_WIDTH, speakerDescription));
+        JLabel leftDescription = new JLabel(String.format(
+              "<html><div style='width:%dpx; text-align:center;'>%s</div></html>",
+              IMAGE_WIDTH,
+              speakerDescription));
         leftDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Add the image and description to the speakerBox

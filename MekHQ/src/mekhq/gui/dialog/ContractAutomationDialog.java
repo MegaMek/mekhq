@@ -36,8 +36,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ResourceBundle;
 
-import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
-import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerDescription;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
 public class ContractAutomationDialog extends JDialog {
@@ -89,9 +89,10 @@ public class ContractAutomationDialog extends JDialog {
 
         // Speaker description (below the icon)
         StringBuilder speakerDescription = getSpeakerDescription(campaign, speaker, speakerName);
-        JLabel leftDescription = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                LEFT_WIDTH, speakerDescription));
+        JLabel leftDescription = new JLabel(String.format(
+              "<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              LEFT_WIDTH,
+              speakerDescription));
         leftDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Add the image and description to the leftBox
@@ -109,9 +110,10 @@ public class ContractAutomationDialog extends JDialog {
         JPanel rightBox = new JPanel(new BorderLayout());
         rightBox.setBorder(BorderFactory.createEtchedBorder());
 
-        JLabel rightDescription = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                RIGHT_WIDTH, message));
+        JLabel rightDescription = new JLabel(String.format(
+              "<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              RIGHT_WIDTH,
+              message));
         rightBox.add(rightDescription);
 
         // Add rightBox to mainPanel
@@ -145,10 +147,9 @@ public class ContractAutomationDialog extends JDialog {
         if (includeAddendum) {
             // New panel (to be added below the button panel)
             JPanel infoPanel = new JPanel(new BorderLayout());
-            JLabel lblInfo = new JLabel(
-                String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                    RIGHT_WIDTH + LEFT_WIDTH,
-                    String.format(resources.getString("mothballDescription.addendum"))));
+            JLabel lblInfo = new JLabel(String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+                  RIGHT_WIDTH + LEFT_WIDTH,
+                  String.format(resources.getString("mothballDescription.addendum"))));
             lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
             infoPanel.add(lblInfo, BorderLayout.CENTER);
             infoPanel.setBorder(BorderFactory.createEtchedBorder());

@@ -39,15 +39,15 @@ import java.awt.*;
 import java.util.UUID;
 
 import static megamek.common.Compute.randomInt;
-import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
-import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerDescription;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
- * This class provides a utility method to display a custom dialog related to abandoned convoys
- * in the MekHQ game. The dialog includes detailed information and visuals, like the convoy
- * commander or speaker, a status update message, and employer details.
+ * This class provides a utility method to display a custom dialog related to abandoned convoys in the MekHQ game. The
+ * dialog includes detailed information and visuals, like the convoy commander or speaker, a status update message, and
+ * employer details.
  */
 public class DialogAbandonedConvoy extends JDialog {
     final int LEFT_WIDTH = UIUtil.scaleForGUI(200);
@@ -84,8 +84,9 @@ public class DialogAbandonedConvoy extends JDialog {
             speakerName = speaker.getFullTitle();
         } else {
             if (targetConvoy == null) {
-                speakerName = getFormattedTextAt(RESOURCE_BUNDLE, "dialogBorderConvoySpeakerDefault.text",
-                    contract.getEmployerName(campaign.getGameYear()));
+                speakerName = getFormattedTextAt(RESOURCE_BUNDLE,
+                      "dialogBorderConvoySpeakerDefault.text",
+                      contract.getEmployerName(campaign.getGameYear()));
             } else {
                 speakerName = campaign.getName();
             }
@@ -102,9 +103,10 @@ public class DialogAbandonedConvoy extends JDialog {
 
         // Speaker description (below the icon)
         StringBuilder speakerDescription = getSpeakerDescription(campaign, speaker, speakerName);
-        JLabel leftDescription = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                LEFT_WIDTH, speakerDescription));
+        JLabel leftDescription = new JLabel(String.format(
+              "<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              LEFT_WIDTH,
+              speakerDescription));
         leftDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Add the image and description to the leftBox
@@ -123,12 +125,13 @@ public class DialogAbandonedConvoy extends JDialog {
         rightBox.setBorder(BorderFactory.createEtchedBorder());
 
         String message = getFormattedTextAt(RESOURCE_BUNDLE,
-            "statusUpdateAbandoned" + randomInt(20) + ".text",
-            campaign.getCommanderAddress(false));
+              "statusUpdateAbandoned" + randomInt(20) + ".text",
+              campaign.getCommanderAddress(false));
 
-        JLabel rightDescription = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                RIGHT_WIDTH, message));
+        JLabel rightDescription = new JLabel(String.format(
+              "<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              RIGHT_WIDTH,
+              message));
         rightBox.add(rightDescription);
 
         // Add rightBox to mainPanel
@@ -156,10 +159,10 @@ public class DialogAbandonedConvoy extends JDialog {
         infoPanel.setBorder(BorderFactory.createEtchedBorder());
         infoPanel.setLayout(new BorderLayout());
 
-        JLabel newPanelLabel = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                LEFT_WIDTH + RIGHT_WIDTH,
-                getFormattedTextAt(RESOURCE_BUNDLE, "documentation.prompt")));
+        JLabel newPanelLabel = new JLabel(String.format(
+              "<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              LEFT_WIDTH + RIGHT_WIDTH,
+              getFormattedTextAt(RESOURCE_BUNDLE, "documentation.prompt")));
         infoPanel.add(newPanelLabel, BorderLayout.CENTER);
 
         // Add the new panel to the container (below the button panel)
