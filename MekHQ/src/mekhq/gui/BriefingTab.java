@@ -78,7 +78,6 @@ import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
@@ -412,14 +411,11 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        PrisonerMissionEndEvent prisoners = null;
-        if (mission instanceof Contract) {
-            prisoners = new PrisonerMissionEndEvent(getCampaign(), mission);
+        PrisonerMissionEndEvent prisoners = new PrisonerMissionEndEvent(getCampaign(), mission);
 
-            if (!getCampaign().getPrisonerDefectors().isEmpty() &&
-                      prisoners.handlePrisonerDefectors() == 0) { // This is the cancel choice index
-                return;
-            }
+        if (!getCampaign().getPrisonerDefectors().isEmpty() &&
+                  prisoners.handlePrisonerDefectors() == 0) { // This is the cancel choice index
+            return;
         }
 
         if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
