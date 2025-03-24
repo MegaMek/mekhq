@@ -238,31 +238,36 @@ public class PrisonerEventManager {
         int prisonerCapacityUsage = calculatePrisonerCapacityUsage(campaign);
         int prisonerCapacity = calculatePrisonerCapacity(campaign);
 
-        int overflow = prisonerCapacityUsage - prisonerCapacity;
+        // Calculate overflow as the percentage over prisonerCapacity
+        double overflowPercentage = ((double) (prisonerCapacityUsage - prisonerCapacity) / prisonerCapacity) * 100;
 
-        if (overflow <= 0 && totalPrisoners < MINIMUM_PRISONER_COUNT) {
-            // No risk of event
+        // If no overflow and total prisoners are below the minimum count, no risk of event
+        if (overflowPercentage <= 0 && totalPrisoners < MINIMUM_PRISONER_COUNT) {
             return List.of(false, false);
         }
 
-        int eventRoll = randomInt(100);
-        boolean minorEvent = eventRoll < overflow;
+        // Generate an event roll
+        int eventRoll = randomInt(50);
 
+        // Minor event occurs if the random roll is less than the overflow percentage
+        boolean minorEvent = eventRoll < overflowPercentage;
+
+        // Special case: a roll of '0' always results in a minor event
         if (eventRoll == 0) {
             minorEvent = true;
         }
 
         // Does the minor event escalate into a major event?
-        eventRoll = randomInt(100);
-        boolean majorEvent = minorEvent
-            && (totalPrisoners > MINIMUM_PRISONER_COUNT)
-            && (eventRoll < overflow || eventRoll == 0);
+        eventRoll = randomInt(50);
+        boolean majorEvent = minorEvent &&
+                                   (totalPrisoners > MINIMUM_PRISONER_COUNT) &&
+                                   (eventRoll < overflowPercentage || eventRoll == 0);
 
         // If there is no event, throw up a warning and give the player an opportunity to do
         // something about the situation.
-        if (!minorEvent && overflow > 0) {
+        if (!minorEvent && overflowPercentage > 0) {
             if (!isHeadless) {
-                processWarning(overflow);
+                processWarning((int) round(totalPrisoners * overflowPercentage));
             }
             return List.of(false, false);
         }
