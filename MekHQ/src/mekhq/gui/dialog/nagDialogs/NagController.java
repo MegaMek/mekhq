@@ -242,7 +242,7 @@ public class NagController {
         // Contract Ended
         if (EndContractNagDialog.checkNag(today, activeContracts)) {
             EndContractNagDialog endContractNagDialog = new EndContractNagDialog(campaign);
-            if (endContractNagDialog.wasAdvanceDayCanceled()) {
+            if (endContractNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
