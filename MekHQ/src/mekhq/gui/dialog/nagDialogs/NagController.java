@@ -159,7 +159,7 @@ public class NagController {
         // Insufficient AsTechs
         if (InsufficientAstechsNagDialog.checkNag(campaign.getAstechNeed())) {
             InsufficientAstechsNagDialog insufficientAstechsNagDialog = new InsufficientAstechsNagDialog(campaign);
-            if (insufficientAstechsNagDialog.wasAdvanceDayCanceled()) {
+            if (insufficientAstechsNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
