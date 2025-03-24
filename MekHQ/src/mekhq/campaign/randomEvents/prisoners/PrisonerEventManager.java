@@ -283,10 +283,11 @@ public class PrisonerEventManager {
 
         // If there is no event, throw up a warning and give the player an opportunity to do
         // something about the situation.
-        if (!minorEvent && overflowPercentage > 0) {
-            if (!isHeadless) {
+        if (!minorEvent) {
+            if (overflowPercentage > 0 && !isHeadless) {
                 processWarning((int) round(totalPrisoners * overflowPercentage));
             }
+
             return List.of(false, false);
         }
 
