@@ -55,7 +55,6 @@ public class DeploymentShortfallNagDialog {
     private final int CHOICE_CONTINUE = 1;
     private final int CHOICE_SUPPRESS = 2;
 
-    private final Campaign campaign;
     private boolean cancelAdvanceDay;
 
     /**
@@ -69,8 +68,6 @@ public class DeploymentShortfallNagDialog {
      * @param campaign The {@link Campaign} object representing the current campaign.
      */
     public DeploymentShortfallNagDialog(final Campaign campaign) {
-        this.campaign = campaign;
-
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
               campaign.getSeniorAdminPerson(COMMAND),
               null,

@@ -84,7 +84,7 @@ public class NagController {
 
         if (InvalidFactionNagDialog.checkNag(campaign.getFaction(), today)) {
             InvalidFactionNagDialog invalidFactionNagDialog = new InvalidFactionNagDialog(campaign);
-            if (invalidFactionNagDialog.wasAdvanceDayCanceled()) {
+            if (invalidFactionNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
