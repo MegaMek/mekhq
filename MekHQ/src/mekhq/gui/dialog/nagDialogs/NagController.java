@@ -44,16 +44,15 @@ import mekhq.campaign.unit.Unit;
  * A controller class responsible for managing and triggering daily nag dialogs in the campaign.
  *
  * <p>
- * The purpose of this class is to sequentially check all predefined "nag" conditions
- * to alert the player about issues that require their attention before advancing the day
- * in the campaign. Each nag dialog is displayed based on specific conditions, and the daily
- * nag process stops if the player cancels proceeding to the next day.
+ * The purpose of this class is to sequentially check all predefined "nag" conditions to alert the player about issues
+ * that require their attention before advancing the day in the campaign. Each nag dialog is displayed based on specific
+ * conditions, and the daily nag process stops if the player cancels proceeding to the next day.
  * </p>
  *
  * <strong>Usage:</strong>
  * <p>
- * This class is primarily called during the "Advance Day" process in MekHQ, to notify
- * players of campaign-related issues spanning financial, personnel, and strategic concerns.
+ * This class is primarily called during the "Advance Day" process in MekHQ, to notify players of campaign-related
+ * issues spanning financial, personnel, and strategic concerns.
  * </p>
  */
 public class NagController {
@@ -61,8 +60,8 @@ public class NagController {
      * Triggers a sequence of daily nag dialogs to check and display issues in the campaign.
      *
      * <p>
-     * This method iterates through all predefined nag dialogs, each associated with a specific
-     * condition or scenario within the campaign. Nags include, but are not limited to, the following:
+     * This method iterates through all predefined nag dialogs, each associated with a specific condition or scenario
+     * within the campaign. Nags include, but are not limited to, the following:
      * <ul>
      *     <li>Invalid faction settings.</li>
      *     <li>Missing commander.</li>
@@ -76,6 +75,7 @@ public class NagController {
      * allowing the campaign to progress to the next day.
      *
      * @param campaign The {@link Campaign} object representing the current campaign.
+     *
      * @return {@code true} if the player cancels any nag dialog, {@code false} otherwise.
      */
     public static boolean triggerDailyNags(Campaign campaign) {
@@ -111,7 +111,8 @@ public class NagController {
 
         // Unable to afford expenses
         if (UnableToAffordExpensesNagDialog.checkNag(campaign)) {
-            UnableToAffordExpensesNagDialog unableToAffordExpensesNagDialog = new UnableToAffordExpensesNagDialog(campaign);
+            UnableToAffordExpensesNagDialog unableToAffordExpensesNagDialog = new UnableToAffordExpensesNagDialog(
+                  campaign);
             if (unableToAffordExpensesNagDialog.wasAdvanceDayCanceled()) {
                 return true;
             }
@@ -129,7 +130,8 @@ public class NagController {
         final Finances finances = campaign.getFinances();
 
         if (UnableToAffordLoanPaymentNagDialog.checkNag(finances.getLoans(), today, finances.getBalance())) {
-            UnableToAffordLoanPaymentNagDialog unableToAffordLoanPaymentNagDialog = new UnableToAffordLoanPaymentNagDialog(campaign);
+            UnableToAffordLoanPaymentNagDialog unableToAffordLoanPaymentNagDialog = new UnableToAffordLoanPaymentNagDialog(
+                  campaign);
             if (unableToAffordLoanPaymentNagDialog.wasAdvanceDayCanceled()) {
                 return true;
             }
@@ -167,8 +169,12 @@ public class NagController {
         final boolean isOvertimeAllowed = campaign.isOvertimeAllowed();
         final int possibleAstechPoolOvertime = campaign.getPossibleAstechPoolOvertime();
 
-        if (InsufficientAstechTimeNagDialog.checkNag(units, possibleAstechPoolMinutes, isOvertimeAllowed, possibleAstechPoolOvertime)) {
-            InsufficientAstechTimeNagDialog insufficientAstechTimeNagDialog = new InsufficientAstechTimeNagDialog(campaign);
+        if (InsufficientAstechTimeNagDialog.checkNag(units,
+              possibleAstechPoolMinutes,
+              isOvertimeAllowed,
+              possibleAstechPoolOvertime)) {
+            InsufficientAstechTimeNagDialog insufficientAstechTimeNagDialog = new InsufficientAstechTimeNagDialog(
+                  campaign);
             if (insufficientAstechTimeNagDialog.wasAdvanceDayCanceled()) {
                 return true;
             }
@@ -179,7 +185,8 @@ public class NagController {
         final List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
 
         if (UnresolvedStratConContactsNagDialog.checkNag(isUseStratCon, activeContracts, today)) {
-            UnresolvedStratConContactsNagDialog unresolvedStratConContactsNagDialog = new UnresolvedStratConContactsNagDialog(campaign);
+            UnresolvedStratConContactsNagDialog unresolvedStratConContactsNagDialog = new UnresolvedStratConContactsNagDialog(
+                  campaign);
             if (unresolvedStratConContactsNagDialog.wasAdvanceDayCanceled()) {
                 return true;
             }
@@ -224,9 +231,10 @@ public class NagController {
 
         // Admin Strain
         if (AdminStrainNagDialog.checkNag(campaignOptions.isUseRandomRetirement(),
-              campaignOptions.isUseAdministrativeStrain(), getAdministrativeStrainModifier(campaign))) {
+              campaignOptions.isUseAdministrativeStrain(),
+              getAdministrativeStrainModifier(campaign))) {
             AdminStrainNagDialog adminStrainNagDialog = new AdminStrainNagDialog(campaign);
-            if (adminStrainNagDialog.wasAdvanceDayCanceled()) {
+            if (adminStrainNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
