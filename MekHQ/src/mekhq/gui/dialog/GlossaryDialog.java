@@ -65,8 +65,8 @@ public class GlossaryDialog extends JDialog {
     private final JDialog parent;
     private final Campaign campaign;
 
-    private int CENTER_WIDTH = UIUtil.scaleForGUI(400);
-    private int CENTER_HEIGHT = UIUtil.scaleForGUI(300);
+    private int CENTER_WIDTH = UIUtil.scaleForGUI(800);
+    private int CENTER_HEIGHT = UIUtil.scaleForGUI(400);
     private int PADDING = UIUtil.scaleForGUI(10);
 
     private final String GLOSSARY_BUNDLE = "mekhq.resources.Glossary";
