@@ -27,7 +27,7 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import static mekhq.MHQConstants.NAG_ADMIN_STRAIN;
+import static mekhq.MHQConstants.NAG_SHORT_DEPLOYMENT;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.DeploymentShortfallNagLogic.hasDeploymentShortfall;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -35,7 +35,6 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import java.util.ArrayList;
 import java.util.List;
 
-import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -88,7 +87,7 @@ public class DeploymentShortfallNagDialog {
             case CHOICE_CANCEL -> cancelAdvanceDay = true;
             case CHOICE_CONTINUE -> cancelAdvanceDay = false;
             case CHOICE_SUPPRESS -> {
-                MekHQ.getMHQOptions().setNagDialogIgnore(NAG_ADMIN_STRAIN, true);
+                MekHQ.getMHQOptions().setNagDialogIgnore(NAG_SHORT_DEPLOYMENT, true);
                 cancelAdvanceDay = false;
             }
             default -> throw new IllegalStateException("Unexpected value in AdminStrainNagDialog: " + choiceIndex);
@@ -138,7 +137,7 @@ public class DeploymentShortfallNagDialog {
      * @return {@code true} if the nag dialog should be displayed due to deployment shortfalls; {@code false} otherwise.
      */
     public static boolean checkNag(boolean isUseAtB, Campaign campaign) {
-        final String NAG_KEY = MHQConstants.NAG_SHORT_DEPLOYMENT;
+        final String NAG_KEY = NAG_SHORT_DEPLOYMENT;
 
         return isUseAtB && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) && hasDeploymentShortfall(campaign);
     }
