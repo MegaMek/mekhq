@@ -31,7 +31,7 @@ import megamek.common.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.gui.dialog.GenericImmersiveMessageDialog;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.MercenaryAuctionDialog;
 
 import static java.lang.Math.max;
@@ -45,9 +45,9 @@ import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
- * This class handles the logic for determining auction eligibility based on the player's resources
- * and provides the interface for bidding in mercenary auctions. Successful auctions result in the
- * unit being added to the campaign, while failures notify the player of the outcome.
+ * This class handles the logic for determining auction eligibility based on the player's resources and provides the
+ * interface for bidding in mercenary auctions. Successful auctions result in the unit being added to the campaign,
+ * while failures notify the player of the outcome.
  */
 public class MercenaryAuction {
     private static final MMLogger logger = MMLogger.create(MercenaryAuction.class);
@@ -60,18 +60,22 @@ public class MercenaryAuction {
      * Creates and processes a mercenary auction.
      *
      * <p>The auction determines eligibility for bidding, calculates the maximum bid based on campaign
-     * resources, and displays an auction dialog for the player to place their bid. Additionally, it
-     * handles the outcome of the auction, applying the results to the campaign accordingly.</p>
+     * resources, and displays an auction dialog for the player to place their bid. Additionally, it handles the outcome
+     * of the auction, applying the results to the campaign accordingly.</p>
      *
      * @param campaign The current {@link Campaign} instance where the auction takes place.
      * @param unitType The type of unit being auctioned (e.g., `MECH`, `VEHICLE`).
      */
-    public MercenaryAuction(Campaign campaign, int requiredCombatTeams, StratconCampaignState campaignState,
-                            int unitType) {
+    public MercenaryAuction(Campaign campaign, int requiredCombatTeams, StratconCampaignState campaignState, int unitType) {
         String faction = campaign.getFaction().getShortName();
 
-        Entity entity = getEntity(faction, REGULAR, getRandomUnitQuality(-2).toNumeric(),
-              unitType, UNIT_WEIGHT_UNSPECIFIED, null, campaign);
+        Entity entity = getEntity(faction,
+              REGULAR,
+              getRandomUnitQuality(-2).toNumeric(),
+              unitType,
+              UNIT_WEIGHT_UNSPECIFIED,
+              null,
+              campaign);
 
         if (entity == null) {
             logger.error("Unable to find entity for unit type {} in 'MercenaryAuction'", unitType);
@@ -92,21 +96,33 @@ public class MercenaryAuction {
         // If the player can't afford the minimum bid, we just tell them about the opportunity and
         // then close out the auction.
         if (cannotAffordOpeningBid) {
-            String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "auction.ic.noFunds",
-                  campaign.getCommanderAddress(false), entity.getShortName());
+            String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+                  "auction.ic.noFunds",
+                  campaign.getCommanderAddress(false),
+                  entity.getShortName());
 
-            String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "auction.ooc.noFunds",
-                  minimumBid, maximumBid);
+            String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+                  "auction.ooc.noFunds",
+                  minimumBid,
+                  maximumBid);
 
-            new GenericImmersiveMessageDialog(campaign, campaign.getSeniorAdminPerson(TRANSPORT),
-                  null, inCharacterMessage, null, outOfCharacterMessage,
+            new ImmersiveDialogSimple(campaign,
+                  campaign.getSeniorAdminPerson(TRANSPORT),
+                  null,
+                  inCharacterMessage,
+                  null,
+                  outOfCharacterMessage,
                   true);
             return;
         }
 
         // Otherwise, we show the Auction dialog.
-        MercenaryAuctionDialog mercenaryAuctionDialog = new MercenaryAuctionDialog(campaign, entity,
-              minimumBid, maximumBid, AUCTION_TIER_SUCCESS_PERCENT, max(requiredCombatTeams, 1));
+        MercenaryAuctionDialog mercenaryAuctionDialog = new MercenaryAuctionDialog(campaign,
+              entity,
+              minimumBid,
+              maximumBid,
+              AUCTION_TIER_SUCCESS_PERCENT,
+              max(requiredCombatTeams, 1));
         int finalBid = mercenaryAuctionDialog.getSpinnerValue() * AUCTION_TIER_SUCCESS_PERCENT;
 
         // If the player confirmed the auction (option 0) then check whether they were successful,
@@ -126,14 +142,22 @@ public class MercenaryAuction {
                 campaign.addNewUnit(entity, false, deliveryTime + 1);
 
                 // This dialog informs the player their bid was successful
-                new GenericImmersiveMessageDialog(campaign, campaign.getSeniorAdminPerson(TRANSPORT),
-                      null, getFormattedTextAt(RESOURCE_BUNDLE, "auction.successful",
-                      entity.getChassis(), deliveryTime), null, null, true);
+                new ImmersiveDialogSimple(campaign,
+                      campaign.getSeniorAdminPerson(TRANSPORT),
+                      null,
+                      getFormattedTextAt(RESOURCE_BUNDLE, "auction.successful", entity.getChassis(), deliveryTime),
+                      null,
+                      null,
+                      true);
             } else {
                 // This dialog informs the player their bid was unsuccessful
-                new GenericImmersiveMessageDialog(campaign, campaign.getSeniorAdminPerson(TRANSPORT),
-                      null, getFormattedTextAt(RESOURCE_BUNDLE, "auction.failure",
-                      entity.getChassis()), null, null, true);
+                new ImmersiveDialogSimple(campaign,
+                      campaign.getSeniorAdminPerson(TRANSPORT),
+                      null,
+                      getFormattedTextAt(RESOURCE_BUNDLE, "auction.failure", entity.getChassis()),
+                      null,
+                      null,
+                      true);
             }
         }
     }

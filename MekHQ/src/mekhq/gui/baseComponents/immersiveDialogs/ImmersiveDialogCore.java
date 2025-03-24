@@ -25,7 +25,7 @@
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
  */
-package mekhq.gui.baseComponents;
+package mekhq.gui.baseComponents.immersiveDialogs;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -62,9 +62,8 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.GlossaryDialog;
 
 /**
- * An immersive dialog used in MekHQ to display interactions between speakers,
- * messages, and actions. The dialog supports entities such as speakers, campaign,
- * buttons, and optional details for enhanced storytelling.
+ * An immersive dialog used in MekHQ to display interactions between speakers, messages, and actions. The dialog
+ * supports entities such as speakers, campaign, buttons, and optional details for enhanced storytelling.
  *
  * <p>It allows displaying one or more speakers in a dialog alongside a central message,
  * optional out-of-character notes, and UI buttons for user interaction.</p>
@@ -72,7 +71,7 @@ import mekhq.gui.dialog.GlossaryDialog;
  * <p>The dialog is flexible in terms of panel layout and width adjustments,
  * allowing for dynamic configurations based on the input parameters.</p>
  */
-public class MHQDialogImmersive extends JDialog {
+public class ImmersiveDialogCore extends JDialog {
     private final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
     public final static String GLOSSARY_COMMAND_STRING = "GLOSSARY";
     public final static String PERSON_COMMAND_STRING = "PERSON";
@@ -94,20 +93,18 @@ public class MHQDialogImmersive extends JDialog {
 
     private int dialogChoice = 0;
 
-    private static final MMLogger logger = MMLogger.create(MHQDialogImmersive.class);
+    private static final MMLogger logger = MMLogger.create(ImmersiveDialogCore.class);
 
     /**
      * Retrieves the user's selected dialog choice.
      * <p>
-     *     <strong>Usage:</strong> This allows us to keep function code out of the GUI element,
-     *     making it far easier to test what's happening for any given option selection. Create
-     *     the dialog, as normal, then fetch whatever decision the user made and perform any code
-     *     actions required.
+     * <strong>Usage:</strong> This allows us to keep function code out of the GUI element,
+     * making it far easier to test what's happening for any given option selection. Create the dialog, as normal, then
+     * fetch whatever decision the user made and perform any code actions required.
      * </p>
      *
-     * @return An integer representing the index of the button selected by the user.
-     *         If the dialog is closed without selection, this will return the {@code defaultChoiceIndex}
-     *         defined during construction.
+     * @return An integer representing the index of the button selected by the user. If the dialog is closed without
+     *       selection, this will return the {@code defaultChoiceIndex} defined during construction.
      */
     public int getDialogChoice() {
         return dialogChoice;
@@ -133,29 +130,26 @@ public class MHQDialogImmersive extends JDialog {
      * Constructs and initializes an immersive dialog with configurable layouts, speakers, actions, and messages.
      *
      * <p>This dialog is designed to provide a rich, immersive interface featuring optional speakers on the
-     * left and right, a central message panel with configurable width, a spinner panel, and a list of actionable buttons.
-     * An optional out-of-character message can also be displayed below the buttons.</p>
+     * left and right, a central message panel with configurable width, a spinner panel, and a list of actionable
+     * buttons. An optional out-of-character message can also be displayed below the buttons.</p>
      *
-     * @param campaign The {@link Campaign} instance tied to the dialog, providing contextual information.
-     * @param leftSpeaker Optional left-side {@link Person}; use {@code null} if no left speaker is present.
-     * @param rightSpeaker Optional right-side {@link Person}; use {@code null} if no right speaker is present.
-     * @param centerMessage The main {@link String} message displayed in the center panel of the dialog.
-     * @param buttons A {@link List} of {@link ButtonLabelTooltipPair} instances representing actions available
-     *                in the dialog (displayed as buttons). The default option is used if the user closes or cancels
-     *                the dialog.
-     * @param outOfCharacterMessage An optional {@link String} message displayed below the buttons;
-     *                               use {@code null} if not applicable.
-     * @param centerWidth An optional width for the center panel; uses the default value if {@code null}.
-     * @param isVerticalLayout A {@code boolean} determining the button layout:
-     *                         {@code true} for vertical stacking, {@code false} for horizontal layout.
-     * @param spinnerPanel An optional {@link JPanel} containing a spinner widget to be displayed in the center panel;
-     *                     use {@code null} if not applicable.
+     * @param campaign              The {@link Campaign} instance tied to the dialog, providing contextual information.
+     * @param leftSpeaker           Optional left-side {@link Person}; use {@code null} if no left speaker is present.
+     * @param rightSpeaker          Optional right-side {@link Person}; use {@code null} if no right speaker is
+     *                              present.
+     * @param centerMessage         The main {@link String} message displayed in the center panel of the dialog.
+     * @param buttons               A {@link List} of {@link ButtonLabelTooltipPair} instances representing actions
+     *                              available in the dialog (displayed as buttons). The default option is used if the
+     *                              user closes or cancels the dialog.
+     * @param outOfCharacterMessage An optional {@link String} message displayed below the buttons; use {@code null} if
+     *                              not applicable.
+     * @param centerWidth           An optional width for the center panel; uses the default value if {@code null}.
+     * @param isVerticalLayout      A {@code boolean} determining the button layout: {@code true} for vertical stacking,
+     *                              {@code false} for horizontal layout.
+     * @param spinnerPanel          An optional {@link JPanel} containing a spinner widget to be displayed in the center
+     *                              panel; use {@code null} if not applicable.
      */
-    public MHQDialogImmersive(Campaign campaign, @Nullable Person leftSpeaker,
-                              @Nullable Person rightSpeaker, String centerMessage,
-                              List<ButtonLabelTooltipPair> buttons, @Nullable String outOfCharacterMessage,
-                              @Nullable Integer centerWidth, boolean isVerticalLayout,
-                              @Nullable JPanel spinnerPanel, boolean isModal) {
+    public ImmersiveDialogCore(Campaign campaign, @Nullable Person leftSpeaker, @Nullable Person rightSpeaker, String centerMessage, List<ButtonLabelTooltipPair> buttons, @Nullable String outOfCharacterMessage, @Nullable Integer centerWidth, boolean isVerticalLayout, @Nullable JPanel spinnerPanel, boolean isModal) {
         // Initialize
         this.campaign = campaign;
         this.leftSpeaker = leftSpeaker;
@@ -245,24 +239,23 @@ public class MHQDialogImmersive extends JDialog {
     }
 
     /**
-     * Creates and returns a central panel containing the main dialog message and a button panel.
-     * This panel is designed to display a central message, typically in HTML format,
-     * using a {@link JEditorPane}, along with an optional list of buttons displayed below the message.
+     * Creates and returns a central panel containing the main dialog message and a button panel. This panel is designed
+     * to display a central message, typically in HTML format, using a {@link JEditorPane}, along with an optional list
+     * of buttons displayed below the message.
      * <ul>
      *   <li>The message is placed in the {@link JEditorPane}, styled for a consistent width.</li>
      *   <li>The panel includes a scrollable viewport if the message content overflows.</li>
      *   <li>An additional button panel is added at the bottom of the central panel.</li>
      * </ul>
      *
-     * @param centerMessage The main dialog message as a string, typically in HTML format.
-     *                      This can include basic HTML for formatting purposes.
-     * @param buttons       A list of {@link ButtonLabelTooltipPair} objects defining the buttons to
-     *                      be displayed at the bottom of the panel. These buttons can have labels,
-     *                      tooltips, and custom actions.
+     * @param centerMessage The main dialog message as a string, typically in HTML format. This can include basic HTML
+     *                      for formatting purposes.
+     * @param buttons       A list of {@link ButtonLabelTooltipPair} objects defining the buttons to be displayed at the
+     *                      bottom of the panel. These buttons can have labels, tooltips, and custom actions.
+     *
      * @return A {@link JPanel} with the message displayed in the center and buttons at the bottom.
      */
-    private JPanel createCenterBox(String centerMessage, List<ButtonLabelTooltipPair> buttons,
-                                   boolean isVerticalLayout, @Nullable JPanel spinnerPanel) {
+    private JPanel createCenterBox(String centerMessage, List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout, @Nullable JPanel spinnerPanel) {
         northPanel = new JPanel(new BorderLayout());
 
         // Buttons panel
@@ -279,7 +272,9 @@ public class MHQDialogImmersive extends JDialog {
         // Use inline CSS to set font family, size, and other style properties
         String fontStyle = "font-family: Noto Sans;";
         editorPane.setText(String.format("<div style='width: %s; %s'>%s</div>",
-            max(buttonPanel.getPreferredSize().width, CENTER_WIDTH), fontStyle, centerMessage));
+              max(buttonPanel.getPreferredSize().width, CENTER_WIDTH),
+              fontStyle,
+              centerMessage));
         setFontScaling(editorPane, false, 1.1);
         // Add a HyperlinkListener to capture hyperlink clicks
         editorPane.addHyperlinkListener(evt -> {
@@ -311,9 +306,9 @@ public class MHQDialogImmersive extends JDialog {
      * Handles hyperlink clicks from HTML content dialog.
      *
      * <p>
-     * This method processes the provided hyperlink reference to determine the type of command
-     * and executes the appropriate action. It supports commands for displaying a glossary
-     * entry or focusing on a specific person in the campaign.
+     * This method processes the provided hyperlink reference to determine the type of command and executes the
+     * appropriate action. It supports commands for displaying a glossary entry or focusing on a specific person in the
+     * campaign.
      * </p>
      *
      * <b>Supported Commands:</b>
@@ -329,10 +324,10 @@ public class MHQDialogImmersive extends JDialog {
      * If the command is not recognized, no action is performed.
      * </p>
      *
-     * @param parent The parent {@link JDialog} instance to associate with the new dialog, if created.
-     * @param campaign The {@link Campaign} instance that contains application and campaign data.
-     * @param reference The hyperlink reference used to determine the command and additional
-     *                 information (e.g., a specific glossary term key or a person's UUID).
+     * @param parent    The parent {@link JDialog} instance to associate with the new dialog, if created.
+     * @param campaign  The {@link Campaign} instance that contains application and campaign data.
+     * @param reference The hyperlink reference used to determine the command and additional information (e.g., a
+     *                  specific glossary term key or a person's UUID).
      */
     public static void handleImmersiveHyperlinkClick(JDialog parent, Campaign campaign, String reference) {
         String[] splitReference = reference.split(":");
@@ -353,8 +348,8 @@ public class MHQDialogImmersive extends JDialog {
     /**
      * Populates the Out-of-Character (OOC) panel with a specific message, resizing as needed.
      * <p>
-     * This method appends a formatted OOC message to the bottom of the dialog, ensuring proper width
-     * alignment with any visible speaker panels.
+     * This method appends a formatted OOC message to the bottom of the dialog, ensuring proper width alignment with any
+     * visible speaker panels.
      *
      * @param outOfCharacterMessage The OOC message to display.
      */
@@ -362,9 +357,7 @@ public class MHQDialogImmersive extends JDialog {
         JPanel pnlOutOfCharacter = new JPanel(new GridBagLayout());
 
         // Create a compound border with an etched border and padding (empty border)
-        pnlOutOfCharacter.setBorder(
-            BorderFactory.createEtchedBorder()
-        );
+        pnlOutOfCharacter.setBorder(BorderFactory.createEtchedBorder());
 
         // Create a JEditorPane for the message
         JEditorPane editorPane = new JEditorPane();
@@ -393,12 +386,12 @@ public class MHQDialogImmersive extends JDialog {
     }
 
     /**
-     * Handles actions triggered by hyperlink events, such as clicks on hyperlinks.
-     * This method identifies when the event type is {@code HyperlinkEvent.EventType.ACTIVATED}
-     * and processes the event accordingly by delegating to the specified handler.
+     * Handles actions triggered by hyperlink events, such as clicks on hyperlinks. This method identifies when the
+     * event type is {@code HyperlinkEvent.EventType.ACTIVATED} and processes the event accordingly by delegating to the
+     * specified handler.
      *
-     * @param evt the {@code HyperlinkEvent} which contains details about the hyperlink interaction.
-     *            It could represent events such as entering, exiting, or activating a hyperlink.
+     * @param evt the {@code HyperlinkEvent} which contains details about the hyperlink interaction. It could represent
+     *            events such as entering, exiting, or activating a hyperlink.
      */
     protected void hyperlinkEventListenerActions(HyperlinkEvent evt) {
         if (evt.getEventType() == EventType.ACTIVATED) {
@@ -409,18 +402,17 @@ public class MHQDialogImmersive extends JDialog {
     /**
      * Populates a button panel with a list of buttons, each defined by a label and an optional tooltip.
      * <p>
-     * This method dynamically creates buttons based on the provided {@link ButtonLabelTooltipPair} objects.
-     * Each button is added to the specified {@link JPanel} (`buttonPanel`) and arranged according to the
-     * selected layout style (`isVerticalLayout`).
+     * This method dynamically creates buttons based on the provided {@link ButtonLabelTooltipPair} objects. Each button
+     * is added to the specified {@link JPanel} (`buttonPanel`) and arranged according to the selected layout style
+     * (`isVerticalLayout`).
      * </p>
      *
-     * @param buttons A {@link List} of {@link ButtonLabelTooltipPair} instances,
-     *                where each pair defines the label and tooltip for a button.
-     * @param isVerticalLayout A {@code boolean} value indicating the layout style:
-     *                         {@code true} for vertical stacking, {@code false} for horizontal arrangement.
+     * @param buttons          A {@link List} of {@link ButtonLabelTooltipPair} instances, where each pair defines the
+     *                         label and tooltip for a button.
+     * @param isVerticalLayout A {@code boolean} value indicating the layout style: {@code true} for vertical stacking,
+     *                         {@code false} for horizontal arrangement.
      */
-    protected JPanel populateButtonPanel(List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout,
-                                         @Nullable JPanel spinnerPanel) {
+    protected JPanel populateButtonPanel(List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout, @Nullable JPanel spinnerPanel) {
         final int padding = getPADDING();
 
         // Main container panel to hold the spinner and button panel
@@ -456,8 +448,11 @@ public class MHQDialogImmersive extends JDialog {
                 String label = buttonStrings.btnLabel();
                 String tooltip = buttonStrings.btnTooltip();
                 if (label != null && tooltip != null) {
-                    buttonLabel.append("<b>").append(buttonStrings.btnLabel()).append("</b>")
-                          .append("<br>").append(tooltip);
+                    buttonLabel.append("<b>")
+                          .append(buttonStrings.btnLabel())
+                          .append("</b>")
+                          .append("<br>")
+                          .append(tooltip);
                 } else if (label == null && tooltip != null) {
                     buttonLabel.append(tooltip);
                 } else if (label != null) {
@@ -542,15 +537,15 @@ public class MHQDialogImmersive extends JDialog {
     /**
      * Retrieves the {@link JSpinner} contained within the specified {@link JPanel}.
      * <p>
-     * This method iterates through all components in the given panel to find and return
-     * the first instance of {@link JSpinner}. If no such spinner is found, it logs an
-     * error and returns a new, empty {@link JSpinner} as a fallback.
+     * This method iterates through all components in the given panel to find and return the first instance of
+     * {@link JSpinner}. If no such spinner is found, it logs an error and returns a new, empty {@link JSpinner} as a
+     * fallback.
      * </p>
      *
-     * @param spinnerPanel The {@link JPanel} to search for a {@link JSpinner}.
-     *                     Must not be {@code null}.
-     * @return The {@link JSpinner} instance found in the panel; if no {@link JSpinner}
-     *         is found, a new, default {@link JSpinner} is returned.
+     * @param spinnerPanel The {@link JPanel} to search for a {@link JSpinner}. Must not be {@code null}.
+     *
+     * @return The {@link JSpinner} instance found in the panel; if no {@link JSpinner} is found, a new, default
+     *       {@link JSpinner} is returned.
      */
     private JSpinner fetchSpinnerFromPanel(JPanel spinnerPanel) {
         for (Component component : spinnerPanel.getComponents()) {
@@ -568,11 +563,12 @@ public class MHQDialogImmersive extends JDialog {
     /**
      * Builds a panel for displaying a speaker's image, name, and role.
      * <p>
-     * This method creates a vertically stacked panel that includes the person's icon, title,
-     * and any additional descriptive information (e.g., roles, forces, or campaign affiliations).
+     * This method creates a vertically stacked panel that includes the person's icon, title, and any additional
+     * descriptive information (e.g., roles, forces, or campaign affiliations).
      *
-     * @param speaker The character shown in the dialog, can be {@code null} for no speaker
-     * @param campaign      The current campaign.
+     * @param speaker  The character shown in the dialog, can be {@code null} for no speaker
+     * @param campaign The current campaign.
+     *
      * @return A {@link JPanel} forming the speaker's dialog box.
      */
     protected JPanel buildSpeakerPanel(@Nullable Person speaker, Campaign campaign) {
@@ -598,9 +594,10 @@ public class MHQDialogImmersive extends JDialog {
 
         // Speaker description (below the icon)
         StringBuilder speakerDescription = getSpeakerDescription(campaign, speaker, speakerName);
-        JLabel leftDescription = new JLabel(
-            String.format("<html><div style='width:%dpx; text-align:center;'>%s</div></html>",
-                IMAGE_WIDTH, speakerDescription));
+        JLabel leftDescription = new JLabel(String.format(
+              "<html><div style='width:%dpx; text-align:center;'>%s</div></html>",
+              IMAGE_WIDTH,
+              speakerDescription));
         leftDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Add the image and description to the speakerBox
@@ -624,6 +621,7 @@ public class MHQDialogImmersive extends JDialog {
      * @param campaign    The current campaign.
      * @param speaker     The {@link Person} representing the speaker, or {@code null} to use fallback data.
      * @param speakerName The name/title to use for the speaker if one exists.
+     *
      * @return A {@link StringBuilder} containing the formatted HTML description of the speaker.
      */
     public static StringBuilder getSpeakerDescription(Campaign campaign, Person speaker, String speakerName) {
@@ -663,12 +661,13 @@ public class MHQDialogImmersive extends JDialog {
     }
 
     /**
-     * Retrieves the speaker's icon for dialogs. If no speaker is supplied, the faction icon
-     * for the campaign is returned instead.
+     * Retrieves the speaker's icon for dialogs. If no speaker is supplied, the faction icon for the campaign is
+     * returned instead.
      *
-     * @param campaign the {@link Campaign} instance containing the faction icon; can be
-     *                 {@code null} to use a default image.
+     * @param campaign the {@link Campaign} instance containing the faction icon; can be {@code null} to use a default
+     *                 image.
      * @param speaker  the {@link Person} serving as the speaker for the dialog; can be {@code null}.
+     *
      * @return an {@link ImageIcon} for the speaker's portrait, or the faction icon if the speaker is {@code null}.
      */
     public static @Nullable ImageIcon getSpeakerIcon(@Nullable Campaign campaign, @Nullable Person speaker) {
@@ -684,8 +683,8 @@ public class MHQDialogImmersive extends JDialog {
     }
 
     /**
-     * Represents a label-tooltip pair for constructing UI buttons.
-     * Each button displays a label and optionally provides a tooltip when hovered.
+     * Represents a label-tooltip pair for constructing UI buttons. Each button displays a label and optionally provides
+     * a tooltip when hovered.
      */
     public record ButtonLabelTooltipPair(String btnLabel, String btnTooltip) {
         /**
@@ -693,6 +692,7 @@ public class MHQDialogImmersive extends JDialog {
          *
          * @param btnLabel   The label for the button. Must not be {@code null}.
          * @param btnTooltip The tooltip for the button. Can be {@code null} if no tooltip is given.
+         *
          * @throws IllegalArgumentException if both {@code btnLabel} and {@code btnTooltip} are {@code null}.
          */
         public ButtonLabelTooltipPair(String btnLabel, @Nullable String btnTooltip) {
