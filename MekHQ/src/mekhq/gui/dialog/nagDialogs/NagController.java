@@ -174,8 +174,12 @@ public class NagController {
               isOvertimeAllowed,
               possibleAstechPoolOvertime)) {
             InsufficientAstechTimeNagDialog insufficientAstechTimeNagDialog = new InsufficientAstechTimeNagDialog(
-                  campaign);
-            if (insufficientAstechTimeNagDialog.wasAdvanceDayCanceled()) {
+                  campaign,
+                  units,
+                  possibleAstechPoolMinutes,
+                  isOvertimeAllowed,
+                  possibleAstechPoolOvertime);
+            if (insufficientAstechTimeNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
@@ -242,7 +246,7 @@ public class NagController {
         // Contract Ended
         if (EndContractNagDialog.checkNag(today, activeContracts)) {
             EndContractNagDialog endContractNagDialog = new EndContractNagDialog(campaign);
-            if (endContractNagDialog.wasAdvanceDayCanceled()) {
+            if (endContractNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
