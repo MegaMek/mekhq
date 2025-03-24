@@ -285,6 +285,8 @@ public class ImmersiveDialogCore extends JDialog {
         JScrollPane scrollPane = new JScrollPane(editorPane);
         scrollPane.setMinimumSize(new Dimension(CENTER_WIDTH, scrollPane.getHeight()));
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        // This line ensures the scroll pane starts scrolled to the top, not bottom.
+        SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
 
         // Create a container with a border for the padding
         JPanel scrollPaneContainer = new JPanel(new BorderLayout());
