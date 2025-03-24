@@ -36,6 +36,7 @@ MEKHQ VERSION HISTORY:
 + Updated Admin Strain Nag to Use Immersive Dialog #6376
 + PR #6377: Fixed Scroll Pane Starting Position In Immersive Dialogs
 + PR #6378: Fixed MekHQ Lockup Caused by Consecutive Glossary Dialogs; Fixed Scroll Pane Start Position in Glossary Dialogs
++ PR #6382: Updated Deployment Shortfall Nag To Use Immersive Dialog
 
 
 0.50.04 (2025-03-22 1600 UTC)
