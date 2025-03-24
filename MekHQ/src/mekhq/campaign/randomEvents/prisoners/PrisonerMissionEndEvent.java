@@ -65,7 +65,7 @@ public class PrisonerMissionEndEvent {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
     private final Campaign campaign;
-    private final Mission contract;
+    private final Mission mission;
     private boolean isSuccess;
     private boolean isAllied;
 
@@ -79,11 +79,11 @@ public class PrisonerMissionEndEvent {
      * Creates a new instance of `PrisonerMissionEndEvent` to handle mission-end prisoner events.
      *
      * @param campaign The current campaign instance, providing context and data about prisoners and finances.
-     * @param contract The current mission contract related to this event.
+     * @param mission  The current mission related to this event.
      */
-    public PrisonerMissionEndEvent(Campaign campaign, Mission contract) {
+    public PrisonerMissionEndEvent(Campaign campaign, Mission mission) {
         this.campaign = campaign;
-        this.contract = contract;
+        this.mission = mission;
     }
 
     /**
@@ -169,10 +169,10 @@ public class PrisonerMissionEndEvent {
      */
     private LocalDate getContractOrMissionStartDate() {
         LocalDate startDate = null;
-        if (contract instanceof Contract) {
-            startDate = ((Contract) contract).getStartDate();
+        if (mission instanceof Contract) {
+            startDate = ((Contract) mission).getStartDate();
         } else {
-            for (Scenario scenario : contract.getCompletedScenarios()) {
+            for (Scenario scenario : mission.getCompletedScenarios()) {
                 LocalDate scenarioDate = scenario.getDate();
 
                 if (startDate == null) {
