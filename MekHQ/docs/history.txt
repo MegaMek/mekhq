@@ -37,6 +37,10 @@ MEKHQ VERSION HISTORY:
 + PR #6377: Fixed Scroll Pane Starting Position In Immersive Dialogs
 + PR #6378: Fixed MekHQ Lockup Caused by Consecutive Glossary Dialogs; Fixed Scroll Pane Start Position in Glossary Dialogs
 + PR #6382: Updated Deployment Shortfall Nag To Use Immersive Dialog
++ PR #6383: Updated Contract End Nag To Use Immersive Dialog
++ PR #6384: Updated Insufficient Astechs Nag To Use Immersive Dialog
++ PR #6385: Updated Insufficient Astech Time Nag To Use Immersive Dialog
++ PR #6386: Adjusted Glossary Dialog Dimensions
 
 
 0.50.04 (2025-03-22 1600 UTC)
