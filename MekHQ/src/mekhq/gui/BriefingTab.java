@@ -27,6 +27,31 @@
  */
 package mekhq.gui;
 
+import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
+import static mekhq.campaign.mission.enums.MissionStatus.PARTIAL;
+import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.io.File;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import java.util.Vector;
+import java.util.stream.Collectors;
+import javax.swing.*;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.PrincessException;
 import megamek.client.generator.ReconfigurationParameters;
@@ -48,7 +73,14 @@ import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
@@ -61,7 +93,14 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
-import mekhq.gui.dialog.*;
+import mekhq.gui.dialog.CompleteMissionDialog;
+import mekhq.gui.dialog.CustomizeAtBContractDialog;
+import mekhq.gui.dialog.CustomizeMissionDialog;
+import mekhq.gui.dialog.CustomizeScenarioDialog;
+import mekhq.gui.dialog.MissionTypeDialog;
+import mekhq.gui.dialog.NewAtBContractDialog;
+import mekhq.gui.dialog.NewContractDialog;
+import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.sorter.DateStringComparator;
@@ -71,20 +110,6 @@ import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
 import mekhq.gui.view.ScenarioViewPanel;
 import mekhq.utilities.MHQInternationalization;
-
-import javax.swing.*;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-import java.awt.*;
-import java.io.File;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
-import static mekhq.campaign.mission.enums.MissionStatus.PARTIAL;
-import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
 
 /**
  * Displays Mission/Contract and Scenario details.
@@ -386,7 +411,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         PrisonerMissionEndEvent prisoners = null;
-        if (mission instanceof AtBContract) {
+        if (mission instanceof Contract) {
             prisoners = new PrisonerMissionEndEvent(getCampaign(), (AtBContract) mission);
 
             if (!getCampaign().getPrisonerDefectors().isEmpty() && prisoners.handlePrisonerDefectors() == 0) { // This is the cancel choice index
@@ -873,8 +898,8 @@ public final class BriefingTab extends CampaignGuiTab {
                     }
                 }
 
-                AtBDynamicScenarioFactory.setDeploymentTurnsForReinforcements(getCampaign(), scenario,
-                      reinforcementEntities, cmdrStrategy);
+                AtBDynamicScenarioFactory.setDeploymentTurnsForReinforcements(getCampaign().getHangar(),
+                      scenario, reinforcementEntities, cmdrStrategy);
             }
         }
 

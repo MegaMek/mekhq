@@ -32,13 +32,12 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -48,9 +47,9 @@ public class Transaction {
 
     // region Variable Declarations
     private TransactionType type;
-    private LocalDate date;
-    private Money amount;
-    private String description;
+    private LocalDate       date;
+    private Money           amount;
+    private String          description;
     // endregion Variable Declarations
 
     // region Constructors
@@ -59,12 +58,10 @@ public class Transaction {
     }
 
     public Transaction(final Transaction transaction) {
-        this(transaction.getType(), transaction.getDate(), transaction.getAmount(),
-                transaction.getDescription());
+        this(transaction.getType(), transaction.getDate(), transaction.getAmount(), transaction.getDescription());
     }
 
-    public Transaction(final TransactionType type, final LocalDate date, final Money amount,
-            final String description) {
+    public Transaction(final TransactionType type, final LocalDate date, final Money amount, final String description) {
         setType(type);
         setDate(date);
         setAmount(amount);
@@ -106,14 +103,27 @@ public class Transaction {
     }
     // endregion Getters/Setters
 
-    @Deprecated // I'd be better as part of the GUI class
+    /**
+     * I'd be better as part of the GUI class
+     *
+     * @since 0.50.04
+     * @deprecated - Move to GUI Class
+     */
+    @Deprecated(since = "0.50.04")
     public String updateTransaction(Transaction previousTransaction) {
         return "Edited Transaction: {" +
-                "Previous = " + previousTransaction.toString() +
-                "} -> {New = " + toString() + "}";
+               "Previous = " +
+               previousTransaction.toString() +
+               "} -> {New = " +
+               toString() +
+               "}";
     }
 
-    @Deprecated // I'd be better as part of the GUI class
+    /**
+     * @since 0.50.04
+     * @deprecated - Move to GUI Class
+     */
+    @Deprecated(since = "0.50.04")
     public String voidTransaction() {
         return "Deleted Transaction: " + toString();
     }
@@ -130,7 +140,7 @@ public class Transaction {
 
     public static Transaction generateInstanceFromXML(final Node wn) {
         final Transaction transaction = new Transaction();
-        final NodeList nl = wn.getChildNodes();
+        final NodeList    nl          = wn.getChildNodes();
         for (int x = 0; x < nl.getLength(); x++) {
             final Node wn2 = nl.item(x);
             try {
@@ -153,8 +163,13 @@ public class Transaction {
 
     @Override
     public String toString() {
-        return getType() + ", " + MekHQ.getMHQOptions().getDisplayFormattedDate(getDate())
-                + ", " + getAmount() + ", " + getDescription();
+        return getType() +
+               ", " +
+               MekHQ.getMHQOptions().getDisplayFormattedDate(getDate()) +
+               ", " +
+               getAmount() +
+               ", " +
+               getDescription();
     }
 
     @Override
@@ -163,12 +178,11 @@ public class Transaction {
             return false;
         } else if (this == other) {
             return true;
-        } else if (other instanceof Transaction) {
-            final Transaction transaction = (Transaction) other;
-            return (getType() == transaction.getType())
-                    && getDate().equals(transaction.getDate())
-                    && getAmount().equals(transaction.getAmount())
-                    && getDescription().equals(transaction.getDescription());
+        } else if (other instanceof Transaction transaction) {
+            return (getType() == transaction.getType()) &&
+                   getDate().equals(transaction.getDate()) &&
+                   getAmount().equals(transaction.getAmount()) &&
+                   getDescription().equals(transaction.getDescription());
         } else {
             return false;
         }

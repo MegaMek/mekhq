@@ -38,23 +38,23 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
-import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerDescription;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
- * The {@code DialogResupplyFocus} class is responsible for displaying a dialog that allows
- * the player to select their focus preference during a resupply operation. The player can
- * choose between a balanced approach, prioritizing armor, or prioritizing ammunition.
- * The dialog includes a speaker icon, a dynamically generated message, and actionable options.
+ * The {@code DialogResupplyFocus} class is responsible for displaying a dialog that allows the player to select their
+ * focus preference during a resupply operation. The player can choose between a balanced approach, prioritizing armor,
+ * or prioritizing ammunition. The dialog includes a speaker icon, a dynamically generated message, and actionable
+ * options.
  */
 public class DialogResupplyFocus extends JDialog {
     final int LEFT_WIDTH = UIUtil.scaleForGUI(200);
     final int RIGHT_WIDTH = UIUtil.scaleForGUI(400);
     final int INSERT_SIZE = UIUtil.scaleForGUI(10);
 
-    private static final String  RESOURCE_BUNDLE = "mekhq.resources.Resupply";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Resupply";
 
     /**
      * Displays a dialog to let the player select a resupply focus. The available options include:
@@ -84,9 +84,8 @@ public class DialogResupplyFocus extends JDialog {
      *
      * <p>The resupply focus is stored in the {@link Resupply} object after the dialog is completed.</p>
      *
-     * @param resupply the {@link Resupply} instance containing campaign and logistical context.
-     *                 The resupply focus preferences will be set within this object based on
-     *                 the player's selection.
+     * @param resupply the {@link Resupply} instance containing campaign and logistical context. The resupply focus
+     *                 preferences will be set within this object based on the player's selection.
      */
     public DialogResupplyFocus(Resupply resupply) {
         final Campaign campaign = resupply.getCampaign();
@@ -129,9 +128,10 @@ public class DialogResupplyFocus extends JDialog {
 
         // Speaker description (below the icon)
         StringBuilder speakerDescription = getSpeakerDescription(campaign, speaker, speakerName);
-        JLabel leftDescription = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                LEFT_WIDTH, speakerDescription));
+        JLabel leftDescription = new JLabel(String.format(
+              "<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              LEFT_WIDTH,
+              speakerDescription));
         leftDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Add the image and description to the leftBox
@@ -149,12 +149,14 @@ public class DialogResupplyFocus extends JDialog {
         JPanel rightBox = new JPanel(new BorderLayout());
         rightBox.setBorder(BorderFactory.createEtchedBorder());
 
-        String message = getFormattedTextAt(RESOURCE_BUNDLE, "focusDescription.text",
-            campaign.getCommanderAddress(false));
+        String message = getFormattedTextAt(RESOURCE_BUNDLE,
+              "focusDescription.text",
+              campaign.getCommanderAddress(false));
 
-        JLabel rightDescription = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                RIGHT_WIDTH, message));
+        JLabel rightDescription = new JLabel(String.format(
+              "<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              RIGHT_WIDTH,
+              message));
         rightBox.add(rightDescription);
 
         // Add rightBox to mainPanel
@@ -208,10 +210,9 @@ public class DialogResupplyFocus extends JDialog {
 
         // OOC panel (to be added below the button panel)
         JPanel infoPanel = new JPanel(new BorderLayout());
-        JLabel lblInfo = new JLabel(
-              String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                    RIGHT_WIDTH + LEFT_WIDTH,
-                    getFormattedTextAt(RESOURCE_BUNDLE, "focusDescription.ooc")));
+        JLabel lblInfo = new JLabel(String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              RIGHT_WIDTH + LEFT_WIDTH,
+              getFormattedTextAt(RESOURCE_BUNDLE, "focusDescription.ooc")));
         lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
         infoPanel.add(lblInfo, BorderLayout.CENTER);
         infoPanel.setBorder(BorderFactory.createEtchedBorder());

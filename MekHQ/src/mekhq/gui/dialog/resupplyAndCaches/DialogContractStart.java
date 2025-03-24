@@ -43,15 +43,14 @@ import java.util.UUID;
 import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
-import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
-import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerDescription;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
- * This class provides utility methods to display dialogs related to the beginning of a contract.
- * It generates user-friendly messages summarizing cargo requirements, player convoy capabilities,
- * and mission details.
+ * This class provides utility methods to display dialogs related to the beginning of a contract. It generates
+ * user-friendly messages summarizing cargo requirements, player convoy capabilities, and mission details.
  */
 public class DialogContractStart extends JDialog {
     final int LEFT_WIDTH = UIUtil.scaleForGUI(200);
@@ -61,14 +60,12 @@ public class DialogContractStart extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Resupply";
 
     /**
-     * Displays a dialog at the start of a contract, providing summarized details about the mission
-     * and player convoy capabilities. The content is dynamically generated based on the given
-     * {@link Campaign} and {@link AtBContract}.
+     * Displays a dialog at the start of a contract, providing summarized details about the mission and player convoy
+     * capabilities. The content is dynamically generated based on the given {@link Campaign} and {@link AtBContract}.
      * <p>
-     * This method:
-     * - Generates a message summarizing the player's convoy capabilities and cargo capacity.
-     * - Fetches localized text from the resource bundle based on the contract type and command rights.
-     * - Displays a dialog with visuals (e.g., faction icon) and a confirmation button to proceed.
+     * This method: - Generates a message summarizing the player's convoy capabilities and cargo capacity. - Fetches
+     * localized text from the resource bundle based on the contract type and command rights. - Displays a dialog with
+     * visuals (e.g., faction icon) and a confirmation button to proceed.
      *
      * @param campaign the current {@link Campaign}.
      * @param contract the active contract.
@@ -109,9 +106,10 @@ public class DialogContractStart extends JDialog {
 
         // Speaker description (below the icon)
         StringBuilder speakerDescription = getSpeakerDescription(campaign, speaker, speakerName);
-        JLabel leftDescription = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                LEFT_WIDTH, speakerDescription));
+        JLabel leftDescription = new JLabel(String.format(
+              "<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              LEFT_WIDTH,
+              speakerDescription));
         leftDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Add the image and description to the leftBox
@@ -131,9 +129,10 @@ public class DialogContractStart extends JDialog {
 
         String message = generateContractStartMessage(campaign, contract);
 
-        JLabel rightDescription = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                RIGHT_WIDTH, message));
+        JLabel rightDescription = new JLabel(String.format(
+              "<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              RIGHT_WIDTH,
+              message));
         rightBox.add(rightDescription);
 
         // Add rightBox to mainPanel
@@ -158,10 +157,9 @@ public class DialogContractStart extends JDialog {
 
         // New panel (to be added below the button panel)
         JPanel infoPanel = new JPanel(new BorderLayout());
-        JLabel lblInfo = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                RIGHT_WIDTH + LEFT_WIDTH,
-                getFormattedTextAt(RESOURCE_BUNDLE, "documentation.prompt")));
+        JLabel lblInfo = new JLabel(String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              RIGHT_WIDTH + LEFT_WIDTH,
+              getFormattedTextAt(RESOURCE_BUNDLE, "documentation.prompt")));
         lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
         infoPanel.add(lblInfo, BorderLayout.CENTER);
         infoPanel.setBorder(BorderFactory.createEtchedBorder());
@@ -181,24 +179,22 @@ public class DialogContractStart extends JDialog {
     }
 
     /**
-     * Generates an HTML-formatted message to display in the start-of-contract dialog.
-     * The message includes details such as
-     * - Total player convoy cargo capacity.
-     * - Number of operational player convoys.
-     * - Cargo requirements for the contract.
+     * Generates an HTML-formatted message to display in the start-of-contract dialog. The message includes details such
+     * as - Total player convoy cargo capacity. - Number of operational player convoys. - Cargo requirements for the
+     * contract.
      * <p>
-     * The message format adapts based on the contract type (e.g., guerrilla warfare vs. general contract)
-     * and the player's command rights (e.g., independent command).
+     * The message format adapts based on the contract type (e.g., guerrilla warfare vs. general contract) and the
+     * player's command rights (e.g., independent command).
      * <p>
-     * This method:
-     * - Iterates through all player forces to calculate total convoy cargo capacity.
-     * - Checks for convoy readiness, excluding units that are damaged, uncrewed, or prohibited.
-     * - Formats the message using localized templates from the resource bundle.
+     * This method: - Iterates through all player forces to calculate total convoy cargo capacity. - Checks for convoy
+     * readiness, excluding units that are damaged, uncrewed, or prohibited. - Formats the message using localized
+     * templates from the resource bundle.
      *
      * @param campaign the current {@link Campaign}.
      * @param contract the current {@link AtBContract}.
-     * @return an HTML-formatted string message summarizing the player's readiness and convoy details
-     *         in the context of the contract.
+     *
+     * @return an HTML-formatted string message summarizing the player's readiness and convoy details in the context of
+     *       the contract.
      */
     private static String generateContractStartMessage(Campaign campaign, AtBContract contract) {
         int playerConvoys = 0;
@@ -220,9 +216,7 @@ public class DialogContractStart extends JDialog {
                     Unit unit = campaign.getUnit(unitId);
                     Entity entity = unit.getEntity();
 
-                    if (unit.isDamaged()
-                        || !unit.isFullyCrewed()
-                        || isProhibitedUnitType(entity, true, true)) {
+                    if (unit.isDamaged() || !unit.isFullyCrewed() || isProhibitedUnitType(entity, true, true)) {
                         continue;
                     }
 
@@ -259,13 +253,18 @@ public class DialogContractStart extends JDialog {
                 convoyMessageTemplate = "contractStartMessageIndependent.text";
             }
 
-            convoyMessage = getFormattedTextAt(RESOURCE_BUNDLE, convoyMessageTemplate, commanderTitle,
-                estimateCargoRequirements(campaign, contract), totalPlayerCargoCapacity, playerConvoys,
-                playerConvoys != 1 ? "s" : "");
+            convoyMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+                  convoyMessageTemplate,
+                  commanderTitle,
+                  estimateCargoRequirements(campaign, contract),
+                  totalPlayerCargoCapacity,
+                  playerConvoys,
+                  playerConvoys != 1 ? "s" : "");
         }
 
         int width = UIUtil.scaleForGUI(500);
         return String.format("<html><i><div style='width: %s; text-align:center;'>%s</div></i></html>",
-            width, convoyMessage);
+              width,
+              convoyMessage);
     }
 }

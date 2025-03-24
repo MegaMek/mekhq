@@ -31,7 +31,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory.CampaignProblemType;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.baseComponents.MHQDialogImmersive;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
 import java.util.List;
 
@@ -43,30 +43,37 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
  * Dialog to inform and handle campaign-loading problems within MekHQ.
  *
  * <p>This dialog prompts the user with both in-character and out-of-character messages,
- * providing actionable options if any issues arise during campaign load, such as version
- * incompatibility or missing contracts.</p>
+ * providing actionable options if any issues arise during campaign load, such as version incompatibility or missing
+ * contracts.</p>
  *
  * <p>The dialog presents two options: "Cancel" to abort loading the campaign or
- * "Continue Regardless" to proceed despite the detected issues. It dynamically generates
- * text based on the problem type and campaign information.</p>
+ * "Continue Regardless" to proceed despite the detected issues. It dynamically generates text based on the problem type
+ * and campaign information.</p>
  */
-public class CampaignHasProblemOnLoad extends MHQDialogImmersive {
+public class CampaignHasProblemOnLoad extends ImmersiveDialogCore {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignHasProblemOnLoad";
 
     /**
      * Constructs the dialog to handle campaign load problems.
      *
      * <p>The dialog is built using localized messages for both
-     * in-character and out-of-character messages, following the detected
-     * problem type and campaign details. It also sets up predefined
-     * buttons for user interaction.</p>
+     * in-character and out-of-character messages, following the detected problem type and campaign details. It also
+     * sets up predefined buttons for user interaction.</p>
      *
      * @param campaign    the {@link Campaign} for which the load problem dialog is presented
      * @param problemType the {@link CampaignProblemType} specifying the nature of the load problem
      */
     public CampaignHasProblemOnLoad(Campaign campaign, CampaignProblemType problemType) {
-        super(campaign, getSpeaker(campaign), null, createInCharacterMessage(campaign, problemType),
-            createButtons(problemType), createOutOfCharacterMessage(problemType), null, false);
+        super(campaign,
+              getSpeaker(campaign),
+              null,
+              createInCharacterMessage(campaign, problemType),
+              createButtons(problemType),
+              createOutOfCharacterMessage(problemType),
+              null,
+              false,
+              null,
+              true);
     }
 
     /**
@@ -82,16 +89,17 @@ public class CampaignHasProblemOnLoad extends MHQDialogImmersive {
      * because proceeding is not allowed for this issue. For other problem types, both "Cancel" and "Continue"
      * buttons are included in the dialog.</p>
      *
-     * @param problemType the {@link CampaignProblemType} specifying the nature of the issue, which determines
-     *                    the buttons to display
+     * @param problemType the {@link CampaignProblemType} specifying the nature of the issue, which determines the
+     *                    buttons to display
+     *
      * @return a {@link List} of {@link ButtonLabelTooltipPair} objects representing the dialog's buttons
      */
     private static List<ButtonLabelTooltipPair> createButtons(CampaignProblemType problemType) {
-        ButtonLabelTooltipPair btnCancel = new ButtonLabelTooltipPair(
-            getFormattedTextAt(RESOURCE_BUNDLE, "cancel.button"), null);
+        ButtonLabelTooltipPair btnCancel = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
+              "cancel.button"), null);
 
-        ButtonLabelTooltipPair btnContinue = new ButtonLabelTooltipPair(
-            getFormattedTextAt(RESOURCE_BUNDLE, "continue.button"), null);
+        ButtonLabelTooltipPair btnContinue = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
+              "continue.button"), null);
 
         if (problemType == CANT_LOAD_FROM_NEWER_VERSION) {
             return List.of(btnCancel);
@@ -104,10 +112,10 @@ public class CampaignHasProblemOnLoad extends MHQDialogImmersive {
      * Retrieves the speaker for in-character dialog.
      *
      * <p>The speaker is determined as the senior administrator for the campaign
-     * with the "Command" specialization. If no such administrator is found, {@code null}
-     * is returned.</p>
+     * with the "Command" specialization. If no such administrator is found, {@code null} is returned.</p>
      *
      * @param campaign the {@link Campaign} whose senior administrator is to be retrieved
+     *
      * @return a {@link Person} representing the senior administrator, or {@code null} if none exists
      */
     private static @Nullable Person getSpeaker(Campaign campaign) {
@@ -122,6 +130,7 @@ public class CampaignHasProblemOnLoad extends MHQDialogImmersive {
      *
      * @param campaign    the {@link Campaign} for which the in-character message is generated
      * @param problemType the {@link CampaignProblemType} specifying the nature of the load problem
+     *
      * @return a localized {@link String} containing the in-character message
      */
     private static String createInCharacterMessage(Campaign campaign, CampaignProblemType problemType) {
@@ -138,6 +147,7 @@ public class CampaignHasProblemOnLoad extends MHQDialogImmersive {
      * explaining the detected issues in plain terms.</p>
      *
      * @param problemType the {@link CampaignProblemType} specifying the nature of the load problem
+     *
      * @return a localized {@link String} containing the out-of-character message
      */
     private static String createOutOfCharacterMessage(CampaignProblemType problemType) {

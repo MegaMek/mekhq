@@ -27,52 +27,158 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import mekhq.MHQConstants;
+import static mekhq.MHQConstants.NAG_INSUFFICIENT_ASTECHS;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAstechsNagLogic.hasAsTechsNeeded;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog;
-
-import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAstechsNagLogic.hasAsTechsNeeded;
+import mekhq.campaign.personnel.Person;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
- * A dialog used to notify the user that their campaign has insufficient astechs. Not to be
- * confused with {@link InsufficientAstechTimeNagDialog}.
+ * A dialog used to notify the user that their campaign has insufficient astechs. Not to be confused with
+ * {@link InsufficientAstechTimeNagDialog}.
  *
  * <p>
- * This nag dialog is triggered when the campaign does not have enough astechs to handle
- * the current maintenance and repair workload. Users are notified via a localized
- * message that provides relevant details about the issue.
+ * This nag dialog is triggered when the campaign does not have enough astechs to handle the current maintenance and
+ * repair workload. Users are notified via a localized message that provides relevant details about the issue.
  * </p>
  *
  * <strong>Features:</strong>
  * <ul>
  *   <li>Notifies users about the shortage of astechs in the current campaign.</li>
  *   <li>Allows users to address the issue or dismiss the dialog while optionally ignoring future warnings.</li>
- *   <li>Extends {@link AbstractMHQNagDialog} for consistent functionality with other nag dialogs.</li>
  * </ul>
  */
-public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
+public class InsufficientAstechsNagDialog {
+    private final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
+
+    private final int CHOICE_CANCEL = 0;
+    private final int CHOICE_CONTINUE = 1;
+    private final int CHOICE_SUPPRESS = 2;
+
+    private final Campaign campaign;
+    private boolean cancelAdvanceDay;
+
     /**
      * Constructs an {@code InsufficientAstechsNagDialog} for the given campaign.
      *
      * <p>
-     * This dialog uses a localized message identified by the key
-     * {@code "InsufficientAstechsNagDialog.text"} to inform the user of the insufficient
-     * astechs in their campaign.
+     * This dialog uses a localized message identified by the key {@code "InsufficientAstechsNagDialog.text"} to inform
+     * the user of the insufficient astechs in their campaign.
      * </p>
      *
      * @param campaign The {@link Campaign} associated with this nag dialog.
      */
     public InsufficientAstechsNagDialog(final Campaign campaign) {
-        super(campaign, MHQConstants.NAG_INSUFFICIENT_ASTECHS);
+        this.campaign = campaign;
+
         int asTechsNeeded = campaign.getAstechNeed();
 
-        String pluralizer = (asTechsNeeded > 1) ? "s" : "";
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
+              getSpeaker(),
+              null,
+              getFormattedTextAt(RESOURCE_BUNDLE,
+                    "InsufficientAstechsNagDialog.ic",
+                    campaign.getCommanderAddress(false),
+                    asTechsNeeded),
+              getButtonLabels(),
+              getFormattedTextAt(RESOURCE_BUNDLE, "InsufficientAstechsNagDialog.ooc"),
+              true);
 
-        final String DIALOG_BODY = "InsufficientAstechsNagDialog.text";
-        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
-            campaign.getCommanderAddress(false), asTechsNeeded, pluralizer));
-        showDialog();
+        int choiceIndex = dialog.getDialogChoice();
+
+        switch (choiceIndex) {
+            case CHOICE_CANCEL -> cancelAdvanceDay = true;
+            case CHOICE_CONTINUE -> cancelAdvanceDay = false;
+            case CHOICE_SUPPRESS -> {
+                MekHQ.getMHQOptions().setNagDialogIgnore(NAG_INSUFFICIENT_ASTECHS, true);
+                cancelAdvanceDay = false;
+            }
+            default ->
+                  throw new IllegalStateException("Unexpected value in InsufficientAstechsNagDialog: " + choiceIndex);
+        }
+    }
+
+    /**
+     * Retrieves a list of button labels from the resource bundle.
+     *
+     * <p>The method collects and returns button labels such as "Cancel", "Continue", and "Suppress" after
+     * formatting them using the provided resource bundle.</p>
+     *
+     * @return a {@link List} of formatted button labels as {@link String}.
+     */
+    private List<String> getButtonLabels() {
+        List<String> buttonLabels = new ArrayList<>();
+
+        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.cancel"));
+        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.continue"));
+        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.suppress"));
+
+        return buttonLabels;
+    }
+
+    /**
+     * Retrieves the speaker based on the active personnel.
+     *
+     * <p>This method iterates through the active personnel within the campaign and attempts to identify a speaker who
+     * meets the criteria. It prioritizes selecting a person with technical specialization, using a tie-breaking
+     * mechanism based on rank and skills. If no suitable speaker is found, it defaults to the senior administrator
+     * person with the "COMMAND" specialization.</p>
+     *
+     * @return the {@link Person} designated as the speaker, either the highest-ranking technical specialist or the
+     *       senior administrator with the "COMMAND" specialization if no other suitable speaker is found.
+     */
+    private Person getSpeaker() {
+        List<Person> activePersonnel = campaign.getActivePersonnel(false);
+
+        Person speaker = null;
+
+        for (Person person : activePersonnel) {
+            if (!person.isTech()) {
+                continue;
+            }
+
+            if (speaker == null) {
+                speaker = person;
+                continue;
+            }
+
+            if (person.outRanksUsingSkillTiebreaker(campaign, speaker)) {
+                speaker = person;
+            }
+        }
+
+        // First fallback
+        if (speaker == null) {
+            speaker = campaign.getSeniorAdminPerson(HR);
+        } else {
+            return speaker;
+        }
+
+        // Second fallback
+        if (speaker == null) {
+            speaker = campaign.getSeniorAdminPerson(COMMAND);
+        } else {
+            return speaker;
+        }
+
+        return speaker;
+    }
+
+    /**
+     * Determines whether the advance day operation should be canceled.
+     *
+     * @return {@code true} if advancing the day should be canceled, {@code false} otherwise.
+     */
+    public boolean shouldCancelAdvanceDay() {
+        return cancelAdvanceDay;
     }
 
     /**
@@ -85,13 +191,12 @@ public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
      * </ul>
      *
      * @param asTechsNeeded The number of additional AsTechs required to meet the campaign's needs.
-     * @return {@code true} if the nag dialog should be displayed due to insufficient AsTechs,
-     *         {@code false} otherwise.
+     *
+     * @return {@code true} if the nag dialog should be displayed due to insufficient AsTechs, {@code false} otherwise.
      */
     public static boolean checkNag(int asTechsNeeded) {
-        final String NAG_KEY = MHQConstants.NAG_INSUFFICIENT_ASTECHS;
+        final String NAG_KEY = NAG_INSUFFICIENT_ASTECHS;
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-              && hasAsTechsNeeded(asTechsNeeded);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) && hasAsTechsNeeded(asTechsNeeded);
     }
 }

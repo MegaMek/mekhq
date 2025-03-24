@@ -27,6 +27,12 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrainModifier;
+
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.Finances;
@@ -34,26 +40,19 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
-
-import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrainModifier;
-
 /**
  * A controller class responsible for managing and triggering daily nag dialogs in the campaign.
  *
  * <p>
- * The purpose of this class is to sequentially check all predefined "nag" conditions
- * to alert the player about issues that require their attention before advancing the day
- * in the campaign. Each nag dialog is displayed based on specific conditions, and the daily
- * nag process stops if the player cancels proceeding to the next day.
+ * The purpose of this class is to sequentially check all predefined "nag" conditions to alert the player about issues
+ * that require their attention before advancing the day in the campaign. Each nag dialog is displayed based on specific
+ * conditions, and the daily nag process stops if the player cancels proceeding to the next day.
  * </p>
  *
  * <strong>Usage:</strong>
  * <p>
- * This class is primarily called during the "Advance Day" process in MekHQ, to notify
- * players of campaign-related issues spanning financial, personnel, and strategic concerns.
+ * This class is primarily called during the "Advance Day" process in MekHQ, to notify players of campaign-related
+ * issues spanning financial, personnel, and strategic concerns.
  * </p>
  */
 public class NagController {
@@ -61,8 +60,8 @@ public class NagController {
      * Triggers a sequence of daily nag dialogs to check and display issues in the campaign.
      *
      * <p>
-     * This method iterates through all predefined nag dialogs, each associated with a specific
-     * condition or scenario within the campaign. Nags include, but are not limited to, the following:
+     * This method iterates through all predefined nag dialogs, each associated with a specific condition or scenario
+     * within the campaign. Nags include, but are not limited to, the following:
      * <ul>
      *     <li>Invalid faction settings.</li>
      *     <li>Missing commander.</li>
@@ -76,6 +75,7 @@ public class NagController {
      * allowing the campaign to progress to the next day.
      *
      * @param campaign The {@link Campaign} object representing the current campaign.
+     *
      * @return {@code true} if the player cancels any nag dialog, {@code false} otherwise.
      */
     public static boolean triggerDailyNags(Campaign campaign) {
@@ -84,7 +84,7 @@ public class NagController {
 
         if (InvalidFactionNagDialog.checkNag(campaign.getFaction(), today)) {
             InvalidFactionNagDialog invalidFactionNagDialog = new InvalidFactionNagDialog(campaign);
-            if (invalidFactionNagDialog.wasAdvanceDayCanceled()) {
+            if (invalidFactionNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
@@ -98,9 +98,11 @@ public class NagController {
         }
 
         final List<Person> activePersonnel = campaign.getActivePersonnel(false);
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final int doctorCapacity = campaignOptions.getMaximumPatients();
 
         // Untreated personnel
-        if (UntreatedPersonnelNagDialog.checkNag(activePersonnel)) {
+        if (UntreatedPersonnelNagDialog.checkNag(activePersonnel, doctorCapacity)) {
             UntreatedPersonnelNagDialog untreatedPersonnelNagDialog = new UntreatedPersonnelNagDialog(campaign);
             if (untreatedPersonnelNagDialog.wasAdvanceDayCanceled()) {
                 return true;
@@ -109,7 +111,8 @@ public class NagController {
 
         // Unable to afford expenses
         if (UnableToAffordExpensesNagDialog.checkNag(campaign)) {
-            UnableToAffordExpensesNagDialog unableToAffordExpensesNagDialog = new UnableToAffordExpensesNagDialog(campaign);
+            UnableToAffordExpensesNagDialog unableToAffordExpensesNagDialog = new UnableToAffordExpensesNagDialog(
+                  campaign);
             if (unableToAffordExpensesNagDialog.wasAdvanceDayCanceled()) {
                 return true;
             }
@@ -127,7 +130,8 @@ public class NagController {
         final Finances finances = campaign.getFinances();
 
         if (UnableToAffordLoanPaymentNagDialog.checkNag(finances.getLoans(), today, finances.getBalance())) {
-            UnableToAffordLoanPaymentNagDialog unableToAffordLoanPaymentNagDialog = new UnableToAffordLoanPaymentNagDialog(campaign);
+            UnableToAffordLoanPaymentNagDialog unableToAffordLoanPaymentNagDialog = new UnableToAffordLoanPaymentNagDialog(
+                  campaign);
             if (unableToAffordLoanPaymentNagDialog.wasAdvanceDayCanceled()) {
                 return true;
             }
@@ -135,7 +139,6 @@ public class NagController {
 
         // Unmaintained Units
         final Collection<Unit> units = campaign.getUnits();
-        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final boolean isCheckMaintenance = campaignOptions.isCheckMaintenance();
 
         if (UnmaintainedUnitsNagDialog.checkNag(units, isCheckMaintenance)) {
@@ -148,7 +151,7 @@ public class NagController {
         // Insufficient Medics
         if (InsufficientMedicsNagDialog.checkNag(campaign.getMedicsNeed())) {
             InsufficientMedicsNagDialog insufficientMedicsNagDialog = new InsufficientMedicsNagDialog(campaign);
-            if (insufficientMedicsNagDialog.wasAdvanceDayCanceled()) {
+            if (insufficientMedicsNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
@@ -156,7 +159,7 @@ public class NagController {
         // Insufficient AsTechs
         if (InsufficientAstechsNagDialog.checkNag(campaign.getAstechNeed())) {
             InsufficientAstechsNagDialog insufficientAstechsNagDialog = new InsufficientAstechsNagDialog(campaign);
-            if (insufficientAstechsNagDialog.wasAdvanceDayCanceled()) {
+            if (insufficientAstechsNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
@@ -166,9 +169,17 @@ public class NagController {
         final boolean isOvertimeAllowed = campaign.isOvertimeAllowed();
         final int possibleAstechPoolOvertime = campaign.getPossibleAstechPoolOvertime();
 
-        if (InsufficientAstechTimeNagDialog.checkNag(units, possibleAstechPoolMinutes, isOvertimeAllowed, possibleAstechPoolOvertime)) {
-            InsufficientAstechTimeNagDialog insufficientAstechTimeNagDialog = new InsufficientAstechTimeNagDialog(campaign);
-            if (insufficientAstechTimeNagDialog.wasAdvanceDayCanceled()) {
+        if (InsufficientAstechTimeNagDialog.checkNag(units,
+              possibleAstechPoolMinutes,
+              isOvertimeAllowed,
+              possibleAstechPoolOvertime)) {
+            InsufficientAstechTimeNagDialog insufficientAstechTimeNagDialog = new InsufficientAstechTimeNagDialog(
+                  campaign,
+                  units,
+                  possibleAstechPoolMinutes,
+                  isOvertimeAllowed,
+                  possibleAstechPoolOvertime);
+            if (insufficientAstechTimeNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
@@ -178,7 +189,8 @@ public class NagController {
         final List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
 
         if (UnresolvedStratConContactsNagDialog.checkNag(isUseStratCon, activeContracts, today)) {
-            UnresolvedStratConContactsNagDialog unresolvedStratConContactsNagDialog = new UnresolvedStratConContactsNagDialog(campaign);
+            UnresolvedStratConContactsNagDialog unresolvedStratConContactsNagDialog = new UnresolvedStratConContactsNagDialog(
+                  campaign);
             if (unresolvedStratConContactsNagDialog.wasAdvanceDayCanceled()) {
                 return true;
             }
@@ -197,14 +209,14 @@ public class NagController {
 
         if (DeploymentShortfallNagDialog.checkNag(isUseAtB, campaign)) {
             DeploymentShortfallNagDialog deploymentShortfallNagDialog = new DeploymentShortfallNagDialog(campaign);
-            if (deploymentShortfallNagDialog.wasAdvanceDayCanceled()) {
+            if (deploymentShortfallNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
 
         // Prisoners of War
         final boolean hasActiveContract = campaign.hasActiveContract();
-        final boolean hasPrisoners = campaign.getCurrentPrisoners().isEmpty();
+        final boolean hasPrisoners = !campaign.getCurrentPrisoners().isEmpty();
 
         if (PrisonersNagDialog.checkNag(hasActiveContract, hasPrisoners)) {
             PrisonersNagDialog prisonersNagDialog = new PrisonersNagDialog(campaign);
@@ -223,9 +235,10 @@ public class NagController {
 
         // Admin Strain
         if (AdminStrainNagDialog.checkNag(campaignOptions.isUseRandomRetirement(),
-              campaignOptions.isUseAdministrativeStrain(), getAdministrativeStrainModifier(campaign))) {
+              campaignOptions.isUseAdministrativeStrain(),
+              getAdministrativeStrainModifier(campaign))) {
             AdminStrainNagDialog adminStrainNagDialog = new AdminStrainNagDialog(campaign);
-            if (adminStrainNagDialog.wasAdvanceDayCanceled()) {
+            if (adminStrainNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
@@ -233,7 +246,7 @@ public class NagController {
         // Contract Ended
         if (EndContractNagDialog.checkNag(today, activeContracts)) {
             EndContractNagDialog endContractNagDialog = new EndContractNagDialog(campaign);
-            if (endContractNagDialog.wasAdvanceDayCanceled()) {
+            if (endContractNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }

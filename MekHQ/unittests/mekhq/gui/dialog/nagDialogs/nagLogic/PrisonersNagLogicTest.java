@@ -27,15 +27,15 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import mekhq.campaign.Campaign;
-import mekhq.gui.dialog.nagDialogs.PrisonersNagDialog;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import static mekhq.gui.dialog.nagDialogs.nagLogic.PrisonersNagLogic.hasPrisoners;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+
+import mekhq.campaign.Campaign;
+import mekhq.gui.dialog.nagDialogs.PrisonersNagDialog;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class is a test class for the {@link PrisonersNagDialog} class.
@@ -57,7 +57,7 @@ class PrisonersNagLogicTest {
 
     @Test
     void activeContract() {
-        assertTrue(hasPrisoners(true, true));
+        assertFalse(hasPrisoners(true, true));
     }
 
     @Test
@@ -67,6 +67,6 @@ class PrisonersNagLogicTest {
 
     @Test
     void noActiveContractPrisoners() {
-        assertFalse(hasPrisoners(false, true));
+        assertTrue(hasPrisoners(false, true));
     }
 }

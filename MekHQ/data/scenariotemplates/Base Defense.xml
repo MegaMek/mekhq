@@ -69,7 +69,6 @@ The victor will control the field when this is over. Ensure that it is us.</deta
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>0</deploymentZone>
                     <deploymentZone>1</deploymentZone>
                     <deploymentZone>2</deploymentZone>
                     <deploymentZone>3</deploymentZone>

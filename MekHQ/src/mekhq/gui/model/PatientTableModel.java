@@ -27,17 +27,18 @@
  */
 package mekhq.gui.model;
 
-import java.awt.Component;
-import java.util.ArrayList;
-
-import javax.swing.AbstractListModel;
-import javax.swing.JList;
-import javax.swing.ListCellRenderer;
-
+import megamek.client.ui.swing.util.UIUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.BasicInfo;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.lang.Math.round;
 
 /**
  * A table model for displaying personnel in the infirmary
@@ -91,12 +92,15 @@ public class PatientTableModel extends AbstractListModel<Person> {
                 int index,
                 boolean isSelected,
                 boolean cellHasFocus) {
-            Person p = getElementAt(index);
-            setImage(p.getPortrait().getImage(54));
+            final int maximumWidth = UIUtil.scaleForGUI(300);
+            final int maximumHeight = UIUtil.scaleForGUI(100);
+
+            Person person = getElementAt(index);
+            setImage(person.getPortrait().getImage(UIUtil.scaleForGUI(50)));
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
-                setHtmlText(getInjuriesDesc(p));
+                setHtmlText(getInjuriesDesc(person, (int) round(maximumWidth * 0.75) - 50));
             } else {
-                setHtmlText(getPatientDesc(p));
+                setHtmlText(getPatientDesc(person));
             }
             if (isSelected) {
                 highlightBorder();
@@ -105,23 +109,49 @@ public class PatientTableModel extends AbstractListModel<Person> {
             }
             setBackground(list.getBackground());
             setForeground(list.getForeground());
+
+            setPreferredSize(new Dimension(maximumWidth, maximumHeight));
             return this;
         }
     }
 
-    private String getInjuriesDesc(Person p) {
-        StringBuilder toReturn = new StringBuilder("<html><font><b>").append(p.getFullTitle())
-                .append("</b><br/>").append("&nbsp;&nbsp;&nbsp;Injuries:");
-        String sep = "<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-        for (Injury injury : p.getInjuries()) {
-            toReturn.append(sep).append(injury.getFluff());
-            if (sep.contains("<br/>")) {
-                sep = ", ";
+    /**
+     * Generates a styled HTML string describing the injuries of a person, formatted with a specified
+     * maximum width.
+     *
+     * <p>The generated string includes the person's full title in bold and a list of their injuries,
+     * each formatted with descriptive text and the time required to heal. Injuries are separated
+     * by commas, and the list is wrapped at the specified width to allow proper text wrapping.</p>
+     *
+     * @param person       The person whose injury description is to be generated.
+     * @param maximumWidth The maximum width (in pixels) for the HTML content, ensuring text wrapping.
+     * @return A styled HTML string describing the person's injuries.
+     */
+    private String getInjuriesDesc(Person person, int maximumWidth) {
+        StringBuilder toReturn = new StringBuilder("<html><div style='width:")
+              .append(maximumWidth).append("px'><b>").append(person.getFullTitle())
+              .append("</b>");
+
+        List<Injury> injuries = person.getInjuries();
+
+        for (Injury injury : injuries) {
+            if (injuries.indexOf(injury) != 0) {
+                toReturn.append(", ");
             } else {
-                sep = ",<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                toReturn.append("<br>");
             }
+
+            toReturn.append(injury.getFluff()).append(" (");
+
+            if (injury.isPermanent()) {
+                toReturn.append('\u221E');
+            } else {
+                toReturn.append(injury.getTime());
+            }
+
+            toReturn.append(')');
         }
-        toReturn.append("</font></html>");
+        toReturn.append("</div></html>");
         return toReturn.toString();
     }
 

@@ -27,20 +27,20 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.Person;
-import mekhq.gui.baseComponents.MHQDialogImmersive;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
-public class MissionEndPrisonerDialog extends MHQDialogImmersive {
+import java.util.ArrayList;
+import java.util.List;
+
+import megamek.common.annotations.Nullable;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.Person;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
+
+public class MissionEndPrisonerDialog extends ImmersiveDialogCore {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
     /**
@@ -52,61 +52,65 @@ public class MissionEndPrisonerDialog extends MHQDialogImmersive {
      * @param isSuccess   Indicates whether the mission was successful.
      * @param isGoodEvent Indicates whether the event is positive.
      */
-    public MissionEndPrisonerDialog(Campaign campaign, Money ransom, boolean isAllied,
-                                    boolean isSuccess, boolean isGoodEvent) {
-        super(campaign, getSpeaker(campaign), null,
-            createInCharacterMessage(campaign, ransom, isAllied, isSuccess, isGoodEvent),
-            createButtons(isAllied, isSuccess, isGoodEvent),
-            createOutOfCharacterMessage(isAllied, isSuccess, isGoodEvent), null, false);
+    public MissionEndPrisonerDialog(Campaign campaign, Money ransom, boolean isAllied, boolean isSuccess, boolean isGoodEvent) {
+        super(campaign,
+              getSpeaker(campaign),
+              null,
+              createInCharacterMessage(campaign, ransom, isAllied, isSuccess, isGoodEvent),
+              createButtons(isAllied, isSuccess, isGoodEvent),
+              createOutOfCharacterMessage(isAllied, isSuccess, isGoodEvent),
+              null,
+              false,
+              null,
+              true);
     }
 
     /**
      * Builds the list of buttons to be displayed in the dialog based on the parameters.
      *
      * <p>
-     * The available buttons depend on the ownership (allied/enemy), mission outcome,
-     * and the type of event. Buttons may include options such as "Accept Ransom",
-     * "Decline Ransom", "Release Prisoners", and "Execute Prisoners".
+     * The available buttons depend on the ownership (allied/enemy), mission outcome, and the type of event. Buttons may
+     * include options such as "Accept Ransom", "Decline Ransom", "Release Prisoners", and "Execute Prisoners".
      * </p>
      *
      * @param isAllied    Indicates whether the prisoners are allied.
      * @param isSuccess   Indicates whether the mission was successful.
      * @param isGoodEvent Indicates whether the event is positive.
+     *
      * @return A list of button-label and tooltip pairs to be displayed on the dialog.
      */
-    private static List<ButtonLabelTooltipPair> createButtons(boolean isAllied, boolean isSuccess,
-                                                              boolean isGoodEvent) {
+    private static List<ButtonLabelTooltipPair> createButtons(boolean isAllied, boolean isSuccess, boolean isGoodEvent) {
         List<ButtonLabelTooltipPair> buttons = new ArrayList<>();
 
-        boolean isRansom = (!isAllied && isSuccess && isGoodEvent)
-                || (!isAllied && !isSuccess && isGoodEvent)
-                || (isAllied && !isSuccess && isGoodEvent);
+        boolean isRansom = (!isAllied && isSuccess && isGoodEvent) ||
+                                 (!isAllied && !isSuccess && isGoodEvent) ||
+                                 (isAllied && !isSuccess && isGoodEvent);
 
         if (isRansom) {
-            ButtonLabelTooltipPair btnAccept = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
-                "accept.button"), null);
-            buttons.add(btnAccept);
-
             if (isAllied) {
                 ButtonLabelTooltipPair btnDecline = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
-                    "decline.button"), null);
+                      "decline.button"), null);
                 buttons.add(btnDecline);
             }
+
+            ButtonLabelTooltipPair btnAccept = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "accept.button"), null);
+            buttons.add(btnAccept);
         }
 
         if (!isAllied) {
             ButtonLabelTooltipPair btnReleaseThem = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
-                "releaseThem.button"), null);
+                  "releaseThem.button"), null);
             buttons.add(btnReleaseThem);
 
             ButtonLabelTooltipPair btnExecuteThem = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
-                "executeThem.button"), null);
+                  "executeThem.button"), null);
             buttons.add(btnExecuteThem);
         }
 
         if (isAllied && !isRansom) {
             ButtonLabelTooltipPair btnConfirmation = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
-                "successful.button"), null);
+                  "successful.button"), null);
             buttons.add(btnConfirmation);
         }
 
@@ -117,9 +121,8 @@ public class MissionEndPrisonerDialog extends MHQDialogImmersive {
      * Generates the in-character message for the dialog based on mission details.
      *
      * <p>
-     * The message reflects the outcome of the mission, the type of event, and whether
-     * the prisoners are allied or enemies. It also includes the ransom amount and a
-     * commander-specific greeting or address.
+     * The message reflects the outcome of the mission, the type of event, and whether the prisoners are allied or
+     * enemies. It also includes the ransom amount and a commander-specific greeting or address.
      * </p>
      *
      * @param campaign    The current campaign instance.
@@ -127,25 +130,28 @@ public class MissionEndPrisonerDialog extends MHQDialogImmersive {
      * @param isAllied    Indicates whether the prisoners are allied.
      * @param isSuccess   Indicates whether the mission was successful.
      * @param isGoodEvent Indicates whether the event is positive.
+     *
      * @return A formatted string containing the in-character dialog message.
      */
-    private static String createInCharacterMessage(Campaign campaign, Money ransomSum, boolean isAllied,
-                                                   boolean isSuccess, boolean isGoodEvent) {
-        String key = "prisoners."
-            + (isAllied ? "player" : "enemy") + '.'
-            + (isSuccess ? "victory" : "defeat") + '.'
-            + (isGoodEvent ? "good" : "bad") + '.'
-            + randomInt(50);
+    private static String createInCharacterMessage(Campaign campaign, Money ransomSum, boolean isAllied, boolean isSuccess, boolean isGoodEvent) {
+        String key = "prisoners." +
+                           (isAllied ? "player" : "enemy") +
+                           '.' +
+                           (isSuccess ? "victory" : "defeat") +
+                           '.' +
+                           (isGoodEvent ? "good" : "bad") +
+                           '.' +
+                           randomInt(50);
 
         String commanderAddress = campaign.getCommanderAddress(false);
-        return getFormattedTextAt(RESOURCE_BUNDLE, key,
-            commanderAddress, ransomSum.toAmountAndSymbolString());
+        return getFormattedTextAt(RESOURCE_BUNDLE, key, commanderAddress, ransomSum.toAmountAndSymbolString());
     }
 
     /**
      * Retrieves the speaker for the dialog, typically the senior commanding officer.
      *
      * @param campaign The current campaign instance.
+     *
      * @return The person to be displayed as the speaker in the dialog.
      */
     private static Person getSpeaker(Campaign campaign) {
@@ -156,18 +162,17 @@ public class MissionEndPrisonerDialog extends MHQDialogImmersive {
      * Creates an optional out-of-character (OOC) message based on mission details.
      *
      * <p>
-     * This message provides additional context or instructions for the user regarding
-     * the prisoners. The message is only displayed in specific scenarios.
+     * This message provides additional context or instructions for the user regarding the prisoners. The message is
+     * only displayed in specific scenarios.
      * </p>
      *
      * @param isAllied    Indicates whether the prisoners are allied.
      * @param isSuccess   Indicates whether the mission was successful.
      * @param isGoodEvent Indicates whether the event is positive.
-     * @return A formatted string containing the OOC dialog message, or {@code null} if
-     *         no message is required.
+     *
+     * @return A formatted string containing the OOC dialog message, or {@code null} if no message is required.
      */
-    private static @Nullable String createOutOfCharacterMessage(boolean isAllied, boolean isSuccess,
-                                                                boolean isGoodEvent) {
+    private static @Nullable String createOutOfCharacterMessage(boolean isAllied, boolean isSuccess, boolean isGoodEvent) {
         boolean showMessage = (isAllied && !isSuccess && isGoodEvent);
 
         if (showMessage) {

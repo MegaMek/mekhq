@@ -31,6 +31,7 @@ import megamek.common.Entity;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Hangar;
 import mekhq.campaign.unit.Unit;
 
 import java.util.UUID;
@@ -46,13 +47,13 @@ public class EntityUtilities {
      * unit ID. If the unit exists, the method returns the associated {@link Entity}. If the unit
      * does not exist or has no associated entity, the method returns {@code null}.
      *
-     * @param campaign The {@link Campaign} instance from which to retrieve the {@link Unit}.
+     * @param hangar The {@link Hangar} instance from which to retrieve the {@link Unit}.
      * @param unitID The {@link UUID} of the unit for which the associated {@link Entity} is requested.
      * @return The {@link Entity} associated with the specified unit ID, or {@code null} if the unit
      *         is not found or has no associated entity.
      */
-    public static @Nullable Entity getEntityFromUnitId(Campaign campaign, UUID unitID) {
-        Unit unit = campaign.getUnit(unitID);
+    public static @Nullable Entity getEntityFromUnitId(Hangar hangar, UUID unitID) {
+        Unit unit = hangar.getUnit(unitID);
 
         if (unit == null) {
             return null;

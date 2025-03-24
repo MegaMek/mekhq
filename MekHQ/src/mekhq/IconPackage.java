@@ -48,17 +48,17 @@ public class IconPackage {
     /** A map of resolution widths to file names for the startup screen */
     private final TreeMap<Integer, String> startupScreenImages = new TreeMap<>();
     {
-        startupScreenImages.put(0, "data/images/misc/MekHQ Start_spooky_hd.png");
-        startupScreenImages.put(1441, "data/images/misc/MekHQ Start_spooky_fhd.png");
-        startupScreenImages.put(1921, "data/images/misc/MekHQ Start_spooky_uhd.png");
+        startupScreenImages.put(0, "data/images/misc/MekHQ Start_hd.png");
+        startupScreenImages.put(1441, "data/images/misc/MekHQ Start_fhd.png");
+        startupScreenImages.put(1921, "data/images/misc/MekHQ Start_uhd.png");
     }
 
     /** A map of resolution widths to file names for the loading screen */
     private final TreeMap<Integer, String> loadingScreenImages = new TreeMap<>();
     {
-        loadingScreenImages.put(0, "data/images/misc/MekHQ Load_spooky_hd.png");
-        loadingScreenImages.put(1441, "data/images/misc/MekHQ Load_spooky_fhd.png");
-        loadingScreenImages.put(1921, "data/images/misc/MekHQ Load_spooky_uhd.png");
+        loadingScreenImages.put(0, "data/images/misc/MekHQ Load_hd.png");
+        loadingScreenImages.put(1441, "data/images/misc/MekHQ Load_fhd.png");
+        loadingScreenImages.put(1921, "data/images/misc/MekHQ Load_uhd.png");
     }
 
     private final TreeMap<Integer, String> autoResolveScreenImages = new TreeMap<>(Map.of(
