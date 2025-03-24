@@ -33,6 +33,10 @@ MEKHQ VERSION HISTORY:
 + PR #6358: Fixed Fatigue Status Report Update Messages
 + PR #6372: Enabled MekHQ Prisoner Capture Style for Non-AtB, Non-StratCon Campaigns
 + PR #6375: Moved and Renamed Immersive Dialog Base Classes
++ Updated Admin Strain Nag to Use Immersive Dialog #6376
++ PR #6377: Fixed Scroll Pane Starting Position In Immersive Dialogs
++ PR #6378: Fixed MekHQ Lockup Caused by Consecutive Glossary Dialogs; Fixed Scroll Pane Start Position in Glossary Dialogs
+
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
