@@ -445,18 +445,15 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (mission instanceof AtBContract) {
-            boolean wasOverallSuccess = cmd.getStatus() == SUCCESS || cmd.getStatus() == PARTIAL;
+        // Prisoners
+        boolean wasOverallSuccess = cmd.getStatus() == SUCCESS || cmd.getStatus() == PARTIAL;
 
-            if (prisoners != null) { // IDEA says we don't need the null check; I left it for insurance
-                if (!getCampaign().getFriendlyPrisoners().isEmpty()) {
-                    prisoners.handlePrisoners(wasOverallSuccess, true);
-                }
+        if (!getCampaign().getFriendlyPrisoners().isEmpty()) {
+            prisoners.handlePrisoners(wasOverallSuccess, true);
+        }
 
-                if (!getCampaign().getCurrentPrisoners().isEmpty()) {
-                    prisoners.handlePrisoners(wasOverallSuccess, false);
-                }
-            }
+        if (!getCampaign().getCurrentPrisoners().isEmpty()) {
+            prisoners.handlePrisoners(wasOverallSuccess, false);
         }
 
         // resolve turnover
