@@ -27,22 +27,28 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.swing.util.UIUtil;
-import megamek.logging.MMLogger;
-import mekhq.campaign.Campaign;
-
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent.EventType;
-import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
 import static java.lang.Math.round;
 import static javax.swing.BorderFactory.createEmptyBorder;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.handleImmersiveHyperlinkClick;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
+import javax.swing.event.HyperlinkEvent.EventType;
+
+import megamek.client.ui.swing.util.UIUtil;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
 
 /**
  * The {@code GlossaryDialog} class represents a dialog window for displaying glossary entries. It displays detailed
@@ -127,13 +133,15 @@ public class GlossaryDialog extends JDialog {
         // Add a HyperlinkListener to capture hyperlink clicks
         editorPane.addHyperlinkListener(evt -> {
             if (evt.getEventType() == EventType.ACTIVATED) {
-                handleImmersiveHyperlinkClick(parent, campaign, evt.getDescription());
+                handleImmersiveHyperlinkClick(this, campaign, evt.getDescription());
             }
         });
 
         // Wrap the JEditorPane in a JScrollPane
         JScrollPane scrollPane = new JScrollPane(editorPane);
         scrollPane.setMinimumSize(new Dimension(CENTER_WIDTH, scrollPane.getHeight()));
+        // This line ensures the scroll pane starts scrolled to the top, not bottom.
+        SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
 
         // Create a JPanel with padding
         JPanel paddedPanel = new JPanel(new BorderLayout());
