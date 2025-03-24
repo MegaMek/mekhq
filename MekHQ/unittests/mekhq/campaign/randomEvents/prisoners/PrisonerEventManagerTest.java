@@ -27,25 +27,12 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.finances.Finances;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.randomEvents.RandomEventLibraries;
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.TEMPORARY_CAPACITY_DEGRADE_RATE;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle.MEKHQ;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -53,13 +40,23 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.finances.Finances;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.personnel.Person;
+import org.junit.jupiter.api.Test;
+
 /**
  * Test class for the {@link PrisonerEventManager} class.
  *
  * <p>This class contains unit tests to verify the behavior of prisoner management-related
- * functionality. It uses mock instances of dependent components to isolate and test the specific
- * logic of the {@link PrisonerEventManager} class. The tests primarily focus on scenarios involving
- * degradation of temporary prisoner capacity and events triggered by prisoner or morale conditions.</p>
+ * functionality. It uses mock instances of dependent components to isolate and test the specific logic of the
+ * {@link PrisonerEventManager} class. The tests primarily focus on scenarios involving degradation of temporary
+ * prisoner capacity and events triggered by prisoner or morale conditions.</p>
  */
 public class PrisonerEventManagerTest {
     @Test
@@ -87,6 +84,7 @@ public class PrisonerEventManagerTest {
         // Assert
         assertEquals(expectedValue, actualValue);
     }
+
     @Test
     void testDegradeTemporaryCapacity_DegradeDownTowardsDefault_ResultBelowDefault() {
         final int INITIAL_TEMPORARY_CAPACITY = 101;
@@ -284,35 +282,24 @@ public class PrisonerEventManagerTest {
     @Test
     void testCheckForPrisonerEvents_NoEvent() {
         // Setup
-        Campaign mockCampaign = mock(Campaign.class);
+        int totalPrisoners = 1;
+        int prisonerCapacity = 10;
 
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.getPrisonerCaptureStyle()).thenReturn(MEKHQ);
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
 
-        LocalDate today = LocalDate.of(3151, 1, 3);
-        when(mockCampaign.getLocalDate()).thenReturn(today);
-
-        RandomEventLibraries eventLibraries = new RandomEventLibraries();
-        when(mockCampaign.getRandomEventLibraries()).thenReturn(eventLibraries);
-
-        Person prisoner = new Person(mockCampaign);
-        List<Person> prisoners = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            prisoners.add(prisoner);
-        }
-        when(mockCampaign.getCurrentPrisoners()).thenReturn(prisoners);
-
-        PrisonerEventManager realEventManager = new PrisonerEventManager(mockCampaign) {
+        PrisonerEventManager realEventManager = new PrisonerEventManager(campaign) {
             @Override
             protected int randomInt(int maxValue) {
-                return prisoners.size() + 1;
+                return 1;
             }
         };
 
         // Act
-        PrisonerEventManager eventManager = spy(realEventManager);
-        List<Boolean> results = eventManager.checkForPrisonerEvents(true);
+        List<Boolean> results = realEventManager.checkForPrisonerEvents(true,
+              totalPrisoners,
+              totalPrisoners,
+              prisonerCapacity);
         boolean minorEvent = results.get(0);
         boolean majorEvent = results.get(1);
 
@@ -324,35 +311,82 @@ public class PrisonerEventManagerTest {
     @Test
     void testCheckForPrisonerEvents_MinorEvent() {
         // Setup
-        Campaign mockCampaign = mock(Campaign.class);
+        int totalPrisoners = 1;
+        int prisonerCapacity = 0;
 
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.getPrisonerCaptureStyle()).thenReturn(MEKHQ);
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
 
-        LocalDate today = LocalDate.of(3151, 1, 3);
-        when(mockCampaign.getLocalDate()).thenReturn(today);
-
-        RandomEventLibraries eventLibraries = new RandomEventLibraries();
-        when(mockCampaign.getRandomEventLibraries()).thenReturn(eventLibraries);
-
-        Person prisoner = new Person(mockCampaign);
-        List<Person> prisoners = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            prisoners.add(prisoner);
-        }
-        when(mockCampaign.getCurrentPrisoners()).thenReturn(prisoners);
-
-        PrisonerEventManager realEventManager = new PrisonerEventManager(mockCampaign) {
+        PrisonerEventManager realEventManager = new PrisonerEventManager(campaign) {
             @Override
             protected int randomInt(int maxValue) {
-                return prisoners.size() - 1;
+                return 1;
             }
         };
 
         // Act
-        PrisonerEventManager eventManager = spy(realEventManager);
-        List<Boolean> results = eventManager.checkForPrisonerEvents(true);
+        List<Boolean> results = realEventManager.checkForPrisonerEvents(true,
+              totalPrisoners,
+              totalPrisoners,
+              prisonerCapacity);
+        boolean minorEvent = results.get(0);
+        boolean majorEvent = results.get(1);
+
+        // Assert
+        assertTrue(minorEvent);
+        assertFalse(majorEvent);
+    }
+
+    @Test
+    void testCheckForPrisonerEvents_MinorEvent_Automatic_BelowThreshold() {
+        // Setup
+        int totalPrisoners = 1;
+        int prisonerCapacity = 1;
+
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
+
+        PrisonerEventManager realEventManager = new PrisonerEventManager(campaign) {
+            @Override
+            protected int randomInt(int maxValue) {
+                return 0;
+            }
+        };
+
+        // Act
+        List<Boolean> results = realEventManager.checkForPrisonerEvents(true,
+              totalPrisoners,
+              totalPrisoners,
+              prisonerCapacity);
+        boolean minorEvent = results.get(0);
+        boolean majorEvent = results.get(1);
+
+        // Assert
+        assertFalse(minorEvent);
+        assertFalse(majorEvent);
+    }
+
+    @Test
+    void testCheckForPrisonerEvents_MinorEvent_Automatic_AboveThreshold() {
+        // Setup
+        int totalPrisoners = 25;
+        int prisonerCapacity = 25;
+
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
+
+        PrisonerEventManager realEventManager = new PrisonerEventManager(campaign) {
+            @Override
+            protected int randomInt(int maxValue) {
+                return 0;
+            }
+        };
+
+        // Act
+        List<Boolean> results = realEventManager.checkForPrisonerEvents(true,
+              totalPrisoners,
+              totalPrisoners,
+              prisonerCapacity);
         boolean minorEvent = results.get(0);
         boolean majorEvent = results.get(1);
 
@@ -364,35 +398,82 @@ public class PrisonerEventManagerTest {
     @Test
     void testCheckForPrisonerEvents_MajorEvent() {
         // Setup
-        Campaign mockCampaign = mock(Campaign.class);
+        int totalPrisoners = 100;
+        int prisonerCapacity = 0;
 
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.getPrisonerCaptureStyle()).thenReturn(MEKHQ);
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
 
-        LocalDate today = LocalDate.of(3151, 1, 3);
-        when(mockCampaign.getLocalDate()).thenReturn(today);
-
-        RandomEventLibraries eventLibraries = new RandomEventLibraries();
-        when(mockCampaign.getRandomEventLibraries()).thenReturn(eventLibraries);
-
-        Person prisoner = new Person(mockCampaign);
-        List<Person> prisoners = new ArrayList<>();
-        for (int i = 0; i < 30; i++) {
-            prisoners.add(prisoner);
-        }
-        when(mockCampaign.getCurrentPrisoners()).thenReturn(prisoners);
-
-        PrisonerEventManager realEventManager = new PrisonerEventManager(mockCampaign) {
+        PrisonerEventManager realEventManager = new PrisonerEventManager(campaign) {
             @Override
             protected int randomInt(int maxValue) {
-                return prisoners.size() - 1;
+                return 1;
             }
         };
 
         // Act
-        PrisonerEventManager eventManager = spy(realEventManager);
-        List<Boolean> results = eventManager.checkForPrisonerEvents(true);
+        List<Boolean> results = realEventManager.checkForPrisonerEvents(true,
+              totalPrisoners,
+              totalPrisoners,
+              prisonerCapacity);
+        boolean minorEvent = results.get(0);
+        boolean majorEvent = results.get(1);
+
+        // Assert
+        assertTrue(minorEvent);
+        assertTrue(majorEvent);
+    }
+
+    @Test
+    void testCheckForPrisonerEvents_MajorEvent_NotEnoughPrisoners() {
+        // Setup
+        int totalPrisoners = 1;
+        int prisonerCapacity = 0;
+
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
+
+        PrisonerEventManager realEventManager = new PrisonerEventManager(campaign) {
+            @Override
+            protected int randomInt(int maxValue) {
+                return 1;
+            }
+        };
+
+        // Act
+        List<Boolean> results = realEventManager.checkForPrisonerEvents(true,
+              totalPrisoners,
+              totalPrisoners,
+              prisonerCapacity);
+        boolean minorEvent = results.get(0);
+        boolean majorEvent = results.get(1);
+
+        // Assert
+        assertTrue(minorEvent);
+        assertFalse(majorEvent);
+    }
+
+    @Test
+    void testCheckForPrisonerEvents_MajorEvent_Automatic() {
+        // Setup
+        int totalPrisoners = 100;
+        int prisonerCapacity = 100;
+
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
+
+        PrisonerEventManager realEventManager = new PrisonerEventManager(campaign) {
+            @Override
+            protected int randomInt(int maxValue) {
+                return 0;
+            }
+        };
+
+        // Act
+        List<Boolean> results = realEventManager.checkForPrisonerEvents(true,
+              totalPrisoners,
+              totalPrisoners,
+              prisonerCapacity);
         boolean minorEvent = results.get(0);
         boolean majorEvent = results.get(1);
 

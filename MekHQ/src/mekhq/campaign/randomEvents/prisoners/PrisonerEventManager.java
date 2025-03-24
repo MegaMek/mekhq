@@ -70,9 +70,9 @@ import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerWarningResultsDialo
  * Manages prisoner-related events and warnings during a campaign.
  *
  * <p>Handles both weekly and monthly events associated with prisoners in the campaign, including
- * ransom opportunities, warnings for prisoner overflow, and random events that affect the campaign
- * state. It also calculates prisoner capacity, processes executions, and dynamically generates
- * prisoner-related scenarios based on campaign conditions.</p>
+ * ransom opportunities, warnings for prisoner overflow, and random events that affect the campaign state. It also
+ * calculates prisoner capacity, processes executions, and dynamically generates prisoner-related scenarios based on
+ * campaign conditions.</p>
  *
  * <p>The manager adjusts campaign parameters such as temporary prisoner capacity and handles
  * interactions with the player via dialogs, providing options to resolve prisoner-related issues.</p>
@@ -108,8 +108,7 @@ public class PrisonerEventManager {
     private final int CHOICE_EXECUTE = 2;
 
     /**
-     * Constructs a new {@link PrisonerEventManager} and handles the initialization of
-     * prisoner-related events.
+     * Constructs a new {@link PrisonerEventManager} and handles the initialization of prisoner-related events.
      *
      * <p>Performs the following during initialization:</p>
      * <ul>
@@ -118,8 +117,7 @@ public class PrisonerEventManager {
      *     <li>Handles weekly events related to prisoner overflow or random events.</li>
      * </ul>
      *
-     * @param campaign The current campaign instance, providing context and state for prisoner
-     *                management.
+     * @param campaign The current campaign instance, providing context and state for prisoner management.
      */
     public PrisonerEventManager(Campaign campaign) {
         this.campaign = campaign;
@@ -155,7 +153,11 @@ public class PrisonerEventManager {
 
         // Fortnightly events
         if (isMonday && isFortnight) {
-            checkForPrisonerEvents(false);
+            int totalPrisoners = campaign.getCurrentPrisoners().size();
+            int prisonerCapacityUsage = calculatePrisonerCapacityUsage(campaign);
+            int prisonerCapacity = calculatePrisonerCapacity(campaign);
+
+            checkForPrisonerEvents(false, totalPrisoners, prisonerCapacityUsage, prisonerCapacity);
         }
     }
 
@@ -163,9 +165,8 @@ public class PrisonerEventManager {
      * Adjusts the temporary prisoner capacity for the given campaign by degrading it.
      *
      * <p>This method modifies the campaign's temporary prisoner capacity based on a percentage of
-     * the current value. It ensures that the capacity moves closer to a default value, either
-     * increasing or decreasing depending on the current capacity modifier's position relative to
-     * the default.</p>
+     * the current value. It ensures that the capacity moves closer to a default value, either increasing or decreasing
+     * depending on the current capacity modifier's position relative to the default.</p>
      *
      * @return The updated temporary capacity modifier after the adjustment has been applied.
      */
@@ -193,11 +194,11 @@ public class PrisonerEventManager {
     }
 
     /**
-     * Checks for ransom-related events in the given campaign. This method determines if a ransom
-     * event is triggered and whether friendly prisoners of war (POWs) are involved.
+     * Checks for ransom-related events in the given campaign. This method determines if a ransom event is triggered and
+     * whether friendly prisoners of war (POWs) are involved.
      *
-     * @return A list of two boolean values where the first element indicates if an event
-     *         was triggered, and the second element specifies if the event involves friendly POWs.
+     * @return A list of two boolean values where the first element indicates if an event was triggered, and the second
+     *       element specifies if the event involves friendly POWs.
      */
     List<Boolean> checkForRansomEvents() {
         boolean eventTriggered = false;
@@ -222,22 +223,39 @@ public class PrisonerEventManager {
     }
 
     /**
-     * Checks for events related to prisoner overflow in the campaign.
+     * Evaluates the campaign's current prisoner conditions and determines whether a prisoner-related event occurs due
+     * to overflow or capacity constraints.
      *
-     * <p>This method determines whether a minor or major prisoner-related event occurs based on
-     * the current prisoner capacity, usage, and overflow. If there is no event, a warning may be
-     * processed.
+     * <p>This method calculates the percentage overflow of prisoners compared to the capacity and uses
+     * random rolls to decide whether a minor or major event is triggered. If no event occurs and there is overflow, it
+     * displays a warning (when not in headless mode) to alert the user about the situation and allow for corrective
+     * actions.</p>
      *
-     * @param isHeadless A boolean value indicating whether the process is running without a user
-     *                  interface. Allows Unit Tests to bypass the GUI prompts created by this method.
-     * @return A list of two boolean values: The first element indicates whether a minor event
-     * occurred. The second element indicates whether a major event occurred.
+     * <p>The decision process includes:
+     * <ul>
+     *   <li>Determining whether the overflow percentage exceeds the threshold for triggering a minor event.</li>
+     *   <li>Escalating a minor event to a major event based on prisoner count and another random roll.</li>
+     *   <li>Issuing a warning to the user for overflow situations when no events are triggered.</li>
+     *   <li>Executing random events if an event is triggered.</li>
+     * </ul>
+     * </p>
+     *
+     * @param isHeadless            A {@code boolean} indicating whether the process is running without a user
+     *                              interface. Allows unit tests to bypass GUI prompts created by this method.
+     * @param totalPrisoners        The total number of prisoners currently in the campaign. Used to determine
+     *                              escalation thresholds and whether warnings/events are applicable.
+     * @param prisonerCapacityUsage The current number of prisoners relative to the available capacity, used to
+     *                              calculate overflow percentage.
+     * @param prisonerCapacity      The total prisoner capacity available in the campaign. Serves as the threshold when
+     *                              calculating overflow.
+     *
+     * @return A {@code List} of two {@code boolean} values:
+     *       <ul>
+     *         <li>The first element is {@code true} if a minor event occurred, {@code false} otherwise.</li>
+     *         <li>The second element is {@code true} if a major event occurred, {@code false} otherwise.</li>
+     *       </ul>
      */
-    List<Boolean> checkForPrisonerEvents(boolean isHeadless) {
-        int totalPrisoners = campaign.getCurrentPrisoners().size();
-        int prisonerCapacityUsage = calculatePrisonerCapacityUsage(campaign);
-        int prisonerCapacity = calculatePrisonerCapacity(campaign);
-
+    List<Boolean> checkForPrisonerEvents(boolean isHeadless, int totalPrisoners, int prisonerCapacityUsage, int prisonerCapacity) {
         // Calculate overflow as the percentage over prisonerCapacity
         double overflowPercentage = ((double) (prisonerCapacityUsage - prisonerCapacity) / prisonerCapacity) * 100;
 
@@ -283,11 +301,10 @@ public class PrisonerEventManager {
      * Processes a random event involving prisoners.
      *
      * <p>Handles both minor and major prisoner events. A dialog is presented to the player,
-     * allowing them to decide how to respond. Based on the outcome, the event's effects are
-     * applied, which may include generating escapee scenarios or other consequences.</p>
+     * allowing them to decide how to respond. Based on the outcome, the event's effects are applied, which may include
+     * generating escapee scenarios or other consequences.</p>
      *
-     * @param majorEvent {@code true} if the event is classified as a major event, {@code false}
-     *                              for a minor event.
+     * @param majorEvent {@code true} if the event is classified as a major event, {@code false} for a minor event.
      */
     private void processRandomEvent(boolean majorEvent) {
         PrisonerEventData eventData;
@@ -298,8 +315,7 @@ public class PrisonerEventManager {
         }
         PrisonerEvent event = eventData.prisonerEvent();
 
-        PrisonerEventDialog eventDialog =
-            new PrisonerEventDialog(campaign, speaker, event);
+        PrisonerEventDialog eventDialog = new PrisonerEventDialog(campaign, speaker, event);
 
         int choiceIndex = eventDialog.getDialogChoice();
 
@@ -326,8 +342,8 @@ public class PrisonerEventManager {
      * Processes a warning event when the prisoner overflow exceeds acceptable limits.
      *
      * <p>Presents a dialog to the player, allowing them to take corrective actions by choosing to
-     * either release or execute prisoners to address the overflow. Results in the removal or
-     * execution of prisoners based on the player's choice.</p>
+     * either release or execute prisoners to address the overflow. Results in the removal or execution of prisoners
+     * based on the player's choice.</p>
      *
      * @param overflow The calculated overflow value indicating prisoners exceeding capacity.
      */
@@ -364,6 +380,7 @@ public class PrisonerEventManager {
      * Selects a random event from the available prisoner events.
      *
      * @param isMajor {@code true} to select a major event, {@code false} to select a minor event.
+     *
      * @return A randomly selected {@link PrisonerEventData} object representing the event.
      */
     private PrisonerEventData pickEvent(boolean isMajor) {
@@ -380,13 +397,17 @@ public class PrisonerEventManager {
      *
      * @param eventData   The data for the prisoner event being processed.
      * @param choiceIndex The index of the choice made by the player in the event dialog.
+     *
      * @return {@code true} if the player's response is deemed successful, {@code false} otherwise.
      */
     private boolean makeEventCheck(PrisonerEventData eventData, int choiceIndex) {
         int responseModifier = 0;
         if (speaker != null) {
             responseModifier = getPersonalityValue(campaign.getCampaignOptions().isUseRandomPersonalities(),
-                speaker.getAggression(), speaker.getAmbition(), speaker.getGreed(), speaker.getSocial());
+                  speaker.getAggression(),
+                  speaker.getAmbition(),
+                  speaker.getGreed(),
+                  speaker.getSocial());
         }
 
         if (speaker == null) {
@@ -395,7 +416,8 @@ public class PrisonerEventManager {
 
         ResponseQuality responseQuality = eventData.responseEntries().get(choiceIndex).quality();
         switch (responseQuality) {
-            case RESPONSE_NEUTRAL -> {} // No modifier
+            case RESPONSE_NEUTRAL -> {
+            } // No modifier
             case RESPONSE_POSITIVE -> responseModifier += 3;
             case RESPONSE_NEGATIVE -> responseModifier -= 3;
         }
@@ -409,8 +431,8 @@ public class PrisonerEventManager {
      * Processes the execution of a given number of prisoners.
      *
      * <p>Removes prisoners from the campaign while generating appropriate reports of their
-     * execution. Triggers additional logic to handle campaign state updates, such as potential
-     * backfires or penalties from the executions.</p>
+     * execution. Triggers additional logic to handle campaign state updates, such as potential backfires or penalties
+     * from the executions.</p>
      *
      * @param executions The number of prisoners to be executed.
      * @param prisoners  The list of prisoners involved in the execution.
@@ -418,8 +440,7 @@ public class PrisonerEventManager {
     private void processExecutions(int executions, List<Person> prisoners) {
         for (int i = 0; i < executions; i++) {
             Person prisoner = prisoners.get(i);
-            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "execute.report",
-                    prisoner.getFullName()));
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "execute.report", prisoner.getFullName()));
             campaign.removePerson(prisoner, false);
         }
 
@@ -459,23 +480,27 @@ public class PrisonerEventManager {
         // Build the report
         String key = getFormattedTextAt(RESOURCE_BUNDLE, hasBackfired ? "execute.backfired" : "execute.successful");
 
-        String messageColor = hasBackfired
-            ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
-            : spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+        String messageColor = hasBackfired ?
+                                    spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
+                                    spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
 
-        String crimeColor = crimeNoticed
-            ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
-            : spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+        String crimeColor = crimeNoticed ?
+                                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
+                                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
 
-        String crimeMessage = crimeNoticed
-            ? getFormattedTextAt(RESOURCE_BUNDLE, "execute.crimeNoticed",
-                crimeColor, CLOSING_SPAN_TAG, penalty)
-            : getFormattedTextAt(RESOURCE_BUNDLE, "execute.crimeUnnoticed",
-                crimeColor, CLOSING_SPAN_TAG);
+        String crimeMessage = crimeNoticed ?
+                                    getFormattedTextAt(RESOURCE_BUNDLE,
+                                          "execute.crimeNoticed",
+                                          crimeColor,
+                                          CLOSING_SPAN_TAG,
+                                          penalty) :
+                                    getFormattedTextAt(RESOURCE_BUNDLE,
+                                          "execute.crimeUnnoticed",
+                                          crimeColor,
+                                          CLOSING_SPAN_TAG);
 
         // Add the report
-        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, key), messageColor, CLOSING_SPAN_TAG,
-                crimeMessage);
+        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, key), messageColor, CLOSING_SPAN_TAG, crimeMessage);
     }
 
     /**
@@ -485,6 +510,7 @@ public class PrisonerEventManager {
      * This value represents the total number of prisoners consuming capacity resources.</p>
      *
      * @param campaign The current campaign instance.
+     *
      * @return The total prisoner capacity usage.
      */
     public static int calculatePrisonerCapacityUsage(Campaign campaign) {
@@ -512,10 +538,10 @@ public class PrisonerEventManager {
      * Calculates the total available capacity for holding prisoners in the campaign.
      *
      * <p>This calculation accounts for forces capable of handling prisoners, such as security
-     * units, and factors in adjustments based on the MekHQ capture style and temporary capacity
-     * modifiers.</p>
+     * units, and factors in adjustments based on the MekHQ capture style and temporary capacity modifiers.</p>
      *
      * @param campaign The current campaign instance.
+     *
      * @return The total prisoner capacity.
      */
     public static int calculatePrisonerCapacity(Campaign campaign) {
@@ -548,9 +574,10 @@ public class PrisonerEventManager {
                     int crewSize = unit.getCrew().size();
                     for (int trooper = 0; trooper < crewSize; trooper++) {
                         if (unit.isBattleArmorSuitOperable(trooper)) {
-                            prisonerCapacity += isMekHQCaptureStyle
-                                ? PRISONER_CAPACITY_BATTLE_ARMOR
-                                : PRISONER_CAPACITY_BATTLE_ARMOR * PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
+                            prisonerCapacity += isMekHQCaptureStyle ?
+                                                      PRISONER_CAPACITY_BATTLE_ARMOR :
+                                                      PRISONER_CAPACITY_BATTLE_ARMOR *
+                                                            PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
                         }
                     }
 
@@ -560,9 +587,10 @@ public class PrisonerEventManager {
                 if (unit.isConventionalInfantry()) {
                     for (Person soldier : unit.getCrew()) {
                         if (!soldier.needsFixing()) {
-                            prisonerCapacity += isMekHQCaptureStyle
-                                ? PRISONER_CAPACITY_CONVENTIONAL_INFANTRY
-                                : PRISONER_CAPACITY_CONVENTIONAL_INFANTRY * PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
+                            prisonerCapacity += isMekHQCaptureStyle ?
+                                                      PRISONER_CAPACITY_CONVENTIONAL_INFANTRY :
+                                                      PRISONER_CAPACITY_CONVENTIONAL_INFANTRY *
+                                                            PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
                         }
                     }
                     continue;
@@ -584,10 +612,11 @@ public class PrisonerEventManager {
     }
 
     /**
-     * Determines whether the specified unit is of a prohibited type. A unit is considered
-     * prohibited if its associated entity is an aerospace entity.
+     * Determines whether the specified unit is of a prohibited type. A unit is considered prohibited if its associated
+     * entity is an aerospace entity.
      *
      * @param unit The unit to be checked for prohibition. Must not be null.
+     *
      * @return true if the unit's entity is an aerospace entity, false otherwise.
      */
     private static boolean isProhibitedUnitType(Unit unit) {
@@ -604,8 +633,7 @@ public class PrisonerEventManager {
      * Retrieves the speaker for a prisoner-related dialog or event.
      *
      * <p>The speaker is typically selected from security forces within the campaign. If no suitable
-     * speaker is found, a senior administrator with the transport specialization is returned as a
-     * fallback.</p>
+     * speaker is found, a senior administrator with the transport specialization is returned as a fallback.</p>
      *
      * @return The selected {@link Person} who acts as the speaker, or {@code null} if none is found.
      */
@@ -643,6 +671,7 @@ public class PrisonerEventManager {
      * value.</p>
      *
      * @param maxValue The upper bound (exclusive) for the random integer. Must be greater than 0.
+     *
      * @return A randomly generated integer in the range [0, (maxValue - 1)].
      */
     protected int randomInt(int maxValue) {
@@ -656,6 +685,7 @@ public class PrisonerEventManager {
      * value.</p>
      *
      * @param dice The number of six-sided dice to roll. Must be a non-negative integer.
+     *
      * @return The total result of the rolled dice.
      */
     protected int d6(int dice) {
