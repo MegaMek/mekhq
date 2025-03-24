@@ -205,7 +205,7 @@ public class NagController {
 
         if (DeploymentShortfallNagDialog.checkNag(isUseAtB, campaign)) {
             DeploymentShortfallNagDialog deploymentShortfallNagDialog = new DeploymentShortfallNagDialog(campaign);
-            if (deploymentShortfallNagDialog.wasAdvanceDayCanceled()) {
+            if (deploymentShortfallNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }

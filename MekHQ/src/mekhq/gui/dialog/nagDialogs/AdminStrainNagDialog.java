@@ -85,7 +85,10 @@ public class AdminStrainNagDialog {
                 MekHQ.getMHQOptions().setNagDialogIgnore(NAG_ADMIN_STRAIN, true);
                 cancelAdvanceDay = false;
             }
-            default -> throw new IllegalStateException("Unexpected value in AdminStrainNagDialog: " + choiceIndex);
+            default -> throw new IllegalStateException("Unexpected value in " +
+                                                             getClass().getSimpleName() +
+                                                             ": " +
+                                                             choiceIndex);
         }
     }
 
