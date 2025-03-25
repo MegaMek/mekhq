@@ -28,95 +28,34 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_SHORT_DEPLOYMENT;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.DeploymentShortfallNagLogic.hasDeploymentShortfall;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 /**
- * A nag dialog that alerts the user if short deployments are detected in the campaign's active contracts.
+ * A dialog class used to notify players about deployment shortfalls in their campaign.
  *
- * <p>
- * This dialog checks whether any active AtB (Against the Bot) contracts have a deployment deficit and alerts the player
- * to address the issue. The check is performed weekly (on Sundays) and only when the campaign is currently located on a
- * planet. If deployment requirements are not met, the dialog is displayed to prompt the user to correct the situation.
- * </p>
+ * <p>The {@code DeploymentShortfallNagDialog} extends {@link ImmersiveDialogNag} and provides
+ * a specialized nag dialog designed to alert players when deployment shortfalls occur. It uses predefined parameters,
+ * such as the {@code NAG_SHORT_DEPLOYMENT} constant, and no specific specialization for its speaker, allowing for a
+ * default fallback during dialog creation.</p>
  */
-public class DeploymentShortfallNagDialog {
-    private final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
-
-    private final int CHOICE_CANCEL = 0;
-    private final int CHOICE_CONTINUE = 1;
-    private final int CHOICE_SUPPRESS = 2;
-
-    private boolean cancelAdvanceDay;
-
+public class DeploymentShortfallNagDialog extends ImmersiveDialogNag {
     /**
-     * Constructs the shortfall deployment nag dialog for a given campaign.
+     * Constructs a new {@code DeploymentShortfallNagDialog} instance to display the deployment shortfall nag dialog.
      *
-     * <p>
-     * This constructor initializes the dialog with the specified campaign and formats the resource message to display
-     * information about deployment shortfalls.
-     * </p>
+     * <p>This constructor initializes the nag dialog without a specific specialization, allowing the fallback
+     * mechanism to determine the appropriate speaker. The {@code NAG_SHORT_DEPLOYMENT} constant is used to manage
+     * dialog suppression, and the {@code "DeploymentShortfallNagDialog"} message key is utilized to retrieve localized
+     * content.</p>
      *
-     * @param campaign The {@link Campaign} object representing the current campaign.
+     * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data and
+     *                 settings required for dialog construction.
      */
     public DeploymentShortfallNagDialog(final Campaign campaign) {
-        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-              campaign.getSeniorAdminPerson(COMMAND),
-              null,
-              getFormattedTextAt(RESOURCE_BUNDLE,
-                    "DeploymentShortfallNagDialog.ic",
-                    campaign.getCommanderAddress(false)),
-              getButtonLabels(),
-              getFormattedTextAt(RESOURCE_BUNDLE, "DeploymentShortfallNagDialog.ooc"),
-              true);
-
-        int choiceIndex = dialog.getDialogChoice();
-
-        switch (choiceIndex) {
-            case CHOICE_CANCEL -> cancelAdvanceDay = true;
-            case CHOICE_CONTINUE -> cancelAdvanceDay = false;
-            case CHOICE_SUPPRESS -> {
-                MekHQ.getMHQOptions().setNagDialogIgnore(NAG_SHORT_DEPLOYMENT, true);
-                cancelAdvanceDay = false;
-            }
-            default ->
-                  throw new IllegalStateException("Unexpected value in DeploymentShortfallNagDialog: " + choiceIndex);
-        }
-    }
-
-    /**
-     * Retrieves a list of button labels from the resource bundle.
-     *
-     * <p>The method collects and returns button labels such as "Cancel", "Continue", and "Suppress" after
-     * formatting them using the provided resource bundle.</p>
-     *
-     * @return a {@link List} of formatted button labels as {@link String}.
-     */
-    private List<String> getButtonLabels() {
-        List<String> buttonLabels = new ArrayList<>();
-
-        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.cancel"));
-        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.continue"));
-        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.suppress"));
-
-        return buttonLabels;
-    }
-
-    /**
-     * Determines whether the advance day operation should be canceled.
-     *
-     * @return {@code true} if advancing the day should be canceled, {@code false} otherwise.
-     */
-    public boolean shouldCancelAdvanceDay() {
-        return cancelAdvanceDay;
+        super(campaign, null, NAG_SHORT_DEPLOYMENT, "DeploymentShortfallNagDialog");
     }
 
     /**
