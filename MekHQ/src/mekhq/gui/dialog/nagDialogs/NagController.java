@@ -121,7 +121,7 @@ public class NagController {
         // Unable to afford next jump
         if (UnableToAffordJumpNagDialog.checkNag(campaign)) {
             UnableToAffordJumpNagDialog unableToAffordJumpNagDialog = new UnableToAffordJumpNagDialog(campaign);
-            if (unableToAffordJumpNagDialog.wasAdvanceDayCanceled()) {
+            if (unableToAffordJumpNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
