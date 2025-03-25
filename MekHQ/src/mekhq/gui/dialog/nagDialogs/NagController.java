@@ -132,7 +132,7 @@ public class NagController {
         if (UnableToAffordLoanPaymentNagDialog.checkNag(finances.getLoans(), today, finances.getBalance())) {
             UnableToAffordLoanPaymentNagDialog unableToAffordLoanPaymentNagDialog = new UnableToAffordLoanPaymentNagDialog(
                   campaign);
-            if (unableToAffordLoanPaymentNagDialog.wasAdvanceDayCanceled()) {
+            if (unableToAffordLoanPaymentNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
