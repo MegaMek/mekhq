@@ -187,7 +187,7 @@ public class NagController {
         if (UnresolvedStratConContactsNagDialog.checkNag(isUseStratCon, activeContracts, today)) {
             UnresolvedStratConContactsNagDialog unresolvedStratConContactsNagDialog = new UnresolvedStratConContactsNagDialog(
                   campaign);
-            if (unresolvedStratConContactsNagDialog.wasAdvanceDayCanceled()) {
+            if (unresolvedStratConContactsNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
