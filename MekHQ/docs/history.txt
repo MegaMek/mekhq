@@ -44,6 +44,15 @@ MEKHQ VERSION HISTORY:
 + fix #6388: Removed Deprecated methods from MMLogger and updated impacted calls
 + PR #6389: Updated Insufficient Medics Nag To Use Immersive Dialog
 + PR #6398: Updated Invalid Faction Nag To Use Immersive Dialog
++ Fix #6373: Increase random off-board distance range
++ PR #6379: Added New Glossary Entries for Nag Terms
++ Fix #6391: Fixed Error in Retirement Defection Checker if 'Use Commander Leadership Only' is Selected But No Campaign Commander Has Been Chosen
++ PR #6393: Expanded Prisoner End of Contract Events to Missions
++ PR  #6395: Updated Prisoner Capacity Event OOC Text
++ Fix #6396: Adjusted Prisoner Event Chances; Updated Prisoner Documentation
++ PR #6401: Created ImmersiveDialogNag Base Class; Rolled Out Base Class to Previously Edited Nags
++ PR #6402, #6403, #6405, #6406, #6407, #6408, #6410, #6411, #6413, #6414: Refactored Nag Dialogs To Use Immersive Dialog Framework
++ PR #6404: Marked AbstractMHQNagDialog as Deprecated
 
 
 0.50.04 (2025-03-22 1600 UTC)
