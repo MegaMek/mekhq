@@ -92,7 +92,7 @@ public class NagController {
         // No Commander
         if (NoCommanderNagDialog.checkNag(campaign.getFlaggedCommander())) {
             NoCommanderNagDialog noCommanderNagDialog = new NoCommanderNagDialog(campaign);
-            if (noCommanderNagDialog.wasAdvanceDayCanceled()) {
+            if (noCommanderNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
@@ -113,7 +113,7 @@ public class NagController {
         if (UnableToAffordExpensesNagDialog.checkNag(campaign)) {
             UnableToAffordExpensesNagDialog unableToAffordExpensesNagDialog = new UnableToAffordExpensesNagDialog(
                   campaign);
-            if (unableToAffordExpensesNagDialog.wasAdvanceDayCanceled()) {
+            if (unableToAffordExpensesNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
@@ -121,7 +121,7 @@ public class NagController {
         // Unable to afford next jump
         if (UnableToAffordJumpNagDialog.checkNag(campaign)) {
             UnableToAffordJumpNagDialog unableToAffordJumpNagDialog = new UnableToAffordJumpNagDialog(campaign);
-            if (unableToAffordJumpNagDialog.wasAdvanceDayCanceled()) {
+            if (unableToAffordJumpNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
@@ -132,7 +132,7 @@ public class NagController {
         if (UnableToAffordLoanPaymentNagDialog.checkNag(finances.getLoans(), today, finances.getBalance())) {
             UnableToAffordLoanPaymentNagDialog unableToAffordLoanPaymentNagDialog = new UnableToAffordLoanPaymentNagDialog(
                   campaign);
-            if (unableToAffordLoanPaymentNagDialog.wasAdvanceDayCanceled()) {
+            if (unableToAffordLoanPaymentNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
@@ -143,7 +143,7 @@ public class NagController {
 
         if (UnmaintainedUnitsNagDialog.checkNag(units, isCheckMaintenance)) {
             UnmaintainedUnitsNagDialog unmaintainedUnitsNagDialog = new UnmaintainedUnitsNagDialog(campaign);
-            if (unmaintainedUnitsNagDialog.wasAdvanceDayCanceled()) {
+            if (unmaintainedUnitsNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
@@ -195,7 +195,7 @@ public class NagController {
         // Outstanding Scenarios
         if (OutstandingScenariosNagDialog.checkNag(campaign)) {
             OutstandingScenariosNagDialog outstandingScenariosNagDialog = new OutstandingScenariosNagDialog(campaign);
-            if (outstandingScenariosNagDialog.wasAdvanceDayCanceled()) {
+            if (outstandingScenariosNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
@@ -216,7 +216,7 @@ public class NagController {
 
         if (PrisonersNagDialog.checkNag(hasActiveContract, hasPrisoners)) {
             PrisonersNagDialog prisonersNagDialog = new PrisonersNagDialog(campaign);
-            if (prisonersNagDialog.wasAdvanceDayCanceled()) {
+            if (prisonersNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
@@ -224,7 +224,7 @@ public class NagController {
         // Pregnant Personnel Assigned to Active Force
         if (PregnantCombatantNagDialog.checkNag(hasActiveContract, activePersonnel)) {
             PregnantCombatantNagDialog pregnantCombatantNagDialog = new PregnantCombatantNagDialog(campaign);
-            if (pregnantCombatantNagDialog.wasAdvanceDayCanceled()) {
+            if (pregnantCombatantNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }

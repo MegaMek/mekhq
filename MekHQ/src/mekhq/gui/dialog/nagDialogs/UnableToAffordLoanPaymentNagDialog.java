@@ -27,53 +27,55 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import mekhq.MHQConstants;
+import static mekhq.MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordLoanPaymentNag.getTotalPaymentsDue;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordLoanPaymentNag.unableToAffordLoans;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.time.LocalDate;
+import java.util.List;
+
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog;
-
-import java.time.LocalDate;
-import java.util.List;
-
-import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordLoanPaymentNag.getTotalPaymentsDue;
-import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordLoanPaymentNag.unableToAffordLoans;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 /**
- * A nag dialog that warns the user if the campaign's available funds are not enough to cover
- * upcoming loan payments.
+ * A dialog class used to notify players when they are unable to afford a loan payment within the campaign.
  *
- * <p>
- * This dialog calculates the total amount due for loan payments scheduled for the next day
- * and compares it against the campaign's available funds. If the funds are not enough to cover
- * the payments, the dialog is displayed to alert the user and prompt corrective action.
- * </p>
+ * <p>The {@code UnableToAffordLoanPaymentNagDialog} extends {@link ImmersiveDialogNag} and is specifically
+ * designed to alert players about financial constraints preventing them from making a loan payment. It uses predefined
+ * constants, including the {@code TRANSPORT} speaker and the {@code NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT} identifier, to
+ * configure the dialog's behavior and content.</p>
  */
-public class UnableToAffordLoanPaymentNagDialog extends AbstractMHQNagDialog {
+public class UnableToAffordLoanPaymentNagDialog extends ImmersiveDialogNag {
     /**
-     * Constructs the nag dialog for insufficient funds to cover loan payments.
+     * Constructs a new {@code UnableToAffordLoanPaymentNagDialog} to display a warning about an unaffordable loan
+     * payment.
      *
-     * <p>
-     * This constructor initializes the dialog with relevant information about the campaign.
-     * The displayed message includes the commander's name or title and the total amount due
-     * for loans that must be paid the next day.
-     * </p>
+     * <p>This constructor initializes the dialog with preconfigured values, such as the
+     * {@code NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT}
+     * constant for managing dialog suppression, the {@code "UnableToAffordLoanPaymentNagDialog"} localization key for
+     * retrieving dialog content, and the {@code TRANSPORT} speaker for delivering the message.</p>
      *
-     * @param campaign The {@link Campaign} object representing the current campaign.
+     * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data
+     *                 required for constructing the nag dialog.
      */
     public UnableToAffordLoanPaymentNagDialog(final Campaign campaign) {
-        super(campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT);
+        super(campaign, TRANSPORT, NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT, "UnableToAffordLoanPaymentNagDialog");
+    }
+
+    @Override
+    protected String getInCharacterMessage(Campaign campaign, String key, String commanderAddress) {
+        final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
 
         Finances finances = campaign.getFinances();
         Money totalPaymentsDue = getTotalPaymentsDue(finances.getLoans(), campaign.getLocalDate());
 
-        final String DIALOG_BODY = "UnableToAffordLoanPaymentNagDialog.text";
-        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
-            campaign.getCommanderAddress(false),
-            totalPaymentsDue.toAmountAndSymbolString()));
-        showDialog();
+        return getFormattedTextAt(RESOURCE_BUNDLE, key + ".ic", commanderAddress, totalPaymentsDue.toAmountString());
     }
 
     /**
@@ -85,16 +87,16 @@ public class UnableToAffordLoanPaymentNagDialog extends AbstractMHQNagDialog {
      *     <li>The campaign does not have sufficient funds to cover its loan payments.</li>
      * </ul>
      *
-     * @param loans A {@link List} of {@link Loan} objects representing the campaign's active loans.
-     * @param today The current date, used to calculate tomorrow's date for loan payments.
+     * @param loans        A {@link List} of {@link Loan} objects representing the campaign's active loans.
+     * @param today        The current date, used to calculate tomorrow's date for loan payments.
      * @param currentFunds The current available funds in the campaign as a {@link Money} object.
+     *
      * @return {@code true} if the nag dialog should be displayed due to insufficient funds for loan payments,
-     *         {@code false} otherwise.
+     *       {@code false} otherwise.
      */
     public static boolean checkNag(List<Loan> loans, LocalDate today, Money currentFunds) {
-        final String NAG_KEY = MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT;
+        final String NAG_KEY = NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT;
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-              && unableToAffordLoans(loans, today, currentFunds);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) && unableToAffordLoans(loans, today, currentFunds);
     }
 }

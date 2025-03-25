@@ -27,48 +27,48 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import mekhq.MHQConstants;
+import static mekhq.MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordJumpNagLogic.getNextJumpCost;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordJumpNagLogic.unableToAffordNextJump;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog;
-
-import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordJumpNagLogic.getNextJumpCost;
-import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordJumpNagLogic.unableToAffordNextJump;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 /**
- * A nag dialog that warns the user if the campaign's available funds are not enough to cover the
- * next jump cost.
+ * A dialog class used to notify players when they are unable to afford a jump within the campaign.
  *
- * <p>
- * This dialog calculates the cost of the next jump based on the campaign's current location and
- * contract options. It alerts the user when the campaign's available funds are less than the
- * calculated jump cost, ensuring players are notified of financial constraints before moving
- * to another system.
- * </p>
+ * <p>The {@code UnableToAffordJumpNagDialog} extends {@link ImmersiveDialogNag} and is specifically designed
+ * to alert players about financial constraints preventing them from performing a jump. It utilizes predefined
+ * constants, including the {@code TRANSPORT} speaker and the {@code NAG_UNABLE_TO_AFFORD_JUMP} identifier, to configure
+ * the dialog's behavior and content.</p>
  */
-public class UnableToAffordJumpNagDialog extends AbstractMHQNagDialog {
+public class UnableToAffordJumpNagDialog extends ImmersiveDialogNag {
     /**
-     * Constructs the nag dialog for insufficient funds to afford a jump.
+     * Constructs a new {@code UnableToAffordJumpNagDialog} to display a warning about unaffordable jump expenses.
      *
-     * <p>
-     * This constructor initializes the dialog with relevant campaign data. It formats the
-     * message to display the name or title of the commander and the calculated cost of the
-     * next jump, enabling the user to take appropriate financial action if necessary.
-     * </p>
+     * <p>This constructor initializes the dialog with preconfigured values, such as the
+     * {@code NAG_UNABLE_TO_AFFORD_JUMP}
+     * constant for managing dialog suppression, the {@code "UnableToAffordJumpNagDialog"} localization key for
+     * retrieving dialog content, and the {@code TRANSPORT} speaker for delivering the message.</p>
      *
-     * @param campaign The {@link Campaign} object representing the current campaign.
+     * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data
+     *                 required for constructing the nag dialog.
      */
     public UnableToAffordJumpNagDialog(final Campaign campaign) {
-        super(campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP);
+        super(campaign, TRANSPORT, NAG_UNABLE_TO_AFFORD_JUMP, "UnableToAffordJumpNagDialog");
+    }
+
+    @Override
+    protected String getInCharacterMessage(Campaign campaign, String key, String commanderAddress) {
+        final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
 
         Money nextJumpCost = getNextJumpCost(campaign);
 
-        final String DIALOG_BODY = "UnableToAffordJumpNagDialog.text";
-        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
-            campaign.getCommanderAddress(false),
-            nextJumpCost.toAmountAndSymbolString()));
-        showDialog();
+        return getFormattedTextAt(RESOURCE_BUNDLE, key + ".ic", commanderAddress, nextJumpCost.toAmountString());
     }
 
     /**
@@ -81,12 +81,12 @@ public class UnableToAffordJumpNagDialog extends AbstractMHQNagDialog {
      * </ul>
      *
      * @param campaign the {@link Campaign} to check for nagging conditions
+     *
      * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
     public static boolean checkNag(Campaign campaign) {
-        final String NAG_KEY = MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP;
+        final String NAG_KEY = NAG_UNABLE_TO_AFFORD_JUMP;
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && unableToAffordNextJump(campaign);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) && unableToAffordNextJump(campaign);
     }
 }
