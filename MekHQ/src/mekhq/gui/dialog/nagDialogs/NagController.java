@@ -174,11 +174,7 @@ public class NagController {
               isOvertimeAllowed,
               possibleAstechPoolOvertime)) {
             InsufficientAstechTimeNagDialog insufficientAstechTimeNagDialog = new InsufficientAstechTimeNagDialog(
-                  campaign,
-                  units,
-                  possibleAstechPoolMinutes,
-                  isOvertimeAllowed,
-                  possibleAstechPoolOvertime);
+                  campaign);
             if (insufficientAstechTimeNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
