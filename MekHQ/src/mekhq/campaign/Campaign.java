@@ -57,7 +57,7 @@ import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMAN;
-import static mekhq.campaign.stratcon.StratconRulesManager.processIgnoredScenario;
+import static mekhq.campaign.stratcon.StratconRulesManager.processIgnoredDynamicScenario;
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
@@ -4445,7 +4445,7 @@ public class Campaign implements ITechManager {
                             return;
                         }
 
-                        processIgnoredScenario(scenario.getId(), campaignState);
+                        processIgnoredDynamicScenario(scenario.getId(), campaignState);
 
                         ScenarioType scenarioType = scenario.getStratConScenarioType();
                         if (scenarioType.isResupply()) {

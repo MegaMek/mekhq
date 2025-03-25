@@ -3053,13 +3053,13 @@ public class StratconRulesManager {
      * @param scenarioId    The ID of the dynamic scenario to be processed.
      * @param campaignState The state of the current campaign, used to access tracks and scenarios.
      */
-    public static void processIgnoredScenario(int scenarioId, StratconCampaignState campaignState) {
+    public static void processIgnoredDynamicScenario(int scenarioId, StratconCampaignState campaignState) {
         for (StratconTrackState track : campaignState.getTracks()) {
             Map<Integer, StratconScenario> backingScenarios = track.getBackingScenariosMap();
             StratconScenario stratConScenario = backingScenarios.get(scenarioId);
 
             if (stratConScenario != null) {
-                processIgnoredScenario(stratConScenario, track, campaignState);
+                processIgnoredStratConScenario(stratConScenario, track, campaignState);
                 break;
             }
         }
@@ -3095,7 +3095,7 @@ public class StratconRulesManager {
      * @param campaignState The {@link StratconCampaignState} representing the overall state of the campaign, which will
      *                      be updated during the processing (e.g., victory points adjustments).
      */
-    public static void processIgnoredScenario(StratconScenario scenario, StratconTrackState track, StratconCampaignState campaignState) {
+    public static void processIgnoredStratConScenario(StratconScenario scenario, StratconTrackState track, StratconCampaignState campaignState) {
         // Update victory points if the scenario is marked as "special" or "turning point"
         if (scenario.isSpecial() || scenario.isTurningPoint()) {
             campaignState.updateVictoryPoints(-1);
@@ -3158,7 +3158,7 @@ public class StratconRulesManager {
                         if ((scenario.getDeploymentDate() != null) &&
                                   scenario.getDeploymentDate().isBefore(campaign.getLocalDate()) &&
                                   scenario.getPrimaryForceIDs().isEmpty()) {
-                            processIgnoredScenario(scenario, track, campaignState);
+                            processIgnoredStratConScenario(scenario, track, campaignState);
                         }
                     }
 
