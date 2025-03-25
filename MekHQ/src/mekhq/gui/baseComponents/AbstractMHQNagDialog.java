@@ -74,6 +74,7 @@ import mekhq.campaign.personnel.Person;
  *   <li>Localized using resource bundles.</li>
  * </ul>
  */
+@Deprecated(since = "0.50.05", forRemoval = true)
 public abstract class AbstractMHQNagDialog extends JDialog {
     /**
      * Unique key for this nag dialog, used to track if the dialog has been ignored by the user in the campaign
