@@ -104,7 +104,7 @@ public class NagController {
         // Untreated personnel
         if (UntreatedPersonnelNagDialog.checkNag(activePersonnel, doctorCapacity)) {
             UntreatedPersonnelNagDialog untreatedPersonnelNagDialog = new UntreatedPersonnelNagDialog(campaign);
-            if (untreatedPersonnelNagDialog.wasAdvanceDayCanceled()) {
+            if (untreatedPersonnelNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }

@@ -27,43 +27,101 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
+import static mekhq.MHQConstants.NAG_UNTREATED_PERSONNEL;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UntreatedPersonnelNagLogic.campaignHasUntreatedInjuries;
 
 import java.util.List;
 
-import mekhq.MHQConstants;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
-/**
- * A nag dialog that alerts the user about untreated injuries within the campaign's personnel.
- *
- * <p>
- * This dialog checks for active, injured personnel who have not been assigned to a doctor,
- * excluding those currently classified as prisoners. It provides a reminder to the player, ensuring
- * that injured personnel receive immediate treatment.
- * </p>
- */
-public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
-    /**
-     * Constructs the nag dialog for untreated personnel injuries.
-     *
-     * <p>
-     * This constructor initializes the dialog with relevant campaign details
-     * and formats the displayed message to include context for the commander.
-     * </p>
-     *
-     * @param campaign The {@link Campaign} object representing the current campaign.
-     */
+public class UntreatedPersonnelNagDialog extends ImmersiveDialogNag {
     public UntreatedPersonnelNagDialog(Campaign campaign) {
-        super(campaign, MHQConstants.NAG_UNTREATED_PERSONNEL);
+        super(campaign, null, NAG_UNTREATED_PERSONNEL, "UntreatedPersonnelNagDialog");
+    }
 
-        final String DIALOG_BODY = "UntreatedPersonnelNagDialog.text";
-        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
-            campaign.getCommanderAddress(false)));
-        showDialog();
+    /**
+     * Retrieves the appropriate speaker for a campaign dialog based on personnel specialization and rank.
+     *
+     * <p>This method evaluates the active personnel within the campaign to determine the most suitable speaker.
+     * It prioritizes personnel with doctor roles, using rank and skills to select the optimal candidate. If no medical
+     * specialist is available, the method falls back to senior administrators with the "HR" or "COMMAND"
+     * specialization, ensuring a valid speaker is selected whenever possible.</p>
+     *
+     * <p>If the campaign instance is {@code null} or there are no active personnel available, a fallback mechanism is
+     * employed to determine the speaker based on senior administrators.</p>
+     *
+     * @param campaign       The {@link Campaign} instance providing access to personnel and administrator data.
+     * @param specialization The {@link AdministratorSpecialization} used as a criterion for selecting the speaker.
+     *
+     * @return The {@link Person} designated as the speaker, prioritizing medical specialists, then senior
+     *       administrators with "HR" or "COMMAND" specializations. Returns {@code null} if no suitable speaker can be
+     *       found.
+     */
+    @Override
+    protected @Nullable Person getSpeaker(@Nullable Campaign campaign, @Nullable Campaign.AdministratorSpecialization specialization) {
+        if (campaign == null) {
+            return null;
+        }
+
+        List<Person> potentialSpeakers = campaign.getActivePersonnel(false);
+
+        if (potentialSpeakers.isEmpty()) {
+            return getFallbackSpeaker(campaign);
+        }
+
+        Person speaker = null;
+
+        for (Person person : potentialSpeakers) {
+            if (!person.isDoctor()) {
+                continue;
+            }
+
+            if (speaker == null) {
+                speaker = person;
+                continue;
+            }
+
+            if (person.outRanksUsingSkillTiebreaker(campaign, speaker)) {
+                speaker = person;
+            }
+        }
+
+        // First fallback
+        if (speaker == null) {
+            return getFallbackSpeaker(campaign);
+        } else {
+            return speaker;
+        }
+    }
+
+    /**
+     * Retrieves a fallback speaker based on senior administrators within the campaign.
+     *
+     * <p>This method attempts to retrieve a senior administrator with the "HR" specialization first.
+     * If no such administrator is available, it falls back to one with the "COMMAND" specialization.</p>
+     *
+     * @param campaign The {@link Campaign} instance providing access to administrator data.
+     *
+     * @return The {@link Person} designated as the fallback speaker. Returns {@code null} if no suitable administrator
+     *       is available.
+     */
+    private @Nullable Person getFallbackSpeaker(Campaign campaign) {
+        Person speaker = campaign.getSeniorAdminPerson(HR);
+
+        if (speaker == null) {
+            speaker = campaign.getSeniorAdminPerson(COMMAND);
+        } else {
+            return speaker;
+        }
+
+        return speaker;
     }
 
     /**
@@ -76,14 +134,14 @@ public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
      * </ul>
      *
      * @param activePersonnel A {@link List} of active personnel in the campaign.
-     * @param doctorCapacity The maximum number of patients each doctor can medicate.
+     * @param doctorCapacity  The maximum number of patients each doctor can medicate.
      *
      * @return {@code true} if the nag dialog should be displayed due to untreated injuries, {@code false} otherwise.
      */
     public static boolean checkNag(List<Person> activePersonnel, int doctorCapacity) {
-        final String NAG_KEY = MHQConstants.NAG_UNTREATED_PERSONNEL;
+        final String NAG_KEY = NAG_UNTREATED_PERSONNEL;
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && campaignHasUntreatedInjuries(activePersonnel, doctorCapacity);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) &&
+                     campaignHasUntreatedInjuries(activePersonnel, doctorCapacity);
     }
 }
