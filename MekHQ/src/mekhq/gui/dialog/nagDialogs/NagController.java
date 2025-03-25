@@ -84,7 +84,7 @@ public class NagController {
 
         if (InvalidFactionNagDialog.checkNag(campaign.getFaction(), today)) {
             InvalidFactionNagDialog invalidFactionNagDialog = new InvalidFactionNagDialog(campaign);
-            if (invalidFactionNagDialog.wasAdvanceDayCanceled()) {
+            if (invalidFactionNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
@@ -151,7 +151,7 @@ public class NagController {
         // Insufficient Medics
         if (InsufficientMedicsNagDialog.checkNag(campaign.getMedicsNeed())) {
             InsufficientMedicsNagDialog insufficientMedicsNagDialog = new InsufficientMedicsNagDialog(campaign);
-            if (insufficientMedicsNagDialog.wasAdvanceDayCanceled()) {
+            if (insufficientMedicsNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }

@@ -142,7 +142,7 @@ public class PrisonerEventManager {
             return;
         }
 
-        if (!campaign.hasActiveContract()) {
+        if (campaign.getActiveMissions(false).isEmpty()) {
             return;
         }
 

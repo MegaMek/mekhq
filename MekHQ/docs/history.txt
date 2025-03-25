@@ -42,6 +42,8 @@ MEKHQ VERSION HISTORY:
 + PR #6385: Updated Insufficient Astech Time Nag To Use Immersive Dialog
 + PR #6386: Adjusted Glossary Dialog Dimensions
 + fix #6388: Removed Deprecated methods from MMLogger and updated impacted calls
++ PR #6389: Updated Insufficient Medics Nag To Use Immersive Dialog
++ PR #6398: Updated Invalid Faction Nag To Use Immersive Dialog
 
 
 0.50.04 (2025-03-22 1600 UTC)
