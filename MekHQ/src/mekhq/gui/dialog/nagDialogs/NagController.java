@@ -143,7 +143,7 @@ public class NagController {
 
         if (UnmaintainedUnitsNagDialog.checkNag(units, isCheckMaintenance)) {
             UnmaintainedUnitsNagDialog unmaintainedUnitsNagDialog = new UnmaintainedUnitsNagDialog(campaign);
-            if (unmaintainedUnitsNagDialog.wasAdvanceDayCanceled()) {
+            if (unmaintainedUnitsNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
