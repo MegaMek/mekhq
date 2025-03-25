@@ -216,7 +216,7 @@ public class NagController {
 
         if (PrisonersNagDialog.checkNag(hasActiveContract, hasPrisoners)) {
             PrisonersNagDialog prisonersNagDialog = new PrisonersNagDialog(campaign);
-            if (prisonersNagDialog.wasAdvanceDayCanceled()) {
+            if (prisonersNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
