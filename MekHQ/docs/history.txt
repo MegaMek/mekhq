@@ -53,6 +53,7 @@ MEKHQ VERSION HISTORY:
 + PR #6401: Created ImmersiveDialogNag Base Class; Rolled Out Base Class to Previously Edited Nags
 + PR #6402, #6403, #6405, #6406, #6407, #6408, #6410, #6411, #6413, #6414: Refactored Nag Dialogs To Use Immersive Dialog Framework
 + PR #6404: Marked AbstractMHQNagDialog as Deprecated
++ PR #6415: Post-Nag Upgrade Adjustments
 
 
 0.50.04 (2025-03-22 1600 UTC)
