@@ -554,7 +554,9 @@ public class StratconContractInitializer {
     public static @Nullable StratconCoords getUnoccupiedCoords(StratconTrackState trackState, boolean allowPlayerFacilities, boolean allowPlayerForces, boolean emphasizeStrategicTargets) {
         final int trackHeight = trackState.getHeight();
         final int trackWidth = trackState.getWidth();
-        final int weightingMultiplier = (trackHeight * trackWidth) / 4;
+
+        final int weightingDivider = 8;
+        int weightingMultiplier = weightingDivider;
 
         List<StratconCoords> suitableCoords = new ArrayList<>();
 
@@ -581,6 +583,7 @@ public class StratconContractInitializer {
 
                 if (allowPlayerForces && trackState.getAssignedForceCoords().containsValue(coords)) {
                     if (emphasizeStrategicTargets) {
+                        weightingMultiplier /= 2;
                         for (int weight = 0; weight < weightingMultiplier; weight++) {
                             suitableCoords.add(coords);
                         }
