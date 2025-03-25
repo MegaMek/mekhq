@@ -195,7 +195,7 @@ public class NagController {
         // Outstanding Scenarios
         if (OutstandingScenariosNagDialog.checkNag(campaign)) {
             OutstandingScenariosNagDialog outstandingScenariosNagDialog = new OutstandingScenariosNagDialog(campaign);
-            if (outstandingScenariosNagDialog.wasAdvanceDayCanceled()) {
+            if (outstandingScenariosNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
