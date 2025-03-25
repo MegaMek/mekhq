@@ -28,101 +28,38 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_INVALID_FACTION;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.InvalidFactionNagLogic.isFactionInvalid;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 /**
- * A dialog used to notify the user about an invalid faction in the current campaign.
+ * A dialog class used to notify players about an invalid faction in their campaign.
  *
- * <p>
- * This nag dialog is triggered when the campaign's selected faction is determined to be invalid for the current
- * campaign date. It evaluates the validity of the faction based on the campaign date and displays a localized message
- * warning the user about the issue.
- * </p>
- *
- * <strong>Features:</strong>
- * <ul>
- *   <li>Checks whether the campaign's faction is valid based on the current in-game date.</li>
- *   <li>Displays a warning dialog to alert the user when an invalid faction is detected.</li>
- * </ul>
+ * <p>The {@code InvalidFactionNagDialog} extends {@link ImmersiveDialogNag} and provides a specialized dialog
+ * designed to alert players when an invalid or unexpected faction is encountered during campaign operations. It uses
+ * predefined values, including the {@code NAG_INVALID_FACTION} constant, and does not include a specific speaker
+ * specialization, relying on a default fallback mechanism instead.</p>
  */
-public class InvalidFactionNagDialog {
-    private final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
-
-    private final int CHOICE_CANCEL = 0;
-    private final int CHOICE_CONTINUE = 1;
-    private final int CHOICE_SUPPRESS = 2;
-
-    private boolean cancelAdvanceDay;
+public class InvalidFactionNagDialog extends ImmersiveDialogNag {
 
     /**
-     * Constructs an {@code InvalidFactionNagDialog} for the given campaign.
+     * Constructs a new {@code InvalidFactionNagDialog} instance to display the invalid faction nag dialog.
      *
-     * <p>
-     * This dialog initializes with the campaign information and sets a localized message to notify the user about the
-     * potential issue involving an invalid faction. The message includes the commander's address for better clarity.
-     * </p>
+     * <p>This constructor initializes the dialog with preconfigured parameters, such as the
+     * {@code NAG_INVALID_FACTION} constant for managing dialog suppression and the {@code "InvalidFactionNagDialog"}
+     * message key for retrieving localized dialog content. No specific speaker is provided, triggering fallback logic
+     * to determine a suitable speaker for the dialog.</p>
      *
-     * @param campaign The {@link Campaign} associated with this nag dialog. The campaign provides the faction and other
-     *                 details for evaluation.
+     * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data and
+     *                 settings required for constructing the dialog.
      */
     public InvalidFactionNagDialog(final Campaign campaign) {
-        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-              campaign.getSeniorAdminPerson(COMMAND),
-              null,
-              getFormattedTextAt(RESOURCE_BUNDLE, "InvalidFactionNagDialog.ic", campaign.getCommanderAddress(false)),
-              getButtonLabels(),
-              getFormattedTextAt(RESOURCE_BUNDLE, "InvalidFactionNagDialog.ooc"),
-              true);
-
-        int choiceIndex = dialog.getDialogChoice();
-
-        switch (choiceIndex) {
-            case CHOICE_CANCEL -> cancelAdvanceDay = true;
-            case CHOICE_CONTINUE -> cancelAdvanceDay = false;
-            case CHOICE_SUPPRESS -> {
-                MekHQ.getMHQOptions().setNagDialogIgnore(NAG_INVALID_FACTION, true);
-                cancelAdvanceDay = false;
-            }
-            default -> throw new IllegalStateException("Unexpected value in InvalidFactionNagDialog: " + choiceIndex);
-        }
-    }
-
-    /**
-     * Retrieves a list of button labels from the resource bundle.
-     *
-     * <p>The method collects and returns button labels such as "Cancel", "Continue", and "Suppress" after
-     * formatting them using the provided resource bundle.</p>
-     *
-     * @return a {@link List} of formatted button labels as {@link String}.
-     */
-    private List<String> getButtonLabels() {
-        List<String> buttonLabels = new ArrayList<>();
-
-        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.cancel"));
-        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.continue"));
-        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.suppress"));
-
-        return buttonLabels;
-    }
-
-    /**
-     * Determines whether the advance day operation should be canceled.
-     *
-     * @return {@code true} if advancing the day should be canceled, {@code false} otherwise.
-     */
-    public boolean shouldCancelAdvanceDay() {
-        return cancelAdvanceDay;
+        super(campaign, null, NAG_INVALID_FACTION, "InvalidFactionNagDialog");
     }
 
     /**
