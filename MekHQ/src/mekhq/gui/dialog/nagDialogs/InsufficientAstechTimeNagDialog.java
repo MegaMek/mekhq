@@ -34,127 +34,75 @@ import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAstechTimeNagLogi
 import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAstechTimeNagLogic.hasAsTechTimeDeficit;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 /**
- * A dialog used to notify the user about insufficient available time for astechs to complete the required maintenance
- * tasks. Not to be confused with {@link InsufficientAstechsNagDialog}.
+ * A dialog class used to notify players about insufficient astech time in their campaign.
  *
- * <p>
- * This nag dialog is triggered when the available work time for the astech pool is inadequate to meet the maintenance
- * time requirements for the current campaign's hangar units. It provides a localized message detailing the time deficit
- * and allows the user to take necessary action or dismiss the dialog.
- * </p>
- *
- * <strong>Features:</strong>
- * <ul>
- *   <li>Calculates the time deficit for the astech pool based on hangar unit maintenance requirements.</li>
- *   <li>Notifies the user when there is inadequate time available to maintain all units.</li>
- * </ul>
+ * <p>The {@code InsufficientAstechTimeNagDialog} extends {@link ImmersiveDialogNag} and provides a specialized dialog
+ * designed to alert players when there is not enough astech time available to complete required tasks efficiently. It
+ * uses predefined values, including the {@code NAG_INSUFFICIENT_ASTECH_TIME} constant, and does not provide a specific
+ * speaker specialization, relying instead on a default fallback mechanism.</p>
  */
-public class InsufficientAstechTimeNagDialog {
-    private final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
-
-    private final int CHOICE_CANCEL = 0;
-    private final int CHOICE_CONTINUE = 1;
-    private final int CHOICE_SUPPRESS = 2;
-
-    private final Campaign campaign;
-    private boolean cancelAdvanceDay;
+public class InsufficientAstechTimeNagDialog extends ImmersiveDialogNag {
+    /**
+     * Constructs a new {@code InsufficientAstechTimeNagDialog} instance to display the insufficient astech time nag
+     * dialog.
+     *
+     * <p>This constructor initializes the dialog with preconfigured parameters, such as the
+     * {@code NAG_INSUFFICIENT_ASTECH_TIME} constant for managing dialog suppression and the
+     * {@code "InsufficientAstechTimeNagDialog"} message key for retrieving localized dialog content. No specific
+     * speaker is provided, triggering fallback logic to determine the appropriate speaker for the dialog.</p>
+     *
+     * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data and
+     *                 settings required for constructing the dialog.
+     */
+    public InsufficientAstechTimeNagDialog(final Campaign campaign) {
+        super(campaign, null, NAG_INSUFFICIENT_ASTECH_TIME, "InsufficientAstechTimeNagDialog");
+    }
 
     /**
-     * Constructs an {@code InsufficientAstechTimeNagDialog} for the given campaign.
+     * Retrieves the appropriate speaker for a campaign dialog based on personnel specialization and rank.
      *
-     * <p>
-     * This dialog calculates the astech time deficit and uses a localized message to notify the user about the shortage
-     * of available time. The message provides the commander's address, the time deficit, and a pluralized suffix for
-     * correctness.
-     * </p>
+     * <p>This method evaluates the active personnel within the campaign to determine the most suitable speaker.
+     * It prioritizes personnel with technical specialization, using rank and skills to select the optimal candidate. If
+     * no technical specialist is available, the method falls back to senior administrators with the "HR" or "COMMAND"
+     * specialization, ensuring a valid speaker is selected whenever possible.</p>
      *
-     * @param campaign                   The {@link Campaign} tied to this nag dialog. The campaign provides data about
-     *                                   hangar units and astech availability.
-     * @param units                      A collection of {@link Unit} objects to evaluate for maintenance needs.
-     * @param possibleAstechPoolMinutes  The total available AsTech work minutes without considering overtime.
-     * @param isOvertimeAllowed          A flag indicating whether overtime is allowed, which adds to the available
-     *                                   AsTech work time.
-     * @param possibleAstechPoolOvertime The additional AsTech work minutes available if overtime is allowed.
+     * <p>If the campaign instance is {@code null} or there are no active personnel available, a fallback mechanism is
+     * employed to determine the speaker based on senior administrators.</p>
+     *
+     * @param campaign       The {@link Campaign} instance providing access to personnel and administrator data.
+     * @param specialization The {@link AdministratorSpecialization} used as a criterion for selecting the speaker.
+     *
+     * @return The {@link Person} designated as the speaker, prioritizing technical specialists, then senior
+     *       administrators with "HR" or "COMMAND" specializations. Returns {@code null} if no suitable speaker can be
+     *       found.
      */
-    public InsufficientAstechTimeNagDialog(final Campaign campaign, Collection<Unit> units, int possibleAstechPoolMinutes, boolean isOvertimeAllowed, int possibleAstechPoolOvertime) {
-        this.campaign = campaign;
-
-        int asTechsTimeDeficit = getAsTechTimeDeficit(units,
-              possibleAstechPoolMinutes,
-              isOvertimeAllowed,
-              possibleAstechPoolOvertime);
-
-        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-              getSpeaker(),
-              null,
-              getFormattedTextAt(RESOURCE_BUNDLE,
-                    "InsufficientAstechTimeNagDialog.ic",
-                    campaign.getCommanderAddress(false),
-                    asTechsTimeDeficit),
-              getButtonLabels(),
-              getFormattedTextAt(RESOURCE_BUNDLE, "InsufficientAstechTimeNagDialog.ooc"),
-              true);
-
-        int choiceIndex = dialog.getDialogChoice();
-
-        switch (choiceIndex) {
-            case CHOICE_CANCEL -> cancelAdvanceDay = true;
-            case CHOICE_CONTINUE -> cancelAdvanceDay = false;
-            case CHOICE_SUPPRESS -> {
-                MekHQ.getMHQOptions().setNagDialogIgnore(NAG_INSUFFICIENT_ASTECH_TIME, true);
-                cancelAdvanceDay = false;
-            }
-            default ->
-                  throw new IllegalStateException("Unexpected value in InsufficientAstechTimeNagDialog" + choiceIndex);
+    @Override
+    protected @Nullable Person getSpeaker(@Nullable Campaign campaign, @Nullable AdministratorSpecialization specialization) {
+        if (campaign == null) {
+            return null;
         }
-    }
 
-    /**
-     * Retrieves a list of button labels from the resource bundle.
-     *
-     * <p>The method collects and returns button labels such as "Cancel", "Continue", and "Suppress" after
-     * formatting them using the provided resource bundle.</p>
-     *
-     * @return a {@link List} of formatted button labels as {@link String}.
-     */
-    private List<String> getButtonLabels() {
-        List<String> buttonLabels = new ArrayList<>();
+        List<Person> potentialSpeakers = campaign.getActivePersonnel(false);
 
-        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.cancel"));
-        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.continue"));
-        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.suppress"));
-
-        return buttonLabels;
-    }
-
-    /**
-     * Retrieves the speaker based on the active personnel.
-     *
-     * <p>This method iterates through the active personnel within the campaign and attempts to identify a speaker who
-     * meets the criteria. It prioritizes selecting a person with technical specialization, using a tie-breaking
-     * mechanism based on rank and skills. If no suitable speaker is found, it defaults to the senior administrator
-     * person with the "COMMAND" specialization.</p>
-     *
-     * @return the {@link Person} designated as the speaker, either the highest-ranking technical specialist or the
-     *       senior administrator with the "COMMAND" specialization if no other suitable speaker is found.
-     */
-    private Person getSpeaker() {
-        List<Person> activePersonnel = campaign.getActivePersonnel(false);
+        if (potentialSpeakers.isEmpty()) {
+            return getFallbackSpeaker(campaign);
+        }
 
         Person speaker = null;
 
-        for (Person person : activePersonnel) {
+        for (Person person : potentialSpeakers) {
             if (!person.isTech()) {
                 continue;
             }
@@ -171,12 +119,26 @@ public class InsufficientAstechTimeNagDialog {
 
         // First fallback
         if (speaker == null) {
-            speaker = campaign.getSeniorAdminPerson(HR);
+            return getFallbackSpeaker(campaign);
         } else {
             return speaker;
         }
+    }
 
-        // Second fallback
+    /**
+     * Retrieves a fallback speaker based on senior administrators within the campaign.
+     *
+     * <p>This method attempts to retrieve a senior administrator with the "HR" specialization first.
+     * If no such administrator is available, it falls back to one with the "COMMAND" specialization.</p>
+     *
+     * @param campaign The {@link Campaign} instance providing access to administrator data.
+     *
+     * @return The {@link Person} designated as the fallback speaker. Returns {@code null} if no suitable administrator
+     *       is available.
+     */
+    private @Nullable Person getFallbackSpeaker(Campaign campaign) {
+        Person speaker = campaign.getSeniorAdminPerson(HR);
+
         if (speaker == null) {
             speaker = campaign.getSeniorAdminPerson(COMMAND);
         } else {
@@ -186,15 +148,26 @@ public class InsufficientAstechTimeNagDialog {
         return speaker;
     }
 
-    /**
-     * Determines whether the advance day operation should be canceled.
-     *
-     * @return {@code true} if advancing the day should be canceled, {@code false} otherwise.
-     */
-    public boolean shouldCancelAdvanceDay() {
-        return cancelAdvanceDay;
-    }
+    @Override
+    protected String getInCharacterMessage(@Nullable Campaign campaign, String key, String commanderAddress) {
+        final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
 
+        int count = 0;
+
+        if (campaign != null) {
+            final Collection<Unit> units = campaign.getUnits();
+            final int possibleAstechPoolMinutes = campaign.getPossibleAstechPoolMinutes();
+            final boolean isOvertimeAllowed = campaign.isOvertimeAllowed();
+            final int possibleAstechPoolOvertime = campaign.getPossibleAstechPoolOvertime();
+
+            count = getAsTechTimeDeficit(units,
+                  possibleAstechPoolMinutes,
+                  isOvertimeAllowed,
+                  possibleAstechPoolOvertime);
+        }
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, key + ".ic", commanderAddress, count);
+    }
 
     /**
      * Determines whether a nag dialog should be displayed due to insufficient AsTech time in the campaign.
