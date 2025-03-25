@@ -39,6 +39,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
@@ -105,6 +106,7 @@ import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.*;
@@ -131,12 +133,12 @@ public class CampaignGUI extends JPanel {
     private static final MMLogger logger = MMLogger.create(CampaignGUI.class);
 
     @Serial
-    private static final long serialVersionUID     = 3126634639249129512L;
+    private static final long serialVersionUID = 3126634639249129512L;
     // region Variable Declarations
-    public static final  int  MAX_START_WIDTH      = 1400;
-    public static final  int  MAX_START_HEIGHT     = 900;
+    public static final int MAX_START_WIDTH = 1400;
+    public static final int MAX_START_HEIGHT = 900;
     // the max quantity when mass purchasing parts, hiring, etc. using the JSpinner
-    public static final  int  MAX_QUANTITY_SPINNER = 10000;
+    public static final int MAX_QUANTITY_SPINNER = 10000;
 
     private JFrame frame;
 
@@ -149,8 +151,8 @@ public class CampaignGUI extends JPanel {
     private JTabbedPane tabMain;
 
     /* For the menu bar */
-    private JMenuBar  menuBar;
-    private JMenu     menuThemes;
+    private JMenuBar menuBar;
+    private JMenu menuThemes;
     private JMenuItem miPersonnelMarket;
     private JMenuItem miContractMarket;
     private JMenuItem miUnitMarket;
@@ -170,8 +172,8 @@ public class CampaignGUI extends JPanel {
     private JLabel lblPartsAvailabilityRating;
 
     /* for the top button panel */
-    private       JPanel        btnPanel;
-    private final JToggleButton btnGMMode   = new MMToggleButton(resourceMap.getString("btnGMMode.text"));
+    private JPanel btnPanel;
+    private final JToggleButton btnGMMode = new MMToggleButton(resourceMap.getString("btnGMMode.text"));
     private final JToggleButton btnOvertime = new MMToggleButton(resourceMap.getString("btnOvertime.text"));
 
     ReportHyperlinkListener reportHLL;
@@ -183,8 +185,8 @@ public class CampaignGUI extends JPanel {
 
     // region Constructors
     public CampaignGUI(MekHQ app) {
-        this.app     = app;
-        reportHLL    = new ReportHyperlinkListener(this);
+        this.app = app;
+        reportHLL = new ReportHyperlinkListener(this);
         standardTabs = new EnumMap<>(MHQTabType.class);
         initComponents();
         MekHQ.registerHandler(this);
@@ -462,10 +464,10 @@ public class CampaignGUI extends JPanel {
                 exportUnits(FileType.CSV,
                       resourceMap.getString("dlgSaveUnitsCSV.text"),
                       getCampaign().getName() +
-                      getCampaign().getLocalDate()
-                            .format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                          .withLocale(MekHQ.getMHQOptions().getDateLocale())) +
-                      "_ExportedUnits");
+                            getCampaign().getLocalDate()
+                                  .format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                                .withLocale(MekHQ.getMHQOptions().getDateLocale())) +
+                            "_ExportedUnits");
             } catch (Exception ex) {
                 logger.error("", ex);
             }
@@ -480,10 +482,10 @@ public class CampaignGUI extends JPanel {
                 exportFinances(FileType.CSV,
                       resourceMap.getString("dlgSaveFinancesCSV.text"),
                       getCampaign().getName() +
-                      getCampaign().getLocalDate()
-                            .format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                          .withLocale(MekHQ.getMHQOptions().getDateLocale())) +
-                      "_ExportedFinances");
+                            getCampaign().getLocalDate()
+                                  .format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                                .withLocale(MekHQ.getMHQOptions().getDateLocale())) +
+                            "_ExportedFinances");
             } catch (Exception ex) {
                 logger.error("", ex);
             }
@@ -525,10 +527,10 @@ public class CampaignGUI extends JPanel {
                 exportPlanets(FileType.XML,
                       resourceMap.getString("dlgSavePlanetsXML.text"),
                       getCampaign().getName() +
-                      getCampaign().getLocalDate()
-                            .format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                          .withLocale(MekHQ.getMHQOptions().getDateLocale())) +
-                      "_ExportedPlanets");
+                            getCampaign().getLocalDate()
+                                  .format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                                .withLocale(MekHQ.getMHQOptions().getDateLocale())) +
+                            "_ExportedPlanets");
             } catch (Exception ex) {
                 logger.error("", ex);
             }
@@ -1072,8 +1074,8 @@ public class CampaignGUI extends JPanel {
 
         // Abort if the user cancels, closes the dialog, or fails to save
         if (savePrompt == JOptionPane.CANCEL_OPTION ||
-            savePrompt == JOptionPane.CLOSED_OPTION ||
-            (savePrompt == JOptionPane.YES_OPTION && !app.getCampaigngui().saveCampaign(null))) {
+                  savePrompt == JOptionPane.CLOSED_OPTION ||
+                  (savePrompt == JOptionPane.YES_OPTION && !app.getCampaigngui().saveCampaign(null))) {
             return;
         }
 
@@ -1100,9 +1102,9 @@ public class CampaignGUI extends JPanel {
         statusPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 20, 4));
         statusPanel.getAccessibleContext().setAccessibleName("Status Bar");
 
-        lblFunds                   = new JLabel();
-        lblTempAstechs             = new JLabel();
-        lblTempMedics              = new JLabel();
+        lblFunds = new JLabel();
+        lblTempAstechs = new JLabel();
+        lblTempMedics = new JLabel();
         lblPartsAvailabilityRating = new JLabel();
 
         statusPanel.add(lblFunds);
@@ -1118,43 +1120,43 @@ public class CampaignGUI extends JPanel {
         btnPanel.getAccessibleContext().setAccessibleName("Campaign Actions");
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx      = 0;
-        gridBagConstraints.gridy      = 0;
-        gridBagConstraints.fill       = GridBagConstraints.NONE;
-        gridBagConstraints.weightx    = 1;
-        gridBagConstraints.weighty    = 0.0;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 1;
+        gridBagConstraints.weighty = 0.0;
         gridBagConstraints.gridheight = 2;
-        gridBagConstraints.anchor     = GridBagConstraints.WEST;
-        gridBagConstraints.insets     = new Insets(3, 10, 3, 3);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(3, 10, 3, 3);
         btnPanel.add(lblLocation, gridBagConstraints);
 
         btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText"));
         btnGMMode.setSelected(getCampaign().isGM());
         btnGMMode.addActionListener(e -> getCampaign().setGMMode(btnGMMode.isSelected()));
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 1;
-        gridBagConstraints.gridy   = 0;
-        gridBagConstraints.fill    = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor  = GridBagConstraints.EAST;
-        gridBagConstraints.insets  = new Insets(3, 3, 3, 3);
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
         btnPanel.add(btnGMMode, gridBagConstraints);
 
         btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
         btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 1;
-        gridBagConstraints.gridy   = 1;
-        gridBagConstraints.fill    = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor  = GridBagConstraints.EAST;
-        gridBagConstraints.insets  = new Insets(3, 3, 3, 3);
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(3, 3, 3, 3);
         btnPanel.add(btnOvertime, gridBagConstraints);
 
         // This button uses a mnemonic that is unique and listed in the initMenu JavaDoc
-        String  padding       = "       ";
+        String padding = "       ";
         JButton btnAdvanceDay = new JButton(padding + resourceMap.getString("btnAdvanceDay.text") + padding);
         btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText"));
         btnAdvanceDay.addActionListener(evt -> {
@@ -1174,15 +1176,15 @@ public class CampaignGUI extends JPanel {
             });
         });
         btnAdvanceDay.setMnemonic(KeyEvent.VK_A);
-        gridBagConstraints            = new GridBagConstraints();
-        gridBagConstraints.gridx      = 2;
-        gridBagConstraints.gridy      = 0;
-        gridBagConstraints.fill       = GridBagConstraints.VERTICAL;
-        gridBagConstraints.weightx    = 0.0;
-        gridBagConstraints.weighty    = 0.0;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.VERTICAL;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
         gridBagConstraints.gridheight = 2;
-        gridBagConstraints.anchor     = GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets     = new Insets(3, 3, 3, 15);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
+        gridBagConstraints.insets = new Insets(3, 3, 3, 15);
         btnPanel.add(btnAdvanceDay, gridBagConstraints);
     }
     // endregion Initialization
@@ -1242,7 +1244,7 @@ public class CampaignGUI extends JPanel {
                 standardTabs.put(tab, t);
                 int index = IntStream.range(0, tabMain.getTabCount())
                                   .filter(i -> ((CampaignGuiTab) tabMain.getComponentAt(i)).tabType().ordinal() >
-                                               tab.ordinal())
+                                                     tab.ordinal())
                                   .findFirst()
                                   .orElse(tabMain.getTabCount());
                 tabMain.insertTab(t.getTabName(), null, t, null, index);
@@ -1294,8 +1296,8 @@ public class CampaignGUI extends JPanel {
          * present the retirement view to give the player a chance to follow a
          * custom schedule
          */
-        boolean                   doRetirement = getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty();
-        RetirementDefectionDialog dialog       = new RetirementDefectionDialog(this, null, doRetirement);
+        boolean doRetirement = getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty();
+        RetirementDefectionDialog dialog = new RetirementDefectionDialog(this, null, doRetirement);
 
         if (!dialog.wasAborted()) {
             getCampaign().applyRetirement(dialog.totalPayout(), dialog.getUnitAssignments());
@@ -1434,8 +1436,8 @@ public class CampaignGUI extends JPanel {
         }
 
         // check for existing file and make a back-up if found
-        String path2      = path + "_backup";
-        File   backupFile = new File(path2);
+        String path2 = path + "_backup";
+        File backupFile = new File(path2);
         if (file.exists()) {
             Utilities.copyfile(file, backupFile);
         }
@@ -1458,10 +1460,10 @@ public class CampaignGUI extends JPanel {
         } catch (Exception ex) {
             logger.error("", ex);
             JOptionPane.showMessageDialog(frame, """
-                                                 Oh no! The program was unable to correctly save your game. We know this
-                                                 is annoying and apologize. Please help us out and submit a bug with the
-                                                 mekhq.log file from this game so we can prevent this from happening in
-                                                 the future.""", "Could not save game", JOptionPane.ERROR_MESSAGE);
+                  Oh no! The program was unable to correctly save your game. We know this
+                  is annoying and apologize. Please help us out and submit a bug with the
+                  mekhq.log file from this game so we can prevent this from happening in
+                  the future.""", "Could not save game", JOptionPane.ERROR_MESSAGE);
 
             // restore the backup file
             if (file.delete()) {
@@ -1470,13 +1472,13 @@ public class CampaignGUI extends JPanel {
                     if (!backupFile.delete()) {
                         logger.error(
                               "Backup file deletion failure after restoring the original file. This means that the " +
-                              "backup file of {} will be retained instead of being properly deleted.",
+                                    "backup file of {} will be retained instead of being properly deleted.",
                               backupFile.getPath());
                     }
                 }
             } else {
                 logger.error("File deletion failure. This means that the file at {} will be retained instead of being " +
-                             "properly deleted, with any backup at {} not being restored nor deleted.",
+                                   "properly deleted, with any backup at {} not being restored nor deleted.",
                       file.getPath(),
                       backupFile.getPath());
             }
@@ -1494,13 +1496,13 @@ public class CampaignGUI extends JPanel {
         final CampaignOptions oldOptions = getCampaign().getCampaignOptions();
         // We need to handle it like this for now, as the options above get written to
         // currently
-        boolean                       atb                     = oldOptions.isUseAtB();
-        boolean                       timeIn                  = oldOptions.isUseTimeInService();
-        boolean                       rankIn                  = oldOptions.isUseTimeInRank();
-        boolean                       staticRATs              = oldOptions.isUseStaticRATs();
-        boolean                       factionIntroDate        = oldOptions.isFactionIntroDate();
-        final RandomDivorceMethod     randomDivorceMethod     = oldOptions.getRandomDivorceMethod();
-        final RandomMarriageMethod    randomMarriageMethod    = oldOptions.getRandomMarriageMethod();
+        boolean atb = oldOptions.isUseAtB();
+        boolean timeIn = oldOptions.isUseTimeInService();
+        boolean rankIn = oldOptions.isUseTimeInRank();
+        boolean staticRATs = oldOptions.isUseStaticRATs();
+        boolean factionIntroDate = oldOptions.isFactionIntroDate();
+        final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
+        final RandomMarriageMethod randomMarriageMethod = oldOptions.getRandomMarriageMethod();
         final RandomProcreationMethod randomProcreationMethod = oldOptions.getRandomProcreationMethod();
 
         CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(getFrame(), getCampaign());
@@ -1643,12 +1645,12 @@ public class CampaignGUI extends JPanel {
             }
             r.setTech(engineer);
         } else if (getCampaign().getActivePersonnel(true).stream().anyMatch(Person::isTech)) {
-            String              name;
+            String name;
             Map<String, Person> techHash = new HashMap<>();
-            List<String>        techList = new ArrayList<>();
+            List<String> techList = new ArrayList<>();
 
-            List<Person> techs         = getCampaign().getTechs(false, true);
-            int          lastRightTech = 0;
+            List<Person> techs = getCampaign().getTechs(false, true);
+            int lastRightTech = 0;
 
             for (Person tech : techs) {
                 if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
@@ -1656,18 +1658,18 @@ public class CampaignGUI extends JPanel {
                 }
 
                 name = "<html>" +
-                       tech.getFullName() +
-                       ", <b>" +
-                       SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false)) +
-                       "</b> " +
-                       tech.getPrimaryRoleDesc() +
-                       " (" +
-                       getCampaign().getTargetFor(r, tech).getValueAsString() +
-                       "+), " +
-                       tech.getMinutesLeft() +
-                       '/' +
-                       tech.getDailyAvailableTechTime() +
-                       " minutes</html>";
+                             tech.getFullName() +
+                             ", <b>" +
+                             SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false)) +
+                             "</b> " +
+                             tech.getPrimaryRoleDesc() +
+                             " (" +
+                             getCampaign().getTargetFor(r, tech).getValueAsString() +
+                             "+), " +
+                             tech.getMinutesLeft() +
+                             '/' +
+                             tech.getDailyAvailableTechTime() +
+                             " minutes</html>";
                 techHash.put(name, tech);
                 if (tech.isRightTechTypeFor(r)) {
                     techList.add(lastRightTech++, name);
@@ -1694,10 +1696,10 @@ public class CampaignGUI extends JPanel {
 
             if (!selectedTech.isRightTechTypeFor(r)) {
                 if (JOptionPane.NO_OPTION ==
-                    JOptionPane.showConfirmDialog(null,
-                          "This tech is not appropriate for this unit. Would you like to continue?",
-                          "Incorrect Tech Type",
-                          JOptionPane.YES_NO_OPTION)) {
+                          JOptionPane.showConfirmDialog(null,
+                                "This tech is not appropriate for this unit. Would you like to continue?",
+                                "Incorrect Tech Type",
+                                JOptionPane.YES_NO_OPTION)) {
                     return;
                 }
             }
@@ -1728,17 +1730,17 @@ public class CampaignGUI extends JPanel {
         String RefitRefurbish;
         if (r.isBeingRefurbished()) {
             RefitRefurbish = "Refurbishment is a " +
-                             r.getRefitClassName() +
-                             " refit and must be done at a factory and costs 10% of the purchase price" +
-                             ".\n Are you sure you want to refurbish ";
+                                   r.getRefitClassName() +
+                                   " refit and must be done at a factory and costs 10% of the purchase price" +
+                                   ".\n Are you sure you want to refurbish ";
         } else {
             RefitRefurbish = "This is a " + r.getRefitClassName() + " refit. Are you sure you want to refit ";
         }
         if (0 !=
-            JOptionPane.showConfirmDialog(null,
-                  RefitRefurbish + r.getUnit().getName() + '?',
-                  "Proceed?",
-                  JOptionPane.YES_NO_OPTION)) {
+                  JOptionPane.showConfirmDialog(null,
+                        RefitRefurbish + r.getUnit().getName() + '?',
+                        "Proceed?",
+                        JOptionPane.YES_NO_OPTION)) {
             return;
         }
         try {
@@ -1770,7 +1772,7 @@ public class CampaignGUI extends JPanel {
      * @return The ID of the selected tech, or null if none is selected.
      */
     public @Nullable UUID selectTech(Unit u, String desc, boolean ignoreMaintenance) {
-        String              name;
+        String name;
         Map<String, Person> techHash = new LinkedHashMap<>();
         for (Person tech : getCampaign().getTechsExpanded()) {
             if (!tech.isMothballing() && tech.canTech(u.getEntity())) {
@@ -1779,11 +1781,11 @@ public class CampaignGUI extends JPanel {
                     time -= Math.max(0, tech.getMaintenanceTimeUsing());
                 }
                 name = tech.getFullTitle() +
-                       ", " +
-                       SkillType.getExperienceLevelName(tech.getSkillForWorkingOn(u).getExperienceLevel()) +
-                       " (" +
-                       time +
-                       "min)";
+                             ", " +
+                             SkillType.getExperienceLevelName(tech.getSkillForWorkingOn(u).getExperienceLevel()) +
+                             " (" +
+                             time +
+                             "min)";
                 techHash.put(name, tech);
             }
         }
@@ -1949,8 +1951,8 @@ public class CampaignGUI extends JPanel {
      */
     private void checkToBackupFile(File file, String path) {
         // check for existing file and make a back-up if found
-        String path2      = path + "_backup";
-        File   backupFile = new File(path2);
+        String path2 = path + "_backup";
+        File backupFile = new File(path2);
         if (file.exists()) {
             Utilities.copyfile(file, backupFile);
         }
@@ -2013,8 +2015,8 @@ public class CampaignGUI extends JPanel {
                 return; // otherwise we NPE out in the next line
             }
 
-            Element  personnelEle = xmlDoc.getDocumentElement();
-            NodeList nl           = personnelEle.getChildNodes();
+            Element personnelEle = xmlDoc.getDocumentElement();
+            NodeList nl = personnelEle.getChildNodes();
 
             // Get rid of empty text nodes and adjacent text nodes...
             // Stupid weird parsing of XML. At least this cleans it up.
@@ -2061,7 +2063,7 @@ public class CampaignGUI extends JPanel {
             // TODO : make it so that exports will automatically include both spouses
             for (Person p : getCampaign().getActivePersonnel(true)) {
                 if (p.getGenealogy().hasSpouse() &&
-                    !getCampaign().getPersonnel().contains(p.getGenealogy().getSpouse())) {
+                          !getCampaign().getPersonnel().contains(p.getGenealogy().getSpouse())) {
                     // If this happens, we need to clear the spouse
                     if (p.getMaidenName() != null) {
                         p.setSurname(p.getMaidenName());
@@ -2072,9 +2074,9 @@ public class CampaignGUI extends JPanel {
 
                 if (p.isPregnant()) {
                     String fatherIdString = p.getExtraData().get(AbstractProcreation.PREGNANCY_FATHER_DATA);
-                    UUID   fatherId       = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
+                    UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
                     if ((fatherId != null) &&
-                        !getCampaign().getPersonnel().contains(getCampaign().getPerson(fatherId))) {
+                              !getCampaign().getPersonnel().contains(getCampaign().getPerson(fatherId))) {
                         p.getExtraData().set(AbstractProcreation.PREGNANCY_FATHER_DATA, null);
                     }
                 }
@@ -2097,8 +2099,8 @@ public class CampaignGUI extends JPanel {
         }
 
         // check for existing file and make a back-up if found
-        String path2      = path + "_backup";
-        File   backupFile = new File(path2);
+        String path2 = path + "_backup";
+        File backupFile = new File(path2);
         if (file.exists()) {
             Utilities.copyfile(file, backupFile);
         }
@@ -2114,7 +2116,7 @@ public class CampaignGUI extends JPanel {
             return;
         }
         Person selectedPerson = pt.getPersonModel().getPerson(pt.getPersonnelTable().convertRowIndexToModel(row));
-        int[]  rows           = pt.getPersonnelTable().getSelectedRows();
+        int[] rows = pt.getPersonnelTable().getSelectedRows();
         Person[] people = Arrays.stream(rows)
                                 .mapToObj(j -> pt.getPersonModel()
                                                      .getPerson(pt.getPersonnelTable().convertRowIndexToModel(j)))
@@ -2148,14 +2150,11 @@ public class CampaignGUI extends JPanel {
             logger.info("Personnel saved to {}", file);
         } catch (Exception ex) {
             logger.error("", ex);
-            JOptionPane.showMessageDialog(getFrame(),
-                  """
+            JOptionPane.showMessageDialog(getFrame(), """
                   Oh no! The program was unable to correctly export your personnel. We know this
                   is annoying and apologize. Please help us out and submit a bug with the
                   mekhq.log file from this game so we can prevent this from happening in
-                  the future.""",
-                  "Could not export personnel",
-                  JOptionPane.ERROR_MESSAGE);
+                  the future.""", "Could not export personnel", JOptionPane.ERROR_MESSAGE);
             // restore the backup file
             file.delete();
             if (backupFile.exists()) {
@@ -2190,8 +2189,8 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
-        Element  partsEle = xmlDoc.getDocumentElement();
-        NodeList nl       = partsEle.getChildNodes();
+        Element partsEle = xmlDoc.getDocumentElement();
+        NodeList nl = partsEle.getChildNodes();
 
         // Get rid of empty text nodes and adjacent text nodes...
         // Stupid weird parsing of XML. At least this cleans it up.
@@ -2241,8 +2240,8 @@ public class CampaignGUI extends JPanel {
         }
 
         // check for existing file and make a back-up if found
-        String path2      = file.getAbsolutePath() + "_backup";
-        File   backupFile = new File(path2);
+        String path2 = file.getAbsolutePath() + "_backup";
+        File backupFile = new File(path2);
         if (file.exists()) {
             Utilities.copyfile(file, backupFile);
         }
@@ -2254,15 +2253,15 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
-        JTable          partsTable = warehouseTab.getPartsTable();
+        JTable partsTable = warehouseTab.getPartsTable();
         PartsTableModel partsModel = warehouseTab.getPartsModel();
-        int             row        = partsTable.getSelectedRow();
+        int row = partsTable.getSelectedRow();
         if (row < 0) {
             logger.warn("Cannot export parts if none are selected! Ignoring.");
             return;
         }
-        Part  selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
-        int[] rows         = partsTable.getSelectedRows();
+        Part selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
+        int[] rows = partsTable.getSelectedRows();
         Part[] parts = Arrays.stream(rows)
                              .mapToObj(j -> partsModel.getPartAt(partsTable.convertRowIndexToModel(j)))
                              .toArray(Part[]::new);
@@ -2295,14 +2294,11 @@ public class CampaignGUI extends JPanel {
             logger.info("Parts saved to {}", file);
         } catch (Exception ex) {
             logger.error("", ex);
-            JOptionPane.showMessageDialog(getFrame(),
-                  """
+            JOptionPane.showMessageDialog(getFrame(), """
                   Oh no! The program was unable to correctly export your parts. We know this
                   is annoying and apologize. Please help us out and submit a bug with the
                   mekhq.log file from this game so we can prevent this from happening in
-                  the future.""",
-                  "Could not export parts",
-                  JOptionPane.ERROR_MESSAGE);
+                  the future.""", "Could not export parts", JOptionPane.ERROR_MESSAGE);
             // restore the backup file
             file.delete();
             if (backupFile.exists()) {
@@ -2362,7 +2358,7 @@ public class CampaignGUI extends JPanel {
      * Refreshes the 'funds' display on the GUI.
      */
     private void refreshFunds() {
-        Money  funds  = getCampaign().getFunds();
+        Money funds = getCampaign().getFunds();
         String inDebt = "";
         if (getCampaign().getFinances().isInDebt()) {
             // FIXME : Localize
@@ -2387,7 +2383,7 @@ public class CampaignGUI extends JPanel {
 
     private void refreshPartsAvailability() {
         if (!getCampaign().getCampaignOptions().isUseAtB() ||
-            CampaignOptions.S_AUTO.equals(getCampaign().getCampaignOptions().getAcquisitionSkill())) {
+                  CampaignOptions.S_AUTO.equals(getCampaign().getCampaignOptions().getAcquisitionSkill())) {
             lblPartsAvailabilityRating.setText("");
         } else {
             int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel();
@@ -2442,7 +2438,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void undeployForce(Force f, boolean killSubs) {
-        int      sid      = f.getScenarioId();
+        int sid = f.getScenarioId();
         Scenario scenario = getCampaign().getScenario(sid);
         if (null != scenario) {
             f.clearScenarioIds(getCampaign(), killSubs);
@@ -2459,7 +2455,7 @@ public class CampaignGUI extends JPanel {
 
             // We have to clear out the parents as well.
             Force parent = f;
-            int   prevId = f.getId();
+            int prevId = f.getId();
             while ((parent = parent.getParentForce()) != null) {
                 if (parent.getScenarioId() == NO_ASSIGNED_SCENARIO) {
                     break;
@@ -2501,6 +2497,10 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
+        if (checkForInvalidFaction(dayEndingEvent)) {
+            return;
+        }
+
         if (checkForDueScenarios(dayEndingEvent)) {
             return;
         }
@@ -2528,7 +2528,7 @@ public class CampaignGUI extends JPanel {
                     return;
                 default:
                     throw new IllegalStateException("Unexpected value in mekhq/gui/CampaignGUI.java/handleDayEnding: " +
-                                                    turnoverPrompt);
+                                                          turnoverPrompt);
             }
         }
     }
@@ -2572,6 +2572,32 @@ public class CampaignGUI extends JPanel {
             JOptionPane.showMessageDialog(null,
                   getResourceMap().getString("dialogOverdueLoans.text"),
                   getResourceMap().getString("dialogOverdueLoans.title"),
+                  JOptionPane.WARNING_MESSAGE);
+
+            dayEndingEvent.cancel();
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the faction associated with the campaign is invalid for the current date and takes appropriate action
+     * if so.
+     *
+     * @param dayEndingEvent the event that signals the ending of the day's activities in the campaign
+     *
+     * @return {@code true} if the faction is invalid, {@code false} otherwise.
+     */
+    private boolean checkForInvalidFaction(DayEndingEvent dayEndingEvent) {
+        Campaign campaign = getCampaign();
+        Faction campaignFaction = campaign.getFaction();
+        LocalDate currentDate = campaign.getLocalDate();
+
+        if (!campaignFaction.validIn(currentDate)) {
+            JOptionPane.showMessageDialog(null,
+                  getResourceMap().getString("dialogInvalidFaction.text"),
+                  getResourceMap().getString("dialogInvalidFaction.title"),
                   JOptionPane.WARNING_MESSAGE);
 
             dayEndingEvent.cancel();
