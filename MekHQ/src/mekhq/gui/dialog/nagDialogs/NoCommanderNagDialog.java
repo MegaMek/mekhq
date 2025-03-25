@@ -27,50 +27,37 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
+import static mekhq.MHQConstants.NAG_NO_COMMANDER;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.NoCommanderNagLogic.hasNoCommander;
+
 import megamek.common.annotations.Nullable;
-import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog;
-
-import static mekhq.gui.dialog.nagDialogs.nagLogic.NoCommanderNagLogic.hasNoCommander;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 /**
- * A dialog used to notify the user that their campaign lacks a designated commander.
+ * A dialog class used to notify players that a commander is missing in their campaign.
  *
- * <p>
- * This nag dialog is displayed when the campaign does not currently have a commander,
- * and checks whether the user has opted to ignore such notifications in the future.
- * If shown, the user has the option to dismiss the dialog or address the issue.
- * </p>
- *
- * <strong>Features:</strong>
- * <ul>
- *   <li>Handles the "No Commander" notification for campaigns.</li>
- *   <li>Localized message fetched using resource bundles.</li>
- *   <li>Extends the {@link AbstractMHQNagDialog} for reusable dialog behavior.</li>
- * </ul>
- *
- * @see AbstractMHQNagDialog
+ * <p>The {@code NoCommanderNagDialog} extends {@link ImmersiveDialogNag} and provides a specialized dialog
+ * designed to alert players when no commander is assigned or present in the campaign. It uses predefined values,
+ * including the {@code HR} speaker and the {@code NAG_NO_COMMANDER} constant, to configure dialog settings and
+ * content.</p>
  */
-public class NoCommanderNagDialog extends AbstractMHQNagDialog {
+public class NoCommanderNagDialog extends ImmersiveDialogNag {
     /**
-     * Constructs a {@code NoCommanderNagDialog} for a campaign.
+     * Constructs a new {@code NoCommanderNagDialog} instance to display the no commander nag dialog.
      *
-     * <p>
-     * This dialog uses the localization key {@code "NoCommanderNagDialog.text"}
-     * to display a message informing the user about the absence of a commander in their campaign.
-     * </p>
+     * <p>This constructor initializes the dialog with preconfigured parameters, such as the
+     * {@code NAG_NO_COMMANDER} constant for managing dialog suppression, the {@code "NoCommanderNagDialog"} message key
+     * for localization, and the {@code HR} speaker to deliver the dialog message.</p>
      *
-     * @param campaign The {@link Campaign} for which the nag dialog is being triggered.
+     * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data and
+     *                 settings required for constructing the dialog.
      */
     public NoCommanderNagDialog(final Campaign campaign) {
-        super(campaign, MHQConstants.NAG_NO_COMMANDER);
-
-        final String DIALOG_BODY = "NoCommanderNagDialog.text";
-        setRightDescriptionMessage(resources.getString(DIALOG_BODY));
-        showDialog();
+        super(campaign, HR, NAG_NO_COMMANDER, "NoCommanderNagDialog");
     }
 
     /**
@@ -82,15 +69,15 @@ public class NoCommanderNagDialog extends AbstractMHQNagDialog {
      *     <li>No flagged commander is assigned to the campaign.</li>
      * </ul>
      *
-     * @param flaggedCommander The {@link Person} designated as the flagged commander, or {@code null}
-     *                         if no commander is assigned.
-     * @return {@code true} if the nag dialog should be displayed due to the absence of a commander,
-     *         {@code false} otherwise.
+     * @param flaggedCommander The {@link Person} designated as the flagged commander, or {@code null} if no commander
+     *                         is assigned.
+     *
+     * @return {@code true} if the nag dialog should be displayed due to the absence of a commander, {@code false}
+     *       otherwise.
      */
     public static boolean checkNag(@Nullable Person flaggedCommander) {
-        final String NAG_KEY = MHQConstants.NAG_NO_COMMANDER;
+        final String NAG_KEY = NAG_NO_COMMANDER;
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-              && hasNoCommander(flaggedCommander);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) && hasNoCommander(flaggedCommander);
     }
 }
