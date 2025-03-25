@@ -27,40 +27,97 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import mekhq.MHQConstants;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog;
-
+import static mekhq.MHQConstants.NAG_PRISONERS;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.campaign.force.ForceType.SECURITY;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.PrisonersNagLogic.hasPrisoners;
 
-/**
- * A nag dialog that alerts the user about prisoners of war (POWs) in the campaign.
- *
- * <p>
- * This dialog checks whether there are prisoners of war in the campaign and displays a warning
- * if the user attempts to advance the day without addressing them. The purpose is to ensure
- * the player is aware of the prisoners and can take any necessary actions before proceeding.
- * </p>
- */
-public class PrisonersNagDialog extends AbstractMHQNagDialog {
-    /**
-     * Constructs the prisoners nag dialog for the given campaign.
-     *
-     * <p>
-     * This constructor initializes the dialog with the specified campaign and
-     * formats the resource message to display information about prisoners in the campaign.
-     * </p>
-     *
-     * @param campaign The {@link Campaign} object representing the current campaign.
-     */
-    public PrisonersNagDialog(final Campaign campaign) {
-        super(campaign, MHQConstants.NAG_PRISONERS);
+import java.util.List;
+import java.util.UUID;
 
-        final String DIALOG_BODY = "PrisonersNagDialog.text";
-        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
-            campaign.getCommanderAddress(false)));
-        showDialog();
+import megamek.common.annotations.Nullable;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.Campaign.AdministratorSpecialization;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.personnel.Person;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
+
+public class PrisonersNagDialog extends ImmersiveDialogNag {
+    public PrisonersNagDialog(final Campaign campaign) {
+        super(campaign, null, NAG_PRISONERS, "PrisonersNagDialog");
+    }
+
+    /**
+     * Determines the most suitable speaker for a campaign dialog based on personnel specialization and rank.
+     *
+     * <p>This method evaluates all active forces within the campaign to identify an appropriate speaker. It
+     * prioritizes
+     * selecting force commanders belonging to "SECURITY" forces, using rank and skills to break ties between
+     * candidates. If no qualified force commander is found, it falls back to a default speaker mechanism.</p>
+     *
+     * @param campaign       The {@link Campaign} instance providing access to force and personnel data.
+     * @param specialization The {@link AdministratorSpecialization} used as an optional criterion for selecting the
+     *                       speaker (may be {@code null}).
+     *
+     * @return The {@link Person} designated as the speaker, favoring commanders from "SECURITY" forces, or a fallback
+     *       speaker if no suitable individual is found. Returns {@code null} only if the fallback mechanism cannot
+     *       resolve a speaker.
+     */
+    @Override
+    protected @Nullable Person getSpeaker(Campaign campaign, @Nullable AdministratorSpecialization specialization) {
+        List<Force> forces = campaign.getAllForces();
+
+
+        Person speaker = null;
+        for (Force force : forces) {
+            if (force.isForceType(SECURITY)) {
+                UUID commanderId = force.getForceCommanderID();
+                Person commander = campaign.getPerson(commanderId);
+                if (commander == null) {
+                    continue;
+                }
+
+                if (speaker == null) {
+                    speaker = commander;
+                    continue;
+                }
+
+                if (commander.outRanksUsingSkillTiebreaker(campaign, speaker)) {
+                    speaker = commander;
+                }
+            }
+        }
+
+        if (speaker == null) {
+            return getFallbackSpeaker(campaign);
+        } else {
+            return speaker;
+        }
+    }
+
+    /**
+     * Retrieves a fallback speaker based on senior administrators within the campaign.
+     *
+     * <p>This method attempts to retrieve a senior administrator with the "TRANSPORT" specialization first.
+     * If no such administrator is available, it falls back to one with the "COMMAND" specialization.</p>
+     *
+     * @param campaign The {@link Campaign} instance providing access to administrator data.
+     *
+     * @return The {@link Person} designated as the fallback speaker. Returns {@code null} if no suitable administrator
+     *       is available.
+     */
+    private @Nullable Person getFallbackSpeaker(Campaign campaign) {
+        Person speaker = campaign.getSeniorAdminPerson(TRANSPORT);
+
+        if (speaker == null) {
+            speaker = campaign.getSeniorAdminPerson(COMMAND);
+        } else {
+            return speaker;
+        }
+
+        return speaker;
     }
 
     /**
@@ -73,14 +130,13 @@ public class PrisonersNagDialog extends AbstractMHQNagDialog {
      * </ul>
      *
      * @param hasActiveContract A flag indicating whether the campaign has an active contract.
-     * @param hasPrisoners A flag indicating whether there are prisoners in the campaign.
+     * @param hasPrisoners      A flag indicating whether there are prisoners in the campaign.
      *
      * @return {@code true} if the nag dialog should be displayed; {@code false} otherwise.
      */
     public static boolean checkNag(boolean hasActiveContract, boolean hasPrisoners) {
-        final String NAG_KEY = MHQConstants.NAG_PRISONERS;
+        final String NAG_KEY = NAG_PRISONERS;
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-              && hasPrisoners(hasActiveContract, hasPrisoners);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) && hasPrisoners(hasActiveContract, hasPrisoners);
     }
 }
