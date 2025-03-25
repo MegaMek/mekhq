@@ -28,8 +28,10 @@
  */
 package mekhq.gui;
 
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -108,6 +110,7 @@ import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.CampaignExportWizard.CampaignExportWizardState;
@@ -2582,12 +2585,18 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * Checks if the faction associated with the campaign is invalid for the current date and takes appropriate action
-     * if so.
+     * Checks whether the player’s current faction in the campaign is invalid for the current date, and if so, displays
+     * a warning dialog and cancels the current event.
      *
-     * @param dayEndingEvent the event that signals the ending of the day's activities in the campaign
+     * <p>This method retrieves the campaign's current date and faction, then verifies if the faction
+     * is valid using the {@link Faction#validIn(LocalDate)} method. If the faction is invalid, both an in-character and
+     * an out-of-character message are displayed using an {@link ImmersiveDialogSimple} dialog. The event is
+     * subsequently canceled, and the method returns {@code true} to indicate that an invalid faction was detected.</p>
      *
-     * @return {@code true} if the faction is invalid, {@code false} otherwise.
+     * @param dayEndingEvent The {@link DayEndingEvent} instance that represents the end-of-day event. This event will
+     *                       be canceled if an invalid faction is found.
+     *
+     * @return {@code true} if the faction was found to be invalid and the event was canceled; {@code false} otherwise.
      */
     private boolean checkForInvalidFaction(DayEndingEvent dayEndingEvent) {
         Campaign campaign = getCampaign();
@@ -2595,10 +2604,19 @@ public class CampaignGUI extends JPanel {
         LocalDate currentDate = campaign.getLocalDate();
 
         if (!campaignFaction.validIn(currentDate)) {
-            JOptionPane.showMessageDialog(null,
-                  getResourceMap().getString("dialogInvalidFaction.text"),
-                  getResourceMap().getString("dialogInvalidFaction.title"),
-                  JOptionPane.WARNING_MESSAGE);
+            String inCharacterMessage = getFormattedTextAt(resourceMap.getBaseBundleName(),
+                  "dialogInvalidFaction.ic",
+                  campaign.getCommanderAddress(false));
+            String outOfCharacterMessage = getFormattedTextAt(resourceMap.getBaseBundleName(),
+                  "dialogInvalidFaction.ooc");
+
+            new ImmersiveDialogSimple(campaign,
+                  campaign.getSeniorAdminPerson(COMMAND),
+                  null,
+                  inCharacterMessage,
+                  null,
+                  outOfCharacterMessage,
+                  false);
 
             dayEndingEvent.cancel();
 
