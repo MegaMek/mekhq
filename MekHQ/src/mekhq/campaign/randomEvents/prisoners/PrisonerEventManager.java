@@ -153,7 +153,11 @@ public class PrisonerEventManager {
 
         // Fortnightly events
         if (isMonday && isFortnight) {
-            checkForPrisonerEvents(false);
+            int totalPrisoners = campaign.getCurrentPrisoners().size();
+            int prisonerCapacityUsage = calculatePrisonerCapacityUsage(campaign);
+            int prisonerCapacity = calculatePrisonerCapacity(campaign);
+
+            checkForPrisonerEvents(false, totalPrisoners, prisonerCapacityUsage, prisonerCapacity);
         }
     }
 
@@ -219,48 +223,71 @@ public class PrisonerEventManager {
     }
 
     /**
-     * Checks for events related to prisoner overflow in the campaign.
+     * Evaluates the campaign's current prisoner conditions and determines whether a prisoner-related event occurs due
+     * to overflow or capacity constraints.
      *
-     * <p>This method determines whether a minor or major prisoner-related event occurs based on
-     * the current prisoner capacity, usage, and overflow. If there is no event, a warning may be processed.
+     * <p>This method calculates the percentage overflow of prisoners compared to the capacity and uses
+     * random rolls to decide whether a minor or major event is triggered. If no event occurs and there is overflow, it
+     * displays a warning (when not in headless mode) to alert the user about the situation and allow for corrective
+     * actions.</p>
      *
-     * @param isHeadless A boolean value indicating whether the process is running without a user interface. Allows Unit
-     *                   Tests to bypass the GUI prompts created by this method.
+     * <p>The decision process includes:
+     * <ul>
+     *   <li>Determining whether the overflow percentage exceeds the threshold for triggering a minor event.</li>
+     *   <li>Escalating a minor event to a major event based on prisoner count and another random roll.</li>
+     *   <li>Issuing a warning to the user for overflow situations when no events are triggered.</li>
+     *   <li>Executing random events if an event is triggered.</li>
+     * </ul>
+     * </p>
      *
-     * @return A list of two boolean values: The first element indicates whether a minor event occurred. The second
-     *       element indicates whether a major event occurred.
+     * @param isHeadless            A {@code boolean} indicating whether the process is running without a user
+     *                              interface. Allows unit tests to bypass GUI prompts created by this method.
+     * @param totalPrisoners        The total number of prisoners currently in the campaign. Used to determine
+     *                              escalation thresholds and whether warnings/events are applicable.
+     * @param prisonerCapacityUsage The current number of prisoners relative to the available capacity, used to
+     *                              calculate overflow percentage.
+     * @param prisonerCapacity      The total prisoner capacity available in the campaign. Serves as the threshold when
+     *                              calculating overflow.
+     *
+     * @return A {@code List} of two {@code boolean} values:
+     *       <ul>
+     *         <li>The first element is {@code true} if a minor event occurred, {@code false} otherwise.</li>
+     *         <li>The second element is {@code true} if a major event occurred, {@code false} otherwise.</li>
+     *       </ul>
      */
-    List<Boolean> checkForPrisonerEvents(boolean isHeadless) {
-        int totalPrisoners = campaign.getCurrentPrisoners().size();
-        int prisonerCapacityUsage = calculatePrisonerCapacityUsage(campaign);
-        int prisonerCapacity = calculatePrisonerCapacity(campaign);
+    List<Boolean> checkForPrisonerEvents(boolean isHeadless, int totalPrisoners, int prisonerCapacityUsage, int prisonerCapacity) {
+        // Calculate overflow as the percentage over prisonerCapacity
+        double overflowPercentage = ((double) (prisonerCapacityUsage - prisonerCapacity) / prisonerCapacity) * 100;
 
-        int overflow = prisonerCapacityUsage - prisonerCapacity;
-
-        if (overflow <= 0 && totalPrisoners < MINIMUM_PRISONER_COUNT) {
-            // No risk of event
+        // If no overflow and total prisoners are below the minimum count, no risk of event
+        if (overflowPercentage <= 0 && totalPrisoners < MINIMUM_PRISONER_COUNT) {
             return List.of(false, false);
         }
 
-        int eventRoll = randomInt(100);
-        boolean minorEvent = eventRoll < overflow;
+        // Generate an event roll
+        int eventRoll = randomInt(50);
 
+        // Minor event occurs if the random roll is less than the overflow percentage
+        boolean minorEvent = eventRoll < overflowPercentage;
+
+        // Special case: a roll of '0' always results in a minor event
         if (eventRoll == 0) {
             minorEvent = true;
         }
 
         // Does the minor event escalate into a major event?
-        eventRoll = randomInt(100);
+        eventRoll = randomInt(50);
         boolean majorEvent = minorEvent &&
                                    (totalPrisoners > MINIMUM_PRISONER_COUNT) &&
-                                   (eventRoll < overflow || eventRoll == 0);
+                                   (eventRoll < overflowPercentage || eventRoll == 0);
 
         // If there is no event, throw up a warning and give the player an opportunity to do
         // something about the situation.
-        if (!minorEvent && overflow > 0) {
-            if (!isHeadless) {
-                processWarning(overflow);
+        if (!minorEvent) {
+            if (overflowPercentage > 0 && !isHeadless) {
+                processWarning((int) round(totalPrisoners * overflowPercentage));
             }
+
             return List.of(false, false);
         }
 
