@@ -113,7 +113,7 @@ public class NagController {
         if (UnableToAffordExpensesNagDialog.checkNag(campaign)) {
             UnableToAffordExpensesNagDialog unableToAffordExpensesNagDialog = new UnableToAffordExpensesNagDialog(
                   campaign);
-            if (unableToAffordExpensesNagDialog.wasAdvanceDayCanceled()) {
+            if (unableToAffordExpensesNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
