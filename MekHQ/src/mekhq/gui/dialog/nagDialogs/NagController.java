@@ -92,7 +92,7 @@ public class NagController {
         // No Commander
         if (NoCommanderNagDialog.checkNag(campaign.getFlaggedCommander())) {
             NoCommanderNagDialog noCommanderNagDialog = new NoCommanderNagDialog(campaign);
-            if (noCommanderNagDialog.wasAdvanceDayCanceled()) {
+            if (noCommanderNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
@@ -195,7 +195,7 @@ public class NagController {
         // Outstanding Scenarios
         if (OutstandingScenariosNagDialog.checkNag(campaign)) {
             OutstandingScenariosNagDialog outstandingScenariosNagDialog = new OutstandingScenariosNagDialog(campaign);
-            if (outstandingScenariosNagDialog.wasAdvanceDayCanceled()) {
+            if (outstandingScenariosNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
