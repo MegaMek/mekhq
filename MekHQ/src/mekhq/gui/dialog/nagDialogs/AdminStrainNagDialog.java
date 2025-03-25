@@ -28,112 +28,36 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_ADMIN_STRAIN;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.AdminStrainNagLogic.hasAdminStrain;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 /**
- * Represents a nag dialog that warns the user about administrative strain in a campaign.
+ * A dialog class used to notify players about administrative strain in their campaign.
  *
- * <p>This dialog is triggered when the campaign has a positive administrative strain. The purpose
- * of the dialog is to notify the user about the issue, allowing them to take any corrective action as necessary.</p>
+ * <p>The {@code AdminStrainNagDialog} extends {@link ImmersiveDialogNag} and provides a specialized
+ * nag dialog specifically intended to alert players when administrative strain occurs. It utilizes predefined
+ * parameters such as the "HR" specialization, the "NAG_ADMIN_STRAIN" constant, and a specific message key to display
+ * relevant information to the player.</p>
  */
-public class AdminStrainNagDialog {
-    private final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
-
-    private final int CHOICE_CANCEL = 0;
-    private final int CHOICE_CONTINUE = 1;
-    private final int CHOICE_SUPPRESS = 2;
-
-    private final Campaign campaign;
-    private boolean cancelAdvanceDay;
+public class AdminStrainNagDialog extends ImmersiveDialogNag {
 
     /**
-     * Constructs the administrative strain nag dialog for the given campaign.
+     * Constructs a new {@code AdminStrainNagDialog} instance to display the administrative strain nag dialog.
      *
-     * <p>This dialog displays a detailed message describing the administrative strain
-     * issue in the campaign.</p>
+     * <p>This constructor sets up the nag dialog using predefined parameters specific to administrative
+     * strain scenarios. It passes the {@code HR} specialization to highlight administrators relevant to human resources
+     * and uses the {@code NAG_ADMIN_STRAIN} constant for suppression control. The {@code "AdminStrainNagDialog"}
+     * message key is used to retrieve localized message content.</p>
      *
-     * @param campaign The {@link Campaign} for which the administrative strain nag dialog is to be displayed.
+     * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data and
+     *                 settings required for dialog construction.
      */
     public AdminStrainNagDialog(final Campaign campaign) {
-        this.campaign = campaign;
-
-        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-              getSpeaker(),
-              null,
-              getFormattedTextAt(RESOURCE_BUNDLE, "AdminStrainNagDialog.ic", campaign.getCommanderAddress(false)),
-              getButtonLabels(),
-              getFormattedTextAt(RESOURCE_BUNDLE, "AdminStrainNagDialog.ooc"),
-              true);
-
-        int choiceIndex = dialog.getDialogChoice();
-
-        switch (choiceIndex) {
-            case CHOICE_CANCEL -> cancelAdvanceDay = true;
-            case CHOICE_CONTINUE -> cancelAdvanceDay = false;
-            case CHOICE_SUPPRESS -> {
-                MekHQ.getMHQOptions().setNagDialogIgnore(NAG_ADMIN_STRAIN, true);
-                cancelAdvanceDay = false;
-            }
-            default -> throw new IllegalStateException("Unexpected value in AdminStrainNagDialog: " + choiceIndex);
-        }
-    }
-
-    /**
-     * Retrieves a list of button labels from the resource bundle.
-     *
-     * <p>The method collects and returns button labels such as "Cancel", "Continue", and "Suppress" after
-     * formatting them using the provided resource bundle.</p>
-     *
-     * @return a {@link List} of formatted button labels as {@link String}.
-     */
-    private List<String> getButtonLabels() {
-        List<String> buttonLabels = new ArrayList<>();
-
-        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.cancel"));
-        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.continue"));
-        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.suppress"));
-
-        return buttonLabels;
-    }
-
-    /**
-     * Retrieves the speaker based on the given administrator specialization.
-     *
-     * <p>This method first attempts to fetch the senior administrator person for the specified specialization. If no
-     * person is found, it defaults to retrieving the senior administrator person with the "COMMAND"
-     * specialization.</p>
-     *
-     * @return the {@link Person} assigned as the speaker, either the one matching the given specialization or the one
-     *       with the "COMMAND" specialization if no specialized person is available.
-     */
-    private Person getSpeaker() {
-        Person speaker = campaign.getSeniorAdminPerson(HR);
-
-        if (speaker == null) {
-            speaker = campaign.getSeniorAdminPerson(COMMAND);
-        }
-
-        return speaker;
-    }
-
-    /**
-     * Determines whether the advance day operation should be canceled.
-     *
-     * @return {@code true} if advancing the day should be canceled, {@code false} otherwise.
-     */
-    public boolean shouldCancelAdvanceDay() {
-        return cancelAdvanceDay;
+        super(campaign, HR, NAG_ADMIN_STRAIN, "AdminStrainNagDialog");
     }
 
     /**

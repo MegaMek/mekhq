@@ -28,106 +28,39 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_CONTRACT_ENDED;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.EndContractNagLogic.isContractEnded;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 /**
- * A dialog used to notify the user about the end date of a contract in the campaign.
+ * A dialog class used to notify players when a contract has ended in their campaign.
  *
- * <p>
- * This nag dialog is triggered when a contract in the campaign is flagged as ending on the current date and the user
- * has not opted to ignore such notifications. It shows relevant details about the situation and allows the user to take
- * action or dismiss the dialog.
- * </p>
- *
- * <strong>Features:</strong>
- * <ul>
- *   <li>Handles notifications for contract end dates in the campaign.</li>
- *   <li>Uses a localized message with context-specific details from the campaign.</li>
- *   <li>Extends the {@link AbstractMHQNagDialog} to reuse base nag dialog functionality.</li>
- * </ul>
+ * <p>The {@code EndContractNagDialog} extends {@link ImmersiveDialogNag} and provides
+ * a specialized nag dialog to alert players about the conclusion of a contract. It leverages predefined parameters,
+ * such as the {@code NAG_CONTRACT_ENDED} constant, and uses no specific specialization, relying on a fallback
+ * speaker.</p>
  */
-public class EndContractNagDialog {
-    private final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
-
-    private final int CHOICE_CANCEL = 0;
-    private final int CHOICE_CONTINUE = 1;
-    private final int CHOICE_SUPPRESS = 2;
-
-    private boolean cancelAdvanceDay;
+public class EndContractNagDialog extends ImmersiveDialogNag {
 
     /**
-     * Constructs an {@code EndContractNagDialog} for the given campaign.
+     * Constructs a new {@code EndContractNagDialog} instance to display the end-of-contract nag dialog.
      *
-     * <p>
-     * This dialog uses the localization key {@code "EndContractNagDialog.text"} to provide a message that includes
-     * additional information, such as the commander's address. It is specifically tailored to show when a contract is
-     * reaching its end date.
-     * </p>
+     * <p>This constructor initializes the nag dialog without a specific specialization, enabling
+     * the fallback mechanism to determine the appropriate speaker. The {@code NAG_CONTRACT_ENDED} constant is used to
+     * manage dialog suppression, and the {@code "EndContractNagDialog"} message key is utilized to fetch localized
+     * message content.</p>
      *
-     * @param campaign The {@link Campaign} that the nag dialog is tied to.
+     * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data and
+     *                 settings required for dialog construction.
      */
     public EndContractNagDialog(final Campaign campaign) {
-        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-              campaign.getSeniorAdminPerson(COMMAND),
-              null,
-              getFormattedTextAt(RESOURCE_BUNDLE, "EndContractNagDialog.ic", campaign.getCommanderAddress(false)),
-              getButtonLabels(),
-              getFormattedTextAt(RESOURCE_BUNDLE, "EndContractNagDialog.ooc"),
-              true);
-
-        int choiceIndex = dialog.getDialogChoice();
-
-        switch (choiceIndex) {
-            case CHOICE_CANCEL -> cancelAdvanceDay = true;
-            case CHOICE_CONTINUE -> cancelAdvanceDay = false;
-            case CHOICE_SUPPRESS -> {
-                MekHQ.getMHQOptions().setNagDialogIgnore(NAG_CONTRACT_ENDED, true);
-                cancelAdvanceDay = false;
-            }
-            default -> throw new IllegalStateException("Unexpected value in " +
-                                                             getClass().getSimpleName() +
-                                                             ": " +
-                                                             choiceIndex);
-        }
-    }
-
-    /**
-     * Retrieves a list of button labels from the resource bundle.
-     *
-     * <p>The method collects and returns button labels such as "Cancel", "Continue", and "Suppress" after
-     * formatting them using the provided resource bundle.</p>
-     *
-     * @return a {@link List} of formatted button labels as {@link String}.
-     */
-    private List<String> getButtonLabels() {
-        List<String> buttonLabels = new ArrayList<>();
-
-        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.cancel"));
-        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.continue"));
-        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.suppress"));
-
-        return buttonLabels;
-    }
-
-    /**
-     * Determines whether the advance day operation should be canceled.
-     *
-     * @return {@code true} if advancing the day should be canceled, {@code false} otherwise.
-     */
-    public boolean shouldCancelAdvanceDay() {
-        return cancelAdvanceDay;
+        super(campaign, null, NAG_CONTRACT_ENDED, "EndContractNagDialog");
     }
 
     /**
