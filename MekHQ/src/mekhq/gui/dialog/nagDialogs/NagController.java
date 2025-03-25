@@ -224,7 +224,7 @@ public class NagController {
         // Pregnant Personnel Assigned to Active Force
         if (PregnantCombatantNagDialog.checkNag(hasActiveContract, activePersonnel)) {
             PregnantCombatantNagDialog pregnantCombatantNagDialog = new PregnantCombatantNagDialog(campaign);
-            if (pregnantCombatantNagDialog.wasAdvanceDayCanceled()) {
+            if (pregnantCombatantNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
