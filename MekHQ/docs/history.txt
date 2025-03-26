@@ -54,7 +54,11 @@ MEKHQ VERSION HISTORY:
 + PR #6402, #6403, #6405, #6406, #6407, #6408, #6410, #6411, #6413, #6414: Refactored Nag Dialogs To Use Immersive Dialog Framework
 + PR #6404: Marked AbstractMHQNagDialog as Deprecated
 + PR #6415: Post-Nag Upgrade Adjustments
-
++ PR #6426: Removed Turnover Checks While in Transit
++ PR #6427: Restored Campaign Options to Apply Skill Level Modifiers When Creating Characters
++ PR #6430: Added Skill Deprecation Tool For Managing Deprecated Skills; Deprecated the 'Scrounge' Skill
++ PR #6431: Replaced Scrounge With Negotiation or Removed It Across Academy Curricula
++ Fix #6434: Corrected Briefing Room Combat Team Counter
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
