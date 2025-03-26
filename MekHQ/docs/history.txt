@@ -59,6 +59,7 @@ MEKHQ VERSION HISTORY:
 + PR #6430: Added Skill Deprecation Tool For Managing Deprecated Skills; Deprecated the 'Scrounge' Skill
 + PR #6431: Replaced Scrounge With Negotiation or Removed It Across Academy Curricula
 + Fix #6434: Corrected Briefing Room Combat Team Counter
++ PR #6442: Added Additional Error Tracking to Scenario Resolution in Attempt to Identify Bug Root Cause
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
