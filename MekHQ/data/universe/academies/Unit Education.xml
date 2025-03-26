@@ -3,10 +3,7 @@
     <academy>
         <name>Unit Creche</name>
         <isPrepSchool>true</isPrepSchool>
-        <description>A unit creche serves as a communal living and training space for the youngest children of
-            mercenaries. While the creche fosters a strong sense of community it fails to provide the level of education
-            afforded to more formal settings.
-        </description>
+        <description>A unit creche serves as a communal living and training space for the youngest children of mercenaries. While the creche fosters a strong sense of community it fails to provide the level of education afforded to more formal settings.</description>
         <isHomeSchool>true</isHomeSchool>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -24,10 +21,7 @@
     <academy>
         <name>Home Schooling</name>
         <isPrepSchool>true</isPrepSchool>
-        <description>Home schooling often occurs in mercenary companies posted to remote or frontier regions where
-            formal educational facilities are scarce. The company provides a basic education using a mix of digital
-            resources and practical skills training.
-        </description>
+        <description>Home schooling often occurs in mercenary companies posted to remote or frontier regions where formal educational facilities are scarce. The company provides a basic education using a mix of digital resources and practical skills training.</description>
         <isHomeSchool>true</isHomeSchool>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -46,11 +40,7 @@
         <name>Apprenticeship</name>
         <isMilitary>true</isMilitary>
         <isPrepSchool>true</isPrepSchool>
-        <description>An apprenticeship is a hands-on training program where young recruits learn from experienced
-            personnel. Apprentices start with basic skills, and gradually take on more responsibilities. This
-            mentorship-based training emphasizes practical experience, but lacks any formal qualifications. Furthermore,
-            apprenticing to an active military unit has its dangers.
-        </description>
+        <description>An apprenticeship is a hands-on training program where young recruits learn from experienced personnel. Apprentices start with basic skills, and gradually take on more responsibilities. This mentorship-based training emphasizes practical experience, but lacks any formal qualifications. Furthermore, apprenticing to an active military unit has its dangers.</description>
         <isHomeSchool>true</isHomeSchool>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -100,10 +90,7 @@
     <academy>
         <name>Adult Apprenticeship</name>
         <isMilitary>false</isMilitary>
-        <description>An adult apprenticeship is a hands-on training program where older recruits are integrated into a
-            military or mercenary unit. The apprenticeship focuses heavily on learning in the field, with recruits
-            shadowing seasoned veterans.
-        </description>
+        <description>An adult apprenticeship is a hands-on training program where older recruits are integrated into a military or mercenary unit. The apprenticeship focuses heavily on learning in the field, with recruits shadowing seasoned veterans.</description>
         <isHomeSchool>true</isHomeSchool>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -139,10 +126,7 @@
         <name>In-House Boot Camp</name>
         <type>Basic Training</type>
         <isMilitary>true</isMilitary>
-        <description>In-house training is usually conducted by the unit's more experienced members. This training
-            ensures that new members are well-prepared, cohesive, and loyal to the unit's unique culture and combat
-            style.
-        </description>
+        <description>In-house training is usually conducted by the unit's more experienced members. This training ensures that new members are well-prepared, cohesive, and loyal to the unit's unique culture and combat style.</description>
         <isHomeSchool>true</isHomeSchool>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -169,9 +153,7 @@
         <name>In-House Basic Training</name>
         <type>Basic Training</type>
         <isMilitary>true</isMilitary>
-        <description>In-house training is usually conducted by the unit's more experienced members. Trainees undergo
-            physical conditioning, simulator exercises, and eventually hands-on training in their chosen field.
-        </description>
+        <description>In-house training is usually conducted by the unit's more experienced members. Trainees undergo physical conditioning, simulator exercises, and eventually hands-on training in their chosen field.</description>
         <isHomeSchool>true</isHomeSchool>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -198,9 +180,7 @@
         <name>In-House NCO Bootcamp</name>
         <type>NCO Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The In-House NCO Candidate Bootcamp is led by veteran personnel, blending physical conditioning,
-            simulations, and practical exercises to instill leadership, cohesion, and loyalty.
-        </description>
+        <description>The In-House NCO Candidate Bootcamp is led by veteran personnel, blending physical conditioning, simulations, and practical exercises to instill leadership, cohesion, and loyalty.</description>
         <isHomeSchool>true</isHomeSchool>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -218,9 +198,7 @@
     <academy>
         <name>In-House Warrant Officer Bootcamp</name>
         <isMilitary>true</isMilitary>
-        <description>Led by veteran experts, in-unit Warrant Officer bootcamps focus on advanced technical skills,
-            leadership development, and unit cohesion, preparing candidates for specialized support roles.
-        </description>
+        <description>Led by veteran experts, in-unit Warrant Officer bootcamps focus on advanced technical skills, leadership development, and unit cohesion, preparing candidates for specialized support roles.</description>
         <isHomeSchool>true</isHomeSchool>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -238,9 +216,7 @@
     <academy>
         <name>In-House Officer Bootcamp</name>
         <isMilitary>true</isMilitary>
-        <description>Officer Bootcamp emphasizes leadership, tactical acumen, and strategic planning, blending classroom
-            instruction, simulations, and field exercises to prepare candidates for command roles.
-        </description>
+        <description>Officer Bootcamp emphasizes leadership, tactical acumen, and strategic planning, blending classroom instruction, simulations, and field exercises to prepare candidates for command roles.</description>
         <isHomeSchool>true</isHomeSchool>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
