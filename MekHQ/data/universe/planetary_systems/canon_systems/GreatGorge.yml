@@ -3,9 +3,11 @@ sucsId: 999
 xcood: 492.678
 ycood: -266.866
 spectralType:
-  source: canon
+  source: House Davion
   value: A3V
-primarySlot: 5
+primarySlot:
+  source: House Davion
+  value: 5
 planet:
   - name: Dĕdek
     type: DWARF_TERRESTRIAL
@@ -79,7 +81,9 @@ planet:
       value: Great Gorge
     type: TERRESTRIAL
     orbitalDist: 6.72
-    sysPos: 5
+    sysPos:
+      source: House Davion
+      value: 5
     icon: green43
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -92,7 +96,7 @@ planet:
     temperature: 27
     water: 74
     lifeForm:
-      source: canon
+      source: House Davion
       value: PLANT
     desc: |-
       Great Gorge is a planet with little to draw in settlers. The planet has a thin atmosphere, scarce water, and only primitive plant-like lifeforms. Additionally the planet is covered in rough mountains and canyons with little arable land. This all changed when a religious group from Terra decided to settle the planet just prior to the formation of the Star League.
@@ -106,7 +110,7 @@ planet:
           source: canon
           value: Wide Floor
         capital:
-          source: canon
+          source: House Davion
           value: New Stockdon
     satellite:
       - name: South Bay 1

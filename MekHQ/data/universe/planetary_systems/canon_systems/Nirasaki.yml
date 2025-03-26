@@ -3,37 +3,43 @@ sucsId: 1877
 xcood: 34.378
 ycood: 19.339
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F3IV
-primarySlot: 1
+primarySlot:
+  source: MWDA world profiles
+  value: 1
 planet:
   - name:
       source: canon
       value: Nirasaki
     type: TERRESTRIAL
     orbitalDist: 4.2
-    sysPos: 1
+    sysPos:
+      source: MWDA world profiles
+      value: 1
     icon: green34
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: TOXICPOISON
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.11
-    diameter: 14655
-    density: 5.31894036444
+    diameter: 14660
+    density: 5.320892798494
     dayLength: 27
     yearLength: 8.7
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 37
     water:
-      source: canon
-      value: 57
+      source: MWDA world profiles
+      value: 56
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: Nirasaki was settled by communal idealists who hoped to create a perfect
       society, in which everyone would live in harmony in the virtual absence of government
@@ -78,22 +84,23 @@ planet:
       company based in the city of Arkatis' Unity.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Kalifax
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Elusian
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Ouanii
-      - name:
-          source: canon
-          value: Arkatis
     satellite:
-      - name: Nagano
+      - name:
+          source: MWDA world profiles
+          value: Nagano
         size: medium
         icon: oddmoon3
-      - name: Okinawa
+      - name:
+          source: MWDA world profiles
+          value: Okinawa
         size: large
         icon: rock11
     event:

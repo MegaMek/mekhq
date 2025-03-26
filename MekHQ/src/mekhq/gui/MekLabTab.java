@@ -344,7 +344,10 @@ public class MekLabTab extends CampaignGuiTab {
 
         int walk = entity.getOriginalWalkMP();
         int run = entity.getRunMP(MPCalculationSetting.NO_MASC);
-        int jump = entity.getOriginalJumpMP();
+        String jump = entity.getOriginalJumpMP() + "";
+        if (entity instanceof Mek mek && mek.getOriginalMechanicalJumpBoosterMP() > 0) {
+            jump += " (%d)".formatted(mek.getOriginalMechanicalJumpBoosterMP());
+        }
         int heat = entity.getHeatCapacity();
 
         double totalHeat = calculateTotalHeat();
@@ -433,7 +436,7 @@ public class MekLabTab extends CampaignGuiTab {
         if (entity.getOriginalJumpMP() > 0 && !(entity instanceof Infantry)) {
             if (entity.getJumpType() == Mek.JUMP_IMPROVED) {
                 heat += Math.max(3, entity.getOriginalJumpMP() / 2);
-            } else if (entity.getJumpType() != Mek.JUMP_BOOSTER) {
+            } else {
                 heat += Math.max(3, entity.getOriginalJumpMP());
             }
             if (entity.getEngine().getEngineType() == Engine.XXL_ENGINE) {

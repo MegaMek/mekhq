@@ -5,7 +5,9 @@ ycood: -388.078
 spectralType:
   source: canon
   value: G5V
-primarySlot: 4
+primarySlot:
+  source: Periphery (1ed), pg. 86
+  value: 4
 event:
   - date: '2378-12-18'
     zenithCharge: yes
@@ -69,7 +71,9 @@ planet:
       value: Ishtar
     type: TERRESTRIAL
     orbitalDist: 0.9
-    sysPos: 4
+    sysPos:
+      source: Periphery (1ed), pg. 86
+      value: 4
     icon: green36
     pressure:
       source: canon
@@ -88,7 +92,7 @@ planet:
       source: canon
       value: 35
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 86
       value: MAMMAL
     desc: Ishtar is a major exporter of agriculture for the Taurian Concordat and
       foodstuffs prepared and packaged on Ishtar can be found on most planets in the

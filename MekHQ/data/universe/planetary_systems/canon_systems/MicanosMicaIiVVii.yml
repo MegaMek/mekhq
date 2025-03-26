@@ -3,9 +3,11 @@ sucsId: 1695
 xcood: 679.862
 ycood: 17.15
 spectralType:
-  source: canon
+  source: Periphery (1ed), pg. 136
   value: K3V
-primarySlot: 2
+primarySlot:
+  source: Periphery (1ed), pg. 136
+  value: 2
 event:
   - date: '2781-09-30'
     zenithCharge: yes
@@ -38,7 +40,9 @@ planet:
       value: Micanos (Mica II, V, VII)
     type: TERRESTRIAL
     orbitalDist: 0.49
-    sysPos: 2
+    sysPos:
+      source: Periphery (1ed), pg. 136
+      value: 2
     icon: green1
     pressure: HIGH
     atmosphere: BREATHABLE
@@ -51,7 +55,7 @@ planet:
     temperature: 28
     water: 53
     lifeForm:
-      source: canon
+      source: Periphery (1ed), pg. 136
       value: MAMMAL
     desc: The Mica Majority is a small Periphery nation that controls only a single
       system. Mica contains three inhabited planets, Mica II, V and VII. Mining and

@@ -3,9 +3,11 @@ sucsId: 666
 xcood: 140.085
 ycood: 19.234
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F8IV
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2401-11-16'
     zenithCharge: yes
@@ -36,28 +38,32 @@ planet:
       value: David
     type: TERRESTRIAL
     orbitalDist: 3.36
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green54
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.84
-    diameter: 10699
-    density: 5.518496738415
+    diameter: 10698
+    density: 5.518001510086
     dayLength: 24
     yearLength: 6.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 43
     water:
-      source: canon
+      source: MWDA world profiles
       value: 37
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: FISH
     desc: David‘s water table, not its atmosphere, is actually the health hazard posed
       to humans visiting this otherwise beautiful—if somewhat arid—planet. The problem
@@ -83,7 +89,7 @@ planet:
           source: canon
           value: Geronomis
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Polis
     event:
       - date: '2303-03-24'

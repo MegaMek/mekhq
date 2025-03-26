@@ -27,39 +27,38 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import mekhq.MHQConstants;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog;
-
+import static mekhq.MHQConstants.NAG_ADMIN_STRAIN;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.AdminStrainNagLogic.hasAdminStrain;
 
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
+
 /**
- * Represents a nag dialog that warns the user about administrative strain in a campaign.
+ * A dialog class used to notify players about administrative strain in their campaign.
  *
- * <p>This dialog is triggered when the campaign has a positive administrative strain. The purpose
- * of the dialog is to notify the user about the issue, allowing them to take any corrective action
- * as necessary.</p>
+ * <p>The {@code AdminStrainNagDialog} extends {@link ImmersiveDialogNag} and provides a specialized
+ * nag dialog specifically intended to alert players when administrative strain occurs. It utilizes predefined
+ * parameters such as the "HR" specialization, the "NAG_ADMIN_STRAIN" constant, and a specific message key to display
+ * relevant information to the player.</p>
  */
-public class AdminStrainNagDialog extends AbstractMHQNagDialog {
+public class AdminStrainNagDialog extends ImmersiveDialogNag {
+
     /**
-     * Constructs the administrative strain nag dialog for the given campaign.
+     * Constructs a new {@code AdminStrainNagDialog} instance to display the administrative strain nag dialog.
      *
-     * <p>This dialog displays a detailed message describing the administrative strain
-     * issue in the campaign.</p>
+     * <p>This constructor sets up the nag dialog using predefined parameters specific to administrative
+     * strain scenarios. It passes the {@code HR} specialization to highlight administrators relevant to human resources
+     * and uses the {@code NAG_ADMIN_STRAIN} constant for suppression control. The {@code "AdminStrainNagDialog"}
+     * message key is used to retrieve localized message content.</p>
      *
-     * @param campaign The {@link Campaign} for which the administrative strain nag
-     *                 dialog is to be displayed.
+     * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data and
+     *                 settings required for dialog construction.
      */
     public AdminStrainNagDialog(final Campaign campaign) {
-        super(campaign, MHQConstants.NAG_ADMIN_STRAIN);
-
-        final String DIALOG_BODY = "AdminStrainNagDialog.text";
-        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
-            campaign.getCommanderAddress(false)));
-        showDialog();
+        super(campaign, HR, NAG_ADMIN_STRAIN, "AdminStrainNagDialog");
     }
-
 
     /**
      * Determines if the administrative strain nag dialog should be displayed.
@@ -73,17 +72,18 @@ public class AdminStrainNagDialog extends AbstractMHQNagDialog {
      *     <li>The campaign's administrative strain level is above 0.</li>
      * </ul>
      *
-     * @param isUseTurnover {@code true} if turnover-based checks are enabled, {@code false} otherwise.
+     * @param isUseTurnover    {@code true} if turnover-based checks are enabled, {@code false} otherwise.
      * @param isUseAdminStrain {@code true} if administrative strain checks are enabled, {@code false} otherwise.
      * @param adminStrainLevel The current level of administrative strain in the campaign.
      *
-     * @return {@code true} if the administrative strain nag dialog should be displayed;
-     *         {@code false} otherwise.
+     * @return {@code true} if the administrative strain nag dialog should be displayed; {@code false} otherwise.
      */
     public static boolean checkNag(boolean isUseTurnover, boolean isUseAdminStrain, int adminStrainLevel) {
-        final String NAG_KEY = MHQConstants.NAG_ADMIN_STRAIN;
+        final String NAG_KEY = NAG_ADMIN_STRAIN;
 
-        return isUseTurnover && isUseAdminStrain && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && hasAdminStrain(adminStrainLevel);
+        return isUseTurnover &&
+                     isUseAdminStrain &&
+                     !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) &&
+                     hasAdminStrain(adminStrainLevel);
     }
 }

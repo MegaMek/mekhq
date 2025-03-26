@@ -3,9 +3,11 @@ sucsId: 82
 xcood: 100.804
 ycood: -61.569
 spectralType:
-  source: canon
+  source: House Liao, pg. 153
   value: K4V
-primarySlot: 2
+primarySlot:
+  source: House Liao, pg. 153
+  value: 2
 event:
   - date: '2368-10-08'
     zenithCharge: yes
@@ -34,7 +36,9 @@ planet:
       value: Almach
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 2
+    sysPos:
+      source: House Liao, pg. 153
+      value: 2
     icon: dry13
     pressure: THIN
     atmosphere: BREATHABLE
@@ -47,7 +51,7 @@ planet:
     temperature: 37
     water: 18
     lifeForm:
-      source: canon
+      source: House Liao, pg. 153
       value: MAMMAL
     desc: |-
       Almach was the only planet settled almost entirely by Argentineans. It was once a major center for ocean-based aquaculture technology and supplied the entire food demands of the other planets of the Chesterton province. Unfortunately during the Succession Wars this technology was all but lost.

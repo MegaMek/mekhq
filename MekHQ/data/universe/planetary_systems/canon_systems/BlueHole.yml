@@ -3,9 +3,11 @@ sucsId: 346
 xcood: -186.646
 ycood: 348.664
 spectralType:
-  source: canon
+  source: 'Handbook: House Steiner, pg. 81'
   value: K7V
-primarySlot: 4
+primarySlot:
+  source: 'Handbook: House Steiner, pg. 81'
+  value: 4
 event:
   - date: '2727-01-23'
     nadirCharge: yes
@@ -68,28 +70,32 @@ planet:
       value: Blue Hole
     type: TERRESTRIAL
     orbitalDist: 0.24
-    sysPos: 4
+    sysPos:
+      source: 'Handbook: House Steiner, pg. 81'
+      value: 4
     icon: green10
     pressure:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 81'
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: 'Handbook: House Steiner, pg. 81'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 81'
       value: 0.81
-    diameter: 11788
-    density: 4.824468070941
+    diameter: 11793
+    density: 4.826702537617
     dayLength: 21
     yearLength: 0.8
     temperature:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 81'
       value: 41
     water:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 81'
       value: 67
     lifeForm:
-      source: canon
+      source: 'Handbook: House Steiner, pg. 81'
       value: BIRD
     desc: |-
       Blue Hole is covered in unique lakes and rivers that dot the land and are visible from space. From the ground, these lakes and rivers are even more unique for their massive depths and the fact that many of them are connected by large underground rivers. Often these underground channels are large enough for submersibles and even ‘Mechs to pass through.
@@ -98,7 +104,7 @@ planet:
     smallMoons: 4
     landmass:
       - capital:
-          source: canon
+          source: 'Handbook: House Steiner, pg. 81'
           value: Lapiz
     event:
       - date: '2715-04-26'

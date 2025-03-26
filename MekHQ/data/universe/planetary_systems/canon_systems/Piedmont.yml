@@ -3,9 +3,11 @@ sucsId: 2024
 xcood: 79.399
 ycood: 77.759
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: G6IV
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 planet:
   - name: Fear
     type: TERRESTRIAL
@@ -27,28 +29,32 @@ planet:
       value: Piedmont
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green12
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.03
-    diameter: 13757
-    density: 5.240865068542
+    diameter: 13784
+    density: 5.251236808621
     dayLength: 20
     yearLength: 2.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 31
     water:
-      source: canon
+      source: MWDA world profiles
       value: 64
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: MAMMAL
     desc: '3135 - By all accounts a lovely and bountiful world, with lush forests
       and jungles covering the better part of its six main continents, Piedmont nonetheless
@@ -93,34 +99,40 @@ planet:
       to a mere handful each year.'
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Anistasi
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Austin
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Calcutta
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Cobayne
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Mollasia
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Victoria
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Curtiss Valley
     satellite:
-      - name: Blanche
+      - name:
+          source: MWDA world profiles
+          value: Blanche
         size: medium
         icon: oddmoon2
-      - name: Calliope
+      - name:
+          source: MWDA world profiles
+          value: Calliope
         size: medium
         icon: oddmoon1
-      - name: Lassen
+      - name:
+          source: MWDA world profiles
+          value: Lassen
         size: medium
         icon: oddmoon3
     event:

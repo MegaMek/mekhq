@@ -5,7 +5,9 @@ ycood: -16.073
 spectralType:
   source: canon
   value: F0V
-primarySlot: 7
+primarySlot:
+  source: MWDA world profiles
+  value: 7
 event:
   - date: '2400-08-31'
     nadirCharge: yes
@@ -112,28 +114,32 @@ planet:
       value: Dubhe
     type: TERRESTRIAL
     orbitalDist: 2.56
-    sysPos: 7
+    sysPos:
+      source: MWDA world profiles
+      value: 7
     icon: wet16
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.05
-    diameter: 11087
-    density: 6.646439707681
+    diameter: 11095
+    density: 6.650978303774
     dayLength: 25
     yearLength: 4.3
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 22
     water:
-      source: canon
+      source: MWDA world profiles
       value: 88
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: AMPHIBIAN
     desc: |-
       3135 - Dubhe, once known as Alpha Ursae Majoris, is a binary system blessed by an inhabitable world. Dubhe revolves around the outer star, a pale yellow sun that orbits a cooler orange giant once every forty-four Terran years. The orbit of Dubhe is elongated as it passes between the binary suns, these periods produces warmer-than-average summers for a world that is overall quite cool with harsh winters. As a result, every two decades Dubhe's polar caps begin a period of rapid melting that causes ocean levels worldwide rise by as much as one or two meters and wide-scale flooding. The intensity of the "super-summer" seasons and the melting of the polar caps has increased over the centuries. This has been attributed to the effects of centuries of mining and industrialization rather than to the planet's subtly growing distance from its primary sun in favor of the secondary.
@@ -146,7 +152,7 @@ planet:
           source: canon
           value: Holidius
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Greenwich
     event:
       - date: '2255-01-17'

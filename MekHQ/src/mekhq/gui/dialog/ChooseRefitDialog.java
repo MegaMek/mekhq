@@ -129,10 +129,11 @@ public class ChooseRefitDialog extends JDialog {
     // endregion Variable Declarations
 
     // region Constructors
+
     /** Creates new form EditPersonnelLogDialog */
     public ChooseRefitDialog(JFrame parent, boolean modal, Campaign c, Unit unit) {
         super(parent, modal);
-        campaign = c;
+        campaign  = c;
         this.unit = unit;
         populateRefits();
         setLocationRelativeTo(parent);
@@ -292,9 +293,8 @@ public class ChooseRefitDialog extends JDialog {
         txtOldUnit = new JTextPane();
         txtOldUnit.setEditable(false);
         txtOldUnit.setContentType("text/html");
-        txtOldUnit.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("txtOldUnit.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        txtOldUnit.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
+              "txtOldUnit.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         MekView mv = new MekView(unit.getEntity(), false, true, true, ViewFormatting.HTML);
         txtOldUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMekReadout() + "</div>");
         scrOldUnit = new JScrollPaneWithSpeed(txtOldUnit);
@@ -304,9 +304,8 @@ public class ChooseRefitDialog extends JDialog {
         txtNewUnit = new JTextPane();
         txtNewUnit.setEditable(false);
         txtNewUnit.setContentType("text/html");
-        txtNewUnit.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("txtNewUnit.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        txtNewUnit.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
+              "txtNewUnit.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         scrNewUnit = new JScrollPaneWithSpeed(txtNewUnit);
 
         horizReadoutSplitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrOldUnit, scrNewUnit);
@@ -418,7 +417,13 @@ public class ChooseRefitDialog extends JDialog {
         pack();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ChooseRefitDialog.class);
@@ -537,7 +542,7 @@ public class ChooseRefitDialog extends JDialog {
             model = StringUtility.isNullOrBlank(model) ? "" : " " + model;
             try {
                 MekSummary summary = Utilities.retrieveUnit(chassis + model);
-                Entity refitEn = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                Entity     refitEn = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 if (null != refitEn) {
 
                     Refit kitRefit = new Refit(unit, refitEn, false, false, false);
@@ -594,11 +599,10 @@ public class ChooseRefitDialog extends JDialog {
 
     // region RefitTableModel
     /**
-     * A table model for displaying parts - similar to the one in CampaignGUI, but
-     * not exactly
+     * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
      */
     public class RefitTableModel extends AbstractTableModel {
-        protected String[] columnNames;
+        protected String[]    columnNames;
         protected List<Refit> data;
 
         public final static int COL_MODEL = 0;
@@ -1089,11 +1093,159 @@ public class ChooseRefitDialog extends JDialog {
         public Renderer getRenderer() {
             return new Renderer();
         }
-
         public class Renderer extends DefaultTableCellRenderer {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                     boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setOpaque(true);
+                int actualCol = table.convertColumnIndexToModel(column);
+                setHorizontalAlignment(getAlignment(actualCol));
+
+                return this;
+            }
+        }
+    }
+
+
+
+    // region Steps Model
+
+    public static class RefitStepsListTableModel extends AbstractTableModel {
+        public final static int COL_OLD_NAME = 0;
+        public final static int COL_OLD_LOC = 1;
+        public final static int COL_OLD_QUANTITY = 2;
+        public final static int COL_REFITSTEP_TYPE = 3;
+        public final static int COL_NEW_QUANTITY = 4;
+        public final static int COL_NEW_LOC = 5;
+        public final static int COL_NEW_NAME = 6;
+        public final static int COL_NOTES = 7;
+        public final static int COL_BASETIME = 8;
+        public final static int COL_REFIT_CLASS = 9;
+        public final static int N_COL = 10;
+
+        private List<RefitStep> data;
+
+        public RefitStepsListTableModel() {
+            data = new ArrayList<RefitStep>();
+        }
+
+        public RefitStepsListTableModel(List<RefitStep> parts) {
+            data = parts;
+        }
+
+        public void setData(List<RefitStep> parts) {
+            data = parts;
+            fireTableDataChanged();
+        }
+
+        @Override
+        public int getRowCount() {
+            return data.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return N_COL;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            return switch (column) {
+                case COL_OLD_NAME -> "Old Item";
+                case COL_NEW_NAME -> "New Item";
+                case COL_REFITSTEP_TYPE -> "Step Type";
+                case COL_OLD_LOC -> "Old Location";
+                case COL_NEW_LOC -> "New Location";
+                case COL_OLD_QUANTITY -> "Old #";
+                case COL_NEW_QUANTITY -> "New #";
+                case COL_NOTES -> "Notes";
+                case COL_BASETIME -> "Base Time";
+                case COL_REFIT_CLASS -> "Refit Class";
+                default -> "?";
+            };
+        }
+
+        @Override
+        public Object getValueAt(int row, int col) {
+            RefitStep refitStep;
+            if (data.isEmpty()) {
+                return "";
+            } else {
+                refitStep = (RefitStep) data.get(row);
+            }
+
+            return switch(col) {
+                case COL_OLD_NAME -> "<html><nobr>" + refitStep.getOldPartName() + "</nobr></html>";
+                case COL_NEW_NAME -> "<html><nobr>" + refitStep.getNewPartName() + "</nobr></html>";
+                case COL_REFIT_CLASS -> refitStep.getRefitClass().toShortName();
+                case COL_OLD_LOC -> refitStep.getOldLocName();
+                case COL_NEW_LOC -> refitStep.getNewLocName();
+                case COL_OLD_QUANTITY -> {
+                        if(!refitStep.getOldPartName().isEmpty()) {
+                            yield refitStep.getOldQuantity() != 1 ? refitStep.getOldQuantity() : "";
+                        } else {
+                            yield "";
+                        }}
+                case COL_NEW_QUANTITY -> {
+                        if(!refitStep.getNewPartName().isEmpty()) {
+                            yield refitStep.getNewQuantity() != 1 ? refitStep.getNewQuantity() : "";
+                        } else {
+                            yield "";
+                        }}
+                case COL_BASETIME -> makeRefitTimeDisplay(refitStep.getBaseTime());
+                case COL_REFITSTEP_TYPE -> refitStep.getType().toName();
+                case COL_NOTES -> (null != refitStep.getNotes() && !refitStep.getNotes().isBlank()) ? "!!!" : "";
+                default -> "?";
+            };
+        }
+
+        /*
+        public Part getPartAt(int row) {
+            return ((Part) data.get(row));
+        }
+        */
+
+        public int getColumnWidth(int c) {
+            return switch (c) {
+                case COL_OLD_NAME, COL_NEW_NAME -> 180;
+                case COL_REFITSTEP_TYPE -> 60;
+                case COL_OLD_LOC, COL_NEW_LOC -> 60;
+                case COL_OLD_QUANTITY, COL_NEW_QUANTITY -> 20;
+                case COL_BASETIME, COL_REFIT_CLASS -> 20;
+                case COL_NOTES -> 20;
+                default -> 3;
+            };
+        }
+
+        public int getAlignment(int col) {
+            return switch (col) {
+                case COL_BASETIME -> SwingConstants.RIGHT;
+                case COL_REFIT_CLASS, COL_OLD_QUANTITY, COL_NEW_QUANTITY, COL_NOTES -> SwingConstants.CENTER;
+                default -> SwingConstants.LEFT;
+            };
+        }
+
+        public String getTooltip(int row, int col) {
+            RefitStep step;
+            if (data.isEmpty()) {
+                return "";
+            } else {
+                step = data.get(row);
+            }
+            return switch (col) {
+                case COL_NOTES -> step.getNotes();
+                default -> null;
+            };
+        }
+
+        public Renderer getRenderer() {
+            return new Renderer();
+        }
+
+        public class Renderer extends DefaultTableCellRenderer {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setOpaque(true);
                 int actualCol = table.convertColumnIndexToModel(column);
@@ -1130,9 +1282,9 @@ public class ChooseRefitDialog extends JDialog {
     public static class FormattedNumberSorter implements Comparator<String> {
         @Override
         public int compare(String s0, String s1) {
-            // lets find the weight class integer for each name
+            // let's find the weight class integer for each name
             DecimalFormat format = new DecimalFormat();
-            int l0 = 0;
+            int           l0     = 0;
             try {
                 l0 = format.parse(s0).intValue();
             } catch (ParseException e) {

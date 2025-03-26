@@ -34,7 +34,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ResourceBundle;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -59,21 +58,21 @@ public class EditAssetDialog extends JDialog {
 
     private Asset asset;
 
-    private JButton btnClose;
-    private JButton btnOK;
-    private JTextField txtName;
-    private JMoneyTextField assetValueField;
-    private JMoneyTextField assetIncomeField;
+    private JButton                   btnClose;
+    private JButton                   btnOK;
+    private JTextField                txtName;
+    private JMoneyTextField           assetValueField;
+    private JMoneyTextField           assetIncomeField;
     private MMComboBox<FinancialTerm> choiceSchedule;
     boolean cancelled;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditAssetDialog",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
 
     public EditAssetDialog(final JFrame frame, final Asset asset) {
         super(frame, true);
         this.asset = asset;
-        cancelled = false;
+        cancelled  = false;
         initComponents();
         setLocationRelativeTo(frame);
         setUserPreferences();
@@ -84,32 +83,32 @@ public class EditAssetDialog extends JDialog {
         getContentPane().setLayout(new GridBagLayout());
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel(resourceMap.getString("labelName.text")), gridBagConstraints);
 
         txtName = new JTextField();
         txtName.setText(asset.getName());
         txtName.setMinimumSize(new Dimension(150, 28));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(txtName, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel(resourceMap.getString("labelValue.text")), gridBagConstraints);
 
         assetValueField = new JMoneyTextField();
@@ -117,22 +116,22 @@ public class EditAssetDialog extends JDialog {
         assetValueField.setToolTipText(resourceMap.getString("assetValueField.toolTipText"));
         assetValueField.setName("assetValueField");
         assetValueField.setMinimumSize(new Dimension(150, 28));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(assetValueField, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 2;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel(resourceMap.getString("labelIncome.text")), gridBagConstraints);
 
         assetIncomeField = new JMoneyTextField();
@@ -140,34 +139,34 @@ public class EditAssetDialog extends JDialog {
         assetIncomeField.setToolTipText(resourceMap.getString("assetIncomeField.toolTipText"));
         assetIncomeField.setName("assetIncomeField");
         assetIncomeField.setMinimumSize(new Dimension(150, 28));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 2;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(assetIncomeField, gridBagConstraints);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 3;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Income Schedule:"), gridBagConstraints);
 
         choiceSchedule = new MMComboBox<>("choiceSchedule", FinancialTerm.values());
         choiceSchedule.setSelectedItem(asset.getFinancialTerm());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 3;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weightx   = 1.0;
+        gridBagConstraints.fill      = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(choiceSchedule, gridBagConstraints);
 
         btnOK = new JButton();
@@ -175,12 +174,12 @@ public class EditAssetDialog extends JDialog {
         btnOK.setActionCommand(resourceMap.getString("btnOK.actionCommand"));
         btnOK.setName("btnOK");
         btnOK.addActionListener(this::btnOKActionPerformed);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 0;
+        gridBagConstraints.gridy     = 4;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.EAST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(btnOK, gridBagConstraints);
 
         btnClose = new JButton();
@@ -188,18 +187,24 @@ public class EditAssetDialog extends JDialog {
         btnClose.setActionCommand(resourceMap.getString("btnClose.actionCommand"));
         btnClose.setName("btnClose");
         btnClose.addActionListener(this::btnCloseActionPerformed);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints           = new GridBagConstraints();
+        gridBagConstraints.gridx     = 1;
+        gridBagConstraints.gridy     = 4;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor    = GridBagConstraints.WEST;
+        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
         getContentPane().add(btnClose, gridBagConstraints);
 
         pack();
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditAssetDialog.class);

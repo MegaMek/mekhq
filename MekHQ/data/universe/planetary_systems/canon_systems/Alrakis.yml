@@ -3,9 +3,11 @@ sucsId: 91
 xcood: -19.908
 ycood: 81.891
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K0V
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2402-01-06'
     zenithCharge: yes
@@ -34,28 +36,32 @@ planet:
       value: Alrakis
     type: TERRESTRIAL
     orbitalDist: 0.56
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green6
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.24
-    diameter: 14395
-    density: 6.031729184728
+    diameter: 14421
+    density: 6.042675820116
     dayLength: 24
     yearLength: 1.0
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 43
     water:
-      source: canon
+      source: MWDA world profiles
       value: 67
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: BIRD
     desc: Alrakis is a comfortable temperate planet with large deposits of metal ores
       in the mountain ranges that cross the planet’s continents and three of the planet’s
@@ -71,34 +77,44 @@ planet:
       had been reduced to levels that allowed for further safe inhabitation of Alrakis.
     landmass:
       - name:
-          source: canon
-          value: Skopje
-        capital:
-          source: canon
-          value: Sigmundrac
-      - name:
-          source: canon
-          value: Strumm
-      - name:
-          source: canon
+          source: MWDA world profiles
           value: Kabast
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Ronigawa
+      - name:
+          source: MWDA world profiles
+          value: Skopje
+        capital:
+          source: MWDA world profiles
+          value: Sigmundrac
+      - name:
+          source: MWDA world profiles
+          value: Strumm
     satellite:
-      - name: Cassius
+      - name:
+          source: MWDA world profiles
+          value: Cassius
         size: medium
         icon: rock7
-      - name: Delvia
+      - name:
+          source: MWDA world profiles
+          value: Delvia
         size: medium
         icon: rock1
-      - name: Fermosa
+      - name:
+          source: MWDA world profiles
+          value: Fermosa
         size: medium
         icon: rock3
-      - name: Weir
+      - name:
+          source: MWDA world profiles
+          value: Weir
         size: medium
         icon: oddmoon1
-      - name: Zalazar
+      - name:
+          source: MWDA world profiles
+          value: Zalazar
         size: large
         icon: rock10
     event:

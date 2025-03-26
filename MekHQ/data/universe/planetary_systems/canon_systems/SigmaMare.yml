@@ -3,9 +3,11 @@ sucsId: 2333
 xcood: 6.456
 ycood: -314.937
 spectralType:
-  source: canon
+  source: House Liao, pg. 136
   value: G9V
-primarySlot: 4
+primarySlot:
+  source: House Liao, pg. 136
+  value: 4
 event:
   - date: '2414-09-27'
     nadirCharge: yes
@@ -64,7 +66,9 @@ planet:
       value: Sigma Mare
     type: TERRESTRIAL
     orbitalDist: 0.56
-    sysPos: 4
+    sysPos:
+      source: House Liao, pg. 136
+      value: 4
     icon: green28
     pressure: HIGH
     atmosphere: BREATHABLE
@@ -77,7 +81,7 @@ planet:
     temperature: 39
     water: 41
     lifeForm:
-      source: canon
+      source: House Liao, pg. 136
       value: MAMMAL
     desc: Sigma Mare is a small, cold and inhospitable world that has been the center
       for geophysical/terraforming research for centuries. During this time Capellan

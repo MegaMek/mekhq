@@ -5,7 +5,9 @@ ycood: 59.926
 spectralType:
   source: canon
   value: G8III
-primarySlot: 4
+primarySlot:
+  source: FedCom Civil War, pg. 203
+  value: 4
 planet:
   - name: Hogan
     type: ICE_GIANT
@@ -74,28 +76,32 @@ planet:
       value: Marduk
     type: TERRESTRIAL
     orbitalDist: 1.28
-    sysPos: 4
+    sysPos:
+      source: FedCom Civil War, pg. 203
+      value: 4
     icon: green47
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 203
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 203
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 203
       value: 1.0
-    diameter: 12472
-    density: 5.627965909997
+    diameter: 12479
+    density: 5.6313309147
     dayLength: 20
     yearLength: 1.7
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 203
       value: 45
     water:
-      source: canon
+      source: FedCom Civil War, pg. 203
       value: 60
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 203
       value: REPTILE
     desc: |-
       Marduk is a comfortable planet with a temperate climate, mild weather, fertile land and a vast array of forests and jungles. The planet originally attracted settlers to farm the large tracts of arable land, however just prior to the formation of the Star League large deposits of minerals and ores were discovered and led to a change in the planet’s economy from agriculture to mining and soon after to heavy industry, including a large sprawling ‘Mech factory. While the planet, specifically the factories, were targeted many times during the Succession Wars, they were never destroyed and continued to churn out ‘Mechs even though the planet changed hands between the Federated Suns and the Draconis Combine several times.
@@ -104,19 +110,21 @@ planet:
       Norse BattleMech Works
     landmass:
       - name:
-          source: canon
-          value: Tiller
-        capital:
-          source: canon
-          value: New Pontiac
-      - name:
-          source: canon
+          source: FedCom Civil War, pg. 203
           value: Aileen
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 203
           value: Latvia
+      - name:
+          source: FedCom Civil War, pg. 203
+          value: Tiller
+        capital:
+          source: FedCom Civil War, pg. 203
+          value: Mystique Bay
     satellite:
-      - name: Kafuffle
+      - name:
+          source: FedCom Civil War, pg. 203
+          value: Kafuffle
         size: medium
         icon: rock17
     event:

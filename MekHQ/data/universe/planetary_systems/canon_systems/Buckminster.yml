@@ -3,9 +3,11 @@ sucsId: 414
 xcood: 17.582
 ycood: 154.653
 spectralType:
-  source: canon
+  source: House Kurita
   value: A9III
-primarySlot: 6
+primarySlot:
+  source: House Kurita
+  value: 6
 event:
   - date: '2394-01-20'
     zenithCharge: yes
@@ -125,7 +127,9 @@ planet:
       value: Buckminster
     type: TERRESTRIAL
     orbitalDist: 4.76
-    sysPos: 6
+    sysPos:
+      source: House Kurita
+      value: 6
     icon: green43
     pressure:
       source: canon
@@ -146,7 +150,7 @@ planet:
       source: canon
       value: 62
     lifeForm:
-      source: canon
+      source: House Kurita
       value: INSECT
     desc: Buckminster is an agricultural world that is considered one the Draconis
       Combines' top producers of foodstuffs. The world is also a highly advanced and
@@ -169,7 +173,7 @@ planet:
           value: Buckminster City
       - name:
           source: canon
-          value: Richard’s Rock
+          value: Richard's Rock
       - name:
           source: canon
           value: Storm

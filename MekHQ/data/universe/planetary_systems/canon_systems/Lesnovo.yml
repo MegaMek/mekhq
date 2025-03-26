@@ -3,9 +3,11 @@ sucsId: 1483
 xcood: -315.4
 ycood: -266.86
 spectralType:
-  source: canon
+  source: House Marik, pg. 159
   value: G4III
-primarySlot: 3
+primarySlot:
+  source: House Marik, pg. 159
+  value: 3
 event:
   - date: '2658-08-03'
     zenithCharge: yes
@@ -49,7 +51,9 @@ planet:
       value: Lesnovo
     type: TERRESTRIAL
     orbitalDist: 1.44
-    sysPos: 3
+    sysPos:
+      source: House Marik, pg. 159
+      value: 3
     icon: green27
     pressure:
       source: canon
@@ -70,7 +74,7 @@ planet:
       source: canon
       value: 68
     lifeForm:
-      source: canon
+      source: House Marik, pg. 159
       value: PLANT
     desc: Lesnovo is a poor world on the Free Worlds League Periphery border. The
       primary industry is agriculture, unfortunately the planet barely produces enough

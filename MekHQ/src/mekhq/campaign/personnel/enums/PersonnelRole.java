@@ -27,20 +27,20 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
-import mekhq.MekHQ;
-
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+
 /**
- * The PersonnelRole enum represents various roles a person can have.
- * Each role is associated with a name, an optional clan name, and a mnemonic key event.
- * These roles can be used to classify personnel.
+ * The PersonnelRole enum represents various roles a person can have. Each role is associated with a name, an optional
+ * clan name, and a mnemonic key event. These roles can be used to classify personnel.
  */
 public enum PersonnelRole {
     // region Enum Declarations
@@ -85,6 +85,7 @@ public enum PersonnelRole {
     // endregion Variable Declarations
 
     // region Constructors
+
     /**
      * Constructs a new PersonnelRole with the given name and mnemonic.
      *
@@ -96,15 +97,16 @@ public enum PersonnelRole {
     }
 
     /**
-     * Main constructor that initializes the role with name, clanName, and mnemonic.
-     * ClanName is optional and defaults to name if {@code null}.
-     * @param name the name of the role.
+     * Main constructor that initializes the role with name, clanName, and mnemonic. ClanName is optional and defaults
+     * to name if {@code null}.
+     *
+     * @param name     the name of the role.
      * @param clanName the clan name of the role can be {@code null}.
      * @param mnemonic the mnemonic associated with the role.
      */
     PersonnelRole(final String name, @Nullable final String clanName, final int mnemonic) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.clanName = (clanName == null) ? this.name : resources.getString(clanName);
         this.mnemonic = mnemonic;
@@ -122,29 +124,30 @@ public enum PersonnelRole {
     // endregion Getters
 
     // region Boolean Comparison Methods
+
     /**
      * @return {@code true} if the personnel has the Mek Warrior role, {@code false} otherwise.
      */
     public boolean isMekWarrior() {
         return this == MEKWARRIOR;
     }
+
     /**
      * @return {@code true} if the personnel has the LAM Pilot role, {@code false} otherwise.
      */
     public boolean isLAMPilot() {
         return this == LAM_PILOT;
     }
+
     /**
-     * @return {@code true} if the personnel has the Ground Vehicle Driver role, {@code false}
-     * otherwise.
+     * @return {@code true} if the personnel has the Ground Vehicle Driver role, {@code false} otherwise.
      */
     public boolean isGroundVehicleDriver() {
         return this == GROUND_VEHICLE_DRIVER;
     }
 
     /**
-     * @return {@code true} if the personnel has the Naval Vehicle Driver role, {@code false}
-     * otherwise.
+     * @return {@code true} if the personnel has the Naval Vehicle Driver role, {@code false} otherwise.
      */
     public boolean isNavalVehicleDriver() {
         return this == NAVAL_VEHICLE_DRIVER;
@@ -179,8 +182,7 @@ public enum PersonnelRole {
     }
 
     /**
-     * @return {@code true} if the personnel has the Conventional Aircraft Pilot role, {@code false}
-     * otherwise.
+     * @return {@code true} if the personnel has the Conventional Aircraft Pilot role, {@code false} otherwise.
      */
     public boolean isConventionalAircraftPilot() {
         return this == CONVENTIONAL_AIRCRAFT_PILOT;
@@ -331,9 +333,21 @@ public enum PersonnelRole {
      */
     public boolean isCombat() {
         return switch (this) {
-            case MEKWARRIOR, LAM_PILOT, GROUND_VEHICLE_DRIVER, NAVAL_VEHICLE_DRIVER, VTOL_PILOT,
-                 VEHICLE_GUNNER, VEHICLE_CREW, AEROSPACE_PILOT, CONVENTIONAL_AIRCRAFT_PILOT,
-                 PROTOMEK_PILOT, BATTLE_ARMOUR, SOLDIER, VESSEL_PILOT, VESSEL_GUNNER, VESSEL_CREW,
+            case MEKWARRIOR,
+                 LAM_PILOT,
+                 GROUND_VEHICLE_DRIVER,
+                 NAVAL_VEHICLE_DRIVER,
+                 VTOL_PILOT,
+                 VEHICLE_GUNNER,
+                 VEHICLE_CREW,
+                 AEROSPACE_PILOT,
+                 CONVENTIONAL_AIRCRAFT_PILOT,
+                 PROTOMEK_PILOT,
+                 BATTLE_ARMOUR,
+                 SOLDIER,
+                 VESSEL_PILOT,
+                 VESSEL_GUNNER,
+                 VESSEL_CREW,
                  VESSEL_NAVIGATOR -> true;
             default -> false;
         };
@@ -347,103 +361,101 @@ public enum PersonnelRole {
     }
 
     /**
-     * @return {@code true} if the character is an Aerospace Pilot or a LAM Pilot, {@code false}
-     * otherwise.
+     * @return {@code true} if the character is an Aerospace Pilot or a LAM Pilot, {@code false} otherwise.
      */
     public boolean isAerospaceGrouping() {
         return isLAMPilot() || isAerospacePilot();
     }
 
     /**
-     * Deprecated in favor of {@code isConventionalAircraftPilot()}
+     * @since 0.50.04
+     * @deprecated use {@code isConventionalAircraftPilot()}
      */
-    @Deprecated
+    @Deprecated(since = "0.50.04")
     public boolean isConventionalAirGrouping() {
         return isConventionalAircraftPilot();
     }
 
     /**
-     * @return {@code true} if the character is assigned to the Ground Vehicle Driver, Vehicle Gunner,
-     * or the Vehicle Crew role, {@code false} otherwise.
+     * @return {@code true} if the character is assigned to the Ground Vehicle Driver, Vehicle Gunner, or the Vehicle
+     *       Crew role, {@code false} otherwise.
      */
     public boolean isGroundVehicleCrew() {
         return isGroundVehicleDriver() || isVehicleGunner() || isVehicleCrew();
     }
 
     /**
-     * @return {@code true} if the character is assigned to the Naval Vehicle Driver, Vehicle Gunner,
-     * or the Vehicle Crew role, {@code false} otherwise.
+     * @return {@code true} if the character is assigned to the Naval Vehicle Driver, Vehicle Gunner, or the Vehicle
+     *       Crew role, {@code false} otherwise.
      */
     public boolean isNavalVehicleCrew() {
         return isNavalVehicleDriver() || isVehicleGunner() || isVehicleCrew();
     }
 
     /**
-     * @return {@code true} if the character is assigned to the VTOL Pilot, Vehicle Gunner, or the
-     * Vehicle Crew role, {@code false} otherwise.
+     * @return {@code true} if the character is assigned to the VTOL Pilot, Vehicle Gunner, or the Vehicle Crew role,
+     *       {@code false} otherwise.
      */
     public boolean isVTOLCrew() {
         return isVTOLPilot() || isVehicleGunner() || isVehicleCrew();
     }
 
     /**
-     * @return {@code true} if the character is assigned to the Ground Vehicle Crew,
-     * Naval Vehicle Crew, or the VTOL Pilot role, {@code false} otherwise.
+     * @return {@code true} if the character is assigned to the Ground Vehicle Crew, Naval Vehicle Crew, or the VTOL
+     *       Pilot role, {@code false} otherwise.
      */
     public boolean isVehicleCrewMember() {
         return isGroundVehicleCrew() || isNavalVehicleDriver() || isVTOLPilot();
     }
 
     /**
-     * @return {@code true} if the character is assigned to the Soldier, or the Battle Armor role,
-     * {@code false} otherwise.
+     * @return {@code true} if the character is assigned to the Soldier, or the Battle Armor role, {@code false}
+     *       otherwise.
      */
     public boolean isSoldierOrBattleArmour() {
         return isSoldier() || isBattleArmour();
     }
 
     /**
-     * @return {@code true} if the character is assigned to the Vessel Pilot, Vessel Gunner,
-     * Vessel Crew, or the Vessel Navigator role, {@code false} otherwise.
+     * @return {@code true} if the character is assigned to the Vessel Pilot, Vessel Gunner, Vessel Crew, or the Vessel
+     *       Navigator role, {@code false} otherwise.
      */
     public boolean isVesselCrewMember() {
         return isVesselPilot() || isVesselGunner() || isVesselCrew() || isVesselNavigator();
     }
 
     /**
-     * @return {@code true} if the character is assigned to a support role, excluding civilian roles,
-     * {@code false} otherwise.
+     * @return {@code true} if the character is assigned to a support role, excluding civilian roles, {@code false}
+     *       otherwise.
      */
     public boolean isSupport() {
         return isSupport(false);
     }
 
     /**
-     * @return {@code true} if the character is assigned to a support role, {@code false} otherwise.
-     *
      * @param excludeCivilian whether to exclude civilian roles
+     *
+     * @return {@code true} if the character is assigned to a support role, {@code false} otherwise.
      */
     public boolean isSupport(final boolean excludeCivilian) {
         return !isCombat() && (!excludeCivilian || !isCivilian());
     }
 
     /**
-     * Checks whether a character is assigned to a technician role.
-     * If checking secondary roles, {@code isTechSecondary} should be used.
+     * Checks whether a character is assigned to a technician role. If checking secondary roles, {@code isTechSecondary}
+     * should be used.
      *
-     * @return {@code true} if the character is assigned to a technician role, {@code false}
-     * otherwise.
+     * @return {@code true} if the character is assigned to a technician role, {@code false} otherwise.
      */
     public boolean isTech() {
         return isMekTech() || isMechanic() || isAeroTek() || isBATech() || isVesselCrew();
     }
 
     /**
-     * Checks whether a character is assigned to a technician role.
-     * If checking primary roles, {@code isTech} should be used.
+     * Checks whether a character is assigned to a technician role. If checking primary roles, {@code isTech} should be
+     * used.
      *
-     * @return {@code true} if the character is assigned to a technician role, {@code false}
-     * otherwise.
+     * @return {@code true} if the character is assigned to a technician role, {@code false} otherwise.
      */
     public boolean isTechSecondary() {
         return isMekTech() || isMechanic() || isAeroTek() || isBATech();
@@ -464,17 +476,17 @@ public enum PersonnelRole {
     }
 
     /**
-     * @return {@code true} if the character is assigned to an Administrative role, {@code false}
-     * otherwise.
+     * @return {@code true} if the character is assigned to an Administrative role, {@code false} otherwise.
      */
     public boolean isAdministrator() {
-        return isAdministratorCommand() || isAdministratorLogistics()
-                || isAdministratorTransport() || isAdministratorHR();
+        return isAdministratorCommand() ||
+                     isAdministratorLogistics() ||
+                     isAdministratorTransport() ||
+                     isAdministratorHR();
     }
 
     /**
-     * @return {@code true} if the character's assigned role is Dependent or None, {@code false}
-     * otherwise.
+     * @return {@code true} if the character's assigned role is Dependent or None, {@code false} otherwise.
      */
     public boolean isCivilian() {
         return isDependent() || isNone();
@@ -482,75 +494,97 @@ public enum PersonnelRole {
     // endregion Boolean Comparison Methods
 
     // region Static Methods
+
+    /**
+     * @deprecated Use {@link #getMarketableRoles()}.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public static List<PersonnelRole> getMilitaryRoles() {
+        return getMarketableRoles();
+    }
+
     /**
      * @return a list of roles that can be included in the personnel market
      */
-    public static List<PersonnelRole> getMilitaryRoles() {
-        return Stream.of(values())
-                .filter(personnelRole -> !personnelRole.isCivilian())
-                .collect(Collectors.toList());
+    public static List<PersonnelRole> getMarketableRoles() {
+        return Stream.of(values()).filter(personnelRole -> !personnelRole.isCivilian()).collect(Collectors.toList());
     }
 
     /**
-     * @return a list of roles that are potential primary roles. Currently, this is
-     *         all bar NONE
+     * @return a list of personnel roles classified as combat roles.
+     */
+    public static List<PersonnelRole> getCombatRoles() {
+        List<PersonnelRole> combatRoles = new ArrayList<>();
+        for (PersonnelRole personnelRole : PersonnelRole.values()) {
+            if (personnelRole.isCombat()) {
+                combatRoles.add(personnelRole);
+            }
+        }
+        return combatRoles;
+    }
+
+    /**
+     * @return a list of personnel roles classified as support (non-combat) roles.
+     */
+    public static List<PersonnelRole> getSupportRoles() {
+        List<PersonnelRole> supportRoles = new ArrayList<>();
+        for (PersonnelRole personnelRole : PersonnelRole.values()) {
+            if (!personnelRole.isCombat()) {
+                supportRoles.add(personnelRole);
+            }
+        }
+        return supportRoles;
+    }
+
+    /**
+     * @return a list of roles that are potential primary roles. Currently, this is all bar NONE
      */
     public static List<PersonnelRole> getPrimaryRoles() {
-        return Stream.of(values())
-                .filter(role -> !role.isNone())
-                .collect(Collectors.toList());
+        return Stream.of(values()).filter(role -> !role.isNone()).collect(Collectors.toList());
     }
 
     /**
-     * @return a list of roles that are considered to be vessel (as in spacecraft)
-     *         crew members
+     * @return a list of roles that are considered to be vessel (as in spacecraft) crew members
      */
     public static List<PersonnelRole> getVesselRoles() {
-        return Stream.of(values())
-                .filter(PersonnelRole::isVesselCrewMember)
-                .collect(Collectors.toList());
+        return Stream.of(values()).filter(PersonnelRole::isVesselCrewMember).collect(Collectors.toList());
     }
 
     /**
      * @return a list of roles that are considered to be techs
      */
     public static List<PersonnelRole> getTechRoles() {
-        return Stream.of(values())
-                .filter(PersonnelRole::isTech)
-                .collect(Collectors.toList());
+        return Stream.of(values()).filter(PersonnelRole::isTech).collect(Collectors.toList());
     }
 
     /**
      * @return a list of all roles that are considered to be administrators
      */
     public static List<PersonnelRole> getAdministratorRoles() {
-        return Stream.of(values())
-                .filter(PersonnelRole::isAdministrator)
-                .collect(Collectors.toList());
+        return Stream.of(values()).filter(PersonnelRole::isAdministrator).collect(Collectors.toList());
     }
 
     /**
      * @return the number of civilian roles
      */
     public static int getCivilianCount() {
-        return Math.toIntExact(Stream.of(values())
-                .filter(PersonnelRole::isCivilian)
-                .count());
+        return Math.toIntExact(Stream.of(values()).filter(PersonnelRole::isCivilian).count());
     }
     // endregion Static Methods
 
     /**
-     * Parses a string representation of a {@link PersonnelRole} and returns the corresponding enum
-     * value.
+     * Parses a string representation of a {@link PersonnelRole} and returns the corresponding enum value.
      *
      * @param personnelRole the string representation of the {@link PersonnelRole}
+     *
      * @return the corresponding {@link PersonnelRole} enum value, or {@code NONE} if parsing fails
      */
     // region File I/O
     public static PersonnelRole parseFromString(final String personnelRole) {
         try {
             return valueOf(personnelRole);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         // Magic Number Save Format
         try {
@@ -614,7 +648,8 @@ public enum PersonnelRole {
                 default:
                     break;
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         // <50.1 compatibility
         switch (personnelRole) {
@@ -630,21 +665,22 @@ public enum PersonnelRole {
             case "AERO_TECH" -> {
                 return AERO_TEK;
             }
-            default -> {}
+            default -> {
+            }
         }
 
         // Error report, if parsing fails.
-        // Ignore IDEA's suggestion of concatenating the error log, as this functionality doesn't
+        // Ignore IDEA's suggestion of concatenating the error log, as this
+        // functionality doesn't
         // exist within MMLogger
         MMLogger.create(PersonnelRole.class)
-                .error("Unable to parse " + personnelRole + " into a PersonnelRole. Returning NONE.");
+              .error("Unable to parse {} into a PersonnelRole. Returning {}.", personnelRole, NONE);
         return NONE;
     }
     // endregion File I/O
 
     /**
-     * This method is not recommended to be used in MekHQ, but is provided for non-specified
-     * utilization
+     * This method is not recommended to be used in MekHQ, but is provided for non-specified utilization
      *
      * @return the base name of this role, without applying any overrides
      */

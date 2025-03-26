@@ -5,7 +5,9 @@ ycood: -473.209
 spectralType:
   source: canon
   value: G3V
-primarySlot: 4
+primarySlot:
+  source: Periphery (1ed), pg. 103
+  value: 4
 event:
   - date: '2627-03-28'
     zenithCharge: yes
@@ -63,7 +65,9 @@ planet:
       value: Hardcore
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 4
+    sysPos:
+      source: Periphery (1ed), pg. 103
+      value: 4
     icon: green8
     pressure: HIGH
     atmosphere: BREATHABLE
@@ -76,8 +80,8 @@ planet:
     temperature: 42
     water: 28
     lifeForm:
-      source: canon
-      value: BIRD
+      source: Periphery (1ed), pg. 103
+      value: MAMMAL
     desc: |-
       3025 - Hardcore is one of the Magistracy's most successful entertainment centers and the pleasure planet caters to the elite of Canopian society, as well as numerous wealth Inner Sphere clients. The planet is home to over 75,000 full-time entertainers of nearly every conceivable type of entertainment or pleasure a tourist could dream of and serves over ten-million visitors annually. Hardcore is a warm temperate world with beautiful beaches and landscapes.
 

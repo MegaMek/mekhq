@@ -3,9 +3,11 @@ sucsId: 890
 xcood: 20.928
 ycood: 5.382
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: A3V
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2358-07-13'
     nadirCharge: yes
@@ -49,28 +51,32 @@ planet:
       value: Fomalhaut
     type: TERRESTRIAL
     orbitalDist: 6.72
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: wet13
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: HIGH
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.11
-    diameter: 11969
-    density: 6.491795686283
+    diameter: 11993
+    density: 6.504566349089
     dayLength: 20
     yearLength: 17.5
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 26
     water:
-      source: canon
+      source: MWDA world profiles
       value: 92
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: AMPHIBIAN
     desc: 3135 - The first colonists to Fomalhaut saw a world blessed with an unlimited
       water supply and lush semi-tropical forestlands. Only a pair of small landmasses—Oanhu
@@ -101,22 +107,28 @@ planet:
       distract the liberating forces.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Lyria
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Oanhu
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Lollanda
     satellite:
-      - name: Cryos
+      - name:
+          source: MWDA world profiles
+          value: Cryos
         size: large
         icon: rock14
-      - name: Iolius
+      - name:
+          source: MWDA world profiles
+          value: Iolius
         size: medium
         icon: rock5
-      - name: Scarlet
+      - name:
+          source: MWDA world profiles
+          value: Scarlet
         size: large
         icon: rock4
     event:

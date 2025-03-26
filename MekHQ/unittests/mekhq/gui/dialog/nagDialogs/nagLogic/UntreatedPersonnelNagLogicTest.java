@@ -27,8 +27,18 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
+import static mekhq.campaign.personnel.SkillType.S_DOCTOR;
+import static mekhq.campaign.personnel.enums.PersonnelRole.DOCTOR;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UntreatedPersonnelNagLogic.campaignHasUntreatedInjuries;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+
+import java.util.List;
+
 import megamek.common.EquipmentType;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -39,13 +49,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static mekhq.gui.dialog.nagDialogs.nagLogic.UntreatedPersonnelNagLogic.campaignHasUntreatedInjuries;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-
 /**
  * This class contains test methods for the {@link UntreatedPersonnelNagDialog} class.
  * It tests the different combinations of untreated personnel and verifies the behavior of the
@@ -55,6 +58,7 @@ class UntreatedPersonnelNagLogicTest {
     Campaign campaign;
     Person injuredPerson;
     Person uninjuredPerson;
+    Person doctor;
 
     /**
      * Sets up the necessary dependencies and configurations before running the test methods.
@@ -81,6 +85,9 @@ class UntreatedPersonnelNagLogicTest {
         injuredPerson = new Person(campaign);
         injuredPerson.setHits(1);
         uninjuredPerson = new Person(campaign);
+        doctor = new Person(campaign);
+        doctor.addSkill(S_DOCTOR, 5, 0);
+        doctor.setPrimaryRole(campaign, DOCTOR);
     }
 
     // In the following tests the isUntreatedInjury() method is called, and its response is checked
@@ -88,11 +95,23 @@ class UntreatedPersonnelNagLogicTest {
 
     @Test
     public void isUntreatedInjuryTest() {
-        assertTrue(campaignHasUntreatedInjuries(List.of(injuredPerson)));
+        assertTrue(campaignHasUntreatedInjuries(List.of(injuredPerson), 0));
     }
 
     @Test
     public void isNoUntreatedInjuryTest() {
-        assertFalse(campaignHasUntreatedInjuries(List.of(uninjuredPerson)));
+        assertFalse(campaignHasUntreatedInjuries(List.of(uninjuredPerson), 0));
+    }
+
+    @Test
+    public void isAboveDoctorThresholdTest() {
+        MekHQ.getMHQOptions().setNewDayOptimizeMedicalAssignments(true);
+        assertTrue(campaignHasUntreatedInjuries(List.of(injuredPerson), 0));
+    }
+
+    @Test
+    public void isBelowDoctorThresholdTest() {
+        MekHQ.getMHQOptions().setNewDayOptimizeMedicalAssignments(true);
+        assertFalse(campaignHasUntreatedInjuries(List.of(injuredPerson, doctor), 25));
     }
 }

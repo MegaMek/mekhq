@@ -3,9 +3,11 @@ sucsId: 2085
 xcood: 317.971
 ycood: 358.116
 spectralType:
-  source: canon
+  source: House Kurita
   value: G0IV
-primarySlot: 3
+primarySlot:
+  source: House Kurita
+  value: 3
 event:
   - date: '2700-12-21'
     nadirCharge: yes
@@ -49,7 +51,9 @@ planet:
       value: Qandahar
     type: TERRESTRIAL
     orbitalDist: 3.08
-    sysPos: 3
+    sysPos:
+      source: House Kurita
+      value: 3
     icon: green52
     pressure:
       source: canon
@@ -70,7 +74,7 @@ planet:
       source: canon
       value: 71
     lifeForm:
-      source: canon
+      source: House Kurita
       value: MAMMAL
     desc: Qandahar was settled for its vast natural resources. Unfortunately, the
       early settlers did not restrain the output of their factories and as a result
@@ -92,7 +96,7 @@ planet:
           source: canon
           value: Cordell
         capital:
-          source: canon
+          source: House Kurita
           value: Fair Weather
       - name:
           source: canon

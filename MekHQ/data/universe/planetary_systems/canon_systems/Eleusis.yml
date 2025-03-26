@@ -3,9 +3,11 @@ sucsId: 788
 xcood: -166.519
 ycood: -341.994
 spectralType:
-  source: canon
+  source: House Marik, pg. 163
   value: K4II
-primarySlot: 6
+primarySlot:
+  source: House Marik, pg. 163
+  value: 6
 event:
   - date: '2379-08-19'
     zenithCharge: yes
@@ -97,7 +99,9 @@ planet:
       value: Eleusis
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 6
+    sysPos:
+      source: House Marik, pg. 163
+      value: 6
     icon: green44
     pressure: HIGH
     atmosphere: BREATHABLE
@@ -110,7 +114,7 @@ planet:
     temperature: 31
     water: 67
     lifeForm:
-      source: canon
+      source: House Marik, pg. 163
       value: PLANT
     desc: |-
       Eleusis is located on the Free Worlds League Periphery border and the planet is known for its abundance of lakes. The lakes are a combination of naturally occurring and man-made. The Sultan of Eleusis in 2366 dictated the creation of many man-made lakes that expanded the natural lakes to cover large distances of the planet in patterns visible from orbit.

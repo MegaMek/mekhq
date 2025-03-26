@@ -5,7 +5,9 @@ ycood: -50.974
 spectralType:
   source: canon
   value: G1V
-primarySlot: 2
+primarySlot:
+  source: House Liao, pg. 139
+  value: 2
 event:
   - date: '2364-11-01'
     nadirCharge: yes
@@ -34,7 +36,9 @@ planet:
       value: Chisholm
     type: TERRESTRIAL
     orbitalDist: 1.6
-    sysPos: 2
+    sysPos:
+      source: House Liao, pg. 139
+      value: 2
     icon: green26
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -47,7 +51,7 @@ planet:
     temperature: 15
     water: 49
     lifeForm:
-      source: canon
+      source: House Liao, pg. 139
       value: PLANT
     desc: |-
       Originally called Chisholm, Elgin was a commercial trading centre for Terra and the various independent worlds of the Capellan Zone. The planet was absorbed into the Tikonov Grand Union and then the Capellan Confederation. The planet was renamed after Captain Edward T. Elgin, for his heroic actions in defending the planet against a Free World League attack in 2878.
@@ -339,10 +343,7 @@ planet:
           value:
             - CC
       - date: '2108-12-05'
-        name: Chisholm
       - date: '2878-01-01'
-        name: Elgin
-        message: Chisholm renamed to Elgin
   - name: Avalon
     type: TERRESTRIAL
     orbitalDist: 1.0

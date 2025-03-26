@@ -3,9 +3,11 @@ sucsId: 1161
 xcood: 268.824
 ycood: -354.187
 spectralType:
-  source: canon
+  source: House Davion
   value: A4IV
-primarySlot: 5
+primarySlot:
+  source: House Davion
+  value: 5
 event:
   - date: '2386-06-25'
     zenithCharge: yes
@@ -82,7 +84,9 @@ planet:
       value: Hyalite
     type: TERRESTRIAL
     orbitalDist: 10.92
-    sysPos: 5
+    sysPos:
+      source: House Davion
+      value: 5
     icon: green43
     pressure: HIGH
     atmosphere: BREATHABLE
@@ -95,7 +99,7 @@ planet:
     temperature: 24
     water: 49
     lifeForm:
-      source: canon
+      source: House Davion
       value: REPTILE
     desc: 'Hyalite is a nearly backwater world near the Federated Suns’ Periphery
       border. Hyalite was originally settled for its rich gemstone and chemical deposits.

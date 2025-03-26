@@ -3,37 +3,43 @@ sucsId: 3139
 xcood: 576.252
 ycood: 526.423
 spectralType:
-  source: canon
+  source: Interstellar Players, pg. 111
   value: G2V
-primarySlot: 1
+primarySlot:
+  source: Interstellar Players, pg. 111
+  value: 1
 planet:
   - name:
       source: canon
       value: Trondheim (JF)
     type: TERRESTRIAL
     orbitalDist: 0.7
-    sysPos: 1
+    sysPos:
+      source: Interstellar Players, pg. 111
+      value: 1
     icon: green28
     pressure:
-      source: canon
+      source: Interstellar Players, pg. 111
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: Interstellar Players, pg. 111
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: Interstellar Players, pg. 111
       value: 1.06
-    diameter: 12458
-    density: 5.987176876522
+    diameter: 12450
+    density: 5.983333141019
     dayLength: 22
     yearLength: 1.2
     temperature:
-      source: canon
+      source: Interstellar Players, pg. 111
       value: 28
     water:
-      source: canon
+      source: Interstellar Players, pg. 111
       value: 72
     lifeForm:
-      source: canon
+      source: Interstellar Players, pg. 111
       value: PLANT
     desc: Trondheim is the second most populated world in the small JarnFolk nation
       and the most industrialized. The planet is the main venue for both dropship
@@ -48,12 +54,16 @@ planet:
           source: canon
           value: Narvik
     satellite:
-      - name: Trollvegn
-        size: medium
-        icon: rock8
-      - name: Glittertindane
+      - name:
+          source: Interstellar Players, pg. 111
+          value: Glittertindane
         size: large
         icon: rock9
+      - name:
+          source: Interstellar Players, pg. 111
+          value: Trollvegn
+        size: medium
+        icon: rock8
     event:
       - date: '2504-12-22'
         faction:

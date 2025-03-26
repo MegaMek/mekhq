@@ -27,41 +27,35 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import mekhq.MHQConstants;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog;
-
+import static mekhq.MHQConstants.NAG_SHORT_DEPLOYMENT;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.DeploymentShortfallNagLogic.hasDeploymentShortfall;
 
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
+
 /**
- * A nag dialog that alerts the user if short deployments are detected in the campaign's active contracts.
+ * A dialog class used to notify players about deployment shortfalls in their campaign.
  *
- * <p>
- * This dialog checks whether any active AtB (Against the Bot) contracts have a deployment deficit
- * and alerts the player to address the issue. The check is performed weekly (on Sundays) and only
- * when the campaign is currently located on a planet. If deployment requirements are not met,
- * the dialog is displayed to prompt the user to correct the situation.
- * </p>
+ * <p>The {@code DeploymentShortfallNagDialog} extends {@link ImmersiveDialogNag} and provides
+ * a specialized nag dialog designed to alert players when deployment shortfalls occur. It uses predefined parameters,
+ * such as the {@code NAG_SHORT_DEPLOYMENT} constant, and no specific specialization for its speaker, allowing for a
+ * default fallback during dialog creation.</p>
  */
-public class DeploymentShortfallNagDialog extends AbstractMHQNagDialog {
+public class DeploymentShortfallNagDialog extends ImmersiveDialogNag {
     /**
-     * Constructs the shortfall deployment nag dialog for a given campaign.
+     * Constructs a new {@code DeploymentShortfallNagDialog} instance to display the deployment shortfall nag dialog.
      *
-     * <p>
-     * This constructor initializes the dialog with the specified campaign and
-     * formats the resource message to display information about deployment shortfalls.
-     * </p>
+     * <p>This constructor initializes the nag dialog without a specific specialization, allowing the fallback
+     * mechanism to determine the appropriate speaker. The {@code NAG_SHORT_DEPLOYMENT} constant is used to manage
+     * dialog suppression, and the {@code "DeploymentShortfallNagDialog"} message key is utilized to retrieve localized
+     * content.</p>
      *
-     * @param campaign The {@link Campaign} object representing the current campaign.
+     * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data and
+     *                 settings required for dialog construction.
      */
     public DeploymentShortfallNagDialog(final Campaign campaign) {
-        super(campaign, MHQConstants.NAG_SHORT_DEPLOYMENT);
-
-        final String DIALOG_BODY = "DeploymentShortfallNagDialog.text";
-        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
-            campaign.getCommanderAddress(false)));
-        showDialog();
+        super(campaign, null, NAG_SHORT_DEPLOYMENT, "DeploymentShortfallNagDialog");
     }
 
     /**
@@ -80,10 +74,8 @@ public class DeploymentShortfallNagDialog extends AbstractMHQNagDialog {
      * @return {@code true} if the nag dialog should be displayed due to deployment shortfalls; {@code false} otherwise.
      */
     public static boolean checkNag(boolean isUseAtB, Campaign campaign) {
-        final String NAG_KEY = MHQConstants.NAG_SHORT_DEPLOYMENT;
+        final String NAG_KEY = NAG_SHORT_DEPLOYMENT;
 
-        return isUseAtB
-              && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-              && hasDeploymentShortfall(campaign);
+        return isUseAtB && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) && hasDeploymentShortfall(campaign);
     }
 }

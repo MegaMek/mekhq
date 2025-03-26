@@ -3,9 +3,11 @@ sucsId: 2458
 xcood: -57.92
 ycood: 39.147
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: F6V
-primarySlot: 4
+primarySlot:
+  source: MWDA world profiles
+  value: 4
 event:
   - date: '2377-10-27'
     nadirCharge: yes
@@ -67,28 +69,32 @@ planet:
       value: Syrma
     type: TERRESTRIAL
     orbitalDist: 2.08
-    sysPos: 4
+    sysPos:
+      source: MWDA world profiles
+      value: 4
     icon: wet9
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.84
-    diameter: 13337
-    density: 4.44575144181
+    diameter: 13308
+    density: 4.435948822632
     dayLength: 20
     yearLength: 3.2
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 36
     water:
-      source: canon
+      source: MWDA world profiles
       value: 80
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: REPTILE
     desc: A water-rich world with a host of natural resources, Syrma was a dream world
       for colonial developers when it was first discovered during mankind‘s early
@@ -138,7 +144,7 @@ planet:
           source: canon
           value: Lothair
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Skopje
       - name:
           source: canon
@@ -146,16 +152,6 @@ planet:
       - name:
           source: canon
           value: Rashida
-    satellite:
-      - name: LH-1
-        size: medium
-        icon: rock13
-      - name: LH-2
-        size: medium
-        icon: rock5
-      - name: LH-3
-        size: medium
-        icon: oddmoon3
     event:
       - date: '2242-12-16'
         faction:

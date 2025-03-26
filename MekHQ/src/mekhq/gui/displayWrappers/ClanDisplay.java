@@ -38,28 +38,32 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * I only exist because of our current Clan/Faction split, and need to be removed alongside Clan.
+ * I only exist because of our current Clan/Faction split, and need to be
+ * removed alongside Clan.
+ *
+ * @deprecated Remove alongside {@link Clan}
+ * @since 0.50.04
  */
-@Deprecated
+@Deprecated(since = "0.50.04")
 public class ClanDisplay {
-    //region Variable Declarations
+    // region Variable Declarations
     private final Clan clan;
     private final String displayName;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public ClanDisplay(final Clan clan, final LocalDate today) {
         this.clan = clan;
         this.displayName = String.format("%s [%s]", getClan().getFullName(today.getYear()),
                 getClan().getCode());
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public Clan getClan() {
         return clan;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
     public static List<ClanDisplay> getSortedClanDisplays(
             final Collection<Clan> clans, final LocalDate today) {

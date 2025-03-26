@@ -3,9 +3,11 @@ sucsId: 1230
 xcood: 175.508
 ycood: -280.246
 spectralType:
-  source: canon
+  source: House Davion
   value: F1V
-primarySlot: 4
+primarySlot:
+  source: House Davion
+  value: 4
 event:
   - date: '2559-10-20'
     zenithCharge: yes
@@ -66,7 +68,9 @@ planet:
       value: Jaipur
     type: TERRESTRIAL
     orbitalDist: 2.56
-    sysPos: 4
+    sysPos:
+      source: House Davion
+      value: 4
     icon: green22
     pressure: STANDARD
     atmosphere: BREATHABLE
@@ -79,7 +83,7 @@ planet:
     temperature: 32
     water: 44
     lifeForm:
-      source: canon
+      source: House Davion
       value: MAMMAL
     desc: Jaipur is a reasonably comfortable planet with enough resources to be successful.
       The planet is on the dry side but is not quite arid and contains sufficient
@@ -89,7 +93,9 @@ planet:
       of ores and other natural resources could sustain the factories that were built.
     landmass:
       - name: New Jalore A
-        capital: Belding
+        capital:
+          source: House Davion
+          value: New Amritsar
       - name: New Jalore B
       - name: New Jalore C
     event:

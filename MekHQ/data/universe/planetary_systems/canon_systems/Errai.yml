@@ -3,9 +3,11 @@ sucsId: 819
 xcood: 52.512
 ycood: 3.478
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: M6IV
-primarySlot: 2
+primarySlot:
+  source: MWDA world profiles
+  value: 2
 event:
   - date: '2390-12-13'
     nadirCharge: yes
@@ -34,28 +36,32 @@ planet:
       value: Errai
     type: TERRESTRIAL
     orbitalDist: 0.14
-    sysPos: 2
+    sysPos:
+      source: MWDA world profiles
+      value: 2
     icon: green57
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 1.02
-    diameter: 13549
-    density: 5.28649650818
+    diameter: 13554
+    density: 5.288515845832
     dayLength: 22
     yearLength: 0.5
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 35
     water:
-      source: canon
+      source: MWDA world profiles
       value: 54
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: AMPHIBIAN
     desc: Established early on as a major industrial planet, Errai‘s population swelled
       in the days of the Star League, with electronics, fusion reactors, and heavy
@@ -75,13 +81,13 @@ planet:
       Hallens, which also features two of Errai‘s main spaceports.
     landmass:
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Carrigan
       - name:
-          source: canon
+          source: MWDA world profiles
           value: Hallens
         capital:
-          source: canon
+          source: MWDA world profiles
           value: Errai Prime
     event:
       - date: '2242-04-06'

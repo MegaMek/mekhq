@@ -3,9 +3,11 @@ sucsId: 653
 xcood: -115.774
 ycood: -229.895
 spectralType:
-  source: canon
+  source: House Marik, pg. 162
   value: K1V
-primarySlot: 5
+primarySlot:
+  source: House Marik, pg. 162
+  value: 5
 event:
   - date: '2354-07-16'
     nadirCharge: yes
@@ -85,7 +87,9 @@ planet:
       value: Dalton
     type: TERRESTRIAL
     orbitalDist: 0.56
-    sysPos: 5
+    sysPos:
+      source: House Marik, pg. 162
+      value: 5
     icon: green2
     pressure:
       source: canon
@@ -106,7 +110,7 @@ planet:
       source: canon
       value: 56
     lifeForm:
-      source: canon
+      source: House Marik, pg. 162
       value: MAMMAL
     desc: Early scans of Dalton in 2310 revealed the planet was extremely habitable,
       with a comfortable climate, breathable air, edible lifeforms, and plentiful

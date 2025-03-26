@@ -30,7 +30,6 @@ package mekhq.campaign.market.contractMarket;
 
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
-import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -53,6 +52,10 @@ import java.util.Set;
 import static java.lang.Math.floor;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.d6;
+import static megamek.common.enums.SkillLevel.ELITE;
+import static megamek.common.enums.SkillLevel.GREEN;
+import static megamek.common.enums.SkillLevel.REGULAR;
+import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
@@ -331,7 +334,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         setEnemyRating(contract, campaign.getGameYear());
 
         if (contract.getContractType().isCadreDuty()) {
-            contract.setAllySkill(SkillLevel.GREEN);
+            contract.setAllySkill(GREEN);
             contract.setAllyQuality(IUnitRating.DRAGOON_F);
         }
 
@@ -415,7 +418,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         setEnemyRating(contract, campaign.getGameYear());
 
         if (contract.getContractType().isCadreDuty()) {
-            contract.setAllySkill(SkillLevel.GREEN);
+            contract.setAllySkill(GREEN);
             contract.setAllyQuality(IUnitRating.DRAGOON_F);
         }
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
@@ -700,25 +703,28 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             mods.mods[i] += missionMods[contract.getContractType().ordinal()][i];
         }
 
-        if (Factions.getInstance().getFaction(contract.getEmployerCode()).isISMajorOrSuperPower()) {
-            mods.mods[CLAUSE_SALVAGE] += -1;
+        Faction employerFaction = contract.getEmployerFaction();
+
+        if (employerFaction.isISMajorOrSuperPower()) {
+            mods.mods[CLAUSE_SALVAGE] -= 1;
             mods.mods[CLAUSE_TRANSPORT] += 1;
-        }
-        if (AtBContract.isMinorPower(contract.getEmployerCode())) {
-            mods.mods[CLAUSE_SALVAGE] += -2;
-        }
-        if (contract.getEmployerFaction().isMercenary()) {
-            mods.mods[CLAUSE_COMMAND] += -1;
+        } else if (employerFaction.isMinorPower()) {
+            mods.mods[CLAUSE_SALVAGE] -= 2;
+        } else if (employerFaction.isMercenary()) {
+            mods.mods[CLAUSE_COMMAND] -= 1;
             mods.mods[CLAUSE_SALVAGE] += 2;
             mods.mods[CLAUSE_SUPPORT] += 1;
             mods.mods[CLAUSE_TRANSPORT] += 1;
+        } else if (employerFaction.getShortName().equals("IND")) {
+            mods.mods[CLAUSE_SALVAGE] -= 1;
+            mods.mods[CLAUSE_SUPPORT] -= 1;
         }
-        if (contract.getEmployerCode().equals("IND")) {
-            mods.mods[CLAUSE_COMMAND] += 0;
-            mods.mods[CLAUSE_SALVAGE] += -1;
-            mods.mods[CLAUSE_SUPPORT] += -1;
-            mods.mods[CLAUSE_TRANSPORT] += 0;
-        }
+
+        int modifier = getEmployerNegotiatorModifier(employerFaction);
+        mods.mods[CLAUSE_COMMAND] -= modifier;
+        mods.mods[CLAUSE_SALVAGE] -= modifier;
+        mods.mods[CLAUSE_SUPPORT] -= modifier;
+        mods.mods[CLAUSE_TRANSPORT] -= modifier;
 
         if (campaign.getFaction().isMercenary()) {
             rollCommandClause(contract, mods.mods[CLAUSE_COMMAND]);
@@ -729,5 +735,33 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 campaign.getCampaignOptions().getContractMaxSalvagePercentage());
         rollSupportClause(contract, mods.mods[CLAUSE_SUPPORT]);
         rollTransportClause(contract, mods.mods[CLAUSE_TRANSPORT]);
+    }
+
+    /**
+     * Calculates the negotiation modifier for a contract based on the employer's faction type.
+     * The modifier reflects the negotiation capabilities of the employer, making it harder to
+     * achieve favorable results with more influential or powerful employers.
+     *
+     * <p>The negotiation modifier is determined as follows:
+     * <ul>
+     *   <li>Default: A "Green" modifier is used for most employers.</li>
+     *   <li>Major or superpower faction: A "Regular" modifier is applied.</li>
+     *   <li>Clan faction: A "Veteran" modifier is applied.</li>
+     *   <li>ComStar or Word of Blake (WoB): An "Elite" modifier is applied.</li>
+     * </ul>
+     *
+     * @param employerFaction The {@link Faction} that is performing the negotiation.
+     * @return An integer representing the negotiation modifier corresponding to the employer's capabilities.
+     */
+    private static int getEmployerNegotiatorModifier(Faction employerFaction) {
+        if (employerFaction.isMajorOrSuperPower()) {
+            return REGULAR.getExperienceLevel();
+        } else if (employerFaction.isClan()) {
+            return VETERAN.getExperienceLevel();
+        } else if (employerFaction.isComStarOrWoB()) {
+            return ELITE.getExperienceLevel();
+        }
+
+        return GREEN.getExperienceLevel();
     }
 }

@@ -183,6 +183,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         // don't just return with the first part if it is damaged
         return campaign.getWarehouse().streamSpareParts()
             .filter(MissingPart::isAvailableAsReplacement)
+            .filter(p -> !p.isUsedForRefitPlanning() || !refit)
             .reduce(null, (bestPart, part) -> {
                 if (isAcceptableReplacement(part, refit)) {
                     if (bestPart == null) {

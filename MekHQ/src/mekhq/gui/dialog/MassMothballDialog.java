@@ -41,7 +41,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -67,11 +66,11 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
     private static final MMLogger logger = MMLogger.create(MassMothballDialog.class);
 
     // region Variable Declarations
-    private Map<Integer, List<Unit>> unitsByType = new HashMap<>();
-    private Map<Integer, JList<Person>> techListsByUnitType = new HashMap<>();
-    private Map<Integer, JLabel> timeLabelsByUnitType = new HashMap<>();
-    private Campaign campaign;
-    private boolean activating;
+    private Map<Integer, List<Unit>>    unitsByType          = new HashMap<>();
+    private Map<Integer, JList<Person>> techListsByUnitType  = new HashMap<>();
+    private Map<Integer, JLabel>        timeLabelsByUnitType = new HashMap<>();
+    private Campaign                    campaign;
+    private boolean                     activating;
 
     private JPanel contentPanel = new JPanel();
     // endregion Variable Declarations
@@ -84,31 +83,31 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      * @param campaign Campaign with which we're working
      * @param activate true to activate, otherwise false for mothball
      */
-    public MassMothballDialog(final JFrame frame, final Unit[] units, final Campaign campaign,
-            final boolean activate) {
+    public MassMothballDialog(final JFrame frame, final Unit[] units, final Campaign campaign, final boolean activate) {
         super(frame, "Mass Mothball/Activate");
         setLocationRelativeTo(frame);
 
         sortUnitsByType(units);
-        this.campaign = campaign;
+        this.campaign   = campaign;
         this.activating = activate;
 
         contentPanel.setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = 3;
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.ipadx = 4;
-        gbc.ipady = 4;
-        gbc.insets = new Insets(2, 2, 2, 2);
+        gbc.gridx     = 0;
+        gbc.gridy     = 0;
+        gbc.ipadx     = 4;
+        gbc.ipady     = 4;
+        gbc.insets    = new Insets(2, 2, 2, 2);
 
         gbc.weightx = 3;
         JLabel instructionLabel = new JLabel();
         instructionLabel.setBorder(new LineBorder(Color.BLUE));
         instructionLabel.setText("<html>Choose the techs to carry out " +
-                (activating ? "activation" : "mothballing") + " operations on the displayed units. <br/>"
-                + "A * indicates that the tech is currently maintaining units.</html>");
+                                 (activating ? "activation" : "mothballing") +
+                                 " operations on the displayed units. <br/>" +
+                                 "A * indicates that the tech is currently maintaining units.</html>");
         contentPanel.add(instructionLabel, gbc);
 
         gbc.weightx = 1;
@@ -143,9 +142,9 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      */
     private void addTableHeaders(GridBagConstraints gbc) {
         gbc.gridwidth = 1;
-        gbc.weightx = 0.3;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx   = 0.3;
+        gbc.anchor    = GridBagConstraints.WEST;
+        gbc.fill      = GridBagConstraints.BOTH;
 
         gbc.gridx = 0;
         JLabel labelUnitNames = new JLabel();
@@ -171,10 +170,10 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      */
     private void addUnitTypePanel(int unitType, GridBagConstraints gbc) {
         gbc.gridwidth = 1;
-        gbc.weightx = 0.3;
-        gbc.gridx = 0;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.weightx   = 0.3;
+        gbc.gridx     = 0;
+        gbc.fill      = GridBagConstraints.BOTH;
+        gbc.anchor    = GridBagConstraints.NORTHWEST;
 
         JPanel unitPanel = new JPanel();
         unitPanel.setLayout(new GridLayout(unitsByType.get(unitType).size(), 1, 1, 0));
@@ -188,9 +187,9 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         unitPanel.setBorder(new LineBorder(Color.GRAY, 1));
         contentPanel.add(unitPanel, gbc);
 
-        gbc.gridx = 1;
+        gbc.gridx   = 1;
         gbc.weightx = 2.0;
-        JList<Person> techList = new JList<>();
+        JList<Person>            techList  = new JList<>();
         DefaultListModel<Person> listModel = new DefaultListModel<>();
 
         for (Person tech : campaign.getTechs()) {
@@ -212,9 +211,9 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         contentPanel.add(techListPane, gbc);
         techListsByUnitType.put(unitType, techList);
 
-        gbc.gridx = 2;
+        gbc.gridx   = 2;
         gbc.weightx = 0.5;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill    = GridBagConstraints.HORIZONTAL;
         JLabel labelTotalTime = new JLabel();
         labelTotalTime.setBorder(new LineBorder(Color.BLUE));
         labelTotalTime.setText(getCompletionTimeText(0));
@@ -229,20 +228,27 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      * @param gbc      the input gridBagConstraints to use
      */
     private void addExecuteButton(boolean activate, GridBagConstraints gbc) {
-        gbc.gridx = 1;
+        gbc.gridx   = 1;
         gbc.weightx = 0.8;
         gbc.weighty = 0.8;
-        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.anchor  = GridBagConstraints.CENTER;
         JButton buttonExecute = new JButton();
         activating = activate;
         buttonExecute.setText(activating ? "Activate" : "Mothball");
-        buttonExecute.setActionCommand(activating ? UnitTableMouseAdapter.COMMAND_ACTIVATE
-                : UnitTableMouseAdapter.COMMAND_MOTHBALL);
+        buttonExecute.setActionCommand(activating ?
+                                             UnitTableMouseAdapter.COMMAND_ACTIVATE :
+                                             UnitTableMouseAdapter.COMMAND_MOTHBALL);
         buttonExecute.addActionListener(this);
         contentPanel.add(buttonExecute, gbc);
     }
 
-    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
+    /**
+     * These need to be migrated to the Suite Constants / Suite Options Setup
+     *
+     * @since 0.50.04
+     * @deprecated Move to Suite Constants / Suite Options Setup
+     */
+    @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MassMothballDialog.class);
@@ -254,8 +260,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
     }
 
     /**
-     * Worker function that sorts out the passed-in units by unit type and stores
-     * them in the local dictionary.
+     * Worker function that sorts out the passed-in units by unit type and stores them in the local dictionary.
      *
      * @param units Units to sort
      */
@@ -276,8 +281,8 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (!e.getActionCommand().equals(UnitTableMouseAdapter.COMMAND_MOTHBALL)
-                && !e.getActionCommand().equals(UnitTableMouseAdapter.COMMAND_ACTIVATE)) {
+        if (!e.getActionCommand().equals(UnitTableMouseAdapter.COMMAND_MOTHBALL) &&
+            !e.getActionCommand().equals(UnitTableMouseAdapter.COMMAND_ACTIVATE)) {
             return;
         }
 
@@ -294,7 +299,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
             // this is a "naive" approach, where we assign each of the selected techs
             // to approximately # units / # techs in mothball/reactivation tasks
             for (Unit unit : unitsByType.get(unitType)) {
-                UUID id = selectedTechs.get(techIndex).getId();
+                UUID   id   = selectedTechs.get(techIndex).getId();
                 Person tech = campaign.getPerson(id);
                 if (isMothballing) {
                     unit.startMothballing(tech);
@@ -318,14 +323,12 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      */
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        @SuppressWarnings("unchecked")
-        JList<Person> techList = (JList<Person>) e.getSource();
+        @SuppressWarnings("unchecked") JList<Person> techList = (JList<Person>) e.getSource();
 
         int unitType = -1;
-        // this is mildly kludgy:
-        // we scan the 'tech lists by unit type' dictionary to determine the unit type
-        // since the number of tech lists is limited by the number of unit types, it
-        // shouldn't be too problematic for performance
+        // this is probably a kludge:
+        // we scan the 'tech lists by unit type' dictionary to determine the unit type since the number of tech lists
+        // is limited by the number of unit types, it shouldn't be too problematic for performance
         for (int key : techListsByUnitType.keySet()) {
             if (techListsByUnitType.get(key).equals(techList)) {
                 unitType = key;
@@ -335,8 +338,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
 
         // time to do the work is # units * 2 if mothballing * work day in minutes;
         int workTime = unitsByType.get(unitType).size() * (activating ? 1 : 2) * Unit.TECH_WORK_DAY;
-        // a unit can only be mothballed by one tech, so it's pointless to assign more
-        // techs to the task
+        // a unit can only be mothballed by one tech, so it's pointless to assign more techs to the task
         int numTechs = Math.min(techList.getSelectedValuesList().size(), unitsByType.get(unitType).size());
 
         timeLabelsByUnitType.get(unitType).setText(getCompletionTimeText(workTime / numTechs));
@@ -344,39 +346,37 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
     }
 
     /**
-     * Worker function that determines the "completion time" text based on the
-     * passed-in number.
+     * Worker function that determines the "completion time" text based on the passed-in number.
      *
      * @param completionTime How many minutes to complete the work.
+     *
      * @return Displayable text.
      */
     private String getCompletionTimeText(int completionTime) {
         if (completionTime > 0) {
             return String.format("Completion Time: %d minutes", completionTime);
         } else {
-            return "<html>Completion Time: <span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                    + "'>Never</span></html>";
+            return "<html>Completion Time: <span color='" +
+                   MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                   "'>Never</span></html>";
         }
     }
 
     /**
-     * Custom list cell renderer that displays a * next to the name of a person
-     * who's maintaining units.
+     * Custom list cell renderer that displays a * next to the name of a person who's maintaining units.
      *
      * @author NickAragua
      */
     private static class TechListCellRenderer extends DefaultListCellRenderer {
 
         @Override
-        public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
             Person person = (Person) value;
 
             boolean maintainsUnits = !person.getTechUnits().isEmpty();
-            setText((maintainsUnits ? "(*) " : "") + person.getFullTitle() + " ("
-                    + person.getMinutesLeft() + " min)");
+            setText((maintainsUnits ? "(*) " : "") + person.getFullTitle() + " (" + person.getMinutesLeft() + " min)");
 
             return this;
         }

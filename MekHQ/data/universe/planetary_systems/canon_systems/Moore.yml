@@ -3,9 +3,11 @@ sucsId: 1753
 xcood: 5.683
 ycood: 64.061
 spectralType:
-  source: canon
+  source: MWDA world profiles
   value: K5V
-primarySlot: 3
+primarySlot:
+  source: MWDA world profiles
+  value: 3
 event:
   - date: '2360-11-10'
     nadirCharge: yes
@@ -48,28 +50,32 @@ planet:
       value: Moore
     type: TERRESTRIAL
     orbitalDist: 0.28
-    sysPos: 3
+    sysPos:
+      source: MWDA world profiles
+      value: 3
     icon: wet3
     pressure:
-      source: canon
+      source: MWDA world profiles
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: MWDA world profiles
+      value: TAINTEDPOISON
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: MWDA world profiles
       value: 0.87
-    diameter: 12197
-    density: 5.009169037454
+    diameter: 12201
+    density: 5.010941455381
     dayLength: 22
     yearLength: 0.8
     temperature:
-      source: canon
+      source: MWDA world profiles
       value: 35
     water:
-      source: canon
+      source: MWDA world profiles
       value: 86
     lifeForm:
-      source: canon
+      source: MWDA world profiles
       value: FISH
     desc: |-
       Moore is a wet world, its total landmass locked up in almost a thousand small islands and the long, thin, mountainous chain known as Serpentasia. This half-wooded, half-swampy land runs in an irregular northwest-to-southeast path across Moore‘s surface, and is home to the vast majority of the planetary population, including the capital city of Shizuoka.
@@ -80,10 +86,12 @@ planet:
       Duncan Enterprises
     landmass:
       - capital:
-          source: canon
+          source: MWDA world profiles
           value: Shizuoka
     satellite:
-      - name: Zed
+      - name:
+          source: MWDA world profiles
+          value: Zed
         size: giant
         icon: rock8
     event:

@@ -27,6 +27,21 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.common.options.OptionsConstants.ALLOWED_YEAR;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
+import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.time.LocalDate;
+import java.util.ResourceBundle;
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.swing.util.UIUtil;
@@ -44,22 +59,17 @@ import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
-import mekhq.gui.campaignOptions.components.*;
+import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
+import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
+import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
+import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsTextField;
 import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.dialog.iconDialogs.UnitIconDialog;
 import mekhq.gui.displayWrappers.FactionDisplay;
-
-import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.time.LocalDate;
-import java.util.ResourceBundle;
-
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static megamek.common.options.OptionsConstants.ALLOWED_YEAR;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
 /**
  * Represents a tab within the campaign options UI that allows the user to configure
@@ -124,6 +134,29 @@ public class GeneralTab {
         this.mode = mode;
 
         initialize();
+    }
+
+    /**
+     * @return the currently selected date
+     */
+    public LocalDate getDate() {
+        return date;
+    }
+
+    /**
+     * Retrieves the currently selected faction.
+     *
+     * <p>If no faction is selected, the method defaults to returning the "MERC" faction.</p>
+     *
+     * @return the {@link Faction} object representing the selected faction, or the "MERC" faction if no selection is
+     * made.
+     */
+    public Faction getFaction() {
+        if (comboFaction.getSelectedItem() == null) {
+            return Factions.getInstance().getFaction("MERC");
+        } else {
+            return comboFaction.getSelectedItem().getFaction();
+        }
     }
 
     /**
@@ -371,7 +404,7 @@ public class GeneralTab {
         DefaultComboBoxModel<FactionDisplay> factionModel = new DefaultComboBoxModel<>();
 
         factionModel.addAll(FactionDisplay.getSortedValidFactionDisplays(
-            Factions.getInstance().getChoosableFactions(), campaign.getLocalDate()));
+            Factions.getInstance().getChoosableFactions(), date));
 
         return factionModel;
     }

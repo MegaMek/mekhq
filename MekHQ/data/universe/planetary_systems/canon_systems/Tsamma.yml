@@ -3,9 +3,11 @@ sucsId: 2592
 xcood: 447.964
 ycood: -44.769
 spectralType:
-  source: canon
+  source: FedCom Civil War, pg. 195
   value: K2VII
-primarySlot: 4
+primarySlot:
+  source: FedCom Civil War, pg. 195
+  value: 4
 event:
   - date: '2365-02-25'
     zenithCharge: yes
@@ -63,28 +65,32 @@ planet:
       value: Tsamma
     type: TERRESTRIAL
     orbitalDist: 1.12
-    sysPos: 4
+    sysPos:
+      source: FedCom Civil War, pg. 195
+      value: 4
     icon: wet6
     pressure:
-      source: canon
+      source: FedCom Civil War, pg. 195
       value: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: FedCom Civil War, pg. 195
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: FedCom Civil War, pg. 195
       value: 1.0
-    diameter: 13076
-    density: 5.370392914176
+    diameter: 13081
+    density: 5.3724074818
     dayLength: 21
     yearLength: 1.5
     temperature:
-      source: canon
+      source: FedCom Civil War, pg. 195
       value: 65
     water:
-      source: canon
+      source: FedCom Civil War, pg. 195
       value: 75
     lifeForm:
-      source: canon
+      source: FedCom Civil War, pg. 195
       value: MAMMAL
     desc: Tsamma is a breadbasket world with a hot, humid climate and ample water.
       After the planet was settled, it was discovered that the oceans had very low
@@ -97,19 +103,21 @@ planet:
       Sphere.
     landmass:
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 195
           value: Arcadia
         capital:
-          source: canon
+          source: FedCom Civil War, pg. 195
           value: Phe-Phen
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 195
           value: Bleacher
       - name:
-          source: canon
+          source: FedCom Civil War, pg. 195
           value: Shade
     satellite:
-      - name: Testor’s Eye
+      - name:
+          source: FedCom Civil War, pg. 195
+          value: Testor's Eye
         size: giant
         icon: rock5
     event:

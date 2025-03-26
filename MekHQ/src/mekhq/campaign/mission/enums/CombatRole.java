@@ -27,10 +27,10 @@
  */
 package mekhq.campaign.mission.enums;
 
+import java.util.ResourceBundle;
+
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-
-import java.util.ResourceBundle;
 
 public enum CombatRole {
     // region Enum Declarations
@@ -50,7 +50,7 @@ public enum CombatRole {
     // region Constructors
     CombatRole(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -86,36 +86,54 @@ public enum CombatRole {
     public boolean isReserve() {
         return this == RESERVE;
     }
+
+    /**
+     * Determines if this role is categorized as a combat role.
+     *
+     * <p>A role is considered a combat role if it matches one of the following predefined roles:</p>
+     * <ul>
+     *    <li>{@code FRONTLINE}</li>
+     *    <li>{@code MANEUVER}</li>
+     *    <li>{@code PATROL}</li>
+     * </ul>
+     *
+     * @return {@code true} if this role is one of the combat roles; {@code false} otherwise.
+     */
+    public boolean isCombatRole() {
+        return this == FRONTLINE || this == MANEUVER || this == PATROL;
+    }
     // endregion Boolean Comparison Methods
 
     // region File I/O
+
     /**
      * Parses a {@link String} into a {@link CombatRole} enum value.
      * <p>
-     * This method first attempts to interpret the input string as an integer and then maps it
-     * to the corresponding {@link CombatRole} based on its ordinal index. If that fails, it
-     * attempts to match the string to the name of a {@link CombatRole} using {@code Enum.valueOf(String)}.
-     * If both parsing approaches fail, it logs an error and returns the default value {@code IN_RESERVE}.
+     * This method first attempts to interpret the input string as an integer and then maps it to the corresponding
+     * {@link CombatRole} based on its ordinal index. If that fails, it attempts to match the string to the name of a
+     * {@link CombatRole} using {@code Enum.valueOf(String)}. If both parsing approaches fail, it logs an error and
+     * returns the default value {@code IN_RESERVE}.
      * </p>
      *
-     * @param text the string to be parsed into a {@link CombatRole}.
-     *             The string can represent either:
+     * @param text the string to be parsed into a {@link CombatRole}. The string can represent either:
      *             <ul>
      *               <li>An integer corresponding to the ordinal index of a {@link CombatRole}.</li>
      *               <li>The name of a {@link CombatRole}.</li>
      *             </ul>
-     * @return the corresponding {@link CombatRole} if the input is valid;
-     *         otherwise, returns {@code IN_RESERVE}.
+     *
+     * @return the corresponding {@link CombatRole} if the input is valid; otherwise, returns {@code IN_RESERVE}.
      */
     public static CombatRole parseFromString(final String text) {
         try {
             int value = Integer.parseInt(text);
             return values()[value];
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         try {
             return valueOf(text);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         // <50.02 compatibility handler
         return switch (text) {
@@ -125,8 +143,7 @@ public enum CombatRole {
             case "IN_RESERVE", "UNASSIGNED" -> RESERVE;
             default -> {
                 MMLogger.create(CombatRole.class)
-                    .warn(String.format("Unable to parse %s into an CombatRole. Returning RESERVE.",
-                        text));
+                      .warn(String.format("Unable to parse %s into an CombatRole. Returning RESERVE.", text));
 
                 yield RESERVE;
             }
@@ -134,10 +151,10 @@ public enum CombatRole {
         };
 
         // To be uncommented once the above compatibility handler is removed.
-//        MMLogger.create(CombatRole.class)
-//            .error("Unable to parse " + text + " into an CombatRole. Returning RESERVE.");
-//
-//        return RESERVE;
+        //        MMLogger.create(CombatRole.class)
+        //            .error("Unable to parse " + text + " into an CombatRole. Returning RESERVE.");
+        //
+        //        return RESERVE;
     }
     // endregion File I/O
 

@@ -5,7 +5,9 @@ ycood: -378.003
 spectralType:
   source: canon
   value: M1V
-primarySlot: 2
+primarySlot:
+  source: 'Handbook: Major Periphery States, pg. 98'
+  value: 2
 event:
   - date: '2704-04-27'
     nadirCharge: yes
@@ -29,28 +31,32 @@ planet:
       value: Thraxa
     type: TERRESTRIAL
     orbitalDist: 0.2
-    sysPos: 2
+    sysPos:
+      source: 'Handbook: Major Periphery States, pg. 98'
+      value: 2
     icon: wet3
     pressure:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 98'
       value: STANDARD
-    atmosphere: TAINTEDPOISON
+    atmosphere:
+      source: 'Handbook: Major Periphery States, pg. 98'
+      value: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 98'
       value: 1.03
-    diameter: 11530
-    density: 6.253482890416
+    diameter: 11552
+    density: 6.265681463209
     dayLength: 22
     yearLength: 0.7
     temperature:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 98'
       value: 22
     water:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 98'
       value: 80
     lifeForm:
-      source: canon
+      source: 'Handbook: Major Periphery States, pg. 98'
       value: MAMMAL
     desc: Thraxa is a self sufficient world with successful fur, coal mining, textiles,
       and lumber industries which keep the planet well supplied and provide ample
@@ -62,7 +68,9 @@ planet:
           source: canon
           value: Durango
     satellite:
-      - name: Niobe
+      - name:
+          source: 'Handbook: Major Periphery States, pg. 98'
+          value: Niobe
         size: medium
         icon: rock12
     event:
