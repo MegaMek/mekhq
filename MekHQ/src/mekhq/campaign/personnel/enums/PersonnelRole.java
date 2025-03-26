@@ -28,6 +28,7 @@
 package mekhq.campaign.personnel.enums;
 
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -80,7 +81,7 @@ public enum PersonnelRole {
     // region Variable Declarations
     private final String name;
     private final String clanName;
-    private final int    mnemonic; // Unused: J, K, Q, X, Z
+    private final int mnemonic; // Unused: J, K, Q, X, Z
     // endregion Variable Declarations
 
     // region Constructors
@@ -106,7 +107,7 @@ public enum PersonnelRole {
     PersonnelRole(final String name, @Nullable final String clanName, final int mnemonic) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
               MekHQ.getMHQOptions().getLocale());
-        this.name     = resources.getString(name);
+        this.name = resources.getString(name);
         this.clanName = (clanName == null) ? this.name : resources.getString(clanName);
         this.mnemonic = mnemonic;
     }
@@ -479,9 +480,9 @@ public enum PersonnelRole {
      */
     public boolean isAdministrator() {
         return isAdministratorCommand() ||
-               isAdministratorLogistics() ||
-               isAdministratorTransport() ||
-               isAdministratorHR();
+                     isAdministratorLogistics() ||
+                     isAdministratorTransport() ||
+                     isAdministratorHR();
     }
 
     /**
@@ -495,10 +496,44 @@ public enum PersonnelRole {
     // region Static Methods
 
     /**
+     * @deprecated Use {@link #getMarketableRoles()}.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public static List<PersonnelRole> getMilitaryRoles() {
+        return getMarketableRoles();
+    }
+
+    /**
      * @return a list of roles that can be included in the personnel market
      */
-    public static List<PersonnelRole> getMilitaryRoles() {
+    public static List<PersonnelRole> getMarketableRoles() {
         return Stream.of(values()).filter(personnelRole -> !personnelRole.isCivilian()).collect(Collectors.toList());
+    }
+
+    /**
+     * @return a list of personnel roles classified as combat roles.
+     */
+    public static List<PersonnelRole> getCombatRoles() {
+        List<PersonnelRole> combatRoles = new ArrayList<>();
+        for (PersonnelRole personnelRole : PersonnelRole.values()) {
+            if (personnelRole.isCombat()) {
+                combatRoles.add(personnelRole);
+            }
+        }
+        return combatRoles;
+    }
+
+    /**
+     * @return a list of personnel roles classified as support (non-combat) roles.
+     */
+    public static List<PersonnelRole> getSupportRoles() {
+        List<PersonnelRole> supportRoles = new ArrayList<>();
+        for (PersonnelRole personnelRole : PersonnelRole.values()) {
+            if (!personnelRole.isCombat()) {
+                supportRoles.add(personnelRole);
+            }
+        }
+        return supportRoles;
     }
 
     /**

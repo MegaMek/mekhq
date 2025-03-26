@@ -38,31 +38,28 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import org.junit.jupiter.api.Test;
-
 import mekhq.MekHQ;
+import org.junit.jupiter.api.Test;
 
 class PersonnelRoleTest {
     // region Variable Declarations
     private static final PersonnelRole[] roles = PersonnelRole.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
     // region Getters
     @Test
     void testGetName() {
-        assertEquals(resources.getString("PersonnelRole.MEKWARRIOR.text"),
-                PersonnelRole.MEKWARRIOR.getName(false));
-        assertEquals(resources.getString("PersonnelRole.MEKWARRIOR.text"),
-                PersonnelRole.MEKWARRIOR.getName(true));
+        assertEquals(resources.getString("PersonnelRole.MEKWARRIOR.text"), PersonnelRole.MEKWARRIOR.getName(false));
+        assertEquals(resources.getString("PersonnelRole.MEKWARRIOR.text"), PersonnelRole.MEKWARRIOR.getName(true));
         assertEquals(resources.getString("PersonnelRole.BATTLE_ARMOUR.text"),
-                PersonnelRole.BATTLE_ARMOUR.getName(false));
+              PersonnelRole.BATTLE_ARMOUR.getName(false));
         assertEquals(resources.getString("PersonnelRole.BATTLE_ARMOUR.clan.text"),
-                PersonnelRole.BATTLE_ARMOUR.getName(true));
+              PersonnelRole.BATTLE_ARMOUR.getName(true));
         assertEquals(resources.getString("PersonnelRole.ADMINISTRATOR_LOGISTICS.text"),
-                PersonnelRole.ADMINISTRATOR_LOGISTICS.getName(false));
+              PersonnelRole.ADMINISTRATOR_LOGISTICS.getName(false));
     }
 
     @Test
@@ -74,7 +71,7 @@ class PersonnelRoleTest {
                 continue;
             }
             assertFalse(usedMnemonics.contains(role.getMnemonic()),
-                    String.format("%s: Using duplicate mnemonic of %d", role.name(), role.getMnemonic()));
+                  String.format("%s: Using duplicate mnemonic of %d", role.name(), role.getMnemonic()));
             usedMnemonics.add(role.getMnemonic());
         }
     }
@@ -432,8 +429,7 @@ class PersonnelRoleTest {
     @Test
     void testIsMekWarriorGrouping() {
         for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.MEKWARRIOR)
-                    || (personnelRole == PersonnelRole.LAM_PILOT)) {
+            if ((personnelRole == PersonnelRole.MEKWARRIOR) || (personnelRole == PersonnelRole.LAM_PILOT)) {
                 assertTrue(personnelRole.isMekWarriorGrouping());
             } else {
                 assertFalse(personnelRole.isMekWarriorGrouping());
@@ -444,8 +440,7 @@ class PersonnelRoleTest {
     @Test
     void testIsAerospaceGrouping() {
         for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.LAM_PILOT)
-                    || (personnelRole == PersonnelRole.AEROSPACE_PILOT)) {
+            if ((personnelRole == PersonnelRole.LAM_PILOT) || (personnelRole == PersonnelRole.AEROSPACE_PILOT)) {
                 assertTrue(personnelRole.isAerospaceGrouping());
             } else {
                 assertFalse(personnelRole.isAerospaceGrouping());
@@ -467,9 +462,9 @@ class PersonnelRoleTest {
     @Test
     void testIsGroundVehicleCrew() {
         for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.GROUND_VEHICLE_DRIVER)
-                    || (personnelRole == PersonnelRole.VEHICLE_GUNNER)
-                    || (personnelRole == PersonnelRole.VEHICLE_CREW)) {
+            if ((personnelRole == PersonnelRole.GROUND_VEHICLE_DRIVER) ||
+                      (personnelRole == PersonnelRole.VEHICLE_GUNNER) ||
+                      (personnelRole == PersonnelRole.VEHICLE_CREW)) {
                 assertTrue(personnelRole.isGroundVehicleCrew());
             } else {
                 assertFalse(personnelRole.isGroundVehicleCrew());
@@ -480,9 +475,9 @@ class PersonnelRoleTest {
     @Test
     void testIsNavalVehicleCrew() {
         for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.NAVAL_VEHICLE_DRIVER)
-                    || (personnelRole == PersonnelRole.VEHICLE_GUNNER)
-                    || (personnelRole == PersonnelRole.VEHICLE_CREW)) {
+            if ((personnelRole == PersonnelRole.NAVAL_VEHICLE_DRIVER) ||
+                      (personnelRole == PersonnelRole.VEHICLE_GUNNER) ||
+                      (personnelRole == PersonnelRole.VEHICLE_CREW)) {
                 assertTrue(personnelRole.isNavalVehicleCrew());
             } else {
                 assertFalse(personnelRole.isNavalVehicleCrew());
@@ -493,9 +488,9 @@ class PersonnelRoleTest {
     @Test
     void testIsVTOLCrew() {
         for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.VTOL_PILOT)
-                    || (personnelRole == PersonnelRole.VEHICLE_GUNNER)
-                    || (personnelRole == PersonnelRole.VEHICLE_CREW)) {
+            if ((personnelRole == PersonnelRole.VTOL_PILOT) ||
+                      (personnelRole == PersonnelRole.VEHICLE_GUNNER) ||
+                      (personnelRole == PersonnelRole.VEHICLE_CREW)) {
                 assertTrue(personnelRole.isVTOLCrew());
             } else {
                 assertFalse(personnelRole.isVTOLCrew());
@@ -524,8 +519,7 @@ class PersonnelRoleTest {
     @Test
     void testIsSoldierOrBattleArmour() {
         for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.SOLDIER)
-                    || (personnelRole == PersonnelRole.BATTLE_ARMOUR)) {
+            if ((personnelRole == PersonnelRole.SOLDIER) || (personnelRole == PersonnelRole.BATTLE_ARMOUR)) {
                 assertTrue(personnelRole.isSoldierOrBattleArmour());
             } else {
                 assertFalse(personnelRole.isSoldierOrBattleArmour());
@@ -606,8 +600,7 @@ class PersonnelRoleTest {
     @Test
     void testIsMedicalStaff() {
         for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.DOCTOR)
-                    || (personnelRole == PersonnelRole.MEDIC)) {
+            if ((personnelRole == PersonnelRole.DOCTOR) || (personnelRole == PersonnelRole.MEDIC)) {
                 assertTrue(personnelRole.isMedicalStaff());
             } else {
                 assertFalse(personnelRole.isMedicalStaff());
@@ -635,8 +628,7 @@ class PersonnelRoleTest {
     @Test
     void testIsCivilian() {
         for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.DEPENDENT)
-                    || (personnelRole == PersonnelRole.NONE)) {
+            if ((personnelRole == PersonnelRole.DEPENDENT) || (personnelRole == PersonnelRole.NONE)) {
                 assertTrue(personnelRole.isCivilian());
             } else {
                 assertFalse(personnelRole.isCivilian());
@@ -647,8 +639,8 @@ class PersonnelRoleTest {
 
     // region Static Methods
     @Test
-    void testGetMilitaryRoles() {
-        final List<PersonnelRole> militaryRoles = PersonnelRole.getMilitaryRoles();
+    void testGetMarketableRoles() {
+        final List<PersonnelRole> militaryRoles = PersonnelRole.getMarketableRoles();
         assertEquals(roles.length - 2, militaryRoles.size());
         assertFalse(militaryRoles.contains(PersonnelRole.DEPENDENT));
         assertFalse(militaryRoles.contains(PersonnelRole.NONE));
@@ -716,9 +708,8 @@ class PersonnelRoleTest {
 
     @Test
     void testToStringOverride() {
-        assertEquals(resources.getString("PersonnelRole.MEKWARRIOR.text"),
-                PersonnelRole.MEKWARRIOR.toString());
+        assertEquals(resources.getString("PersonnelRole.MEKWARRIOR.text"), PersonnelRole.MEKWARRIOR.toString());
         assertEquals(resources.getString("PersonnelRole.ADMINISTRATOR_LOGISTICS.text"),
-                PersonnelRole.ADMINISTRATOR_LOGISTICS.toString());
+              PersonnelRole.ADMINISTRATOR_LOGISTICS.toString());
     }
 }
