@@ -40,6 +40,7 @@ import java.io.FileNotFoundException;
 import java.io.ObjectInputFilter.Config;
 import java.lang.management.ManagementFactory;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import javax.swing.InputMap;
 import javax.swing.JOptionPane;
@@ -784,8 +785,23 @@ public class MekHQ implements GameListener {
                   true,
                   tracker);
             resolveDialog.setVisible(true);
+            // TODO remove these safeties as they're shown to be unnecessary
+            if (resolveDialog == null) {
+                throw new IllegalStateException("resolveDialog is null");
+            }
             if (resolveDialog.wasAborted()) {
+                // TODO remove these safeties as they're shown to be unnecessary
+                Map<UUID, ?> peopleStatus = tracker.getPeopleStatus();
+                if (peopleStatus == null) {
+                    throw new IllegalStateException("People status map in tracker is null");
+                }
+
                 for (UUID personId : tracker.getPeopleStatus().keySet()) {
+                    // TODO remove these safeties as they're shown to be unnecessary
+                    if (getCampaign() == null) {
+                        throw new IllegalStateException("Campaign instance is null");
+                    }
+
                     Person person = getCampaign().getPerson(personId);
 
                     if (person == null) {
@@ -794,7 +810,13 @@ public class MekHQ implements GameListener {
                                                                  " does not exist in the campaign");
                     }
 
-                    person.setHits(person.getHitsPrior());
+                    Integer priorHits = person.getHitsPrior();
+                    // TODO remove these safeties as they're shown to be unnecessary
+                    if (priorHits == null) {
+                        throw new IllegalStateException("Person's prior hits are not set for person " +
+                                                              person.getFullName());
+                    }
+                    person.setHits(priorHits);
                 }
                 return;
             }
