@@ -94,9 +94,7 @@ planet:
     event:
       - date: '2821-01-14'
         faction:
-          source: canon
-          value:
-            - CLAN
+          - CLAN
         population: 8849.0
         socioIndustrial: B-C-C-C-F
       - date: '2826-01-29'
@@ -113,14 +111,12 @@ planet:
         population: 777825.0
       - date: '2868-12-07'
         faction:
-          source: canon
-          value:
-            - CGS
-            - CSV
-            - CFM
-            - CSA
-            - CIH
-            - CJF
+          - CGS
+          - CSV
+          - CFM
+          - CSA
+          - CIH
+          - CJF
       - date: '2870-01-01'
         population: 1332400.0
       - date: '2880-01-01'
@@ -162,43 +158,33 @@ planet:
         population: 2822.0
       - date: '3059-12-12'
         faction:
-          source: canon
-          value:
-            - CGS
+          - CGS
       - date: '3060-01-01'
         population: 1612.0
       - date: '3069-11-07'
         faction:
-          source: canon
-          value:
-            - CGS
-            - CSV
-            - CFM
-            - CSA
-            - CIH
+          - CGS
+          - CSV
+          - CFM
+          - CSA
+          - CIH
       - date: '3070-01-01'
         population: 903.0
       - date: '3072-02-22'
         faction:
-          source: canon
-          value:
-            - CGS
-            - CSV
-            - CFM
-            - CIH
-            - SOC
+          - CGS
+          - CSV
+          - CFM
+          - CIH
+          - SOC
       - date: '3072-12-21'
         faction:
-          source: canon
-          value:
-            - CGS
-            - CSV
-            - SOC
+          - CGS
+          - CSV
+          - SOC
       - date: '3073-02-11'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         population: 0.0
         socioIndustrial: X-X-X-X-X
   - name: Palarm

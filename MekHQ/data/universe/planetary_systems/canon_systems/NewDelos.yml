@@ -124,16 +124,12 @@ planet:
     event:
       - date: '2271-03-05'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 43272.0
         socioIndustrial: D-D-C-D-D
       - date: '2280-03-04'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 168709.0
       - date: '2290-01-01'
         population: 629035.0
@@ -302,14 +298,10 @@ planet:
         population: 2089094047.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 2091925274.0
       - date: '3025-01-01'
@@ -336,9 +328,7 @@ planet:
         population: 1721529398.0
       - date: '3079-02-12'
         faction:
-          source: canon
-          value:
-            - TP
+          - TP
       - date: '3080-01-01'
         population: 1751395819.0
       - date: '3090-01-01'
@@ -353,9 +343,7 @@ planet:
         population: 1843771276.0
       - date: '3130-03-17'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
         population: 1861184440.0
       - date: '3132-08-07'
         hpg:
@@ -365,11 +353,6 @@ planet:
         population: 1887424272.0
       - date: '3145-01-01'
         population: 1904487761.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: H5
     type: GAS_GIANT
     orbitalDist: 4.16

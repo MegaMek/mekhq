@@ -86,9 +86,7 @@ planet:
     event:
       - date: '2397-08-08'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 43594.0
         socioIndustrial: D-D-C-F-C
       - date: '2400-01-01'
@@ -249,9 +247,7 @@ planet:
         population: 416479198.0
       - date: '3081-08-13'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 423450454.0
       - date: '3100-01-01'
@@ -264,9 +260,7 @@ planet:
         population: 444627350.0
       - date: '3130-11-22'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
         population: 450175054.0
       - date: '3132-08-07'
         hpg: X
@@ -276,12 +270,7 @@ planet:
         population: 459728692.0
       - date: '3148-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: 1UH-5

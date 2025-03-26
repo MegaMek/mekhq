@@ -68,9 +68,7 @@ planet:
     event:
       - date: '2232-12-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 48206.0
         socioIndustrial: C-C-A-D-C
       - date: '2240-01-01'
@@ -83,9 +81,7 @@ planet:
         population: 2333438.0
       - date: '2280-04-20'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 4851118.0
       - date: '2290-01-01'
         population: 9179401.0
@@ -245,14 +241,10 @@ planet:
         population: 486136780.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 486061625.0
       - date: '3028-01-01'
@@ -273,9 +265,7 @@ planet:
         population: 519393802.0
       - date: '3081-06-23'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 518874668.0
       - date: '3100-01-01'
@@ -288,9 +278,7 @@ planet:
         population: 523460915.0
       - date: '3130-07-02'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
         population: 524403993.0
       - date: '3132-08-07'
         hpg: X
@@ -300,12 +288,7 @@ planet:
         population: 531159507.0
       - date: '3148-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Hachiman

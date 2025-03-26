@@ -39,9 +39,7 @@ planet:
     event:
       - date: '2648-03-02'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 54462.0
         socioIndustrial: C-D-A-D-C
       - date: '2650-01-01'
@@ -146,9 +144,7 @@ planet:
         population: 208920421.0
       - date: '3079-09-03'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
       - date: '3080-01-01'
         population: 211823508.0
       - date: '3090-01-01'
@@ -169,11 +165,6 @@ planet:
         population: 234382270.0
       - date: '3145-01-01'
         population: 236737851.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Peristéri
     type: ICE_GIANT
     orbitalDist: 0.49

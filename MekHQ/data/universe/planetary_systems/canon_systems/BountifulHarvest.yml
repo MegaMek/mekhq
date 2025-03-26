@@ -123,9 +123,7 @@ planet:
     event:
       - date: '2290-08-20'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 51620.0
         socioIndustrial: D-F-C-D-B
       - date: '2300-01-01'
@@ -144,9 +142,7 @@ planet:
         population: 60900896.0
       - date: '2360-08-12'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 118262833.0
       - date: '2370-01-01'
         population: 207942305.0
@@ -301,6 +297,11 @@ planet:
         population: 3375271087.0
       - date: '3027-01-01'
         socioIndustrial: C-D-D-B-B
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 3358417406.0
       - date: '3040-05-30'
@@ -308,18 +309,11 @@ planet:
         socioIndustrial:
           source: canon
           value: B-C-C-B-A
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 3426604582.0
       - date: '3057-12-01'
         faction:
-          source: canon
-          value:
-            - ARDC
+          - ARDC
       - date: '3060-01-01'
         population: 3458966528.0
       - date: '3067-01-01'
@@ -328,9 +322,7 @@ planet:
           value: 3477000000.0
       - date: '3067-04-24'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3070-01-01'
         population: 3485354822.0
       - date: '3080-01-01'
@@ -354,15 +346,11 @@ planet:
         population: 3527431032.0
       - date: '3145-05-10'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 3521087367.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Bogue
     type: DWARF_TERRESTRIAL
     orbitalDist: 2.4

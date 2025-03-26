@@ -52,9 +52,7 @@ planet:
     event:
       - date: '2681-07-06'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 51152.0
         socioIndustrial: C-D-A-D-F
       - date: '2690-01-01'
@@ -136,34 +134,34 @@ planet:
         population: 635569292.0
       - date: '3020-01-01'
         population: 632949368.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 633645010.0
       - date: '3040-01-01'
         population: 638223718.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial: C-D-A-D-D
       - date: '3050-01-01'
         population: 643285653.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
         population: 647351146.0
       - date: '3064-07-08'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - LA
       - date: '3070-01-01'
@@ -186,9 +184,7 @@ planet:
         population: 725810438.0
       - date: '3145-03-10'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 729156857.0
   - name: Bin Hamal's End
     type: TERRESTRIAL

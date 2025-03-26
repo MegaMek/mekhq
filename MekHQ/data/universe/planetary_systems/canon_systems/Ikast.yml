@@ -66,9 +66,7 @@ planet:
     event:
       - date: '2646-01-25'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 50800.0
         socioIndustrial: B-D-B-D-D
       - date: '2648-01-01'
@@ -137,9 +135,7 @@ planet:
         socioIndustrial: F-D-D-C-F
       - date: '2900-10-20'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 3130915970.0
       - date: '2910-01-01'
         population: 3068615004.0
@@ -167,9 +163,12 @@ planet:
         population: 2810193400.0
       - date: '3025-09-12'
         faction:
-          source: canon
+          - FS
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
           value:
-            - FS
+            - FC
       - date: '3029-01-01'
         socioIndustrial: D-D-D-C-F
       - date: '3030-01-01'
@@ -178,11 +177,6 @@ planet:
         socioIndustrial: C-C-C-B-F
       - date: '3040-01-01'
         population: 2856974606.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: B-B-B-A-D
       - date: '3050-01-01'
@@ -191,7 +185,7 @@ planet:
         population: 2913232341.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -216,9 +210,7 @@ planet:
         population: 3041537776.0
       - date: '3145-02-26'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 3047017474.0
   - name: Munk
     type: TERRESTRIAL

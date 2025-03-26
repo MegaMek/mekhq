@@ -101,9 +101,7 @@ planet:
     event:
       - date: '3025-05-29'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         hpg: X
         population: 50351.0
         socioIndustrial: C-F-A-D-F
@@ -141,9 +139,7 @@ planet:
         population: 102838.0
       - date: '3140-05-15'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 103830.0
   - name: Ishigenov

@@ -35,9 +35,7 @@ planet:
     event:
       - date: '2731-01-05'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 58976.0
         socioIndustrial: C-D-D-D-F
       - date: '2732-10-12'
@@ -64,22 +62,10 @@ planet:
         population: 3079495.0
       - date: '2837-06-19'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - CC
-      - date: '2108-12-05'
-        name: Shaobuon
-      - date: '3130-01-01'
-        name: Liu's Memory
-        message: Shaobuon renamed to Liu's Memory
   - name: López
     type: TERRESTRIAL
     orbitalDist: 0.49

@@ -64,9 +64,7 @@ planet:
     event:
       - date: '2302-07-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 49675.0
         socioIndustrial: D-D-B-D-C
       - date: '2310-01-01'
@@ -81,9 +79,7 @@ planet:
         population: 6586890.0
       - date: '2355-10-26'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2360-01-01'
         population: 12465447.0
       - date: '2370-01-01'
@@ -197,9 +193,7 @@ planet:
         population: 455520915.0
       - date: '2864-12-23'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2870-01-01'
         population: 453643180.0
       - date: '2880-01-01'
@@ -218,9 +212,7 @@ planet:
         population: 449058653.0
       - date: '2935-04-29'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2940-01-01'
         population: 448208020.0
       - date: '2950-01-01'
@@ -239,19 +231,17 @@ planet:
         population: 435080049.0
       - date: '3020-01-01'
         population: 434608912.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-02-26'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 436505814.0
       - date: '3040-01-01'
         population: 440496146.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial:
           source: canon
@@ -262,7 +252,7 @@ planet:
         population: 446706463.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -289,9 +279,7 @@ planet:
         population: 495467468.0
       - date: '3145-08-07'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 499547004.0
   - name: Chup Kamui
     type: GIANT_TERRESTRIAL

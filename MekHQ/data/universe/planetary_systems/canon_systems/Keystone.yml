@@ -97,9 +97,7 @@ planet:
     event:
       - date: '2241-02-20'
         faction:
-          source: canon
-          value:
-            - MCM
+          - MCM
         population: 43202.0
         socioIndustrial: D-D-C-D-C
       - date: '2250-01-01'
@@ -110,7 +108,7 @@ planet:
         population: 1789648.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -276,14 +274,10 @@ planet:
         population: 3009270566.0
       - date: '3014-08-03'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 2995497066.0
       - date: '3029-01-01'
@@ -308,9 +302,7 @@ planet:
         population: 3108321138.0
       - date: '3079-05-09'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 3137049641.0
       - date: '3090-06-18'
@@ -332,9 +324,7 @@ planet:
         population: 3247491179.0
       - date: '3145-08-08'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 3258551441.0
   - name: Petersburgh
     type: TERRESTRIAL

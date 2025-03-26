@@ -129,9 +129,7 @@ planet:
     event:
       - date: '2341-11-19'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 44849.0
         socioIndustrial: D-F-B-D-C
       - date: '2350-01-01'
@@ -309,9 +307,7 @@ planet:
         population: 3592477554.0
       - date: '3079-04-15'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
       - date: '3080-01-01'
         population: 3622056980.0
       - date: '3090-01-01'
@@ -334,11 +330,6 @@ planet:
         population: 3815386961.0
       - date: '3145-01-01'
         population: 3834511668.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Barjac
     type: TERRESTRIAL
     orbitalDist: 3.64

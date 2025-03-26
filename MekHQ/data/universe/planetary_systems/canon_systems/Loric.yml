@@ -84,9 +84,7 @@ planet:
     event:
       - date: '2341-05-22'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 47651.0
         socioIndustrial: D-D-C-D-C
       - date: '2350-01-01'
@@ -95,9 +93,7 @@ planet:
         population: 632468.0
       - date: '2362-03-19'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2370-01-01'
         population: 1833675.0
       - date: '2380-01-01'
@@ -114,17 +110,13 @@ planet:
         population: 75209801.0
       - date: '2440-01-27'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 103998760.0
       - date: '2450-01-01'
         population: 136087414.0
       - date: '2459-09-06'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2460-01-01'
         population: 171004075.0
       - date: '2470-01-01'
@@ -240,15 +232,11 @@ planet:
         population: 471478262.0
       - date: '2978-05-01'
         faction:
-          source: canon
-          value:
-            - LA
-            - FWL
+          - LA
+          - FWL
       - date: '2978-08-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2980-01-01'
         population: 464506443.0
       - date: '2990-01-01'
@@ -257,30 +245,26 @@ planet:
         population: 456307107.0
       - date: '3002-02-01'
         faction:
-          source: canon
-          value:
-            - LA
-            - FWL
+          - LA
+          - FWL
       - date: '3002-03-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3010-01-01'
         population: 455350230.0
       - date: '3020-01-01'
         population: 455874720.0
       - date: '3028-01-01'
         socioIndustrial: D-D-D-F-B
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 458378470.0
       - date: '3040-01-01'
         population: 463031551.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial:
           source: canon
@@ -289,23 +273,19 @@ planet:
         population: 469465680.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
         population: 475703707.0
       - date: '3068-09-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3070-01-01'
         population: 481783671.0
       - date: '3079-04-10'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3080-01-01'
         population: 485070964.0
       - date: '3090-01-01'
@@ -327,9 +307,7 @@ planet:
         population: 520138539.0
       - date: '3145-05-01'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 524526105.0
   - name: Castagnè
     type: ICE_GIANT

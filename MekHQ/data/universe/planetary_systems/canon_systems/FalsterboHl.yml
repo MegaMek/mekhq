@@ -44,9 +44,7 @@ planet:
     event:
       - date: '2891-07-03'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 47951.0
         socioIndustrial: C-D-B-D-F
       - date: '2894-07-30'
@@ -110,9 +108,7 @@ planet:
         population: 133440.0
       - date: '3140-07-09'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 133841.0
   - name: Langli
@@ -137,9 +133,7 @@ planet:
     event:
       - date: '2891-05-14'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 44996.0
         socioIndustrial: C-D-B-D-F
       - date: '2900-01-01'
@@ -202,9 +196,7 @@ planet:
         population: 127455.0
       - date: '3140-07-09'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 127582.0
   - name: 6YK-1 Belt

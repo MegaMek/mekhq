@@ -114,9 +114,7 @@ planet:
     event:
       - date: '2786-07-31'
         faction:
-          source: canon
-          value:
-            - SLIE
+          - SLIE
         population: 1073219.0
         socioIndustrial: B-C-D-C-D
       - date: '2790-01-01'
@@ -129,22 +127,18 @@ planet:
         population: 1068507.0
       - date: '2802-06-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2810-01-01'
         population: 561493.0
       - date: '2820-01-01'
         population: 406346.0
       - date: '2823-01-01'
         faction:
-          source: canon
-          value:
-            - CFM
-            - CGS
-            - CJF
-            - CSA
-            - CW
+          - CFM
+          - CGS
+          - CJF
+          - CSA
+          - CW
       - date: '2830-01-01'
         population: 1003328.0
       - date: '2840-01-01'
@@ -155,9 +149,7 @@ planet:
         population: 9005974.0
       - date: '2864-06-20'
         faction:
-          source: canon
-          value:
-            - CLAN
+          - CLAN
       - date: '2870-01-01'
         population: 13563672.0
       - date: '2880-01-01'
@@ -202,47 +194,37 @@ planet:
         population: 51363571.0
       - date: '3059-12-12'
         faction:
-          source: canon
-          value:
-            - CFM
-            - CGS
+          - CFM
+          - CGS
       - date: '3060-01-01'
         population: 51312632.0
       - date: '3070-10-25'
         faction:
-          source: canon
-          value:
-            - CFM
-            - CGS
-            - CSV
-            - CSA
-            - CW
+          - CFM
+          - CGS
+          - CSV
+          - CSA
+          - CW
         population: 51503189.0
       - date: '3072-04-01'
         faction:
-          source: canon
-          value:
-            - CFM
-            - CGS
-            - CSV
-            - CSA
-            - CCO
-            - SOC
+          - CFM
+          - CGS
+          - CSV
+          - CSA
+          - CCO
+          - SOC
       - date: '3075-07-26'
         faction:
-          source: canon
-          value:
-            - CGS
-            - CSA
+          - CGS
+          - CSA
       - date: '3079-01-01'
         population:
           source: canon
           value: 52000000.0
       - date: '3079-10-18'
         faction:
-          source: canon
-          value:
-            - CSA
+          - CSA
       - date: '3080-01-01'
         population: 52052026.0
       - date: '3090-01-01'

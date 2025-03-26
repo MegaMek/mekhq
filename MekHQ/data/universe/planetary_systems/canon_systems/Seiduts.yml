@@ -41,9 +41,7 @@ planet:
     event:
       - date: '2167-06-07'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 59044.0
         socioIndustrial: C-D-C-F-C
       - date: '2170-01-01'
@@ -64,9 +62,7 @@ planet:
         population: 8156780.0
       - date: '2242-03-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 12045205.0
       - date: '2260-01-01'
@@ -95,9 +91,7 @@ planet:
         population: 126929274.0
       - date: '2370-07-23'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 138515568.0
       - date: '2380-01-01'
         population: 149101461.0
@@ -239,80 +233,64 @@ planet:
         population: 211073940.0
       - date: '3020-01-01'
         population: 212000992.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 213654057.0
       - date: '3036-01-01'
         socioIndustrial: C-B-D-D-C
       - date: '3040-01-01'
         population: 216601260.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: B-A-C-C-B
       - date: '3050-01-01'
         population: 219172294.0
       - date: '3050-05-13'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
             - FC
       - date: '3050-05-17'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3060-01-01'
         population: 221507877.0
       - date: '3066-11-27'
         faction:
-          source: canon
-          value:
-            - CW
+          - CW
       - date: '3069-01-13'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3070-01-01'
         population: 224002711.0
       - date: '3071-05-01'
         faction:
-          source: canon
-          value:
-            - CHH
-            - CJF
+          - CHH
+          - CJF
       - date: '3071-05-15'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3072-12-17'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
       - date: '3073-02-13'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
       - date: '3080-01-01'
         population: 227297141.0
       - date: '3080-07-05'
         faction:
-          source: canon
-          value:
-            - CHH
-            - CW
+          - CHH
+          - CW
       - date: '3080-08-15'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
       - date: '3090-01-01'
         population: 230593900.0
       - date: '3100-01-01'

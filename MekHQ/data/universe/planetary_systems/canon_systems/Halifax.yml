@@ -47,9 +47,7 @@ planet:
     event:
       - date: '2714-12-28'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 58261.0
         socioIndustrial: C-D-B-D-F
       - date: '2719-06-30'
@@ -68,9 +66,7 @@ planet:
         population: 7425564.0
       - date: '2779-04-08'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-01-01'
         population: 11230426.0
       - date: '2790-01-01'
@@ -122,22 +118,22 @@ planet:
         population: 64296707.0
       - date: '3020-01-01'
         population: 63864000.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 63805376.0
       - date: '3040-01-01'
         population: 64036827.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: D-D-C-D-D
       - date: '3050-01-01'
         population: 64347883.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -166,12 +162,7 @@ planet:
         population: 68376645.0
       - date: '3148-06-24'
         faction:
-          source: canon
-          value:
-            - TiC
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - TiC
   - name: Amos Belt 1

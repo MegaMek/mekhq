@@ -146,9 +146,7 @@ planet:
     event:
       - date: '2240-09-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 45417.0
         socioIndustrial: D-D-A-D-D
       - date: '2250-01-01'
@@ -177,9 +175,7 @@ planet:
         population: 275480107.0
       - date: '2367-08-17'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2370-01-01'
         population: 353666322.0
       - date: '2380-01-01'
@@ -228,9 +224,7 @@ planet:
         population: 1667155122.0
       - date: '2571-06-09'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2580-01-01'
         population: 1698944725.0
       - date: '2590-01-01'
@@ -274,28 +268,20 @@ planet:
         population: 1887380869.0
       - date: '2767-02-27'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 1888388169.0
       - date: '2779-08-22'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 1885652819.0
       - date: '2786-12-05'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2790-07-27'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 1891760202.0
       - date: '2800-01-01'
         population: 1892815197.0
@@ -305,9 +291,7 @@ planet:
         population: 1908923744.0
       - date: '2821-11-26'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 1917670734.0
       - date: '2840-01-01'
@@ -318,9 +302,7 @@ planet:
         population: 1879565152.0
       - date: '2864-11-13'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2870-01-01'
         population: 1835859861.0
       - date: '2876-01-01'
@@ -359,19 +341,12 @@ planet:
         population: 1523771698.0
       - date: '3030-02-16'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
         population: 1516339549.0
       - date: '3032-01-01'
         socioIndustrial: B-C-B-B-C
       - date: '3040-01-01'
         population: 1535566302.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: A-B-A-A-C
       - date: '3050-01-01'
@@ -380,7 +355,7 @@ planet:
         population: 1569409195.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -389,9 +364,7 @@ planet:
         population: 1610748921.0
       - date: '3081-11-02'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1632478218.0
       - date: '3100-01-01'
@@ -408,25 +381,16 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1656818570.0
       - date: '3145-03-23'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 1657812959.0
       - date: '3149-06-04'
         faction:
-          source: canon
-          value:
-            - DC
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - DC
   - name: Morrigna

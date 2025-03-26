@@ -30,9 +30,7 @@ planet:
     event:
       - date: '2891-08-20'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 47313.0
         socioIndustrial: C-C-A-C-F
       - date: '2900-01-01'
@@ -95,9 +93,7 @@ planet:
         population: 380729.0
       - date: '3140-11-10'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 382714.0
   - name: P1 Belt

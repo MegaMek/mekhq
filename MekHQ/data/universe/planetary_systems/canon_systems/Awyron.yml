@@ -60,9 +60,7 @@ planet:
     event:
       - date: '2719-10-12'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 49212.0
         socioIndustrial: C-D-A-D-F
       - date: '2720-04-10'
@@ -80,9 +78,7 @@ planet:
         population: 6475304.0
       - date: '2779-05-05'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 10390421.0
       - date: '2790-01-01'
@@ -105,9 +101,7 @@ planet:
         population: 2880.0
       - date: '2872-07-25'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
@@ -134,9 +128,7 @@ planet:
     event:
       - date: '2719-02-22'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 42851.0
         socioIndustrial: C-D-A-C-F
       - date: '2720-01-01'
@@ -153,9 +145,7 @@ planet:
         population: 4124919.0
       - date: '2779-12-06'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 6497685.0
       - date: '2790-01-01'
@@ -178,9 +168,7 @@ planet:
         population: 2572.0
       - date: '2872-08-01'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         population: 0.0
         socioIndustrial: X-X-X-X-X
   - name: Achren

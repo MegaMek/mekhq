@@ -48,9 +48,7 @@ planet:
     event:
       - date: '2663-10-25'
         faction:
-          source: canon
-          value:
-            - AXP
+          - AXP
         population: 51774.0
         socioIndustrial: C-D-D-D-F
       - date: '2670-01-01'
@@ -199,9 +197,7 @@ planet:
     event:
       - date: '2663-08-06'
         faction:
-          source: canon
-          value:
-            - AXP
+          - AXP
         population: 50154.0
         socioIndustrial: C-D-B-F-F
       - date: '2669-01-01'

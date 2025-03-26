@@ -108,9 +108,7 @@ planet:
     event:
       - date: '2215-03-29'
         faction:
-          source: canon
-          value:
-            - SSUP
+          - SSUP
         population: 55862.0
         socioIndustrial: D-D-B-D-D
       - date: '2220-01-01'
@@ -145,7 +143,7 @@ planet:
         population: 158519868.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -249,9 +247,7 @@ planet:
         population: 639802679.0
       - date: '2821-09-29'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 638063154.0
       - date: '2840-01-01'
@@ -282,9 +278,7 @@ planet:
         population: 557950372.0
       - date: '2950-08-20'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 552809441.0
       - date: '2960-01-01'
         population: 554376913.0
@@ -302,39 +296,26 @@ planet:
         population: 503112164.0
       - date: '3030-01-14'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
         population: 503472086.0
       - date: '3032-02-05'
         faction:
-          source: canon
-          value:
-            - FWL
-            - FS
+          - FWL
+          - FC
       - date: '3032-02-09'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
       - date: '3035-01-01'
         socioIndustrial: D-D-C-D-C
       - date: '3040-01-01'
         population: 507769838.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: C-C-B-C-C
       - date: '3050-01-01'
         population: 511438974.0
       - date: '3057-10-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3060-01-01'
         population: 514516832.0
       - date: '3070-01-01'

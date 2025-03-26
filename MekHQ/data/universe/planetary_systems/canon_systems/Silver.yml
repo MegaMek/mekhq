@@ -46,9 +46,7 @@ planet:
     event:
       - date: '2622-10-24'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 45909.0
         socioIndustrial: C-D-A-F-C
       - date: '2630-01-01'
@@ -152,9 +150,7 @@ planet:
         population: 167453685.0
       - date: '3079-10-16'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
       - date: '3080-01-01'
         population: 169509133.0
       - date: '3090-01-01'
@@ -175,11 +171,6 @@ planet:
         population: 186514094.0
       - date: '3145-01-01'
         population: 187111895.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Perkūnas
     type: ICE_GIANT
     orbitalDist: 0.07

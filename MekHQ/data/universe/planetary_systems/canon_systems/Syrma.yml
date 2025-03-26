@@ -155,9 +155,7 @@ planet:
     event:
       - date: '2242-12-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 51362.0
         socioIndustrial: D-F-C-D-C
       - date: '2250-01-01'
@@ -174,9 +172,7 @@ planet:
         population: 10587020.0
       - date: '2299-11-27'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 21610855.0
       - date: '2310-01-01'
@@ -187,9 +183,9 @@ planet:
         population: 109640305.0
       - date: '2340-01-01'
         population: 162415021.0
-      - date: '2341-07-26'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -272,9 +268,7 @@ planet:
         population: 1868254491.0
       - date: '2700-10-24'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 1879315958.0
       - date: '2710-01-01'
         population: 1887260299.0
@@ -290,16 +284,12 @@ planet:
         population: 1906989833.0
       - date: '2767-01-18'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 1903842480.0
       - date: '2780-11-14'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 1876216847.0
       - date: '2790-01-01'
         population: 1835607570.0
@@ -353,50 +343,42 @@ planet:
         population: 1490623819.0
       - date: '3020-01-01'
         population: 1477787044.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1484050839.0
       - date: '3040-01-01'
         population: 1501065820.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: B-A-C-B-B
       - date: '3050-01-01'
         population: 1512668640.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
         population: 1526496747.0
       - date: '3068-11-17'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3068-12-27'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3070-01-01'
         population: 1539219396.0
       - date: '3078-05-25'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '3080-01-01'
         population: 1552824301.0
       - date: '3081-12-12'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1566236178.0
       - date: '3100-01-01'
@@ -413,16 +395,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1637999045.0
       - date: '3144-06-01'
         faction:
-          source: canon
-          value:
-            - GL
+          - GL
       - date: '3145-01-01'
         population: 1635380342.0
   - name: Matlalcueyeh

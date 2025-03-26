@@ -30,9 +30,7 @@ planet:
     event:
       - date: '2785-04-06'
         faction:
-          source: canon
-          value:
-            - CIR
+          - CIR
         population: 53814.0
         socioIndustrial: C-D-C-D-F
       - date: '2789-04-21'
@@ -89,9 +87,7 @@ planet:
         population: 1515805.0
       - date: '3025-04-07'
         faction:
-          source: canon
-          value:
-            - CIR
+          - CIR
       - date: '3030-01-01'
         population: 1512028.0
       - date: '3040-01-01'
@@ -108,9 +104,7 @@ planet:
         population: 1509419.0
       - date: '3081-05-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 1529781.0
       - date: '3100-01-01'
@@ -127,11 +121,6 @@ planet:
         population: 1654543.0
       - date: '3145-01-01'
         population: 1670169.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Roberts's Wheel
     type: ICE_GIANT
     orbitalDist: 0.42

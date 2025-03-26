@@ -98,9 +98,7 @@ planet:
     event:
       - date: '2196-02-14'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 69720.0
         socioIndustrial: D-D-A-D-F
       - date: '2200-01-01'
@@ -117,9 +115,7 @@ planet:
         population: 9243723.0
       - date: '2250-07-07'
         faction:
-          source: canon
-          value:
-            - SIS
+          - SIS
         population: 19843144.0
       - date: '2260-01-01'
         population: 38793341.0
@@ -145,7 +141,7 @@ planet:
         population: 1290141913.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -297,26 +293,18 @@ planet:
         population: 2085064345.0
       - date: '3031-04-05'
         faction:
-          source: canon
-          value:
-            - DA
-            - CC
+          - DA
+          - CC
       - date: '3031-04-07'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3032-03-02'
         faction:
-          source: canon
-          value:
-            - CC
-            - DA
+          - CC
+          - DA
       - date: '3032-03-07'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3036-01-01'
         socioIndustrial: C-D-B-D-F
       - date: '3040-01-01'
@@ -353,9 +341,7 @@ planet:
         population: 272652663.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
   - name: Adams's Belt
     type: ASTEROID_BELT
     orbitalDist: 2.24

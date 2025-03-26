@@ -31,9 +31,7 @@ planet:
     event:
       - date: '2900-09-14'
         faction:
-          source: canon
-          value:
-            - MH
+          - MH
         population: 51482.0
         socioIndustrial: C-D-B-D-F
       - date: '2907-09-07'
@@ -66,9 +64,7 @@ planet:
         population: 6810688.0
       - date: '3025-07-22'
         faction:
-          source: canon
-          value:
-            - MH
+          - MH
       - date: '3030-01-01'
         population: 6824512.0
       - date: '3040-01-01'

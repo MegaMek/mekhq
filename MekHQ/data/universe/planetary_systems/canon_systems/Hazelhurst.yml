@@ -34,9 +34,7 @@ planet:
     event:
       - date: '2405-03-23'
         faction:
-          source: canon
-          value:
-            - OA
+          - OA
         population: 52233.0
         socioIndustrial: D-D-C-D-F
       - date: '2410-01-01'
@@ -79,9 +77,7 @@ planet:
         population: 37365807.0
       - date: '2596-09-22'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2600-01-01'
         population: 38417150.0
       - date: '2610-01-01'
@@ -178,15 +174,15 @@ planet:
         population: 43048156.0
       - date: '3020-01-01'
         population: 42786018.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 42892394.0
       - date: '3040-01-01'
         population: 43440601.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: D-D-C-D-D
       - date: '3050-01-01'
@@ -195,7 +191,7 @@ planet:
         population: 44211923.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -220,9 +216,7 @@ planet:
         population: 48283723.0
       - date: '3145-09-06'
         faction:
-          source: canon
-          value:
-            - RA
+          - RA
         population: 48496639.0
   - name: Graves
     type: GIANT_TERRESTRIAL

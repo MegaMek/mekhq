@@ -31,9 +31,7 @@ planet:
     event:
       - date: '2147-10-28'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 53350.0
         socioIndustrial: D-D-B-F-D
       - date: '2150-01-01'
@@ -59,9 +57,7 @@ planet:
         population: 53580404.0
       - date: '2242-02-18'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 77959847.0
       - date: '2260-01-01'
@@ -82,9 +78,9 @@ planet:
         population: 460684429.0
       - date: '2340-01-01'
         population: 525351318.0
-      - date: '2341-04-29'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -192,9 +188,7 @@ planet:
         population: 1395521676.0
       - date: '2821-10-11'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 1380202963.0
       - date: '2840-01-01'
@@ -206,14 +200,10 @@ planet:
         population: 1323635263.0
       - date: '2864-04-15'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2866-11-15'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2870-01-01'
         population: 1320591295.0
       - date: '2880-01-01'
@@ -252,20 +242,11 @@ planet:
         socioIndustrial: C-B-C-B-C
       - date: '3030-05-26'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 1298232987.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3040-12-26'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 1307483240.0
       - date: '3044-01-01'
         socioIndustrial: B-A-B-A-C

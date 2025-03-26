@@ -97,9 +97,7 @@ planet:
     event:
       - date: '2241-07-11'
         faction:
-          source: canon
-          value:
-            - MCM
+          - MCM
         population: 58492.0
         socioIndustrial: D-D-C-D-D
       - date: '2250-01-01'
@@ -110,7 +108,7 @@ planet:
         population: 1762983.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -299,9 +297,7 @@ planet:
         population: 541815258.0
       - date: '3079-06-07'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 549454018.0
       - date: '3090-01-01'
@@ -322,28 +318,14 @@ planet:
           value: X
       - date: '3137-08-01'
         faction:
-          source: canon
-          value:
-            - MiC
+          - MiC
       - date: '3139-07-01'
         faction:
-          source: canon
-          value:
-            - CP
+          - CP
       - date: '3140-01-01'
         population: 593552157.0
       - date: '3145-01-01'
         population: 598439295.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - CP
   - name: Angell III
     type: TERRESTRIAL
     orbitalDist: 0.9

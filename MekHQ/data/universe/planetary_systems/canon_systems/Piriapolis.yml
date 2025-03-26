@@ -30,9 +30,7 @@ planet:
     event:
       - date: '2366-02-19'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 49250.0
         socioIndustrial: D-F-A-D-F
       - date: '2370-01-01'
@@ -81,9 +79,7 @@ planet:
         population: 285681002.0
       - date: '2571-01-31'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2580-01-01'
         population: 294443655.0
       - date: '2590-01-01'
@@ -140,9 +136,7 @@ planet:
         population: 353092032.0
       - date: '2821-12-22'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 347295981.0
       - date: '2840-01-01'
@@ -202,9 +196,7 @@ planet:
         population: 255205924.0
       - date: '3081-07-27'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 257461647.0
       - date: '3100-01-01'
@@ -217,9 +209,7 @@ planet:
         population: 261875910.0
       - date: '3130-12-14'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
         population: 262662717.0
       - date: '3132-08-07'
         hpg: X

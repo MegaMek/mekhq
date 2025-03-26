@@ -61,9 +61,7 @@ planet:
     event:
       - date: '2891-12-04'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 49204.0
         socioIndustrial: C-D-B-D-F
       - date: '2893-10-15'
@@ -126,9 +124,7 @@ planet:
         population: 151277.0
       - date: '3140-05-15'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 152066.0
   - name: Overell

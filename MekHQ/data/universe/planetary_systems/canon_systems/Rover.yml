@@ -88,9 +88,7 @@ planet:
     event:
       - date: '2675-06-06'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 51419.0
         socioIndustrial: C-D-B-D-F
       - date: '2680-01-01'
@@ -122,17 +120,13 @@ planet:
         population: 586.0
       - date: '2791-10-11'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '3025-09-13'
         faction:
-          source: canon
-          value:
-            - IE
+          - IE
         population: 1323.0
         socioIndustrial: B-X-X-X-X
   - name: Natoma

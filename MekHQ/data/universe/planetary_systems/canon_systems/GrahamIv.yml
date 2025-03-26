@@ -141,9 +141,7 @@ planet:
     event:
       - date: '2264-01-23'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 45774.0
         socioIndustrial: D-D-B-D-D
       - date: '2270-01-01'
@@ -158,14 +156,10 @@ planet:
         population: 2666846.0
       - date: '2316-05-26'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2317-03-22'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2320-01-01'
         population: 4743692.0
       - date: '2330-01-01'
@@ -267,26 +261,20 @@ planet:
         population: 204913397.0
       - date: '2767-11-04'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         hpg: X
         population: 200000000.0
       - date: '2770-01-01'
         population: 193566008.0
       - date: '2779-11-05'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-06-02'
         hpg: A
         population: 168727279.0
       - date: '2790-10-10'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 136867245.0
       - date: '2800-01-01'
         population: 108156600.0
@@ -296,9 +284,7 @@ planet:
         population: 61832612.0
       - date: '2821-01-11'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 46981839.0
       - date: '2840-01-01'
@@ -348,53 +334,36 @@ planet:
           value: 3000000.0
       - date: '3030-01-12'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 8424648.0
       - date: '3040-01-01'
         population: 60586296.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial: A-B-C-B-B
       - date: '3050-01-01'
         population: 397336607.0
       - date: '3057-10-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3060-01-01'
         population: 2248439739.0
       - date: '3070-01-01'
         population: 6943305047.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3078-03-09'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3078-03-15'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 6969739800.0
       - date: '3081-03-20'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 7015892218.0
       - date: '3097-01-01'
@@ -415,12 +384,7 @@ planet:
         population: 7129049337.0
       - date: '3150-10-03'
         faction:
-          source: canon
-          value:
-            - CWE
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - CWE
   - name: Graham V

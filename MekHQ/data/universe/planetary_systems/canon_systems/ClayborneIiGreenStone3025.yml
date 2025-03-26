@@ -37,9 +37,7 @@ planet:
     event:
       - date: '2655-09-15'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 46058.0
         socioIndustrial: D-D-B-D-F
       - date: '2660-01-01'
@@ -72,16 +70,12 @@ planet:
         population: 33591647.0
       - date: '2779-10-23'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 11116354.0
       - date: '2785-12-26'
         faction:
-          source: canon
-          value:
-            - CIR
+          - CIR
       - date: '2790-01-01'
         population: 3950741.0
       - date: '2800-01-01'
@@ -96,17 +90,13 @@ planet:
         population: 1844.0
       - date: '2842-09-30'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '3081-04-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 50000.0
         socioIndustrial: C-D-B-C-D
       - date: '3084-07-06'
@@ -125,11 +115,6 @@ planet:
         population: 351083.0
       - date: '3145-01-01'
         population: 376728.0
-      - date: '2108-12-05'
-        name: Green Stone
-      - date: '3025-01-01'
-        name: Clayborne II
-        message: Green Stone renamed to Clayborne II
   - name: Edo-Khel's Wind
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.6
@@ -146,7 +131,6 @@ planet:
     smallMoons: 2
     event:
       - date: '3025-01-01'
-        name: Clayborne II
   - name: Tagg's Station
     type: GAS_GIANT
     orbitalDist: 0.96
@@ -174,7 +158,6 @@ planet:
         icon: rock13
     event:
       - date: '3025-01-01'
-        name: Clayborne III
   - name: Farnsworth's Choice
     type: GAS_GIANT
     orbitalDist: 1.68
@@ -201,7 +184,6 @@ planet:
         icon: rock13
     event:
       - date: '3025-01-01'
-        name: Clayborne IV
   - name: Legh
     type: GAS_GIANT
     orbitalDist: 3.12
@@ -238,7 +220,6 @@ planet:
         icon: oddmoon2
     event:
       - date: '3025-01-01'
-        name: Clayborne V
   - name: Fort Cumberbatch
     type: GAS_GIANT
     orbitalDist: 6.0
@@ -271,7 +252,6 @@ planet:
         icon: rock5
     event:
       - date: '3025-01-01'
-        name: Clayborne VI
   - name: Coverdale's Belt
     type: ASTEROID_BELT
     orbitalDist: 11.76
@@ -306,7 +286,6 @@ planet:
       - name: Big Retallack
     event:
       - date: '3025-01-01'
-        name: Clayborne VII
   - name: Wyles's Stand
     type: ICE_GIANT
     orbitalDist: 46.32
@@ -331,4 +310,3 @@ planet:
         icon: oddmoon1
     event:
       - date: '3025-01-01'
-        name: Clayborne VIII

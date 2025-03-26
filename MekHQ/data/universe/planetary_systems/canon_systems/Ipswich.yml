@@ -84,9 +84,7 @@ planet:
     event:
       - date: '2250-06-03'
         faction:
-          source: canon
-          value:
-            - SIS
+          - SIS
         population: 41884.0
         socioIndustrial: D-D-A-C-D
       - date: '2260-01-01'
@@ -115,7 +113,7 @@ planet:
         population: 79187318.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -226,9 +224,7 @@ planet:
         population: 667649898.0
       - date: '2864-09-02'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2870-01-01'
         population: 662191369.0
       - date: '2880-01-01'
@@ -237,9 +233,7 @@ planet:
         population: 656748636.0
       - date: '2900-09-18'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 658191789.0
       - date: '2908-01-01'
         socioIndustrial: D-D-B-C-C
@@ -282,9 +276,7 @@ planet:
         population: 705700558.0
       - date: '3081-09-14'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 706547907.0
       - date: '3100-01-01'
@@ -297,9 +289,7 @@ planet:
         population: 720244695.0
       - date: '3130-10-31'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
         population: 725594275.0
       - date: '3132-08-07'
         hpg: X
@@ -307,11 +297,6 @@ planet:
         population: 732154098.0
       - date: '3145-01-01'
         population: 734353858.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Smithers
     type: DWARF_TERRESTRIAL
     orbitalDist: 3.64

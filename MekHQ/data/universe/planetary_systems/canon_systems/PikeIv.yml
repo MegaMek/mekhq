@@ -152,9 +152,7 @@ planet:
     event:
       - date: '2242-12-25'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 49289.0
         socioIndustrial: D-D-B-D-F
       - date: '2250-01-01'
@@ -173,9 +171,7 @@ planet:
         population: 97950248.0
       - date: '2320-04-06'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 178397470.0
       - date: '2330-01-01'
         population: 298997251.0
@@ -274,23 +270,17 @@ planet:
         population: 8194149373.0
       - date: '2767-10-04'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 8200900634.0
       - date: '2779-07-14'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 8145953134.0
       - date: '2790-05-07'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 8092792944.0
       - date: '2800-01-01'
         population: 8021670360.0
@@ -300,9 +290,7 @@ planet:
         population: 7808378417.0
       - date: '2821-03-03'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 7707247124.0
       - date: '2840-01-01'
@@ -361,29 +349,21 @@ planet:
         population: 7536937941.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3076-09-06'
         faction:
-          source: canon
-          value:
-            - CGB
-            - CSR
-            - Stone
-            - WOB
+          - CGB
+          - CSR
+          - Stone
+          - WOB
       - date: '3076-09-10'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 7612685427.0
       - date: '3081-09-09'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 7726191041.0
       - date: '3100-01-01'
@@ -400,16 +380,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 8346280503.0
       - date: '3145-10-07'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 8403228615.0
   - name: Pike V
     type: ICE_GIANT

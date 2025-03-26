@@ -86,9 +86,7 @@ planet:
     event:
       - date: '2534-05-27'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 50926.0
         socioIndustrial: C-D-B-F-A
       - date: '2540-01-01'
@@ -216,16 +214,12 @@ planet:
         population: 368644614.0
       - date: '3078-05-01'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
       - date: '3080-01-01'
         population: 372945790.0
       - date: '3086-02-01'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
       - date: '3090-01-01'
         population: 377750179.0
       - date: '3100-01-01'
@@ -245,12 +239,7 @@ planet:
         population: 407333831.0
       - date: '3148-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Lehtinen

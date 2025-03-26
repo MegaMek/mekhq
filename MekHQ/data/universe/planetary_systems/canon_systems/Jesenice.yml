@@ -59,9 +59,7 @@ planet:
     event:
       - date: '2620-07-20'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 50152.0
         socioIndustrial: C-D-A-D-F
       - date: '2630-01-01'
@@ -100,9 +98,7 @@ planet:
         population: 134237774.0
       - date: '2779-01-27'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-01-01'
         population: 133386159.0
       - date: '2788-08-19'
@@ -160,22 +156,22 @@ planet:
         population: 86808186.0
       - date: '3028-01-01'
         socioIndustrial: C-C-A-D-D
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 87048098.0
       - date: '3040-01-01'
         population: 87694643.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: C-D-A-D-D
       - date: '3050-01-01'
         population: 88310659.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -202,15 +198,11 @@ planet:
         population: 95074502.0
       - date: '3145-04-15'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 95074502.0
       - date: '3151-05-13'
         faction:
-          source: canon
-          value:
-            - VSM
+          - VSM
   - name: Poljčane
     type: ICE_GIANT
     orbitalDist: 1.44

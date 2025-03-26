@@ -74,9 +74,7 @@ planet:
     event:
       - date: '2621-12-18'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
         population: 51969.0
         socioIndustrial: C-F-A-D-F
       - date: '2630-01-01'
@@ -120,35 +118,22 @@ planet:
         population: 2793235.0
       - date: '2814-02-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2959-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
         population:
           source: canon
           value: 15133000.0
         socioIndustrial:
           source: canon
           value: D-D-A-C-A
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: C4C-1 Belt
     type: ASTEROID_BELT
     orbitalDist: 0.3

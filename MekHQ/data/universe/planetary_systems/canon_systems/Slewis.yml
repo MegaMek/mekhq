@@ -44,9 +44,7 @@ planet:
     event:
       - date: '2438-03-30'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 59438.0
         socioIndustrial: C-D-C-D-F
       - date: '2440-01-01'
@@ -126,9 +124,7 @@ planet:
         population: 118634077.0
       - date: '2779-04-22'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 118388959.0
       - date: '2790-01-01'
@@ -193,9 +189,7 @@ planet:
         socioIndustrial: F-F-C-D-F
       - date: '3048-01-24'
         faction:
-          source: canon
-          value:
-            - RIM
+          - RIM
       - date: '3050-01-01'
         population: 82526666.0
       - date: '3060-01-01'
@@ -216,9 +210,7 @@ planet:
         population: 91379528.0
       - date: '3130-03-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 92797664.0
       - date: '3140-01-01'
         population: 94313229.0

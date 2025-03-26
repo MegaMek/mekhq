@@ -147,46 +147,29 @@ planet:
     event:
       - date: '2735-11-16'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
       - date: '2814-02-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2910-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
       - date: '3025-09-01'
         faction:
-          source: canon
-          value:
-            - ARC
-            - ARD
+          - ARC
+          - ARD
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
         population:
           source: canon
           value: 909000000.0
         socioIndustrial:
           source: canon
           value: C-C-B-C-A
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name:
       source: canon
       value: Coromodir
@@ -230,9 +213,7 @@ planet:
     event:
       - date: '2735-11-16'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
         population: 44130.0
         socioIndustrial: C-D-A-D-F
       - date: '2740-01-01'
@@ -257,30 +238,19 @@ planet:
         population: 2255588.0
       - date: '2814-02-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
         population:
           source: canon
           value: 1983000000.0
         socioIndustrial:
           source: canon
           value: C-C-A-C-A
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Jackson's Planet
     type: GAS_GIANT
     orbitalDist: 10.0

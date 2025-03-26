@@ -30,9 +30,7 @@ planet:
     event:
       - date: '2247-08-25'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 47451.0
         socioIndustrial: D-D-A-D-F
       - date: '2250-01-01'
@@ -45,9 +43,7 @@ planet:
         population: 734042.0
       - date: '2280-04-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1885839.0
       - date: '2290-01-01'
         population: 4277456.0
@@ -207,15 +203,11 @@ planet:
         population: 715323539.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWL
-            - FWLR
+          - FWL
+          - FWLR
       - date: '3014-11-18'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 696027982.0
       - date: '3028-01-01'
@@ -236,9 +228,7 @@ planet:
         population: 723904252.0
       - date: '3081-06-23'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 730887197.0
       - date: '3091-01-01'
@@ -255,28 +245,14 @@ planet:
         hpg: X
       - date: '3137-08-01'
         faction:
-          source: canon
-          value:
-            - MiC
+          - MiC
       - date: '3139-07-01'
         faction:
-          source: canon
-          value:
-            - CP
+          - CP
       - date: '3140-01-01'
         population: 762695703.0
       - date: '3145-01-01'
         population: 769744880.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - CP
   - name: Yellowknife
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.7

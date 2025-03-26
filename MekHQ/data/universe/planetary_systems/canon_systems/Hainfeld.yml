@@ -76,9 +76,7 @@ planet:
     event:
       - date: '2551-03-02'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 54130.0
         socioIndustrial: C-D-A-D-D
       - date: '2560-01-01'
@@ -163,9 +161,7 @@ planet:
         socioIndustrial: C-D-D-F-C
       - date: '2900-11-06'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 472067055.0
       - date: '2910-01-01'
         population: 469790224.0
@@ -193,19 +189,15 @@ planet:
         population: 450833316.0
       - date: '3025-03-26'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         socioIndustrial: B-C-C-D-C
       - date: '3030-03-20'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 450211478.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-12-09'
@@ -215,7 +207,7 @@ planet:
         population: 460916742.0
       - date: '3051-12-09'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3060-01-01'
@@ -242,9 +234,7 @@ planet:
         population: 472584905.0
       - date: '3145-06-09'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 472301439.0
   - name: Moosbach
     type: GAS_GIANT

@@ -39,9 +39,7 @@ planet:
     event:
       - date: '2396-06-30'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 48907.0
         socioIndustrial: D-F-A-D-D
       - date: '2399-01-01'
@@ -216,9 +214,7 @@ planet:
         population: 194957785.0
       - date: '3145-04-07'
         faction:
-          source: canon
-          value:
-            - RA
+          - RA
         population: 196209516.0
   - name: Y1 Belt
     type: ASTEROID_BELT

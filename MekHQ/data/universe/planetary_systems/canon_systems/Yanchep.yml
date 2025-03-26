@@ -76,9 +76,7 @@ planet:
     event:
       - date: '2635-01-23'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 54092.0
         socioIndustrial: D-D-A-D-B
       - date: '2640-01-01'
@@ -192,9 +190,7 @@ planet:
         population: 362325359.0
       - date: '3081-05-29'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 369201509.0
       - date: '3100-10-18'
@@ -214,12 +210,7 @@ planet:
         population: 392423884.0
       - date: '3148-03-01'
         faction:
-          source: canon
-          value:
-            - DA
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - DA
   - name: El Rosal Belt

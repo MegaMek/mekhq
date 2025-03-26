@@ -60,9 +60,7 @@ planet:
     event:
       - date: '2680-09-03'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 51060.0
         socioIndustrial: C-D-C-C-F
       - date: '2690-01-01'
@@ -140,15 +138,15 @@ planet:
         population: 909067265.0
       - date: '3020-01-01'
         population: 893988744.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 890635234.0
       - date: '3040-01-01'
         population: 898327727.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial: C-D-C-D-D
       - date: '3050-01-01'
@@ -157,7 +155,7 @@ planet:
         socioIndustrial: C-D-D-D-D
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -209,9 +207,7 @@ planet:
     event:
       - date: '2680-04-14'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 46007.0
         socioIndustrial: C-D-A-D-C
       - date: '2687-01-01'
@@ -290,22 +286,22 @@ planet:
         population: 139327712.0
       - date: '3020-01-01'
         population: 139683889.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 140553489.0
       - date: '3040-01-01'
         population: 142221844.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial: C-C-A-C-B
       - date: '3050-01-01'
         population: 143967577.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'

@@ -155,9 +155,7 @@ planet:
     event:
       - date: '2266-01-22'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 49063.0
         socioIndustrial: D-D-B-D-D
       - date: '2270-01-01'
@@ -180,9 +178,7 @@ planet:
         population: 131779937.0
       - date: '2355-06-28'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2360-01-01'
         population: 206113055.0
       - date: '2370-01-01'
@@ -348,9 +344,7 @@ planet:
         population: 2711734861.0
       - date: '3081-01-27'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 2754369612.0
       - date: '3095-01-01'
@@ -371,9 +365,7 @@ planet:
         population: 2862194391.0
       - date: '3145-08-06'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 2862194391.0
   - name: O-1 Belt
     type: ASTEROID_BELT

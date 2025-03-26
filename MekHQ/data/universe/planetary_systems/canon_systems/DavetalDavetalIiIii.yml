@@ -52,9 +52,7 @@ planet:
     event:
       - date: '3028-05-13'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
         hpg: C
         population: 50560.0
         socioIndustrial: C-D-A-D-F
@@ -83,9 +81,7 @@ planet:
         population: 5223330.0
       - date: '3120-06-04'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 5312886.0
       - date: '3130-01-01'
         population: 5408302.0

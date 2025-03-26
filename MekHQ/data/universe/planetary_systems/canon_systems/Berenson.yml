@@ -68,9 +68,7 @@ planet:
     event:
       - date: '2267-04-22'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 48955.0
         socioIndustrial: D-D-D-C-F
       - date: '2270-01-01'
@@ -95,14 +93,10 @@ planet:
         population: 474417482.0
       - date: '2367-10-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2369-12-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2370-01-01'
         population: 709712400.0
       - date: '2380-01-01'
@@ -133,9 +127,7 @@ planet:
         population: 5598895397.0
       - date: '2500-05-30'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 5967331208.0
       - date: '2510-01-01'
         population: 6306845232.0
@@ -197,23 +189,17 @@ planet:
         population: 8533783075.0
       - date: '2767-01-28'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 8443755439.0
       - date: '2779-06-26'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 8371975302.0
       - date: '2786-09-20'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2790-01-01'
         population: 8362883529.0
       - date: '2800-01-01'
@@ -224,16 +210,12 @@ planet:
         population: 7997258655.0
       - date: '2821-12-22'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2830-01-01'
         population: 7996017386.0
       - date: '2832-03-14'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2840-01-01'
         population: 8050815905.0
       - date: '2850-01-01'
@@ -242,9 +224,7 @@ planet:
         socioIndustrial: C-B-D-B-F
       - date: '2860-03-23'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 7936662490.0
       - date: '2870-01-01'
         population: 7745582641.0
@@ -266,9 +246,7 @@ planet:
         population: 6167256381.0
       - date: '2950-04-17'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 6018776032.0
       - date: '2960-01-01'
         population: 5846581078.0
@@ -284,15 +262,11 @@ planet:
         population: 5641531498.0
       - date: '3014-10-05'
         faction:
-          source: canon
-          value:
-            - FWL
-            - FWLR
+          - FWL
+          - FWLR
       - date: '3014-10-17'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 5643283170.0
       - date: '3030-01-01'
@@ -313,27 +287,19 @@ planet:
         population: 5946645106.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3077-01-10'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3077-01-12'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 5952594726.0
       - date: '3081-03-28'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 5954976240.0
       - date: '3097-01-01'
@@ -350,28 +316,17 @@ planet:
         hpg: X
       - date: '3135-05-01'
         faction:
-          source: canon
-          value:
-            - SA
+          - SA
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3139-01-01'
         faction:
-          source: canon
-          value:
-            - AA
+          - AA
       - date: '3140-01-01'
         population: 5951404326.0
       - date: '3145-01-01'
         population: 5959742127.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: LS-4
     type: DWARF_TERRESTRIAL
     orbitalDist: 1.28

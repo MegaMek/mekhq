@@ -86,9 +86,7 @@ planet:
     event:
       - date: '2674-05-24'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 46888.0
         socioIndustrial: D-D-B-F-B
       - date: '2676-01-01'
@@ -192,9 +190,7 @@ planet:
         population: 225950654.0
       - date: '3081-10-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 230008584.0
       - date: '3092-01-01'
@@ -213,9 +209,7 @@ planet:
         population: 243792299.0
       - date: '3145-12-19'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 243597343.0
   - name: Rishmal
     type: DWARF_TERRESTRIAL

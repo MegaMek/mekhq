@@ -70,9 +70,7 @@ planet:
     event:
       - date: '2273-07-18'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 41310.0
         socioIndustrial: D-D-B-D-D
       - date: '2280-01-01'
@@ -97,9 +95,7 @@ planet:
         population: 234210740.0
       - date: '2365-10-23'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2370-01-01'
         population: 364435636.0
       - date: '2380-01-01'
@@ -148,9 +144,7 @@ planet:
         population: 5421403114.0
       - date: '2571-01-25'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2580-01-01'
         population: 5525694225.0
       - date: '2590-01-01'
@@ -266,9 +260,7 @@ planet:
         population: 4846630211.0
       - date: '3081-11-07'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 4911029832.0
       - date: '3100-01-01'
@@ -285,16 +277,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 5230378579.0
       - date: '3145-12-08'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 5271335055.0
   - name: Pérez's World
     type: TERRESTRIAL

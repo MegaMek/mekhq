@@ -35,9 +35,7 @@ planet:
     event:
       - date: '2726-02-26'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 54084.0
         socioIndustrial: B-D-B-C-F
       - date: '2730-08-15'
@@ -53,17 +51,13 @@ planet:
         population: 106712.0
       - date: '2779-12-28'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '2783-02-24'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 48267.0
         socioIndustrial: C-D-B-D-F
       - date: '2784-08-09'
@@ -148,11 +142,6 @@ planet:
         population: 43577871.0
       - date: '3145-01-01'
         population: 43700060.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Srebrenica
     type: TERRESTRIAL
     orbitalDist: 0.49

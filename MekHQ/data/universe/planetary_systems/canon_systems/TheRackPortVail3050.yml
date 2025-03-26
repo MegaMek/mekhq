@@ -97,9 +97,7 @@ planet:
     event:
       - date: '2496-01-03'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 43196.0
         socioIndustrial: C-D-B-D-B
       - date: '2500-01-01'
@@ -166,9 +164,7 @@ planet:
         population: 82073921.0
       - date: '2779-07-06'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-08-14'
         hpg: B
         population: 81310987.0
@@ -187,17 +183,13 @@ planet:
         socioIndustrial: C-D-C-C-B
       - date: '2849-11-24'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '2900-01-02'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 53114.0
         socioIndustrial: C-C-B-D-C
       - date: '2904-05-15'
@@ -246,9 +238,7 @@ planet:
         population: 67823967.0
       - date: '3087-06-01'
         faction:
-          source: canon
-          value:
-            - RT
+          - RT
       - date: '3090-01-01'
         population: 67837533.0
       - date: '3100-01-01'
@@ -265,11 +255,6 @@ planet:
         population: 70211746.0
       - date: '3145-01-01'
         population: 70648412.0
-      - date: '2108-12-05'
-        name: Port Vail
-      - date: '3050-01-01'
-        name: The Rack
-        message: Port Vail renamed to The Rack
   - name: Caldwell
     type: TERRESTRIAL
     orbitalDist: 6.24

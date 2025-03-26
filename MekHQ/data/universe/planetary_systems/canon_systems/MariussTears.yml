@@ -34,9 +34,7 @@ planet:
     event:
       - date: '3000-01-22'
         faction:
-          source: canon
-          value:
-            - MH
+          - MH
         population: 50387.0
         socioIndustrial: B-D-B-D-F
       - date: '3004-05-24'

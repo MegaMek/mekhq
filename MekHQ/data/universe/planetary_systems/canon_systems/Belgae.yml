@@ -53,9 +53,7 @@ planet:
     event:
       - date: '2765-11-16'
         faction:
-          source: canon
-          value:
-            - NDC
+          - NDC
         population: 48761.0
         socioIndustrial: C-F-C-D-F
       - date: '2767-09-27'
@@ -141,9 +139,7 @@ planet:
         population: 9138.0
       - date: '3130-06-25'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

@@ -36,14 +36,15 @@ planet:
       - name: Williams's Wheel
     event:
       - date: '2304-09-08'
-        faction:
-          source: canon
-          value:
-            - FS
         population: 36683.0
         socioIndustrial: D-D-C-C-F
       - date: '2310-01-01'
         population: 99030.0
+      - date: '2317-06-26'
+        faction:
+          source: 'Handbook: House Davion'
+          value:
+            - FS
       - date: '2320-01-01'
         population: 425142.0
       - date: '2330-01-01'
@@ -198,17 +199,17 @@ planet:
         population: 1975442284.0
       - date: '3020-01-01'
         population: 1983088610.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1997681269.0
       - date: '3032-01-01'
         socioIndustrial: D-D-D-C-D
       - date: '3040-01-01'
         population: 2021797855.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: C-C-C-B-D
       - date: '3050-01-01'
@@ -217,7 +218,7 @@ planet:
         population: 2072979911.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'

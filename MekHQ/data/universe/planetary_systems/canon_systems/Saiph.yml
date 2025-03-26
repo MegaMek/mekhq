@@ -63,9 +63,7 @@ planet:
     event:
       - date: '2260-04-05'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 52990.0
         socioIndustrial: D-C-B-D-D
       - date: '2270-01-01'
@@ -82,9 +80,7 @@ planet:
         socioIndustrial: C-C-B-C-D
       - date: '2315-07-15'
         faction:
-          source: canon
-          value:
-            - DoL
+          - DoL
       - date: '2320-01-01'
         population: 34485273.0
       - date: '2330-01-01'
@@ -97,7 +93,7 @@ planet:
         population: 247921876.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -144,9 +140,7 @@ planet:
         population: 2229388663.0
       - date: '2571-03-12'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2580-01-01'
         population: 2280780994.0
       - date: '2584-01-01'
@@ -193,23 +187,17 @@ planet:
         population: 2529356461.0
       - date: '2767-07-21'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 2519733818.0
       - date: '2779-06-16'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 2491461965.0
       - date: '2790-06-03'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 2442990593.0
       - date: '2800-01-01'
         population: 2391649350.0
@@ -262,17 +250,10 @@ planet:
         population: 1840073605.0
       - date: '3030-05-04'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
         population: 1839798172.0
       - date: '3040-01-01'
         population: 1852166206.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: C-B-C-B-C
       - date: '3048-01-01'
@@ -281,36 +262,26 @@ planet:
         population: 1866669592.0
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - ST
+          - ST
       - date: '3060-01-01'
         population: 1877527734.0
       - date: '3068-08-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 1890527473.0
       - date: '3077-01-10'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3077-01-12'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1897345637.0
       - date: '3081-11-23'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1905331247.0
       - date: '3093-01-01'
@@ -327,21 +298,15 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3136-10-01'
         faction:
-          source: canon
-          value:
-            - TTU
+          - TTU
       - date: '3140-01-01'
         population: 1936836315.0
       - date: '3145-10-23'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 1935674562.0
   - name: Rauni
     type: TERRESTRIAL

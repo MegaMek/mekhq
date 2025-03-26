@@ -62,7 +62,7 @@ planet:
     event:
       - date: '3049-08-02'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CNC
         hpg: A
@@ -70,7 +70,7 @@ planet:
         socioIndustrial: A-X-X-X-X
       - date: '3052-12-04'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CNC
         hpg: A
@@ -78,25 +78,16 @@ planet:
         socioIndustrial: A-X-X-X-X
       - date: '3062-07-02'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '3063-10-24'
         faction:
-          source: canon
-          value:
-            - CDS
+          - CDS
         hpg: A
         population: 3197.0
         socioIndustrial: A-X-X-X-X
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: 971 Belt
     type: ASTEROID_BELT
     orbitalDist: 0.4

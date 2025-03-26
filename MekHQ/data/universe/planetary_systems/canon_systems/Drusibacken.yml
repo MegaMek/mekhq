@@ -49,18 +49,14 @@ planet:
     event:
       - date: '2260-06-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 54233.0
         socioIndustrial: D-D-C-D-D
       - date: '2270-01-01'
         population: 200124.0
       - date: '2280-03-02'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 620115.0
       - date: '2290-01-01'
         population: 1662943.0
@@ -221,14 +217,10 @@ planet:
         population: 694622767.0
       - date: '3014-06-27'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 685188325.0
       - date: '3030-01-01'
@@ -247,9 +239,7 @@ planet:
         population: 709572316.0
       - date: '3081-03-20'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 718425791.0
       - date: '3100-01-01'
@@ -268,9 +258,7 @@ planet:
         population: 726953429.0
       - date: '3145-05-03'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 726517388.0
   - name: Wotton's Belt Alpha
     type: ASTEROID_BELT

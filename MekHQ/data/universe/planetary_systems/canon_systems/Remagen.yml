@@ -36,14 +36,15 @@ planet:
       - name: Little Bin Adnan
     event:
       - date: '2302-04-19'
-        faction:
-          source: canon
-          value:
-            - FS
         population: 52222.0
         socioIndustrial: D-D-A-D-B
       - date: '2310-01-01'
         population: 149625.0
+      - date: '2317-06-26'
+        faction:
+          source: 'Handbook: House Davion'
+          value:
+            - FS
       - date: '2320-01-01'
         population: 469083.0
       - date: '2330-01-01'
@@ -197,16 +198,16 @@ planet:
         population: 407859456.0
       - date: '3020-01-01'
         population: 407754318.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-03-27'
         population: 409758498.0
         socioIndustrial: C-D-B-F-B
       - date: '3040-01-01'
         population: 412801958.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial: B-D-A-D-A
       - date: '3050-01-01'
@@ -215,7 +216,7 @@ planet:
         population: 419795613.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'

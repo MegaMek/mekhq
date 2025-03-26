@@ -38,9 +38,7 @@ planet:
     event:
       - date: '2891-06-12'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 53123.0
         socioIndustrial: C-D-B-C-C
       - date: '2898-11-20'
@@ -102,9 +100,7 @@ planet:
         population: 4622440.0
       - date: '3140-11-18'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 4641895.0
   - name: Lee's End

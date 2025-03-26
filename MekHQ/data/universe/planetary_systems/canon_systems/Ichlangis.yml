@@ -34,9 +34,7 @@ planet:
     event:
       - date: '2612-08-06'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 54568.0
         socioIndustrial: C-D-B-D-F
       - date: '2620-07-24'
@@ -83,40 +81,23 @@ planet:
         population: 682960.0
       - date: '2814-02-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2978-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
       - date: '3025-01-25'
         faction:
-          source: assumption
-          value:
-            - ARC
-            - ARD
+          - ARC
+          - ARD
       - date: '3025-03-01'
         faction:
-          source: assumption
-          value:
-            - ARC
+          - ARC
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
+          - ARC
   - name: Tibaldi
     type: GAS_GIANT
     orbitalDist: 0.7

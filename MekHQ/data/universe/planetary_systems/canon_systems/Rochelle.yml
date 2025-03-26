@@ -133,9 +133,7 @@ planet:
     event:
       - date: '2242-07-25'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 48024.0
         socioIndustrial: D-D-B-C-D
       - date: '2250-01-01'
@@ -164,9 +162,7 @@ planet:
         population: 178660819.0
       - date: '2355-06-11'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2360-01-01'
         population: 242663130.0
       - date: '2370-01-01'
@@ -181,9 +177,7 @@ planet:
         population: 688828822.0
       - date: '2418-11-03'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2420-01-01'
         population: 791744302.0
       - date: '2430-01-01'
@@ -274,9 +268,7 @@ planet:
         population: 1635112719.0
       - date: '2821-07-30'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2830-01-01'
         population: 1633980909.0
       - date: '2840-01-01'
@@ -295,9 +287,7 @@ planet:
         population: 1617097461.0
       - date: '2900-03-31'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1619856064.0
       - date: '2910-01-01'
         population: 1616666853.0
@@ -322,15 +312,11 @@ planet:
         population: 1581660219.0
       - date: '3007-06-02'
         faction:
-          source: canon
-          value:
-            - LA
-            - FWL
+          - LA
+          - FWL
       - date: '3007-06-25'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3010-01-01'
         population: 1587399293.0
       - date: '3020-01-01'
@@ -351,27 +337,19 @@ planet:
         population: 1650900277.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3079-09-01'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3079-09-10'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1677527128.0
       - date: '3081-11-26'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1709362957.0
       - date: '3100-01-01'
@@ -388,27 +366,19 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3136-02-01'
         faction:
-          source: canon
-          value:
-            - PC
+          - PC
       - date: '3140-01-01'
         population: 1785182697.0
       - date: '3145-09-17'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 1784825697.0
       - date: '3151-11-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: Fauna's Frontier
     type: TERRESTRIAL
     orbitalDist: 0.6

@@ -60,9 +60,7 @@ planet:
     event:
       - date: '2673-12-13'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 48094.0
         socioIndustrial: C-D-B-D-D
       - date: '2675-01-01'
@@ -92,9 +90,7 @@ planet:
         population: 128712662.0
       - date: '2779-06-22'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 129095863.0
       - date: '2790-01-01'
@@ -157,9 +153,7 @@ planet:
         socioIndustrial: D-D-C-D-D
       - date: '3048-09-23'
         faction:
-          source: canon
-          value:
-            - RIM
+          - RIM
       - date: '3050-01-01'
         population: 84340726.0
       - date: '3060-01-01'
@@ -184,11 +178,6 @@ planet:
         population: 96444224.0
       - date: '3145-01-01'
         population: 96869514.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - TiC
   - name: Plaistow
     type: TERRESTRIAL
     orbitalDist: 1.28

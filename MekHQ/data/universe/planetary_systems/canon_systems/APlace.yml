@@ -69,9 +69,7 @@ planet:
     event:
       - date: '2235-04-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 41458.0
         socioIndustrial: D-C-A-D-C
       - date: '2240-01-01'
@@ -104,9 +102,7 @@ planet:
         population: 111039134.0
       - date: '2362-05-07'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2370-01-01'
         population: 138341732.0
       - date: '2380-01-01'
@@ -248,33 +244,29 @@ planet:
         population: 482148465.0
       - date: '3020-01-01'
         population: 462716592.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 457823982.0
       - date: '3036-01-01'
         socioIndustrial: B-D-B-C-C
       - date: '3040-01-01'
         population: 463165662.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: A-C-A-C-B
       - date: '3050-01-01'
         population: 469695584.0
       - date: '3057-12-01'
         faction:
-          source: canon
-          value:
-            - ARDC
+          - ARDC
       - date: '3060-01-01'
         population: 476031863.0
       - date: '3067-04-24'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3070-01-01'
         population: 481297119.0
       - date: '3080-01-01'
@@ -291,27 +283,21 @@ planet:
         population: 494864897.0
       - date: '3130-08-04'
         faction:
-          source: canon
-          value:
-            - CJF
-            - LA
+          - CJF
+          - LA
         population: 496053999.0
       - date: '3132-08-07'
         hpg: X
       - date: '3135-01-15'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3140-01-01'
         population: 497942591.0
       - date: '3145-01-01'
         population: 498341104.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Sraosa Belt
     type: ASTEROID_BELT
     orbitalDist: 0.9

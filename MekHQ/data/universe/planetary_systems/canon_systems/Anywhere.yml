@@ -88,9 +88,7 @@ planet:
     event:
       - date: '2341-08-16'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 52610.0
         socioIndustrial: D-D-D-D-B
       - date: '2350-01-01'
@@ -186,9 +184,7 @@ planet:
         population: 182939602.0
       - date: '2779-05-02'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-01-01'
         population: 181881228.0
       - date: '2790-01-01'
@@ -243,22 +239,22 @@ planet:
         population: 157880247.0
       - date: '3020-01-01'
         population: 156802483.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 157033047.0
       - date: '3040-01-01'
         population: 158531969.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: C-C-C-D-A
       - date: '3050-01-01'
         population: 159549828.0
       - date: '3050-03-08'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3060-01-01'
@@ -267,14 +263,10 @@ planet:
         population: 162042115.0
       - date: '3071-06-03'
         faction:
-          source: canon
-          value:
-            - CIH
+          - CIH
       - date: '3071-12-03'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3080-01-01'
         population: 164195251.0
       - date: '3090-01-01'
@@ -295,9 +287,7 @@ planet:
         population: 180920240.0
       - date: '3151-11-15'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
   - name: Carleton
     type: ICE_GIANT
     orbitalDist: 2.8

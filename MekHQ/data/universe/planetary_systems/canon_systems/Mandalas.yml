@@ -45,9 +45,7 @@ planet:
     event:
       - date: '3130-12-10'
         faction:
-          source: canon
-          value:
-            - FR
+          - FR
         population: 50000.0
         socioIndustrial: D-D-A-D-D
       - date: '3134-11-03'

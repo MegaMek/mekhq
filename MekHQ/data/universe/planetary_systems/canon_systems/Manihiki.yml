@@ -38,9 +38,7 @@ planet:
     event:
       - date: '2241-05-22'
         faction:
-          source: canon
-          value:
-            - MCM
+          - MCM
         population: 53053.0
         socioIndustrial: D-D-C-D-F
       - date: '2249-01-01'
@@ -53,7 +51,7 @@ planet:
         population: 2846182.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -229,9 +227,7 @@ planet:
         population: 5996646998.0
       - date: '3079-09-06'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 6055703040.0
       - date: '3090-01-01'
@@ -246,9 +242,7 @@ planet:
         population: 6404497509.0
       - date: '3130-06-02'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 6502589481.0
       - date: '3132-08-07'
         hpg: X
@@ -256,9 +250,7 @@ planet:
         population: 6570569294.0
       - date: '3145-06-09'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 6582406970.0
   - name: Nalunani
     type: GIANT_TERRESTRIAL

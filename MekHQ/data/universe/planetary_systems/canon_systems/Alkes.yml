@@ -73,9 +73,7 @@ planet:
     event:
       - date: '2271-11-02'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 63707.0
         socioIndustrial: D-F-D-D-D
       - date: '2280-01-01'
@@ -98,9 +96,7 @@ planet:
         population: 100342723.0
       - date: '2355-06-22'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2360-01-01'
         population: 157095066.0
       - date: '2370-01-01'
@@ -115,9 +111,7 @@ planet:
         population: 673171391.0
       - date: '2417-08-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2420-01-01'
         population: 803186134.0
       - date: '2430-01-01'
@@ -211,9 +205,7 @@ planet:
         population: 2267709336.0
       - date: '2821-07-14'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2830-01-01'
         population: 2257750704.0
       - date: '2840-01-01'
@@ -232,9 +224,7 @@ planet:
         population: 2229713025.0
       - date: '2900-10-13'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 2233045037.0
       - date: '2901-01-01'
         socioIndustrial: C-B-F-C-C
@@ -278,16 +268,12 @@ planet:
         population: 2311386136.0
       - date: '3079-06-22'
         faction:
-          source: canon
-          value:
-            - SHC
+          - SHC
       - date: '3080-01-01'
         population: 2327622600.0
       - date: '3082-06-24'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 2343973119.0
       - date: '3100-01-01'
@@ -304,27 +290,16 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3136-02-01'
         faction:
-          source: canon
-          value:
-            - PC
+          - PC
       - date: '3140-01-01'
         population: 2361382856.0
       - date: '3145-10-16'
         faction:
-          source: canon
-          value:
-            - CvW
+          - CvW
         population: 2368003994.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Hugues
     type: TERRESTRIAL
     orbitalDist: 1.6

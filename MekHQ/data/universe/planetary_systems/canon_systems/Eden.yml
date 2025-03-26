@@ -84,9 +84,7 @@ planet:
     event:
       - date: '2786-12-23'
         faction:
-          source: canon
-          value:
-            - SLIE
+          - SLIE
         population: 1273354.0
         socioIndustrial: B-C-D-C-F
       - date: '2790-01-01'
@@ -99,20 +97,16 @@ planet:
         population: 1288211.0
       - date: '2802-06-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2810-01-01'
         population: 688808.0
       - date: '2820-01-01'
         population: 449331.0
       - date: '2822-12-20'
         faction:
-          source: canon
-          value:
-            - CW
-            - CJF
-            - CHH
+          - CW
+          - CJF
+          - CHH
       - date: '2830-01-01'
         population: 773262.0
       - date: '2840-01-01'
@@ -167,42 +161,32 @@ planet:
         population: 43097.0
       - date: '3069-11-07'
         faction:
-          source: canon
-          value:
-            - CW
-            - CSV
-            - CHH
+          - CW
+          - CSV
+          - CHH
       - date: '3070-01-01'
         population: 34258.0
       - date: '3072-04-01'
         faction:
-          source: canon
-          value:
-            - CSV
-            - CSA
-            - CCO
-            - CBS
-            - CCC
+          - CSV
+          - CSA
+          - CCO
+          - CBS
+          - CCC
       - date: '3073-03-04'
         faction:
-          source: canon
-          value:
-            - CBS
-            - CSV
-            - CCO
+          - CBS
+          - CSV
+          - CCO
       - date: '3075-12-23'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CBS
+          - CCC
+          - CBS
       - date: '3080-01-01'
         population: 25957.0
       - date: '3085-06-08'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         population: 0.0
         socioIndustrial: X-X-X-X-X
   - name: Privithi

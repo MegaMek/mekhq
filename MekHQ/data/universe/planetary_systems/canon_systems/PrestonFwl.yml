@@ -82,9 +82,7 @@ planet:
     event:
       - date: '2249-05-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 59638.0
         socioIndustrial: D-D-A-D-D
       - date: '2250-01-01'
@@ -101,9 +99,7 @@ planet:
         population: 8206708.0
       - date: '2310-11-30'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 15169193.0
       - date: '2320-01-01'
         population: 25718031.0
@@ -277,9 +273,7 @@ planet:
         population: 625587590.0
       - date: '3081-07-15'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 625462485.0
       - date: '3100-01-01'
@@ -288,9 +282,7 @@ planet:
         socioIndustrial: B-F-A-C-C
       - date: '3110-03-02'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
         population: 626965398.0
       - date: '3120-01-01'
         population: 629730124.0
@@ -302,9 +294,7 @@ planet:
         population: 638225298.0
       - date: '3145-11-09'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 643737705.0
   - name: Achelois
     type: DWARF_TERRESTRIAL

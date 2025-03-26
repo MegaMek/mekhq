@@ -48,9 +48,7 @@ planet:
     event:
       - date: '2559-01-07'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 51233.0
         socioIndustrial: C-D-B-D-A
       - date: '2560-01-01'
@@ -117,9 +115,7 @@ planet:
         population: 438925418.0
       - date: '2821-05-03'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 425730282.0
       - date: '2840-01-01'
@@ -138,9 +134,7 @@ planet:
         population: 363625341.0
       - date: '2900-12-17'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 358093406.0
       - date: '2905-01-01'
         socioIndustrial: C-D-C-C-C
@@ -172,7 +166,7 @@ planet:
         population: 320320618.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3036-01-01'
@@ -185,7 +179,7 @@ planet:
         population: 326987658.0
       - date: '3052-04-02'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3060-01-01'
@@ -212,9 +206,7 @@ planet:
         population: 364826693.0
       - date: '3145-02-15'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 368124953.0
   - name: Adrano
     type: ICE_GIANT

@@ -106,9 +106,7 @@ planet:
     event:
       - date: '2269-10-27'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 44643.0
         socioIndustrial: F-D-C-F-C
       - date: '2270-01-01'
@@ -126,9 +124,7 @@ planet:
         socioIndustrial: D-D-C-D-C
       - date: '2330-10-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 30349088.0
       - date: '2340-01-01'
         population: 56006626.0
@@ -297,9 +293,7 @@ planet:
         population: 2447344947.0
       - date: '3081-02-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 2492294425.0
       - date: '3100-01-01'
@@ -320,9 +314,7 @@ planet:
         population: 2574882088.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
   - name: Sajjadi
     type: DWARF_TERRESTRIAL
     orbitalDist: 3.92

@@ -61,9 +61,7 @@ planet:
     event:
       - date: '2554-12-23'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 52425.0
         socioIndustrial: C-D-A-D-C
       - date: '2560-01-01'
@@ -117,9 +115,7 @@ planet:
         population: 69825323.0
       - date: '2779-07-21'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 70331317.0
       - date: '2790-01-01'
@@ -183,9 +179,7 @@ planet:
         socioIndustrial: D-C-A-C-B
       - date: '3048-06-25'
         faction:
-          source: canon
-          value:
-            - RIM
+          - RIM
       - date: '3050-01-01'
         population: 74801633.0
       - date: '3060-01-01'
@@ -210,11 +204,6 @@ planet:
         population: 80273513.0
       - date: '3145-01-01'
         population: 80740452.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - TiC
   - name: Eau Pleine
     type: GIANT_TERRESTRIAL
     orbitalDist: 2.4

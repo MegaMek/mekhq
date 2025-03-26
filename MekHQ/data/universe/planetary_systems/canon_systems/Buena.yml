@@ -105,9 +105,7 @@ planet:
     event:
       - date: '2390-12-02'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 50296.0
         socioIndustrial: D-D-C-D-D
       - date: '2400-01-01'
@@ -248,6 +246,11 @@ planet:
         population: 145740606.0
       - date: '3020-01-01'
         population: 140980574.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-06-06'
         population: 139166002.0
         socioIndustrial: D-C-D-D-C
@@ -255,11 +258,6 @@ planet:
         socioIndustrial: C-C-D-D-C
       - date: '3040-01-01'
         population: 140550588.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial:
           source: canon
@@ -268,7 +266,7 @@ planet:
         population: 141849620.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -295,12 +293,12 @@ planet:
         population: 152348016.0
       - date: '3146-07-07'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - BC
       - date: '3148-01-30'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - LA
   - name: Cabezarados

@@ -75,9 +75,7 @@ planet:
     event:
       - date: '2242-09-08'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 38865.0
         socioIndustrial: D-D-B-D-C
       - date: '2250-01-01'
@@ -88,9 +86,7 @@ planet:
         population: 1306162.0
       - date: '2280-05-08'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 3411094.0
       - date: '2290-01-01'
         population: 7875569.0
@@ -224,9 +220,7 @@ planet:
         population: 2276036294.0
       - date: '2864-03-30'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2870-01-01'
         population: 2272242557.0
       - date: '2880-01-01'
@@ -241,9 +235,7 @@ planet:
         population: 2184599817.0
       - date: '2920-02-07'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 2151289837.0
       - date: '2930-01-01'
         population: 2147704030.0
@@ -281,16 +273,12 @@ planet:
         population: 2145101309.0
       - date: '3071-09-14'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3080-01-01'
         population: 2168827679.0
       - date: '3081-09-06'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 2188872961.0
       - date: '3093-01-01'
@@ -307,23 +295,14 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3138-05-01'
         faction:
-          source: canon
-          value:
-            - CvW
+          - CvW
       - date: '3140-01-01'
         population: 2276380728.0
       - date: '3145-01-01'
         population: 2285047431.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Mousai Belt
     type: ASTEROID_BELT
     orbitalDist: 1.44

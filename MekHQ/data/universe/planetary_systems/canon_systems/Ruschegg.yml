@@ -37,9 +37,7 @@ planet:
     event:
       - date: '2400-05-02'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 46624.0
         socioIndustrial: C-D-C-D-C
       - date: '2401-01-01'
@@ -78,29 +76,21 @@ planet:
         population: 271233723.0
       - date: '2553-05-12'
         faction:
-          source: canon
-          value:
-            - MOC
+          - MOC
       - date: '2560-01-01'
         population: 298017037.0
       - date: '2570-01-01'
         population: 322938595.0
       - date: '2578-07-02'
         faction:
-          source: canon
-          value:
-            - MOC
-            - SL
+          - MOC
+          - SL
       - date: '2578-07-15'
         faction:
-          source: canon
-          value:
-            - SL
+          - SL
       - date: '2579-04-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2580-01-01'
         population: 346350241.0
       - date: '2590-01-01'
@@ -220,9 +210,7 @@ planet:
         population: 293950657.0
       - date: '3081-08-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 297142529.0
       - date: '3096-01-01'
@@ -243,12 +231,7 @@ planet:
         population: 310881534.0
       - date: '3148-09-01'
         faction:
-          source: canon
-          value:
-            - MOC
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - MOC
   - name: Krechswahl

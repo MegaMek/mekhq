@@ -84,9 +84,7 @@ planet:
     event:
       - date: '2215-10-07'
         faction:
-          source: canon
-          value:
-            - SSUP
+          - SSUP
         population: 36763.0
         socioIndustrial: D-F-C-D-F
       - date: '2220-01-01'
@@ -123,7 +121,7 @@ planet:
         population: 407159115.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -244,9 +242,7 @@ planet:
         population: 2287974512.0
       - date: '2900-05-14'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 2280543286.0
       - date: '2910-01-01'
         population: 2275123794.0
@@ -274,21 +270,15 @@ planet:
         population: 2148432857.0
       - date: '3014-08-01'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 2126843755.0
       - date: '3025-07-26'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3030-01-01'
         population: 2126853398.0
       - date: '3039-01-01'
@@ -305,16 +295,12 @@ planet:
         population: 2221857615.0
       - date: '3079-08-01'
         faction:
-          source: canon
-          value:
-            - OZP
+          - OZP
       - date: '3080-01-01'
         population: 2244636538.0
       - date: '3085-03-05'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 2266288813.0
       - date: '3100-01-01'
@@ -333,16 +319,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 2380102632.0
       - date: '3145-02-20'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 2394426176.0
   - name: Cachoeira dos Índios
     type: DWARF_TERRESTRIAL

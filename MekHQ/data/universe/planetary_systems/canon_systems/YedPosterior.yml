@@ -103,9 +103,7 @@ planet:
     event:
       - date: '2133-04-20'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 47214.0
         socioIndustrial: D-C-C-D-F
       - date: '2138-01-01'
@@ -134,9 +132,7 @@ planet:
         population: 233040810.0
       - date: '2242-12-18'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 336949538.0
       - date: '2260-01-01'
@@ -149,9 +145,7 @@ planet:
         population: 1038529593.0
       - date: '2299-10-10'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 1271642081.0
       - date: '2310-01-01'
@@ -162,9 +156,9 @@ planet:
         population: 2087365132.0
       - date: '2340-01-01'
         population: 2384036154.0
-      - date: '2341-12-02'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -313,17 +307,17 @@ planet:
         population: 5115174393.0
       - date: '3020-01-01'
         population: 4985382426.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 4959606333.0
       - date: '3033-01-01'
         socioIndustrial: B-B-C-B-D
       - date: '3040-01-01'
         population: 5028020507.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial: B-B-C-B-F
       - date: '3046-01-01'
@@ -332,34 +326,34 @@ planet:
         population: 5086685142.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
         population: 5122929120.0
+      - date: '3063-01-01'
+        faction:
+          source: FedCom Civil War
+          value:
+            - LA
       - date: '3064-01-01'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - LA
             - FC
       - date: '3064-01-05'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
-      - date: '3063-01-01'
-        faction:
-          - LA
       - date: '3070-01-01'
         population: 5162011707.0
       - date: '3080-01-01'
         population: 5214933670.0
       - date: '3081-04-26'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 5263132434.0
       - date: '3100-01-01'
@@ -376,22 +370,16 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-05-28'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 5694645624.0
       - date: '3145-01-01'
         population: 5741533697.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Sahasadecha's Harvest
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.8

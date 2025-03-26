@@ -175,9 +175,7 @@ planet:
     event:
       - date: '2194-08-10'
         faction:
-          source: canon
-          value:
-            - CRep
+          - CRep
         population: 51372.0
         socioIndustrial: D-D-B-D-D
       - date: '2200-01-01'
@@ -196,9 +194,7 @@ planet:
         population: 42662646.0
       - date: '2270-09-06'
         faction:
-          source: canon
-          value:
-            - CH
+          - CH
         population: 77482376.0
       - date: '2280-01-01'
         population: 130193471.0
@@ -208,9 +204,7 @@ planet:
         population: 304049557.0
       - date: '2310-11-22'
         faction:
-          source: canon
-          value:
-            - CCom
+          - CCom
         population: 430613516.0
       - date: '2320-01-01'
         population: 581246131.0
@@ -224,7 +218,7 @@ planet:
         population: 1428453286.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -272,9 +266,7 @@ planet:
         population: 5118339925.0
       - date: '2571-09-14'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2578-01-01'
         socioIndustrial: B-B-B-B-C
       - date: '2580-01-01'
@@ -387,15 +379,11 @@ planet:
         population: 5636261908.0
       - date: '3039-08-13'
         faction:
-          source: canon
-          value:
-            - FWL
-            - CC
+          - FWL
+          - CC
       - date: '3039-08-15'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3040-01-01'
         population: 5999473454.0
       - date: '3044-01-01'

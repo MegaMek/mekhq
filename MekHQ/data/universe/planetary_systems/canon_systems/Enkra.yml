@@ -39,9 +39,7 @@ planet:
     event:
       - date: '2630-06-26'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 45289.0
         socioIndustrial: C-D-A-D-C
       - date: '2640-02-14'
@@ -82,15 +80,13 @@ planet:
       - date: '2790-01-01'
         population: 112804774.0
       - date: '2800-01-01'
-        population: 51743662.0
         hpg: X
+        population: 51743662.0
       - date: '2810-01-01'
         population: 25013157.0
       - date: '2814-02-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2820-01-01'
         population: 13032420.0
       - date: '2830-01-01'
@@ -119,31 +115,18 @@ planet:
         population: 1553819.0
       - date: '2997-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
       - date: '3025-03-15'
         faction:
-          source: assumption
-          value:
-            - ARC
-            - ARD
+          - ARC
+          - ARD
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
         population: 2497852.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Wassermann
     type: TERRESTRIAL
     orbitalDist: 0.42

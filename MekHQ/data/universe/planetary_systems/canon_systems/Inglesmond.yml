@@ -90,9 +90,7 @@ planet:
     event:
       - date: '2254-02-21'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 52926.0
         socioIndustrial: D-D-C-D-D
       - date: '2260-01-01'
@@ -109,9 +107,7 @@ planet:
         population: 21893932.0
       - date: '2320-01-02'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 41866918.0
       - date: '2330-01-01'
         population: 73171186.0
@@ -212,49 +208,41 @@ planet:
         population: 2036553514.0
       - date: '2767-09-26'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 2025059747.0
       - date: '2773-07-10'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2779-01-01'
+        hpg: A
         population:
           source: canon
           value: 4200000000.0
         socioIndustrial: A-A-A-A-A
-        hpg: A
       - date: '2787-09-18'
+        hpg:
+          source: canon
+          value: A
         population:
           source: canon
           value: 4270000000.0
         socioIndustrial:
           source: canon
           value: A-A-A-A-A
-        hpg:
-          source: canon
-          value: A
       - date: '2789-09-18'
         faction:
-          source: canon
-          value:
-            - DC
-        population: 2000060106.0
-        socioIndustrial: F-F-F-F-F
+          - DC
         hpg:
           source: canon
           value: X
+        population: 2000060106.0
+        socioIndustrial: F-F-F-F-F
       - date: '2790-01-01'
         population: 1995587293.0
       - date: '2799-07-23'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg:
           source: canon
           value: X
@@ -346,11 +334,6 @@ planet:
         population: 1817544225.0
       - date: '3145-01-01'
         population: 1818271388.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Bielobog
     type: TERRESTRIAL
     orbitalDist: 0.77

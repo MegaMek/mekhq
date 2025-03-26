@@ -50,9 +50,7 @@ planet:
     event:
       - date: '2260-04-03'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 47555.0
         socioIndustrial: F-D-A-C-F
       - date: '2270-01-01'
@@ -73,9 +71,7 @@ planet:
         population: 12105549.0
       - date: '2335-01-10'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2340-01-01'
         population: 18769115.0
       - date: '2350-01-01'
@@ -244,9 +240,7 @@ planet:
         population: 227786821.0
       - date: '3081-04-14'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 228699793.0
       - date: '3097-01-01'
@@ -267,12 +261,7 @@ planet:
         population: 241389110.0
       - date: '3148-09-01'
         faction:
-          source: canon
-          value:
-            - MOC
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - MOC
   - name: Cuddalore

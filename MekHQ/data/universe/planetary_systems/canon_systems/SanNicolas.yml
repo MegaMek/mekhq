@@ -36,9 +36,7 @@ planet:
     event:
       - date: '2721-01-30'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 42629.0
         socioIndustrial: C-D-A-D-C
       - date: '2722-05-20'
@@ -105,14 +103,10 @@ planet:
         population: 102254114.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 103513306.0
       - date: '3030-01-01'
@@ -131,9 +125,7 @@ planet:
         population: 106758064.0
       - date: '3081-09-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 108371506.0
       - date: '3100-01-01'
@@ -154,12 +146,7 @@ planet:
         population: 119195523.0
       - date: '3150-08-15'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Angel R. Cabada

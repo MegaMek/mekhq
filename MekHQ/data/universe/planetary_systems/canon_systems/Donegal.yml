@@ -127,9 +127,7 @@ planet:
     event:
       - date: '2314-01-26'
         faction:
-          source: canon
-          value:
-            - PD
+          - PD
         population: 57737.0
         socioIndustrial: D-D-A-D-C
       - date: '2320-01-01'
@@ -138,9 +136,9 @@ planet:
         population: 848190.0
       - date: '2340-01-01'
         population: 3277536.0
-      - date: '2341-06-02'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -292,17 +290,17 @@ planet:
         population: 5509705613.0
       - date: '3020-01-01'
         population: 5505323551.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 5531755159.0
       - date: '3034-01-01'
         socioIndustrial: B-B-B-B-C
       - date: '3040-01-01'
         population: 5596856796.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial:
           source: canon
@@ -311,7 +309,7 @@ planet:
         population: 5660459959.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -322,28 +320,20 @@ planet:
           value: 5765000000.0
       - date: '3068-03-14'
         faction:
-          source: canon
-          value:
-            - LA
-            - WOB
+          - LA
+          - WOB
       - date: '3068-03-18'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3070-01-01'
         population: 5780008503.0
       - date: '3070-02-27'
         faction:
-          source: canon
-          value:
-            - LA
-            - WOB
+          - LA
+          - WOB
       - date: '3072-02-14'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3080-01-01'
         population: 5841602464.0
       - date: '3090-01-01'

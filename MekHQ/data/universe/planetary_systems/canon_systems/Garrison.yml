@@ -91,9 +91,7 @@ planet:
     event:
       - date: '2314-05-11'
         faction:
-          source: canon
-          value:
-            - PD
+          - PD
         population: 50648.0
         socioIndustrial: D-D-C-D-F
       - date: '2320-01-01'
@@ -102,9 +100,9 @@ planet:
         population: 470508.0
       - date: '2340-01-01'
         population: 1450447.0
-      - date: '2341-10-09'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -252,24 +250,24 @@ planet:
         population: 736436596.0
       - date: '3020-01-01'
         population: 732583967.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 735273216.0
       - date: '3034-01-01'
         socioIndustrial: C-D-C-C-D
       - date: '3040-01-01'
         population: 744372925.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial: C-D-C-D-D
       - date: '3050-01-01'
         population: 754565550.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3059-01-01'
@@ -292,17 +290,13 @@ planet:
         socioIndustrial: C-D-B-F-D
       - date: '3130-09-06'
         faction:
-          source: canon
-          value:
-            - CW
+          - CW
         population: 799704395.0
       - date: '3140-01-01'
         population: 812277599.0
       - date: '3145-12-09'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 818310749.0
   - name: Lucifer
     type: TERRESTRIAL

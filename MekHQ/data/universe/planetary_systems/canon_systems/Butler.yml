@@ -100,9 +100,7 @@ planet:
     event:
       - date: '2548-05-20'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 46062.0
         socioIndustrial: C-D-B-D-D
       - date: '2550-01-01'
@@ -215,6 +213,11 @@ planet:
         population: 181290335.0
       - date: '3020-01-01'
         population: 179855521.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 180318054.0
       - date: '3040-04-30'
@@ -222,11 +225,6 @@ planet:
         socioIndustrial:
           source: canon
           value: C-D-C-D-C
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial:
           source: canon
@@ -235,7 +233,7 @@ planet:
         population: 183134757.0
       - date: '3050-05-12'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3060-01-01'
@@ -266,9 +264,7 @@ planet:
         population: 200020980.0
       - date: '3151-12-01'
         faction:
-          source: canon
-          value:
-            - AML
+          - AML
   - name: Mineral Wells
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.8

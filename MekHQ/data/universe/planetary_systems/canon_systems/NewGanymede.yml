@@ -101,9 +101,7 @@ planet:
     event:
       - date: '2322-03-27'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
         population: 55940.0
         socioIndustrial: D-D-C-F-D
       - date: '2330-01-01'
@@ -164,22 +162,16 @@ planet:
         population: 136905.0
       - date: '2587-02-15'
         faction:
-          source: canon
-          value:
-            - SL
-            - TC
+          - SL
+          - TC
       - date: '2587-08-15'
         faction:
-          source: canon
-          value:
-            - SL
+          - SL
       - date: '2590-01-01'
         population: 137204.0
       - date: '2597-03-21'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
       - date: '2600-01-01'
         population: 136901.0
       - date: '2610-01-01'

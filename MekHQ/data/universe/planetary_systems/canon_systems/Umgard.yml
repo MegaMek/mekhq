@@ -38,9 +38,7 @@ planet:
     event:
       - date: '2657-04-14'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 48633.0
         socioIndustrial: C-D-C-F-F
       - date: '2660-01-01'
@@ -84,9 +82,7 @@ planet:
         population: 1945944.0
       - date: '2814-02-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2820-01-01'
         population: 926221.0
       - date: '2830-01-01'
@@ -97,31 +93,18 @@ planet:
         socioIndustrial: F-D-D-D-F
       - date: '2948-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
       - date: '3025-03-15'
         faction:
-          source: assumption
-          value:
-            - ARC
-            - ARD
+          - ARC
+          - ARD
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
         population: 9265811.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Hull
     type: ICE_GIANT
     orbitalDist: 0.42

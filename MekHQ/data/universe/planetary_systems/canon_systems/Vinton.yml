@@ -95,9 +95,7 @@ planet:
     event:
       - date: '2802-11-15'
         faction:
-          source: canon
-          value:
-            - CSJ
+          - CSJ
         population: 9999.0
         socioIndustrial: A-C-D-B-F
       - date: '2805-04-03'
@@ -110,9 +108,7 @@ planet:
         population: 119732.0
       - date: '2821-05-17'
         faction:
-          source: canon
-          value:
-            - CLAN
+          - CLAN
       - date: '2830-01-01'
         population: 305838.0
       - date: '2840-01-01'
@@ -163,30 +159,19 @@ planet:
         population: 149745.0
       - date: '3060-01-03'
         faction:
-          source: canon
-          value:
-            - CDS
+          - CDS
         population: 83045.0
       - date: '3070-01-01'
         population: 40543.0
-      - date: '3074-05-02'
-        faction:
-          source: canon
-          value:
-            - ABN
-        population: 0.0
-        socioIndustrial: X-X-X-X-X
       - date: '3074-01-12'
         faction:
-          source: canon
-          value:
-            - CDS
-            - CCO
-      - date: '3151-01-01'
+          - CDS
+          - CCO
+      - date: '3074-05-02'
         faction:
-          source: sucs
-          value:
-            - ABN
+          - ABN
+        population: 0.0
+        socioIndustrial: X-X-X-X-X
   - name: Unihi Pili
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.8

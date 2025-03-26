@@ -59,9 +59,7 @@ planet:
     event:
       - date: '2497-03-13'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 47644.0
         socioIndustrial: C-D-B-D-C
       - date: '2500-01-01'
@@ -132,9 +130,7 @@ planet:
         population: 374441607.0
       - date: '2790-11-12'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 374843161.0
       - date: '2800-01-01'
         population: 373241037.0
@@ -144,9 +140,7 @@ planet:
         population: 371587349.0
       - date: '2821-07-25'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 371091215.0
       - date: '2840-01-01'
@@ -193,13 +187,11 @@ planet:
         population: 342894700.0
       - date: '3030-06-13'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 344893010.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-01-01'
@@ -210,21 +202,17 @@ planet:
         population: 353730122.0
       - date: '3052-11-04'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3060-01-01'
         population: 358681301.0
       - date: '3062-06-13'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
       - date: '3065-02-22'
         faction:
-          source: canon
-          value:
-            - CGB
+          - CGB
       - date: '3070-01-01'
         population: 363592689.0
       - date: '3080-01-01'
@@ -235,9 +223,7 @@ planet:
         population: 365196021.0
       - date: '3103-03-13'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
       - date: '3110-01-01'
         population: 366293254.0
       - date: '3119-01-01'

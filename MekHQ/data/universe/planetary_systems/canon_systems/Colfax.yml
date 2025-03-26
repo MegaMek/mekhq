@@ -88,9 +88,7 @@ planet:
     event:
       - date: '2267-03-25'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 53021.0
         socioIndustrial: D-C-B-C-F
       - date: '2270-01-01'
@@ -113,9 +111,7 @@ planet:
         population: 22192184.0
       - date: '2335-06-08'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2340-01-01'
         population: 37608240.0
       - date: '2350-01-01'
@@ -272,21 +268,15 @@ planet:
         population: 648194255.0
       - date: '3068-03-30'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3068-07-02'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3070-01-01'
         population: 655363752.0
       - date: '3079-10-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3080-01-01'
         population: 660627689.0
       - date: '3090-01-01'
@@ -307,9 +297,7 @@ planet:
         population: 677487043.0
       - date: '3145-07-28'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 679522556.0
   - name: Ch'eng Huang Belt
     type: ASTEROID_BELT

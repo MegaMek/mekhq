@@ -88,9 +88,7 @@ planet:
     event:
       - date: '2256-01-17'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 63136.0
         socioIndustrial: D-D-B-D-B
       - date: '2260-01-01'
@@ -117,9 +115,7 @@ planet:
         population: 79071620.0
       - date: '2360-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 110463789.0
       - date: '2370-01-01'
         population: 147786973.0
@@ -239,9 +235,7 @@ planet:
         socioIndustrial: C-C-C-C-B
       - date: '2900-06-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 814344154.0
       - date: '2910-01-01'
         population: 819076848.0
@@ -279,16 +273,12 @@ planet:
         population: 714225830.0
       - date: '3070-01-01'
         population: 719242950.0
-      - date: '3079-11-29'
-        faction:
-          source: canon
-          value:
-            - DTA
       - date: '3079-10-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
+      - date: '3079-11-29'
+        faction:
+          - DTA
       - date: '3080-01-01'
         population: 722270123.0
       - date: '3090-01-01'
@@ -308,15 +298,8 @@ planet:
         population: 775881033.0
       - date: '3145-01-31'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
         population: 778679239.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Mildura Shire
     type: GAS_GIANT
     orbitalDist: 7.8

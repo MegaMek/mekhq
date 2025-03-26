@@ -58,9 +58,7 @@ planet:
     event:
       - date: '2244-08-19'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 61553.0
         socioIndustrial: D-C-A-D-D
       - date: '2250-01-01'
@@ -71,9 +69,7 @@ planet:
         population: 1219383.0
       - date: '2280-04-16'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 2941094.0
       - date: '2290-01-01'
         population: 6299702.0
@@ -251,9 +247,7 @@ planet:
         population: 592375567.0
       - date: '3081-05-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 593324127.0
       - date: '3094-01-01'
@@ -266,9 +260,7 @@ planet:
         population: 607250164.0
       - date: '3130-04-20'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
         population: 616304302.0
       - date: '3132-08-07'
         hpg: X
@@ -278,12 +270,7 @@ planet:
         population: 628503023.0
       - date: '3148-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Luganville

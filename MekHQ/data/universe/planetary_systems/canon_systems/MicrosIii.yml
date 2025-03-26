@@ -61,9 +61,7 @@ planet:
     event:
       - date: '3035-08-14'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
         population: 48852.0
         socioIndustrial: F-F-A-D-F
       - date: '3037-03-31'
@@ -88,9 +86,7 @@ planet:
         population: 14244.0
       - date: '3130-01-08'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
   - name: Micros IV

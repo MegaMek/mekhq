@@ -56,9 +56,7 @@ planet:
     event:
       - date: '2241-07-30'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
         population: 49546.0
         socioIndustrial: D-D-A-D-C
       - date: '2250-01-01'
@@ -69,7 +67,7 @@ planet:
         population: 1138148.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -248,16 +246,12 @@ planet:
         population: 563881487.0
       - date: '3079-04-01'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
       - date: '3080-01-01'
         population: 569434692.0
       - date: '3086-12-25'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
       - date: '3090-01-01'
         population: 572174549.0
       - date: '3100-01-01'
@@ -276,11 +270,6 @@ planet:
         population: 612313312.0
       - date: '3145-01-01'
         population: 615259482.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Johnson
     type: TERRESTRIAL
     orbitalDist: 0.8

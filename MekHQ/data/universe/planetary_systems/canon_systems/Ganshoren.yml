@@ -42,9 +42,7 @@ planet:
     event:
       - date: '2283-03-25'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 55351.0
         socioIndustrial: D-D-F-D-D
       - date: '2290-01-01'
@@ -61,9 +59,7 @@ planet:
         population: 49197894.0
       - date: '2345-12-08'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2350-01-01'
         population: 97097880.0
       - date: '2360-01-01'
@@ -216,22 +212,22 @@ planet:
         socioIndustrial: B-B-D-B-D
       - date: '3026-01-01'
         socioIndustrial: B-B-F-B-D
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 4594609008.0
       - date: '3040-01-01'
         population: 4632439696.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3047-01-01'
         socioIndustrial: A-A-F-A-C
       - date: '3050-01-01'
         population: 4678528613.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -256,17 +252,13 @@ planet:
         hpg: X
       - date: '3140-09-20'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 5334972134.0
       - date: '3145-01-01'
         population: 5369225450.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Knoppert
     type: ICE_GIANT
     orbitalDist: 0.42

@@ -59,9 +59,7 @@ planet:
     event:
       - date: '2545-05-12'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 53302.0
         socioIndustrial: C-D-A-D-D
       - date: '2550-01-01'
@@ -188,9 +186,7 @@ planet:
         population: 88106194.0
       - date: '3081-01-09'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 89670589.0
       - date: '3093-01-01'
@@ -203,9 +199,7 @@ planet:
         population: 91830348.0
       - date: '3130-07-19'
         faction:
-          source: canon
-          value:
-            - RCM
+          - RCM
         population: 92032597.0
       - date: '3132-08-07'
         hpg: X
@@ -213,11 +207,6 @@ planet:
         population: 92124676.0
       - date: '3145-01-01'
         population: 92124676.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Montfoort
     type: GAS_GIANT
     orbitalDist: 3.64

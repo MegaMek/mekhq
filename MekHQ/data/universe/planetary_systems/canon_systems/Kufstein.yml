@@ -49,9 +49,7 @@ planet:
     event:
       - date: '2732-04-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 38534.0
         socioIndustrial: C-D-B-D-D
       - date: '2733-01-17'
@@ -78,9 +76,7 @@ planet:
         population: 23736711.0
       - date: '2821-02-13'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 29748392.0
       - date: '2840-01-01'
@@ -97,9 +93,7 @@ planet:
         population: 59910665.0
       - date: '2900-03-23'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 63239507.0
       - date: '2910-01-01'
         population: 66303245.0
@@ -129,7 +123,7 @@ planet:
         population: 82830316.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-01-01'
@@ -140,13 +134,13 @@ planet:
         population: 84776341.0
       - date: '3050-08-03'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
             - FRR
       - date: '3050-08-10'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3060-01-01'
@@ -173,9 +167,7 @@ planet:
         population: 96283567.0
       - date: '3145-08-13'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 96921140.0
   - name: Brendel's Land
     type: GAS_GIANT

@@ -90,9 +90,7 @@ planet:
     event:
       - date: '2433-09-06'
         faction:
-          source: canon
-          value:
-            - OA
+          - OA
         population: 52443.0
         socioIndustrial: B-D-A-D-B
       - date: '2440-01-01'
@@ -129,9 +127,7 @@ planet:
         population: 75487281.0
       - date: '2596-09-22'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2600-01-01'
         population: 79365186.0
       - date: '2610-01-01'
@@ -259,9 +255,7 @@ planet:
         population: 126634952.0
       - date: '3145-11-19'
         faction:
-          source: canon
-          value:
-            - RA
+          - RA
         population: 127575526.0
   - name: Cardea
     type: GIANT_TERRESTRIAL

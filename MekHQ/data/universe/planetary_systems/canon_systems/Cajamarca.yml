@@ -54,9 +54,7 @@ planet:
     event:
       - date: '2470-01-22'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 44654.0
         socioIndustrial: C-D-A-D-D
       - date: '2480-01-01'
@@ -199,9 +197,7 @@ planet:
         population: 401097543.0
       - date: '3081-06-15'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 406671058.0
       - date: '3094-01-01'
@@ -220,9 +216,7 @@ planet:
         population: 415384521.0
       - date: '3145-01-10'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 417216239.0
   - name: Port Hernández
     type: DWARF_TERRESTRIAL

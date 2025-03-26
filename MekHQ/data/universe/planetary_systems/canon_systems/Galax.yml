@@ -112,14 +112,15 @@ planet:
         icon: rock9
     event:
       - date: '2302-05-24'
-        faction:
-          source: canon
-          value:
-            - FS
         population: 58038.0
         socioIndustrial: D-D-A-F-F
       - date: '2310-01-01'
         population: 187990.0
+      - date: '2317-06-26'
+        faction:
+          source: 'Handbook: House Davion'
+          value:
+            - FS
       - date: '2320-01-01'
         population: 669693.0
       - date: '2330-01-01'
@@ -278,6 +279,11 @@ planet:
         population: 1017474885.0
       - date: '3020-01-01'
         population: 1015900164.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1019333644.0
       - date: '3035-01-01'
@@ -287,11 +293,6 @@ planet:
         socioIndustrial:
           source: canon
           value: A-A-A-A-F
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 1030814352.0
       - date: '3060-01-01'
@@ -302,7 +303,7 @@ planet:
           value: 1048278320.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -331,11 +332,6 @@ planet:
         population: 1067318174.0
       - date: '3145-01-01'
         population: 1069027250.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Leslie
     type: TERRESTRIAL
     orbitalDist: 2.24

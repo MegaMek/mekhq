@@ -50,9 +50,7 @@ planet:
     event:
       - date: '2256-03-02'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 62683.0
         socioIndustrial: D-C-A-C-F
       - date: '2260-01-01'
@@ -75,9 +73,7 @@ planet:
         population: 43329449.0
       - date: '2341-10-10'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2350-01-01'
         population: 62795892.0
       - date: '2360-01-01'
@@ -179,9 +175,7 @@ planet:
         population: 261874.0
       - date: '2819-09-27'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

@@ -171,9 +171,7 @@ planet:
     event:
       - date: '2176-02-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 44527.0
         socioIndustrial: D-C-B-D-D
       - date: '2180-01-01'
@@ -194,9 +192,7 @@ planet:
         population: 18266007.0
       - date: '2243-06-18'
         faction:
-          source: canon
-          value:
-            - TGU
+          - TGU
       - date: '2250-01-01'
         population: 32557737.0
       - date: '2260-01-01'
@@ -223,7 +219,7 @@ planet:
         population: 773212836.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -374,29 +370,18 @@ planet:
           value: 2139000000.0
       - date: '3028-09-13'
         faction:
-          source: canon
-          value:
-            - CC
-            - FS
+          - CC
+          - FC
       - date: '3028-09-20'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
       - date: '3030-01-01'
         population: 1968209358.0
       - date: '3030-02-28'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
       - date: '3040-01-01'
         population: 1566555652.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3047-01-01'
         socioIndustrial:
           source: canon
@@ -407,7 +392,7 @@ planet:
         population: 941843287.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -434,9 +419,7 @@ planet:
         population: 827262979.0
       - date: '3145-08-22'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 828421958.0
   - name: Rowan
     type: ICE_GIANT

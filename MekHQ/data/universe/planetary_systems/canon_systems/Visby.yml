@@ -31,9 +31,7 @@ planet:
     event:
       - date: '2891-01-18'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 55511.0
         socioIndustrial: C-D-A-D-F
       - date: '2892-05-24'
@@ -95,9 +93,7 @@ planet:
         population: 186890.0
       - date: '3140-11-15'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 187789.0
   - name: Lohne's Planet

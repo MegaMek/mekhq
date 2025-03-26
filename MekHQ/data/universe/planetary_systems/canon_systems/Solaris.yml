@@ -181,9 +181,7 @@ planet:
     event:
       - date: '2235-08-10'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 60733.0
         socioIndustrial: F-F-A-D-C
       - date: '2240-01-01'
@@ -214,9 +212,7 @@ planet:
         population: 192201779.0
       - date: '2355-12-24'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2360-01-01'
         population: 249594573.0
       - date: '2370-01-01'
@@ -231,9 +227,7 @@ planet:
         population: 600956078.0
       - date: '2419-04-08'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2420-01-01'
         population: 675152346.0
       - date: '2430-01-01'
@@ -331,9 +325,7 @@ planet:
         population: 1210891519.0
       - date: '2821-09-03'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2830-01-01'
         population: 1210103684.0
       - date: '2840-01-01'
@@ -380,17 +372,17 @@ planet:
         population: 1025814407.0
       - date: '3027-01-01'
         socioIndustrial: C-C-C-C-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1024027488.0
       - date: '3035-01-01'
         socioIndustrial: B-B-B-B-C
       - date: '3040-01-01'
         population: 1034215708.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial:
           source: canon
@@ -399,7 +391,7 @@ planet:
         population: 1045341232.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -428,9 +420,7 @@ planet:
         population: 1173444417.0
       - date: '3145-09-17'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 1181214764.0
   - name: Apotamkin
     type: DWARF_TERRESTRIAL

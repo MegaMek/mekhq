@@ -63,7 +63,7 @@ planet:
     event:
       - date: '3052-03-05'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
         hpg: A
@@ -81,9 +81,7 @@ planet:
         population: 258268.0
       - date: '3110-12-23'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         population: 0.0
   - name: Clews
     type: TERRESTRIAL

@@ -51,9 +51,7 @@ planet:
     event:
       - date: '3130-05-03'
         faction:
-          source: canon
-          value:
-            - CDP
+          - CDP
         population: 50000.0
         socioIndustrial: F-F-A-F-F
       - date: '3133-06-06'

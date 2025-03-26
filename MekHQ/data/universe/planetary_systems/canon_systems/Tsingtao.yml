@@ -37,9 +37,7 @@ planet:
     event:
       - date: '2176-05-12'
         faction:
-          source: canon
-          value:
-            - SSUP
+          - SSUP
         population: 44821.0
         socioIndustrial: D-C-A-D-F
       - date: '2180-01-01'
@@ -84,7 +82,7 @@ planet:
         population: 241289769.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -228,28 +226,19 @@ planet:
         population: 499712277.0
       - date: '3030-12-09'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
         population: 492712948.0
       - date: '3036-01-01'
         socioIndustrial: D-F-B-D-D
       - date: '3040-01-01'
         population: 499559519.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3048-01-01'
         socioIndustrial: C-D-A-D-C
       - date: '3050-01-01'
         population: 505742046.0
       - date: '3057-10-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3060-01-01'
         population: 512359614.0
       - date: '3070-01-01'
@@ -296,9 +285,7 @@ planet:
     event:
       - date: '2176-01-09'
         faction:
-          source: canon
-          value:
-            - SSUP
+          - SSUP
         population: 40825.0
         socioIndustrial: D-D-B-C-B
       - date: '2180-01-01'
@@ -343,7 +330,7 @@ planet:
         population: 255856970.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -490,17 +477,10 @@ planet:
         population: 614736506.0
       - date: '3030-08-28'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
         population: 618421522.0
       - date: '3040-01-01'
         population: 624824181.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: B-C-C-B-B
       - date: '3046-01-01'
@@ -509,9 +489,7 @@ planet:
         population: 633506525.0
       - date: '3057-10-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3060-01-01'
         population: 641667528.0
       - date: '3070-01-01'

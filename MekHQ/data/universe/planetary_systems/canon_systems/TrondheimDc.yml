@@ -109,9 +109,7 @@ planet:
     event:
       - date: '2250-09-17'
         faction:
-          source: canon
-          value:
-            - PoR
+          - PoR
         population: 48506.0
         socioIndustrial: D-D-B-D-C
       - date: '2260-01-01'
@@ -132,10 +130,8 @@ planet:
         population: 17089764.0
       - date: '2333-02-11'
         faction:
-          source: canon
-          value:
-            - PoR
-            - DC
+          - PoR
+          - DC
       - date: '2340-01-01'
         population: 24543995.0
       - date: '2350-01-01'
@@ -144,9 +140,7 @@ planet:
         population: 44083622.0
       - date: '2367-01-27'
         faction:
-          source: canon
-          value:
-            - PoR
+          - PoR
       - date: '2370-01-01'
         population: 55707489.0
       - date: '2380-01-01'
@@ -181,9 +175,7 @@ planet:
         population: 221044263.0
       - date: '2510-10-07'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 229535002.0
       - date: '2520-01-01'
         population: 236845914.0
@@ -304,7 +296,7 @@ planet:
         socioIndustrial: B-D-C-C-D
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-01-01'
@@ -317,22 +309,20 @@ planet:
         population: 193018504.0
       - date: '3050-05-01'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CGB
             - FRR
       - date: '3050-05-06'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CGB
       - date: '3060-01-01'
         population: 194744036.0
       - date: '3067-04-01'
         faction:
-          source: canon
-          value:
-            - CDS
+          - CDS
       - date: '3070-01-01'
         population: 196760266.0
       - date: '3080-01-01'
@@ -343,24 +333,18 @@ planet:
         socioIndustrial: A-B-B-B-C
       - date: '3099-07-15'
         faction:
-          source: canon
-          value:
-            - CDS
-            - CGB
+          - CDS
+          - CGB
       - date: '3100-01-01'
         population: 199016167.0
       - date: '3100-03-18'
         faction:
-          source: canon
-          value:
-            - CDS
-            - CGB
-            - DC
+          - CDS
+          - CGB
+          - DC
       - date: '3100-04-06'
         faction:
-          source: canon
-          value:
-            - CDS
+          - CDS
       - date: '3110-01-01'
         population: 200534452.0
       - date: '3120-01-01'
@@ -369,9 +353,7 @@ planet:
         population: 206146290.0
       - date: '3132-07-01'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
       - date: '3132-08-07'
         hpg:
           source: canon

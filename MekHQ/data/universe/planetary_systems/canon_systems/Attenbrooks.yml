@@ -98,17 +98,13 @@ planet:
     event:
       - date: '3052-01-06'
         faction:
-          source: canon
-          value:
-            - CDS
+          - CDS
         hpg: A
         population: 509.0
         socioIndustrial: A-X-X-X-X
       - date: '3110-06-23'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

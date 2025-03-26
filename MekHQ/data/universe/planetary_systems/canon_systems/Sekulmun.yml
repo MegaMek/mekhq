@@ -55,9 +55,7 @@ planet:
     event:
       - date: '2400-06-19'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 54441.0
         socioIndustrial: C-D-C-C-F
       - date: '2410-01-01'
@@ -192,17 +190,17 @@ planet:
         population: 266548568.0
       - date: '3020-01-01'
         population: 260850799.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 260363957.0
       - date: '3039-01-01'
         socioIndustrial: D-D-D-B-F
       - date: '3040-01-01'
         population: 263243770.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3049-01-01'
         socioIndustrial: C-D-C-B-F
       - date: '3050-01-01'
@@ -211,7 +209,7 @@ planet:
         population: 268534792.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -265,9 +263,7 @@ planet:
     event:
       - date: '2400-04-14'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 59200.0
         socioIndustrial: C-D-B-F-D
       - date: '2410-01-01'
@@ -403,16 +399,16 @@ planet:
         population: 16475089.0
       - date: '3020-01-01'
         population: 16461054.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 16518678.0
       - date: '3040-10-22'
         population: 16636378.0
         socioIndustrial: D-F-B-C-D
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: D-F-B-C-C
       - date: '3050-01-01'
@@ -421,7 +417,7 @@ planet:
         population: 16875988.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'

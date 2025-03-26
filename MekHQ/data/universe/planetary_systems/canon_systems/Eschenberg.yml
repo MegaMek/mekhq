@@ -68,16 +68,17 @@ planet:
       - name: Weil
     event:
       - date: '2329-05-19'
-        faction:
-          source: canon
-          value:
-            - LA
         population: 43281.0
         socioIndustrial: D-D-A-D-D
       - date: '2330-01-01'
         population: 50115.0
       - date: '2340-01-01'
         population: 191662.0
+      - date: '2341-01-01'
+        faction:
+          source: 'Handbook: House Steiner'
+          value:
+            - LA
       - date: '2350-01-01'
         population: 599931.0
       - date: '2360-01-01'
@@ -208,9 +209,7 @@ planet:
         socioIndustrial: D-D-C-D-F
       - date: '2924-08-30'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

@@ -86,9 +86,7 @@ planet:
     event:
       - date: '2157-07-02'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 46168.0
         socioIndustrial: D-C-C-D-D
       - date: '2160-01-01'
@@ -111,9 +109,7 @@ planet:
         population: 75169824.0
       - date: '2242-12-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 121353020.0
       - date: '2260-01-01'
@@ -126,9 +122,7 @@ planet:
         population: 502146050.0
       - date: '2299-05-14'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 651258116.0
       - date: '2302-01-01'
@@ -141,9 +135,9 @@ planet:
         population: 1192151976.0
       - date: '2340-01-01'
         population: 1386558135.0
-      - date: '2341-02-26'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -294,22 +288,22 @@ planet:
         population: 4228886933.0
       - date: '3025-01-01'
         socioIndustrial: B-B-D-B-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 4230297343.0
       - date: '3040-01-01'
         population: 4267261491.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial: A-A-D-A-C
       - date: '3050-01-01'
         population: 4293371340.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -320,9 +314,7 @@ planet:
         population: 4420586080.0
       - date: '3081-09-29'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 4493681435.0
       - date: '3091-01-01'
@@ -337,20 +329,13 @@ planet:
         population: 4800270567.0
       - date: '3132-07-01'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3132-08-07'
         hpg: X
       - date: '3140-01-01'
         population: 4883549366.0
       - date: '3145-01-01'
         population: 4928685327.0
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - IND
   - name: Ushatski
     type: TERRESTRIAL
     orbitalDist: 4.13

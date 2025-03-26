@@ -41,9 +41,7 @@ planet:
     event:
       - date: '2267-09-26'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 56957.0
         socioIndustrial: F-F-B-F-C
       - date: '2270-01-01'
@@ -52,9 +50,7 @@ planet:
         population: 273575.0
       - date: '2285-05-11'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2290-01-01'
         population: 752766.0
       - date: '2300-01-01'
@@ -239,9 +235,7 @@ planet:
         population: 393690062.0
       - date: '3081-03-26'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 400760485.0
       - date: '3100-01-01'
@@ -253,9 +247,7 @@ planet:
         socioIndustrial: B-C-B-C-B
       - date: '3130-02-12'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
         population: 427333165.0
       - date: '3132-08-07'
         hpg: X
@@ -263,9 +255,7 @@ planet:
         population: 430765541.0
       - date: '3145-04-19'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 432232637.0
   - name: Lordstown
     type: DWARF_TERRESTRIAL

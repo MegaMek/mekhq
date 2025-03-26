@@ -49,9 +49,7 @@ planet:
     event:
       - date: '2319-12-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 56222.0
         socioIndustrial: D-D-B-D-A
       - date: '2320-01-01'
@@ -64,9 +62,7 @@ planet:
         population: 2357354.0
       - date: '2360-04-16'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 5515022.0
       - date: '2370-01-01'
         population: 11367935.0
@@ -168,9 +164,7 @@ planet:
         population: 670476987.0
       - date: '2821-05-31'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 668905819.0
       - date: '2840-01-01'
@@ -189,9 +183,7 @@ planet:
         population: 671030362.0
       - date: '2900-08-09'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 669147297.0
         socioIndustrial: D-D-D-F-B
       - date: '2910-01-01'

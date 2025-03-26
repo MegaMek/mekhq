@@ -72,9 +72,7 @@ planet:
     event:
       - date: '2340-06-08'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 58951.0
         socioIndustrial: D-F-A-F-B
       - date: '2350-01-01'
@@ -224,16 +222,16 @@ planet:
         population: 222749281.0
       - date: '3020-01-01'
         population: 222729493.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 224053511.0
       - date: '3040-02-28'
         population: 227416904.0
         socioIndustrial: B-C-B-C-B
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3047-01-01'
         socioIndustrial: B-C-A-C-A
       - date: '3050-01-01'
@@ -242,7 +240,7 @@ planet:
         population: 233500662.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -266,15 +264,8 @@ planet:
         population: 247147398.0
       - date: '3145-01-31'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 247444153.0
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - FS
   - name: Adams
     type: ICE_GIANT
     orbitalDist: 1.28

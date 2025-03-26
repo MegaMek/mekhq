@@ -112,9 +112,7 @@ planet:
     event:
       - date: '2628-01-06'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
         population: 53307.0
         socioIndustrial: D-D-B-D-D
       - date: '2630-01-01'
@@ -162,41 +160,26 @@ planet:
         population: 18308094.0
       - date: '2814-02-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2910-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
       - date: '3025-07-01'
         faction:
-          source: assumption
-          value:
-            - ARC
-            - ARD
+          - ARC
+          - ARD
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
         population:
           source: canon
           value: 107890000.0
         socioIndustrial:
           source: canon
           value: C-C-A-B-A
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Morán
     type: GAS_GIANT
     orbitalDist: 7.28

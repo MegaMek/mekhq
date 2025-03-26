@@ -32,9 +32,7 @@ planet:
     event:
       - date: '2734-12-29'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 45392.0
         socioIndustrial: C-D-A-D-D
       - date: '2738-04-20'
@@ -113,9 +111,7 @@ planet:
         population: 126882257.0
       - date: '3081-09-20'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 127390802.0
       - date: '3092-01-01'
@@ -134,15 +130,8 @@ planet:
         population: 127441769.0
       - date: '3145-03-10'
         faction:
-          source: canon
-          value:
-            - RCM
+          - RCM
         population: 127441769.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Morta Belt
     type: ASTEROID_BELT
     orbitalDist: 0.49

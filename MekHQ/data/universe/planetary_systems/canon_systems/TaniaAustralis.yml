@@ -29,9 +29,7 @@ planet:
     event:
       - date: '2341-12-24'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 54484.0
         socioIndustrial: D-D-B-D-C
       - date: '2343-01-01'
@@ -198,9 +196,7 @@ planet:
         population: 765567550.0
       - date: '3081-09-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 763274289.0
       - date: '3093-01-01'
@@ -213,9 +209,7 @@ planet:
         population: 768789696.0
       - date: '3130-12-09'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
         population: 772179823.0
       - date: '3132-08-07'
         hpg: X
@@ -223,9 +217,7 @@ planet:
         population: 776982210.0
       - date: '3145-11-21'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 778382038.0
   - name: Jerusalem
     type: GIANT_TERRESTRIAL

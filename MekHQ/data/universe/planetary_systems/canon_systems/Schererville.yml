@@ -33,9 +33,7 @@ planet:
     event:
       - date: '2630-11-28'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 53179.0
         socioIndustrial: C-D-B-D-F
       - date: '2640-01-01'
@@ -141,9 +139,7 @@ planet:
         population: 206324209.0
       - date: '3079-12-16'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
       - date: '3080-01-01'
         population: 209987659.0
       - date: '3090-01-01'
@@ -163,11 +159,6 @@ planet:
         population: 232769516.0
       - date: '3145-01-01'
         population: 234826927.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Badger
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.49

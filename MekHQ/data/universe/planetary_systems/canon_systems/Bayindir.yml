@@ -48,9 +48,7 @@ planet:
     event:
       - date: '2603-06-05'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 48474.0
         socioIndustrial: C-D-C-D-C
       - date: '2609-01-01'
@@ -164,9 +162,7 @@ planet:
         population: 225981476.0
       - date: '3081-05-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 229580339.0
       - date: '3093-01-01'
@@ -179,9 +175,7 @@ planet:
         population: 239955390.0
       - date: '3130-04-17'
         faction:
-          source: canon
-          value:
-            - RCM
+          - RCM
         population: 242706533.0
       - date: '3132-08-07'
         hpg: X
@@ -189,11 +183,6 @@ planet:
         population: 246670400.0
       - date: '3145-01-01'
         population: 249099654.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Güre
     type: ICE_GIANT
     orbitalDist: 0.9

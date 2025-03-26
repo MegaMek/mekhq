@@ -134,9 +134,7 @@ planet:
     event:
       - date: '2264-04-30'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 48274.0
         socioIndustrial: D-D-A-D-F
       - date: '2270-01-01'
@@ -151,14 +149,10 @@ planet:
         population: 11553206.0
       - date: '2316-04-23'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2317-12-01'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2320-01-01'
         population: 24615385.0
       - date: '2328-01-01'
@@ -259,23 +253,17 @@ planet:
         population: 2749322662.0
       - date: '2767-08-02'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 2742329152.0
       - date: '2779-03-16'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 2705800340.0
       - date: '2790-11-16'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 2681965691.0
       - date: '2800-01-01'
         population: 2652834127.0
@@ -285,9 +273,7 @@ planet:
         population: 2552813627.0
       - date: '2821-01-20'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 2536630976.0
       - date: '2840-01-01'
@@ -298,9 +284,7 @@ planet:
         socioIndustrial: B-B-B-B-D
       - date: '2860-10-03'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 2557759243.0
       - date: '2870-01-01'
         population: 2559527855.0
@@ -322,9 +306,7 @@ planet:
         population: 2388911935.0
       - date: '2950-02-19'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 2343444362.0
       - date: '2960-01-01'
         population: 2297888942.0
@@ -340,20 +322,18 @@ planet:
         population: 1952551427.0
       - date: '3020-01-01'
         population: 1901143303.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1889846777.0
       - date: '3037-01-01'
         socioIndustrial: B-C-B-B-D
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3040-09-15'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 1903883515.0
       - date: '3043-01-01'
         socioIndustrial: A-B-A-A-D
@@ -363,36 +343,26 @@ planet:
         population: 1932270537.0
       - date: '3068-06-18'
         faction:
-          source: canon
-          value:
-            - DC
-            - WOB
+          - DC
+          - WOB
       - date: '3068-07-05'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 1950129451.0
       - date: '3077-11-10'
         faction:
-          source: canon
-          value:
-            - Stone
-            - DC
-            - WOB
+          - Stone
+          - DC
+          - WOB
       - date: '3078-04-07'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1979601884.0
       - date: '3081-04-23'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 2002698970.0
       - date: '3095-01-01'
@@ -411,11 +381,6 @@ planet:
         population: 2180372548.0
       - date: '3145-01-01'
         population: 2192178407.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - DC
   - name: Barendran
     type: TERRESTRIAL
     orbitalDist: 3.84

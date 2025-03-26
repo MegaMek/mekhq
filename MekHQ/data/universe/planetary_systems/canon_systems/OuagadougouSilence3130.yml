@@ -73,9 +73,7 @@ planet:
     event:
       - date: '2341-06-29'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 44634.0
         socioIndustrial: D-D-C-D-C
       - date: '2350-01-01'
@@ -208,22 +206,10 @@ planet:
         population: 1854.0
       - date: '2925-03-22'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - DC
-      - date: '2108-12-05'
-        name: Ouagadougou
-      - date: '3130-01-01'
-        name: Silence
-        message: Ouagadougou renamed to Silence
   - name: Philippon
     type: TERRESTRIAL
     orbitalDist: 3.64

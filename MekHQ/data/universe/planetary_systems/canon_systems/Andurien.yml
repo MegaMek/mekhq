@@ -156,9 +156,7 @@ planet:
     event:
       - date: '2195-06-13'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 67040.0
         socioIndustrial: D-D-A-D-D
       - date: '2200-01-01'
@@ -173,9 +171,7 @@ planet:
         population: 11563738.0
       - date: '2250-04-24'
         faction:
-          source: canon
-          value:
-            - SIS
+          - SIS
         population: 25417138.0
       - date: '2260-01-01'
         population: 50779160.0
@@ -203,14 +199,12 @@ planet:
         population: 1709081302.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2369-11-02'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2370-01-01'
         population: 2014205992.0
       - date: '2380-01-01'
@@ -255,9 +249,7 @@ planet:
         population: 5467590918.0
       - date: '2570-07-09'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2580-01-01'
         population: 5505858805.0
       - date: '2590-01-01'
@@ -310,9 +302,7 @@ planet:
         population: 4889722958.0
       - date: '2789-05-26'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2790-01-01'
         population: 4871965610.0
       - date: '2800-01-01'
@@ -374,22 +364,16 @@ planet:
         population: 4833475334.0
       - date: '3030-09-11'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3032-01-01'
         socioIndustrial: A-B-B-B-C
       - date: '3039-04-25'
         faction:
-          source: canon
-          value:
-            - FWL
-            - DA
+          - FWL
+          - DA
       - date: '3040-12-18'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 4774006491.0
         socioIndustrial:
           source: canon
@@ -406,9 +390,7 @@ planet:
         population: 4586910477.0
       - date: '3079-08-13'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3080-01-01'
         population: 4654370631.0
       - date: '3090-01-01'

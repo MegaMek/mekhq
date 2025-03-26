@@ -78,9 +78,7 @@ planet:
     event:
       - date: '2716-12-03'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
         population: 50366.0
         socioIndustrial: C-D-A-D-C
       - date: '2720-01-01'
@@ -117,9 +115,7 @@ planet:
         population: 21280708.0
       - date: '2850-04-09'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2860-01-01'
         population: 22888192.0
       - date: '2870-01-01'
@@ -156,9 +152,7 @@ planet:
         population: 31505140.0
       - date: '3025-12-20'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3030-01-01'
         population: 31658055.0
       - date: '3040-01-01'
@@ -171,16 +165,12 @@ planet:
         population: 31861860.0
       - date: '3057-12-17'
         faction:
-          source: canon
-          value:
-            - NCR
+          - NCR
       - date: '3060-01-01'
         population: 31999982.0
       - date: '3066-04-09'
         faction:
-          source: canon
-          value:
-            - FR
+          - FR
       - date: '3070-01-01'
         population: 32101897.0
       - date: '3080-01-01'

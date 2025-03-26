@@ -81,9 +81,7 @@ planet:
     event:
       - date: '2293-07-17'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 43151.0
         socioIndustrial: D-D-C-D-C
       - date: '2300-01-01'
@@ -100,9 +98,7 @@ planet:
         population: 8538715.0
       - date: '2360-02-22'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 14621076.0
       - date: '2370-01-01'
         population: 23129644.0
@@ -246,17 +242,17 @@ planet:
         population: 365795038.0
       - date: '3020-01-01'
         population: 367766255.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 370603995.0
       - date: '3037-01-01'
         socioIndustrial: C-C-D-C-C
       - date: '3040-01-01'
         population: 376167338.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3048-01-01'
         socioIndustrial: B-B-C-B-B
       - date: '3050-01-01'
@@ -265,7 +261,7 @@ planet:
         population: 386616828.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -290,9 +286,7 @@ planet:
         population: 428004664.0
       - date: '3145-01-03'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 431183647.0
   - name: Asegeir Belt
     type: ASTEROID_BELT

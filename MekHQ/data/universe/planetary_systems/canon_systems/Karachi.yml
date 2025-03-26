@@ -70,9 +70,7 @@ planet:
     event:
       - date: '2564-02-13'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 49511.0
         socioIndustrial: C-D-A-C-D
       - date: '2570-01-01'
@@ -199,9 +197,7 @@ planet:
         population: 146390066.0
       - date: '3081-07-25'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 147035601.0
       - date: '3093-01-01'
@@ -214,9 +210,7 @@ planet:
         population: 148157329.0
       - date: '3130-09-01'
         faction:
-          source: canon
-          value:
-            - RCM
+          - RCM
         population: 148543039.0
       - date: '3132-08-07'
         hpg:
@@ -226,11 +220,6 @@ planet:
         population: 148483634.0
       - date: '3145-01-01'
         population: 148721398.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Kech
     type: TERRESTRIAL
     orbitalDist: 1.2

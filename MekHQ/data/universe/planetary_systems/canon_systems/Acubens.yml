@@ -32,9 +32,7 @@ planet:
     event:
       - date: '2224-12-12'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 66161.0
         socioIndustrial: D-D-C-D-C
       - date: '2230-01-01'
@@ -49,9 +47,7 @@ planet:
         population: 6537716.0
       - date: '2280-02-08'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 12866984.0
       - date: '2290-01-01'
         population: 23317692.0
@@ -228,27 +224,19 @@ planet:
         population: 1079506804.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3077-01-10'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3077-01-12'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1088177495.0
       - date: '3081-02-08'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1097137235.0
       - date: '3100-01-01'
@@ -265,23 +253,14 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3137-10-01'
         faction:
-          source: canon
-          value:
-            - CvW
+          - CvW
       - date: '3140-01-01'
         population: 1098894060.0
       - date: '3145-01-01'
         population: 1098674303.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Roberts
     type: TERRESTRIAL
     orbitalDist: 0.28

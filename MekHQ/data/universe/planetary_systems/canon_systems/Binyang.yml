@@ -37,9 +37,7 @@ planet:
     event:
       - date: '2600-10-29'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 50130.0
         socioIndustrial: C-D-C-D-D
       - date: '2607-01-01'
@@ -78,9 +76,7 @@ planet:
         population: 250993278.0
       - date: '2750-07-30'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 255909838.0
       - date: '2760-01-01'
         population: 260496972.0
@@ -92,9 +88,7 @@ planet:
         population: 266778656.0
       - date: '2793-07-17'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2800-01-01'
         population: 261501887.0
       - date: '2810-01-01'
@@ -145,15 +139,15 @@ planet:
         population: 188010668.0
       - date: '3020-01-01'
         population: 180907307.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 178986116.0
       - date: '3040-01-01'
         population: 180983930.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: B-C-C-C-D
       - date: '3046-01-01'
@@ -162,7 +156,7 @@ planet:
         population: 183168820.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -191,12 +185,12 @@ planet:
         population: 191542217.0
       - date: '3146-09-01'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - BC
       - date: '3148-01-30'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - LA
   - name: Arc-Zare

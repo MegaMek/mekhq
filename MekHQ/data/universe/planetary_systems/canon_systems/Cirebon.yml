@@ -73,9 +73,7 @@ planet:
     event:
       - date: '2339-02-19'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 40695.0
         socioIndustrial: D-C-C-C-C
       - date: '2340-01-01'
@@ -246,9 +244,7 @@ planet:
         population: 4088362858.0
       - date: '3081-09-25'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 4133583105.0
       - date: '3100-01-01'

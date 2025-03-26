@@ -59,9 +59,7 @@ planet:
     event:
       - date: '2443-09-07'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 41935.0
         socioIndustrial: B-D-B-D-B
       - date: '2450-01-01'
@@ -142,9 +140,7 @@ planet:
         population: 172984395.0
       - date: '2790-05-28'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 172275258.0
       - date: '2800-01-01'
         population: 173025466.0
@@ -202,15 +198,11 @@ planet:
         population: 140522011.0
       - date: '3035-11-06'
         faction:
-          source: canon
-          value:
-            - CIR
-            - FWL
+          - CIR
+          - FWL
       - date: '3035-11-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3040-01-01'
         population: 142062079.0
       - date: '3046-01-01'
@@ -225,9 +217,7 @@ planet:
         population: 146843022.0
       - date: '3081-09-06'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 148675211.0
       - date: '3100-01-01'
@@ -248,9 +238,7 @@ planet:
         population: 163688321.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: Poetic Edda
     type: TERRESTRIAL
     orbitalDist: 2.08

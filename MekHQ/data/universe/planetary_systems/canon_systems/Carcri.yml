@@ -68,9 +68,7 @@ planet:
     event:
       - date: '3130-12-21'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 50000.0
         socioIndustrial: D-D-B-D-C
       - date: '3133-04-06'
@@ -79,11 +77,6 @@ planet:
         population: 135914.0
       - date: '3145-01-01'
         population: 146500.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - IND
   - name: Gallagher's Planet
     type: GAS_GIANT
     orbitalDist: 2.52

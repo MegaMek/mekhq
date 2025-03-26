@@ -71,9 +71,7 @@ planet:
     event:
       - date: '2601-12-19'
         faction:
-          source: canon
-          value:
-            - MOC
+          - MOC
         population: 55591.0
         socioIndustrial: C-D-B-F-C
       - date: '2610-01-01'
@@ -140,9 +138,7 @@ planet:
         population: 500217.0
       - date: '2864-08-15'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2870-01-01'
         population: 292064.0
       - date: '2880-01-01'
@@ -151,9 +147,7 @@ planet:
         population: 116114.0
       - date: '2897-01-12'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

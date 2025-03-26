@@ -152,9 +152,7 @@ planet:
     event:
       - date: '2223-06-12'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 15501.0
         socioIndustrial: F-F-B-D-D
       - date: '2230-01-01'
@@ -177,14 +175,10 @@ planet:
         population: 16093.0
       - date: '2316-06-08'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2317-01-29'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2320-01-01'
         population: 16266.0
       - date: '2330-01-01'
@@ -285,24 +279,18 @@ planet:
         population: 19669.0
       - date: '2767-02-23'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 20000.0
       - date: '2770-01-01'
         population: 20416.0
       - date: '2779-11-07'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 22848.0
       - date: '2790-11-09'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 23841.0
       - date: '2800-01-01'
         population: 26245.0
@@ -312,9 +300,7 @@ planet:
         population: 36284.0
       - date: '2821-08-07'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 41451.0
       - date: '2840-01-01'
@@ -327,9 +313,7 @@ planet:
         population: 53727.0
       - date: '2864-10-12'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2870-01-01'
         population: 65020.0
       - date: '2880-01-01'
@@ -368,16 +352,16 @@ planet:
         population:
           source: canon
           value: 700000.0
-      - date: '3029-02-20'
+      - date: '3029-03-03'
         faction:
-          source: canon
+          source: NAIS 4th SW Atlas Volume 2, p. 16–17
           value:
             - TFR
       - date: '3030-01-01'
         population: 919403.0
-      - date: '3032-12-08'
+      - date: '3031-09-15'
         faction:
-          source: canon
+          source: 20 Year Update, p. 12
           value:
             - FC
       - date: '3040-09-25'
@@ -389,14 +373,10 @@ planet:
         population: 4002066.0
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - CM
+          - CM
       - date: '3058-09-18'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3060-01-01'
         population: 8084468.0
       - date: '3067-01-01'
@@ -407,27 +387,19 @@ planet:
         population: 14289956.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3078-03-09'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3078-03-15'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 14430686.0
       - date: '3081-09-01'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 14517530.0
       - date: '3100-01-01'

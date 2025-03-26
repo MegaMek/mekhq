@@ -145,9 +145,7 @@ planet:
     event:
       - date: '2302-09-02'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 55252.0
         socioIndustrial: D-D-A-D-B
       - date: '2310-01-01'
@@ -330,16 +328,12 @@ planet:
         population: 4230888718.0
       - date: '3079-02-06'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
       - date: '3080-01-01'
         population: 4269992496.0
       - date: '3081-03-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 4331925234.0
       - date: '3096-01-01'
@@ -352,9 +346,7 @@ planet:
         population: 4500606070.0
       - date: '3130-01-22'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
         population: 4564057680.0
       - date: '3132-08-07'
         hpg:
@@ -364,11 +356,6 @@ planet:
         population: 4646025254.0
       - date: '3145-01-01'
         population: 4684279288.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Murfreesboro
     type: DWARF_TERRESTRIAL
     orbitalDist: 4.16

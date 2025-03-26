@@ -82,9 +82,7 @@ planet:
     event:
       - date: '2242-05-13'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 48429.0
         socioIndustrial: D-D-A-D-D
       - date: '2250-01-01'
@@ -103,9 +101,7 @@ planet:
         population: 49859292.0
       - date: '2320-07-11'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 87146109.0
       - date: '2330-01-01'
         population: 141145466.0
@@ -209,23 +205,17 @@ planet:
         population: 2811893047.0
       - date: '2767-01-27'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 2822567086.0
       - date: '2779-06-29'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 2824520747.0
       - date: '2786-09-27'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2790-01-01'
         population: 2810387285.0
       - date: '2800-01-01'
@@ -278,15 +268,15 @@ planet:
         population: 2455454313.0
       - date: '3020-01-01'
         population: 2434940436.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 2438779739.0
       - date: '3040-01-01'
         population: 2473657457.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial:
           source: canon
@@ -295,7 +285,7 @@ planet:
         population: 2508281374.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -306,29 +296,21 @@ planet:
           value: 2561000000.0
       - date: '3068-09-01'
         faction:
-          source: canon
-          value:
-            - LA
-            - FWL
+          - LA
+          - FWL
       - date: '3068-09-22'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3069-01-07'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3070-01-01'
         population: 2570750314.0
       - date: '3080-01-01'
         population: 2603867415.0
       - date: '3081-10-31'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 2643748529.0
       - date: '3100-01-01'
@@ -347,28 +329,16 @@ planet:
           value: X
       - date: '3135-09-24'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3140-01-01'
         population: 2888674676.0
       - date: '3145-01-01'
         population: 2916539490.0
       - date: '3149-02-01'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - ROS
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ROS
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - IND
   - name: Sinaa
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.21

@@ -31,18 +31,14 @@ planet:
     event:
       - date: '2293-02-27'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 40009.0
         socioIndustrial: D-D-B-D-B
       - date: '2300-01-01'
         population: 96948.0
       - date: '2310-07-23'
         faction:
-          source: canon
-          value:
-            - CCom
+          - CCom
         population: 296991.0
       - date: '2320-01-01'
         population: 777605.0
@@ -56,7 +52,7 @@ planet:
         population: 11228605.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'

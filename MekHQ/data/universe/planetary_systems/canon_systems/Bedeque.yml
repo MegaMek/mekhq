@@ -55,9 +55,7 @@ planet:
     event:
       - date: '2259-02-11'
         faction:
-          source: canon
-          value:
-            - SCon
+          - SCon
         population: 49476.0
         socioIndustrial: D-D-C-D-C
       - date: '2260-01-01'
@@ -70,9 +68,7 @@ planet:
         population: 1893781.0
       - date: '2293-11-27'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2300-01-01'
         population: 4537450.0
       - date: '2310-01-01'
@@ -245,16 +241,12 @@ planet:
         population: 689049859.0
       - date: '3079-05-25'
         faction:
-          source: canon
-          value:
-            - SC
+          - SC
       - date: '3080-01-01'
         population: 689739253.0
       - date: '3082-12-15'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3090-01-01'
         population: 689601319.0
       - date: '3100-01-01'
@@ -273,15 +265,11 @@ planet:
         population: 689187683.0
       - date: '3145-12-16'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 689877215.0
       - date: '3151-12-30'
         faction:
-          source: canon
-          value:
-            - CP
+          - CP
   - name: Lang Singalang Burong
     type: TERRESTRIAL
     orbitalDist: 0.9

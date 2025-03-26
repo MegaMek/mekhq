@@ -169,9 +169,7 @@ planet:
     event:
       - date: '2494-08-08'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 56101.0
         socioIndustrial: C-D-A-C-F
       - date: '2500-01-01'
@@ -293,17 +291,17 @@ planet:
         population: 1586491911.0
       - date: '3020-01-01'
         population: 1579681133.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1585188935.0
       - date: '3039-01-01'
         socioIndustrial: C-B-B-B-F
       - date: '3040-01-01'
         population: 1600960245.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3049-01-01'
         socioIndustrial:
           source: canon
@@ -312,7 +310,7 @@ planet:
         population: 1616403472.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -341,8 +339,6 @@ planet:
         population: 1807064313.0
       - date: '3145-01-01'
         population: 1810682058.0
-      - date: '2108-12-05'
-      - date: '3057-01-01'
   - name: Nova Sdiret Nord
     type: TERRESTRIAL
     orbitalDist: 4.16

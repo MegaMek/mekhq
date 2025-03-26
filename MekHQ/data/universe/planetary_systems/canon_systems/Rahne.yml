@@ -127,9 +127,7 @@ planet:
     event:
       - date: '2242-04-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 51816.0
         socioIndustrial: D-D-A-D-F
       - date: '2250-01-01'
@@ -144,9 +142,7 @@ planet:
         population: 11938265.0
       - date: '2299-07-19'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 25015500.0
       - date: '2310-01-01'
@@ -157,9 +153,9 @@ planet:
         population: 132247540.0
       - date: '2340-01-01'
         population: 199317201.0
-      - date: '2341-07-21'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -313,6 +309,11 @@ planet:
         population: 2999321978.0
       - date: '3020-01-01'
         population: 2972842044.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 2974808278.0
       - date: '3032-01-01'
@@ -321,11 +322,6 @@ planet:
         socioIndustrial: C-C-C-B-D
       - date: '3040-01-01'
         population: 2995704989.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial:
           source: canon
@@ -334,7 +330,7 @@ planet:
         population: 3017351901.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -367,9 +363,7 @@ planet:
         population: 3200092106.0
       - date: '3145-09-30'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 3205857459.0
   - name: Beltaine
     type: GAS_GIANT

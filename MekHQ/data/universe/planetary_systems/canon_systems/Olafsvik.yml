@@ -90,9 +90,7 @@ planet:
     event:
       - date: '2247-03-11'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
         population: 56064.0
         socioIndustrial: D-D-C-D-F
       - date: '2250-01-01'
@@ -103,7 +101,7 @@ planet:
         population: 1337841.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -284,16 +282,12 @@ planet:
         population: 2891046551.0
       - date: '3078-05-01'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
       - date: '3080-01-01'
         population: 2897413855.0
       - date: '3086-02-01'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
       - date: '3090-01-01'
         population: 2923023615.0
       - date: '3092-01-01'
@@ -312,12 +306,7 @@ planet:
         population: 3200856931.0
       - date: '3148-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: K4

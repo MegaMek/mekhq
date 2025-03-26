@@ -111,9 +111,7 @@ planet:
     event:
       - date: '2171-12-26'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 42194.0
         socioIndustrial: D-D-B-D-D
       - date: '2180-01-01'
@@ -132,9 +130,7 @@ planet:
         population: 11482464.0
       - date: '2242-07-10'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 18471795.0
       - date: '2260-01-01'
@@ -159,9 +155,7 @@ planet:
         population: 222509934.0
       - date: '2345-10-07'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2350-01-01'
         population: 257245629.0
       - date: '2360-01-01'
@@ -212,9 +206,7 @@ planet:
         population: 758306998.0
       - date: '2571-09-11'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2580-01-01'
         population: 764626123.0
       - date: '2590-01-01'
@@ -315,15 +307,15 @@ planet:
         population: 500622381.0
       - date: '3020-01-01'
         population: 466974383.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 457850740.0
       - date: '3040-01-01'
         population: 463285380.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial:
           source: canon
@@ -332,7 +324,7 @@ planet:
         population: 468925185.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -359,17 +351,13 @@ planet:
           value: X
       - date: '3140-06-04'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 524918617.0
       - date: '3145-01-01'
         population: 527444283.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Park
     type: TERRESTRIAL
     orbitalDist: 2.08

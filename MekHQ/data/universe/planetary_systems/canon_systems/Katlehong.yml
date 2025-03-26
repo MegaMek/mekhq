@@ -34,9 +34,7 @@ planet:
     event:
       - date: '2519-03-10'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 53891.0
         socioIndustrial: C-D-A-D-C
       - date: '2520-01-01'
@@ -171,9 +169,7 @@ planet:
         population: 197607895.0
       - date: '3081-11-26'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 199633810.0
       - date: '3094-01-01'
@@ -186,9 +182,7 @@ planet:
         population: 203422427.0
       - date: '3130-06-05'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
         population: 203911227.0
       - date: '3132-08-07'
         hpg: X
@@ -198,12 +192,7 @@ planet:
         population: 208405299.0
       - date: '3148-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Gorxheimertal

@@ -64,9 +64,7 @@ planet:
     event:
       - date: '2644-12-14'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 46828.0
         socioIndustrial: C-D-B-D-F
       - date: '2645-01-01'
@@ -153,42 +151,34 @@ planet:
         population: 120967863.0
       - date: '3020-01-01'
         population: 118755329.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 118197471.0
       - date: '3040-01-01'
         population: 119791977.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial: C-F-B-D-D
       - date: '3050-01-01'
         population: 121177536.0
       - date: '3057-12-01'
         faction:
-          source: canon
-          value:
-            - ARDC
+          - ARDC
       - date: '3060-01-01'
         population: 122101994.0
       - date: '3067-04-24'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3069-06-10'
         faction:
-          source: canon
-          value:
-            - LA
-            - CJF
+          - LA
+          - CJF
       - date: '3069-06-14'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3070-01-01'
         population: 122836808.0
       - date: '3080-01-01'
@@ -211,9 +201,7 @@ planet:
         population: 124294868.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name:
       source: canon
       value: Mkuranga
@@ -241,9 +229,7 @@ planet:
     event:
       - date: '2644-03-06'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 45335.0
         socioIndustrial: C-D-A-D-B
       - date: '2650-01-01'
@@ -330,44 +316,36 @@ planet:
         population: 138285556.0
       - date: '3020-01-01'
         population: 139086022.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 140044712.0
       - date: '3032-01-01'
         socioIndustrial: B-D-B-C-B
       - date: '3040-01-01'
         population: 141070779.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial: B-D-A-C-A
       - date: '3050-01-01'
         population: 142061738.0
       - date: '3057-12-01'
         faction:
-          source: canon
-          value:
-            - ARDC
+          - ARDC
       - date: '3060-01-01'
         population: 143002447.0
       - date: '3067-04-24'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3069-06-10'
         faction:
-          source: canon
-          value:
-            - LA
-            - CJF
+          - LA
+          - CJF
       - date: '3069-06-14'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3070-01-01'
         population: 144006976.0
       - date: '3080-01-01'
@@ -392,9 +370,7 @@ planet:
         population: 146974888.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Entsha Neruma
     type: ICE_GIANT
     orbitalDist: 3.92

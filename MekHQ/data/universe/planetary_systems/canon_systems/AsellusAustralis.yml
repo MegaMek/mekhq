@@ -59,16 +59,12 @@ planet:
     event:
       - date: '2270-01-27'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 43332.0
         socioIndustrial: D-F-B-D-C
       - date: '2280-11-29'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 143225.0
       - date: '2290-01-01'
         population: 400678.0
@@ -229,14 +225,10 @@ planet:
         population: 373072513.0
       - date: '3014-11-05'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 373118464.0
       - date: '3030-01-01'
@@ -255,9 +247,7 @@ planet:
         population: 395631669.0
       - date: '3081-10-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 402253968.0
       - date: '3093-01-01'
@@ -274,28 +264,14 @@ planet:
         hpg: X
       - date: '3137-08-01'
         faction:
-          source: canon
-          value:
-            - MiC
+          - MiC
       - date: '3139-07-01'
         faction:
-          source: canon
-          value:
-            - CP
+          - CP
       - date: '3140-01-01'
         population: 433843405.0
       - date: '3145-01-01'
         population: 437590548.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - CP
   - name: Z-1 Belt
     type: ASTEROID_BELT
     orbitalDist: 0.7

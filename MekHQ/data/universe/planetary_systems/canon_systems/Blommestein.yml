@@ -85,9 +85,7 @@ planet:
     event:
       - date: '2709-05-06'
         faction:
-          source: canon
-          value:
-            - OA
+          - OA
         population: 55820.0
         socioIndustrial: C-D-A-F-A
       - date: '2710-01-01'
@@ -126,9 +124,7 @@ planet:
         population: 140667501.0
       - date: '2864-10-21'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2865-01-01'
         socioIndustrial: C-D-A-D-A
       - date: '2870-01-01'
@@ -195,11 +191,6 @@ planet:
         population: 186938480.0
       - date: '3145-01-01'
         population: 188741731.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Mosson
     type: TERRESTRIAL
     orbitalDist: 3.64

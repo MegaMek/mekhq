@@ -88,9 +88,7 @@ planet:
     event:
       - date: '2219-05-08'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 46979.0
         socioIndustrial: C-D-D-D-F
       - date: '2220-01-01'
@@ -115,9 +113,7 @@ planet:
         population: 265479881.0
       - date: '2315-05-05'
         faction:
-          source: canon
-          value:
-            - DoL
+          - DoL
       - date: '2320-01-01'
         population: 417806715.0
       - date: '2330-01-01'
@@ -132,7 +128,7 @@ planet:
         population: 1539578961.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -235,9 +231,7 @@ planet:
         population: 8561182712.0
       - date: '2821-08-05'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 8649188959.0
       - date: '2840-01-01'
@@ -258,9 +252,7 @@ planet:
         socioIndustrial: D-C-F-B-F
       - date: '2900-07-12'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 9275922546.0
       - date: '2910-01-01'
         population: 9391714391.0
@@ -286,14 +278,10 @@ planet:
         population: 10254920349.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 10352816818.0
       - date: '3030-01-01'
@@ -314,14 +302,10 @@ planet:
         population: 11082452664.0
       - date: '3081-07-26'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3082-09-24'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 11306333059.0
       - date: '3093-01-01'
@@ -338,28 +322,17 @@ planet:
         hpg: X
       - date: '3135-09-01'
         faction:
-          source: canon
-          value:
-            - SA
+          - SA
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3137-07-17'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
       - date: '3140-01-01'
         population: 12309397763.0
       - date: '3145-01-01'
         population: 12378523763.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Randleman
     type: TERRESTRIAL
     orbitalDist: 4.2

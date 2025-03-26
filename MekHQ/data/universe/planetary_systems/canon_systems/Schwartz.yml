@@ -41,9 +41,7 @@ planet:
     event:
       - date: '2524-08-24'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 53195.0
         socioIndustrial: C-D-B-C-F
       - date: '2528-01-01'
@@ -172,14 +170,12 @@ planet:
         population: 58186044.0
       - date: '3050-03-01'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CSJ
       - date: '3059-08-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3060-01-01'
         population: 58941506.0
       - date: '3070-01-01'

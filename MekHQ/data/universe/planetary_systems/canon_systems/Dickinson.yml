@@ -103,9 +103,7 @@ planet:
     event:
       - date: '2341-03-28'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 45201.0
         socioIndustrial: D-D-B-D-D
       - date: '2350-01-01'
@@ -270,9 +268,7 @@ planet:
         population: 986543102.0
       - date: '3079-09-16'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 995262993.0
       - date: '3090-01-01'
@@ -293,9 +289,7 @@ planet:
         population: 1067854759.0
       - date: '3145-12-04'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 1075355966.0
   - name: Isis
     type: TERRESTRIAL

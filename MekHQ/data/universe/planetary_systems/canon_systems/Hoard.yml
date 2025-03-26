@@ -69,11 +69,9 @@ planet:
     event:
       - date: '2802-06-14'
         faction:
-          source: canon
-          value:
-            - CNC
-            - CB
-            - CIH
+          - CNC
+          - CB
+          - CIH
         hpg:
           source: canon
           value: A
@@ -129,9 +127,7 @@ planet:
         population: 45701256.0
       - date: '3025-02-27'
         faction:
-          source: canon
-          value:
-            - CLAN
+          - CLAN
       - date: '3030-01-01'
         population: 45539164.0
       - date: '3040-01-01'
@@ -142,57 +138,43 @@ planet:
         population: 45319834.0
       - date: '3060-08-14'
         faction:
-          source: canon
-          value:
-            - CSA
-            - CIH
-            - CHH
-            - CW
+          - CSA
+          - CIH
+          - CHH
+          - CW
         population: 45121315.0
       - date: '3070-01-01'
         population: 45117152.0
       - date: '3072-04-01'
         faction:
-          source: canon
-          value:
-            - CSA
-            - CIH
-            - CHH
-            - CCO
+          - CSA
+          - CIH
+          - CHH
+          - CCO
       - date: '3072-04-05'
         faction:
-          source: canon
-          value:
-            - SOC
-            - CIH
-            - CHH
-            - CCO
+          - SOC
+          - CIH
+          - CHH
+          - CCO
       - date: '3072-09-07'
         faction:
-          source: canon
-          value:
-            - CSA
-            - CHH
-            - CCO
-            - SOC
+          - CSA
+          - CHH
+          - CCO
+          - SOC
       - date: '3072-11-27'
         faction:
-          source: canon
-          value:
-            - CSA
-            - CHH
+          - CSA
+          - CHH
       - date: '3075-06-01'
         faction:
-          source: canon
-          value:
-            - CSA
-            - CSL
-            - CCC
+          - CSA
+          - CSL
+          - CCC
       - date: '3079-09-03'
         faction:
-          source: canon
-          value:
-            - CSA
+          - CSA
       - date: '3080-01-01'
         population: 45525039.0
       - date: '3090-01-01'

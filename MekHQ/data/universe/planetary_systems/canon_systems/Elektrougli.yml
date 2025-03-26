@@ -80,18 +80,14 @@ planet:
     event:
       - date: '2268-10-02'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 57992.0
         socioIndustrial: D-C-A-D-C
       - date: '2270-01-01'
         population: 76921.0
       - date: '2280-03-05'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 279882.0
       - date: '2290-01-01'
         population: 855065.0
@@ -270,9 +266,7 @@ planet:
         population: 742628400.0
       - date: '3081-09-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 755663208.0
       - date: '3093-01-01'
@@ -291,9 +285,7 @@ planet:
         population: 820567181.0
       - date: '3145-10-27'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 825175247.0
   - name: Batara Kali
     type: ICE_GIANT

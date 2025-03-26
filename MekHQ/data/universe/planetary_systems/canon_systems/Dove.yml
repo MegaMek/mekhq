@@ -86,14 +86,15 @@ planet:
       - name: Audumla's Skörd
     event:
       - date: '2333-01-20'
-        faction:
-          source: canon
-          value:
-            - LA
         population: 66988.0
         socioIndustrial: C-D-B-D-C
       - date: '2340-01-01'
         population: 200211.0
+      - date: '2341-01-01'
+        faction:
+          source: 'Handbook: House Steiner'
+          value:
+            - LA
       - date: '2350-01-01'
         population: 773877.0
       - date: '2360-01-01'
@@ -198,9 +199,7 @@ planet:
         population: 3641638.0
       - date: '2822-09-03'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

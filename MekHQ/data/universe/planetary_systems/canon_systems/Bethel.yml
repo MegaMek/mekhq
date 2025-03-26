@@ -84,9 +84,7 @@ planet:
     event:
       - date: '2245-02-09'
         faction:
-          source: canon
-          value:
-            - SIMA
+          - SIMA
         population: 41783.0
         socioIndustrial: D-C-A-C-D
       - date: '2250-01-01'
@@ -117,7 +115,7 @@ planet:
         population: 157429101.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -231,9 +229,7 @@ planet:
         population: 920518882.0
       - date: '2864-08-23'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2870-01-01'
         population: 859181643.0
       - date: '2880-01-01'
@@ -244,9 +240,7 @@ planet:
         socioIndustrial: D-F-C-F-C
       - date: '2900-07-15'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 713733317.0
       - date: '2910-01-01'
         population: 664987908.0
@@ -274,17 +268,17 @@ planet:
         population: 647627357.0
       - date: '3027-01-01'
         socioIndustrial: D-F-C-F-D
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3029-01-01'
         socioIndustrial: D-F-B-F-D
       - date: '3030-01-01'
         population: 654559715.0
       - date: '3040-01-01'
         population: 660807663.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial: C-D-A-D-D
       - date: '3050-01-01'
@@ -293,7 +287,7 @@ planet:
         population: 674898843.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'

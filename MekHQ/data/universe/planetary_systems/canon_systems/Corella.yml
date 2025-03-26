@@ -51,9 +51,7 @@ planet:
     event:
       - date: '2316-06-26'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 48984.0
         socioIndustrial: D-D-A-D-C
       - date: '2320-01-01'
@@ -68,9 +66,7 @@ planet:
         population: 6144639.0
       - date: '2367-08-03'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2370-01-01'
         population: 12402329.0
       - date: '2380-01-01'
@@ -119,9 +115,7 @@ planet:
         population: 651988482.0
       - date: '2571-05-21'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2580-01-01'
         population: 674647354.0
       - date: '2590-01-01'
@@ -186,9 +180,7 @@ planet:
         population: 694387560.0
       - date: '2864-05-31'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2870-01-01'
         population: 703015898.0
       - date: '2880-01-01'
@@ -223,17 +215,17 @@ planet:
         population: 500484047.0
       - date: '3020-01-01'
         population: 486817585.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 482198067.0
       - date: '3032-01-01'
         socioIndustrial: C-D-B-D-C
       - date: '3040-01-01'
         population: 488409873.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: B-C-A-D-B
       - date: '3050-01-01'
@@ -242,7 +234,7 @@ planet:
         population: 501174808.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -267,9 +259,7 @@ planet:
         population: 554271677.0
       - date: '3145-03-14'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 557718836.0
   - name: Brynhild Belt
     type: ASTEROID_BELT

@@ -93,9 +93,7 @@ planet:
     event:
       - date: '2205-11-26'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 65621.0
         socioIndustrial: D-D-C-D-D
       - date: '2210-01-01'
@@ -118,9 +116,7 @@ planet:
         population: 81928707.0
       - date: '2299-02-26'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 124688525.0
       - date: '2310-01-01'
@@ -131,9 +127,9 @@ planet:
         population: 329517109.0
       - date: '2340-01-01'
         population: 421114509.0
-      - date: '2341-01-17'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -284,25 +280,26 @@ planet:
         population: 1636846611.0
       - date: '3020-01-01'
         population: 1621235022.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-04-30'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 1635111123.0
       - date: '3040-01-01'
         population: 1653361962.0
       - date: '3048-10-27'
         faction:
-          source: canon
-          value:
-            - FC
+          - FC
         socioIndustrial: B-B-C-B-C
       - date: '3050-01-01'
         population: 1668476221.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -313,9 +310,7 @@ planet:
         population: 1729116816.0
       - date: '3081-12-03'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1760170655.0
       - date: '3100-01-01'
@@ -332,22 +327,13 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1895363740.0
       - date: '3145-08-13'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 1907532968.0
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - IND
   - name: Todd's Frontier
     type: TERRESTRIAL
     orbitalDist: 2.9

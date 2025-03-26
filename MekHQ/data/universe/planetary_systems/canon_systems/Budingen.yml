@@ -58,9 +58,7 @@ planet:
     event:
       - date: '2481-10-17'
         faction:
-          source: canon
-          value:
-            - OA
+          - OA
         population: 39867.0
         socioIndustrial: C-D-B-D-D
       - date: '2490-01-01'
@@ -88,9 +86,7 @@ planet:
         population: 141789942.0
       - date: '2596-09-22'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2600-01-01'
         population: 163366238.0
       - date: '2610-01-01'
@@ -128,9 +124,7 @@ planet:
         population: 295546262.0
       - date: '2750-09-13'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 299875556.0
       - date: '2760-01-01'
         population: 304290788.0
@@ -207,34 +201,24 @@ planet:
         population: 190917169.0
       - date: '3069-05-01'
         faction:
-          source: canon
-          value:
-            - CSR
+          - CSR
       - date: '3070-01-01'
         population: 192566137.0
       - date: '3075-09-07'
         faction:
-          source: canon
-          value:
-            - OA
+          - OA
       - date: '3080-01-01'
         population: 193608807.0
-      - date: '3083-10-20'
-        faction:
-          source: canon
-          value:
-            - RA
       - date: '3083-02-10'
         faction:
-          source: canon
-          value:
-            - DC
-            - RA
+          - DC
+          - RA
       - date: '3083-02-21'
         faction:
-          source: canon
-          value:
-            - RA
+          - RA
+      - date: '3083-10-20'
+        faction:
+          - RA
       - date: '3090-01-01'
         population: 193725007.0
       - date: '3100-01-01'
@@ -245,9 +229,7 @@ planet:
         population: 196142153.0
       - date: '3120-06-17'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 199704678.0
       - date: '3130-01-01'
         population: 202520206.0

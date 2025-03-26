@@ -82,10 +82,8 @@ planet:
     event:
       - date: '2511-08-29'
         faction:
-          source: canon
-          value:
-            - TC
-            - FS
+          - TC
+          - FS
         population: 43779.0
         socioIndustrial: C-D-B-D-C
       - date: '2520-01-01'
@@ -104,18 +102,14 @@ planet:
         population: 18663531.0
       - date: '2578-05-15'
         faction:
-          source: canon
-          value:
-            - SL
+          - SL
       - date: '2580-01-01'
         population: 27316224.0
       - date: '2590-01-01'
         population: 36585930.0
       - date: '2593-02-19'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2600-01-01'
         population: 45833744.0
       - date: '2610-01-01'
@@ -210,17 +204,17 @@ planet:
         population: 88644468.0
       - date: '3027-01-01'
         socioIndustrial: D-B-C-C-D
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3029-01-01'
         socioIndustrial: C-B-B-C-C
       - date: '3030-01-01'
         population: 89121088.0
       - date: '3040-01-01'
         population: 89863871.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3048-01-01'
         socioIndustrial: C-C-B-C-C
       - date: '3050-01-01'
@@ -229,23 +223,19 @@ planet:
         population: 91121701.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
         population: 91770967.0
       - date: '3073-03-19'
         faction:
-          source: canon
-          value:
-            - MC
+          - MC
       - date: '3074-01-01'
         socioIndustrial: D-C-C-C-C
       - date: '3079-02-27'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '3080-01-01'
         population: 92841708.0
       - date: '3090-01-01'

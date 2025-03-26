@@ -113,9 +113,7 @@ planet:
     event:
       - date: '2177-01-14'
         faction:
-          source: canon
-          value:
-            - TU
+          - TU
         population: 45390.0
         socioIndustrial: D-F-A-D-C
       - date: '2180-01-01'
@@ -134,9 +132,7 @@ planet:
         population: 27415712.0
       - date: '2243-06-28'
         faction:
-          source: canon
-          value:
-            - TGU
+          - TGU
       - date: '2250-01-01'
         population: 51111682.0
       - date: '2260-01-01'
@@ -166,7 +162,7 @@ planet:
         population: 1539699117.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -317,25 +313,20 @@ planet:
         population:
           source: canon
           value: 5279000000.0
-      - date: '3029-11-06'
+      - date: '3029-03-03'
         faction:
-          source: canon
+          source: NAIS 4th SW Atlas Volume 2, p. 16–17
           value:
             - TFR
       - date: '3030-01-01'
         population: 5396833151.0
-      - date: '3032-10-02'
+      - date: '3031-09-15'
         faction:
-          source: canon
-          value:
-            - FS
-      - date: '3040-01-01'
-        population: 5671025084.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
+          source: 20 Year Update, p. 12
           value:
             - FC
+      - date: '3040-01-01'
+        population: 5671025084.0
       - date: '3046-01-01'
         socioIndustrial:
           source: canon
@@ -350,42 +341,32 @@ planet:
         population: 6230952835.0
       - date: '3063-09-08'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
             - LA
       - date: '3067-04-07'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population:
           source: canon
           value: 6378650000.0
       - date: '3069-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 6399094374.0
       - date: '3075-07-20'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3079-12-01'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 6460821496.0
       - date: '3085-07-21'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 6528364655.0
       - date: '3092-01-01'
@@ -404,24 +385,18 @@ planet:
           value: X
       - date: '3135-09-16'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '3140-01-01'
         population: 7034006627.0
       - date: '3145-01-01'
         population: 7101858258.0
       - date: '3145-04-08'
         faction:
-          source: canon
-          value:
-            - FS
-            - CC
+          - FS
+          - CC
       - date: '3145-05-25'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
   - name: Brahma's Stand
     type: GIANT_TERRESTRIAL
     orbitalDist: 1.28

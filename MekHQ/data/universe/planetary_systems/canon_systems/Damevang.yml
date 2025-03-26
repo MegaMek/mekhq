@@ -38,9 +38,7 @@ planet:
     event:
       - date: '2631-12-15'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 53671.0
         socioIndustrial: B-D-A-C-C
       - date: '2640-01-01'
@@ -129,16 +127,16 @@ planet:
         population: 160099573.0
       - date: '3020-01-01'
         population: 158758882.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-08-27'
         population: 158710518.0
         socioIndustrial: B-D-B-C-C
       - date: '3040-01-01'
         population: 159649678.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: A-D-A-C-C
       - date: '3050-01-01'
@@ -147,7 +145,7 @@ planet:
         population: 161819562.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -172,9 +170,7 @@ planet:
         population: 175034291.0
       - date: '3145-02-23'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 175911654.0
   - name: WTH-2
     type: ICE_GIANT

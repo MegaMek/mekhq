@@ -51,9 +51,7 @@ planet:
     event:
       - date: '2693-11-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 53884.0
         socioIndustrial: C-D-B-D-C
       - date: '2694-01-01'
@@ -151,15 +149,11 @@ planet:
         population: 127647108.0
       - date: '3077-11-11'
         faction:
-          source: canon
-          value:
-            - FWL
-            - MH
+          - FWL
+          - MH
       - date: '3077-11-28'
         faction:
-          source: canon
-          value:
-            - MH
+          - MH
       - date: '3080-01-01'
         population: 129757781.0
       - date: '3090-01-01'
@@ -182,12 +176,7 @@ planet:
         population: 141128312.0
       - date: '3150-08-15'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Blair

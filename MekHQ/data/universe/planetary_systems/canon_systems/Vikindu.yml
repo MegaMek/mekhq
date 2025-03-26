@@ -54,9 +54,7 @@ planet:
     event:
       - date: '2338-02-09'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 48101.0
         socioIndustrial: D-D-A-D-C
       - date: '2340-01-01'
@@ -226,9 +224,7 @@ planet:
         population: 376848689.0
       - date: '3081-08-23'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 377376647.0
       - date: '3100-01-01'
@@ -249,9 +245,7 @@ planet:
         population: 390349992.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
   - name: Sululu
     type: TERRESTRIAL
     orbitalDist: 0.8

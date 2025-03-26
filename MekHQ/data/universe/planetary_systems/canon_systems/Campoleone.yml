@@ -84,9 +84,7 @@ planet:
     event:
       - date: '2474-07-31'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 48392.0
         socioIndustrial: C-D-C-C-D
       - date: '2480-10-24'
@@ -233,9 +231,7 @@ planet:
         population: 1255261.0
       - date: '3075-04-13'
         faction:
-          source: canon
-          value:
-            - RCM
+          - RCM
       - date: '3080-01-01'
         population: 1269907.0
       - date: '3090-01-01'
@@ -258,11 +254,6 @@ planet:
         population: 1319620.0
       - date: '3145-01-01'
         population: 1323584.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Jupiter
     type: TERRESTRIAL
     orbitalDist: 1.0
@@ -287,9 +278,7 @@ planet:
     event:
       - date: '2474-09-25'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 54214.0
         socioIndustrial: C-D-D-D-D
       - date: '2480-01-01'
@@ -425,9 +414,7 @@ planet:
         population: 113242837.0
       - date: '3075-04-13'
         faction:
-          source: canon
-          value:
-            - RCM
+          - RCM
       - date: '3080-01-01'
         population: 115023276.0
       - date: '3090-01-01'
@@ -446,11 +433,6 @@ planet:
         population: 118076711.0
       - date: '3145-01-01'
         population: 118218489.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Iupiter's Home
     type: TERRESTRIAL
     orbitalDist: 1.6

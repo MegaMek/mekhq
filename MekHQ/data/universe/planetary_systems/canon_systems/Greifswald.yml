@@ -64,9 +64,7 @@ planet:
     event:
       - date: '2891-03-01'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 51666.0
         socioIndustrial: C-D-B-D-D
       - date: '2892-08-05'
@@ -129,9 +127,7 @@ planet:
         population: 564028.0
       - date: '3140-12-01'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 568558.0
   - name: We Gyet

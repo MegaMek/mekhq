@@ -63,9 +63,7 @@ planet:
     event:
       - date: '2534-01-18'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
         population: 45403.0
         socioIndustrial: C-F-A-D-F
       - date: '2540-01-01'
@@ -86,14 +84,10 @@ planet:
         population: 153788842.0
       - date: '2596-09-22'
         faction:
-          source: canon
-          value:
-            - SL
+          - SL
       - date: '2597-03-21'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
       - date: '2600-01-01'
         population: 250236234.0
       - date: '2610-01-01'
@@ -222,16 +216,6 @@ planet:
         population: 1002477648.0
       - date: '3145-01-01'
         population: 1006495589.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - IND
-      - date: '2108-12-05'
-        name: Badlands Cluster (50)
-      - date: '3025-01-01'
-        name: Pirates Haven (50)
-        message: Badlands Cluster (50) renamed to Pirates Haven (50)
   - name: Parker's Run
     type: GAS_GIANT
     orbitalDist: 7.28

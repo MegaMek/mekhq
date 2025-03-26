@@ -84,9 +84,7 @@ planet:
     event:
       - date: '2802-02-08'
         faction:
-          source: canon
-          value:
-            - CSJ
+          - CSJ
         population: 10358.0
         socioIndustrial: B-C-B-D-D
       - date: '2804-04-21'
@@ -143,9 +141,7 @@ planet:
         population: 7640587.0
       - date: '3025-12-04'
         faction:
-          source: canon
-          value:
-            - CLAN
+          - CLAN
       - date: '3030-01-01'
         population: 7754030.0
       - date: '3040-01-01'
@@ -154,112 +150,88 @@ planet:
         socioIndustrial: A-B-C-B-C
       - date: '3046-04-15'
         faction:
-          source: canon
-          value:
-            - CSJ
-            - CJF
+          - CSJ
+          - CJF
       - date: '3050-01-01'
         population: 7909358.0
       - date: '3060-01-01'
         population: 7977079.0
-      - date: '3061-05-30'
-        faction:
-          source: canon
-          value:
-            - SL
-            - CJF
       - date: '3061-04-01'
         faction:
-          source: canon
-          value:
-            - SL
-            - CFM
-            - CGS
-            - CIH
-            - CJF
-            - CSA
+          - SL
+          - CFM
+          - CGS
+          - CIH
+          - CJF
+          - CSA
+      - date: '3061-05-30'
+        faction:
+          - SL
+          - CJF
       - date: '3067-07-12'
         faction:
-          source: canon
-          value:
-            - CJF
-            - CSA
-            - CGS
-            - CFM
-            - CIH
+          - CJF
+          - CSA
+          - CGS
+          - CFM
+          - CIH
       - date: '3069-11-07'
         faction:
-          source: canon
-          value:
-            - CSV
-            - CSA
-            - CGS
-            - CFM
-            - CIH
+          - CSV
+          - CSA
+          - CGS
+          - CFM
+          - CIH
       - date: '3070-01-01'
         population: 8020827.0
       - date: '3072-01-18'
         faction:
-          source: canon
-          value:
-            - CSV
-            - CSA
-            - CGS
-            - CFM
-            - CIH
-            - SOC
-            - CCO
+          - CSV
+          - CSA
+          - CGS
+          - CFM
+          - CIH
+          - SOC
+          - CCO
       - date: '3072-06-27'
         faction:
-          source: canon
-          value:
-            - CSV
-            - CSA
-            - CGS
-            - CFM
-            - CIH
-            - SOC
-            - CCO
-            - CCC
+          - CSV
+          - CSA
+          - CGS
+          - CFM
+          - CIH
+          - SOC
+          - CCO
+          - CCC
       - date: '3072-06-30'
         faction:
-          source: canon
-          value:
-            - CSV
-            - CSA
-            - CGS
-            - CFM
-            - CIH
-            - CCC
+          - CSV
+          - CSA
+          - CGS
+          - CFM
+          - CIH
+          - CCC
       - date: '3072-07-01'
         faction:
-          source: canon
-          value:
-            - CSA
-            - CCC
-            - CGS
-            - SOC
+          - CSA
+          - CCC
+          - CGS
+          - SOC
       - date: '3072-08-09'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CGS
-            - SOC
+          - CCC
+          - CGS
+          - SOC
       - date: '3075-12-07'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CGS
+          - CCC
+          - CGS
       - date: '3079-10-22'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CSA
-            - CCO
-            - CSL
+          - CCC
+          - CSA
+          - CCO
+          - CSL
       - date: '3080-01-01'
         population: 8103058.0
       - date: '3090-01-01'

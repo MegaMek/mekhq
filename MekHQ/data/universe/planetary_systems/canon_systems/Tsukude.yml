@@ -115,9 +115,7 @@ planet:
     event:
       - date: '2319-04-07'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 51291.0
         socioIndustrial: D-D-C-D-F
       - date: '2320-01-01'
@@ -132,9 +130,7 @@ planet:
         population: 21167068.0
       - date: '2365-11-05'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2370-01-01'
         population: 54458833.0
       - date: '2380-01-01'
@@ -236,9 +232,7 @@ planet:
         population: 9231326628.0
       - date: '2821-08-25'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 9076249994.0
       - date: '2840-01-01'
@@ -300,9 +294,7 @@ planet:
         population: 8056742232.0
       - date: '3081-12-18'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 8157267807.0
       - date: '3100-09-18'
@@ -318,16 +310,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 8320391303.0
       - date: '3145-01-16'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 8338716314.0
   - name: Yamada Sawa
     type: TERRESTRIAL

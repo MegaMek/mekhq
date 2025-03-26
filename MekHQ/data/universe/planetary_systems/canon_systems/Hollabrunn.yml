@@ -42,9 +42,7 @@ planet:
     event:
       - date: '2228-06-24'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 49377.0
         socioIndustrial: C-D-A-D-B
       - date: '2230-09-28'
@@ -74,17 +72,13 @@ planet:
         population: 18146.0
       - date: '2341-01-28'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '2596-04-12'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 47391.0
         socioIndustrial: C-D-A-D-B
       - date: '2600-01-01'
@@ -189,22 +183,22 @@ planet:
         population: 471857845.0
       - date: '3025-01-01'
         socioIndustrial: C-C-B-D-B
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 476500892.0
       - date: '3040-01-01'
         population: 480664536.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial: B-B-A-C-A
       - date: '3050-01-01'
         population: 486126849.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -231,9 +225,7 @@ planet:
         population: 543358648.0
       - date: '3145-02-16'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 546628600.0
   - name: Hunt's Choice
     type: TERRESTRIAL

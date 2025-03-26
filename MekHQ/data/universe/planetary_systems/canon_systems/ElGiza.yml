@@ -93,9 +93,7 @@ planet:
     event:
       - date: '2325-05-08'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 60916.0
         socioIndustrial: C-C-A-D-F
       - date: '2330-01-01'
@@ -152,9 +150,7 @@ planet:
         population: 208182374.0
       - date: '2571-10-19'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2580-01-01'
         population: 211229820.0
       - date: '2590-01-01'
@@ -206,9 +202,7 @@ planet:
         population: 224581298.0
       - date: '2790-03-12'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 222571572.0
       - date: '2800-01-01'
         population: 220479469.0
@@ -273,9 +267,7 @@ planet:
         population: 197107198.0
       - date: '3079-12-26'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3080-01-01'
         population: 198333059.0
       - date: '3090-01-01'
@@ -296,18 +288,11 @@ planet:
         population: 198968742.0
       - date: '3145-02-19'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
         population: 198889170.0
       - date: '3146-08-28'
         faction:
-          source: canon
-          value:
-            - DA
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - DA
   - name: Bin Kareem

@@ -32,9 +32,7 @@ planet:
     event:
       - date: '2663-12-07'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 54902.0
         socioIndustrial: C-D-B-C-D
       - date: '2666-01-11'
@@ -139,9 +137,7 @@ planet:
         population: 1175315012.0
       - date: '3081-06-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 1189741679.0
       - date: '3097-01-01'
@@ -160,15 +156,8 @@ planet:
         population: 1286256687.0
       - date: '3145-07-29'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
         population: 1296069479.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Evans's World
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.07

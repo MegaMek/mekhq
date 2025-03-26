@@ -41,9 +41,7 @@ planet:
     event:
       - date: '2202-03-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 53543.0
         socioIndustrial: D-D-C-D-D
       - date: '2210-01-01'
@@ -62,9 +60,7 @@ planet:
         population: 27304752.0
       - date: '2280-05-31'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 46564126.0
       - date: '2290-01-01'
         population: 74471119.0
@@ -191,9 +187,7 @@ planet:
         population: 1871572934.0
       - date: '2864-11-15'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2870-01-01'
         population: 1856666312.0
       - date: '2878-01-01'
@@ -210,9 +204,7 @@ planet:
         population: 1781542421.0
       - date: '2920-12-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1750148375.0
       - date: '2930-01-01'
         population: 1726932910.0
@@ -250,14 +242,10 @@ planet:
         population: 1644203392.0
       - date: '3081-02-10'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3082-05-11'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1650463251.0
       - date: '3098-01-01'
@@ -274,23 +262,14 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3137-10-01'
         faction:
-          source: canon
-          value:
-            - CvW
+          - CvW
       - date: '3140-01-01'
         population: 1673732239.0
       - date: '3145-01-01'
         population: 1677754021.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Igigi
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.21

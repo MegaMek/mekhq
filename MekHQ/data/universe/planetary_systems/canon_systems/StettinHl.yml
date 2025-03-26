@@ -64,9 +64,7 @@ planet:
     event:
       - date: '2891-03-24'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 49686.0
         socioIndustrial: C-C-B-D-F
       - date: '2892-08-28'
@@ -102,9 +100,7 @@ planet:
         population: 62382.0
       - date: '3025-01-11'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
       - date: '3030-01-01'
         population: 62552.0
       - date: '3040-01-01'
@@ -135,9 +131,7 @@ planet:
         population: 63169.0
       - date: '3140-01-15'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 63334.0
   - name: Burkot's Planet

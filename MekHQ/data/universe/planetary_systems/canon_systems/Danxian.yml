@@ -45,9 +45,7 @@ planet:
     event:
       - date: '2600-12-19'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 51348.0
         socioIndustrial: C-D-A-D-F
       - date: '2603-01-01'
@@ -88,9 +86,7 @@ planet:
         population: 155784921.0
       - date: '2750-04-19'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 157882079.0
       - date: '2760-01-01'
         population: 160017809.0
@@ -102,9 +98,7 @@ planet:
         population: 160706914.0
       - date: '2791-01-14'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2800-01-01'
         population: 160045104.0
       - date: '2810-01-01'
@@ -161,22 +155,22 @@ planet:
         socioIndustrial: C-D-B-C-B
       - date: '3027-01-01'
         socioIndustrial: C-D-B-C-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 146680306.0
       - date: '3040-01-01'
         population: 147533523.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3047-01-01'
         socioIndustrial: C-C-A-C-C
       - date: '3050-01-01'
         population: 148436228.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -205,12 +199,12 @@ planet:
         population: 168082583.0
       - date: '3146-09-01'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - BC
       - date: '3148-01-30'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - LA
   - name: Tangatamanu

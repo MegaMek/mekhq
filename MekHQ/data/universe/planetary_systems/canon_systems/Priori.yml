@@ -149,9 +149,7 @@ planet:
     event:
       - date: '2802-08-16'
         faction:
-          source: canon
-          value:
-            - CB
+          - CB
         population: 9924.0
         socioIndustrial: A-C-B-C-F
       - date: '2803-03-27'
@@ -207,9 +205,7 @@ planet:
         population: 86087.0
       - date: '3025-09-08'
         faction:
-          source: canon
-          value:
-            - CLAN
+          - CLAN
       - date: '3030-01-01'
         population: 56506.0
       - date: '3040-01-01'
@@ -220,40 +216,28 @@ planet:
         population: 20428.0
       - date: '3059-02-27'
         faction:
-          source: canon
-          value:
-            - CSA
+          - CSA
       - date: '3060-01-01'
         population: 10489.0
       - date: '3062-05-30'
         faction:
-          source: canon
-          value:
-            - CSA
-            - CDS
+          - CSA
+          - CDS
       - date: '3070-01-01'
         population: 5323.0
       - date: '3070-10-03'
         faction:
-          source: canon
-          value:
-            - CSA
+          - CSA
       - date: '3072-02-03'
         faction:
-          source: canon
-          value:
-            - SOC
-            - CB
+          - SOC
+          - CB
       - date: '3074-10-03'
         faction:
-          source: canon
-          value:
-            - CSA
+          - CSA
       - date: '3075-11-16'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         population: 0.0
         socioIndustrial: X-X-X-X-X
   - name: Yakupchina

@@ -33,9 +33,7 @@ planet:
     event:
       - date: '2395-11-21'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 39115.0
         socioIndustrial: D-D-A-D-F
       - date: '2400-01-01'
@@ -189,10 +187,8 @@ planet:
         population: 107138636.0
       - date: '3077-12-19'
         faction:
-          source: canon
-          value:
-            - DC
-            - REB
+          - DC
+          - REB
       - date: '3080-01-01'
         population: 108997359.0
       - date: '3090-01-17'
@@ -212,11 +208,6 @@ planet:
         population: 115644827.0
       - date: '3145-01-01'
         population: 115691094.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - DC
   - name: Bin Fakih
     type: TERRESTRIAL
     orbitalDist: 0.42

@@ -34,9 +34,7 @@ planet:
     event:
       - date: '2267-12-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 52347.0
         socioIndustrial: D-D-A-D-B
       - date: '2270-01-01'
@@ -59,9 +57,7 @@ planet:
         population: 6608088.0
       - date: '2355-11-27'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2360-01-01'
         population: 8771079.0
       - date: '2370-01-01'
@@ -78,9 +74,7 @@ planet:
         population: 22545113.0
       - date: '2418-06-11'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2420-01-01'
         population: 25375086.0
       - date: '2430-01-01'
@@ -228,16 +222,12 @@ planet:
         population: 48302193.0
       - date: '3079-10-22'
         faction:
-          source: canon
-          value:
-            - SHC
+          - SHC
       - date: '3080-01-01'
         population: 48612318.0
       - date: '3085-06-09'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3090-01-01'
         population: 49189341.0
       - date: '3100-01-01'
@@ -256,15 +246,11 @@ planet:
         population: 53147813.0
       - date: '3145-02-02'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 53671222.0
       - date: '3151-11-04'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: Berger
     type: TERRESTRIAL
     orbitalDist: 0.9

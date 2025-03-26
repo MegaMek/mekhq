@@ -31,9 +31,7 @@ planet:
     event:
       - date: '3057-03-23'
         faction:
-          source: canon
-          value:
-            - NCR
+          - NCR
         population: 50013.0
         socioIndustrial: D-F-B-D-D
       - date: '3060-01-01'
@@ -42,9 +40,7 @@ planet:
         hpg: X
       - date: '3066-04-09'
         faction:
-          source: canon
-          value:
-            - FR
+          - FR
       - date: '3070-01-01'
         population: 13268314.0
       - date: '3080-01-01'

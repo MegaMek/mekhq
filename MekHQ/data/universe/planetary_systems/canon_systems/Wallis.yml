@@ -147,9 +147,7 @@ planet:
     event:
       - date: '2247-07-09'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
         population: 53469.0
         socioIndustrial: D-D-D-D-D
       - date: '2250-01-01'
@@ -160,7 +158,7 @@ planet:
         population: 751551.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2274-01-01'
@@ -343,16 +341,12 @@ planet:
         population: 582173669.0
       - date: '3078-05-01'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
       - date: '3080-01-01'
         population: 591090303.0
       - date: '3086-02-01'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
       - date: '3090-01-01'
         population: 599543662.0
       - date: '3097-01-01'
@@ -375,12 +369,7 @@ planet:
         population: 650778151.0
       - date: '3148-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Buchs

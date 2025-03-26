@@ -112,9 +112,7 @@ planet:
     event:
       - date: '2600-02-16'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 48562.0
         socioIndustrial: B-D-C-D-D
       - date: '2610-01-01'
@@ -213,24 +211,24 @@ planet:
         population: 1129947658.0
       - date: '3020-01-01'
         population: 1130143960.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1136909461.0
       - date: '3032-01-01'
         socioIndustrial: C-B-D-C-D
       - date: '3040-01-01'
         population: 1145353796.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: B-A-C-B-C
       - date: '3050-01-01'
         population: 1152361807.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -241,9 +239,7 @@ planet:
         population: 1175876211.0
       - date: '3081-01-22'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1183899418.0
       - date: '3097-01-01'
@@ -260,16 +256,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1252840761.0
       - date: '3145-03-17'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 1265685131.0
   - name: Pales
     type: DWARF_TERRESTRIAL

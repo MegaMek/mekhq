@@ -43,9 +43,7 @@ planet:
     event:
       - date: '2611-02-16'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 45597.0
         socioIndustrial: D-D-B-F-C
       - date: '2613-01-01'
@@ -157,9 +155,7 @@ planet:
         population: 128102543.0
       - date: '3081-07-20'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 129649034.0
       - date: '3091-01-01'
@@ -178,9 +174,7 @@ planet:
         population: 138744076.0
       - date: '3145-05-25'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 139998409.0
   - name: Webb
     type: TERRESTRIAL

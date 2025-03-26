@@ -110,9 +110,7 @@ planet:
     event:
       - date: '2220-08-12'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 38935.0
         socioIndustrial: D-D-B-C-C
       - date: '2230-01-01'
@@ -137,9 +135,7 @@ planet:
         population: 54917330.0
       - date: '2310-12-31'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 88619830.0
       - date: '2320-01-01'
         population: 134623579.0
@@ -239,16 +235,12 @@ planet:
         population: 2685337682.0
       - date: '2767-03-13'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 2700153619.0
       - date: '2779-04-10'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2780-01-01'
         population: 2717456208.0
       - date: '2790-01-01'
@@ -271,9 +263,7 @@ planet:
         population: 2653081700.0
       - date: '2864-06-08'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2870-01-01'
         population: 2662807528.0
       - date: '2880-01-01'
@@ -288,9 +278,7 @@ planet:
         population: 2628020573.0
       - date: '2920-03-22'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 2639464826.0
       - date: '2930-01-01'
         population: 2598734921.0
@@ -334,14 +322,10 @@ planet:
         population: 2212997445.0
       - date: '3081-09-24'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3082-06-25'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 2221867162.0
       - date: '3100-01-01'
@@ -360,22 +344,13 @@ planet:
           value: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 2296871332.0
       - date: '3145-04-23'
         faction:
-          source: canon
-          value:
-            - CvW
+          - CvW
         population: 2311618449.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Saint-Sever-de-Saintonge
     type: GIANT_TERRESTRIAL
     orbitalDist: 1.5

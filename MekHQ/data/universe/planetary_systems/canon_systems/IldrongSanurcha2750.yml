@@ -48,9 +48,7 @@ planet:
     event:
       - date: '2252-04-14'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 49625.0
         socioIndustrial: D-D-B-D-F
       - date: '2260-01-01'
@@ -75,9 +73,7 @@ planet:
         population: 14282259.0
       - date: '2355-08-05'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2360-01-01'
         population: 18597576.0
       - date: '2370-01-01'
@@ -192,17 +188,10 @@ planet:
         population: 858.0
       - date: '2861-08-13'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '2108-12-05'
-        name: Sanurcha
-      - date: '2750-01-01'
-        name: Ildrong
-        message: Sanurcha renamed to Ildrong
   - name: Moldovan
     type: ICE_GIANT
     orbitalDist: 0.8

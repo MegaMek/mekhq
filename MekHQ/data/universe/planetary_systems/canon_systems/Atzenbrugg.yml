@@ -36,9 +36,7 @@ planet:
     event:
       - date: '2713-10-06'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 47566.0
         socioIndustrial: C-D-D-F-D
       - date: '2714-02-28'
@@ -125,9 +123,7 @@ planet:
         population: 129106836.0
       - date: '3081-09-10'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 130300099.0
       - date: '3100-01-01'
@@ -140,9 +136,7 @@ planet:
         population: 132454640.0
       - date: '3130-04-03'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
         population: 133065335.0
       - date: '3132-08-07'
         hpg: X
@@ -152,19 +146,12 @@ planet:
         population: 134107303.0
       - date: '3147-04-01'
         faction:
-          source: canon
-          value:
-            - MH
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - MH
       - date: '3151-01-17'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: Sankt Oswald bei Freistadt
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.49

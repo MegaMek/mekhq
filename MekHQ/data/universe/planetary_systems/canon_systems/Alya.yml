@@ -94,9 +94,7 @@ planet:
     event:
       - date: '2310-09-05'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 61222.0
         socioIndustrial: D-C-B-D-F
       - date: '2320-01-01'
@@ -105,9 +103,9 @@ planet:
         population: 896620.0
       - date: '2340-01-01'
         population: 2558237.0
-      - date: '2341-01-26'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -124,9 +122,7 @@ planet:
         population: 68837708.0
       - date: '2400-05-17'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 102213793.0
       - date: '2410-01-01'
         population: 143900702.0
@@ -276,27 +272,19 @@ planet:
         population: 579987994.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3075-08-28'
         faction:
-          source: canon
-          value:
-            - CGB
-            - WOB
+          - CGB
+          - WOB
       - date: '3075-09-06'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 583478382.0
       - date: '3081-02-18'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 584763448.0
       - date: '3092-01-01'
@@ -313,16 +301,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 589342438.0
       - date: '3145-10-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 589342438.0
   - name: Bin Ali's Den
     type: GIANT_TERRESTRIAL

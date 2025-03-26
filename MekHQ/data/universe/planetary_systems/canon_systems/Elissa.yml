@@ -204,9 +204,7 @@ planet:
     event:
       - date: '2622-01-11'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 51421.0
         socioIndustrial: C-D-C-D-C
       - date: '2630-01-01'
@@ -248,9 +246,7 @@ planet:
         population: 6554407.0
       - date: '2779-12-20'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 6615982.0
       - date: '2790-01-01'
@@ -281,9 +277,7 @@ planet:
         socioIndustrial: D-D-D-D-C
       - date: '2900-01-17'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 3630961.0
       - date: '2910-01-01'
         population: 3478912.0
@@ -311,9 +305,7 @@ planet:
         population: 3387247.0
       - date: '3025-12-08'
         faction:
-          source: canon
-          value:
-            - EF
+          - EF
       - date: '3030-01-01'
         population: 3410725.0
       - date: '3040-01-01'
@@ -324,7 +316,7 @@ planet:
           value: D-D-C-D-B
       - date: '3049-09-03'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3050-01-01'
@@ -339,9 +331,7 @@ planet:
         population: 3579148.0
       - date: '3071-01-25'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
       - date: '3080-01-01'
         population: 3629609.0
       - date: '3090-01-01'
@@ -350,9 +340,7 @@ planet:
         population: 3686675.0
       - date: '3100-02-07'
         faction:
-          source: canon
-          value:
-            - TB
+          - TB
       - date: '3110-01-01'
         population: 3697012.0
       - date: '3120-01-01'
@@ -365,11 +353,6 @@ planet:
         population: 3740895.0
       - date: '3145-01-01'
         population: 3740147.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FCo
   - name: SVE1 Belt
     type: ASTEROID_BELT
     orbitalDist: 123.52

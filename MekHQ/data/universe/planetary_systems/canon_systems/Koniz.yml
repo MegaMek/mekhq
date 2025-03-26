@@ -47,16 +47,12 @@ planet:
     event:
       - date: '2341-11-15'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 51816.0
         socioIndustrial: D-C-C-C-D
       - date: '2346-08-03'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2350-01-01'
         population: 171660.0
       - date: '2352-01-01'
@@ -203,33 +199,29 @@ planet:
         population: 208855583.0
       - date: '3020-01-01'
         population: 202558892.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 200909315.0
       - date: '3037-01-01'
         socioIndustrial: C-D-D-D-D
       - date: '3040-01-01'
         population: 203680714.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial: C-D-C-D-C
       - date: '3050-01-01'
         population: 206469693.0
       - date: '3057-12-01'
         faction:
-          source: canon
-          value:
-            - ARDC
+          - ARDC
       - date: '3060-01-01'
         population: 209296862.0
       - date: '3067-07-23'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3070-01-01'
         population: 211675330.0
       - date: '3080-01-01'
@@ -254,9 +246,7 @@ planet:
         population: 227933436.0
       - date: '3152-05-13'
         faction:
-          source: canon
-          value:
-            - NTamP
+          - NTamP
   - name: Mati Syra Zemlya
     type: TERRESTRIAL
     orbitalDist: 0.9

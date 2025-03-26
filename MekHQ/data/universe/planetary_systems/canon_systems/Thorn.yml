@@ -61,9 +61,7 @@ planet:
     event:
       - date: '2891-10-10'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 52952.0
         socioIndustrial: C-D-B-D-F
       - date: '2895-12-22'
@@ -126,9 +124,7 @@ planet:
         population: 341296.0
       - date: '3141-03-02'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 344382.0
   - name: Blankenship's Garden

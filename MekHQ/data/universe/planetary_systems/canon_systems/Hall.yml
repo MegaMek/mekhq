@@ -99,9 +99,7 @@ planet:
     event:
       - date: '2270-02-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 41203.0
         socioIndustrial: D-D-C-D-B
       - date: '2280-01-01'
@@ -116,9 +114,7 @@ planet:
         population: 16476473.0
       - date: '2321-11-18'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2330-01-01'
         population: 34671536.0
       - date: '2340-01-01'
@@ -217,23 +213,17 @@ planet:
         population: 3322669953.0
       - date: '2767-10-23'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 3339948610.0
       - date: '2779-01-03'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 3328882680.0
       - date: '2790-12-10'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 3290221462.0
       - date: '2800-01-01'
         population: 3190435086.0
@@ -243,9 +233,7 @@ planet:
         population: 2993882137.0
       - date: '2821-03-05'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2830-01-01'
         population: 2925133110.0
       - date: '2840-01-01'
@@ -292,77 +280,56 @@ planet:
         population: 2459531444.0
       - date: '3028-01-01'
         socioIndustrial: B-B-C-C-C
-      - date: '3029-12-02'
+      - date: '3029-03-03'
         faction:
-          source: canon
+          source: NAIS 4th SW Atlas Volume 2, p. 16–17
           value:
             - TFR
       - date: '3030-01-01'
         population: 2475390951.0
-      - date: '3032-08-13'
+      - date: '3031-09-15'
         faction:
-          source: canon
-          value:
-            - FS
-      - date: '3039-12-12'
-        faction:
-          source: canon
-          value:
-            - FWL
-            - FS
-      - date: '3039-12-15'
-        faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3039-12-24'
-        faction:
-          source: canon
-          value:
-            - FS
-            - FWL
-      - date: '3040-01-01'
-        population: 2504523116.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
+          source: 20 Year Update, p. 12
           value:
             - FC
+      - date: '3039-12-12'
+        faction:
+          - FWL
+          - FC
+      - date: '3039-12-15'
+        faction:
+          - FWL
+      - date: '3039-12-24'
+        faction:
+          - FC
+          - FWL
+      - date: '3040-01-01'
+        population: 2504523116.0
       - date: '3046-01-01'
         socioIndustrial: A-A-C-B-B
       - date: '3050-01-01'
         population: 2524387209.0
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - CM
+          - CM
       - date: '3060-01-01'
         population: 2539833032.0
       - date: '3066-10-10'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3068-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 2559465234.0
       - date: '3077-11-20'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 2588292375.0
       - date: '3081-05-27'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 2610125602.0
       - date: '3100-01-01'
@@ -383,12 +350,7 @@ planet:
         population: 2793229194.0
       - date: '3149-03-01'
         faction:
-          source: canon
-          value:
-            - CC
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - CC
   - name: Oxossi

@@ -34,9 +34,7 @@ planet:
     event:
       - date: '2722-01-29'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         hpg: B
         population: 45102.0
         socioIndustrial: C-D-C-D-C

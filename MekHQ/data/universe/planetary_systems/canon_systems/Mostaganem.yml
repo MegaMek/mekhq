@@ -47,9 +47,7 @@ planet:
     event:
       - date: '2218-02-13'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 46847.0
         socioIndustrial: D-D-C-D-F
       - date: '2220-01-01'
@@ -164,9 +162,7 @@ planet:
         population: 7463951.0
       - date: '2750-11-12'
         faction:
-          source: canon
-          value:
-            - AXP
+          - AXP
         population: 7557094.0
       - date: '2760-01-01'
         population: 7630655.0
