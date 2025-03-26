@@ -1211,6 +1211,7 @@ public class Refit extends Part implements IAcquisitionWork {
         for (Part part : neededList) {
             kit.addPart(part);
         }
+        kit.setRefitUnit(oldUnit);
         neededList = List.of(kit);
     }
 
@@ -1439,14 +1440,14 @@ public class Refit extends Part implements IAcquisitionWork {
     public int partsInTransit() {
         int totalParts = 0;
         // for (Part part : reservedParts) {
-        //     logger.info(String.format("PIT: %s: %s, %s", part.isPresent(), part, part.getQuantity()));
+        //     logger.info(String.format("PIT: %s: %s, %s", part.isPresent(), part, part.getQuantity())); // FIXME: LOGGER
         //     if (!part.isPresent()) {
         //         totalParts += 1;
         //     }
         // }
         for (Part part : getCampaign().getWarehouse().getParts()) {
             if (part.getRefitUnit() == oldUnit) {
-                logger.info(String.format("PIT: %s: %s", part.isPresent(), part));
+                logger.info(String.format("PIT: %s: %s", part.isPresent(), part)); // FIXME: LOGGER
                 if (!(part.isPresent())) {
                     totalParts += 1;
                 }
@@ -1456,12 +1457,12 @@ public class Refit extends Part implements IAcquisitionWork {
             if (iAcqWork instanceof Part) {
                 Part part = (Part) iAcqWork;
                 if (part.getRefitUnit() == oldUnit) {
-                    logger.info(String.format("PISL: %s: %s", part.isPresent(), part));
+                    logger.info(String.format("PISL: %s: %s", part.isPresent(), part)); // FIXME: LOGGER
                     totalParts += 1;
                 }
             }
         }
-        logger.info("Total: " + totalParts);
+        logger.info("Total: " + totalParts); // FIXME: LOGGER
         return totalParts;
     }
 
@@ -2537,15 +2538,7 @@ public class Refit extends Part implements IAcquisitionWork {
      */
     @Override
     public String find(int transitDays) {
-        if (campaign.getQuartermaster().buyPart(this, transitDays)) {
-            return ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
-                    "<b> refit kit found.</b> Kit will arrive in " + transitDays + " days.");
-        } else {
-            return ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
-                    "<b> You cannot afford this refit kit. Transaction cancelled</b>.");
-        }
+        throw new IllegalStateException("Refit is no longer a purchasable item. Use RefitKit instead.");
     }
 
     /**
@@ -2554,9 +2547,7 @@ public class Refit extends Part implements IAcquisitionWork {
      */
     @Override
     public String failToFind() {
-        return ReportingUtilities.messageSurroundedBySpanWithColor(
-            MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
-            " refit kit not found.");
+        throw new IllegalStateException("Refit is no longer a purchasable item. Use RefitKit instead.");
     }
 
     /**

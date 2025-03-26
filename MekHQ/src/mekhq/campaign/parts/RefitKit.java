@@ -66,7 +66,7 @@ public class RefitKit extends Part implements IAcquisitionWork {
 
     public void addPart(Part part) {
         partList.add(part);
-        tons += part.getTonnage();
+        tons += (int) part.getTonnage();
         stickerPrice = stickerPrice.plus(part.getStickerPrice().multipliedBy(1.10));
     }
     
@@ -266,7 +266,8 @@ public class RefitKit extends Part implements IAcquisitionWork {
      */
     @Override
     public String find(int transitDays) {
-       if (campaign.getQuartermaster().buyPart(this, transitDays)) {
+        logger.info("In RefitKit.Find!!!"); // FIXME: LOGGER
+        if (campaign.getQuartermaster().buyPart(this, transitDays)) {
             return ReportingUtilities.messageSurroundedBySpanWithColor(
                     MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
                     "<b> refit kit found.</b> Kit will arrive in " + transitDays + " days.");
@@ -293,7 +294,7 @@ public class RefitKit extends Part implements IAcquisitionWork {
 
     @Override
     public boolean isExtinctIn(int year, boolean clan, int techFaction) {
-        return true;
+        return false;
     }
 
 }

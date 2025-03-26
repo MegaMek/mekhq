@@ -4798,12 +4798,13 @@ public class Campaign implements ITechManager {
         List<Part> assignedParts = new ArrayList<>();
         List<Part> arrivedParts = new ArrayList<>();
         getWarehouse().forEachPart(part -> {
-            if (part instanceof Refit) {
-                return;
+  
+            if (part instanceof RefitKit) {
+                logger.info("REFIT KIT IN PNDU"); // FIXME: LOGGER
             }
 
-            if (part instanceof RefitKit) {
-                logger.info("REFIT KIT IN PNDU");
+            if (null != part.getRefitUnit()) {
+                logger.info("Refit Part PDNU: " + part); // FIXME: LOGGER
             }
 
             if (part.getTech() != null) {
