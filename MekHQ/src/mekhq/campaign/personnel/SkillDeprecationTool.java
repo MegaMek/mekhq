@@ -58,6 +58,8 @@ public class SkillDeprecationTool {
      * <p>Once the skill is removed from this list, players will no longer be able to benefit from skill refund.
      * This list should be updated following each Milestone release. If there are no skills in the list an empty array
      * MUST be left; otherwise we will run into NPEs during campaign loading.</p>
+     *
+     * <p><b>Last Updated:</b> 50.05</p>
      */
     public static final List<SkillType> DEPRECATED_SKILLS = List.of(SkillType.getType(SkillType.S_SCROUNGE));
 
