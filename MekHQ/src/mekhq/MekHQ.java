@@ -785,36 +785,50 @@ public class MekHQ implements GameListener {
                   true,
                   tracker);
             resolveDialog.setVisible(true);
-            // TODO remove these safeties as they're shown to be unnecessary
+            // TODO remove these safeties once the investigation is concluded -Illiani
             if (resolveDialog == null) {
-                throw new IllegalStateException("resolveDialog is null");
+                logger.errorDialog(new IllegalStateException(),
+                      "resolveDialog is null please report this as a bug",
+                      "UNDER ACTIVE INVESTIGATION");
             }
             if (resolveDialog.wasAborted()) {
-                // TODO remove these safeties as they're shown to be unnecessary
+                // TODO remove these safeties once the investigation is concluded -Illiani
                 Map<UUID, ?> peopleStatus = tracker.getPeopleStatus();
                 if (peopleStatus == null) {
-                    throw new IllegalStateException("People status map in tracker is null");
+                    logger.errorDialog(new IllegalStateException(),
+                          "People status map in tracker is null please report this as a bug",
+                          "UNDER ACTIVE INVESTIGATION");
                 }
 
                 for (UUID personId : tracker.getPeopleStatus().keySet()) {
-                    // TODO remove these safeties as they're shown to be unnecessary
+                    // TODO remove these safeties once the investigation is concluded -Illiani
                     if (getCampaign() == null) {
-                        throw new IllegalStateException("Campaign instance is null");
+                        logger.errorDialog(new IllegalStateException(),
+                              "Campaign instance is null please report this as a bug",
+                              "UNDER ACTIVE INVESTIGATION");
                     }
 
                     Person person = getCampaign().getPerson(personId);
 
                     if (person == null) {
-                        throw new IllegalArgumentException("Person with ID " +
-                                                                 personId +
-                                                                 " does not exist in the campaign");
+                        // TODO remove these safeties once the investigation is concluded -Illiani
+                        logger.errorDialog(new IllegalStateException(),
+                              "Person with ID " +
+                                    personId +
+                                    " does not exist in the campaign" +
+                                    " please report this" +
+                                    " as a bug",
+                              "UNDER ACTIVE INVESTIGATION");
                     }
 
                     Integer priorHits = person.getHitsPrior();
-                    // TODO remove these safeties as they're shown to be unnecessary
+                    // TODO remove these safeties once the investigation is concluded -Illiani
                     if (priorHits == null) {
-                        throw new IllegalStateException("Person's prior hits are not set for person " +
-                                                              person.getFullName());
+                        logger.errorDialog(new IllegalStateException(),
+                              "Person's prior hits are not set for person " +
+                                    person.getFullName() +
+                                    " please report this as a bug",
+                              "UNDER ACTIVE INVESTIGATION");
                     }
                     person.setHits(priorHits);
                 }
