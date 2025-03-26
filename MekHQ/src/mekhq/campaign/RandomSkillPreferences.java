@@ -85,11 +85,17 @@ public class RandomSkillPreferences {
         overallRecruitBonus = b;
     }
 
+    /**
+     * @deprecated Use {@link #getRecruitmentBonus(PersonnelRole)} instead.
+     */
     @Deprecated(since = "0.50.05", forRemoval = true)
     public int getRecruitBonus(PersonnelRole role) {
         return getRecruitmentBonus(role);
     }
 
+    /**
+     * @deprecated Use {@link #addRecruitmentBonus(PersonnelRole, int)}.
+     */
     @Deprecated(since = "0.50.05", forRemoval = true)
     public void setRecruitBonus(int index, int bonus) {
         PersonnelRole[] personnelRoles = PersonnelRole.values();
@@ -97,6 +103,9 @@ public class RandomSkillPreferences {
         addRecruitmentBonus(role, bonus);
     }
 
+    /**
+     * @deprecated Use {@link #getRecruitmentBonuses()}.
+     */
     @Deprecated(since = "0.50.05", forRemoval = true)
     public int[] getRecruitBonuses() {
         List<PersonnelRole> personnelRoles = List.of(PersonnelRole.values());
