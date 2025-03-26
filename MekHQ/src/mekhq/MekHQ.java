@@ -40,6 +40,7 @@ import java.io.FileNotFoundException;
 import java.io.ObjectInputFilter.Config;
 import java.lang.management.ManagementFactory;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import javax.swing.InputMap;
 import javax.swing.JOptionPane;
@@ -108,8 +109,8 @@ public class MekHQ implements GameListener {
 
     // region Variable Declarations
     private static final SuitePreferences mhqPreferences = new SuitePreferences();
-    private static final MHQOptions       mhqOptions     = new MHQOptions();
-    private static final EventBus         EVENT_BUS      = new EventBus();
+    private static final MHQOptions mhqOptions = new MHQOptions();
+    private static final EventBus EVENT_BUS = new EventBus();
 
     private static ObservableString selectedTheme;
 
@@ -124,21 +125,21 @@ public class MekHQ implements GameListener {
     private static ObservableString financesDirectory;
 
     // stuff related to MM games
-    private Server     myServer        = null;
-    private GameThread gameThread      = null;
-    private Scenario   currentScenario = null;
-    private Client     client          = null;
+    private Server myServer = null;
+    private GameThread gameThread = null;
+    private Scenario currentScenario = null;
+    private Client client = null;
 
     // the actual campaign - this is where the good stuff is
     private CampaignController campaignController;
-    private CampaignGUI        campaignGUI;
+    private CampaignGUI campaignGUI;
 
     private final IconPackage iconPackage = new IconPackage();
 
-    private final        IAutosaveService  autosaveService;
+    private final IAutosaveService autosaveService;
     // endregion Variable Declarations
     private static final SanityInputFilter sanityInputFilter = new SanityInputFilter();
-    private static final String            defaultTheme      = "com.formdev.flatlaf.FlatDarculaLaf";
+    private static final String defaultTheme = "com.formdev.flatlaf.FlatDarculaLaf";
 
     public static SuitePreferences getMHQPreferences() {
         return mhqPreferences;
@@ -318,9 +319,9 @@ public class MekHQ implements GameListener {
 
         // First, create a global default exception handler
         Thread.setDefaultUncaughtExceptionHandler((thread, t) -> {
-            final String name    = t.getClass().getName();
+            final String name = t.getClass().getName();
             final String message = String.format(MMLoggingConstants.UNHANDLED_EXCEPTION, name);
-            final String title   = String.format(MMLoggingConstants.UNHANDLED_EXCEPTION_TITLE, name);
+            final String title = String.format(MMLoggingConstants.UNHANDLED_EXCEPTION_TITLE, name);
             logger.errorDialog(t, message, title);
         });
 
@@ -390,9 +391,9 @@ public class MekHQ implements GameListener {
             return;
         }
 
-        final String playerName    = joinGameDialog.getPlayerName();
+        final String playerName = joinGameDialog.getPlayerName();
         final String serverAddress = joinGameDialog.getServerAddress();
-        final int    port          = joinGameDialog.getPort();
+        final int port = joinGameDialog.getPort();
         joinGameDialog.dispose();
 
         try {
@@ -443,11 +444,11 @@ public class MekHQ implements GameListener {
 
         this.autosaveService.requestBeforeMissionAutosave(getCampaign());
 
-        final String  playerName = hostDialog.getPlayerName();
-        final String  password   = hostDialog.getServerPass();
-        final int     port       = hostDialog.getPort();
-        final boolean register   = hostDialog.isRegister();
-        final String  metaserver = register ? hostDialog.getMetaserver() : "";
+        final String playerName = hostDialog.getPlayerName();
+        final String password = hostDialog.getServerPass();
+        final int port = hostDialog.getPort();
+        final boolean register = hostDialog.isRegister();
+        final String metaserver = register ? hostDialog.getMetaserver() : "";
 
         // Force cleanup of the current modal, since we are (possibly) about to display a new one and macOS seems to
         // struggle with that (see https://github.com/MegaMek/mekhq/issues/953)
@@ -583,7 +584,7 @@ public class MekHQ implements GameListener {
                     BattlefieldControlType battlefieldControl = template.getBattlefieldControl();
 
                     String controlMessage = MHQInternationalization.getText("ResolveDialog.control." +
-                                                                            battlefieldControl.name());
+                                                                                  battlefieldControl.name());
 
                     victoryMessage = String.format("%s\n\n%s", controlMessage, victoryMessage);
                 }
@@ -632,7 +633,7 @@ public class MekHQ implements GameListener {
                 BattlefieldControlType battlefieldControl = template.getBattlefieldControl();
 
                 String controlMessage = MHQInternationalization.getText("ResolveDialog.control." +
-                                                                        battlefieldControl.name());
+                                                                              battlefieldControl.name());
 
                 victoryMessage = String.format("%s\n\n%s", controlMessage, victoryMessage);
             }
@@ -763,7 +764,7 @@ public class MekHQ implements GameListener {
                     BattlefieldControlType battlefieldControl = template.getBattlefieldControl();
 
                     String controlMessage = MHQInternationalization.getText("ResolveDialog.control." +
-                                                                            battlefieldControl.name());
+                                                                                  battlefieldControl.name());
 
                     victoryMessage = String.format("%s\n\n%s\n\n%s", controlMessage, victoryMessage, decisionMessage);
                 }
@@ -784,10 +785,38 @@ public class MekHQ implements GameListener {
                   true,
                   tracker);
             resolveDialog.setVisible(true);
+            // TODO remove these safeties as they're shown to be unnecessary
+            if (resolveDialog == null) {
+                throw new IllegalStateException("resolveDialog is null");
+            }
             if (resolveDialog.wasAborted()) {
+                // TODO remove these safeties as they're shown to be unnecessary
+                Map<UUID, ?> peopleStatus = tracker.getPeopleStatus();
+                if (peopleStatus == null) {
+                    throw new IllegalStateException("People status map in tracker is null");
+                }
+
                 for (UUID personId : tracker.getPeopleStatus().keySet()) {
+                    // TODO remove these safeties as they're shown to be unnecessary
+                    if (getCampaign() == null) {
+                        throw new IllegalStateException("Campaign instance is null");
+                    }
+
                     Person person = getCampaign().getPerson(personId);
-                    person.setHits(person.getHitsPrior());
+
+                    if (person == null) {
+                        throw new IllegalArgumentException("Person with ID " +
+                                                                 personId +
+                                                                 " does not exist in the campaign");
+                    }
+
+                    Integer priorHits = person.getHitsPrior();
+                    // TODO remove these safeties as they're shown to be unnecessary
+                    if (priorHits == null) {
+                        throw new IllegalStateException("Person's prior hits are not set for person " +
+                                                              person.getFullName());
+                    }
+                    person.setHits(priorHits);
                 }
                 return;
             }
