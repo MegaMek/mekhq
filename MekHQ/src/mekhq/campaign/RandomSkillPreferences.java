@@ -30,6 +30,7 @@ package mekhq.campaign;
 
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -82,6 +83,31 @@ public class RandomSkillPreferences {
 
     public void setOverallRecruitBonus(int b) {
         overallRecruitBonus = b;
+    }
+
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public int getRecruitBonus(PersonnelRole role) {
+        return getRecruitmentBonus(role);
+    }
+
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public void setRecruitBonus(int index, int bonus) {
+        PersonnelRole[] personnelRoles = PersonnelRole.values();
+        PersonnelRole role = personnelRoles[index];
+        addRecruitmentBonus(role, bonus);
+    }
+
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public int[] getRecruitBonuses() {
+        List<PersonnelRole> personnelRoles = List.of(PersonnelRole.values());
+        int[] bonuses = new int[personnelRoles.size()];
+
+        for (PersonnelRole personnelRole : personnelRoles) {
+            int index = personnelRoles.indexOf(personnelRole);
+            bonuses[index] = getRecruitmentBonus(personnelRole);
+        }
+
+        return bonuses;
     }
 
     /**

@@ -494,6 +494,10 @@ public enum PersonnelRole {
     // endregion Boolean Comparison Methods
 
     // region Static Methods
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public static List<PersonnelRole> getMilitaryRoles() {
+        return getMarketableRoles();
+    }
 
     /**
      * @return a list of roles that can be included in the personnel market
