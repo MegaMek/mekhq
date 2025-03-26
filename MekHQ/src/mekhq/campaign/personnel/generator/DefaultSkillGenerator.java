@@ -27,16 +27,17 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import java.util.Arrays;
+import java.util.List;
+
 import megamek.common.Compute;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class DefaultSkillGenerator extends AbstractSkillGenerator {
     //region Constructors
@@ -69,9 +70,9 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         // roll small arms skill
         if (!person.getSkills().hasSkill(SkillType.S_SMALL_ARMS)) {
-            int sarmsLvl = Utilities.generateExpLevel(
-                    (primaryRole.isSupport(true) || secondaryRole.isSupport(true))
-                            ? rskillPrefs.getSupportSmallArmsBonus() : rskillPrefs.getCombatSmallArmsBonus());
+            int sarmsLvl = Utilities.generateExpLevel((primaryRole.isSupport(true) || secondaryRole.isSupport(true)) ?
+                                                            rskillPrefs.getSupportSmallArmsBonus() :
+                                                            rskillPrefs.getCombatSmallArmsBonus());
 
             if (primaryRole.isCivilian()) {
                 sarmsLvl = 0;
@@ -100,30 +101,35 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             }
         }
 
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
         // roll artillery skill
-        if (campaign.getCampaignOptions().isUseArtillery()
-                && (primaryRole.isMekWarrior() || primaryRole.isVehicleGunner() || primaryRole.isSoldier())
-                && Utilities.rollProbability(rskillPrefs.getArtilleryProb())) {
+        if (campaignOptions.isUseArtillery() &&
+                  (primaryRole.isMekWarrior() || primaryRole.isVehicleGunner() || primaryRole.isSoldier()) &&
+                  Utilities.rollProbability(rskillPrefs.getArtilleryProb())) {
             generateArtillerySkill(person, bonus);
         }
 
         // roll Negotiation skill
-        if (campaign.getCampaignOptions().isAdminsHaveNegotiation()
-                && (primaryRole.isAdministrator())) {
+        if (campaignOptions.isAdminsHaveNegotiation() && (primaryRole.isAdministrator())) {
             addSkill(person, SkillType.S_NEG, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
         }
 
         // roll Scrounge skill
-        if (campaign.getCampaignOptions().isAdminsHaveScrounge()
-                && (primaryRole.isAdministrator())) {
+        if (campaignOptions.isAdminsHaveScrounge() && (primaryRole.isAdministrator())) {
             addSkill(person, SkillType.S_SCROUNGE, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
+        }
+
+        // roll Administration skill
+        if (campaignOptions.isDoctorsUseAdministration() && (primaryRole.isDoctor())) {
+            addSkill(person, SkillType.S_ADMIN, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
         }
 
         // roll random secondary skill
         if (Utilities.rollProbability(rskillPrefs.getSecondSkillProb())) {
             final List<String> possibleSkills = Arrays.stream(SkillType.skillList)
-                    .filter(stype -> !person.getSkills().hasSkill(stype))
-                    .toList();
+                                                      .filter(stype -> !person.getSkills().hasSkill(stype))
+                                                      .toList();
             String selSkill = possibleSkills.get(Compute.randomInt(possibleSkills.size()));
             int secondLvl = Utilities.generateExpLevel(rskillPrefs.getSecondSkillBonus());
             addSkill(person, selSkill, secondLvl, rskillPrefs.randomizeSkill(), bonus);
