@@ -29,8 +29,10 @@
 package mekhq.campaign.personnel;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.randomInt;
+import static megamek.common.enums.SkillLevel.REGULAR;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -4222,6 +4224,46 @@ public class Person {
 
     public boolean isDoctor() {
         return hasSkill(SkillType.S_DOCTOR) && (getPrimaryRole().isDoctor() || getSecondaryRole().isDoctor());
+    }
+
+    /**
+     * Calculates the medical capacity of a doctor based on their administrative skills, and the base number of hospital
+     * beds they are responsible for. If the entity represented is not a doctor, the capacity is returned as 0.
+     *
+     * @param doctorsUseAdministration A flag indicating whether the doctor's administrative skills should be considered
+     *                                 in the calculation. If {@code true}, administrative skills are included in the
+     *                                 performance multiplier adjustment. If {@code false}, {@code baseBedCount} is
+     *                                 returned, instead.
+     * @param baseBedCount             The base number of hospital beds assigned to the doctor. This value is adjusted
+     *                                 by the calculated multiplier to determine the doctor's effective capacity.
+     *
+     * @return The calculated medical capacity of the doctor, as an {@link Integer} representing their ability to
+     *       effectively manage hospital beds. If the entity is not a doctor, returns {@code 0}.
+     */
+    public int getDoctorMedicalCapacity(final boolean doctorsUseAdministration, final int baseBedCount) {
+        final double DOCTOR_ADMINISTRATION_MULTIPLIER = 0.2;
+        final int REGULAR_EXPERIENCE_LEVEL = REGULAR.getExperienceLevel();
+
+        if (!isDoctor()) {
+            return 0;
+        }
+
+        if (!doctorsUseAdministration) {
+            return baseBedCount;
+        }
+
+        double administrationMultiplier = 1.0 - (DOCTOR_ADMINISTRATION_MULTIPLIER * REGULAR_EXPERIENCE_LEVEL);
+
+        Skill administration = skills.getSkill(SkillType.S_ADMIN);
+        int experienceLevel = SkillLevel.NONE.getExperienceLevel();
+
+        if (administration != null) {
+            experienceLevel = administration.getExperienceLevel();
+        }
+
+        administrationMultiplier += experienceLevel * DOCTOR_ADMINISTRATION_MULTIPLIER;
+
+        return (int) round(baseBedCount * administrationMultiplier);
     }
 
     public boolean isSupport() {
