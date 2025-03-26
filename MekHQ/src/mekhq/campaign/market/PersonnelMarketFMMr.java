@@ -27,6 +27,9 @@
  */
 package mekhq.campaign.market;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import megamek.common.Compute;
 import megamek.common.Entity;
 import mekhq.campaign.Campaign;
@@ -34,9 +37,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.module.api.PersonnelMarketMethod;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Generation method for personnel market based on Field Manual: Mercenaries (Revised)
@@ -59,10 +59,13 @@ public class PersonnelMarketFMMr implements PersonnelMarketMethod {
         int q = 0;
         long mft = PersonnelMarket.getUnitMainForceType(c);
         int mftMod = 0;
-        if (mft == Entity.ETYPE_MEK || mft == Entity.ETYPE_TANK || mft == Entity.ETYPE_INFANTRY || mft == Entity.ETYPE_BATTLEARMOR) {
+        if (mft == Entity.ETYPE_MEK ||
+                  mft == Entity.ETYPE_TANK ||
+                  mft == Entity.ETYPE_INFANTRY ||
+                  mft == Entity.ETYPE_BATTLEARMOR) {
             mftMod = 1;
         }
-        for (PersonnelRole role : PersonnelRole.getMilitaryRoles()) {
+        for (PersonnelRole role : PersonnelRole.getMarketableRoles()) {
             int roll = Compute.d6(2);
             // TODO: Modifiers for hiring hall, but first needs to track the hiring hall
             switch (c.getAtBUnitRatingMod()) {
