@@ -29,8 +29,11 @@
 package mekhq.campaign.personnel;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.randomInt;
+import static megamek.common.enums.SkillLevel.REGULAR;
+import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -386,7 +389,6 @@ public class Person {
         hits = 0;
         hitsPrior = 0;
         toughness = 0;
-        resetMinutesLeft(); // this assigns minutesLeft and overtimeLeft
         dateOfDeath = null;
         recruitment = null;
         joinedCampaign = null;
@@ -434,6 +436,9 @@ public class Person {
         intelligence = Intelligence.AVERAGE;
         intelligenceDescriptionIndex = randomInt(Intelligence.MAXIMUM_VARIATIONS);
         personalityDescription = "";
+
+        // This assigns minutesLeft and overtimeLeft. Must be after skills to avoid an NPE.
+        resetMinutesLeft(campaign != null && campaign.getCampaignOptions().isTechsUseAdministration());
 
         // region Flags
         setClanPersonnel(originFaction.isClan());
@@ -998,7 +1003,7 @@ public class Person {
             case DOCTOR -> hasSkill(SkillType.S_DOCTOR);
             case MEDIC -> hasSkill(SkillType.S_MEDTECH);
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
-                  hasSkill(SkillType.S_ADMIN);
+                  hasSkill(S_ADMIN);
             case DEPENDENT, NONE -> true;
         };
     }
@@ -2250,9 +2255,7 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "toughness", toughness);
             }
 
-            if (minutesLeft > 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minutesLeft", minutesLeft);
-            }
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minutesLeft", minutesLeft);
 
             if (overtimeLeft > 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overtimeLeft", overtimeLeft);
@@ -3487,7 +3490,7 @@ public class Person {
             case ADMINISTRATOR_LOGISTICS:
             case ADMINISTRATOR_TRANSPORT:
             case ADMINISTRATOR_HR:
-                int adminLevel = getSkillLevelOrNegative(SkillType.S_ADMIN);
+                int adminLevel = getSkillLevelOrNegative(S_ADMIN);
                 int negotiationLevel = getSkillLevelOrNegative(SkillType.S_NEG);
                 int scroungeLevel = getSkillLevelOrNegative(SkillType.S_SCROUNGE);
 
@@ -3592,7 +3595,7 @@ public class Person {
             case DOCTOR -> List.of(SkillType.S_DOCTOR);
             case MEDIC -> List.of(SkillType.S_MEDTECH);
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
-                  List.of(SkillType.S_ADMIN, SkillType.S_NEG, SkillType.S_SCROUNGE);
+                  List.of(S_ADMIN, SkillType.S_NEG, SkillType.S_SCROUNGE);
             case DEPENDENT, NONE -> List.of(String.valueOf(SkillType.EXP_NONE));
         };
     }
@@ -4084,10 +4087,39 @@ public class Person {
     }
 
     /**
-     * @return the person's current daily available tech time. This does NOT account for any expended time.
+     * @deprecated Use {@link #getDailyAvailableTechTime(boolean)}.
      */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public int getDailyAvailableTechTime() {
-        return (getPrimaryRole().isTech() ? PRIMARY_ROLE_SUPPORT_TIME : SECONDARY_ROLE_SUPPORT_TIME) -
+        return getDailyAvailableTechTime(false);
+    }
+
+    /**
+     * Calculates and retrieves the person's current daily available tech time. This does NOT account for any expended
+     * time, but it factors in administrative adjustments if specified.
+     *
+     * <p>The returned value is determined based on the person's role:</p>
+     * <ul>
+     *   <li>If the primary role is a technician, the primary role's base support
+     *       time is used.</li>
+     *   <li>Otherwise, the secondary role's base support time is used.</li>
+     * </ul>
+     *
+     * <p>The base time is then adjusted by a multiplier if administrative adjustments
+     * are enabled (via the {@code isTechsUseAdministration} parameter). Maintenance
+     * time is also deducted from the result.</p>
+     *
+     * @param isTechsUseAdministration Determines whether administrative adjustments should be applied when calculating
+     *                                 the person's time.
+     *
+     * @return The person's current daily available tech time, after applying the multiplier for administrative
+     *       adjustments (if applicable) and deducting maintenance time.
+     */
+    public int getDailyAvailableTechTime(final boolean isTechsUseAdministration) {
+        int baseTime = (getPrimaryRole().isTech() ? PRIMARY_ROLE_SUPPORT_TIME : SECONDARY_ROLE_SUPPORT_TIME);
+
+        // TODO maintenance time should only be deducted when we make a maintenance check
+        return (int) round(baseTime * calculateTechTimeMultiplier(isTechsUseAdministration)) -
                      getMaintenanceTimeUsing();
     }
 
@@ -4188,13 +4220,64 @@ public class Person {
         }
     }
 
+    /**
+     * @deprecated Use {@link #resetMinutesLeft(boolean)}.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public void resetMinutesLeft() {
-        if (getPrimaryRole().isTech() || getPrimaryRole().isDoctor()) {
+        resetMinutesLeft(false);
+    }
+
+    /**
+     * Resets the number of minutes and overtime minutes a person has left for tasks, based on their primary or
+     * secondary role. Administrative adjustments may be applied for technicians if specified.
+     *
+     * <p>This method calculates and assigns task and overtime time values depending on whether
+     * the person is identified as a technician or doctor, and whether their role is primary or secondary. If
+     * administrative adjustments are enabled (via the {@code isTechsUseAdministration} parameter), a multiplier is
+     * applied to calculate the adjusted task time for technicians.</p>
+     *
+     * <ul>
+     *   <li>If the primary role is a doctor, the base support time values for the primary role
+     *       are assigned without any adjustments.</li>
+     *   <li>If the secondary role is a doctor, the base support time values for the secondary role
+     *       are assigned without any adjustments.</li>
+     *   <li>If the primary role is a technician and administrative adjustments are enabled, the primary
+     *       role's support time is multiplied by the administrative adjustment multiplier and assigned.</li>
+     *   <li>If the secondary role is a technician (secondary-specific), and administrative adjustments
+     *       are enabled, the secondary role's support time is multiplied by the adjustment multiplier and assigned.</li>
+     *   <li>If administrative adjustments are not enabled for technicians, base (non-adjusted) time values
+     *       are used for both primary and secondary roles.</li>
+     * </ul>
+     *
+     * <p>If the person has both primary and secondary roles applicable (e.g., a doctor as the primary
+     * and a technician as the secondary), the logic prioritizes the roles as listed above, with primary roles
+     * taking precedence.</p>
+     *
+     * @param isTechsUseAdministration Indicates whether administrative adjustments should be applied to the time
+     *                                 calculations for technicians.
+     */
+    public void resetMinutesLeft(boolean isTechsUseAdministration) {
+        // Doctors and Technicians without adjustments
+        if (primaryRole.isDoctor() || (primaryRole.isTech() && !isTechsUseAdministration)) {
             this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
             this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
-        } else if (getSecondaryRole().isTechSecondary() || getSecondaryRole().isDoctor()) {
+        } else if (secondaryRole.isDoctor() || (secondaryRole.isTech() && !isTechsUseAdministration)) {
             this.minutesLeft = SECONDARY_ROLE_SUPPORT_TIME;
             this.overtimeLeft = SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
+        }
+
+        // Technicians with adjustments
+        if (primaryRole.isTech()) {
+            double techTimeMultiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
+
+            this.minutesLeft = (int) round(PRIMARY_ROLE_SUPPORT_TIME * techTimeMultiplier);
+            this.overtimeLeft = (int) round(PRIMARY_ROLE_OVERTIME_SUPPORT_TIME * techTimeMultiplier);
+        } else if (secondaryRole.isTechSecondary()) {
+            double techTimeMultiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
+
+            this.minutesLeft = (int) round(SECONDARY_ROLE_SUPPORT_TIME * techTimeMultiplier);
+            this.overtimeLeft = (int) round(SECONDARY_ROLE_OVERTIME_SUPPORT_TIME * techTimeMultiplier);
         }
     }
 
@@ -4255,6 +4338,49 @@ public class Person {
     public boolean isTechBA() {
         boolean hasSkill = hasSkill(SkillType.S_TECH_BA);
         return hasSkill && (getPrimaryRole().isBATech() || getSecondaryRole().isBATech());
+    }
+
+    /**
+     * Calculates the tech availability time multiplier for tasks based on the technician's experience level and
+     * administration skill.
+     *
+     * <p>The method considers whether administration skills should be applied to improve efficiency. If
+     * administration is enabled, the multiplier is adjusted based on the technician's baseline experience level and
+     * their administration skill level.</p>
+     *
+     * @param isTechsUseAdministration {@code true} if administration skills are considered
+     *                                  for task calculation; {@code false} otherwise.
+     * @return the calculated time multiplier, where:
+     *         <ul>
+     *           <li>0.0 indicates the person is not a technician.</li>
+     *           <li>1.0 indicates no adjustment is applied.</li>
+     *           <li>Values greater or less than 1.0 adjust task times accordingly.</li>
+     *         </ul>
+     */
+    public double calculateTechTimeMultiplier(boolean isTechsUseAdministration) {
+        final double TECH_ADMINISTRATION_MULTIPLIER = 0.05;
+        final int REGULAR_EXPERIENCE_LEVEL = REGULAR.getExperienceLevel();
+
+        if (!isTech()) {
+            return 0;
+        }
+
+        if (!isTechsUseAdministration) {
+            return 1.0;
+        }
+
+        double administrationMultiplier = 1.0 - (TECH_ADMINISTRATION_MULTIPLIER * REGULAR_EXPERIENCE_LEVEL);
+
+        Skill administration = skills.getSkill(SkillType.S_ADMIN);
+        int experienceLevel = SkillLevel.NONE.getExperienceLevel();
+
+        if (administration != null) {
+            experienceLevel = administration.getExperienceLevel();
+        }
+
+        administrationMultiplier += experienceLevel * TECH_ADMINISTRATION_MULTIPLIER;
+
+        return administrationMultiplier;
     }
 
     public boolean isAdministrator() {

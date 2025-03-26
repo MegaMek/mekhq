@@ -1666,7 +1666,8 @@ public class CampaignGUI extends JPanel {
                        "+), " +
                        tech.getMinutesLeft() +
                        '/' +
-                       tech.getDailyAvailableTechTime() +
+                             tech.getDailyAvailableTechTime(getCampaign().getCampaignOptions()
+                                                                  .isTechsUseAdministration()) +
                        " minutes</html>";
                 techHash.put(name, tech);
                 if (tech.isRightTechTypeFor(r)) {
