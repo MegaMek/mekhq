@@ -345,11 +345,38 @@ public final class InfirmaryTab extends CampaignGuiTab {
         return patients;
     }
 
+    /**
+     * Updates the enabled or disabled state of the doctor assignment-related buttons.
+     *
+     * <p>This method determines the current eligibility of the "Assign Doctor" and "Unassign Doctor"
+     * buttons based on the following conditions:</p>
+     * <ul>
+     *   <li>If a doctor is selected, it calculates their medical capacity using the campaign
+     *       options (e.g., maximum number of patients and administration usage). The "Assign Doctor"
+     *       button is enabled if the doctor has available capacity and there are unassigned
+     *       patients in the system.</li>
+     *   <li>If no doctor is selected, the "Assign Doctor" button is disabled.</li>
+     *   <li>The "Unassign Doctor" button is enabled if one or more assigned patients are selected.</li>
+     * </ul>
+     *
+     * <p>This ensures that buttons in the UI reflect whether valid actions can be performed
+     * based on the current application state.</p>
+     */
     private void updateAssignDoctorEnabled() {
         Person doctor = getSelectedDoctor();
-        btnAssignDoc.setEnabled((null != doctor) &&
-                                      (getCampaign().getPatientsFor(doctor) < 25) &&
-                                      (unassignedPatientModel.getSize() > 0));
+        final CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+        final int baseBedCount = campaignOptions.getMaximumPatients();
+        final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
+
+        if (doctor == null) {
+            btnAssignDoc.setEnabled(false);
+        } else {
+            final int doctorCapacity = doctor.getDoctorMedicalCapacity(isDoctorsUseAdministration, baseBedCount);
+
+            btnAssignDoc.setEnabled((getCampaign().getPatientsFor(doctor) < doctorCapacity)
+                                          && (unassignedPatientModel.getSize() > 0));
+        }
+
         btnUnassignDoc.setEnabled(!getSelectedAssignedPatients().isEmpty());
     }
 
