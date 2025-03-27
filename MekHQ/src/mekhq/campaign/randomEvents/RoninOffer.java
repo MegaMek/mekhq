@@ -28,6 +28,28 @@
  */
 package mekhq.campaign.randomEvents;
 
+import static megamek.common.Compute.randomInt;
+import static megamek.common.enums.SkillLevel.VETERAN;
+import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
+import static mekhq.campaign.finances.enums.TransactionType.RECRUITMENT;
+import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
+import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
+import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
+import static mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT;
+import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.AGGRESSION;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.AMBITION;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.GREED;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.SOCIAL;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateBigPersonality;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
@@ -47,28 +69,6 @@ import mekhq.campaign.randomEvents.personalities.enums.Greed;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-
-import static megamek.common.Compute.randomInt;
-import static megamek.common.enums.SkillLevel.VETERAN;
-import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
-import static mekhq.campaign.finances.enums.TransactionType.RECRUITMENT;
-import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
-import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
-import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
-import static mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT;
-import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.AGGRESSION;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.AMBITION;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.GREED;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.SOCIAL;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateBigPersonality;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * Represents a dialog and associated logic for presenting the player with a Ronin offer. The Ronin offer involves
@@ -108,8 +108,8 @@ public class RoninOffer {
         RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
         boolean useExtraRandomness = randomSkillPreferences.randomizeSkill();
 
-        // We don't care about admin settings, as we're not going to have an admin here
-        overrideSkills(false, false, useExtraRandomness, ronin, role, VETERAN);
+        // We don't care about admin or doctor settings, as we're not going to have an admin or doctor here
+        overrideSkills(false, false, false, useExtraRandomness, ronin, role, VETERAN);
 
         generateBigPersonality(ronin);
 
