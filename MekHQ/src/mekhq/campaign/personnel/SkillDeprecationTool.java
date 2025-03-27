@@ -50,6 +50,8 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 public class SkillDeprecationTool {
     private final String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
+    private final int SKIP_ALL_DIALOG_OPTION_INDEX = 1;
+    private final int REFUND_ALL_DIALOG_OPTION_INDEX = 3;
     /**
      * A list of deprecated skills.
      *
@@ -65,6 +67,8 @@ public class SkillDeprecationTool {
 
     private final Campaign campaign;
     private final Person person;
+    private boolean skipAll = false;
+    private boolean refundAll;
 
     /**
      * Constructs a new {@code SkillDeprecationTool} for the specified campaign and person.
@@ -75,11 +79,20 @@ public class SkillDeprecationTool {
      * @param campaign the {@link Campaign} instance that provides context for the operation
      * @param person   the {@link Person} whose skills will be checked for deprecation
      */
-    public SkillDeprecationTool(Campaign campaign, Person person) {
+    public SkillDeprecationTool(Campaign campaign, Person person, boolean refundAll) {
         this.campaign = campaign;
         this.person = person;
+        this.refundAll = refundAll;
 
         checkForDeprecatedSkills(person);
+    }
+
+    public boolean isSkipAll() {
+        return skipAll;
+    }
+
+    public boolean isRefundAll() {
+        return refundAll;
     }
 
     /**
@@ -140,16 +153,22 @@ public class SkillDeprecationTool {
      * @param refundValue the XP refund value for the skill
      */
     private void triggerDialog(final Skills skills, final String skillName, final int refundValue) {
-        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-              person,
-              null,
-              getInCharacterMessage(skillName),
-              getButtonLabels(),
-              getOutOfCharacterMessage(skillName, refundValue),
-              false);
+        ImmersiveDialogSimple dialog = null;
+        if (!refundAll) {
+            dialog = new ImmersiveDialogSimple(campaign,
+                  person,
+                  null,
+                  getInCharacterMessage(skillName),
+                  getButtonLabels(),
+                  getOutOfCharacterMessage(skillName, refundValue),
+                  true);
+        }
 
-        final int REFUND_DIALOG_OPTION_INDEX = 1;
-        if (dialog.getDialogChoice() == REFUND_DIALOG_OPTION_INDEX) {
+        if (dialog != null && dialog.getDialogChoice() == SKIP_ALL_DIALOG_OPTION_INDEX) {
+            skipAll = true;
+        }
+
+        if (isRefundAll() || (dialog != null && dialog.getDialogChoice() == REFUND_ALL_DIALOG_OPTION_INDEX)) {
             skills.removeSkill(skillName);
             int currentXp = person.getXP();
             // We use 'setXPDirect' here as the xp gain has already been factored into the tracking of xp gain, so we
@@ -180,8 +199,10 @@ public class SkillDeprecationTool {
      * @return a {@link List} of button label strings
      */
     private List<String> getButtonLabels() {
-        return List.of(getFormattedTextAt(RESOURCE_BUNDLE, "button.continue"),
-              getFormattedTextAt(RESOURCE_BUNDLE, "button.refund"));
+        return List.of(getFormattedTextAt(RESOURCE_BUNDLE, "button.skip"),
+              getFormattedTextAt(RESOURCE_BUNDLE, "button.skipAll"),
+              getFormattedTextAt(RESOURCE_BUNDLE, "button.refund"),
+              getFormattedTextAt(RESOURCE_BUNDLE, "button.refundAll"));
     }
 
     /**
