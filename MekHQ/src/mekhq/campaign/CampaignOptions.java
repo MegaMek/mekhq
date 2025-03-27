@@ -3916,8 +3916,7 @@ public class CampaignOptions {
     }
 
     /**
-     * @deprecated Use {@link #isAcquisitionPersonnelCategory(ProcurementPersonnelPick)} with {@code SUPPORT} to check
-     *       for support staff restrictions.
+     * @deprecated Use {@link #isAcquisitionPersonnelCategory(ProcurementPersonnelPick)} instead.
      */
     @Deprecated(since = "0.50.05", forRemoval = true)
     public boolean isAcquisitionSupportStaffOnly() {
