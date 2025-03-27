@@ -27,6 +27,17 @@
  */
 package mekhq.campaign.market.contractMarket;
 
+import static megamek.common.Compute.d6;
+import static megamek.common.enums.SkillLevel.REGULAR;
+import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+
 import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
@@ -43,12 +54,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.enums.HiringHallLevel;
-
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-
-import static megamek.common.Compute.d6;
-import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 /**
  * Contract Market as described in Campaign Operations, 4th printing.
@@ -77,9 +82,9 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     @Override
     public void generateContractOffers(Campaign campaign, boolean newCampaign) {
-        boolean isGrayMonday = isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().isSimulateGrayMonday());
-        boolean hasActiveContract = campaign.hasActiveContract()
-            || campaign.hasActiveAtBContract(true);
+        boolean isGrayMonday = isGrayMonday(campaign.getLocalDate(),
+              campaign.getCampaignOptions().isSimulateGrayMonday());
+        boolean hasActiveContract = campaign.hasActiveContract() || campaign.hasActiveAtBContract(true);
 
         if (!(campaign.getLocalDate().getDayOfMonth() == 1) && !newCampaign) {
             return;
@@ -94,15 +99,15 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         new ArrayList<>(contracts).forEach(this::removeContract);
         // TODO: Allow subcontracts?
         //for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            //checkForSubcontracts(campaign, contract, unitRatingMod);
+        //checkForSubcontracts(campaign, contract, unitRatingMod);
         //}
         // TODO: CamopsMarket: allow players to choose negotiators and send them out, removing them
         // from other tasks they're doing. For now just use the highest negotiation skill on the force.
         int ratingMod = campaign.getReputation().getReputationModifier();
         HiringHallModifiers hiringHallModifiers = getHiringHallModifiers(campaign);
         int negotiationSkill = findNegotiationSkill(campaign);
-        int numOffers = getNumberOfOffers(
-            rollNegotiation(negotiationSkill, ratingMod + hiringHallModifiers.offersMod) - BASE_NEGOTIATION_TARGET);
+        int numOffers = getNumberOfOffers(rollNegotiation(negotiationSkill, ratingMod + hiringHallModifiers.offersMod) -
+                                                BASE_NEGOTIATION_TARGET);
 
         if (isGrayMonday) {
             for (int i = 0; i < numOffers; i++) {
@@ -228,8 +233,10 @@ public class CamOpsContractMarket extends AbstractContractMarket {
             return Optional.empty();
         }
         // Step 4: Populate some information about enemies and allies
-        setAllyRating(contract, campaign.getGameYear());
-        setEnemyRating(contract, campaign.getGameYear());
+        final SkillLevel campaignSkillLevel = reputation.getAverageSkillLevel();
+        final boolean useDynamicDifficulty = campaign.getCampaignOptions().isUseDynamicDifficulty();
+        setAllyRating(contract, campaign.getGameYear(), useDynamicDifficulty ? campaignSkillLevel : REGULAR);
+        setEnemyRating(contract, campaign.getGameYear(), useDynamicDifficulty ? campaignSkillLevel : REGULAR);
         if (contract.getContractType().isCadreDuty()) {
             contract.setAllySkill(SkillLevel.GREEN);
             contract.setAllyQuality(IUnitRating.DRAGOON_F);
@@ -249,9 +256,11 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         contract.initContractDetails(campaign);
         contract.calculateContract(campaign);
         contract.setName(String.format("%s - %s - %s %s",
-            contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")
-                .withLocale(MekHQ.getMHQOptions().getDateLocale())), contract.getEmployer(),
-            contract.getSystem().getName(contract.getStartDate()), contract.getContractType()));
+              contract.getStartDate()
+                    .format(DateTimeFormatter.ofPattern("yyyy").withLocale(MekHQ.getMHQOptions().getDateLocale())),
+              contract.getEmployer(),
+              contract.getSystem().getName(contract.getStartDate()),
+              contract.getContractType()));
 
         contract.clanTechSalvageOverride();
 
@@ -291,7 +300,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
                 filtered.add(faction);
             }
         }
-        Random rand  = new Random();
+        Random rand = new Random();
         return filtered.get(rand.nextInt(filtered.size()));
     }
 
@@ -323,10 +332,10 @@ public class CamOpsContractMarket extends AbstractContractMarket {
                 tags.add(Tag.MAJOR);
             } else {
                 if (Factions.getInstance()
-                    .getActiveFactions(campaign.getLocalDate())
-                    .stream()
-                    .anyMatch(Faction::isSuperPower)) {
-                        tags.add(Tag.SUPER);
+                          .getActiveFactions(campaign.getLocalDate())
+                          .stream()
+                          .anyMatch(Faction::isSuperPower)) {
+                    tags.add(Tag.SUPER);
                 } else {
                     tags.add(Tag.MAJOR);
                 }
@@ -340,7 +349,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
             return MissionSelector.getPirateMission(Compute.d6(2), 0);
         }
         int margin = rollNegotiation(findNegotiationSkill(campaign),
-            ratingMod + getHiringHallModifiers(campaign).missionsMod) - BASE_NEGOTIATION_TARGET;
+              ratingMod + getHiringHallModifiers(campaign).missionsMod) - BASE_NEGOTIATION_TARGET;
         boolean isClan = campaign.getFaction().isClan();
         if (employer.isInnerSphere() || employer.isClan()) {
             return MissionSelector.getInnerSphereClanMission(Compute.d6(2), margin, isClan);
@@ -356,9 +365,9 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     private ContractTerms getContractTerms(Campaign campaign, AtBContract contract) {
         return new ContractTerms(contract.getContractType(),
-            contract.getEmployerFaction(),
-            campaign.getReputation().getReputationFactor(),
-            campaign.getLocalDate());
+              contract.getEmployerFaction(),
+              campaign.getReputation().getReputationFactor(),
+              campaign.getLocalDate());
     }
 
     private void setContractClauses(AtBContract contract, ContractTerms terms) {

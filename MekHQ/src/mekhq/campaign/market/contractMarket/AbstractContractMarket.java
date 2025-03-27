@@ -27,6 +27,20 @@
  */
 package mekhq.campaign.market.contractMarket;
 
+import static java.lang.Math.min;
+import static megamek.common.Compute.d6;
+import static megamek.common.enums.SkillLevel.REGULAR;
+import static megamek.common.enums.SkillLevel.VETERAN;
+import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
+import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
+
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.enums.SkillLevel;
@@ -47,19 +61,9 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
-import java.util.*;
-
-import static java.lang.Math.min;
-import static megamek.common.Compute.d6;
-import static megamek.common.enums.SkillLevel.REGULAR;
-import static megamek.common.enums.SkillLevel.VETERAN;
-import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
-import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
-
 /**
- * Abstract base class for various Contract Market types in AtB/Stratcon. Responsible for generation
- * and initialization of AtBContracts.
+ * Abstract base class for various Contract Market types in AtB/Stratcon. Responsible for generation and initialization
+ * of AtBContracts.
  */
 public abstract class AbstractContractMarket {
     public static final int CLAUSE_COMMAND = 0;
@@ -69,8 +73,8 @@ public abstract class AbstractContractMarket {
     public static final int CLAUSE_NUM = 4;
 
     /**
-     * The portion of combat teams we expect to be performing combat actions.
-     * This is one in 'x' where 'x' is the value set here.
+     * The portion of combat teams we expect to be performing combat actions. This is one in 'x' where 'x' is the value
+     * set here.
      */
     static final double COMBAT_FORCE_DIVIDER = 2;
 
@@ -95,8 +99,7 @@ public abstract class AbstractContractMarket {
     protected HashMap<Integer, Integer> followupContracts = new HashMap<>();
 
     /**
-     * An arbitrary maximum number of attempts to find a random employer faction that
-     * is not a Mercenary.
+     * An arbitrary maximum number of attempts to find a random employer faction that is not a Mercenary.
      */
     protected static final int MAXIMUM_ATTEMPTS_TO_FIND_NON_MERC_EMPLOYER = 20;
 
@@ -106,21 +109,23 @@ public abstract class AbstractContractMarket {
 
     /**
      * Generate a new contract and add it to the market.
+     *
      * @param campaign
+     *
      * @return The newly generated contract
      */
     public abstract AtBContract addAtBContract(Campaign campaign);
 
     /**
      * Generate available contract offers for the player's force.
+     *
      * @param campaign
      * @param newCampaign Boolean indicating whether this is a fresh campaign.
      */
     public abstract void generateContractOffers(Campaign campaign, boolean newCampaign);
 
     /**
-     * Generate followup contracts and add them to the market if the currently selected market type
-     * supports them.
+     * Generate followup contracts and add them to the market if the currently selected market type supports them.
      *
      * @param campaign The current campaign.
      * @param contract The AtBContract being completed and used as a basis for followup missions
@@ -128,10 +133,12 @@ public abstract class AbstractContractMarket {
     public abstract void checkForFollowup(Campaign campaign, AtBContract contract);
 
     /**
-     * Calculate the total payment modifier for the contract based on the configured market method
-     * (e.g., CAM_OPS, ATB_MONTHLY).
+     * Calculate the total payment modifier for the contract based on the configured market method (e.g., CAM_OPS,
+     * ATB_MONTHLY).
+     *
      * @param campaign
      * @param contract
+     *
      * @return a double representing the total payment multiplier.
      */
     public abstract double calculatePaymentMultiplier(Campaign campaign, AtBContract contract);
@@ -141,7 +148,6 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     *
      * @return the Method (e.g., CAM_OPS, ATB_MONTHLY) associated with the Contract Market instance
      */
     public ContractMarketMethod getMethod() {
@@ -150,6 +156,7 @@ public abstract class AbstractContractMarket {
 
     /**
      * Empty an available contract from the market.
+     *
      * @param c contract to remove
      */
     public void removeContract(Contract c) {
@@ -160,16 +167,15 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * Rerolls a specific clause in a contract, typically as part of a negotiation process.
-     * This method adjusts the clause based on the provided clause type and associated modifiers,
-     * ensuring the contract reflects updated terms.
+     * Rerolls a specific clause in a contract, typically as part of a negotiation process. This method adjusts the
+     * clause based on the provided clause type and associated modifiers, ensuring the contract reflects updated terms.
      *
      * <p>The recalculated clause values can affect aspects such as command, salvage, transport,
-     * or support terms. Special rules, such as overrides for Clan technology salvage, may also be
-     * applied when rerolling specific clauses.
+     * or support terms. Special rules, such as overrides for Clan technology salvage, may also be applied when
+     * rerolling specific clauses.
      *
      * @param contract the contract being negotiated, which will have its terms modified
-     * @param clause the type of clause to be rerolled (e.g., command, salvage, transport, or support)
+     * @param clause   the type of clause to be rerolled (e.g., command, salvage, transport, or support)
      * @param campaign the active campaign context, used to access campaign-specific options and rules
      */
     public void rerollClause(AtBContract contract, int clause, Campaign campaign) {
@@ -177,8 +183,9 @@ public abstract class AbstractContractMarket {
             switch (clause) {
                 case CLAUSE_COMMAND -> rollCommandClause(contract, clauseMods.get(contract.getId()).mods[clause]);
                 case CLAUSE_SALVAGE -> {
-                    rollSalvageClause(contract, clauseMods.get(contract.getId()).mods[clause],
-                        campaign.getCampaignOptions().getContractMaxSalvagePercentage());
+                    rollSalvageClause(contract,
+                          clauseMods.get(contract.getId()).mods[clause],
+                          campaign.getCampaignOptions().getContractMaxSalvagePercentage());
 
                     contract.clanTechSalvageOverride();
                 }
@@ -192,8 +199,10 @@ public abstract class AbstractContractMarket {
 
     /**
      * Returns the number of rerolls used so far for a specific clause.
+     *
      * @param c
      * @param clause ID representing the type of clause.
+     *
      * @return
      */
     public int getRerollsUsed(Contract c, int clause) {
@@ -212,6 +221,7 @@ public abstract class AbstractContractMarket {
 
     /**
      * Empties the market and generates a new batch of contract offers for an existing campaign.
+     *
      * @param campaign
      */
     public void generateContractOffers(Campaign campaign) {
@@ -225,8 +235,8 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * Calculates the required number of combat teams for a contract based on campaign options,
-     * contract details, and variance factors.
+     * Calculates the required number of combat teams for a contract based on campaign options, contract details, and
+     * variance factors.
      *
      * <p>
      * This method determines the number of combat teams needed to deploy, taking into account factors such as:
@@ -240,9 +250,10 @@ public abstract class AbstractContractMarket {
      * The method ensures values are clamped to maintain a minimum deployment of at least 1 combat
      * team while not exceeding the maximum deployable combat teams.
      *
-     * @param campaign        the campaign containing relevant options and faction information
-     * @param contract        the contract that specifies details such as subcontract status
-     * @param bypassVariance  a flag indicating whether variance adjustments should be bypassed
+     * @param campaign       the campaign containing relevant options and faction information
+     * @param contract       the contract that specifies details such as subcontract status
+     * @param bypassVariance a flag indicating whether variance adjustments should be bypassed
+     *
      * @return the calculated number of required combat teams, ensuring it meets game rules and constraints
      */
     public int calculateRequiredCombatTeams(Campaign campaign, AtBContract contract, boolean bypassVariance) {
@@ -290,8 +301,8 @@ public abstract class AbstractContractMarket {
      * Calculates the variance factor based on the given roll value and a fixed formation size divisor.
      *
      * <p>
-     * The variance factor is determined by applying a multiplier to the fixed formation size divisor.
-     * The multiplier varies based on the roll value:
+     * The variance factor is determined by applying a multiplier to the fixed formation size divisor. The multiplier
+     * varies based on the roll value:
      * <ul>
      *   <li><b>Roll 2:</b> Multiplier is 0.75.</li>
      *   <li><b>Roll 3:</b> Multiplier is 0.5.</li>
@@ -301,6 +312,7 @@ public abstract class AbstractContractMarket {
      * </ul>
      *
      * @param roll the roll value used to determine the multiplier
+     *
      * @return the calculated variance factor as a double
      */
     private double calculateVarianceFactor(int roll) {
@@ -319,12 +331,12 @@ public abstract class AbstractContractMarket {
      * Calculates the bypass variance reduction based on the available forces.
      *
      * <p>
-     * The reduction is calculated by dividing the available forces by a fixed factor of 3
-     * and rounding down to the nearest whole number. This value is used in scenarios where
-     * variance adjustments are bypassed.
+     * The reduction is calculated by dividing the available forces by a fixed factor of 3 and rounding down to the
+     * nearest whole number. This value is used in scenarios where variance adjustments are bypassed.
      * </p>
      *
      * @param availableForces the total number of forces available
+     *
      * @return the bypass variance reduction as an integer
      */
     private int calculateBypassVarianceReduction(int availableForces) {
@@ -335,11 +347,12 @@ public abstract class AbstractContractMarket {
      * Calculates the maximum number of deployable combat teams based on the given campaign's options.
      *
      * <p>
-     * This method retrieves campaign options and calculates the total deployable combat teams using
-     * the base strategy deployment, additional strategy deployment, and the campaign's commander strategy.
+     * This method retrieves campaign options and calculates the total deployable combat teams using the base strategy
+     * deployment, additional strategy deployment, and the campaign's commander strategy.
      * </p>
      *
      * @param campaign the campaign object containing the necessary data to perform the calculation
+     *
      * @return the total number of deployable combat teams
      */
     public int calculateMaxDeployableCombatTeams(Campaign campaign) {
@@ -437,18 +450,16 @@ public abstract class AbstractContractMarket {
 
     protected AtBContractType findMissionType(int unitRatingMod, boolean majorPower) {
         final AtBContractType[][] table = {
-            // col 0: IS Houses
-            { AtBContractType.GUERRILLA_WARFARE, AtBContractType.RECON_RAID, AtBContractType.PIRATE_HUNTING,
-                AtBContractType.PLANETARY_ASSAULT, AtBContractType.OBJECTIVE_RAID,
-                AtBContractType.OBJECTIVE_RAID,
+              // col 0: IS Houses
+              { AtBContractType.GUERRILLA_WARFARE, AtBContractType.RECON_RAID, AtBContractType.PIRATE_HUNTING,
+                AtBContractType.PLANETARY_ASSAULT, AtBContractType.OBJECTIVE_RAID, AtBContractType.OBJECTIVE_RAID,
                 AtBContractType.EXTRACTION_RAID, AtBContractType.RECON_RAID, AtBContractType.GARRISON_DUTY,
                 AtBContractType.CADRE_DUTY, AtBContractType.RELIEF_DUTY },
-            // col 1: Others
-            { AtBContractType.GUERRILLA_WARFARE, AtBContractType.RECON_RAID, AtBContractType.PLANETARY_ASSAULT,
+              // col 1: Others
+              { AtBContractType.GUERRILLA_WARFARE, AtBContractType.RECON_RAID, AtBContractType.PLANETARY_ASSAULT,
                 AtBContractType.OBJECTIVE_RAID, AtBContractType.EXTRACTION_RAID, AtBContractType.PIRATE_HUNTING,
                 AtBContractType.SECURITY_DUTY, AtBContractType.OBJECTIVE_RAID, AtBContractType.GARRISON_DUTY,
-                AtBContractType.CADRE_DUTY, AtBContractType.DIVERSIONARY_RAID }
-        };
+                AtBContractType.CADRE_DUTY, AtBContractType.DIVERSIONARY_RAID } };
         int roll = MathUtility.clamp(d6(2) + unitRatingMod - IUnitRating.DRAGOON_C, 2, 12);
         return table[majorPower ? 0 : 1][roll - 2];
     }
@@ -459,30 +470,33 @@ public abstract class AbstractContractMarket {
         } else if (contract.getContractType().isRiotDuty()) {
             contract.setEnemyCode("REB");
         } else {
-            contract.setEnemyCode(RandomFactionGenerator.getInstance().getEnemy(contract.getEmployerCode(),
-                contract.getContractType().isGarrisonType()));
+            contract.setEnemyCode(RandomFactionGenerator.getInstance()
+                                        .getEnemy(contract.getEmployerCode(),
+                                              contract.getContractType().isGarrisonType()));
         }
     }
 
     protected void setAttacker(AtBContract contract) {
-        boolean isAttacker = !contract.getContractType().isGarrisonType()
-            || (contract.getContractType().isReliefDuty() && (d6() < 4))
-            || contract.getEnemy().isRebel();
+        boolean isAttacker = !contract.getContractType().isGarrisonType() ||
+                                   (contract.getContractType().isReliefDuty() && (d6() < 4)) ||
+                                   contract.getEnemy().isRebel();
         contract.setAttacker(isAttacker);
     }
 
     protected void setSystemId(AtBContract contract) throws NoContractLocationFoundException {
         // FIXME : Windchild : I don't work properly
         if (contract.isAttacker()) {
-            contract.setSystemId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEmployerCode(),
-                contract.getEnemyCode()));
+            contract.setSystemId(RandomFactionGenerator.getInstance()
+                                       .getMissionTarget(contract.getEmployerCode(), contract.getEnemyCode()));
         } else {
-            contract.setSystemId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEnemyCode(),
-                contract.getEmployerCode()));
+            contract.setSystemId(RandomFactionGenerator.getInstance()
+                                       .getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode()));
         }
         if (contract.getSystem() == null) {
-            String errorMsg = "Could not find contract location for "
-                + contract.getEmployerCode() + " vs. " + contract.getEnemyCode();
+            String errorMsg = "Could not find contract location for " +
+                                    contract.getEmployerCode() +
+                                    " vs. " +
+                                    contract.getEnemyCode();
             logger.warn(errorMsg);
             throw new NoContractLocationFoundException(errorMsg);
         }
@@ -495,26 +509,44 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * Sets the ally rating (skill and quality) for the contract.
-     * The ally rating is determined by modifiers influenced by the employer faction,
-     * contract type, historical context, and a random roll.
+     * Calculates and sets the ally skill and quality ratings for the given contract.
      *
-     * <p>The calculated ally skill and quality ratings are assigned to the contract.</p>
+     * <p>The ally rating is influenced by multiple factors:</p>
+     * <ul>
+     *     <li>The employer faction's specific modifiers.</li>
+     *     <li>Modifiers based on the contract type (e.g., attacking vs. defending roles).</li>
+     *     <li>Historical context derived from the year parameter.</li>
+     *     <li>The player's average skill level, used to adjust contract difficulty.</li>
+     *     <li>A random roll for variability in calculations.</li>
+     * </ul>
      *
-     * @param contract the contract for which the ally rating is being set.
-     * @param year     the year of the contract, used for calculating historical modifiers.
+     * <p>Special considerations are made for specific factions:</p>
+     * <ul>
+     *     <li><b>Clan Factions</b>: Enforce minimum ally skill levels based on attacking or defending roles.</li>
+     *     <li><b>ComStar or Word of Blake</b>: Apply additional historical modifier adjustments.</li>
+     * </ul>
+     *
+     * <p>For non-Clan and non-ComStar/Word of Blake factions, the ally ratings are further adjusted based
+     * on the player's average skill level, making the contract easier if the player's skill level is lower.</p>
+     *
+     * <p>After all the calculations, the resulting ally skill and quality ratings are assigned to the contract.</p>
+     *
+     * @param contract          the {@link AtBContract} instance for which the ally ratings are being calculated and
+     *                          assigned.
+     * @param year              the year of the contract, used for applying historical context modifiers.
+     * @param averageSkillLevel the average skill level of the player, used to adjust contract difficulty.
      */
-    protected void setAllyRating(AtBContract contract, int year) {
+    protected void setAllyRating(AtBContract contract, int year, SkillLevel averageSkillLevel) {
+        final Faction employerFaction = contract.getEmployerFaction();
+
         int mod = calculateFactionModifiers(contract.getEmployerFaction());
         mod += calculateContractTypeModifiers(contract.getContractType(), contract.isAttacker());
 
         // Assign ally skill rating
         contract.setAllySkill(getSkillRating(d6(2) + mod));
 
-        // Apply historical modifiers
-        if (!contract.getEmployerFaction().isClan()) {
-            mod += calculateHistoricalModifiers(year);
-        } else {
+        // Apply faction modifiers
+        if (employerFaction.isClan()) {
             // Apply Clan clamping
             if (contract.isAttacker()) {
                 if (contract.getAllySkill().ordinal() < VETERAN.ordinal()) {
@@ -525,23 +557,51 @@ public abstract class AbstractContractMarket {
                     contract.setAllySkill(SkillLevel.REGULAR);
                 }
             }
+        } else {
+            mod += calculateHistoricalModifiers(year);
+
+            if (employerFaction.isComStarOrWoB()) {
+                mod += 2;
+            }
         }
+
+        // The less skilled the player, the easier their contract.
+        mod += REGULAR.getExperienceLevel() - averageSkillLevel.getExperienceLevel();
 
         // Assign ally quality rating
         contract.setAllyQuality(getQualityRating(d6(2) + mod));
     }
 
     /**
-     * Sets the enemy rating (skill and quality) for the contract.
-     * The enemy rating is determined by modifiers based on the enemy faction,
-     * whether the faction is attacking or defending, historical context, and a random roll.
+     * Calculates and sets the enemy skill and quality ratings for the given contract.
      *
-     * <p>The calculated enemy skill and quality ratings are assigned to the contract.</p>
+     * <p>The enemy rating is influenced by various factors:</p>
+     * <ul>
+     *     <li>Modifiers based on the enemy faction's attributes.</li>
+     *     <li>The enemy faction's role in the contract (e.g., attacking or defending).</li>
+     *     <li>Historical context derived from the year parameter.</li>
+     *     <li>The player's average skill level, used to adjust the enemy difficulty.</li>
+     *     <li>A random roll to introduce variability into the calculations.</li>
+     * </ul>
      *
-     * @param contract the contract for which the enemy rating is being set.
-     * @param year     the year of the contract, used for calculating historical modifiers.
+     * <p>Special adjustments are made for specific factions:</p>
+     * <ul>
+     *     <li><b>Clan Factions</b>: Enforce minimum enemy skill levels based on their roles as attackers or defenders.</li>
+     *     <li><b>ComStar or Word of Blake</b>: Apply additional historical modifier adjustments.</li>
+     * </ul>
+     *
+     * <p>For non-Clan and non-ComStar/Word of Blake factions, the enemy ratings are further adjusted
+     * based on the player's average skill level, making contracts more difficult against weaker factions
+     * or easier when the enemy's overall experience level is lower.</p>
+     *
+     * <p>After the calculations, the resulting enemy skill and quality ratings are applied to the contract.</p>
+     *
+     * @param contract          the {@link AtBContract} instance for which the enemy ratings are being calculated and
+     *                          assigned.
+     * @param year              the year of the contract, used for applying historical context modifiers.
+     * @param averageSkillLevel the average skill level of the player, used to adjust the enemy contract difficulty.
      */
-    protected void setEnemyRating(AtBContract contract, int year) {
+    protected void setEnemyRating(AtBContract contract, int year, SkillLevel averageSkillLevel) {
         Faction enemyFaction = Factions.getInstance().getFaction(contract.getEnemyCode());
         int mod = calculateFactionModifiers(enemyFaction);
 
@@ -553,19 +613,27 @@ public abstract class AbstractContractMarket {
         // Assign enemy skill rating
         contract.setEnemySkill(getSkillRating(d6(2) + mod));
 
-        // Apply historical modifiers
-        if (!enemyFaction.isClan()) {
-            mod += calculateHistoricalModifiers(year);
-        } else {
+        // Apply faction modifiers
+        if (enemyFaction.isClan()) {
             // Apply Clan clamping
             if (!contract.isAttacker()) {
-                if (contract.getAllySkill().ordinal() < VETERAN.ordinal()) {
-                    contract.setAllySkill(VETERAN);
+                if (contract.getEnemySkill().ordinal() < VETERAN.ordinal()) {
+                    contract.setEnemySkill(VETERAN);
                 }
             } else {
-                if (contract.getAllySkill().ordinal() < REGULAR.ordinal()) {
-                    contract.setAllySkill(SkillLevel.REGULAR);
+                if (contract.getEnemySkill().ordinal() < REGULAR.ordinal()) {
+                    contract.setEnemySkill(SkillLevel.REGULAR);
                 }
+            }
+        } else {
+            mod += calculateHistoricalModifiers(year);
+
+            if (enemyFaction.isComStarOrWoB()) {
+                mod += 2;
+            } else {
+                // The less skilled the player, the easier their contract. We only do this for non-ComStar and Clan
+                // opponents, as they're meant to be pinnacle opponents. Even in Clan campaigns.
+                mod += averageSkillLevel.getExperienceLevel() - REGULAR.getExperienceLevel();
             }
         }
 
@@ -574,8 +642,8 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * Calculates the modifiers for a faction based on its attributes, such as whether it is:
-     * a rebel, pirate, independent, a minor power, or a Clan faction.
+     * Calculates the modifiers for a faction based on its attributes, such as whether it is: a rebel, pirate,
+     * independent, a minor power, or a Clan faction.
      *
      * <p>Faction modifiers are determined as follows:</p>
      * <ul>
@@ -586,6 +654,7 @@ public abstract class AbstractContractMarket {
      * </ul>
      *
      * @param faction the faction for which the modifiers are being calculated.
+     *
      * @return the calculated modifier for the faction.
      */
     private int calculateFactionModifiers(Faction faction) {
@@ -611,8 +680,8 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * Calculates the modifiers for a contract based on its type and whether the faction
-     * is in an attacker role or defender role.
+     * Calculates the modifiers for a contract based on its type and whether the faction is in an attacker role or
+     * defender role.
      *
      * <p>Contract type modifiers are determined as follows:</p>
      * <ul>
@@ -623,6 +692,7 @@ public abstract class AbstractContractMarket {
      *
      * @param contractType the type of the contract (e.g., Guerrilla Warfare, Cadre Duty, etc.).
      * @param isAttacker   a boolean indicating whether the faction is in an attacker role.
+     *
      * @return the calculated modifier for the contract type.
      */
     private int calculateContractTypeModifiers(AtBContractType contractType, boolean isAttacker) {
@@ -642,9 +712,9 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * Calculates modifiers based on the historical period in which the given year falls.
-     * Modifiers are applied to non-Clan factions based on the progressive degradation or
-     * recovery of combat capabilities during the Succession Wars and Renaissance periods.
+     * Calculates modifiers based on the historical period in which the given year falls. Modifiers are applied to
+     * non-Clan factions based on the progressive degradation or recovery of combat capabilities during the Succession
+     * Wars and Renaissance periods.
      *
      * <p>The modifiers are determined as follows:</p>
      * <ul>
@@ -654,6 +724,7 @@ public abstract class AbstractContractMarket {
      * </ul>
      *
      * @param year the year of the contract, which determines the historical period.
+     *
      * @return the calculated historical modifier to be applied.
      */
     private int calculateHistoricalModifiers(int year) {
@@ -730,12 +801,12 @@ public abstract class AbstractContractMarket {
                     for (int i = 0; i < nl2.getLength(); i++) {
                         Node wn3 = nl2.item(i);
                         if (wn3.getNodeName().equalsIgnoreCase("mods")) {
-                            String [] s = wn3.getTextContent().split(",");
+                            String[] s = wn3.getTextContent().split(",");
                             for (int j = 0; j < s.length; j++) {
                                 cm.mods[j] = Integer.parseInt(s[j]);
                             }
                         } else if (wn3.getNodeName().equalsIgnoreCase("rerollsUsed")) {
-                            String [] s = wn3.getTextContent().split(",");
+                            String[] s = wn3.getTextContent().split(",");
                             for (int j = 0; j < s.length; j++) {
                                 cm.rerollsUsed[j] = Integer.parseInt(s[j]);
                             }
@@ -795,13 +866,12 @@ public abstract class AbstractContractMarket {
      * the random clause bonuses should be persistent.
      */
     protected static class ClauseMods {
-        public int[] rerollsUsed = {0, 0, 0, 0};
-        public int[] mods = {0, 0, 0, 0};
+        public int[] rerollsUsed = { 0, 0, 0, 0 };
+        public int[] mods = { 0, 0, 0, 0 };
     }
 
     /**
-     * Exception indicating that no valid location was generated for a contract and that the contract
-     * is invalid.
+     * Exception indicating that no valid location was generated for a contract and that the contract is invalid.
      */
     public static class NoContractLocationFoundException extends RuntimeException {
         public NoContractLocationFoundException(String message) {
