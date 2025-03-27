@@ -44,7 +44,6 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import javax.swing.*;
 
 import megamek.common.AmmoType;
@@ -548,7 +547,8 @@ public class CampaignExportWizard extends JDialog {
             }
 
             destinationCampaign.importPerson(person);
-            destinationCampaign.getPerson(person.getId()).resetMinutesLeft();
+            destinationCampaign.getPerson(person.getId())
+                  .resetMinutesLeft(destinationCampaign.getCampaignOptions().isTechsUseAdministration());
 
             for (Kill kill : sourceCampaign.getKillsFor(person.getId())) {
                 // we don't preserve IDs to avoid conflicts with the destination campaign

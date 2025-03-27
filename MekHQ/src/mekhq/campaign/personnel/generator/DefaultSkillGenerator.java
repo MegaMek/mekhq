@@ -27,16 +27,17 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import java.util.Arrays;
+import java.util.List;
+
 import megamek.common.Compute;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class DefaultSkillGenerator extends AbstractSkillGenerator {
     //region Constructors
@@ -100,23 +101,33 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             }
         }
 
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         // roll artillery skill
-        if (campaign.getCampaignOptions().isUseArtillery()
+        if (campaignOptions.isUseArtillery()
                 && (primaryRole.isMekWarrior() || primaryRole.isVehicleGunner() || primaryRole.isSoldier())
                 && Utilities.rollProbability(rskillPrefs.getArtilleryProb())) {
             generateArtillerySkill(person, bonus);
         }
 
         // roll Negotiation skill
-        if (campaign.getCampaignOptions().isAdminsHaveNegotiation()
+        if (campaignOptions.isAdminsHaveNegotiation()
                 && (primaryRole.isAdministrator())) {
             addSkill(person, SkillType.S_NEG, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
         }
 
         // roll Scrounge skill
-        if (campaign.getCampaignOptions().isAdminsHaveScrounge()
+        if (campaignOptions.isAdminsHaveScrounge()
                 && (primaryRole.isAdministrator())) {
             addSkill(person, SkillType.S_SCROUNGE, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
+        }
+
+        // roll Administration skill
+        if (campaignOptions.isTechsUseAdministration() && (person.isTech() || primaryRole.isVesselCrew())) {
+            addSkill(person, SkillType.S_ADMIN, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
+        }
+
+        if (campaignOptions.isDoctorsUseAdministration() && (primaryRole.isDoctor())) {
+            addSkill(person, SkillType.S_ADMIN, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
         }
 
         // roll random secondary skill

@@ -27,15 +27,23 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.CampaignOptions;
-import mekhq.gui.campaignOptions.components.*;
-
-import javax.swing.*;
-import java.awt.*;
-
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+
+import java.awt.GridBagConstraints;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+
+import megamek.common.annotations.Nullable;
+import mekhq.campaign.CampaignOptions;
+import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
+import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
+import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
  * Represents a tab in the campaign options UI used to configure settings related to
@@ -58,6 +66,7 @@ public class RepairAndMaintenanceTab {
     private final CampaignOptions campaignOptions;
 
     //start Repair Tab
+    private JCheckBox chkTechsUseAdministration;
     private JCheckBox useEraModsCheckBox;
     private JCheckBox assignedTechFirstCheckBox;
     private JCheckBox resetToFirstTechCheckBox;
@@ -115,6 +124,7 @@ public class RepairAndMaintenanceTab {
      * </p>
      */
     private void initializeRepairTab() {
+        chkTechsUseAdministration = new JCheckBox();
         useEraModsCheckBox = new JCheckBox();
 
         assignedTechFirstCheckBox = new JCheckBox();
@@ -179,20 +189,17 @@ public class RepairAndMaintenanceTab {
         JPanel headerPanel = new CampaignOptionsHeaderPanel("RepairTab",
             getImageDirectory() + "logo_clan_burrock.png");
 
-        // Era Mods
-            useEraModsCheckBox = new CampaignOptionsCheckBox("UseEraModsCheckBox");
+        chkTechsUseAdministration = new CampaignOptionsCheckBox("TechsUseAdministration");
 
-        // Tech Placement
+        useEraModsCheckBox = new CampaignOptionsCheckBox("UseEraModsCheckBox");
+
         assignedTechFirstCheckBox = new CampaignOptionsCheckBox("AssignedTechFirstCheckBox");
         resetToFirstTechCheckBox = new CampaignOptionsCheckBox("ResetToFirstTechCheckBox");
 
-        // Use Quirks
         useQuirksBox = new CampaignOptionsCheckBox("UseQuirksBox");
 
-        // Aero System Damage
         useAeroSystemHitsBox = new CampaignOptionsCheckBox("UseAeroSystemHitsBox");
 
-        // Damage by Margin
         useDamageMargin = new CampaignOptionsCheckBox("UseDamageMargin");
         useDamageMargin.addActionListener(evt -> spnDamageMargin.setEnabled(useDamageMargin.isSelected()));
 
@@ -200,7 +207,6 @@ public class RepairAndMaintenanceTab {
         spnDamageMargin = new CampaignOptionsSpinner("DamageMargin",
             1, 1, 20, 1);
 
-        // Equipment Survival
         lblDestroyPartTarget = new CampaignOptionsLabel("DestroyPartTarget");
         spnDestroyPartTarget = new CampaignOptionsSpinner("DestroyPartTarget",
             2, 2, 13, 1);
@@ -212,6 +218,9 @@ public class RepairAndMaintenanceTab {
         layoutLeft.gridx = 0;
         layoutLeft.gridy = 0;
         layoutLeft.gridwidth = 1;
+        panelLeft.add(chkTechsUseAdministration, layoutLeft);
+
+        layoutLeft.gridy++;
         panelLeft.add(useEraModsCheckBox, layoutLeft);
 
         layoutLeft.gridy++;
@@ -397,6 +406,7 @@ public class RepairAndMaintenanceTab {
         }
 
         // Repair
+        options.setTechsUseAdministration(chkTechsUseAdministration.isSelected());
         options.setEraMods(useEraModsCheckBox.isSelected());
         options.setAssignedTechFirst(assignedTechFirstCheckBox.isSelected());
         options.setResetToFirstTech(resetToFirstTechCheckBox.isSelected());
@@ -445,6 +455,7 @@ public class RepairAndMaintenanceTab {
         }
 
         // Repair
+        chkTechsUseAdministration.setSelected(options.isTechsUseAdministration());
         useEraModsCheckBox.setSelected(options.isUseEraMods());
         assignedTechFirstCheckBox.setSelected(options.isAssignedTechFirst());
         resetToFirstTechCheckBox.setSelected(options.isResetToFirstTech());
