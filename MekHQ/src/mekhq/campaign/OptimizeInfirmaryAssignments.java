@@ -117,7 +117,7 @@ public class OptimizeInfirmaryAssignments {
             MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, patient));
 
             // Check if the current doctor has reached their patient limit
-            if (patientCounter++ == doctorCapacity) {
+            if (++patientCounter == doctorCapacity) {
                 doctors.remove(0); // Move to the next doctor
                 patientCounter = 0; // Reset patient counter
                 doctorCapacity = 0; // Reset doctor capacity
