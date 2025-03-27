@@ -27,6 +27,17 @@
  */
 package mekhq.campaign.stratcon;
 
+import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.UNRESOLVED;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlTransient;
@@ -39,17 +50,17 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 
-import java.time.LocalDate;
-import java.util.*;
-
-import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.UNRESOLVED;
-
 /**
  * Class that handles scenario metadata and interaction at the StratCon level
+ *
  * @author NickAragua
  */
 public class StratconScenario implements IStratconDisplayable {
@@ -75,7 +86,8 @@ public class StratconScenario implements IStratconDisplayable {
             scenarioStateNames.put(ScenarioState.NONEXISTENT, "Shouldn't be seen");
             scenarioStateNames.put(ScenarioState.UNRESOLVED, "Unresolved");
             scenarioStateNames.put(ScenarioState.PRIMARY_FORCES_COMMITTED, "Primary forces committed");
-            scenarioStateNames.put(ScenarioState.AWAITING_REINFORCEMENTS, "Forces committed reinforcement interception not resolved");
+            scenarioStateNames.put(ScenarioState.AWAITING_REINFORCEMENTS,
+                  "Forces committed reinforcement interception not resolved");
             scenarioStateNames.put(ScenarioState.COMPLETED, "Victory");
             scenarioStateNames.put(ScenarioState.IGNORED, "Ignored");
             scenarioStateNames.put(ScenarioState.DEFEATED, "Defeat");
@@ -104,7 +116,9 @@ public class StratconScenario implements IStratconDisplayable {
     private ArrayList<Integer> primaryForceIDs = new ArrayList<>();
 
     /**
-     * Add a force to the backing scenario. Do our best to add the force as a "primary" force, as defined in the scenario template.
+     * Add a force to the backing scenario. Do our best to add the force as a "primary" force, as defined in the
+     * scenario template.
+     *
      * @param forceID ID of the force to add.
      */
     public void addPrimaryForce(int forceID) {
@@ -113,8 +127,8 @@ public class StratconScenario implements IStratconDisplayable {
     }
 
     /**
-     * Add a force to the backing scenario, trying to associate it with the given template.
-     * Does some scenario and force house-keeping, fires a deployment changed event.
+     * Add a force to the backing scenario, trying to associate it with the given template. Does some scenario and force
+     * house-keeping, fires a deployment changed event.
      */
     public void addForce(Force force, String templateID, Campaign campaign) {
         if (!getBackingScenario().getForceIDs().contains(force.getId())) {
@@ -136,8 +150,8 @@ public class StratconScenario implements IStratconDisplayable {
     }
 
     /**
-     * Add an individual unit to the backing scenario, trying to associate it with the given template.
-     * Performs house keeping on the unit and scenario and invokes a deployment changed event.
+     * Add an individual unit to the backing scenario, trying to associate it with the given template. Performs house
+     * keeping on the unit and scenario and invokes a deployment changed event.
      */
     public void addUnit(Unit unit, String templateID, boolean useLeadership) {
         if (!backingScenario.containsPlayerUnit(unit.getId())) {
@@ -157,12 +171,12 @@ public class StratconScenario implements IStratconDisplayable {
     }
 
     /**
-     * Establishes transport relationships between the specified unit and any assigned transport
-     * units in the campaign. Each transport assignment of the given unit is checked, and if valid
-     * transport is found, a transport relationship is added to the backing scenario.
+     * Establishes transport relationships between the specified unit and any assigned transport units in the campaign.
+     * Each transport assignment of the given unit is checked, and if valid transport is found, a transport relationship
+     * is added to the backing scenario.
      *
-     * @param unit the {@code Unit} for which transport relationships will be established.
-     *             This unit will be checked for active transport assignments.
+     * @param unit the {@code Unit} for which transport relationships will be established. This unit will be checked for
+     *             active transport assignments.
      */
     private void addPlayerTransportRelationships(Unit unit) {
         for (CampaignTransportType transportType : CampaignTransportType.values()) {
@@ -171,8 +185,7 @@ public class StratconScenario implements IStratconDisplayable {
                 Unit transport = transportAssignment.getTransport();
 
                 if (transport == null) {
-                    logger.warn(
-                          "Unit {} has a transport assigned, but the transported unit doesn't exist",
+                    logger.warn("Unit {} has a transport assigned, but the transported unit doesn't exist",
                           unit.getId());
                     continue;
                 }
@@ -189,17 +202,16 @@ public class StratconScenario implements IStratconDisplayable {
     }
 
     /**
-     * These are all of the force IDs that have been matched up to a template
-     * Note: since there's a default Reinforcements template, this is all forces
-     * that have been assigned to this scenario
+     * These are all of the force IDs that have been matched up to a template Note: since there's a default
+     * Reinforcements template, this is all forces that have been assigned to this scenario
      */
     public List<Integer> getPlayerTemplateForceIDs() {
         return backingScenario.getPlayerTemplateForceIDs();
     }
 
     /**
-     * These are all the "primary" force IDs, meaning forces that have been used
-     * by the scenario to drive the generation of the OpFor.
+     * These are all the "primary" force IDs, meaning forces that have been used by the scenario to drive the generation
+     * of the OpFor.
      */
     @XmlElementWrapper(name = "primaryForceIDs")
     @XmlElement(name = "primaryForceID")
@@ -222,8 +234,8 @@ public class StratconScenario implements IStratconDisplayable {
     }
 
     /**
-     * This convenience method sets the scenario's current state to PRIMARY_FORCES_COMMITTED
-     * and fixes the forces that were assigned to this scenario prior as "primary".
+     * This convenience method sets the scenario's current state to PRIMARY_FORCES_COMMITTED and fixes the forces that
+     * were assigned to this scenario prior as "primary".
      */
     public void commitPrimaryForces() {
         currentState = ScenarioState.PRIMARY_FORCES_COMMITTED;
@@ -250,50 +262,42 @@ public class StratconScenario implements IStratconDisplayable {
         StringBuilder stateBuilder = new StringBuilder();
 
         if (isStrategicObjective()) {
-            stateBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
-                .append("'>Contract objective located</span><br/>");
+            stateBuilder.append("<span color='")
+                  .append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                  .append("'>Contract objective located</span><br/>");
         }
 
         if (backingScenario != null) {
-            stateBuilder.append("<b>Scenario:</b> ")
-                .append(backingScenario.getName())
-                .append("<br/>");
+            stateBuilder.append("<b>Scenario:</b> ").append(backingScenario.getName()).append("<br/>");
 
             if (backingScenario.getTemplate() != null) {
-                stateBuilder.append("<i>").append(backingScenario.getTemplate().shortBriefing).append("</i>")
-                    .append("<br/>");
+                stateBuilder.append("<i>")
+                      .append(backingScenario.getTemplate().shortBriefing)
+                      .append("</i>")
+                      .append("<br/>");
             }
 
             if (isTurningPoint()) {
-                stateBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorWarning())
-                    .append("'>Turning Point</span><br/>");
+                stateBuilder.append("<span color='")
+                      .append(MekHQ.getMHQOptions().getFontColorWarning())
+                      .append("'>Turning Point</span><br/>");
             }
 
-            stateBuilder.append("<b>Status:</b> ")
-                .append(currentState.getScenarioStateName())
-                .append("<br/>");
+            stateBuilder.append("<b>Status:</b> ").append(currentState.getScenarioStateName()).append("<br/>");
 
 
-                stateBuilder.append("<b>Terrain:</b> ")
-                    .append(backingScenario.getMap())
-                    .append("<br/>");
+            stateBuilder.append("<b>Terrain:</b> ").append(backingScenario.getMap()).append("<br/>");
 
             if (deploymentDate != null) {
-                stateBuilder.append("<b>Deployment Date:</b> ")
-                    .append(deploymentDate)
-                    .append("<br/>");
+                stateBuilder.append("<b>Deployment Date:</b> ").append(deploymentDate).append("<br/>");
             }
 
             if (actionDate != null) {
-                stateBuilder.append("<b>Battle Date:</b> ")
-                    .append(actionDate)
-                    .append("<br/>");
+                stateBuilder.append("<b>Battle Date:</b> ").append(actionDate).append("<br/>");
             }
 
             if (returnDate != null) {
-                stateBuilder.append("<b>Return Date:</b> ")
-                    .append(returnDate)
-                    .append("<br/>");
+                stateBuilder.append("<b>Return Date:</b> ").append(returnDate).append("<br/>");
             }
 
             int hostileBV = backingScenario.getTeamTotalBattleValue(campaign, false);
@@ -301,10 +305,9 @@ public class StratconScenario implements IStratconDisplayable {
 
             if (campaign != null) {
                 stateBuilder.append(String.format("<b>Hostile BV:</b> %s<br>",
-                    hostileBV == 0 && alliedBV == 0 ? "UNKNOWN" : hostileBV));
+                      hostileBV == 0 && alliedBV == 0 ? "UNKNOWN" : hostileBV));
                 stateBuilder.append(String.format("<b>Allied BV:</b> %s",
-                    hostileBV == 0 && alliedBV == 0 ? "UNKNOWN" : alliedBV
-                    ));
+                      hostileBV == 0 && alliedBV == 0 ? "UNKNOWN" : alliedBV));
             }
         }
 
@@ -337,6 +340,19 @@ public class StratconScenario implements IStratconDisplayable {
         return turningPoint;
     }
 
+    /**
+     * Determines if the current scenario is considered "special."
+     *
+     * <p>This method checks whether the backing scenario exists and if it qualifies as a special scenario
+     * by invoking {@link AtBDynamicScenario#isSpecialScenario()}. A "special" scenario typically indicates unique
+     * conditions or behavior within the current context.</p>
+     *
+     * @return {@code true} if there is a backing scenario, and it is marked as special; {@code false} otherwise.
+     */
+    public boolean isSpecial() {
+        return backingScenario != null && backingScenario.isSpecialScenario();
+    }
+
     public void setTurningPoint(boolean turningPoint) {
         this.turningPoint = turningPoint;
     }
@@ -353,8 +369,9 @@ public class StratconScenario implements IStratconDisplayable {
      * retrieves the associated contract through the provided campaign instance.
      *
      * @param campaign The {@code Campaign} instance used to obtain the contract.
-     * @return The {@code AtBContract} associated with the current backing scenario, or {@code null}
-     * if no backing scenario exists.
+     *
+     * @return The {@code AtBContract} associated with the current backing scenario, or {@code null} if no backing
+     *       scenario exists.
      */
     public @Nullable AtBContract getBackingContract(Campaign campaign) {
         if (backingScenario == null) {
@@ -471,38 +488,37 @@ public class StratconScenario implements IStratconDisplayable {
     }
 
     /**
-     * Retrieves the {@link StratconTrackState} that contains this {@link StratconScenario}
-     * within the given {@link StratconCampaignState} or derives the campaign state if not provided.
+     * Retrieves the {@link StratconTrackState} that contains this {@link StratconScenario} within the given
+     * {@link StratconCampaignState} or derives the campaign state if not provided.
      *
      * <p>
-     * If a {@link StratconCampaignState} is not provided, the method attempts to derive it using
-     * information from the backing scenario associated with this {@link StratconScenario}. It uses
-     * the campaign and contract details to fetch the {@link StratconCampaignState}. Once the
-     * campaign state is obtained (or provided as input), it searches for the track that contains
-     * this scenario.
+     * If a {@link StratconCampaignState} is not provided, the method attempts to derive it using information from the
+     * backing scenario associated with this {@link StratconScenario}. It uses the campaign and contract details to
+     * fetch the {@link StratconCampaignState}. Once the campaign state is obtained (or provided as input), it searches
+     * for the track that contains this scenario.
      * </p>
      *
      * <p>
-     * If no matching track is found, or if the input or derived data is incomplete (such as
-     * missing tracks or scenarios), the method returns {@code null}.
+     * If no matching track is found, or if the input or derived data is incomplete (such as missing tracks or
+     * scenarios), the method returns {@code null}.
      * </p>
      *
      * <strong>Usage:</strong>
      * <p>
-     * Use this method to locate the {@link StratconTrackState} that contains this scenario, either by
-     * directly providing a {@link StratconCampaignState} or allowing the method to derive one using
-     * the campaign and available scenario details.
+     * Use this method to locate the {@link StratconTrackState} that contains this scenario, either by directly
+     * providing a {@link StratconCampaignState} or allowing the method to derive one using the campaign and available
+     * scenario details.
      * </p>
      *
-     * @param campaign      The {@link Campaign} containing the data needed to derive the campaign state
-     *                      if none is provided.
-     * @param campaignState The {@link StratconCampaignState} to search for the track containing this scenario.
-     *                      Can be {@code null}, in which case the method attempts to determine the campaign state.
-     * @return The {@link StratconTrackState} that contains this scenario, or {@code null} if no matching track
-     *         is found or if enough data to derive the campaign state is unavailable.
+     * @param campaign      The {@link Campaign} containing the data needed to derive the campaign state if none is
+     *                      provided.
+     * @param campaignState The {@link StratconCampaignState} to search for the track containing this scenario. Can be
+     *                      {@code null}, in which case the method attempts to determine the campaign state.
+     *
+     * @return The {@link StratconTrackState} that contains this scenario, or {@code null} if no matching track is found
+     *       or if enough data to derive the campaign state is unavailable.
      */
-    public @Nullable StratconTrackState getTrackForScenario(Campaign campaign,
-                                                            @Nullable StratconCampaignState campaignState) {
+    public @Nullable StratconTrackState getTrackForScenario(Campaign campaign, @Nullable StratconCampaignState campaignState) {
         // If a campaign state hasn't been provided, we try to derive it from the available
         // scenario information.
         if (campaignState == null) {
@@ -545,27 +561,27 @@ public class StratconScenario implements IStratconDisplayable {
     }
 
     /**
-     * Resets the state of the current scenario for the given campaign. This includes updating the
-     * scenario state, clearing associated forces and units, and detaching them from the scenario.
-     * It also ensures that the scenario's backing contract and campaign state remain consistent.
+     * Resets the state of the current scenario for the given campaign. This includes updating the scenario state,
+     * clearing associated forces and units, and detaching them from the scenario. It also ensures that the scenario's
+     * backing contract and campaign state remain consistent.
      *
      * @param campaign The {@link Campaign} object for which the scenario needs to be reset.
-     * <p>
-     * The method performs the following:
-     * <ul>
-     *     <li>Resets the scenario's state to {@code UNRESOLVED}.</li>
-     *     <li>Clears any leadership budget and failed reinforcements associated with the scenario.</li>
-     *     <li>Resets the list of primary forces linked to the scenario.</li>
-     *     <li>If the scenario has a backing {@link AtBDynamicScenario}, it fetches the corresponding contract and
-     *         {@link StratconCampaignState} to handle associated track and force assignments:</li>
-     *         <li>-- Clears all forces and units assigned to the scenario, detaching them appropriately.</li>
-     *         <li>-- Undeploys all units and clears scenario IDs for the forces and units associated with the scenario.</li>
-     *         <li>-- Unassigns the force from the {@link StratconTrackState} and triggers a
-     *             {@link DeploymentChangedEvent} for updates.</li>
-     * </ul>
+     *                 <p>
+     *                 The method performs the following:
+     *                 <ul>
+     *                     <li>Resets the scenario's state to {@code UNRESOLVED}.</li>
+     *                     <li>Clears any leadership budget and failed reinforcements associated with the scenario.</li>
+     *                     <li>Resets the list of primary forces linked to the scenario.</li>
+     *                     <li>If the scenario has a backing {@link AtBDynamicScenario}, it fetches the corresponding contract and
+     *                         {@link StratconCampaignState} to handle associated track and force assignments:</li>
+     *                         <li>-- Clears all forces and units assigned to the scenario, detaching them appropriately.</li>
+     *                         <li>-- Undeploys all units and clears scenario IDs for the forces and units associated with the scenario.</li>
+     *                         <li>-- Unassigns the force from the {@link StratconTrackState} and triggers a
+     *                             {@link DeploymentChangedEvent} for updates.</li>
+     *                 </ul>
      *
-     * <strong>Note:</strong> If the backing scenario ID is invalid or the contract is null, the
-     *                method exits early and performs no further actions.
+     *                 <strong>Note:</strong> If the backing scenario ID is invalid or the contract is null, the
+     *                                method exits early and performs no further actions.
      */
     public void resetScenario(Campaign campaign) {
         setCurrentState(UNRESOLVED);
