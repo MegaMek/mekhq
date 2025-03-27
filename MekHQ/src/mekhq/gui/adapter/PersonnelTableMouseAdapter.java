@@ -27,7 +27,6 @@
  */
 package mekhq.gui.adapter;
 
-import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.Compute.d6;
@@ -1207,9 +1206,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ADD_RANDOM_INJURIES: {
                 for (Person person : people) {
-                    // We want an injury count between 1 and 5 (inclusive), so use randomInt instead of 6.
+                    // We want an injury count between 1 and 5 (inclusive), so use randomInt instead of d6.
                     // At 6 injuries, the character should be dead, and we don't want to kill anyone.
-                    InjuryUtil.resolveCombatDamage(getCampaign(), person, max(1, randomInt(6)));
+                    InjuryUtil.resolveCombatDamage(getCampaign(), person, randomInt(5) + 1);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
