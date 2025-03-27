@@ -46,7 +46,7 @@ import mekhq.campaign.personnel.Person;
  *       procurement checks.</li>
  * </ul>
  *
- * <h3>Core Features:</h3>
+ * <b>Core Features:</b>
  * <ul>
  *   <li>Provides localized labels (e.g., {@code ALL.label = "Anyone"}) retrieved from a
  *       resource bundle to display user-friendly names in the UI.</li>
