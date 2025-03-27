@@ -8937,6 +8937,7 @@ public class Campaign implements ITechManager {
         atbEventProcessor.shutdown();
     }
 
+    @Deprecated(forRemoval = true, since = "0.50.05")
     public boolean checkOverDueLoans() {
         Money overdueAmount = getFinances().checkOverdueLoanPayments(this);
         if (overdueAmount.isPositive()) {
