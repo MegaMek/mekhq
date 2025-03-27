@@ -33,8 +33,34 @@ import mekhq.MekHQ;
 import mekhq.campaign.event.PersonMedicalAssignmentEvent;
 import mekhq.campaign.personnel.Person;
 
+/**
+ * Handles the optimization of doctor-to-patient assignments.
+ *
+ * <p>The {@code OptimizeInfirmaryAssignments} class is responsible for efficiently assigning doctors to patients
+ * based on the severity of patients' injuries and the experience level of doctors. The assignment process takes into
+ * account the maximum number of patients a doctor can handle, as well as the prisoner status of the patient.</p>
+ *
+ * <p>Key features of this class include:</p>
+ * <ul>
+ *   <li>Sorting doctors by their experience level to ensure the most skilled doctors are utilized first.</li>
+ *   <li>Sorting patients by the severity of their medical needs, prioritizing critically injured individuals
+ *       and deprioritizing prisoners.</li>
+ *   <li>Assigning doctors to patients based on the sorted lists, ensuring capacity limits are adhered to
+ *       while maintaining an efficient assignment strategy.</li>
+ *   <li>Generating medical assignment events for doctor-patient pairings, which can be tracked throughout
+ *       the campaign for monitoring and reporting purposes.</li>
+ * </ul>
+ *
+ * <p>This class is designed to be instantiated with a {@link Campaign} object, after which it automatically
+ * organizes doctors, sorts patients by priority, and assigns them according to the specified constraints.</p>
+ *
+ * @see Campaign Represents the campaign containing doctors, patients, and configuration details.
+ * @see Person Represents an individual in the campaign, such as a doctor or patient.
+ */
 public class OptimizeInfirmaryAssignments {
     private final Campaign campaign;
+    private List<Person> doctors;
+    private List<Person> patients;
 
     /**
      * Optimizes the assignment of doctors to patients within the campaign.
@@ -47,27 +73,32 @@ public class OptimizeInfirmaryAssignments {
      * priority than other personnel. The assignment also generates a medical assignment event for each pairing.</p>
      */
     public OptimizeInfirmaryAssignments(Campaign campaign) {
-        this.campaign = campaign;
-
         // Get campaign configuration details
+        this.campaign = campaign;
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
         final int maximumPatients = campaignOptions.getMaximumPatients();
         final int healingWaitingPeriod = campaignOptions.getHealingWaitingPeriod();
 
         // First, order the doctors based on experience level, highest to lowest
-        List<Person> doctors = organizeDoctors(campaign);
+        organizeDoctors();
 
         // Then, order the patients based on severity of injuries,
         // rating prisoners as a lower priority than all other personnel.
-        List<Person> patients = organizePatients(campaign);
+        organizePatients();
 
         // Assign doctors to patients
         assignDoctors(isDoctorsUseAdministration, maximumPatients, healingWaitingPeriod, patients, doctors);
     }
 
+    /**
+     * @deprecated Use {@link #assignDoctors(boolean, int, int, List, List)} instead.
+     *
+     *       <p>When this method is removed, the {@link List} params can be dropped from the linked method.</p>
+     */
     @Deprecated(since = "0.50.05", forRemoval = true)
-    private static void assignDoctors(final int maximumPatients, final int healingWaitingPeriod, final List<Person> patients, List<Person> doctors) {
+    private static void assignDoctors(final int maximumPatients, final int healingWaitingPeriod,
+                                      final List<Person> patients, List<Person> doctors) {
         assignDoctors(false, maximumPatients, healingWaitingPeriod, patients, doctors);
     }
 
@@ -91,7 +122,9 @@ public class OptimizeInfirmaryAssignments {
      * @param doctors                    The list of available doctors, ordered by priority (e.g., experience level or
      *                                   suitability). Doctors higher on the list are assigned first.
      */
-    private static void assignDoctors(final boolean isDoctorsUseAdministration, final int maximumPatients, final int healingWaitingPeriod, final List<Person> patients, List<Person> doctors) {
+    private static void assignDoctors(final boolean isDoctorsUseAdministration, final int maximumPatients,
+                                      final int healingWaitingPeriod, final List<Person> patients,
+                                      List<Person> doctors) {
         int patientCounter = 0;
         int doctorCapacity = 0;
 
@@ -130,16 +163,11 @@ public class OptimizeInfirmaryAssignments {
      *
      * <p>This method sorts the doctors within the campaign, prioritizing those with the highest
      * experience levels so that the most skilled doctors are assigned first.</p>
-     *
-     * @param campaign the {@link Campaign} instance containing the current list of doctors
-     *
-     * @return a sorted list of doctors, ordered by decreasing experience level
      */
-    private List<Person> organizeDoctors(Campaign campaign) {
-        List<Person> doctors = campaign.getDoctors();
+    private void organizeDoctors() {
+        doctors = campaign.getDoctors();
         doctors.sort((doctor1, doctor2) -> Integer.compare(getDoctorExperienceLevel(doctor2),
               getDoctorExperienceLevel(doctor1)));
-        return doctors;
     }
 
     /**
@@ -148,15 +176,10 @@ public class OptimizeInfirmaryAssignments {
      * <p>This method sorts the patients based on their medical need. Patients with more severe
      * injuries are given higher priority, while prisoners are treated as lower priority by artificially increasing the
      * severity value of non-prisoners.</p>
-     *
-     * @param campaign the {@link Campaign} instance containing the current list of patients
-     *
-     * @return a sorted list of patients, ordered by decreasing severity
      */
-    private List<Person> organizePatients(Campaign campaign) {
-        List<Person> patients = campaign.getPatients();
+    private void organizePatients() {
+        patients = campaign.getPatients();
         patients.sort((patient1, patient2) -> Integer.compare(getSeverity(patient2), getSeverity(patient1)));
-        return patients;
     }
 
     /**
