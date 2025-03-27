@@ -31,6 +31,8 @@ package mekhq.campaign;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static megamek.common.Compute.d6;
+import static mekhq.campaign.CampaignOptions.S_AUTO;
+import static mekhq.campaign.CampaignOptions.S_TECH;
 import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_MONTH;
 import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_WEEK;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
@@ -60,6 +62,7 @@ import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMA
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.isIneligibleToPerformProcurement;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -215,6 +218,7 @@ import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.RangedPlanetSelector;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.gui.sorter.PersonTitleSorter;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.service.AutosaveService;
@@ -3201,41 +3205,71 @@ public class Campaign implements ITechManager {
         return target;
     }
 
+    /**
+     * Retrieves the best logistics person based on the acquisition skill, personnel category, and maximum acquisitions
+     * allowed for the campaign.
+     *
+     * <p>This method evaluates all active personnel to determine the most suitable candidate
+     * for logistics tasks, depending on the specified acquisition skill and rules. The determination is made according
+     * to the following logic:</p>
+     * <ul>
+     *   <li>If the skill is {@code S_AUTO}, the method immediately returns {@code null}.</li>
+     *   <li>If the skill is {@code S_TECH}, the method evaluates personnel based on their technical
+     *       skill level, ignoring those who are ineligible for procurement or who exceed
+     *       the maximum acquisition limit.</li>
+     *   <li>For all other skills, the method evaluates personnel who possess the specified skill,
+     *       ensuring their eligibility for procurement and checking that they have not exceeded
+     *       the maximum acquisition limit.</li>
+     * </ul>
+     *
+     * <p>The "best" logistics person is selected as the one with the highest skill level (based on the skill being
+     * evaluated). If no suitable candidate is found, the method returns {@code null}.
+     *
+     * @return The {@link Person} representing the best logistics character, or {@code null} if no suitable person is
+     *       found.
+     */
     public @Nullable Person getLogisticsPerson() {
+        final String skill = campaignOptions.getAcquisitionSkill();
+        final ProcurementPersonnelPick acquisitionCategory = campaignOptions.getAcquisitionPersonnelCategory();
+        final int maxAcquisitions = campaignOptions.getMaxAcquisitions();
+
         int bestSkill = -1;
-        int maxAcquisitions = getCampaignOptions().getMaxAcquisitions();
-        Person admin = null;
-        String skill = getCampaignOptions().getAcquisitionSkill();
-        if (skill.equals(CampaignOptions.S_AUTO)) {
+        Person procurementCharacter = null;
+        if (skill.equals(S_AUTO)) {
             return null;
-        } else if (skill.equals(CampaignOptions.S_TECH)) {
-            for (Person p : getActivePersonnel()) {
-                if (getCampaignOptions().isAcquisitionSupportStaffOnly() && !p.hasSupportRole(true)) {
+        } else if (skill.equals(S_TECH)) {
+            for (Person person : getActivePersonnel(false)) {
+                if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
-                if (maxAcquisitions > 0 && (p.getAcquisitions() >= maxAcquisitions)) {
+
+                if (maxAcquisitions > 0 && (person.getAcquisitions() >= maxAcquisitions)) {
                     continue;
                 }
-                if ((p.getBestTechSkill() != null) && p.getBestTechSkill().getLevel() > bestSkill) {
-                    admin = p;
-                    bestSkill = p.getBestTechSkill().getLevel();
+
+                if ((person.getBestTechSkill() != null) && person.getBestTechSkill().getLevel() > bestSkill) {
+                    procurementCharacter = person;
+                    bestSkill = person.getBestTechSkill().getLevel();
                 }
             }
         } else {
-            for (Person p : getActivePersonnel()) {
-                if (getCampaignOptions().isAcquisitionSupportStaffOnly() && !p.hasSupportRole(true)) {
+            for (Person person : getActivePersonnel(false)) {
+                if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
-                if (maxAcquisitions > 0 && (p.getAcquisitions() >= maxAcquisitions)) {
+
+                if (maxAcquisitions > 0 && (person.getAcquisitions() >= maxAcquisitions)) {
                     continue;
                 }
-                if (p.hasSkill(skill) && (p.getSkill(skill).getLevel() > bestSkill)) {
-                    admin = p;
-                    bestSkill = p.getSkill(skill).getLevel();
+
+                if (person.hasSkill(skill) && (person.getSkill(skill).getLevel() > bestSkill)) {
+                    procurementCharacter = person;
+                    bestSkill = person.getSkill(skill).getLevel();
                 }
             }
         }
-        return admin;
+
+        return procurementCharacter;
     }
 
     /**
@@ -3316,36 +3350,65 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Gets a list of applicable logistics personnel, or an empty list if acquisitions automatically succeed.
+     * Retrieves a list of eligible logistics personnel who can perform procurement actions
+     * based on the current campaign options. If acquisitions are set to automatically succeed,
+     * an empty list is returned.
      *
-     * @return A <code>List</code> of {@link Person} who can perform logistical actions.
+     * <p>This method evaluates active personnel to determine who is eligible for procurement
+     * actions under the current campaign configuration. Personnel are filtered and sorted
+     * based on specific criteria:</p>
+     * <ul>
+     *   <li><strong>Automatic Success:</strong> If the acquisition skill equals {@code S_AUTO},
+     *       an empty list is immediately returned.</li>
+     *   <li><strong>Eligibility Filtering:</strong> The following checks are applied to filter personnel:
+     *       <ul>
+     *          <li>Personnel must not be ineligible based on the {@link ProcurementPersonnelPick} category.</li>
+     *          <li>Personnel must not have exceeded the maximum acquisition limit, if specified.</li>
+     *          <li>If the skill is {@code S_TECH}, the person must have a valid technical skill.</li>
+     *          <li>For other skills, the person must have the specified skill.</li>
+     *       </ul>
+     *    </li>
+     *   <li><b>Sorting:</b> The resulting list is sorted in descending order by skill level:
+     *       <ul>
+     *          <li>When the skill is {@code S_TECH}, sorting is based on the person's best technical skill level.</li>
+     *          <li>For other skills, sorting is based on the level of the specified skill.</li>
+     *       </ul>
+     *   </li>
+     * </ul>
+     *
+     * @return A {@link List} of {@link Person} objects who are eligible and sorted to perform
+     *         logistical actions, or an empty list if acquisitions automatically succeed.
      */
     public List<Person> getLogisticsPersonnel() {
-        String skill = getCampaignOptions().getAcquisitionSkill();
-        if (skill.equals(CampaignOptions.S_AUTO)) {
+        final String skill = getCampaignOptions().getAcquisitionSkill();
+
+        if (skill.equals(S_AUTO)) {
             return Collections.emptyList();
         } else {
+            final int maxAcquisitions = campaignOptions.getMaxAcquisitions();
+            final ProcurementPersonnelPick acquisitionCategory = campaignOptions.getAcquisitionPersonnelCategory();
             List<Person> logisticsPersonnel = new ArrayList<>();
-            int maxAcquisitions = getCampaignOptions().getMaxAcquisitions();
-            for (Person p : getActivePersonnel()) {
-                if (getCampaignOptions().isAcquisitionSupportStaffOnly() && !p.hasSupportRole(true)) {
+
+            for (Person person : getActivePersonnel()) {
+                if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
-                if ((maxAcquisitions > 0) && (p.getAcquisitions() >= maxAcquisitions)) {
+
+                if ((maxAcquisitions > 0) && (person.getAcquisitions() >= maxAcquisitions)) {
                     continue;
                 }
-                if (skill.equals(CampaignOptions.S_TECH)) {
-                    if (null != p.getBestTechSkill()) {
-                        logisticsPersonnel.add(p);
+                if (skill.equals(S_TECH)) {
+                    if (null != person.getBestTechSkill()) {
+                        logisticsPersonnel.add(person);
                     }
-                } else if (p.hasSkill(skill)) {
-                    logisticsPersonnel.add(p);
+                } else if (person.hasSkill(skill)) {
+                    logisticsPersonnel.add(person);
                 }
             }
 
             // Sort by their skill level, descending.
             logisticsPersonnel.sort((a, b) -> {
-                if (skill.equals(CampaignOptions.S_TECH)) {
+                if (skill.equals(S_TECH)) {
                     return Integer.compare(b.getBestTechSkill().getLevel(), a.getBestTechSkill().getLevel());
                 } else {
                     return Integer.compare(b.getSkill(skill).getLevel(), a.getSkill(skill).getLevel());
@@ -3372,7 +3435,7 @@ public class Campaign implements ITechManager {
             shoppingItem.decrementDaysToWait();
         }
 
-        if (getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
+        if (getCampaignOptions().getAcquisitionSkill().equals(S_AUTO)) {
             return goShoppingAutomatically(sList);
         } else if (!getCampaignOptions().isUsePlanetaryAcquisition()) {
             return goShoppingStandard(sList);
@@ -7231,7 +7294,7 @@ public class Campaign implements ITechManager {
      *       an impossible/automatic result under specific circumstances.
      */
     public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition, final @Nullable Person person, final boolean checkDaysToWait) {
-        if (getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
+        if (getCampaignOptions().getAcquisitionSkill().equals(S_AUTO)) {
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "Automatic Success");
         }
 

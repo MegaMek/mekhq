@@ -30,6 +30,8 @@ package mekhq.campaign;
 
 import static megamek.common.TechConstants.getSimpleLevel;
 import static megamek.common.options.OptionsConstants.*;
+import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.ALL;
+import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.SUPPORT;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -64,6 +66,7 @@ import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.service.mrms.MRMSOption;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -159,7 +162,7 @@ public class CampaignOptions {
     // Acquisition
     private int     waitingPeriod;
     private String  acquisitionSkill;
-    private boolean acquisitionSupportStaffOnly;
+    private ProcurementPersonnelPick acquisitionPersonnelCategory;
     private int     clanAcquisitionPenalty;
     private int     isAcquisitionPenalty;
     private int     maxAcquisitions;
@@ -673,7 +676,7 @@ public class CampaignOptions {
         // Acquisition
         waitingPeriod               = 7;
         acquisitionSkill            = S_TECH;
-        acquisitionSupportStaffOnly = true;
+        acquisitionPersonnelCategory = SUPPORT;
         clanAcquisitionPenalty      = 0;
         isAcquisitionPenalty        = 0;
         maxAcquisitions             = 0;
@@ -3912,12 +3915,60 @@ public class CampaignOptions {
         this.acquisitionSkill = acquisitionSkill;
     }
 
+    /**
+     * @deprecated Use {@link #isAcquisitionPersonnelCategory(ProcurementPersonnelPick)} with {@code SUPPORT} to check
+     *       for support staff restrictions.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public boolean isAcquisitionSupportStaffOnly() {
-        return acquisitionSupportStaffOnly;
+        return acquisitionPersonnelCategory == SUPPORT;
     }
 
+    /**
+     * @deprecated Use {@link #setAcquisitionPersonnelCategory(ProcurementPersonnelPick)} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public void setAcquisitionSupportStaffOnly(final boolean acquisitionSupportStaffOnly) {
-        this.acquisitionSupportStaffOnly = acquisitionSupportStaffOnly;
+        this.acquisitionPersonnelCategory = acquisitionSupportStaffOnly ? SUPPORT : ALL;
+    }
+
+    /**
+     * Checks if the acquisition personnel category matches a specified category.
+     *
+     * @param category The {@link ProcurementPersonnelPick} category to check against.
+     *
+     * @return {@code true} if the current acquisition personnel category matches the specified category, {@code false}
+     *       otherwise.
+     */
+    public boolean isAcquisitionPersonnelCategory(ProcurementPersonnelPick category) {
+        return acquisitionPersonnelCategory == category;
+    }
+
+    /**
+     * Retrieves the current acquisition personnel category.
+     *
+     * <p>This method returns the {@link ProcurementPersonnelPick} value assigned to indicate what
+     * personnel category can make acquisition checks.</p>
+     *
+     * <p><b>Usage:</b> Generally, for most use-cases, you'll want to use the shortcut method
+     * {@link #isAcquisitionPersonnelCategory(ProcurementPersonnelPick)} instead.</p>
+     *
+     * @return The current {@link ProcurementPersonnelPick} that represents the acquisition's personnel category.
+     */
+    public ProcurementPersonnelPick getAcquisitionPersonnelCategory() {
+        return acquisitionPersonnelCategory;
+    }
+
+    /**
+     * Sets the acquisition personnel category.
+     *
+     * <p>This method defines what personnel category (represented as a {@link ProcurementPersonnelPick})
+     * is eligible to make acquisition checks in the campaign system.</p>
+     *
+     * @param acquisitionPersonnelCategory The {@link ProcurementPersonnelPick} value to assign.
+     */
+    public void setAcquisitionPersonnelCategory(final ProcurementPersonnelPick acquisitionPersonnelCategory) {
+        this.acquisitionPersonnelCategory = acquisitionPersonnelCategory;
     }
 
     public int getUnitTransitTime() {
@@ -4710,7 +4761,10 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAmmoByType", useAmmoByType);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "waitingPeriod", waitingPeriod);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitionSkill", acquisitionSkill);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitionSupportStaffOnly", acquisitionSupportStaffOnly);
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "acquisitionPersonnelCategory",
+              acquisitionPersonnelCategory.name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techLevel", techLevel);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitTransitTime", unitTransitTime);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePlanetaryAcquisition", usePlanetaryAcquisition);
@@ -5420,7 +5474,12 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("overageRepaymentInFinalPayment")) {
                     retVal.setOverageRepaymentInFinalPayment(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSupportStaffOnly")) {
-                    retVal.acquisitionSupportStaffOnly = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    retVal.acquisitionPersonnelCategory = Boolean.parseBoolean(wn2.getTextContent().trim()) ?
+                                                                SUPPORT :
+                                                                ALL;
+                } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionPersonnelCategory")) {
+                    retVal.acquisitionPersonnelCategory = ProcurementPersonnelPick.fromString(wn2.getTextContent()
+                                                                                                    .trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("limitByYear")) {
                     retVal.limitByYear = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("disallowExtinctStuff")) {
