@@ -27,20 +27,12 @@
  */
 package mekhq.gui;
 
-import megamek.common.util.ImageUtil;
-import megamek.logging.MMLogger;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.stratcon.*;
-import mekhq.campaign.stratcon.StratconBiomeManifest.ImageType;
-import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
-import mekhq.gui.stratcon.StratconScenarioWizard;
-import mekhq.gui.stratcon.TrackForceAssignmentUI;
+import static java.awt.Color.BLACK;
+import static java.awt.Font.BOLD;
+import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
+import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
+import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.UNRESOLVED;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -51,15 +43,36 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import javax.imageio.ImageIO;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
-import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
-import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
-import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.UNRESOLVED;
+import megamek.common.util.ImageUtil;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.stratcon.StratconBiomeManifest;
+import mekhq.campaign.stratcon.StratconBiomeManifest.ImageType;
+import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratcon.StratconCoords;
+import mekhq.campaign.stratcon.StratconFacility;
+import mekhq.campaign.stratcon.StratconFacilityFactory;
+import mekhq.campaign.stratcon.StratconRulesManager;
+import mekhq.campaign.stratcon.StratconScenario;
+import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
+import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.gui.stratcon.StratconScenarioWizard;
+import mekhq.gui.stratcon.TrackForceAssignmentUI;
 
 /**
  * This panel handles AtB-Stratcon GUI interactions with a specific scenario
@@ -402,7 +415,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         }
 
         Font pushFont = g2D.getFont();
-        Font newFont = pushFont.deriveFont(Font.BOLD, pushFont.getSize());
+        Font newFont = pushFont.deriveFont(BOLD, pushFont.getSize());
         g2D.setFont(newFont);
 
         boolean trackRevealed = currentTrack.hasActiveTrackReveal();
@@ -412,7 +425,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 StratconCoords currentCoords = new StratconCoords(x, y);
 
                 if (drawHexType == DrawHexType.Outline) {
-                    g2D.setColor(Color.BLACK);
+                    g2D.setColor(BLACK);
 
                     // for legacy campaigns with no terrain data or if there's an un/poorly-defined
                     // terrain type
@@ -614,7 +627,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                     }
 
                     if (currentTrack.getFacility(currentCoords) == null) {
-                        drawTextEffect(g2D, scenarioMarker, "Hostile Force Detected", currentCoords);
+                        drawTextEffect(g2D, scenarioMarker, scenario.getName(), currentCoords);
                     } else if (currentTrack.getFacility(currentCoords).getOwner() == Allied) {
                         drawTextEffect(g2D, scenarioMarker, "Under Attack!", currentCoords);
                     }
@@ -755,7 +768,7 @@ public class StratconPanel extends JPanel implements ActionListener {
      * all drawn in the same hex.
      */
     private void drawTextEffect(Graphics2D g2D, Shape marker, String text, StratconCoords coords) {
-        int verticalOffsetIndex = numIconsInHex.containsKey(coords) ? numIconsInHex.get(coords) : 0;
+        int verticalOffsetIndex = numIconsInHex.getOrDefault(coords, 0);
 
         double startX = marker.getBounds().getMaxX();
         double startY = marker.getBounds().getMinY();
@@ -766,19 +779,32 @@ public class StratconPanel extends JPanel implements ActionListener {
         g2D.drawLine((int) startX, (int) startY, (int) midPointX, (int) midPointY);
         g2D.drawLine((int) midPointX, (int) midPointY, (int) endPointX, (int) midPointY);
 
-        // draw gray rectangle
+        // Save the original font
+        Font originalFont = g2D.getFont();
+        Font boldFont = originalFont.deriveFont(BOLD);
+
+        // Set the bold font temporarily for text measurement
+        g2D.setFont(boldFont);
+        FontMetrics boldFontMetrics = g2D.getFontMetrics();
+
+        // Update the rectangle width based on bold text width
+        int rectangleYStart = (int) midPointY - boldFontMetrics.getHeight();
+        int rectangleWidth = boldFontMetrics.stringWidth(text.toUpperCase()) + 4;
+
+        // Draw black rectangle
         Color push = g2D.getColor();
-        g2D.setColor(Color.GRAY);
-        int rectYStart = (int) midPointY - g2D.getFontMetrics().getHeight();
-        int rectWidth = g2D.getFontMetrics().stringWidth(text) + 4;
-
-        g2D.fillRect((int) endPointX, rectYStart, rectWidth, g2D.getFontMetrics().getHeight());
+        g2D.setColor(BLACK);
+        g2D.fillRect((int) endPointX, rectangleYStart, rectangleWidth, boldFontMetrics.getHeight());
         g2D.setColor(push);
-        g2D.drawRect((int) endPointX, rectYStart, rectWidth, g2D.getFontMetrics().getHeight());
+        g2D.drawRect((int) endPointX, rectangleYStart, rectangleWidth, boldFontMetrics.getHeight());
 
-        g2D.drawString(text, (int) endPointX + 2, (int) midPointY - 2);
+        // Draw the string with the bold font
+        g2D.drawString(text.toUpperCase(), (int) endPointX + 2, (int) midPointY - 2);
 
-        // register that we drew text off of this hex
+        // Restore the original font
+        g2D.setFont(originalFont);
+
+        // Register that we drew text off of this hex
         numIconsInHex.put(coords, ++verticalOffsetIndex);
     }
 
