@@ -1039,6 +1039,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         }
 
         private void maybeShowPopup(MouseEvent e) {
+            final boolean isBlindDrop = campaign.getGameOptions().getOption("blind_drop").booleanValue();
             final JPopupMenu popup = new JPopupMenu();
             if (e.isPopupTrigger()) {
                 final TreePath path = tree.getPathForLocation(e.getX(), e.getY());
@@ -1049,7 +1050,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 JMenuItem menuItem;
                 if ((path.getPathCount() > 1) &&
                           (tree.getSelectionRows() != null) &&
-                          (tree.getSelectionRows()[0] != 0)) {
+                          (tree.getSelectionRows()[0] != 0) &&
+                          !isBlindDrop) {
                     menuItem = new JMenuItem("Edit Unit...");
                     menuItem.setActionCommand("EDIT_UNIT");
                     menuItem.addActionListener(this);
