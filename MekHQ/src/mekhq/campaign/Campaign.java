@@ -8953,13 +8953,22 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Checks if a turnover prompt should be displayed based on campaign options and current date.
+     * Checks if an employee turnover prompt should be displayed based on campaign options, current date, and other
+     * conditions (like transit status and campaign start date).
      *
-     * @return An integer representing the user's choice: -1 if turnover prompt should not be displayed. 0 to indicate
-     *       the user selected "Employee Turnover". 1 to indicate the user selected "Advance Day Regardless". 2 to
-     *       indicate the user selected "Cancel Advance Day".
+     * <p>The turnover prompt is triggered based on the configured turnover frequency (weekly, monthly, quarterly, or
+     * annually), but only after the campaign has been running for at least 6 days and when not in transit.<p>
+     *
+     * <p>The dialog will show different messages depending on whether there are pending retirees.</p>
+     *
+     * @return An integer representing the outcome: -1 if turnover prompt should not be displayed, 0 if user selected
+     *       "Employee Turnover", 1 if user selected "Advance Day Regardless", 2 if user selected "Cancel Advance Day"
      */
     public int checkTurnoverPrompt() {
+        if (location.isInTransit()) {
+            return -1;
+        }
+
         if (getLocalDate().isBefore(getCampaignStartDate().plusDays(6))) {
             return -1;
         }

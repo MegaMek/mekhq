@@ -27,6 +27,9 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import java.time.LocalDate;
+import java.util.Objects;
+
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.common.Compute;
@@ -39,12 +42,8 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 
-import java.time.LocalDate;
-import java.util.Objects;
-
 /**
- * Represents a class which can generate new {@link Person} objects
- * for a {@link Campaign}.
+ * Represents a class which can generate new {@link Person} objects for a {@link Campaign}.
  */
 public abstract class AbstractPersonnelGenerator {
     private RandomNameGenerator randomNameGenerator = RandomNameGenerator.getInstance();
@@ -53,6 +52,7 @@ public abstract class AbstractPersonnelGenerator {
 
     /**
      * Gets the {@link RandomNameGenerator}.
+     *
      * @return The {@link RandomNameGenerator} to use.
      */
     public RandomNameGenerator getNameGenerator() {
@@ -61,6 +61,7 @@ public abstract class AbstractPersonnelGenerator {
 
     /**
      * Sets the {@link RandomNameGenerator}.
+     *
      * @param rng A {@link RandomNameGenerator} to use.
      */
     public void setNameGenerator(RandomNameGenerator rng) {
@@ -69,6 +70,7 @@ public abstract class AbstractPersonnelGenerator {
 
     /**
      * Gets the {@link RandomSkillPreferences}.
+     *
      * @return The {@link RandomSkillPreferences} to use.
      */
     public RandomSkillPreferences getSkillPreferences() {
@@ -77,6 +79,7 @@ public abstract class AbstractPersonnelGenerator {
 
     /**
      * Sets the {@link RandomSkillPreferences}.
+     *
      * @param skillPreferences A {@link RandomSkillPreferences} to use.
      */
     public void setSkillPreferences(RandomSkillPreferences skillPreferences) {
@@ -85,17 +88,21 @@ public abstract class AbstractPersonnelGenerator {
 
     /**
      * Generates a new {@link Person}.
-     * @param campaign The {@link Campaign} which tracks the person.
-     * @param primaryRole The primary role of the person.
+     *
+     * @param campaign      The {@link Campaign} which tracks the person.
+     * @param primaryRole   The primary role of the person.
      * @param secondaryRole The secondary role of the person.
-     * @param gender The person's gender, or a randomize value
+     * @param gender        The person's gender, or a randomize value
+     *
      * @return A new {@link Person}.
      */
     public abstract Person generate(Campaign campaign, PersonnelRole primaryRole, PersonnelRole secondaryRole, Gender gender);
 
     /**
      * Creates a {@link Person} object for the given {@link Campaign}.
+     *
      * @param campaign The {@link Campaign} to create the person within.
+     *
      * @return A new {@link Person} object for the given campaign.
      */
     protected Person createPerson(Campaign campaign) {
@@ -104,12 +111,15 @@ public abstract class AbstractPersonnelGenerator {
 
     /**
      * Generates an experience level for a {@link Person}.
+     *
      * @param person The {@link Person} being generated.
+     *
      * @return An integer value between {@link SkillType#EXP_ULTRA_GREEN} and {@link SkillType#EXP_ELITE}.
      */
     public int generateExperienceLevel(Person person) {
-        int bonus = getSkillPreferences().getOverallRecruitBonus()
-                + getSkillPreferences().getRecruitBonus(person.getPrimaryRole());
+
+
+        int bonus = rSkillPrefs.getOverallRecruitBonus() + rSkillPrefs.getRecruitmentBonus(person.getPrimaryRole());
 
         // LAM pilots get +3 to random experience roll
         if (person.getPrimaryRole().isLAMPilot()) {
@@ -123,8 +133,9 @@ public abstract class AbstractPersonnelGenerator {
      * Generates and sets the name and gender of a person.
      *
      * @param campaign the campaign the person belongs to
-     * @param person the person whose name and gender is being generated
-     * @param gender the gender of the person. Can be Gender.MALE, Gender.FEMALE, Gender.NON_BINARY, or Gender.RANDOMIZE
+     * @param person   the person whose name and gender is being generated
+     * @param gender   the gender of the person. Can be Gender.MALE, Gender.FEMALE, Gender.NON_BINARY, or
+     *                 Gender.RANDOMIZE
      */
     protected void generateNameAndGender(Campaign campaign, Person person, Gender gender) {
         int nonBinaryDiceSize = campaign.getCampaignOptions().getNonBinaryDiceSize();
@@ -135,20 +146,22 @@ public abstract class AbstractPersonnelGenerator {
             person.setGender(RandomGenderGenerator.generate());
         }
 
-        String factionCode = campaign.getCampaignOptions().isUseOriginFactionForNames()
-                ? person.getOriginFaction().getShortName()
-                : RandomNameGenerator.getInstance().getChosenFaction();
+        String factionCode = campaign.getCampaignOptions().isUseOriginFactionForNames() ?
+                                   person.getOriginFaction().getShortName() :
+                                   RandomNameGenerator.getInstance().getChosenFaction();
 
-        String[] name = getNameGenerator().generateGivenNameSurnameSplit(person.getGender(), person.isClanPersonnel(),
-                factionCode);
+        String[] name = getNameGenerator().generateGivenNameSurnameSplit(person.getGender(),
+              person.isClanPersonnel(),
+              factionCode);
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
     }
 
     /**
      * Generates the starting XP for a {@link Person}.
+     *
      * @param campaign The {@link Campaign} which tracks the person.
-     * @param person The {@link Person} being generated.
+     * @param person   The {@link Person} being generated.
      */
     protected void generateXp(Campaign campaign, Person person) {
         if (campaign.getCampaignOptions().isUseDylansRandomXP()) {
@@ -158,8 +171,9 @@ public abstract class AbstractPersonnelGenerator {
 
     /**
      * Generates the clan phenotype, if applicable, for a {@link Person}.
+     *
      * @param campaign The {@link Campaign} which tracks the person.
-     * @param person The {@link Person} being generated.
+     * @param person   The {@link Person} being generated.
      */
     protected void generatePhenotype(Campaign campaign, Person person) {
         //check for clan phenotypes
@@ -167,7 +181,8 @@ public abstract class AbstractPersonnelGenerator {
             switch (person.getPrimaryRole()) {
                 case MEKWARRIOR:
                 case LAM_PILOT:
-                    if (Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.MEKWARRIOR))) {
+                    if (Utilities.rollProbability(campaign.getCampaignOptions()
+                                                        .getPhenotypeProbability(Phenotype.MEKWARRIOR))) {
                         person.setPhenotype(Phenotype.MEKWARRIOR);
                     }
                     break;
@@ -176,26 +191,30 @@ public abstract class AbstractPersonnelGenerator {
                 case VTOL_PILOT:
                 case VEHICLE_GUNNER:
                 case VEHICLE_CREW:
-                    if (person.getOriginFaction().getShortName().equalsIgnoreCase("CHH")
-                            && (campaign.getGameYear() >= 3100)
-                            && Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.VEHICLE))) {
+                    if (person.getOriginFaction().getShortName().equalsIgnoreCase("CHH") &&
+                              (campaign.getGameYear() >= 3100) &&
+                              Utilities.rollProbability(campaign.getCampaignOptions()
+                                                              .getPhenotypeProbability(Phenotype.VEHICLE))) {
                         person.setPhenotype(Phenotype.VEHICLE);
                     }
                     break;
                 case AEROSPACE_PILOT:
                 case CONVENTIONAL_AIRCRAFT_PILOT:
-                    if (Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.AEROSPACE))) {
+                    if (Utilities.rollProbability(campaign.getCampaignOptions()
+                                                        .getPhenotypeProbability(Phenotype.AEROSPACE))) {
                         person.setPhenotype(Phenotype.AEROSPACE);
                     }
                     break;
                 case PROTOMEK_PILOT:
-                    if ((campaign.getGameYear() > 3060)
-                            && Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.PROTOMEK))) {
+                    if ((campaign.getGameYear() > 3060) &&
+                              Utilities.rollProbability(campaign.getCampaignOptions()
+                                                              .getPhenotypeProbability(Phenotype.PROTOMEK))) {
                         person.setPhenotype(Phenotype.PROTOMEK);
                     }
                     break;
                 case BATTLE_ARMOUR:
-                    if (Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.ELEMENTAL))) {
+                    if (Utilities.rollProbability(campaign.getCampaignOptions()
+                                                        .getPhenotypeProbability(Phenotype.ELEMENTAL))) {
                         person.setPhenotype(Phenotype.ELEMENTAL);
                     }
                     break;
@@ -203,9 +222,10 @@ public abstract class AbstractPersonnelGenerator {
                 case VESSEL_GUNNER:
                 case VESSEL_CREW:
                 case VESSEL_NAVIGATOR:
-                    if ((person.getOriginFaction().getShortName().equalsIgnoreCase("CSR")
-                            || person.getOriginFaction().getShortName().equalsIgnoreCase("RA"))
-                            && Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.NAVAL))) {
+                    if ((person.getOriginFaction().getShortName().equalsIgnoreCase("CSR") ||
+                               person.getOriginFaction().getShortName().equalsIgnoreCase("RA")) &&
+                              Utilities.rollProbability(campaign.getCampaignOptions()
+                                                              .getPhenotypeProbability(Phenotype.NAVAL))) {
                         person.setPhenotype(Phenotype.NAVAL);
                     }
                     break;
@@ -218,17 +238,17 @@ public abstract class AbstractPersonnelGenerator {
     /**
      * Generates the birthday for a {@link Person} based on their experience level and affiliation.
      * <p>
-     * The method calculates the person's age using {@link Utilities#getAgeByExpLevel(int, boolean)}
-     * and subtracts it from the current campaign date to determine their year of birth.
-     * A random day within that year is then selected, ensuring the generated birthday is
-     * always on or before the current campaign date, so the person's age is accurate.
+     * The method calculates the person's age using {@link Utilities#getAgeByExpLevel(int, boolean)} and subtracts it
+     * from the current campaign date to determine their year of birth. A random day within that year is then selected,
+     * ensuring the generated birthday is always on or before the current campaign date, so the person's age is
+     * accurate.
      * </p>
      *
      * @param campaign        The {@link Campaign} containing metadata such as the current local date.
      * @param person          The {@link Person} whose birthday is being generated.
      * @param expLvl          The experience level of the {@code person}, which determines their age.
-     * @param isClanPersonnel Indicates whether the {@code person} belongs to the Clans,
-     *                        which affects the calculated age.
+     * @param isClanPersonnel Indicates whether the {@code person} belongs to the Clans, which affects the calculated
+     *                        age.
      */
     protected void generateBirthday(Campaign campaign, Person person, int expLvl, boolean isClanPersonnel) {
         LocalDate currentDate = campaign.getLocalDate();

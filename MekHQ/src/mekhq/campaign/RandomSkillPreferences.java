@@ -28,14 +28,18 @@
  */
 package mekhq.campaign;
 
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
 
 /**
  * @author Jay Lawson
@@ -44,7 +48,7 @@ public class RandomSkillPreferences {
     private static final MMLogger logger = MMLogger.create(CampaignOptions.class);
 
     private int overallRecruitBonus;
-    private int[] recruitBonuses;
+    Map<PersonnelRole, Integer> recruitmentBonuses;
     private boolean randomizeSkill;
     private boolean useClanBonuses;
     private int antiMekProb;
@@ -59,7 +63,7 @@ public class RandomSkillPreferences {
 
     public RandomSkillPreferences() {
         overallRecruitBonus = 0;
-        recruitBonuses = new int[PersonnelRole.values().length];
+        recruitmentBonuses = new HashMap<>();
         randomizeSkill = true;
         useClanBonuses = true;
         antiMekProb = 10;
@@ -81,16 +85,70 @@ public class RandomSkillPreferences {
         overallRecruitBonus = b;
     }
 
-    public int[] getRecruitBonuses() {
-        return recruitBonuses;
-    }
-
+    /**
+     * @deprecated Use {@link #getRecruitmentBonus(PersonnelRole)} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public int getRecruitBonus(PersonnelRole role) {
-        return getRecruitBonuses()[role.ordinal()];
+        return getRecruitmentBonus(role);
     }
 
+    /**
+     * @deprecated Use {@link #addRecruitmentBonus(PersonnelRole, int)}.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public void setRecruitBonus(int index, int bonus) {
-        recruitBonuses[index] = bonus;
+        PersonnelRole[] personnelRoles = PersonnelRole.values();
+        PersonnelRole role = personnelRoles[index];
+        addRecruitmentBonus(role, bonus);
+    }
+
+    /**
+     * @deprecated Use {@link #getRecruitmentBonuses()}.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public int[] getRecruitBonuses() {
+        List<PersonnelRole> personnelRoles = List.of(PersonnelRole.values());
+        int[] bonuses = new int[personnelRoles.size()];
+
+        for (PersonnelRole personnelRole : personnelRoles) {
+            int index = personnelRoles.indexOf(personnelRole);
+            bonuses[index] = getRecruitmentBonus(personnelRole);
+        }
+
+        return bonuses;
+    }
+
+    /**
+     * Retrieves the current recruitment bonus values for different personnel roles.
+     *
+     * @return A map containing personnel roles as keys and their associated recruitment bonus values as integers
+     */
+    public Map<PersonnelRole, Integer> getRecruitmentBonuses() {
+        return recruitmentBonuses;
+    }
+
+    /**
+     * Adds or updates a recruitment bonus for a specific personnel role.
+     *
+     * @param role  The personnel role to set a bonus for
+     * @param bonus The integer value representing the recruitment bonus
+     */
+    public void addRecruitmentBonus(final PersonnelRole role, final int bonus) {
+        recruitmentBonuses.put(role, bonus);
+    }
+
+    /**
+     * Retrieves the recruitment bonus value for a specific personnel role.
+     *
+     * <p>If no bonus has been defined for the requested role, this method returns 0.</p>
+     *
+     * @param role The personnel role to get the recruitment bonus for
+     *
+     * @return The integer bonus value for the specified role, or 0 if no bonus is defined
+     */
+    public int getRecruitmentBonus(final PersonnelRole role) {
+        return recruitmentBonuses.getOrDefault(role, 0);
     }
 
     public int getSpecialAbilityBonus(int type) {
@@ -188,7 +246,11 @@ public class RandomSkillPreferences {
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "randomSkillPreferences");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overallRecruitBonus", overallRecruitBonus);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "recruitBonuses", recruitBonuses);
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "recruitmentBonuses");
+        for (final Entry<PersonnelRole, Integer> entry : recruitmentBonuses.entrySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "recruitmentBonuses");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "specialAbilityBonus", specialAbilityBonus);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandSkillsModifier", commandSkillsModifier);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeSkill", randomizeSkill);
@@ -242,14 +304,11 @@ public class RandomSkillPreferences {
                     retVal.secondSkillProb = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("secondSkillBonus")) {
                     retVal.secondSkillBonus = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("recruitBonuses")) {
-                    String[] values = wn2.getTextContent().split(",");
-                    for (int i = 0; i < values.length; i++) {
-                        retVal.recruitBonuses[i] = Integer.parseInt(values[i]);
-                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("recruitmentBonuses")) {
+                    processRecruitmentBonusNodes(wn2, retVal);
                 } else if (wn2.getNodeName().equalsIgnoreCase("commandSkillsModifier")
-                      // <50.04 compatibility handler
-                      || wn2.getNodeName().equalsIgnoreCase("tacticsMod")) {
+                                 // <50.04 compatibility handler
+                                 || wn2.getNodeName().equalsIgnoreCase("tacticsMod")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
                         retVal.commandSkillsModifier[i] = Integer.parseInt(values[i]);
@@ -268,5 +327,38 @@ public class RandomSkillPreferences {
         logger.debug("Load Random Skill Preferences Complete!");
 
         return retVal;
+    }
+
+    /**
+     * Processes XML nodes containing recruitment bonus information and populates the random skill preferences.
+     *
+     * <p>This method parses child nodes where each node name represents a {@link PersonnelRole} enum value and
+     * the node's text content represents the bonus value as an integer. Each parsed role-bonus pair is added into the
+     * specified {@link RandomSkillPreferences} object. If parsing fails for any node, an error is logged.</p>
+     *
+     * @param node             The parent XML node containing recruitment bonus child nodes
+     * @param skillPreferences The {@link RandomSkillPreferences} object to populate with recruitment bonuses
+     */
+    private static void processRecruitmentBonusNodes(Node node, RandomSkillPreferences skillPreferences) {
+        if (!node.hasChildNodes()) {
+            return;
+        }
+
+        final NodeList nodes = node.getChildNodes();
+        for (int j = 0; j < nodes.getLength(); j++) {
+            final Node workingNode = nodes.item(j);
+            if (workingNode.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            String nodeName = workingNode.getNodeName().trim();
+            String nodeValue = workingNode.getTextContent().trim();
+
+            try {
+                skillPreferences.addRecruitmentBonus(PersonnelRole.valueOf(nodeName), Integer.parseInt(nodeValue));
+            } catch (Exception ex) {
+                logger.error(ex, "Failed to process recruitment bonus node: {}, {}", nodeName, nodeValue);
+            }
+        }
     }
 }
