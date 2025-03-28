@@ -27,12 +27,13 @@
  */
 package mekhq.campaign.personnel;
 
-import static java.lang.Math.ceil;
+import static java.lang.Math.round;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.List;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
@@ -91,14 +92,22 @@ public class SkillDeprecationTool {
      * @param person the {@link Person} to check for deprecated skills
      */
     private void checkForDeprecatedSkills(Person person) {
-        final Skills skills = person.getSkills();
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
+        final double xpCostMultiplier = campaignOptions.getXpCostMultiplier();
+
+        final boolean isUseIntelligenceMultiplier = campaignOptions.isUseIntelligenceXpMultiplier();
+        final double intelligenceMultiplier = person.getIntelligenceXpCostMultiplier(isUseIntelligenceMultiplier);
+
+        final Skills skills = person.getSkills();
         for (SkillType skillType : DEPRECATED_SKILLS) {
             final String skillName = skillType.getName();
             if (skills.hasSkill(skillName)) {
                 int refundValue = getRefundValue(skills, skillType, skillName);
-                double intelligenceMultiplier = person.getIntelligenceXpCostMultiplier(campaign.getCampaignOptions());
-                refundValue = (int) ceil(refundValue * intelligenceMultiplier);
+
+                // Intelligence cost changes should always take place before global changes
+                refundValue = (int) round(refundValue * intelligenceMultiplier);
+                refundValue = (int) round(refundValue * xpCostMultiplier);
 
                 triggerDialog(skills, skillName, refundValue);
             }
