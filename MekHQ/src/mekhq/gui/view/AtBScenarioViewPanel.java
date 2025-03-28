@@ -28,8 +28,34 @@
  */
 package mekhq.gui.view;
 
+import static megamek.common.Entity.getEntityMajorTypeName;
+
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import java.util.Vector;
+import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
+
 import megamek.client.ui.dialogs.BotConfigDialog;
 import megamek.client.ui.swing.UnitEditorDialog;
+import megamek.common.Entity;
 import megamek.common.IStartingPositions;
 import megamek.common.annotations.Nullable;
 import megamek.common.planetaryconditions.Atmosphere;
@@ -40,21 +66,14 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
-import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForceStub;
+import mekhq.campaign.mission.Loot;
+import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.gui.baseComponents.JScrollablePanel;
-
-import javax.swing.*;
-import javax.swing.event.MouseInputAdapter;
-import javax.swing.event.TreeModelListener;
-import javax.swing.tree.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemListener;
-import java.awt.event.MouseEvent;
-import java.text.DecimalFormat;
-import java.util.List;
-import java.util.*;
 
 /**
  * @author Neoancient
@@ -177,9 +196,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         txtReport.setEditable(false);
         txtReport.setLineWrap(true);
         txtReport.setWrapStyleWord(true);
-        txtReport.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("After-Action Report"),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
+        txtReport.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("After-Action Report"),
+              BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
@@ -193,7 +211,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
     private void fillStats() {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ScenarioViewPanel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         lblStatus = new JLabel();
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -253,14 +271,44 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             panStats.add(tree, gridBagConstraints);
         }
 
+        boolean isBlindDrop = campaign.getGameOptions().getOption("blind_drop").booleanValue();
+        boolean isTrueBlindDrop = campaign.getGameOptions().getOption("real_blind_drop").booleanValue();
+
         for (int i = 0; i < botStubs.size(); i++) {
-            if (null == botStubs.get(i)) {
+            BotForceStub botStub = botStubs.get(i);
+            if (botStub == null) {
                 continue;
             }
 
-            DefaultMutableTreeNode top = new DefaultMutableTreeNode(botStubs.get(i).getName());
-            for (String en : botStubs.get(i).getEntityList()) {
-                top.add(new DefaultMutableTreeNode(en));
+            int team = botStub.getTeam();
+            DefaultMutableTreeNode top = new DefaultMutableTreeNode(botStub.getName());
+            List<String> allEntries = botStub.getEntityList();
+            for (String entry : allEntries) {
+                if ((team != 1) && isTrueBlindDrop) {
+                    continue;
+                }
+
+                if ((team != 1) && isBlindDrop) {
+                    int unitIndex = allEntries.indexOf(entry);
+                    Entity entity = scenario.getBotForce(i).getFullEntityList(campaign).get(unitIndex);
+
+                    if (entity == null) {
+                        String label = "???";
+                        top.add(new DefaultMutableTreeNode(label));
+                        continue;
+                    }
+
+                    String weightClass = entity.getWeightClassName();
+                    long entityType = entity.getEntityType();
+                    String unitType = getEntityMajorTypeName(entityType);
+
+                    String label = weightClass + ' ' + unitType;
+                    top.add(new DefaultMutableTreeNode(label));
+                    continue;
+                }
+
+                top.add(new DefaultMutableTreeNode(entry));
+
             }
             JTree tree = new JTree(top);
             tree.collapsePath(new TreePath(top));
@@ -315,7 +363,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 for (int forceID : scenario.getForceIDs()) {
                     forceBuilder.append(campaign.getForce(forceID).getFullName());
                     forceBuilder.append("<br/>");
-                    ScenarioForceTemplate template = ((AtBDynamicScenario) scenario).getPlayerForceTemplates().get(forceID);
+                    ScenarioForceTemplate template = ((AtBDynamicScenario) scenario).getPlayerForceTemplates()
+                                                           .get(forceID);
                     if (template != null && template.getActualDeploymentZone() >= 0) {
                         forceBuilder.append("Deploy: ");
                         forceBuilder.append(IStartingPositions.START_LOCATION_NAMES[template.getActualDeploymentZone()]);
@@ -360,8 +409,9 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
         if (scenario.getStatus().isCurrent()) {
             btnReroll = new JButton(scenario.getRerollsRemaining() +
-                    " Reroll" + ((scenario.getRerollsRemaining() == 1)?"":"s") +
-                    " Remaining");
+                                          " Reroll" +
+                                          ((scenario.getRerollsRemaining() == 1) ? "" : "s") +
+                                          " Remaining");
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y++;
             gridBagConstraints.gridwidth = 1;
@@ -475,9 +525,11 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
     /**
      * Worker function that generates UI elements appropriate for planet-side scenarios
+     *
      * @param gridBagConstraints Current grid bag constraints in use
-     * @param resourceMap Text resource
-     * @param y current row in the parent UI element
+     * @param resourceMap        Text resource
+     * @param y                  current row in the parent UI element
+     *
      * @return the row at which we wind up after doing all this
      */
     private int fillPlanetSideStats(GridBagConstraints gridBagConstraints, ResourceBundle resourceMap, int y) {
@@ -702,9 +754,11 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
     /**
      * Worker function that generates UI elements appropriate for space scenarios
+     *
      * @param gridBagConstraints Current grid bag constraints in use
-     * @param resourceMap Text resource
-     * @param y current row in the parent UI element
+     * @param resourceMap        Text resource
+     * @param y                  current row in the parent UI element
+     *
      * @return the row at which we wind up after doing all this
      */
     private int fillSpaceStats(GridBagConstraints gridBagConstraints, ResourceBundle resourceMap, int y) {
@@ -745,9 +799,11 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
     /**
      * Worker function that generates UI elements appropriate for low atmosphere scenarios
+     *
      * @param gridBagConstraints Current grid bag constraints in use
-     * @param resourceMap Text resource
-     * @param y current row in the parent UI element
+     * @param resourceMap        Text resource
+     * @param y                  current row in the parent UI element
+     *
      * @return the row at which we wind up after doing all this
      */
     private int fillLowAtmoStats(GridBagConstraints gridBagConstraints, ResourceBundle resourceMap, int y) {
@@ -802,8 +858,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
          */
         for (int i = 0; i < REROLL_NUM; i++) {
             if (chkReroll[i] != null) {
-                chkReroll[i].setEnabled(checkedBoxes < scenario.getRerollsRemaining() ||
-                        chkReroll[i].isSelected());
+                chkReroll[i].setEnabled(checkedBoxes < scenario.getRerollsRemaining() || chkReroll[i].isSelected());
             }
         }
     }
@@ -853,8 +908,9 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             lblEMIDesc.setText(emiDesc);
         }
         btnReroll.setText(scenario.getRerollsRemaining() +
-                " Reroll" + ((scenario.getRerollsRemaining() == 1)?"":"s") +
-                " Remaining");
+                                " Reroll" +
+                                ((scenario.getRerollsRemaining() == 1) ? "" : "s") +
+                                " Remaining");
         btnReroll.setEnabled(scenario.getRerollsRemaining() > 0);
         countRerollBoxes();
     }
@@ -889,8 +945,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
         @Override
         public boolean isLeaf(final @Nullable Object node) {
-            return (node instanceof UnitStub)
-                    || ((node instanceof ForceStub) && ((ForceStub) node).getAllChildren().isEmpty());
+            return (node instanceof UnitStub) ||
+                         ((node instanceof ForceStub) && ((ForceStub) node).getAllChildren().isEmpty());
         }
 
         @Override
@@ -919,9 +975,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         }
 
         @Override
-        public Component getTreeCellRendererComponent(final JTree tree, final Object value,
-                                                      final boolean selected, final boolean expanded,
-                                                      final boolean leaf, final int row,
+        public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean selected,
+                                                      final boolean expanded, final boolean leaf, final int row,
                                                       final boolean hasFocus) {
             super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
             setIcon(getIcon(value));
@@ -954,9 +1009,9 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
             if (command.equalsIgnoreCase("CONFIG_BOT")) {
                 BotConfigDialog pbd = new BotConfigDialog(frame,
-                        null,
-                        scenario.getBotForce(forceIndex).getBehaviorSettings(),
-                        null);
+                      null,
+                      scenario.getBotForce(forceIndex).getBehaviorSettings(),
+                      null);
                 pbd.setBotName(scenario.getBotForce(forceIndex).getName());
                 pbd.setVisible(true);
                 if (!pbd.getResult().isCancelled()) {
@@ -967,7 +1022,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 if ((tree.getSelectionCount() > 0) && (tree.getSelectionRows() != null)) {
                     int unitIndex = tree.getSelectionRows()[0] - 1;
                     UnitEditorDialog editorDialog = new UnitEditorDialog(frame,
-                            scenario.getBotForce(this.forceIndex).getFullEntityList(campaign).get(unitIndex));
+                          scenario.getBotForce(this.forceIndex).getFullEntityList(campaign).get(unitIndex));
                     editorDialog.setVisible(true);
                 }
             }
@@ -984,6 +1039,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         }
 
         private void maybeShowPopup(MouseEvent e) {
+            final boolean isBlindDrop = campaign.getGameOptions().getOption("blind_drop").booleanValue();
             final JPopupMenu popup = new JPopupMenu();
             if (e.isPopupTrigger()) {
                 final TreePath path = tree.getPathForLocation(e.getX(), e.getY());
@@ -992,8 +1048,10 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 }
 
                 JMenuItem menuItem;
-                if ((path.getPathCount() > 1) && (tree.getSelectionRows() != null)
-                    && (tree.getSelectionRows()[0] != 0)) {
+                if ((path.getPathCount() > 1) &&
+                          (tree.getSelectionRows() != null) &&
+                          (tree.getSelectionRows()[0] != 0) &&
+                          !isBlindDrop) {
                     menuItem = new JMenuItem("Edit Unit...");
                     menuItem.setActionCommand("EDIT_UNIT");
                     menuItem.addActionListener(this);

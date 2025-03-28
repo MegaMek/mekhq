@@ -167,7 +167,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JRadioButton optionSaveWeekly;
     private JRadioButton optionSaveMonthly;
     private JRadioButton optionSaveYearly;
-    private JCheckBox checkSaveBeforeMissions;
+    private JCheckBox checkSaveBeforeScenarios;
+    private JCheckBox checkSaveBeforeContractEnd;
     private JSpinner spinnerSavedGamesCount;
     // endregion Autosave
 
@@ -857,8 +858,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         saveFrequencyGroup.add(optionSaveMonthly);
         saveFrequencyGroup.add(optionSaveYearly);
 
-        checkSaveBeforeMissions = new JCheckBox(resources.getString("checkSaveBeforeMissions.text"));
-        checkSaveBeforeMissions.setMnemonic(KeyEvent.VK_S);
+        checkSaveBeforeScenarios = new JCheckBox(resources.getString("checkSaveBeforeScenarios.text"));
+        checkSaveBeforeScenarios.setMnemonic(KeyEvent.VK_S);
+
+        checkSaveBeforeContractEnd = new JCheckBox(resources.getString("checkSaveBeforeMissionEnd.text"));
 
         JLabel labelSavedGamesCount = new JLabel(resources.getString("labelSavedGamesCount.text"));
         spinnerSavedGamesCount = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
@@ -878,7 +881,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(optionSaveWeekly)
                                       .addComponent(optionSaveMonthly)
                                       .addComponent(optionSaveYearly)
-                                      .addComponent(checkSaveBeforeMissions)
+                                      .addComponent(checkSaveBeforeScenarios)
+                                      .addComponent(checkSaveBeforeContractEnd)
                                       .addGroup(layout.createParallelGroup(Alignment.LEADING)
                                                       .addComponent(labelSavedGamesCount)
                                                       .addComponent(spinnerSavedGamesCount,
@@ -892,7 +896,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(optionSaveWeekly)
                                         .addComponent(optionSaveMonthly)
                                         .addComponent(optionSaveYearly)
-                                        .addComponent(checkSaveBeforeMissions)
+                                        .addComponent(checkSaveBeforeScenarios)
+                                        .addComponent(checkSaveBeforeContractEnd)
                                         .addGroup(layout.createSequentialGroup()
                                                         .addComponent(labelSavedGamesCount)
                                                         .addComponent(spinnerSavedGamesCount)));
@@ -1416,7 +1421,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setAutosaveWeeklyValue(optionSaveWeekly.isSelected());
         MekHQ.getMHQOptions().setAutosaveMonthlyValue(optionSaveMonthly.isSelected());
         MekHQ.getMHQOptions().setAutosaveYearlyValue(optionSaveYearly.isSelected());
-        MekHQ.getMHQOptions().setAutosaveBeforeMissionsValue(checkSaveBeforeMissions.isSelected());
+        MekHQ.getMHQOptions().setAutosaveBeforeScenariosValue(checkSaveBeforeScenarios.isSelected());
+        MekHQ.getMHQOptions().setAutosaveBeforeMissionEndValue(checkSaveBeforeContractEnd.isSelected());
         MekHQ.getMHQOptions().setMaximumNumberOfAutosavesValue((Integer) spinnerSavedGamesCount.getValue());
 
         MekHQ.getMHQOptions().setNewDayAstechPoolFill(chkNewDayAstechPoolFill.isSelected());
@@ -1574,13 +1580,14 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionSaveWeekly.setSelected(MekHQ.getMHQOptions().getAutosaveWeeklyValue());
         optionSaveMonthly.setSelected(MekHQ.getMHQOptions().getAutosaveMonthlyValue());
         optionSaveYearly.setSelected(MekHQ.getMHQOptions().getAutosaveYearlyValue());
-        checkSaveBeforeMissions.setSelected(MekHQ.getMHQOptions().getAutosaveBeforeMissionsValue());
+        checkSaveBeforeScenarios.setSelected(MekHQ.getMHQOptions().getAutosaveBeforeScenariosValue());
+        checkSaveBeforeContractEnd.setSelected(MekHQ.getMHQOptions().getAutosaveBeforeMissionEndValue());
         spinnerSavedGamesCount.setValue(MekHQ.getMHQOptions().getMaximumNumberOfAutosavesValue());
 
         chkNewDayAstechPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayAstechPoolFill());
         chkNewDayMedicPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayMedicPoolFill());
         chkNewDayMRMS.setSelected(MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments());
-        chkNewDayOptimizeMedicalAssignments.setSelected(MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments());
+        chkNewDayOptimizeMedicalAssignments.setSelected(MekHQ.getMHQOptions().getNewDayMRMS());
         if (chkNewDayForceIconOperationalStatus.isSelected() !=
                   MekHQ.getMHQOptions().getNewDayForceIconOperationalStatus()) {
             chkNewDayForceIconOperationalStatus.doClick();

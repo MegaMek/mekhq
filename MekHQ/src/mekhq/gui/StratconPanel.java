@@ -27,20 +27,12 @@
  */
 package mekhq.gui;
 
-import megamek.common.util.ImageUtil;
-import megamek.logging.MMLogger;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.stratcon.*;
-import mekhq.campaign.stratcon.StratconBiomeManifest.ImageType;
-import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
-import mekhq.gui.stratcon.StratconScenarioWizard;
-import mekhq.gui.stratcon.TrackForceAssignmentUI;
+import static java.awt.Color.BLUE;
+import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
+import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
+import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.UNRESOLVED;
+import static mekhq.utilities.ImageUtilities.addTintToBufferedImage;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -51,15 +43,36 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import javax.imageio.ImageIO;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
-import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
-import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
-import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.UNRESOLVED;
+import megamek.common.util.ImageUtil;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.stratcon.StratconBiomeManifest;
+import mekhq.campaign.stratcon.StratconBiomeManifest.ImageType;
+import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratcon.StratconCoords;
+import mekhq.campaign.stratcon.StratconFacility;
+import mekhq.campaign.stratcon.StratconFacilityFactory;
+import mekhq.campaign.stratcon.StratconRulesManager;
+import mekhq.campaign.stratcon.StratconScenario;
+import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
+import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.gui.stratcon.StratconScenarioWizard;
+import mekhq.gui.stratcon.TrackForceAssignmentUI;
 
 /**
  * This panel handles AtB-Stratcon GUI interactions with a specific scenario
@@ -333,7 +346,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         g2D.setTransform(initialTransform);
         if (clickedPoint != null) {
-            g2D.setColor(Color.BLUE);
+            g2D.setColor(BLUE);
             g2D.drawRect((int) clickedPoint.getX(), (int) clickedPoint.getY(), 2, 2);
         }
     }
@@ -444,6 +457,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                         BufferedImage fogOfWarLayerImage = getImage(StratconBiomeManifest.FOG_OF_WAR,
                                 ImageType.TerrainTile);
                         if (fogOfWarLayerImage != null) {
+                            fogOfWarLayerImage = addTintToBufferedImage(fogOfWarLayerImage, BLUE);
                             g2D.drawImage(fogOfWarLayerImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
                         }
 
