@@ -387,8 +387,6 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void completeMission() {
-        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI", MekHQ.getMHQOptions().getLocale());
-
         final Mission mission = comboMission.getSelectedItem();
 
         if (mission == null) {
@@ -400,6 +398,8 @@ public final class BriefingTab extends CampaignGuiTab {
                   JOptionPane.WARNING_MESSAGE);
             return;
         }
+
+        getCampaign().getApp().getAutosaveService().requestBeforeMissionEndAutosave(getCampaign());
 
         final CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame());
         if (!cmd.showDialog().isConfirmed()) {
