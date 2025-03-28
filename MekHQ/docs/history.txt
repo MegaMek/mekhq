@@ -61,6 +61,28 @@ MEKHQ VERSION HISTORY:
 + Fix #6434: Corrected Briefing Room Combat Team Counter
 + PR #6442: Added Additional Error Tracking to Scenario Resolution in Attempt to Identify Bug Root Cause
 + Fix #6399: Load Entity in Specific Transporter when Recalculating Free Space
++ Fix #4353: Improved StratCon Fog of War Clarity
++ Fix #4506: Added Optional Autosave at Mission/Contract End
++ Fix #6424: Refactored Command Rights Calculation For Contracts
++ Fix #6380: Fixed Infirmary Assign/Unassign Interactions
++ PR #6441: Added Administration Curriculum to Various Tech Qualifications
++ PR #6445: Fixed "Every Monday is a Gray Monday" Bug
++ PR #6447: Updated Scenario and Deployment Labels in StratCon
++ PR #6448: Disabled StratCon Debug Mouse-Click Visualization
++ PR #6450: Added Dynamic Contract Difficulty Option; Fixed Clan OpFor Skill Level Generation
++ PR #6452: Company Generator & Contract Market Now Trigger On New Campaign; Adjusted StratCon Promo Trigger
++ PR #6453: Increased the Number of Contracts Generated for New Campaigns
++ PR #6456: Fixed Daily Medical Optimization Option
++ PR #6457: Added the GM Ability to Inflict Random Advanced Medical Injuries
++ PR #6458: Enforced Blind Drop Settings in Briefing Room
++ PR #6461: Added Early Arrival Dialog for Contracts
++ PR #6462: Updated Campaign Options UI with New Option Indicators
++ PR #6464: Enhanced Deprecation Skill Handling
++ PR #6467: Fixed Skill Value Out-Of-Range Errors in Dialogs
++ PR #6468: Refactored Intelligence XP Costs and Skill Calculations; Blocked Illegal Skill Progression
++ PR #6471: Updated Combat Team Training Duration and Documentation
++ PR #6472: Added Helper Methods to PersonnelTableMouseAdapter for Cleaner Campaign and Frame Access
++ PR #6474: Removed Pending Scenario Check When Completing Missions/Contracts
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
