@@ -239,7 +239,7 @@ public class TrainingCombatTeams {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final String EDUCATION_STRING = "TRAINING_COMBAT_TEAM"; // Never change this
         final int WEEK_DURATION = 7; // days
-        final int EDUCATION_TIME_MULTIPLIER = 70; // days
+        final int EDUCATION_TIME_MULTIPLIER = 35; // days
 
         if (!Objects.equals(trainee.getEduAcademyName(), EDUCATION_STRING)) {
             trainee.setEduAcademyName(EDUCATION_STRING);
