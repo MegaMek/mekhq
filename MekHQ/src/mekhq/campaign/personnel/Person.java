@@ -2354,7 +2354,7 @@ public class Person {
             }
 
             if (eduHighestEducation != EducationLevel.EARLY_CHILDHOOD) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduHighestEducation", eduHighestEducation.toString());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduHighestEducation", eduHighestEducation.name());
             }
 
             if (eduJourneyTime != 0) {
@@ -2760,7 +2760,7 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitId")) {
                     person.originalUnitId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduHighestEducation")) {
-                    person.eduHighestEducation = EducationLevel.parseFromString(wn2.getTextContent());
+                    person.eduHighestEducation = EducationLevel.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduJourneyTime")) {
                     person.eduJourneyTime = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravel")) {
