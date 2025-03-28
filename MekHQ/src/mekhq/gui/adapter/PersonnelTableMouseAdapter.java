@@ -51,6 +51,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -238,6 +239,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         this.gui = gui;
         this.personnelTable = personnelTable;
         this.personnelModel = personnelModel;
+    }
+
+    private JFrame getFrame() {
+        return gui.getFrame();
     }
 
     private Campaign getCampaign() {
@@ -882,14 +887,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_EDIT: {
                 for (Person person : people) {
-                    CustomizePersonDialog npd = new CustomizePersonDialog(gui.getFrame(), true, person, getCampaign());
+                    CustomizePersonDialog npd = new CustomizePersonDialog(getFrame(), true, person, getCampaign());
                     npd.setVisible(true);
                     getCampaign().personUpdated(selectedPerson);
                 }
                 break;
             }
             case CMD_EDIT_HITS: {
-                EditPersonnelHitsDialog ephd = new EditPersonnelHitsDialog(gui.getFrame(), true, selectedPerson);
+                EditPersonnelHitsDialog ephd = new EditPersonnelHitsDialog(getFrame(), true, selectedPerson);
                 ephd.setVisible(true);
                 if (0 == selectedPerson.getHits()) {
                     selectedPerson.setDoctorId(null, getCampaignOptions().getNaturalHealingWaitingPeriod());
@@ -898,7 +903,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_EDIT_PORTRAIT: {
-                final PortraitChooserDialog portraitDialog = new PortraitChooserDialog(gui.getFrame(),
+                final PortraitChooserDialog portraitDialog = new PortraitChooserDialog(getFrame(),
                       selectedPerson.getPortrait());
                 if (portraitDialog.showDialog().isConfirmed()) {
                     for (Person person : people) {
@@ -911,7 +916,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_EDIT_BIOGRAPHY: {
-                MarkdownEditorDialog tad = new MarkdownEditorDialog(gui.getFrame(),
+                MarkdownEditorDialog tad = new MarkdownEditorDialog(getFrame(),
                       true,
                       resources.getString("editBiography.text"),
                       selectedPerson.getBiography());
@@ -930,7 +935,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADD_XP: {
-                PopupValueChoiceDialog pvcda = new PopupValueChoiceDialog(gui.getFrame(),
+                PopupValueChoiceDialog pvcda = new PopupValueChoiceDialog(getFrame(),
                       true,
                       resources.getString("xp.text"),
                       1,
@@ -951,7 +956,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_SET_XP: {
-                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(gui.getFrame(),
+                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(),
                       true,
                       resources.getString("xp.text"),
                       selectedPerson.getXP(),
@@ -969,10 +974,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_BUY_EDGE: {
                 int baseCost = getCampaignOptions().getEdgeCost();
-                double costMultiplier = getCampaignOptions().getXpCostMultiplier();
+                final double xpCostMultiplier = getCampaignOptions().getXpCostMultiplier();
+                final boolean isUseIntelligenceMultiplier = getCampaignOptions().isUseIntelligenceXpMultiplier();
                 for (Person person : people) {
-                    double intelligenceCostMultiplier = person.getIntelligenceXpCostMultiplier(getCampaignOptions());
-                    int cost = (int) round(baseCost * intelligenceCostMultiplier * costMultiplier);
+                    double intelligenceXpCostMultiplier = person.getIntelligenceXpCostMultiplier(
+                          isUseIntelligenceMultiplier);
+
+                    // Intelligence cost changes should always take place before global changes
+                    int cost = (int) round(baseCost * intelligenceXpCostMultiplier);
+                    cost = (int) round(cost * xpCostMultiplier);
 
                     selectedPerson.spendXP(cost);
                     person.changeEdge(1);
@@ -987,7 +997,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_SET_EDGE: {
-                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(gui.getFrame(),
+                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(),
                       true,
                       resources.getString("edge.text"),
                       selectedPerson.getEdge(),
@@ -1011,14 +1021,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 AddOrEditKillEntryDialog nkd;
                 Unit unit = selectedPerson.getUnit();
                 if (people.length > 1) {
-                    nkd = new AddOrEditKillEntryDialog(gui.getFrame(),
+                    nkd = new AddOrEditKillEntryDialog(getFrame(),
                           true,
                           null,
                           (unit != null) ? unit.getName() : resources.getString("bareHands.text"),
                           getCampaign().getLocalDate(),
                           getCampaign());
                 } else {
-                    nkd = new AddOrEditKillEntryDialog(gui.getFrame(),
+                    nkd = new AddOrEditKillEntryDialog(getFrame(),
                           true,
                           selectedPerson.getId(),
                           (unit != null) ? unit.getName() : resources.getString("bareHands.text"),
@@ -1043,13 +1053,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_EDIT_KILL_LOG: {
-                EditKillLogDialog ekld = new EditKillLogDialog(gui.getFrame(), true, getCampaign(), selectedPerson);
+                EditKillLogDialog ekld = new EditKillLogDialog(getFrame(), true, getCampaign(), selectedPerson);
                 ekld.setVisible(true);
                 MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                 break;
             }
             case CMD_EDIT_PERSONNEL_LOG: {
-                EditPersonnelLogDialog epld = new EditPersonnelLogDialog(gui.getFrame(),
+                EditPersonnelLogDialog epld = new EditPersonnelLogDialog(getFrame(),
                       true,
                       getCampaign(),
                       selectedPerson);
@@ -1058,7 +1068,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADD_LOG_ENTRY: {
-                final AddOrEditPersonnelEntryDialog addPersonnelLogDialog = new AddOrEditPersonnelEntryDialog(gui.getFrame(),
+                final AddOrEditPersonnelEntryDialog addPersonnelLogDialog = new AddOrEditPersonnelEntryDialog(getFrame(),
                       null,
                       getCampaign().getLocalDate());
                 if (addPersonnelLogDialog.showDialog().isConfirmed()) {
@@ -1070,16 +1080,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_EDIT_SCENARIO_LOG: {
-                EditScenarioLogDialog emld = new EditScenarioLogDialog(gui.getFrame(),
-                      true,
-                      getCampaign(),
-                      selectedPerson);
+                EditScenarioLogDialog emld = new EditScenarioLogDialog(getFrame(), true, getCampaign(), selectedPerson);
                 emld.setVisible(true);
                 MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                 break;
             }
             case CMD_ADD_SCENARIO_ENTRY: {
-                AddOrEditScenarioEntryDialog addScenarioDialog = new AddOrEditScenarioEntryDialog(gui.getFrame(),
+                AddOrEditScenarioEntryDialog addScenarioDialog = new AddOrEditScenarioEntryDialog(getFrame(),
                       true,
                       getCampaign().getLocalDate());
                 addScenarioDialog.setVisible(true);
@@ -1093,7 +1100,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_CALLSIGN: {
-                String s = (String) JOptionPane.showInputDialog(gui.getFrame(),
+                String s = (String) JOptionPane.showInputDialog(getFrame(),
                       resources.getString("enterNewCallsign.text"),
                       resources.getString("editCallsign.text"),
                       JOptionPane.PLAIN_MESSAGE,
@@ -1139,7 +1146,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_EDIT_INJURIES: {
-                EditPersonnelInjuriesDialog epid = new EditPersonnelInjuriesDialog(gui.getFrame(),
+                EditPersonnelInjuriesDialog epid = new EditPersonnelInjuriesDialog(getFrame(),
                       true,
                       getCampaign(),
                       selectedPerson);
@@ -1150,7 +1157,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_EDIT_SALARY: {
                 int originalSalary = selectedPerson.getSalary(getCampaign()).getAmount().intValue();
 
-                PopupValueChoiceDialog salaryDialog = new PopupValueChoiceDialog(gui.getFrame(),
+                PopupValueChoiceDialog salaryDialog = new PopupValueChoiceDialog(getFrame(),
                       true,
                       resources.getString("changeSalary.text"),
                       MathUtility.clamp(originalSalary, -1, 1000000000),
@@ -1173,7 +1180,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_GIVE_PAYMENT: {
-                PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(gui.getFrame(),
+                PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(getFrame(),
                       true,
                       resources.getString("givePayment.title"),
                       1000,
@@ -1457,7 +1464,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     private void loadGMToolsForPerson(Person person) {
-        GMToolsDialog gmToolsDialog = new GMToolsDialog(gui.getFrame(), gui, person);
+        GMToolsDialog gmToolsDialog = new GMToolsDialog(getFrame(), gui, person);
         gmToolsDialog.setVisible(true);
         getCampaign().personUpdated(person);
     }
