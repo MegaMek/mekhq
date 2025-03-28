@@ -27,9 +27,11 @@
  */
 package mekhq.gui;
 
+import static java.awt.Color.BLUE;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
 import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
 import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.UNRESOLVED;
+import static mekhq.utilities.ImageUtilities.addTintToBufferedImage;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -346,7 +348,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         // Enable this code to get a little blue dot wherever you click on the StratCon map. This is useful to
         // confirm whether mouse-clicks are being recognized.
         //        if (clickedPoint != null) {
-        //            g2D.setColor(Color.BLUE);
+        //            g2D.setColor(BLUE);
         //            g2D.drawRect((int) clickedPoint.getX(), (int) clickedPoint.getY(), 2, 2);
         //        }
     }
@@ -457,6 +459,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                         BufferedImage fogOfWarLayerImage = getImage(StratconBiomeManifest.FOG_OF_WAR,
                                 ImageType.TerrainTile);
                         if (fogOfWarLayerImage != null) {
+                            fogOfWarLayerImage = addTintToBufferedImage(fogOfWarLayerImage, BLUE);
                             g2D.drawImage(fogOfWarLayerImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
                         }
 

@@ -28,6 +28,14 @@
 
 package mekhq.campaign.unit;
 
+import static mekhq.campaign.enums.CampaignTransportType.TOW_TRANSPORT;
+
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.Vector;
+import java.util.stream.Collectors;
+
 import megamek.common.Entity;
 import megamek.common.Tank;
 import megamek.common.TankTrailerHitch;
@@ -37,11 +45,6 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.enums.TransporterType;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static mekhq.campaign.enums.CampaignTransportType.TOW_TRANSPORT;
 
 /**
  * Tracks what units this tractor is towing, and its current capacity for towing more units if it
@@ -59,7 +62,7 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary{
     private static final MMLogger logger = MMLogger.create(TowTransportedUnitsSummary.class);
 
     public TowTransportedUnitsSummary(Unit transport) {
-        super(transport);
+        super(transport, TOW_TRANSPORT);
     }
 
     /**

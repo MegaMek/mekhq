@@ -28,53 +28,46 @@
  */
 package mekhq.campaign.personnel;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
+import java.io.PrintWriter;
+
 import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
+import mekhq.campaign.randomEvents.personalities.enums.Intelligence;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
-
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-
 /**
- * As ov v0.1.9, we will be tracking a group of skills on the person. These
- * skills will define personnel rather than subtypes wrapped around pilots and
- * teams. This will allow for considerably more flexibility in the kinds of
- * personnel available.
+ * As ov v0.1.9, we will be tracking a group of skills on the person. These skills will define personnel rather than
+ * subtypes wrapped around pilots and teams. This will allow for considerably more flexibility in the kinds of personnel
+ * available.
  * <p>
  * Four important characteristics will determine how each skill works
- *
- * level - this is the level of the skill. By default this will go from 0 to 10,
- * but the max will be customizable. These won't necessarily correspond to named
- * levels (e.g. Green, Elite).
- *
- * By assigning skill costs of 0 to some levels, these can basically be skipped
- * and by assigning skill costs of -1, they can be made inaccessible.
- *
- * bonus - this is a bonus that the given person has for this skill which is
- * separable from level. Primarily this allows for rpg-style attribute bonuses
- * to come into play.
- *
- * target - this is the baseline target number for the skill when level and
- * bonus are zero.
- *
- * countUp - this is a boolean that defines whether this skill's target is a
- * "roll greater than or equal to" (false) or an rpg-style bonus to a roll
- * (true)
- *
+ * <p>
+ * level - this is the level of the skill. By default this will go from 0 to 10, but the max will be customizable. These
+ * won't necessarily correspond to named levels (e.g. Green, Elite).
+ * <p>
+ * By assigning skill costs of 0 to some levels, these can basically be skipped and by assigning skill costs of -1, they
+ * can be made inaccessible.
+ * <p>
+ * bonus - this is a bonus that the given person has for this skill which is separable from level. Primarily this allows
+ * for rpg-style attribute bonuses to come into play.
+ * <p>
+ * target - this is the baseline target number for the skill when level and bonus are zero.
+ * <p>
+ * countUp - this is a boolean that defines whether this skill's target is a "roll greater than or equal to" (false) or
+ * an rpg-style bonus to a roll (true)
+ * <p>
  * The actual target number for a skill is given by
- *
- * countUp: target + lvl + bonus
- * !countUp: target - level - bonus
- *
- * by clever manipulation of these values and skill costs in campaignOptions,
- * players should be able to recreate any of the rpg versions or their own
- * homebrew system. The default setup will follow the core rule books (not
- * aToW).
+ * <p>
+ * countUp: target + lvl + bonus !countUp: target - level - bonus
+ * <p>
+ * by clever manipulation of these values and skill costs in campaignOptions, players should be able to recreate any of
+ * the rpg versions or their own homebrew system. The default setup will follow the core rule books (not aToW).
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
@@ -122,15 +115,39 @@ public class Skill {
     }
 
     /**
+     * @return {@code true} if the progression type is "count up", {@code false} otherwise.
+     */
+    private boolean isCountUp() {
+        return type.countUp();
+    }
+
+    /**
+     * Evaluates whether the current skill or attribute level is eligible for improvement based on progression type,
+     * current value, and min-max limitations.
+     *
+     * <p>For a "count up" progression (increasing value), the improvement is valid only if the calculated skill value
+     * is less than the defined maximum value. In contrast, for a "count down" progression (decreasing value), the
+     * improvement is valid only if the calculated skill value is greater than the defined minimum value.</p>
+     *
+     * @return {@code true} if the current state satisfies the eligibility criteria for legal improvement based on the
+     *       progression type; {@code false} otherwise.
+     */
+    public boolean isImprovementLegal() {
+        if (isCountUp()) {
+            return getSkillValue() < COUNT_UP_MAX_VALUE;
+        } else {
+            return getSkillValue() > COUNT_DOWN_MIN_VALUE;
+        }
+    }
+
+    /**
      * Creates a new {@link Skill} from the given experience level and bonus.
      *
      * @param type            The {@link SkillType} name.
-     * @param experienceLevel An experience level (e.g.
-     *                        {@link SkillType#EXP_GREEN}).
+     * @param experienceLevel An experience level (e.g. {@link SkillType#EXP_GREEN}).
      * @param bonus           The bonus for the resulting {@link Skill}.
-     * @return A new {@link Skill} of the appropriate type, with a level based on
-     *         {@code experienceLevel}
-     *         and the bonus.
+     *
+     * @return A new {@link Skill} of the appropriate type, with a level based on {@code experienceLevel} and the bonus.
      */
     public static Skill createFromExperience(String type, int experienceLevel, int bonus) {
         SkillType skillType = SkillType.getType(type);
@@ -142,13 +159,12 @@ public class Skill {
      * Creates a new {@link Skill} with a randomized level.
      *
      * @param type            The {@link SkillType} name.
-     * @param experienceLevel An experience level (e.g.
-     *                        {@link SkillType#EXP_GREEN}).
+     * @param experienceLevel An experience level (e.g. {@link SkillType#EXP_GREEN}).
      * @param bonus           The bonus for the resulting {@link Skill}.
      * @param rollModifier    The roll modifier on a 1D6.
-     * @return A new {@link Skill} of the appropriate type, with a randomized level
-     *         based on
-     *         the experience level and a 1D6 roll.
+     *
+     * @return A new {@link Skill} of the appropriate type, with a randomized level based on the experience level and a
+     *       1D6 roll.
      */
     public static Skill randomizeLevel(String type, int experienceLevel, int bonus, int rollModifier) {
         SkillType skillType = SkillType.getType(type);
@@ -184,11 +200,37 @@ public class Skill {
         return type;
     }
 
+    /**
+     * Calculates the final skill value based on the progression type, the current level, and any applicable bonuses,
+     * while ensuring the value stays within the legal bounds for the skill type.
+     *
+     * <p>For "count up" progression types, the final skill value is capped at the maximum allowed value. For "count
+     * down" progression types, the final skill value is capped at the minimum allowed value.</p>
+     *
+     * @return the final skill value after applying progression rules and limiting it to the legal range.
+     */
     public int getFinalSkillValue() {
-        if (type.countUp()) {
-            return min(COUNT_UP_MAX_VALUE, type.getTarget() + level + bonus);
+        if (isCountUp()) {
+            return min(COUNT_UP_MAX_VALUE, getSkillValue());
         } else {
-            return max(COUNT_DOWN_MIN_VALUE, type.getTarget() - level - bonus);
+            return max(COUNT_DOWN_MIN_VALUE, getSkillValue());
+        }
+    }
+
+    /**
+     * Calculates the raw skill value based on the type's progression rules, level, and bonus.
+     *
+     * <p>For "count up" progression types, the skill value is determined by adding the target value, level, and bonus.
+     * For "count down" progression types, it is determined by subtracting the level and bonus from the target
+     * value.</p>
+     *
+     * @return the calculated raw skill value before applying any boundaries or limits.
+     */
+    private int getSkillValue() {
+        if (isCountUp()) {
+            return type.getTarget() + level + bonus;
+        } else {
+            return type.getTarget() - level - bonus;
         }
     }
 
@@ -214,6 +256,17 @@ public class Skill {
         }
     }
 
+    /**
+     * Calculates the cost required to improve this skill to a higher level.
+     *
+     * <p>This method iterates through skill levels starting from the current level and returns
+     * the cost for the next valid level if it exists.</p>
+     *
+     * <p><b>Usage:</b> For most use cases you probably want to call {@code getCostToImprove(String)} from a
+     * {@link Person} object, as that will factor in things like {@link Intelligence}.</p>
+     *
+     * @return the cost to improve the skill, or 0 if no valid level with a positive cost is found.
+     */
     public int getCostToImprove() {
         int cost = 0;
         int i = 1;
@@ -236,7 +289,7 @@ public class Skill {
 
     @Override
     public String toString() {
-        if (type.countUp()) {
+        if (isCountUp()) {
             return "+" + getFinalSkillValue();
         } else {
             return getFinalSkillValue() + "+";
