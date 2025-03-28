@@ -159,6 +159,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_BUY_EDGE = "EDGE_BUY";
     private static final String CMD_SET_EDGE = "EDGE_SET";
     private static final String CMD_SET_XP = "XP_SET";
+    /**
+     * @deprecated use {@code CMD_ADD_XP} instead
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     private static final String CMD_ADD_1_XP = "XP_ADD_1";
     private static final String CMD_ADD_XP = "XP_ADD";
     private static final String CMD_EDIT_BIOGRAPHY = "BIOGRAPHY";
@@ -928,13 +932,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 if (tad.wasChanged()) {
                     selectedPerson.setBiography(tad.getText());
                     MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
-                }
-                break;
-            }
-            case CMD_ADD_1_XP: {
-                for (Person person : people) {
-                    person.awardXP(getCampaign(), 1);
-                    MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
             }
@@ -3239,11 +3236,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
             }
-
-            menuItem = new JMenuItem(resources.getString("add1XP.text"));
-            menuItem.setActionCommand(CMD_ADD_1_XP);
-            menuItem.addActionListener(this);
-            menu.add(menuItem);
 
             menuItem = new JMenuItem(resources.getString("addXP.text"));
             menuItem.setActionCommand(CMD_ADD_XP);
