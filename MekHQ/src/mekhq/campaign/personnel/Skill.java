@@ -122,25 +122,21 @@ public class Skill {
     }
 
     /**
-     * Determines whether the current skill or attribute level is eligible for improvement based on its type, current
-     * value, and defined rules.
+     * Evaluates whether the current skill or attribute level is eligible for improvement based on progression type,
+     * current value, and min-max limitations.
      *
-     * <p>If the type follows a "count up" progression (increasing value), the improvement is legal only if the
-     * calculated skill value has reached or exceeded the specified maximum value. Conversely, if the type follows a
-     * "count down" progression (decreasing value), the improvement is legal only if the calculated skill value has
-     * reached or dropped below the specified minimum value.</p>
+     * <p>For a "count up" progression (increasing value), the improvement is valid only if the calculated skill value
+     * is less than the defined maximum value. In contrast, for a "count down" progression (decreasing value), the
+     * improvement is valid only if the calculated skill value is greater than the defined minimum value.</p>
      *
-     * <p>The determination is based on the skill's dynamically calculated value, which incorporates the type target,
-     * level, and any applicable bonuses.</p>
-     *
-     * @return {@code true} if the current state meets the conditions for legal improvement according to the progression
-     *       type and calculated skill value, {@code false} otherwise.
+     * @return {@code true} if the current state satisfies the eligibility criteria for legal improvement based on the
+     *       progression type; {@code false} otherwise.
      */
     public boolean isImprovementLegal() {
         if (isCountUp()) {
-            return getSkillValue() >= COUNT_UP_MAX_VALUE;
+            return getSkillValue() < COUNT_UP_MAX_VALUE;
         } else {
-            return getSkillValue() <= COUNT_DOWN_MIN_VALUE;
+            return getSkillValue() > COUNT_DOWN_MIN_VALUE;
         }
     }
 
