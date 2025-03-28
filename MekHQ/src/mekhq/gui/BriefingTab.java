@@ -30,6 +30,7 @@ package mekhq.gui;
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
 import static mekhq.campaign.mission.enums.MissionStatus.PARTIAL;
 import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
+import static mekhq.campaign.mission.enums.ScenarioStatus.REFUSED_ENGAGEMENT;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -391,12 +392,6 @@ public final class BriefingTab extends CampaignGuiTab {
 
         if (mission == null) {
             return;
-        } else if (mission.hasPendingScenarios()) {
-            JOptionPane.showMessageDialog(getFrame(),
-                  "You cannot complete a mission that has pending scenarios",
-                  "Pending Scenarios",
-                  JOptionPane.WARNING_MESSAGE);
-            return;
         }
 
         getCampaign().getApp().getAutosaveService().requestBeforeMissionEndAutosave(getCampaign());
@@ -503,6 +498,11 @@ public final class BriefingTab extends CampaignGuiTab {
             autoAwardsController.PostMissionController(getCampaign(),
                   mission,
                   Objects.equals(String.valueOf(cmd.getStatus()), "Success"));
+        }
+
+        // Get rid of any remaining scenarios
+        for (Scenario scenario : mission.getCurrentScenarios()) {
+            scenario.setStatus(REFUSED_ENGAGEMENT);
         }
 
         final List<Mission> missions = getCampaign().getSortedMissions();
