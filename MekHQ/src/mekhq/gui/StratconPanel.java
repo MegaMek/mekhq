@@ -344,10 +344,12 @@ public class StratconPanel extends JPanel implements ActionListener {
         drawForces(g2D);
 
         g2D.setTransform(initialTransform);
-        if (clickedPoint != null) {
-            g2D.setColor(BLUE);
-            g2D.drawRect((int) clickedPoint.getX(), (int) clickedPoint.getY(), 2, 2);
-        }
+        // Enable this code to get a little blue dot wherever you click on the StratCon map. This is useful to
+        // confirm whether mouse-clicks are being recognized.
+        //        if (clickedPoint != null) {
+        //            g2D.setColor(BLUE);
+        //            g2D.drawRect((int) clickedPoint.getX(), (int) clickedPoint.getY(), 2, 2);
+        //        }
     }
 
     /**
