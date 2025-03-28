@@ -27,6 +27,13 @@
  */
 package mekhq.campaign.randomEvents;
 
+import static java.time.temporal.ChronoUnit.DAYS;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
+import static mekhq.campaign.finances.enums.TransactionType.STARTING_CAPITAL;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.time.LocalDate;
+
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
@@ -34,13 +41,6 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.dialog.randomEvents.GrayMondayDialog;
-
-import java.time.LocalDate;
-
-import static java.time.temporal.ChronoUnit.DAYS;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
-import static mekhq.campaign.finances.enums.TransactionType.STARTING_CAPITAL;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public class GrayMonday {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.GrayMonday";
@@ -140,7 +140,7 @@ public class GrayMonday {
      */
     public static boolean isGrayMonday(LocalDate today, boolean isUseGrayMonday) {
         return isUseGrayMonday
-            && today.isAfter(EVENT_DATE_GRAY_MONDAY.minusDays(1))
-            && EVENT_DATE_GRAY_MONDAY.isBefore(today.plusMonths(12));
+            && today.isAfter(EVENT_DATE_GRAY_MONDAY.minusDays(1)) &&
+                     today.isBefore(EVENT_DATE_GRAY_MONDAY.plusMonths(12));
     }
 }
