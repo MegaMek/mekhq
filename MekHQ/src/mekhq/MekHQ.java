@@ -224,6 +224,18 @@ public class MekHQ implements GameListener {
     }
 
     /**
+     * Retrieves the autosave service instance associated with this instance of {@link MekHQ}.
+     *
+     * <p>This service is responsible for handling autosave operations, such as saving the current state
+     * of the campaign or mission. It provides an interface to manage autosave requests.</p>
+     *
+     * @return the {@link IAutosaveService} instance responsible for managing autosave operations.
+     */
+    public IAutosaveService getAutosaveService() {
+        return autosaveService;
+    }
+
+    /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
      *
      * @since 50.04
@@ -433,7 +445,8 @@ public class MekHQ implements GameListener {
      * @param autoResolveBehaviorSettings The auto resolve behavior settings to use if running an AtB scenario and auto
      *                                    resolve is wanted
      */
-    public void startHost(Scenario scenario, boolean loadSavegame, List<Unit> meks, @Nullable BehaviorSettings autoResolveBehaviorSettings) {
+    public void startHost(Scenario scenario, boolean loadSavegame, List<Unit> meks,
+                          @Nullable BehaviorSettings autoResolveBehaviorSettings) {
         HostDialog hostDialog = new HostDialog(campaignGUI.getFrame(), getCampaign().getName());
         hostDialog.setVisible(true);
 
@@ -442,7 +455,7 @@ public class MekHQ implements GameListener {
             return;
         }
 
-        this.autosaveService.requestBeforeMissionAutosave(getCampaign());
+        this.autosaveService.requestBeforeScenarioAutosave(getCampaign());
 
         final String playerName = hostDialog.getPlayerName();
         final String password = hostDialog.getServerPass();
@@ -719,7 +732,7 @@ public class MekHQ implements GameListener {
      */
     public void startAutoResolve(AtBScenario scenario, List<Unit> units) {
 
-        this.autosaveService.requestBeforeMissionAutosave(getCampaign());
+        this.autosaveService.requestBeforeScenarioAutosave(getCampaign());
 
         if (getCampaign().getCampaignOptions().isAutoResolveVictoryChanceEnabled()) {
             var proceed = AutoResolveChanceDialog.showDialog(campaignGUI.getFrame(),

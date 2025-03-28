@@ -45,7 +45,9 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
@@ -265,6 +267,19 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         contract.clanTechSalvageOverride();
 
         return Optional.of(contract);
+    }
+
+    @Override
+    protected void rollCommandClause(final Contract contract, final int modifier, boolean isMercenary) {
+        final int roll = d6(2) + modifier;
+
+        if (isMercenary) {
+            // Handle mercenaries
+            contract.setCommandRights(determineMercenaryCommandRights(roll));
+        } else {
+            // Handle non-mercenaries
+            contract.setCommandRights(ContractCommandRights.INTEGRATED);
+        }
     }
 
     private Faction determineEmployer(Campaign campaign, int ratingMod, HiringHallModifiers hiringHallModifiers) {

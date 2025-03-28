@@ -72,6 +72,12 @@ public abstract class AbstractContractMarket {
     public static final int CLAUSE_TRANSPORT = 3;
     public static final int CLAUSE_NUM = 4;
 
+    // Command Rights thresholds
+    private static final int MERCENARY_THRESHOLD_INTEGRATED = 3;
+    private static final int MERCENARY_THRESHOLD_HOUSE = 8;
+    private static final int MERCENARY_THRESHOLD_LIAISON = 12;
+    private static final int NON_MERCENARY_THRESHOLD = 12;
+
     /**
      * The portion of combat teams we expect to be performing combat actions. This is one in 'x' where 'x' is the value
      * set here.
@@ -179,9 +185,12 @@ public abstract class AbstractContractMarket {
      * @param campaign the active campaign context, used to access campaign-specific options and rules
      */
     public void rerollClause(AtBContract contract, int clause, Campaign campaign) {
+        final Faction faction = campaign.getFaction();
+        final boolean isMercenary = faction.isMercenary();
         if (null != clauseMods.get(contract.getId())) {
             switch (clause) {
-                case CLAUSE_COMMAND -> rollCommandClause(contract, clauseMods.get(contract.getId()).mods[clause]);
+                case CLAUSE_COMMAND ->
+                      rollCommandClause(contract, clauseMods.get(contract.getId()).mods[clause], isMercenary);
                 case CLAUSE_SALVAGE -> {
                     rollSalvageClause(contract,
                           clauseMods.get(contract.getId()).mods[clause],
@@ -390,16 +399,90 @@ public abstract class AbstractContractMarket {
         }
     }
 
+    /**
+     * @deprecated use {@link #rollCommandClause(Contract, int, boolean)} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     protected void rollCommandClause(final Contract contract, final int modifier) {
+        rollCommandClause(contract, modifier, true);
+    }
+
+    /**
+     * Calculates and sets the command rights clause for a contract based on a roll and modifier.
+     *
+     * <p>This method determines the appropriate {@link ContractCommandRights} for the given {@link Contract},
+     * using the result of a dice roll (with modifiers). The logic differentiates between mercenary and non-mercenary
+     * contracts, as these have different thresholds for command rights determination.</p>
+     *
+     * <ul>
+     *   <li>For mercenaries, the command rights are determined using multiple thresholds, defined by constants,
+     *       and can be one of the following:
+     *       <ul>
+     *         <li>{@link ContractCommandRights#INTEGRATED}</li>
+     *         <li>{@link ContractCommandRights#HOUSE}</li>
+     *         <li>{@link ContractCommandRights#LIAISON}</li>
+     *         <li>{@link ContractCommandRights#INDEPENDENT}</li>
+     *       </ul>
+     *   </li>
+     *   <li>For non-mercenaries, only two outcomes are possible:
+     *       <ul>
+     *         <li>{@link ContractCommandRights#INTEGRATED}</li>
+     *         <li>{@link ContractCommandRights#HOUSE}</li>
+     *       </ul>
+     *   </li>
+     * </ul>
+     *
+     * @param contract    The {@link Contract} whose command rights will be set based on the roll outcome.
+     * @param modifier    The numeric modifier applied to the dice roll value.
+     * @param isMercenary Indicates whether the contract applies to a mercenary, which affects the thresholds used for
+     *                    determining command rights.
+     */
+    protected void rollCommandClause(final Contract contract, final int modifier, boolean isMercenary) {
         final int roll = d6(2) + modifier;
-        if (roll < 3) {
-            contract.setCommandRights(ContractCommandRights.INTEGRATED);
-        } else if (roll < 8) {
-            contract.setCommandRights(ContractCommandRights.HOUSE);
-        } else if (roll < 12) {
-            contract.setCommandRights(ContractCommandRights.LIAISON);
+
+        if (isMercenary) {
+            // Handle mercenary thresholds
+            contract.setCommandRights(determineMercenaryCommandRights(roll));
         } else {
-            contract.setCommandRights(ContractCommandRights.INDEPENDENT);
+            // Handle non-mercenary thresholds
+            contract.setCommandRights(roll < NON_MERCENARY_THRESHOLD ?
+                                            ContractCommandRights.INTEGRATED :
+                                            ContractCommandRights.HOUSE);
+        }
+    }
+
+    /**
+     * Determines the command rights for a mercenary contract based on a roll.
+     *
+     * <p>This method evaluates the roll against predefined thresholds to determine and return the appropriate
+     * {@link ContractCommandRights} for mercenaries</p>
+     *
+     * <ul>
+     *   <li>Results:
+     *       <ul>
+     *         <li>Less than {@code MERCENARY_THRESHOLD_INTEGRATED}: {@link ContractCommandRights#INTEGRATED}</li>
+     *         <li>Between {@code MERCENARY_THRESHOLD_INTEGRATED} (inclusive) and {@code MERCENARY_THRESHOLD_HOUSE}:
+     *             {@link ContractCommandRights#HOUSE}</li>
+     *         <li>Between {@code MERCENARY_THRESHOLD_HOUSE} (inclusive) and {@code MERCENARY_THRESHOLD_LIAISON}:
+     *             {@link ContractCommandRights#LIAISON}</li>
+     *         <li>Greater than or equal to {@code MERCENARY_THRESHOLD_LIAISON}: {@link ContractCommandRights#INDEPENDENT}</li>
+     *       </ul>
+     *   </li>
+     * </ul>
+     *
+     * @param roll The total value of a dice roll (with modifiers) used to determine command rights.
+     *
+     * @return The {@link ContractCommandRights} determined based on the roll value.
+     */
+    ContractCommandRights determineMercenaryCommandRights(int roll) {
+        if (roll < MERCENARY_THRESHOLD_INTEGRATED) {
+            return ContractCommandRights.INTEGRATED;
+        } else if (roll < MERCENARY_THRESHOLD_HOUSE) {
+            return ContractCommandRights.HOUSE;
+        } else if (roll < MERCENARY_THRESHOLD_LIAISON) {
+            return ContractCommandRights.LIAISON;
+        } else {
+            return ContractCommandRights.INDEPENDENT;
         }
     }
 
