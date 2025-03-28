@@ -260,11 +260,11 @@ public class TrainingCombatTeams {
 
             int perExperienceLevelMultiplier = EDUCATION_TIME_MULTIPLIER;
             double experienceMultiplier = campaignOptions.getXpCostMultiplier();
-            double intelligenceCostMultiplier = trainee.getIntelligenceXpCostMultiplier(campaignOptions);
+            double intelligenceCostMultiplier = trainee.getIntelligenceXpCostMultiplier(campaignOptions.isUseIntelligenceXpMultiplier());
 
-            perExperienceLevelMultiplier = (int) round(perExperienceLevelMultiplier *
-                                                             experienceMultiplier *
-                                                             intelligenceCostMultiplier);
+            // Intelligence cost changes should always take place before global changes
+            perExperienceLevelMultiplier = (int) round(perExperienceLevelMultiplier * experienceMultiplier);
+            perExperienceLevelMultiplier = (int) round(perExperienceLevelMultiplier * intelligenceCostMultiplier);
 
             int educationTimeReduction = currentExperienceLevel * perExperienceLevelMultiplier;
             if (newEducationTime >= educationTimeReduction) {
