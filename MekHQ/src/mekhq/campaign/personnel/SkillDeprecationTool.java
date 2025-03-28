@@ -87,6 +87,14 @@ public class SkillDeprecationTool {
         checkForDeprecatedSkills(person);
     }
 
+    /**
+     * @deprecated use {@link #SkillDeprecationTool(Campaign, Person, boolean)} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public SkillDeprecationTool(Campaign campaign, Person person) {
+        this(campaign, person, false);
+    }
+
     public boolean isSkipAll() {
         return skipAll;
     }
