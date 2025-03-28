@@ -29,6 +29,8 @@ package mekhq.gui.adapter;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.common.Compute.d6;
+import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.finances.enums.TransactionType.MEDICAL_EXPENSES;
 import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_COST_ARM_TYPE_5;
 import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_COST_FOOT_TYPE_5;
@@ -63,7 +65,6 @@ import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.dialogs.PortraitChooserDialog;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Compute;
 import megamek.common.Crew;
 import megamek.common.EntityWeightClass;
 import megamek.common.Mounted;
@@ -83,6 +84,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.PersonalLogger;
+import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.education.Academy;
@@ -142,6 +144,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_EDIT_SALARY = "SALARY";
     private static final String CMD_GIVE_PAYMENT = "GIVE_PAYMENT";
     private static final String CMD_EDIT_INJURIES = "EDIT_INJURIES";
+    private static final String CMD_ADD_RANDOM_INJURY = "ADD_RANDOM_INJURY";
+    private static final String CMD_ADD_RANDOM_INJURIES = "ADD_RANDOM_INJURIES";
     private static final String CMD_REMOVE_INJURY = "REMOVE_INJURY";
     private static final String CMD_REPLACE_MISSING_LIMB = "REPLACE_MISSING_LIMB";
     private static final String CMD_CLEAR_INJURIES = "CLEAR_INJURIES";
@@ -1154,6 +1158,22 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 break;
             }
+            case CMD_ADD_RANDOM_INJURY: {
+                for (Person person : people) {
+                    InjuryUtil.resolveCombatDamage(getCampaign(), person, 1);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
+            case CMD_ADD_RANDOM_INJURIES: {
+                for (Person person : people) {
+                    // We want an injury count between 1 and 5 (inclusive), so use randomInt instead of d6.
+                    // At 6 injuries, the character should be dead, and we don't want to kill anyone.
+                    InjuryUtil.resolveCombatDamage(getCampaign(), person, randomInt(5) + 1);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
             case CMD_EDIT_SALARY: {
                 int originalSalary = selectedPerson.getSalary(getCampaign()).getAmount().intValue();
 
@@ -1209,7 +1229,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_LOYALTY: {
                 for (Person person : people) {
-                    person.setLoyalty(Compute.d6(3));
+                    person.setLoyalty(d6(3));
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -3272,6 +3292,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
                 }
+
+                menuItem = new JMenuItem(resources.getString("addRandomInjury.format"));
+                menuItem.setActionCommand(CMD_ADD_RANDOM_INJURY);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+
+                menuItem = new JMenuItem(resources.getString("addRandomInjuries.format"));
+                menuItem.setActionCommand(CMD_ADD_RANDOM_INJURIES);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
             }
 
             if (getCampaignOptions().isUseManualProcreation()) {
