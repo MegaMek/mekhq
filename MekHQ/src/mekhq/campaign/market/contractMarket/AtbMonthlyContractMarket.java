@@ -44,6 +44,7 @@ import java.util.Set;
 
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -56,6 +57,7 @@ import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -344,8 +346,11 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
         }
 
-        setAllyRating(contract, campaign.getGameYear());
-        setEnemyRating(contract, campaign.getGameYear());
+        final ReputationController reputation = campaign.getReputation();
+        final SkillLevel campaignSkillLevel = reputation == null ? REGULAR : reputation.getAverageSkillLevel();
+        final boolean useDynamicDifficulty = campaign.getCampaignOptions().isUseDynamicDifficulty();
+        setAllyRating(contract, campaign.getGameYear(), useDynamicDifficulty ? campaignSkillLevel : REGULAR);
+        setEnemyRating(contract, campaign.getGameYear(), useDynamicDifficulty ? campaignSkillLevel : REGULAR);
 
         if (contract.getContractType().isCadreDuty()) {
             contract.setAllySkill(GREEN);
@@ -430,8 +435,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         setAttacker(contract);
         contract.setSystemId(parent.getSystemId());
-        setAllyRating(contract, campaign.getGameYear());
-        setEnemyRating(contract, campaign.getGameYear());
+        setAllyRating(contract, campaign.getGameYear(), campaign.getReputation().getAverageSkillLevel());
+        setEnemyRating(contract, campaign.getGameYear(), campaign.getReputation().getAverageSkillLevel());
 
         if (contract.getContractType().isCadreDuty()) {
             contract.setAllySkill(GREEN);

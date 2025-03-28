@@ -28,6 +28,7 @@
 package mekhq.campaign.market.contractMarket;
 
 import static megamek.common.Compute.d6;
+import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 import java.time.format.DateTimeFormatter;
@@ -234,8 +235,10 @@ public class CamOpsContractMarket extends AbstractContractMarket {
             return Optional.empty();
         }
         // Step 4: Populate some information about enemies and allies
-        setAllyRating(contract, campaign.getGameYear());
-        setEnemyRating(contract, campaign.getGameYear());
+        final SkillLevel campaignSkillLevel = reputation.getAverageSkillLevel();
+        final boolean useDynamicDifficulty = campaign.getCampaignOptions().isUseDynamicDifficulty();
+        setAllyRating(contract, campaign.getGameYear(), useDynamicDifficulty ? campaignSkillLevel : REGULAR);
+        setEnemyRating(contract, campaign.getGameYear(), useDynamicDifficulty ? campaignSkillLevel : REGULAR);
         if (contract.getContractType().isCadreDuty()) {
             contract.setAllySkill(SkillLevel.GREEN);
             contract.setAllyQuality(IUnitRating.DRAGOON_F);

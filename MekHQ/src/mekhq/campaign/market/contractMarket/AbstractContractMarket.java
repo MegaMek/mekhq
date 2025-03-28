@@ -592,25 +592,52 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * Sets the ally rating (skill and quality) for the contract. The ally rating is determined by modifiers influenced
-     * by the employer faction, contract type, historical context, and a random roll.
-     *
-     * <p>The calculated ally skill and quality ratings are assigned to the contract.</p>
-     *
-     * @param contract the contract for which the ally rating is being set.
-     * @param year     the year of the contract, used for calculating historical modifiers.
+     * @deprecated use {@link #setAllyRating(AtBContract, int, SkillLevel)} instead.
      */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     protected void setAllyRating(AtBContract contract, int year) {
+        setAllyRating(contract, year, REGULAR);
+    }
+
+    /**
+     * Calculates and sets the ally skill and quality ratings for the given contract.
+     *
+     * <p>The ally rating is influenced by multiple factors:</p>
+     * <ul>
+     *     <li>The employer faction's specific modifiers.</li>
+     *     <li>Modifiers based on the contract type (e.g., attacking vs. defending roles).</li>
+     *     <li>Historical context derived from the year parameter.</li>
+     *     <li>The player's average skill level, used to adjust contract difficulty.</li>
+     *     <li>A random roll for variability in calculations.</li>
+     * </ul>
+     *
+     * <p>Special considerations are made for specific factions:</p>
+     * <ul>
+     *     <li><b>Clan Factions</b>: Enforce minimum ally skill levels based on attacking or defending roles.</li>
+     *     <li><b>ComStar or Word of Blake</b>: Apply additional historical modifier adjustments.</li>
+     * </ul>
+     *
+     * <p>For non-Clan and non-ComStar/Word of Blake factions, the ally ratings are further adjusted based
+     * on the player's average skill level, making the contract easier if the player's skill level is lower.</p>
+     *
+     * <p>After all the calculations, the resulting ally skill and quality ratings are assigned to the contract.</p>
+     *
+     * @param contract          the {@link AtBContract} instance for which the ally ratings are being calculated and
+     *                          assigned.
+     * @param year              the year of the contract, used for applying historical context modifiers.
+     * @param averageSkillLevel the average skill level of the player, used to adjust contract difficulty.
+     */
+    protected void setAllyRating(AtBContract contract, int year, SkillLevel averageSkillLevel) {
+        final Faction employerFaction = contract.getEmployerFaction();
+
         int mod = calculateFactionModifiers(contract.getEmployerFaction());
         mod += calculateContractTypeModifiers(contract.getContractType(), contract.isAttacker());
 
         // Assign ally skill rating
         contract.setAllySkill(getSkillRating(d6(2) + mod));
 
-        // Apply historical modifiers
-        if (!contract.getEmployerFaction().isClan()) {
-            mod += calculateHistoricalModifiers(year);
-        } else {
+        // Apply faction modifiers
+        if (employerFaction.isClan()) {
             // Apply Clan clamping
             if (contract.isAttacker()) {
                 if (contract.getAllySkill().ordinal() < VETERAN.ordinal()) {
@@ -621,22 +648,59 @@ public abstract class AbstractContractMarket {
                     contract.setAllySkill(SkillLevel.REGULAR);
                 }
             }
+        } else {
+            mod += calculateHistoricalModifiers(year);
+
+            if (employerFaction.isComStarOrWoB()) {
+                mod += 2;
+            }
         }
+
+        // The less skilled the player, the easier their contract.
+        mod += REGULAR.getExperienceLevel() - averageSkillLevel.getExperienceLevel();
 
         // Assign ally quality rating
         contract.setAllyQuality(getQualityRating(d6(2) + mod));
     }
 
     /**
-     * Sets the enemy rating (skill and quality) for the contract. The enemy rating is determined by modifiers based on
-     * the enemy faction, whether the faction is attacking or defending, historical context, and a random roll.
-     *
-     * <p>The calculated enemy skill and quality ratings are assigned to the contract.</p>
-     *
-     * @param contract the contract for which the enemy rating is being set.
-     * @param year     the year of the contract, used for calculating historical modifiers.
+     * @deprecated use {@link #setEnemyRating(AtBContract, int, SkillLevel)} instead.
      */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     protected void setEnemyRating(AtBContract contract, int year) {
+        setEnemyRating(contract, year, REGULAR);
+    }
+
+    /**
+     * Calculates and sets the enemy skill and quality ratings for the given contract.
+     *
+     * <p>The enemy rating is influenced by various factors:</p>
+     * <ul>
+     *     <li>Modifiers based on the enemy faction's attributes.</li>
+     *     <li>The enemy faction's role in the contract (e.g., attacking or defending).</li>
+     *     <li>Historical context derived from the year parameter.</li>
+     *     <li>The player's average skill level, used to adjust the enemy difficulty.</li>
+     *     <li>A random roll to introduce variability into the calculations.</li>
+     * </ul>
+     *
+     * <p>Special adjustments are made for specific factions:</p>
+     * <ul>
+     *     <li><b>Clan Factions</b>: Enforce minimum enemy skill levels based on their roles as attackers or defenders.</li>
+     *     <li><b>ComStar or Word of Blake</b>: Apply additional historical modifier adjustments.</li>
+     * </ul>
+     *
+     * <p>For non-Clan and non-ComStar/Word of Blake factions, the enemy ratings are further adjusted
+     * based on the player's average skill level, making contracts more difficult against weaker factions
+     * or easier when the enemy's overall experience level is lower.</p>
+     *
+     * <p>After the calculations, the resulting enemy skill and quality ratings are applied to the contract.</p>
+     *
+     * @param contract          the {@link AtBContract} instance for which the enemy ratings are being calculated and
+     *                          assigned.
+     * @param year              the year of the contract, used for applying historical context modifiers.
+     * @param averageSkillLevel the average skill level of the player, used to adjust the enemy contract difficulty.
+     */
+    protected void setEnemyRating(AtBContract contract, int year, SkillLevel averageSkillLevel) {
         Faction enemyFaction = Factions.getInstance().getFaction(contract.getEnemyCode());
         int mod = calculateFactionModifiers(enemyFaction);
 
@@ -648,19 +712,27 @@ public abstract class AbstractContractMarket {
         // Assign enemy skill rating
         contract.setEnemySkill(getSkillRating(d6(2) + mod));
 
-        // Apply historical modifiers
-        if (!enemyFaction.isClan()) {
-            mod += calculateHistoricalModifiers(year);
-        } else {
+        // Apply faction modifiers
+        if (enemyFaction.isClan()) {
             // Apply Clan clamping
             if (!contract.isAttacker()) {
-                if (contract.getAllySkill().ordinal() < VETERAN.ordinal()) {
-                    contract.setAllySkill(VETERAN);
+                if (contract.getEnemySkill().ordinal() < VETERAN.ordinal()) {
+                    contract.setEnemySkill(VETERAN);
                 }
             } else {
-                if (contract.getAllySkill().ordinal() < REGULAR.ordinal()) {
-                    contract.setAllySkill(SkillLevel.REGULAR);
+                if (contract.getEnemySkill().ordinal() < REGULAR.ordinal()) {
+                    contract.setEnemySkill(SkillLevel.REGULAR);
                 }
+            }
+        } else {
+            mod += calculateHistoricalModifiers(year);
+
+            if (enemyFaction.isComStarOrWoB()) {
+                mod += 2;
+            } else {
+                // The less skilled the player, the easier their contract. We only do this for non-ComStar and Clan
+                // opponents, as they're meant to be pinnacle opponents. Even in Clan campaigns.
+                mod += averageSkillLevel.getExperienceLevel() - REGULAR.getExperienceLevel();
             }
         }
 
