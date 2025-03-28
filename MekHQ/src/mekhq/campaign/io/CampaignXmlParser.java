@@ -428,15 +428,20 @@ public class CampaignXmlParser {
         logger.info(String.format("[Campaign Load] Parts processed in %dms", System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
+        boolean skipAllDeprecationChecks = false;
+        boolean refundAllDeprecatedSkills = false;
         for (Person person : campaign.getPersonnel()) {
             // skill types might need resetting
             person.resetSkillTypes();
 
             // Seeing as we're already looping through all personnel, we might as well have the deprecation checks
             // here, too.
-            if (!DEPRECATED_SKILLS.isEmpty()) {
+            if (!DEPRECATED_SKILLS.isEmpty() && !skipAllDeprecationChecks) {
                 // This checks to ensure the character doesn't have any Deprecated skills.
-                new SkillDeprecationTool(campaign, person);
+                SkillDeprecationTool deprecationTool = new SkillDeprecationTool(campaign,
+                      person,
+                      refundAllDeprecatedSkills);
+                skipAllDeprecationChecks = deprecationTool.isSkipAll();
             }
         }
 
@@ -1695,7 +1700,8 @@ public class CampaignXmlParser {
         retVal.setPartsInUseRequestedStockMap(partInUseStockMap);
     }
 
-    private static void processPartsInUseRequestedStockMapVal(Campaign retVal, Node wn, Map<String, Double> partsInUseRequestedStockMap) {
+    private static void processPartsInUseRequestedStockMapVal(Campaign retVal, Node wn,
+                                                              Map<String, Double> partsInUseRequestedStockMap) {
         NodeList wList = wn.getChildNodes();
 
         String key = null;
