@@ -100,6 +100,12 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
             int unitRatingMod = campaign.getAtBUnitRatingMod();
 
+            if (newCampaign) {
+                // At this point in a campaign the unit rating would be NONE, however, we want the player to start
+                // with access to plenty of contracts, so we temporarily bump them to REGULAR.
+                unitRatingMod = REGULAR.getExperienceLevel();
+            }
+
             for (AtBContract contract : campaign.getActiveAtBContracts()) {
                 checkForSubcontracts(campaign, contract, unitRatingMod);
 
@@ -115,6 +121,12 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
 
             int numContracts = d6() - 4 + unitRatingMod;
+
+            if (newCampaign) {
+                // For a similar reason as previously stated, we want the user to be able to jump into the action off
+                // the bat, so we give them extra contracts to start off.
+                numContracts = d6() + (unitRatingMod * 2);
+            }
 
             if (isGrayMonday) {
                 for (int i = 0; i < numContracts; i++) {
