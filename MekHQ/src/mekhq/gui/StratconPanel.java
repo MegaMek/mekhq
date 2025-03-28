@@ -346,7 +346,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         g2D.setTransform(initialTransform);
         if (clickedPoint != null) {
-            g2D.setColor(Color.BLUE);
+            g2D.setColor(BLUE);
             g2D.drawRect((int) clickedPoint.getX(), (int) clickedPoint.getY(), 2, 2);
         }
     }
@@ -457,6 +457,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                         BufferedImage fogOfWarLayerImage = getImage(StratconBiomeManifest.FOG_OF_WAR,
                                 ImageType.TerrainTile);
                         if (fogOfWarLayerImage != null) {
+                            fogOfWarLayerImage = addTintToBufferedImage(fogOfWarLayerImage, BLUE);
                             g2D.drawImage(fogOfWarLayerImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
                         }
 
