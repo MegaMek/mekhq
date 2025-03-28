@@ -2130,6 +2130,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         // region Spend XP Menu
         if (oneSelected && person.getStatus().isActive()) {
+            final boolean isUseIntelligenceMultiplier = getCampaignOptions().isUseIntelligenceXpMultiplier();
+            final double intelligenceXpCostMultiplier = person.getIntelligenceXpCostMultiplier(
+                  isUseIntelligenceMultiplier);
+            final double xpCostMultiplier = getCampaignOptions().getXpCostMultiplier();
+
             menu = new JMenu(resources.getString("spendXP.text"));
             if (getCampaignOptions().isUseAbilities()) {
                 JMenu abMenu = new JMenu(resources.getString("spendOnSpecialAbilities.text"));
@@ -2145,9 +2150,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (!spa.isEligible(person)) {
                         continue;
                     }
-                    cost = (int) round((spa.getCost() *
-                                              person.getIntelligenceXpCostMultiplier(getCampaignOptions()) *
-                                              getCampaignOptions().getXpCostMultiplier()));
+                    // Intelligence cost changes should always take place before global changes
+                    cost = (int) round(spa.getCost() * intelligenceXpCostMultiplier);
+                    cost = (int) round(cost * xpCostMultiplier);
+
                     String costDesc;
                     if (cost < 0) {
                         costDesc = resources.getString("costNotPossible.text");
@@ -2493,12 +2499,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             JMenu newMenu = new JMenu(resources.getString("spendOnNewSkills.text"));
             for (int i = 0; i < SkillType.getSkillList().length; i++) {
                 String type = SkillType.getSkillList()[i];
-                int cost = person.hasSkill(type) ?
-                                 person.getSkill(type).getCostToImprove() :
-                                 SkillType.getType(type).getCost(0);
-                cost = (int) round(cost *
-                                         person.getIntelligenceXpCostMultiplier(getCampaignOptions()) *
-                                         getCampaignOptions().getXpCostMultiplier());
+
+                int cost = person.getCostToImprove(type, isUseIntelligenceMultiplier);
+                cost = (int) round(cost * xpCostMultiplier);
 
                 if (cost >= 0) {
                     String desc = String.format(resources.getString("skillDesc.format"), type, cost);
@@ -2507,7 +2510,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(person.getXP() >= cost);
                     if (person.hasSkill(type)) {
-                        currentMenu.add(menuItem);
+                        Skill skill = person.getSkill(type);
+                        if (skill.isImprovementLegal()) {
+                            currentMenu.add(menuItem);
+                        }
                     } else {
                         newMenu.add(menuItem);
                     }
@@ -2519,9 +2525,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             // Edge Purchasing
             if (getCampaignOptions().isUseEdge()) {
                 JMenu edgeMenu = new JMenu(resources.getString("edge.text"));
-                int cost = (int) round(getCampaignOptions().getEdgeCost() *
-                                             person.getIntelligenceXpCostMultiplier(getCampaignOptions()) *
-                                             getCampaignOptions().getXpCostMultiplier());
+
+                // Intelligence cost changes should always take place before global changes
+                int cost = (int) round(getCampaignOptions().getEdgeCost() * intelligenceXpCostMultiplier);
+                cost = (int) round(cost * xpCostMultiplier);
 
                 if ((cost >= 0) && (person.getXP() >= cost)) {
                     menuItem = new JMenuItem(String.format(resources.getString("spendOnEdge.text"), cost));

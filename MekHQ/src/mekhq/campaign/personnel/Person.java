@@ -29,6 +29,7 @@
 package mekhq.campaign.personnel;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.randomInt;
 
@@ -325,7 +326,8 @@ public class Person {
         this(givenName, surname, campaign, campaign.getFactionCode());
     }
 
-    public Person(final String givenName, final String surname, final @Nullable Campaign campaign, final String factionCode) {
+    public Person(final String givenName, final String surname, final @Nullable Campaign campaign,
+                  final String factionCode) {
         this("", givenName, surname, "", campaign, factionCode);
     }
 
@@ -339,7 +341,8 @@ public class Person {
      * @param campaign    the campaign this person is a part of, or null (unit testing only)
      * @param factionCode the faction this person was borne into
      */
-    public Person(final String preNominal, final String givenName, final String surname, final String postNominal, final @Nullable Campaign campaign, final String factionCode) {
+    public Person(final String preNominal, final String givenName, final String surname, final String postNominal,
+                  final @Nullable Campaign campaign, final String factionCode) {
         // We assign the variables in XML file order
         id = UUID.randomUUID();
 
@@ -1269,7 +1272,8 @@ public class Person {
      *                   initial change
      * @param isVerbose  a boolean indicating whether the method should generate a report if the loyalty has changed
      */
-    public void performForcedDirectionLoyaltyChange(Campaign campaign, boolean isPositive, boolean isMajor, boolean isVerbose) {
+    public void performForcedDirectionLoyaltyChange(Campaign campaign, boolean isPositive, boolean isMajor,
+                                                    boolean isVerbose) {
         int originalLoyalty = loyalty;
 
         Consumer<Integer> applyLoyaltyChange = (roll) -> {
@@ -3763,8 +3767,40 @@ public class Person {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
+    /**
+     * @deprecated Use {@link #getCostToImprove(String, boolean)} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public int getCostToImprove(final String skillName) {
-        return hasSkill(skillName) ? getSkill(skillName).getCostToImprove() : -1;
+        return getCostToImprove(skillName, false);
+    }
+
+    /**
+     * Calculates the cost to improve a specific skill, with an optional intelligence multiplier.
+     *
+     * <p>If the skill exists, the cost is based on its current level's improvement cost.</p>
+     *
+     * <p>If the skill does not exist, the method calculates the cost using the default cost for the skill type at
+     * level 0.</p>
+     *
+     * @param skillName       the name of the skill for which to calculate the improvement cost.
+     * @param useIntelligence a boolean indicating whether to apply {@link Intelligence} cost multipliers.
+     *
+     * @return the cost to improve the skill, adjusted by the intelligence multiplier if applicable, or the cost for
+     *       level 0 if the specified skill does not currently exist.
+     */
+    public int getCostToImprove(final String skillName, final boolean useIntelligence) {
+        int cost = hasSkill(skillName) ?
+                         getSkill(skillName).getCostToImprove() :
+                         SkillType.getType(skillName).getCost(0);
+
+        double multiplier = 1.0;
+
+        if (useIntelligence) {
+            multiplier = getIntelligenceXpCostMultiplier(useIntelligence);
+        }
+
+        return (int) round(cost * multiplier);
     }
     // endregion skill
 
@@ -4739,25 +4775,39 @@ public class Person {
         };
     }
 
-    /**
-     * @param campaignOptions the campaign options to determine whether to calculate the multiplier or to just return 1
-     *
-     * @return the intelligence experience cost multiplier based on campaign options.
-     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public double getIntelligenceXpCostMultiplier(CampaignOptions campaignOptions) {
-        if (campaignOptions.isUseRandomPersonalities() && campaignOptions.isUseIntelligenceXpMultiplier()) {
-            double intelligenceMultiplier = 0.025; // each rank in Intelligence should adjust costs by 2.5%
+        return getIntelligenceXpCostMultiplier(campaignOptions.isUseIntelligenceXpMultiplier());
+    }
 
-            int intelligence = getIntelligence().getIntelligenceScore();
-            double intelligenceScore = intelligence * intelligenceMultiplier;
-
-            if (intelligenceScore == 0) {
-                return 1;
-            } else {
-                return 1 - intelligenceScore;
-            }
+    /**
+     * Calculates the experience cost multiplier based on intelligence.
+     *
+     * <p>If intelligence adjustment is not enabled, the multiplier is 1 (no effect).</p>
+     *
+     * <p>Otherwise, the multiplier is determined by the intelligence score, where each point adjusts the cost by 2.5%.
+     * A neutral intelligence score (resulting in a modifier of 0) will also return a multiplier of 1.</p>
+     *
+     * @param useIntelligenceXpCostMultiplier a {@link Boolean} indicating whether to apply the intelligence-based
+     *                                        adjustment to the experience cost.
+     *
+     * @return the experience cost multiplier: - `1` if intelligence adjustment is disabled or {@link Intelligence} is
+     *       neutral. - A value adjusted by the formula `1 - (score * 0.025)` otherwise.
+     */
+    public double getIntelligenceXpCostMultiplier(final boolean useIntelligenceXpCostMultiplier) {
+        if (!useIntelligenceXpCostMultiplier) {
+            return 1;
         }
 
-        return 1;
+        double intelligenceMultiplier = 0.025; // each rank in Intelligence should adjust costs by 2.5%
+
+        int score = getIntelligence().getIntelligenceScore();
+        double modifier = score * intelligenceMultiplier;
+
+        if (modifier == 0) { // neutral intelligence
+            return 1;
+        } else {
+            return 1 - modifier;
+        }
     }
 }
