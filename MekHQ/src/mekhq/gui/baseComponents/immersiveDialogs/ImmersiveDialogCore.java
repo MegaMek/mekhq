@@ -32,7 +32,7 @@ import static java.lang.Math.min;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.campaign.force.Force.FORCE_NONE;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import static mekhq.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.BorderLayout;
@@ -149,7 +149,10 @@ public class ImmersiveDialogCore extends JDialog {
      * @param spinnerPanel          An optional {@link JPanel} containing a spinner widget to be displayed in the center
      *                              panel; use {@code null} if not applicable.
      */
-    public ImmersiveDialogCore(Campaign campaign, @Nullable Person leftSpeaker, @Nullable Person rightSpeaker, String centerMessage, List<ButtonLabelTooltipPair> buttons, @Nullable String outOfCharacterMessage, @Nullable Integer centerWidth, boolean isVerticalLayout, @Nullable JPanel spinnerPanel, boolean isModal) {
+    public ImmersiveDialogCore(Campaign campaign, @Nullable Person leftSpeaker, @Nullable Person rightSpeaker,
+                               String centerMessage, List<ButtonLabelTooltipPair> buttons,
+                               @Nullable String outOfCharacterMessage, @Nullable Integer centerWidth,
+                               boolean isVerticalLayout, @Nullable JPanel spinnerPanel, boolean isModal) {
         // Initialize
         this.campaign = campaign;
         this.leftSpeaker = leftSpeaker;
@@ -255,7 +258,8 @@ public class ImmersiveDialogCore extends JDialog {
      *
      * @return A {@link JPanel} with the message displayed in the center and buttons at the bottom.
      */
-    private JPanel createCenterBox(String centerMessage, List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout, @Nullable JPanel spinnerPanel) {
+    private JPanel createCenterBox(String centerMessage, List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout,
+                                   @Nullable JPanel spinnerPanel) {
         northPanel = new JPanel(new BorderLayout());
 
         // Buttons panel
@@ -414,7 +418,8 @@ public class ImmersiveDialogCore extends JDialog {
      * @param isVerticalLayout A {@code boolean} value indicating the layout style: {@code true} for vertical stacking,
      *                         {@code false} for horizontal arrangement.
      */
-    protected JPanel populateButtonPanel(List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout, @Nullable JPanel spinnerPanel) {
+    protected JPanel populateButtonPanel(List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout,
+                                         @Nullable JPanel spinnerPanel) {
         final int padding = getPADDING();
 
         // Main container panel to hold the spinner and button panel
@@ -588,7 +593,7 @@ public class ImmersiveDialogCore extends JDialog {
         // Add speaker image (icon)
         ImageIcon speakerIcon = getSpeakerIcon(campaign, speaker);
         if (speakerIcon != null) {
-            speakerIcon = scaleImageIconToWidth(speakerIcon, IMAGE_WIDTH);
+            speakerIcon = scaleImageIcon(speakerIcon, IMAGE_WIDTH, true);
         }
         JLabel imageLabel = new JLabel();
         imageLabel.setIcon(speakerIcon);
