@@ -82,9 +82,7 @@ planet:
     event:
       - date: '2262-02-04'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 56109.0
         socioIndustrial: D-D-C-C-C
       - date: '2270-01-01'
@@ -107,9 +105,7 @@ planet:
         population: 51890870.0
       - date: '2355-03-03'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2360-01-01'
         population: 74107036.0
       - date: '2370-01-01'
@@ -255,36 +251,36 @@ planet:
         population: 581739262.0
       - date: '3020-01-01'
         population: 571018920.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 573078292.0
       - date: '3038-01-01'
         socioIndustrial: B-C-D-B-C
       - date: '3040-01-01'
         population: 578143636.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3049-01-01'
         socioIndustrial: A-B-C-A-B
       - date: '3050-01-01'
         population: 585357249.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
         population: 591595038.0
       - date: '3064-07-01'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - LA
       - date: '3070-01-01'
@@ -309,9 +305,7 @@ planet:
         population: 671035702.0
       - date: '3145-11-03'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 676560817.0
   - name: Gatacre
     type: DWARF_TERRESTRIAL

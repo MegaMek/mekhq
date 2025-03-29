@@ -120,9 +120,7 @@ planet:
     event:
       - date: '2502-07-11'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 41878.0
         socioIndustrial: D-D-C-D-D
       - date: '2510-01-01'
@@ -241,15 +239,15 @@ planet:
         population: 167487732.0
       - date: '3020-01-01'
         population: 164222129.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 164034974.0
       - date: '3040-01-01'
         population: 165965455.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial:
           source: canon
@@ -258,34 +256,24 @@ planet:
         population: 168221180.0
       - date: '3057-12-01'
         faction:
-          source: canon
-          value:
-            - ARDC
+          - ARDC
       - date: '3060-01-01'
         population: 170507564.0
       - date: '3067-04-24'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3070-01-01'
         population: 172686819.0
       - date: '3071-05-14'
         faction:
-          source: canon
-          value:
-            - LA
-            - CJF
+          - LA
+          - CJF
       - date: '3071-08-02'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3079-08-20'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3080-01-01'
         population: 174108673.0
       - date: '3090-01-01'
@@ -299,24 +287,18 @@ planet:
         population: 175296646.0
       - date: '3130-04-03'
         faction:
-          source: canon
-          value:
-            - CJF
-            - LA
+          - CJF
+          - LA
         population: 176739989.0
       - date: '3140-01-01'
         population: 178088330.0
       - date: '3145-05-01'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 178195215.0
       - date: '3152-02-15'
         faction:
-          source: canon
-          value:
-            - ARL
+          - ARL
   - name: Great V
     type: DWARF_TERRESTRIAL
     orbitalDist: 1.4

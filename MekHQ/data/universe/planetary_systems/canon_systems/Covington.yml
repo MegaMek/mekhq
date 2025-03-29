@@ -56,14 +56,15 @@ planet:
       - name: Northern Sturgeon Lake
     event:
       - date: '2301-10-02'
-        faction:
-          source: canon
-          value:
-            - FS
         population: 44111.0
         socioIndustrial: F-D-D-D-C
       - date: '2310-01-01'
         population: 139089.0
+      - date: '2317-06-26'
+        faction:
+          source: 'Handbook: House Davion'
+          value:
+            - FS
       - date: '2320-01-01'
         population: 418364.0
       - date: '2330-01-01'
@@ -216,15 +217,15 @@ planet:
         population: 298520541.0
       - date: '3020-01-01'
         population: 291358247.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 289752698.0
       - date: '3040-01-01'
         population: 292343007.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3049-01-01'
         socioIndustrial: D-C-D-C-B
       - date: '3050-01-01'
@@ -233,7 +234,7 @@ planet:
         population: 297355322.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'

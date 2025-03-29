@@ -122,18 +122,14 @@ planet:
     event:
       - date: '2267-01-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 43263.0
         socioIndustrial: D-C-B-D-C
       - date: '2270-01-01'
         population: 73358.0
       - date: '2271-01-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2280-01-01'
         population: 360574.0
       - date: '2290-01-01'
@@ -144,9 +140,7 @@ planet:
         population: 12535027.0
       - date: '2315-05-08'
         faction:
-          source: canon
-          value:
-            - DoL
+          - DoL
       - date: '2320-01-01'
         population: 29496315.0
       - date: '2330-01-01'
@@ -155,21 +149,17 @@ planet:
         population: 114156193.0
       - date: '2341-01-01'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2350-01-01'
         population: 194392834.0
       - date: '2360-01-01'
         population: 306029772.0
       - date: '2366-01-01'
         faction:
-          source: canon
-          value:
-            - DoL
+          - DoL
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -220,9 +210,7 @@ planet:
         population: 4677083418.0
       - date: '2571-10-08'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2580-01-01'
         population: 4782691542.0
       - date: '2590-01-01'
@@ -269,23 +257,17 @@ planet:
         population: 5575156497.0
       - date: '2767-07-20'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 5621310674.0
       - date: '2779-05-12'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 5578688734.0
       - date: '2786-03-20'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2790-01-01'
         population: 5506305020.0
       - date: '2800-01-01'
@@ -344,56 +326,39 @@ planet:
           value: 4261000000.0
       - date: '3028-08-24'
         faction:
-          source: canon
-          value:
-            - CC
-            - FS
+          - CC
+          - FC
       - date: '3028-09-07'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
       - date: '3030-01-01'
         population: 3651268184.0
       - date: '3030-02-28'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
       - date: '3032-01-01'
         socioIndustrial: B-C-C-B-C
       - date: '3040-01-01'
         population: 2663873752.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: A-B-B-A-B
       - date: '3050-01-01'
         population: 2007039884.0
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - CM
+          - CM
       - date: '3060-01-01'
         population: 1422494827.0
       - date: '3062-01-14'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3070-01-01'
         population: 1106771622.0
       - date: '3080-01-01'
         population: 1118565800.0
       - date: '3085-05-17'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1134335854.0
       - date: '3094-01-01'
@@ -412,16 +377,12 @@ planet:
           value: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1229057148.0
       - date: '3145-02-15'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 1234476914.0
   - name: Little
     type: GIANT_TERRESTRIAL

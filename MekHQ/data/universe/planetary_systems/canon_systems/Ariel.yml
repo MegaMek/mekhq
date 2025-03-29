@@ -35,9 +35,7 @@ planet:
     event:
       - date: '2241-10-08'
         faction:
-          source: canon
-          value:
-            - MCM
+          - MCM
         population: 49476.0
         socioIndustrial: D-D-B-D-D
       - date: '2250-01-01'
@@ -50,7 +48,7 @@ planet:
         population: 1203423.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -227,9 +225,7 @@ planet:
         population: 728108088.0
       - date: '3079-03-27'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 739555633.0
       - date: '3090-01-01'
@@ -250,15 +246,11 @@ planet:
         population: 801471578.0
       - date: '3145-03-25'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 807909066.0
       - date: '3151-12-06'
         faction:
-          source: canon
-          value:
-            - CP
+          - CP
   - name: Tambarinang Belt
     type: ASTEROID_BELT
     orbitalDist: 0.35

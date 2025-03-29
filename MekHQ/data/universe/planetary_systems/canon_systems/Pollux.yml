@@ -71,9 +71,7 @@ planet:
     event:
       - date: '2252-09-07'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 49447.0
         socioIndustrial: D-D-B-D-C
       - date: '2260-01-01'
@@ -92,14 +90,10 @@ planet:
         population: 29295171.0
       - date: '2315-01-07'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2319-11-18'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2320-01-01'
         population: 55683039.0
       - date: '2330-01-01'
@@ -198,23 +192,17 @@ planet:
         population: 2892845467.0
       - date: '2767-02-13'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 2899449658.0
       - date: '2779-03-26'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 2883880024.0
       - date: '2790-02-17'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 2844007886.0
       - date: '2800-01-01'
         population: 2807924887.0
@@ -224,9 +212,7 @@ planet:
         population: 2739654085.0
       - date: '2821-06-23'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 2691198048.0
       - date: '2840-01-01'
@@ -272,17 +258,10 @@ planet:
         population: 2241510743.0
       - date: '3030-09-02'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 2249335244.0
       - date: '3040-01-01'
         population: 2266268680.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: B-B-C-B-C
       - date: '3048-01-01'
@@ -291,36 +270,26 @@ planet:
         population: 2282188214.0
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3060-01-01'
         population: 2309970435.0
       - date: '3070-01-01'
         population: 2335987527.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3078-04-03'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3078-04-12'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 2340664177.0
       - date: '3081-10-24'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 2343006012.0
       - date: '3099-01-01'
@@ -341,12 +310,7 @@ planet:
         population: 2452811029.0
       - date: '3150-10-10'
         faction:
-          source: canon
-          value:
-            - CWE
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - CWE
   - name: Jackson's Folly

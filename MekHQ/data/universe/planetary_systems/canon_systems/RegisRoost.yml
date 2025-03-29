@@ -70,28 +70,20 @@ planet:
     event:
       - date: '3011-04-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 2020.0
         socioIndustrial: D-F-B-D-B
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
         population: 25836.0
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
         population: 30714.0
       - date: '3040-09-22'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
         population: 50714.0
         socioIndustrial: B-C-B-C-A
       - date: '3050-01-01'
@@ -112,9 +104,7 @@ planet:
         population: 6225064.0
       - date: '3120-12-03'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 6325466.0
       - date: '3130-01-01'
         population: 6435205.0

@@ -94,9 +94,7 @@ planet:
     event:
       - date: '2680-09-14'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 45777.0
         socioIndustrial: C-D-A-D-C
       - date: '2683-09-13'
@@ -176,23 +174,23 @@ planet:
         population: 104830643.0
       - date: '3020-01-01'
         population: 102313663.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 102096339.0
       - date: '3040-10-04'
         population: 103349543.0
         socioIndustrial: C-C-A-D-C
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 104367348.0
       - date: '3060-01-01'
         population: 105374099.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -215,9 +213,7 @@ planet:
         population: 112002015.0
       - date: '3145-02-15'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 112450921.0
   - name: Nieves
     type: TERRESTRIAL

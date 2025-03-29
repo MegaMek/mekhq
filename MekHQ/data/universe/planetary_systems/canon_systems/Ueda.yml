@@ -38,9 +38,7 @@ planet:
     event:
       - date: '2688-08-15'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 45843.0
         socioIndustrial: C-D-A-D-C
       - date: '2690-01-01'
@@ -97,9 +95,7 @@ planet:
         socioIndustrial: C-D-C-D-B
       - date: '2900-04-25'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 468724826.0
       - date: '2910-01-01'
         population: 462939781.0
@@ -127,18 +123,14 @@ planet:
         population: 391765732.0
       - date: '3025-07-30'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3030-09-14'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 388421040.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3039-01-01'
@@ -155,9 +147,7 @@ planet:
         population: 400891134.0
       - date: '3075-03-01'
         faction:
-          source: canon
-          value:
-            - CGB
+          - CGB
       - date: '3080-01-01'
         population: 406624398.0
       - date: '3090-01-01'
@@ -168,9 +158,7 @@ planet:
         population: 411862644.0
       - date: '3103-03-13'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
       - date: '3110-01-01'
         population: 413182715.0
       - date: '3120-01-01'

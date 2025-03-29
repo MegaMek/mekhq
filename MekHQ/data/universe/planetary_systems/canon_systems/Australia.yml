@@ -99,9 +99,7 @@ planet:
     event:
       - date: '2725-07-29'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         hpg:
           source: canon
           value: A
@@ -168,15 +166,15 @@ planet:
         population: 925439761.0
       - date: '3020-01-01'
         population: 937335390.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 945112780.0
       - date: '3040-01-01'
         population: 946905299.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial:
           source: canon
@@ -185,7 +183,7 @@ planet:
         population: 953213037.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'

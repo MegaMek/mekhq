@@ -74,9 +74,7 @@ planet:
     event:
       - date: '2306-02-26'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 46791.0
         socioIndustrial: D-D-C-D-F
       - date: '2310-01-01'
@@ -135,29 +133,21 @@ planet:
         population: 78725152.0
       - date: '2571-09-30'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
       - date: '2580-01-01'
         population: 81279953.0
       - date: '2585-03-10'
         faction:
-          source: canon
-          value:
-            - SL
-            - TC
+          - SL
+          - TC
       - date: '2586-03-04'
         faction:
-          source: canon
-          value:
-            - SL
+          - SL
       - date: '2590-01-01'
         population: 83406439.0
       - date: '2597-03-21'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
       - date: '2600-01-01'
         population: 85270194.0
       - date: '2610-01-01'
@@ -234,22 +224,10 @@ planet:
         population: 4468.0
       - date: '2923-10-02'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FS
-      - date: '2108-12-05'
-        name: Sartu
-      - date: '3130-01-01'
-        name: Bastille
-        message: Sartu renamed to Bastille
   - name: Durante's Planet
     type: TERRESTRIAL
     orbitalDist: 3.92

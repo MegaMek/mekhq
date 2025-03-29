@@ -109,9 +109,7 @@ planet:
     event:
       - date: '2165-10-19'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 49545.0
         socioIndustrial: D-D-C-D-C
       - date: '2170-01-01'
@@ -130,9 +128,7 @@ planet:
         population: 35479850.0
       - date: '2235-08-07'
         faction:
-          source: canon
-          value:
-            - TamP
+          - TamP
       - date: '2240-01-01'
         population: 65790696.0
       - date: '2250-01-01'
@@ -155,9 +151,9 @@ planet:
         population: 1544326337.0
       - date: '2340-01-01'
         population: 1846932370.0
-      - date: '2341-08-09'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -276,14 +272,10 @@ planet:
         socioIndustrial: B-B-B-B-C
       - date: '2864-06-14'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2865-08-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2870-01-01'
         population: 6093850010.0
       - date: '2880-01-01'
@@ -320,13 +312,11 @@ planet:
         population: 5946948151.0
       - date: '3030-07-03'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 5973267769.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3038-01-01'
@@ -345,9 +335,7 @@ planet:
         population: 6273247371.0
       - date: '3075-08-20'
         faction:
-          source: canon
-          value:
-            - CGB
+          - CGB
       - date: '3079-01-01'
         population:
           source: canon
@@ -358,23 +346,17 @@ planet:
         population: 6357874622.0
       - date: '3099-04-20'
         faction:
-          source: canon
-          value:
-            - CGB
-            - DC
+          - CGB
+          - DC
       - date: '3099-04-30'
         faction:
-          source: canon
-          value:
-            - CGB
+          - CGB
       - date: '3100-09-20'
         population: 6426911798.0
         socioIndustrial: B-B-B-A-B
       - date: '3103-03-13'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
       - date: '3110-01-01'
         population: 6432055384.0
       - date: '3120-01-01'

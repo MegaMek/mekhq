@@ -40,9 +40,7 @@ planet:
     event:
       - date: '2296-06-13'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 63707.0
         socioIndustrial: D-D-C-D-C
       - date: '2300-01-01'
@@ -61,9 +59,7 @@ planet:
         population: 8154269.0
       - date: '2360-04-16'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 13882530.0
       - date: '2370-01-01'
         population: 21976551.0
@@ -207,15 +203,15 @@ planet:
         population: 275499606.0
       - date: '3025-01-01'
         socioIndustrial: D-C-C-D-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 276487357.0
       - date: '3040-01-01'
         population: 280077149.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: D-C-C-D-B
       - date: '3050-01-01'
@@ -224,7 +220,7 @@ planet:
         population: 287684702.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -250,9 +246,7 @@ planet:
         population: 301649303.0
       - date: '3145-09-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 304437282.0
   - name: Gray's Belt 1
     type: ASTEROID_BELT

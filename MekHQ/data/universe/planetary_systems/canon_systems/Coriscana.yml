@@ -35,9 +35,7 @@ planet:
     event:
       - date: '2241-03-07'
         faction:
-          source: canon
-          value:
-            - MCM
+          - MCM
         population: 35648.0
         socioIndustrial: D-D-A-F-D
       - date: '2250-01-01'
@@ -48,7 +46,7 @@ planet:
         population: 845555.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -230,9 +228,7 @@ planet:
         population: 470250756.0
       - date: '3079-06-04'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 474312352.0
       - date: '3090-01-01'
@@ -245,9 +241,7 @@ planet:
         population: 485542137.0
       - date: '3120-03-18'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 487683229.0
       - date: '3130-01-01'
         population: 489148476.0
@@ -257,9 +251,7 @@ planet:
         population: 492584527.0
       - date: '3145-02-13'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 494361028.0
   - name: Gorbatsevich's Belt
     type: ASTEROID_BELT

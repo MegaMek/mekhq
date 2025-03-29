@@ -48,16 +48,14 @@ planet:
     event:
       - date: '2305-04-30'
         faction:
-          source: canon
-          value:
-            - AG
+          - AG
         population: 49824.0
         socioIndustrial: D-D-A-D-D
       - date: '2310-01-01'
         population: 98504.0
-      - date: '2319-01-01'
+      - date: '2319-11-15'
         faction:
-          source: canon
+          source: 'Handbook: House Kurita'
           value:
             - DC
       - date: '2320-01-01'

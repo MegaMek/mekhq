@@ -54,9 +54,7 @@ planet:
     event:
       - date: '2247-08-19'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
         population: 59353.0
         socioIndustrial: D-D-D-D-F
       - date: '2250-01-01'
@@ -67,7 +65,7 @@ planet:
         population: 1440149.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2272-01-01'
@@ -248,16 +246,12 @@ planet:
         population: 3725187227.0
       - date: '3078-05-01'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
       - date: '3080-01-01'
         population: 3749854776.0
       - date: '3086-02-01'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
       - date: '3090-01-01'
         population: 3808811175.0
       - date: '3096-01-01'
@@ -278,12 +272,7 @@ planet:
         population: 4110386705.0
       - date: '3148-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Bruin

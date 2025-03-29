@@ -91,9 +91,7 @@ planet:
     event:
       - date: '2891-02-25'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         hpg: X
         population: 53496.0
         socioIndustrial: C-D-A-D-F
@@ -157,9 +155,7 @@ planet:
         population: 2714210.0
       - date: '3140-05-08'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 2718556.0
   - name: Mohr's Planet

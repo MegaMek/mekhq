@@ -89,9 +89,7 @@ planet:
     event:
       - date: '2900-05-09'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 54600.0
         socioIndustrial: C-D-C-C-D
       - date: '2907-06-30'
@@ -162,19 +160,12 @@ planet:
         socioIndustrial: F-F-C-D-C
       - date: '3130-08-06'
         faction:
-          source: canon
-          value:
-            - RCM
+          - RCM
         population: 2887075.0
       - date: '3140-01-01'
         population: 2879002.0
       - date: '3145-01-01'
         population: 2877851.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: ZC4-1 Belt
     type: ASTEROID_BELT
     orbitalDist: 1.44

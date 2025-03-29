@@ -121,9 +121,7 @@ planet:
     event:
       - date: '2241-08-05'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
         population: 44411.0
         socioIndustrial: D-D-B-D-C
       - date: '2250-01-01'
@@ -134,7 +132,7 @@ planet:
         population: 2058099.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -325,9 +323,7 @@ planet:
         population: 3989297587.0
       - date: '3079-01-18'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
         population:
           source: canon
           value: 4020000000.0
@@ -335,9 +331,7 @@ planet:
         population: 4038265482.0
       - date: '3086-04-27'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
       - date: '3090-01-01'
         population: 4102576799.0
       - date: '3100-01-01'
@@ -358,11 +352,6 @@ planet:
         population: 4422102509.0
       - date: '3145-01-01'
         population: 4448714881.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Sutri
     type: TERRESTRIAL
     orbitalDist: 2.4

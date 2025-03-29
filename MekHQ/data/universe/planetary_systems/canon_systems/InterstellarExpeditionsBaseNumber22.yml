@@ -110,9 +110,7 @@ planet:
     event:
       - date: '3095-10-03'
         faction:
-          source: canon
-          value:
-            - IE
+          - IE
         population: 750.0
         socioIndustrial: B-X-X-X-X
   - name: DZJ6

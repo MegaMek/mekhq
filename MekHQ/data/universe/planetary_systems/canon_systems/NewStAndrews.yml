@@ -139,9 +139,7 @@ planet:
     event:
       - date: '2822-05-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         hpg:
           source: canon
           value: C
@@ -165,9 +163,7 @@ planet:
         population: 2919594.0
       - date: '2900-01-26'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 3433998.0
       - date: '2910-01-01'
         population: 3869669.0

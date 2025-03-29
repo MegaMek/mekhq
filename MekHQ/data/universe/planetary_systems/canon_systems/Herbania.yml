@@ -49,9 +49,7 @@ planet:
     event:
       - date: '2396-11-13'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 57970.0
         socioIndustrial: D-D-C-D-F
       - date: '2400-01-01'
@@ -135,9 +133,7 @@ planet:
         population: 5194773.0
       - date: '2779-08-12'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 4112822.0
       - date: '2790-01-01'
@@ -164,9 +160,7 @@ planet:
         population: 122498.0
       - date: '2881-06-19'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
@@ -193,9 +187,7 @@ planet:
     event:
       - date: '2396-01-27'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 53588.0
         socioIndustrial: D-D-D-D-F
       - date: '2400-01-01'
@@ -278,9 +270,7 @@ planet:
         population: 9905.0
       - date: '2779-07-19'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 6556.0
       - date: '2790-01-01'
@@ -307,9 +297,7 @@ planet:
         population: 156.0
       - date: '2881-02-06'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         population: 0.0
         socioIndustrial: X-X-X-X-X
   - name: Yinepu

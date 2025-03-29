@@ -44,9 +44,7 @@ planet:
     event:
       - date: '2244-12-09'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 62097.0
         socioIndustrial: D-D-A-D-C
       - date: '2250-01-01'
@@ -57,9 +55,7 @@ planet:
         population: 1154136.0
       - date: '2280-08-14'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 2756412.0
       - date: '2290-01-01'
         population: 5881231.0
@@ -240,9 +236,7 @@ planet:
         population: 536854671.0
       - date: '3081-11-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 539545666.0
       - date: '3100-01-01'
@@ -259,9 +253,7 @@ planet:
         population: 555088426.0
       - date: '3145-09-27'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 557536196.0
   - name:
       source: canon
@@ -290,9 +282,7 @@ planet:
     event:
       - date: '2244-06-18'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 59281.0
         socioIndustrial: D-D-A-D-F
       - date: '2250-01-01'
@@ -303,9 +293,7 @@ planet:
         population: 1168578.0
       - date: '2280-10-22'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 2827637.0
       - date: '2290-01-01'
         population: 6091843.0
@@ -484,9 +472,7 @@ planet:
         population: 928057209.0
       - date: '3081-02-24'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 928985730.0
       - date: '3099-01-01'
@@ -505,9 +491,7 @@ planet:
         population: 971356335.0
       - date: '3145-02-10'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 981314872.0
   - name: Mayansky's End
     type: ICE_GIANT

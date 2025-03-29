@@ -53,9 +53,7 @@ planet:
     event:
       - date: '2415-12-14'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 62012.0
         socioIndustrial: C-C-B-D-D
       - date: '2420-01-01'
@@ -138,9 +136,7 @@ planet:
         population: 118683358.0
       - date: '2779-09-04'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-01-01'
         population: 117600096.0
       - date: '2790-01-01'
@@ -197,22 +193,22 @@ planet:
         population: 101889972.0
       - date: '3028-01-01'
         socioIndustrial: C-C-C-C-D
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 102517597.0
       - date: '3040-01-01'
         population: 103496155.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3049-01-01'
         socioIndustrial: C-C-B-C-C
       - date: '3050-01-01'
         population: 104098176.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -239,15 +235,11 @@ planet:
         population: 116016736.0
       - date: '3145-11-22'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 117135860.0
       - date: '3151-05-13'
         faction:
-          source: canon
-          value:
-            - VSM
+          - VSM
   - name: Soedjatmoko's Planet
     type: DWARF_TERRESTRIAL
     orbitalDist: 1.0

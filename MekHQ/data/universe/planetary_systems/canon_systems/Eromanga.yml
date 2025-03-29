@@ -105,9 +105,7 @@ planet:
     event:
       - date: '2213-06-14'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 40040.0
         socioIndustrial: D-D-C-D-C
       - date: '2220-01-01'
@@ -142,9 +140,7 @@ planet:
         population: 551106661.0
       - date: '2355-01-29'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2360-01-01'
         population: 693372917.0
       - date: '2370-01-01'
@@ -307,9 +303,7 @@ planet:
         population: 4214100476.0
       - date: '3081-05-04'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 4279499906.0
       - date: '3096-01-01'
@@ -326,9 +320,7 @@ planet:
         population: 4679710076.0
       - date: '3145-04-03'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 4705048864.0
   - name: Xaman Ek Belt
     type: ASTEROID_BELT

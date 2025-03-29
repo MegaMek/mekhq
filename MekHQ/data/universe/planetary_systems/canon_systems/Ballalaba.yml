@@ -78,9 +78,7 @@ planet:
     event:
       - date: '2900-12-27'
         faction:
-          source: canon
-          value:
-            - MH
+          - MH
         population: 53359.0
         socioIndustrial: B-D-A-D-F
       - date: '2906-04-27'
@@ -145,12 +143,7 @@ planet:
         population: 10199083.0
       - date: '3150-11-01'
         faction:
-          source: canon
-          value:
-            - MOC
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - MOC
   - name: Baba Yaga Belt

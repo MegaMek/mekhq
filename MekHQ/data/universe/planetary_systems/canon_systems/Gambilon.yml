@@ -32,9 +32,7 @@ planet:
     event:
       - date: '2714-02-21'
         faction:
-          source: canon
-          value:
-            - MOC
+          - MOC
         population: 50397.0
         socioIndustrial: C-D-D-D-F
       - date: '2719-07-11'
@@ -141,12 +139,12 @@ planet:
         population: 91362757.0
       - date: '3150-04-14'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - MH
       - date: '3150-05-01'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - MOC
   - name: Cole's Glory

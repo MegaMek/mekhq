@@ -53,10 +53,8 @@ planet:
     event:
       - date: '2802-08-19'
         faction:
-          source: canon
-          value:
-            - CWI
-            - CGS
+          - CWI
+          - CGS
         population: 9854.0
         socioIndustrial: B-C-B-C-D
       - date: '2807-09-07'
@@ -69,17 +67,13 @@ planet:
         population: 129912.0
       - date: '2821-06-07'
         faction:
-          source: canon
-          value:
-            - CLAN
+          - CLAN
       - date: '2830-01-01'
         population: 341818.0
       - date: '2834-10-07'
         faction:
-          source: canon
-          value:
-            - CGS
-            - CW
+          - CGS
+          - CW
       - date: '2840-01-01'
         population: 714612.0
       - date: '2850-01-01'
@@ -130,35 +124,25 @@ planet:
         population: 7985653.0
       - date: '3059-12-12'
         faction:
-          source: canon
-          value:
-            - CGS
+          - CGS
       - date: '3060-01-01'
         population: 8002646.0
       - date: '3070-01-01'
         population: 8014413.0
       - date: '3072-04-01'
         faction:
-          source: canon
-          value:
-            - CGS
-            - CCO
+          - CGS
+          - CCO
       - date: '3075-12-06'
         faction:
-          source: canon
-          value:
-            - CGS
+          - CGS
       - date: '3079-10-08'
         faction:
-          source: canon
-          value:
-            - CGS
-            - CCC
+          - CGS
+          - CCC
       - date: '3079-10-24'
         faction:
-          source: canon
-          value:
-            - CCC
+          - CCC
       - date: '3080-01-01'
         population: 8033671.0
       - date: '3090-03-12'

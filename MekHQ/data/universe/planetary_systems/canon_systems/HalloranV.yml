@@ -124,18 +124,14 @@ planet:
     event:
       - date: '2269-09-04'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 54353.0
         socioIndustrial: D-D-B-C-D
       - date: '2270-01-01'
         population: 63690.0
       - date: '2278-03-29'
         faction:
-          source: canon
-          value:
-            - Mara
+          - Mara
       - date: '2280-01-01'
         population: 274685.0
       - date: '2290-01-01'
@@ -144,9 +140,7 @@ planet:
         population: 2857542.0
       - date: '2309-10-29'
         faction:
-          source: canon
-          value:
-            - TGU
+          - TGU
       - date: '2310-01-01'
         population: 7238266.0
       - date: '2320-01-01'
@@ -159,9 +153,9 @@ planet:
         population: 96571473.0
       - date: '2360-01-01'
         population: 150537534.0
-      - date: '2367-02-24'
+      - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -288,9 +282,7 @@ planet:
         population: 1449596316.0
       - date: '2930-08-11'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 1417034266.0
       - date: '2940-01-01'
         population: 1383258395.0
@@ -314,6 +306,11 @@ planet:
         population:
           source: canon
           value: 1237000000.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1166223640.0
       - date: '3034-01-01'
@@ -322,11 +319,6 @@ planet:
         socioIndustrial: D-D-C-D-C
       - date: '3040-01-01'
         population: 1028238978.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: D-D-B-D-C
       - date: '3050-01-01'
@@ -335,45 +327,33 @@ planet:
         population: 833259984.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
         population: 763593421.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3077-02-27'
         faction:
-          source: canon
-          value:
-            - CC
-            - WOB
+          - CC
+          - WOB
       - date: '3077-04-08'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3078-12-27'
         faction:
-          source: canon
-          value:
-            - CC
-            - WOB
+          - CC
+          - WOB
       - date: '3079-10-31'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3080-01-01'
         population: 772039315.0
       - date: '3085-10-04'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 782454267.0
       - date: '3100-01-01'
@@ -382,14 +362,10 @@ planet:
         population: 806767462.0
       - date: '3112-10-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3113-05-01'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3119-01-01'
         socioIndustrial: F-D-B-D-C
       - date: '3120-01-01'
@@ -402,16 +378,12 @@ planet:
           value: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 829842128.0
       - date: '3145-11-14'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 832834943.0
   - name: Halloran V
     type: DWARF_TERRESTRIAL

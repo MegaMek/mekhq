@@ -29,9 +29,7 @@ planet:
     event:
       - date: '3095-04-02'
         faction:
-          source: canon
-          value:
-            - IE
+          - IE
         population: 50000.0
         socioIndustrial: F-F-A-C-F
       - date: '3100-01-01'
@@ -69,9 +67,7 @@ planet:
     event:
       - date: '3095-03-31'
         faction:
-          source: canon
-          value:
-            - IE
+          - IE
         population: 50000.0
         socioIndustrial: F-F-C-D-F
       - date: '3097-11-03'

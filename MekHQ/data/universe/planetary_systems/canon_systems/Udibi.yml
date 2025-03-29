@@ -55,9 +55,7 @@ planet:
     event:
       - date: '2162-01-10'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 63199.0
         socioIndustrial: C-D-C-C-B
       - date: '2170-01-01'
@@ -78,9 +76,7 @@ planet:
         population: 11270017.0
       - date: '2242-07-24'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 16582164.0
       - date: '2260-01-01'
@@ -105,9 +101,7 @@ planet:
         population: 116236930.0
       - date: '2345-05-11'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2350-01-01'
         population: 129127752.0
       - date: '2360-01-01'
@@ -201,33 +195,25 @@ planet:
         population: 268710101.0
       - date: '2780-06-25'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 267070495.0
       - date: '2790-01-01'
         population: 264815876.0
       - date: '2796-09-16'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2800-01-01'
         population: 259716580.0
       - date: '2808-12-08'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2810-01-01'
         population: 255699715.0
       - date: '2820-01-01'
         population: 253816586.0
       - date: '2821-12-02'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2830-01-01'
         population: 255248134.0
       - date: '2840-01-01'
@@ -272,15 +258,15 @@ planet:
         population: 208262476.0
       - date: '3020-01-01'
         population: 200254723.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 198579301.0
       - date: '3040-01-01'
         population: 200876144.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: B-C-D-B-C
       - date: '3048-01-01'
@@ -291,7 +277,7 @@ planet:
         population: 205734915.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -310,10 +296,8 @@ planet:
         population: 213938485.0
       - date: '3130-08-23'
         faction:
-          source: canon
-          value:
-            - DC
-            - FS
+          - DC
+          - FS
         population: 216477912.0
       - date: '3132-08-07'
         hpg: X
@@ -321,9 +305,7 @@ planet:
         population: 218828544.0
       - date: '3145-12-09'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 219573828.0
   - name: Waylen
     type: TERRESTRIAL

@@ -98,9 +98,7 @@ planet:
     event:
       - date: '2170-05-28'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 62420.0
         socioIndustrial: D-F-A-D-B
       - date: '2180-01-01'
@@ -119,9 +117,7 @@ planet:
         population: 55680754.0
       - date: '2242-01-08'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 98594399.0
       - date: '2260-01-01'
@@ -146,9 +142,7 @@ planet:
         population: 2055810913.0
       - date: '2355-03-03'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2360-01-01'
         population: 2393475219.0
       - date: '2370-01-01'
@@ -199,9 +193,7 @@ planet:
         population: 5539486929.0
       - date: '2571-03-14'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2580-01-01'
         population: 5542513416.0
       - date: '2590-01-01'
@@ -260,9 +252,7 @@ planet:
         population: 5660377883.0
       - date: '2825-08-14'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 5685486258.0
       - date: '2840-01-01'
@@ -275,9 +265,7 @@ planet:
         population: 5759045794.0
       - date: '2864-01-08'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2870-01-01'
         population: 5798306291.0
       - date: '2880-01-01'
@@ -300,9 +288,7 @@ planet:
         population: 6089647420.0
       - date: '2955-05-31'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2960-01-01'
         population: 6122870780.0
       - date: '2970-01-01'
@@ -319,18 +305,16 @@ planet:
         population: 6279676636.0
       - date: '3025-11-18'
         faction:
-          source: canon
+          - FS
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
           value:
-            - FS
+            - FC
       - date: '3030-01-01'
         population: 6314276391.0
       - date: '3040-01-01'
         population: 6410345461.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial:
           source: canon
@@ -349,7 +333,7 @@ planet:
           value: 6665288000.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -376,9 +360,7 @@ planet:
         population: 7197351877.0
       - date: '3145-08-03'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 7237770113.0
   - name: Wesselingh
     type: GIANT_TERRESTRIAL

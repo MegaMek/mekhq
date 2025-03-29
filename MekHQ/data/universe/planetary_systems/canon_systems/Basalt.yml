@@ -158,9 +158,7 @@ planet:
     event:
       - date: '2320-08-15'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 54408.0
         socioIndustrial: D-D-B-C-F
       - date: '2330-01-01'
@@ -259,23 +257,17 @@ planet:
         population: 1213940795.0
       - date: '2767-10-04'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 1198870453.0
       - date: '2779-04-05'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 1178437540.0
       - date: '2790-02-17'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 1148525115.0
       - date: '2800-01-01'
         population: 1131991983.0
@@ -285,9 +277,7 @@ planet:
         population: 1105074068.0
       - date: '2821-10-14'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2830-01-01'
         population: 1089654958.0
       - date: '2840-01-01'
@@ -314,9 +304,7 @@ planet:
         population: 1007410587.0
       - date: '2929-06-24'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2930-01-01'
         population: 1008616022.0
       - date: '2940-01-01'
@@ -337,17 +325,17 @@ planet:
         population: 828499832.0
       - date: '3020-01-01'
         population: 825409473.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3029-01-01'
         socioIndustrial: C-D-B-C-D
       - date: '3030-01-01'
         population: 830707312.0
       - date: '3040-01-01'
         population: 842671768.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial: C-D-B-D-D
       - date: '3050-01-01'
@@ -356,34 +344,26 @@ planet:
         population: 859522945.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3069-10-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 867206842.0
       - date: '3077-05-21'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3077-05-26'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 874871939.0
       - date: '3081-03-05'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 875747249.0
       - date: '3100-01-01'
@@ -400,16 +380,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 919727583.0
       - date: '3145-02-25'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 922675425.0
   - name: 6D-6
     type: TERRESTRIAL

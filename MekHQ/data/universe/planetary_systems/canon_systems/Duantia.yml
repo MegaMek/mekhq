@@ -80,9 +80,7 @@ planet:
     event:
       - date: '2680-05-02'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 48240.0
         socioIndustrial: B-D-A-D-C
       - date: '2686-09-10'
@@ -159,9 +157,7 @@ planet:
         population: 7222.0
       - date: '3010-09-15'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
@@ -196,9 +192,7 @@ planet:
     event:
       - date: '2680-02-18'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 49948.0
         socioIndustrial: C-D-B-D-B
       - date: '2690-01-01'
@@ -273,9 +267,7 @@ planet:
         population: 6643.0
       - date: '3010-07-11'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         population: 0.0
         socioIndustrial: X-X-X-X-X
   - name: Torremejía

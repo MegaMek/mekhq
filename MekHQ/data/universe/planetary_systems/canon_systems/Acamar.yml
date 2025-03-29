@@ -195,9 +195,7 @@ planet:
     event:
       - date: '2240-03-13'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 47746.0
         socioIndustrial: D-D-C-D-F
       - date: '2247-01-01'
@@ -218,9 +216,7 @@ planet:
         population: 104683511.0
       - date: '2320-09-18'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 188253192.0
       - date: '2330-01-01'
         population: 312987798.0
@@ -318,23 +314,17 @@ planet:
         population: 8202971940.0
       - date: '2767-07-24'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 8218100466.0
       - date: '2779-06-11'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 8201969030.0
       - date: '2790-11-23'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 8197098320.0
       - date: '2800-01-01'
         population: 8188862170.0
@@ -386,18 +376,19 @@ planet:
         population: 8120672300.0
       - date: '3020-01-01'
         population: 8037242801.0
-      - date: '3029-09-13'
+      - date: '3029-03-03'
         faction:
-          source: canon
+          source: NAIS 4th SW Atlas Volume 2, p. 16–17
           value:
             - TFR
+      - date: '3029-09-13'
         socioIndustrial: C-C-D-B-D
       - date: '3030-06-19'
         population: 8039234821.0
         socioIndustrial: B-B-D-B-D
-      - date: '3032-11-28'
+      - date: '3031-09-15'
         faction:
-          source: canon
+          source: 20 Year Update, p. 12
           value:
             - FC
       - date: '3040-01-01'
@@ -408,63 +399,45 @@ planet:
         population: 8231217245.0
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - CM
+          - CM
       - date: '3058-02-01'
         faction:
-          source: canon
-          value:
-            - MERC
-            - CM
+          - MERC
+          - CM
       - date: '3058-08-01'
         faction:
-          source: canon
-          value:
-            - PIR
+          - PIR
       - date: '3060-01-01'
         population: 8333919778.0
       - date: '3061-02-09'
         faction:
-          source: canon
-          value:
-            - MERC
-            - PIR
+          - MERC
+          - PIR
       - date: '3061-08-31'
         faction:
-          source: canon
-          value:
-            - CM
+          - CM
       - date: '3065-12-01'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3068-08-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3070-01-01'
         population: 8441279588.0
-      - date: '3078-01-15'
-        faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
       - date: '3078-01-05'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
+      - date: '3078-01-15'
+        faction:
+          - Stone
+          - WOB
       - date: '3080-01-01'
         population: 8580857988.0
       - date: '3081-12-07'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 8708799115.0
       - date: '3100-01-01'
@@ -479,18 +452,14 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3136-01-01'
         socioIndustrial: A-A-D-B-D
       - date: '3140-01-01'
         population: 9155308794.0
       - date: '3145-03-14'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 9166301759.0
   - name: Lindsay's Choice
     type: DWARF_TERRESTRIAL

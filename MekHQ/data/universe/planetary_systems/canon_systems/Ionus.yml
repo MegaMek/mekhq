@@ -100,9 +100,7 @@ planet:
     event:
       - date: '2431-07-18'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 49995.0
         socioIndustrial: C-D-A-D-F
       - date: '2440-01-01'
@@ -256,9 +254,7 @@ planet:
         population: 707455232.0
       - date: '3079-01-07'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 710717022.0
       - date: '3090-01-01'
@@ -281,9 +277,7 @@ planet:
         population: 721602440.0
       - date: '3145-12-08'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 724060064.0
   - name: Dimos South Kynouria
     type: GAS_GIANT

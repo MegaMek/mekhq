@@ -39,9 +39,7 @@ planet:
     event:
       - date: '2278-07-14'
         faction:
-          source: canon
-          value:
-            - Mara
+          - Mara
         population: 49944.0
         socioIndustrial: D-D-C-F-F
       - date: '2280-01-01'
@@ -58,9 +56,7 @@ planet:
         population: 5015224.0
       - date: '2324-06-05'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2330-01-01'
         population: 10415570.0
       - date: '2340-01-01'
@@ -167,9 +163,7 @@ planet:
         population: 890141094.0
       - date: '2821-09-13'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2830-01-01'
         population: 869947030.0
       - date: '2840-01-01'
@@ -182,9 +176,7 @@ planet:
         population: 820743664.0
       - date: '2864-09-08'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2870-01-01'
         population: 820313282.0
       - date: '2880-01-01'
@@ -221,15 +213,15 @@ planet:
         population: 759141962.0
       - date: '3026-01-01'
         socioIndustrial: C-D-C-C-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 759752448.0
       - date: '3040-01-01'
         population: 766467774.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial: C-D-C-C-D
       - date: '3050-01-01'
@@ -238,7 +230,7 @@ planet:
         population: 776574557.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'

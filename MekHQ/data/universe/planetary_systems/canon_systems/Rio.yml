@@ -130,9 +130,7 @@ planet:
     event:
       - date: '2192-02-02'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 56401.0
         socioIndustrial: D-D-C-D-C
       - date: '2200-01-01'
@@ -143,9 +141,7 @@ planet:
         population: 1397612.0
       - date: '2223-09-22'
         faction:
-          source: canon
-          value:
-            - TU
+          - TU
       - date: '2230-01-01'
         population: 3378631.0
       - date: '2238-01-01'
@@ -154,9 +150,7 @@ planet:
         population: 7286857.0
       - date: '2243-01-30'
         faction:
-          source: canon
-          value:
-            - TGU
+          - TGU
       - date: '2250-01-01'
         population: 14289120.0
       - date: '2260-01-01'
@@ -181,9 +175,9 @@ planet:
         population: 459751465.0
       - date: '2360-01-01'
         population: 533497614.0
-      - date: '2367-06-09'
+      - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -194,9 +188,7 @@ planet:
         population: 755402655.0
       - date: '2400-07-19'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 824954604.0
       - date: '2410-01-01'
         population: 890709115.0
@@ -278,22 +270,16 @@ planet:
         population: 1593594592.0
       - date: '2767-04-26'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 1599720214.0
       - date: '2779-11-30'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-09-23'
         faction:
-          source: canon
-          value:
-            - CC
-            - DC
+          - CC
+          - DC
         population: 1583160455.0
       - date: '2790-01-01'
         population: 1565398853.0
@@ -301,9 +287,7 @@ planet:
         population: 1542958079.0
       - date: '2806-09-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2810-01-01'
         population: 1521372533.0
       - date: '2820-01-01'
@@ -319,9 +303,7 @@ planet:
         population: 1467733538.0
       - date: '2864-11-08'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2870-01-01'
         population: 1466618543.0
       - date: '2880-01-01'
@@ -356,17 +338,17 @@ planet:
         population: 1299310138.0
       - date: '3020-01-01'
         population: 1295139283.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3029-01-01'
         socioIndustrial: C-C-D-C-C
       - date: '3030-01-01'
         population: 1301707289.0
       - date: '3040-01-01'
         population: 1318212566.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: B-B-C-B-B
       - date: '3050-01-01'
@@ -375,34 +357,26 @@ planet:
         population: 1350772569.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
         population: 1364348059.0
       - date: '3075-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3076-07-01'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3076-07-10'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1381923960.0
       - date: '3081-06-21'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1401687267.0
       - date: '3100-01-01'
@@ -417,16 +391,12 @@ planet:
         population: 1450454132.0
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1454521095.0
       - date: '3145-07-06'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 1453648644.0
   - name: Optimus Maximus Belt 1
     type: ASTEROID_BELT

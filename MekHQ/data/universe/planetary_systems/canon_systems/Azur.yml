@@ -38,9 +38,7 @@ planet:
     event:
       - date: '2665-09-11'
         faction:
-          source: canon
-          value:
-            - OA
+          - OA
         population: 50934.0
         socioIndustrial: D-D-C-D-B
       - date: '2670-08-09'
@@ -92,9 +90,7 @@ planet:
         population: 174220696.0
       - date: '2864-10-19'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2870-01-01'
         population: 175432867.0
       - date: '2880-01-01'
@@ -161,11 +157,6 @@ planet:
         population: 205454749.0
       - date: '3145-01-01'
         population: 206649849.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Q-2
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.07

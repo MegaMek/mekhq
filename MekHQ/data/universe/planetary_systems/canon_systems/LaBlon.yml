@@ -116,9 +116,7 @@ planet:
     event:
       - date: '2119-05-08'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 65909.0
         socioIndustrial: D-D-C-D-C
       - date: '2120-01-01'
@@ -149,9 +147,7 @@ planet:
         population: 245784902.0
       - date: '2242-07-26'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 331544477.0
       - date: '2260-01-01'
@@ -164,9 +160,7 @@ planet:
         population: 838375080.0
       - date: '2299-08-09'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 991127469.0
       - date: '2310-01-01'
@@ -177,9 +171,9 @@ planet:
         population: 1441554576.0
       - date: '2340-01-01'
         population: 1583493982.0
-      - date: '2341-05-28'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -328,17 +322,17 @@ planet:
         population: 2133562701.0
       - date: '3020-01-01'
         population: 2108657589.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 2110585085.0
       - date: '3035-01-01'
         socioIndustrial: C-C-C-C-C
       - date: '3040-01-01'
         population: 2133929681.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial: B-C-C-B-B
       - date: '3050-05-21'
@@ -346,7 +340,7 @@ planet:
         socioIndustrial: B-D-C-B-B
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -357,9 +351,7 @@ planet:
         population: 2210823787.0
       - date: '3081-10-10'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 2213035717.0
       - date: '3100-01-01'
@@ -376,20 +368,14 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-12-24'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 2242441439.0
       - date: '3145-10-07'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 2248729073.0
   - name: Etain
     type: DWARF_TERRESTRIAL

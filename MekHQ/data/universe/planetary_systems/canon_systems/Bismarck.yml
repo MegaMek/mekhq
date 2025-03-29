@@ -68,9 +68,7 @@ planet:
     event:
       - date: '2436-12-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 42731.0
         socioIndustrial: C-D-B-D-F
       - date: '2440-01-01'
@@ -202,14 +200,10 @@ planet:
         population: 2899330858.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 2785546870.0
       - date: '3030-01-01'
@@ -228,9 +222,7 @@ planet:
         population: 2860799619.0
       - date: '3081-10-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 2859655528.0
       - date: '3100-01-01'
@@ -243,9 +235,7 @@ planet:
         socioIndustrial: C-B-B-B-C
       - date: '3130-03-29'
         faction:
-          source: canon
-          value:
-            - RCM
+          - RCM
         population: 2955007452.0
       - date: '3132-08-07'
         hpg: X
@@ -253,11 +243,6 @@ planet:
         population: 2973385411.0
       - date: '3145-01-01'
         population: 2984108889.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Gullintani Belt I
     type: ASTEROID_BELT
     orbitalDist: 3.92

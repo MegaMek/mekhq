@@ -81,9 +81,7 @@ planet:
     event:
       - date: '3095-03-15'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 50000.0
         socioIndustrial: F-F-A-F-F
       - date: '3097-07-06'

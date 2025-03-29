@@ -67,9 +67,7 @@ planet:
     event:
       - date: '2263-10-17'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 44287.0
         socioIndustrial: D-D-D-D-D
       - date: '2270-01-01'
@@ -94,9 +92,7 @@ planet:
         population: 65297272.0
       - date: '2355-06-22'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2360-01-01'
         population: 96343406.0
       - date: '2370-01-01'
@@ -111,9 +107,7 @@ planet:
         population: 359113151.0
       - date: '2419-09-18'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2420-01-01'
         population: 424295473.0
       - date: '2430-01-01'
@@ -205,9 +199,7 @@ planet:
         population: 1265449672.0
       - date: '2821-10-06'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2830-01-01'
         population: 1259594397.0
       - date: '2840-01-01'
@@ -226,9 +218,7 @@ planet:
         population: 1233618674.0
       - date: '2900-09-11'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1234541799.0
       - date: '2909-01-01'
         socioIndustrial: C-C-D-B-D
@@ -262,15 +252,11 @@ planet:
         population: 1213285086.0
       - date: '3036-08-03'
         faction:
-          source: canon
-          value:
-            - LA
-            - FWL
+          - FC
+          - FWL
       - date: '3036-08-25'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3040-01-01'
         population: 1226827572.0
       - date: '3043-01-01'
@@ -285,9 +271,7 @@ planet:
         population: 1277406216.0
       - date: '3081-02-26'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 1283039186.0
       - date: '3100-01-01'
@@ -297,9 +281,7 @@ planet:
         socioIndustrial: A-A-D-A-C
       - date: '3120-08-27'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
         population: 1305820564.0
       - date: '3130-01-01'
         population: 1307911549.0
@@ -309,9 +291,7 @@ planet:
         population: 1309220115.0
       - date: '3145-12-23'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 1313941802.0
   - name: Attoe's Planet
     type: GIANT_TERRESTRIAL

@@ -40,9 +40,7 @@ planet:
     event:
       - date: '2232-01-03'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 50638.0
         socioIndustrial: D-D-B-D-D
       - date: '2240-01-01'
@@ -59,9 +57,7 @@ planet:
         population: 43974603.0
       - date: '2299-07-24'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 89235422.0
       - date: '2310-01-01'
@@ -72,9 +68,9 @@ planet:
         population: 449995253.0
       - date: '2340-01-01'
         population: 675134387.0
-      - date: '2341-10-15'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -225,6 +221,11 @@ planet:
         population: 8491884343.0
       - date: '3020-01-01'
         population: 8485023851.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 8522351675.0
       - date: '3032-01-01'
@@ -232,16 +233,11 @@ planet:
       - date: '3040-06-29'
         population: 8607141976.0
         socioIndustrial: A-A-C-A-C
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 8713663587.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'

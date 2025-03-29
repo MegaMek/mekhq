@@ -103,9 +103,7 @@ planet:
     event:
       - date: '2597-03-08'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 45348.0
         socioIndustrial: C-D-F-D-C
       - date: '2600-01-01'
@@ -114,9 +112,7 @@ planet:
         population: 68286.0
       - date: '2617-11-09'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2620-01-01'
         population: 84835.0
       - date: '2630-01-01'
@@ -160,9 +156,7 @@ planet:
         population: 177522.0
       - date: '2777-11-27'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 177954.0
       - date: '2790-01-01'
@@ -217,9 +211,7 @@ planet:
         population: 149803.0
       - date: '3012-08-08'
         faction:
-          source: canon
-          value:
-            - OC
+          - OC
       - date: '3020-01-01'
         population: 149855.0
       - date: '3025-01-01'
@@ -228,9 +220,7 @@ planet:
           value: 150000.0
       - date: '3028-05-14'
         faction:
-          source: canon
-          value:
-            - GV
+          - GV
       - date: '3030-01-01'
         population: 325489.0
       - date: '3036-01-01'
@@ -242,7 +232,7 @@ planet:
           value: D-F-F-D-B
       - date: '3049-09-12'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3050-01-01'
@@ -253,9 +243,7 @@ planet:
         population: 115182297.0
       - date: '3071-01-25'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
       - date: '3080-01-01'
         population: 116433007.0
       - date: '3090-01-01'
@@ -266,9 +254,7 @@ planet:
         population: 117980111.0
       - date: '3100-02-07'
         faction:
-          source: canon
-          value:
-            - TB
+          - TB
       - date: '3110-01-01'
         population: 118381926.0
       - date: '3120-01-01'
@@ -279,11 +265,6 @@ planet:
         population: 119523865.0
       - date: '3145-01-01'
         population: 119906954.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - NOC
   - name: Saidullah's Belt
     type: ASTEROID_BELT
     orbitalDist: 1.28

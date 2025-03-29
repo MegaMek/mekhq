@@ -121,9 +121,7 @@ planet:
     event:
       - date: '2172-06-15'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 58855.0
         socioIndustrial: D-D-B-D-F
       - date: '2180-01-01'
@@ -142,9 +140,7 @@ planet:
         population: 4733455.0
       - date: '2242-01-25'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 7045196.0
       - date: '2260-01-01'
@@ -169,9 +165,7 @@ planet:
         population: 64561312.0
       - date: '2355-03-03'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2360-01-01'
         population: 71070545.0
       - date: '2370-01-01'
@@ -268,16 +262,12 @@ planet:
         population: 130649717.0
       - date: '2796-08-07'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2800-01-01'
         population: 124327463.0
       - date: '2808-08-20'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2810-01-01'
         population: 117826489.0
       - date: '2811-01-01'
@@ -330,15 +320,15 @@ planet:
         population: 61682902.0
       - date: '3020-01-01'
         population: 57920126.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 55460685.0
       - date: '3040-01-01'
         population: 55928517.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial:
           source: canon
@@ -357,7 +347,7 @@ planet:
           value: 57144000.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -384,15 +374,8 @@ planet:
         population: 62201207.0
       - date: '3145-11-18'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 62375614.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FS
   - name: Frontière de Brunet
     type: DWARF_TERRESTRIAL
     orbitalDist: 3.08

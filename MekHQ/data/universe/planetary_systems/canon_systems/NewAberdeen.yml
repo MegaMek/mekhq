@@ -56,9 +56,7 @@ planet:
     event:
       - date: '2633-11-18'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 46278.0
         socioIndustrial: C-D-A-D-C
       - date: '2637-01-01'
@@ -101,9 +99,7 @@ planet:
         population: 387884423.0
       - date: '2786-11-24'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2790-01-01'
         population: 388048540.0
       - date: '2800-01-01'
@@ -124,9 +120,7 @@ planet:
         population: 377791910.0
       - date: '2864-06-03'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2870-01-01'
         population: 375597068.0
       - date: '2880-01-01'
@@ -135,9 +129,7 @@ planet:
         population: 372050419.0
       - date: '2900-03-03'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 370318314.0
       - date: '2907-01-01'
         socioIndustrial: B-C-D-D-D
@@ -165,11 +157,14 @@ planet:
         population: 361051212.0
       - date: '3020-01-01'
         population: 359148021.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-04-19'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 359888680.0
       - date: '3031-01-01'
         socioIndustrial: B-C-C-D-C
@@ -197,18 +192,14 @@ planet:
         socioIndustrial: A-C-B-C-B
       - date: '3130-03-25'
         faction:
-          source: canon
-          value:
-            - FS
-            - DC
+          - FS
+          - DC
         population: 372298056.0
       - date: '3132-08-07'
         hpg: X
       - date: '3139-04-20'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3140-01-01'
         population: 374313904.0
       - date: '3145-01-01'

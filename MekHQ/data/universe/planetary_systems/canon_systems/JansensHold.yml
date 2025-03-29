@@ -94,9 +94,7 @@ planet:
     event:
       - date: '2673-10-24'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
         population: 48529.0
         socioIndustrial: C-D-B-D-F
       - date: '2680-01-01'

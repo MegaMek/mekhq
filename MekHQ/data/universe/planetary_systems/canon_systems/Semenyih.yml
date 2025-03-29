@@ -40,18 +40,14 @@ planet:
     event:
       - date: '2269-03-26'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 47214.0
         socioIndustrial: D-D-D-D-D
       - date: '2270-01-01'
         population: 56574.0
       - date: '2280-11-06'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 298243.0
       - date: '2290-01-01'
         population: 1240674.0
@@ -227,9 +223,7 @@ planet:
         population: 9085614340.0
       - date: '3081-11-09'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 9208180935.0
       - date: '3100-01-01'
@@ -242,9 +236,7 @@ planet:
         population: 9462080841.0
       - date: '3130-06-25'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
         population: 9607003089.0
       - date: '3132-08-07'
         hpg: X
@@ -252,11 +244,6 @@ planet:
         population: 9773672793.0
       - date: '3145-01-01'
         population: 9820699195.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Sungai Baharu
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.35

@@ -93,9 +93,7 @@ planet:
     event:
       - date: '2637-01-23'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 50344.0
         socioIndustrial: C-D-D-D-C
       - date: '2640-01-01'
@@ -159,9 +157,7 @@ planet:
         population: 3604331967.0
       - date: '2900-01-28'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 3614046689.0
       - date: '2902-01-01'
         socioIndustrial: C-C-D-D-C
@@ -191,20 +187,16 @@ planet:
         population: 3438845619.0
       - date: '3025-02-03'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3028-01-01'
         socioIndustrial: C-B-D-C-C
       - date: '3030-06-17'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 3459735871.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-01-01'
@@ -215,7 +207,7 @@ planet:
         population: 3510267510.0
       - date: '3051-12-08'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3060-01-01'
@@ -242,15 +234,11 @@ planet:
         population: 3597690991.0
       - date: '3145-10-17'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 3599850253.0
       - date: '3151-02-15'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
   - name: Lehighton
     type: GAS_GIANT
     orbitalDist: 7.8

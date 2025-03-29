@@ -104,9 +104,7 @@ planet:
     event:
       - date: '2499-05-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 47959.0
         socioIndustrial: C-D-A-D-B
       - date: '2500-01-01'
@@ -229,16 +227,16 @@ planet:
         population: 183057261.0
       - date: '3020-01-01'
         population: 182776364.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-09-09'
         population: 183570785.0
         socioIndustrial: B-B-B-B-C
       - date: '3040-01-01'
         population: 185619771.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial:
           source: canon
@@ -247,19 +245,19 @@ planet:
         population: 188142629.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
         population: 189995491.0
       - date: '3064-03-01'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - LA
       - date: '3070-01-01'
@@ -286,11 +284,6 @@ planet:
         population: 211727557.0
       - date: '3145-01-01'
         population: 213513559.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Charles
     type: TERRESTRIAL
     orbitalDist: 1.76

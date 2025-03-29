@@ -87,9 +87,7 @@ planet:
     event:
       - date: '2247-08-19'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
         population: 45345.0
         socioIndustrial: D-D-C-D-F
       - date: '2250-01-01'
@@ -100,7 +98,7 @@ planet:
         population: 1181750.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -280,16 +278,12 @@ planet:
         population: 4766029915.0
       - date: '3078-05-01'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
       - date: '3080-01-01'
         population: 4800469163.0
       - date: '3086-02-01'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
       - date: '3090-01-01'
         population: 4822602188.0
       - date: '3091-01-01'
@@ -308,12 +302,7 @@ planet:
         population: 5017408952.0
       - date: '3148-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Hali's Retreat

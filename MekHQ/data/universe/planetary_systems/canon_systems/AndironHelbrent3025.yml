@@ -37,9 +37,7 @@ planet:
     event:
       - date: '2397-01-25'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 61027.0
         socioIndustrial: D-D-C-D-F
       - date: '2400-01-01'
@@ -126,9 +124,7 @@ planet:
         population: 123414369.0
       - date: '2779-03-04'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-01-01'
         population: 122573449.0
       - date: '2790-01-01'
@@ -145,17 +141,13 @@ planet:
         population: 6776.0
       - date: '2842-04-25'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: F-D-D-F-D
       - date: '3081-08-12'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 50000.0
         socioIndustrial: D-D-C-F-D
       - date: '3084-01-14'
@@ -174,11 +166,6 @@ planet:
         population: 280346.0
       - date: '3145-01-01'
         population: 307669.0
-      - date: '2108-12-05'
-        name: Helbrent
-      - date: '3025-01-01'
-        name: Andiron
-        message: Helbrent renamed to Andiron
   - name: Cenci
     type: ICE_GIANT
     orbitalDist: 0.49
