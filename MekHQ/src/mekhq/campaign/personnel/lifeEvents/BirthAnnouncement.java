@@ -25,7 +25,7 @@
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
  */
-package mekhq.campaign.personnel.procreation;
+package mekhq.campaign.personnel.lifeEvents;
 
 import static megamek.common.Compute.randomInt;
 import static megamek.common.enums.Gender.FEMALE;
