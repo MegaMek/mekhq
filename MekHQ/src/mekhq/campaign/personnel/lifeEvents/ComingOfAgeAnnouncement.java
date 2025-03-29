@@ -43,12 +43,25 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.randomEvents.personalities.PersonalityController.PronounData;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
+/**
+ * Handles the coming-of-age announcement for a character.
+ *
+ * <p>This class is responsible for generating both in-character and out-of-character messages, determining the
+ * speaker for the announcement, and displaying the dialog to the user. The announcement is tailored based on the
+ * settings, genealogy, and status of the involved characters in the campaign.</p>
+ *
+ * <p>Announcements prioritize parents as speakers but fallback to HR or other administrators if needed. Dialog
+ * choices may affect the campaign options, such as suppressing future life event dialogs.</p>
+ *
+ * @since MekHQ 0.50.05
+ */
 public class ComingOfAgeAnnouncement {
     private static final MMLogger logger = MMLogger.create(ComingOfAgeAnnouncement.class);
 
@@ -64,6 +77,18 @@ public class ComingOfAgeAnnouncement {
         PARENT, OTHER_PARENT, HR_REMINDER, HR_ORPHAN
     }
 
+
+    /**
+     * Constructs and initializes a coming-of-age announcement dialog.
+     *
+     * <p>During initialization, the speaker for the announcement is determined, messages are generated, and the
+     * immersive dialog is displayed to the user. User responses are processed to possibly adjust campaign options.</p>
+     *
+     * @param campaign      the {@link Campaign} instance managing the event. Provides context such as the commander,
+     *                      genealogy, and personnel data needed for processing.
+     * @param birthdayHaver the {@link Person} who is "coming of age". This individual is the subject of the
+     *                      announcement.
+     */
     public ComingOfAgeAnnouncement(Campaign campaign, Person birthdayHaver) {
         this.campaign = campaign;
         this.birthdayHaver = birthdayHaver;
@@ -83,12 +108,24 @@ public class ComingOfAgeAnnouncement {
               outOfCharacterMessage,
               true);
 
-        //        if (dialog.getDialogChoice() == SUPPRESS_DIALOG_RESPONSE_INDEX) {
-        //            CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        //            campaignOptions.setShowLifeEventDialogBirths(false);
-        //        }
+        if (dialog.getDialogChoice() == SUPPRESS_DIALOG_RESPONSE_INDEX) {
+            CampaignOptions campaignOptions = campaign.getCampaignOptions();
+            campaignOptions.setShowLifeEventDialogComingOfAge(false);
+        }
     }
 
+    /**
+     * Generates the in-character narrative text for the coming-of-age announcement.
+     *
+     * <p>The message is built dynamically by considering the attributes of the birthday haver, such as their first
+     * name, gender, and title. It also incorporates the speaker's context (e.g., parent, HR representative) to deliver
+     * a personalized message.</p>
+     *
+     * @param birthdayHaverFirstName the first name of the person coming of age. This is used for personalization within
+     *                               the message.
+     *
+     * @return a formatted string containing the in-character announcement message.
+     */
     private String getInCharacterMessage(String birthdayHaverFirstName) {
         // Birthday Haver Data
         Gender birthdayHaverGender = birthdayHaver.getGender();
@@ -126,6 +163,15 @@ public class ComingOfAgeAnnouncement {
               campaign.getCommanderAddress(false));
     }
 
+    /**
+     * Determines the most appropriate speaker for the coming-of-age announcement.
+     *
+     * <p>The speaker is selected based on the birthday haver’s genealogy, present and active parents, and campaign
+     * context.</p>
+     *
+     * @return the selected {@link Person} who will act as the speaker, or {@code null} if no suitable speaker can be
+     *       found.
+     */
     private @Nullable Person getSpeaker() {
         Genealogy genealogy = birthdayHaver.getGenealogy();
         Person commander = campaign.getFlaggedCommander();
@@ -181,6 +227,14 @@ public class ComingOfAgeAnnouncement {
         return speaker;
     }
 
+    /**
+     * Provides a fallback speaker if no parents or suitable personnel are found.
+     *
+     * <p>The fallback speaker is determined from the campaign's available administrators. Priority is given to HR
+     * personnel, with a secondary fallback to the senior COMMAND character.</p>
+     *
+     * @return the fallback {@link Person} to act as the speaker, or {@code null} if no fallback is available.
+     */
     private @Nullable Person getFallbackSpeaker() {
         Person speaker = campaign.getSeniorAdminPerson(HR);
 
@@ -193,6 +247,21 @@ public class ComingOfAgeAnnouncement {
         return speaker;
     }
 
+    /**
+     * Retrieves a gender-appropriate title for the birthday haver.
+     *
+     * <p>The title is generated based on the birthday haver's gender and localized using resource bundle keys.
+     * Titles are categorized as:</p>
+     * <ul>
+     *   <li>Neutral</li>
+     *   <li>Female</li>
+     *   <li>Male</li>
+     * </ul>
+     *
+     * @param gender the {@link Gender} of the person coming of age.
+     *
+     * @return a localized and formatted string representing the title.
+     */
     private static String getGenderedTitle(Gender gender) {
         String titleKey = "title.";
 
@@ -206,6 +275,16 @@ public class ComingOfAgeAnnouncement {
         return getFormattedTextAt(RESOURCE_BUNDLE, titleKey);
     }
 
+    /**
+     * Generates the button labels for the immersive announcement dialog.
+     *
+     * <p>These labels include positive, neutral, negative, and suppress responses, ailored to the birthday haver's
+     * first name and localized based on the resource bundle.</p>
+     *
+     * @param birthdayHaverFirstName the first name of the birthday haver, used for personalizing button labels.
+     *
+     * @return a list of strings representing the localized labels for the dialog buttons.
+     */
     private List<String> getButtonLabels(String birthdayHaverFirstName) {
         return List.of(getFormattedTextAt(RESOURCE_BUNDLE, "button.response.positive", birthdayHaverFirstName),
               getFormattedTextAt(RESOURCE_BUNDLE, "button.response.neutral"),
