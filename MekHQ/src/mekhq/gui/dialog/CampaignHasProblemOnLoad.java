@@ -27,17 +27,17 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.campaign.CampaignFactory.CampaignProblemType.CANT_LOAD_FROM_NEWER_VERSION;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.util.List;
+
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory.CampaignProblemType;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
-
-import java.util.List;
-
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.campaign.CampaignFactory.CampaignProblemType.CANT_LOAD_FROM_NEWER_VERSION;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * Dialog to inform and handle campaign-loading problems within MekHQ.
@@ -72,6 +72,7 @@ public class CampaignHasProblemOnLoad extends ImmersiveDialogCore {
               createOutOfCharacterMessage(problemType),
               null,
               false,
+              null,
               null,
               true);
     }

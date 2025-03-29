@@ -27,14 +27,15 @@
  */
 package mekhq.gui.baseComponents.immersiveDialogs;
 
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.ImageIcon;
 
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import megamek.common.annotations.Nullable;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
 
 /**
  * A generic immersive message dialog for providing information to the player in the campaign.
@@ -51,25 +52,37 @@ public class ImmersiveDialogSimple extends ImmersiveDialogCore {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
 
     /**
-     * Constructs a {@code GenericImmersiveMessageDialog} with the specified campaign and message details.
+     * Constructs a {@code GenericImmersiveMessageDialog} with the specified campaign, message details, and optional
+     * image and layout configuration.
      *
-     * <p>This dialog represents an immersive interaction, typically involving the appearance
-     * of one or two characters "speaking" to the player. The dialog is modal by default, and it provides customizable
-     * button labels for user interaction, with the commonly used button being "Understood" for closing the dialog.</p>
+     * <p>This dialog represents an immersive interaction, typically involving one or two characters
+     * "speaking" to the player. It provides a central message area, optional image display above the content, and
+     * customizable buttons for user interaction. The dialog is modal by default, blocking other interactions until it
+     * is closed.</p>
      *
      * @param campaign              The current game state, providing relevant campaign data.
      * @param leftSpeaker           The {@link Person} appearing as the left speaker, or {@code null} if no speaker is
-     *                              present on the left side.
+     *                              displayed on the left side.
      * @param rightSpeaker          The {@link Person} appearing as the right speaker, or {@code null} if no speaker is
-     *                              present on the right side.
-     * @param centerMessage         The primary message to be displayed in the center of the dialog.
+     *                              displayed on the right side.
+     * @param centerMessage         The primary message to be displayed in the center of the dialog. This typically
+     *                              conveys the main information or narrative of the dialog.
      * @param buttonLabels          A {@link List} of custom button labels to display in the dialog. If the list is
      *                              {@code null}, a default "Understood" button is displayed.
      * @param outOfCharacterMessage An optional out-of-character (OOC) message, or {@code null} if not applicable. This
-     *                              message is displayed in a non-character context, usually to provide additional
-     *                              information or context to the player.
+     *                              message is displayed outside the dialog's in-character context, usually to provide
+     *                              additional explanation or game-related information to the player.
+     * @param imageIcon             An optional {@link ImageIcon}, or {@code null} if not applicable. If specified, the
+     *                              image will appear above the center message to highlight or visually support the
+     *                              dialog's content. For example, it can represent a symbol, character, or important
+     *                              visual cue.
+     * @param useVerticalLayout     A boolean flag indicating whether to use a vertical layout. If {@code true}, the
+     *                              buttons are stacked vertically; otherwise, they are arranged side-by-side.
      */
-    public ImmersiveDialogSimple(Campaign campaign, @Nullable Person leftSpeaker, @Nullable Person rightSpeaker, String centerMessage, @Nullable List<String> buttonLabels, @Nullable String outOfCharacterMessage, boolean useVerticalLayout) {
+    public ImmersiveDialogSimple(Campaign campaign, @Nullable Person leftSpeaker, @Nullable Person rightSpeaker,
+                                 String centerMessage, @Nullable List<String> buttonLabels,
+                                 @Nullable String outOfCharacterMessage, @Nullable ImageIcon imageIcon,
+                                 boolean useVerticalLayout) {
         super(campaign,
               leftSpeaker,
               rightSpeaker,
@@ -79,6 +92,7 @@ public class ImmersiveDialogSimple extends ImmersiveDialogCore {
               null,
               useVerticalLayout,
               null,
+              imageIcon,
               true);
     }
 

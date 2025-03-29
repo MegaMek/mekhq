@@ -358,6 +358,7 @@ public class CurrentLocation {
                       inCharacterMessage,
                       null,
                       outOfCharacterMessage,
+                      null,
                       false);
                 break;
             }

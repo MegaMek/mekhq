@@ -27,22 +27,26 @@
  */
 package mekhq.gui.dialog.randomEvents;
 
+import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
+import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
+import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.awt.Component;
+import java.awt.Dimension;
+import java.time.LocalDate;
+import java.util.List;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
-
-import javax.swing.*;
-import java.awt.*;
-import java.time.LocalDate;
-import java.util.List;
-
-import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
-import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public class GrayMondayDialog extends ImmersiveDialogCore {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.GrayMonday";
@@ -56,6 +60,7 @@ public class GrayMondayDialog extends ImmersiveDialogCore {
               createOutOfCharacterMessage(),
               null,
               false,
+              null,
               null,
               true);
     }
