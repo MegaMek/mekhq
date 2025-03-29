@@ -31,6 +31,7 @@ import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.weapons.infantry.InfantryWeapon;
+import megamek.logging.MMLogger; // FIXME: LOGGER
 import mekhq.MekHQ;
 import mekhq.campaign.event.PartArrivedEvent;
 import mekhq.campaign.event.PartChangedEvent;
@@ -50,6 +51,7 @@ import java.util.Objects;
  * Manages machines and materiel for a campaign.
  */
 public class Quartermaster {
+    private static final MMLogger logger = MMLogger.create(Quartermaster.class); // FIXME: LOGGER
     public enum PartAcquisitionResult {
         PartInherentFailure,
         PlanetSpecificFailure,
@@ -123,7 +125,6 @@ public class Quartermaster {
      */
     public void addPart(Part part, int transitDays, boolean isBrandNew) {
         Objects.requireNonNull(part);
-
         if (part.getUnit() instanceof TestUnit) {
             // If this is a test unit, then we won't add the part
             return;
@@ -489,6 +490,8 @@ public class Quartermaster {
     public void arrivePart(Part part) {
         Objects.requireNonNull(part);
 
+        logger.info("ARRIVE PART: " + part); // FIXME: LOGGER
+      
         // Parts on a unit do not need to be reported as being "arrived",
         // the unit itself will receive an arrival event.
         if (part.getUnit() != null) {
@@ -779,21 +782,15 @@ public class Quartermaster {
             Money cost = part.getActualValue().multipliedBy(costMultiplier);
             if (getCampaign().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
                     getCampaign().getLocalDate(), cost, "Purchase of " + part.getName())) {
-                if (part instanceof Refit) {
-                    ((Refit) part).addRefitKitParts(transitDays);
-                } else {
-                    addPart(part, transitDays, true);
-                }
+    
+                addPart(part, transitDays, true);
+                
                 return true;
             } else {
                 return false;
             }
         } else {
-            if (part instanceof Refit) {
-                ((Refit) part).addRefitKitParts(transitDays);
-            } else {
-                addPart(part, transitDays, true);
-            }
+            addPart(part, transitDays, true);
             return true;
         }
     }

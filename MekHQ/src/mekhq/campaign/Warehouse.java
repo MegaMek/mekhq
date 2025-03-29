@@ -28,6 +28,7 @@
 package mekhq.campaign;
 
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger; // FIXME: LOGGER
 import mekhq.MekHQ;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartNewEvent;
@@ -35,6 +36,7 @@ import mekhq.campaign.event.PartRemovedEvent;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.Refit;
 import mekhq.utilities.MHQXMLUtility;
 
 import java.io.PrintWriter;
@@ -48,6 +50,7 @@ import java.util.stream.Stream;
  * Stores parts for a Campaign.
  */
 public class Warehouse {
+    private static final MMLogger logger = MMLogger.create(Warehouse.class); // FIXME: LOGGER
     private final TreeMap<Integer, Part> parts = new TreeMap<>();
 
     /**
@@ -69,6 +72,8 @@ public class Warehouse {
      */
     public Part addPart(Part part, boolean mergeWithExisting) {
         Objects.requireNonNull(part);
+
+        // Attempting to log here will cause NPEs when loading saves. Strange.
 
         if (mergeWithExisting && part.isSpare()) {
             Part mergedPart = mergePartWithExisting(part);

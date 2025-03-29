@@ -25,6 +25,9 @@
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
  */
+
+// FIXME: WeaverThree - This entire file needs to be completely redone for the new refit system once that shakes out.
+
 package mekhq.campaign.parts;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
