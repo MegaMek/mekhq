@@ -588,7 +588,7 @@ public class PersonalityController {
      * linguistic or grammatical processing. It includes pronoun forms commonly required for sentence construction and
      * supports pluralization when applicable.</p>
      *
-     * <h3>Fields</h3>
+     * <b>Fields</b>
      * <ul>
      *   <li><b>subjectPronoun</b>: The pronoun used as the subject of a sentence (e.g., "He", "She", "They").</li>
      *   <li><b>subjectPronounLowerCase</b>: The lowercased version of the subject pronoun (e.g., "he", "she", "they").</li>
