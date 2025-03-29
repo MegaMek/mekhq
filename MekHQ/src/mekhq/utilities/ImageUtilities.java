@@ -27,6 +27,7 @@
  */
 package mekhq.utilities;
 
+import static java.lang.Math.max;
 import static java.lang.Math.round;
 
 import java.awt.AlphaComposite;
@@ -85,10 +86,11 @@ public class ImageUtilities {
         int width, height;
 
         if (scaleByWidth) {
-            width = UIUtil.scaleForGUI(size);
+            // The uses of 'max' here are to prevent us risking a potential image with an illegal 0 px dimension.
+            width = max(1, UIUtil.scaleForGUI(size));
             height = (int) Math.ceil((double) width * icon.getIconHeight() / icon.getIconWidth());
         } else {
-            height = UIUtil.scaleForGUI(size);
+            height = max(1, UIUtil.scaleForGUI(size));
             width = (int) Math.ceil((double) height * icon.getIconWidth() / icon.getIconHeight());
         }
 
