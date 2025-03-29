@@ -171,6 +171,7 @@ import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
+import mekhq.campaign.personnel.lifeEvents.ComingOfAgeAnnouncement;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
@@ -4957,9 +4958,9 @@ public class Campaign implements ITechManager {
      * @param person The {@link Person} for whom the anniversaries will be processed
      */
     private void processAnniversaries(Person person) {
+        LocalDate birthday = person.getBirthday(getGameYear());
         if ((person.getRank().isOfficer()) || (!getCampaignOptions().isAnnounceOfficersOnly())) {
-            if ((person.getBirthday(getGameYear()).isEqual(getLocalDate())) &&
-                      (campaignOptions.isAnnounceBirthdays())) {
+            if (birthday.isEqual(currentDay) && campaignOptions.isAnnounceBirthdays()) {
                 addReport(String.format(resources.getString("anniversaryBirthday.text"),
                       person.getHyperlinkedFullTitle(),
                       ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions()
@@ -4973,7 +4974,7 @@ public class Campaign implements ITechManager {
                 LocalDate recruitmentAnniversary = recruitmentDate.withYear(getGameYear());
                 int yearsOfEmployment = (int) ChronoUnit.YEARS.between(recruitmentDate, currentDay);
 
-                if ((recruitmentAnniversary.isEqual(getLocalDate())) &&
+                if ((recruitmentAnniversary.isEqual(currentDay)) &&
                           (campaignOptions.isAnnounceRecruitmentAnniversaries())) {
                     addReport(String.format(resources.getString("anniversaryRecruitment.text"),
                           person.getHyperlinkedFullTitle(),
@@ -4985,13 +4986,19 @@ public class Campaign implements ITechManager {
                 }
             }
         } else if ((person.getAge(getLocalDate()) == 18) && (campaignOptions.isAnnounceChildBirthdays())) {
-            if (person.getBirthday(getGameYear()).isEqual(getLocalDate())) {
+            if (birthday.isEqual(currentDay)) {
                 addReport(String.format(resources.getString("anniversaryBirthday.text"),
                       person.getHyperlinkedFullTitle(),
                       ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions()
                                                                           .getFontColorPositiveHexColor()),
                       person.getAge(getLocalDate()),
                       CLOSING_SPAN_TAG));
+            }
+        }
+
+        if (campaignOptions.isShowLifeEventDialogComingOfAge()) {
+            if ((person.getAge(currentDay) == 16) && (birthday.isEqual(currentDay))) {
+                new ComingOfAgeAnnouncement(this, person);
             }
         }
     }

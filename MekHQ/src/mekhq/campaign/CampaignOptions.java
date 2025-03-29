@@ -312,6 +312,9 @@ public class CampaignOptions {
     private boolean announceOfficersOnly;
     private boolean announceChildBirthdays;
 
+    // Life Events
+    private boolean showLifeEventDialogComingOfAge;
+
     // Marriage
     private boolean useManualMarriages;
     private boolean useClanPersonnelMarriages;
@@ -882,6 +885,9 @@ public class CampaignOptions {
         setAnnounceRecruitmentAnniversaries(true);
         setAnnounceOfficersOnly(true);
         setAnnounceChildBirthdays(true);
+
+        // Life Events
+        setShowLifeEventDialogComingOfAge(true);
 
         // Marriage
         setUseManualMarriages(true);
@@ -2252,6 +2258,16 @@ public class CampaignOptions {
         this.announceChildBirthdays = announceChildBirthdays;
     }
     // endregion anniversaries
+
+    //startregion Life Events
+    public boolean isShowLifeEventDialogComingOfAge() {
+        return showLifeEventDialogComingOfAge;
+    }
+
+    public void setShowLifeEventDialogComingOfAge(final boolean showLifeEventDialogComingOfAge) {
+        this.showLifeEventDialogComingOfAge = showLifeEventDialogComingOfAge;
+    }
+    //endregion Life Events
 
     // region Dependents
     public boolean isUseRandomDependentAddition() {
@@ -4974,6 +4990,13 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "announceChildBirthdays", isAnnounceChildBirthdays());
         // endregion Announcements
 
+        // region Life Events
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "showLifeEventDialogComingOfAge",
+              isShowLifeEventDialogComingOfAge());
+        // endregion Life Events
+
         // region Marriage
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManualMarriages", isUseManualMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanPersonnelMarriages", isUseClanPersonnelMarriages());
@@ -5351,8 +5374,7 @@ public class CampaignOptions {
                     retVal.mistakeXP = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("vocationalXP")
                                  // <50.03 compatibility handler
-                                 ||
-                                 wn2.getNodeName().equalsIgnoreCase("idleXP")) {
+                                 || wn2.getNodeName().equalsIgnoreCase("idleXP")) {
                     retVal.vocationalXP = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("vocationalXPTargetNumber")
                                  // <50.03 compatibility handler
@@ -5720,6 +5742,8 @@ public class CampaignOptions {
                     retVal.setAnnounceOfficersOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("announceChildBirthdays")) {
                     retVal.setAnnounceChildBirthdays(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("showLifeEventDialogComingOfAge")) {
+                    retVal.setShowLifeEventDialogComingOfAge(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     // endregion anniversaries
 
                     // region Marriage
@@ -5788,8 +5812,9 @@ public class CampaignOptions {
                         if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         }
-                        retVal.getDivorceSurnameWeights().put(SplittingSurnameStyle.valueOf(wn3.getNodeName().trim()),
-                              Integer.parseInt(wn3.getTextContent().trim()));
+                        retVal.getDivorceSurnameWeights()
+                              .put(SplittingSurnameStyle.valueOf(wn3.getNodeName().trim()),
+                                    Integer.parseInt(wn3.getTextContent().trim()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomDivorceMethod")) {
                     retVal.setRandomDivorceMethod(RandomDivorceMethod.valueOf(wn2.getTextContent().trim()));
