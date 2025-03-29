@@ -600,14 +600,6 @@ public class PersonalityController {
      *       on the context in which the pronoun data is used (e.g., 1 for singular, >1 for plural).</li>
      * </ul>
      *
-     * <h3>Example Usage</h3>
-     * <pre>
-     * PronounData pronounData = new PronounData("He", "he", "Him", "him", "His", "his", 1);
-     * System.out.println("Subject Pronoun: " + pronounData.subjectPronoun());
-     * System.out.println("Object Pronoun: " + pronounData.objectPronoun());
-     * System.out.println("Pluralizer: " + (pronounData.pluralizer() > 1 ? "Plural" : "Singular"));
-     * </pre>
-     *
      * @param subjectPronoun             The subject pronoun (e.g., "He", "She", "They").
      * @param subjectPronounLowerCase    The lowercased version of the subject pronoun.
      * @param objectPronoun              The object pronoun (e.g., "Him", "Her", "Them").
