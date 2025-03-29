@@ -28,7 +28,7 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordLoanPaymentNag.getTotalPaymentsDue;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordLoanPaymentNag.unableToAffordLoans;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -48,7 +48,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
  *
  * <p>The {@code UnableToAffordLoanPaymentNagDialog} extends {@link ImmersiveDialogNag} and is specifically
  * designed to alert players about financial constraints preventing them from making a loan payment. It uses predefined
- * constants, including the {@code TRANSPORT} speaker and the {@code NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT} identifier, to
+ * constants, including the {@code LOGISTICS} speaker and the {@code NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT} identifier, to
  * configure the dialog's behavior and content.</p>
  */
 public class UnableToAffordLoanPaymentNagDialog extends ImmersiveDialogNag {
@@ -57,15 +57,15 @@ public class UnableToAffordLoanPaymentNagDialog extends ImmersiveDialogNag {
      * payment.
      *
      * <p>This constructor initializes the dialog with preconfigured values, such as the
-     * {@code NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT}
-     * constant for managing dialog suppression, the {@code "UnableToAffordLoanPaymentNagDialog"} localization key for
-     * retrieving dialog content, and the {@code TRANSPORT} speaker for delivering the message.</p>
+     * {@code NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT} constant for managing dialog suppression, the
+     * {@code "UnableToAffordLoanPaymentNagDialog"} localization key for retrieving dialog content, and the
+     * {@code LOGISTICS} speaker for delivering the message.</p>
      *
      * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data
      *                 required for constructing the nag dialog.
      */
     public UnableToAffordLoanPaymentNagDialog(final Campaign campaign) {
-        super(campaign, TRANSPORT, NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT, "UnableToAffordLoanPaymentNagDialog");
+        super(campaign, LOGISTICS, NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT, "UnableToAffordLoanPaymentNagDialog");
     }
 
     @Override
@@ -74,8 +74,15 @@ public class UnableToAffordLoanPaymentNagDialog extends ImmersiveDialogNag {
 
         Finances finances = campaign.getFinances();
         Money totalPaymentsDue = getTotalPaymentsDue(finances.getLoans(), campaign.getLocalDate());
+        Money currentFunds = campaign.getFunds();
+        Money deficit = totalPaymentsDue.minus(currentFunds);
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, key + ".ic", commanderAddress, totalPaymentsDue.toAmountString());
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              key + ".ic",
+              commanderAddress,
+              totalPaymentsDue.toAmountString(),
+              currentFunds.toAmountString(),
+              deficit.toAmountString());
     }
 
     /**

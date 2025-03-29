@@ -51,9 +51,9 @@ public class UnableToAffordJumpNagDialog extends ImmersiveDialogNag {
      * Constructs a new {@code UnableToAffordJumpNagDialog} to display a warning about unaffordable jump expenses.
      *
      * <p>This constructor initializes the dialog with preconfigured values, such as the
-     * {@code NAG_UNABLE_TO_AFFORD_JUMP}
-     * constant for managing dialog suppression, the {@code "UnableToAffordJumpNagDialog"} localization key for
-     * retrieving dialog content, and the {@code TRANSPORT} speaker for delivering the message.</p>
+     * {@code NAG_UNABLE_TO_AFFORD_JUMP} constant for managing dialog suppression, the
+     * {@code "UnableToAffordJumpNagDialog"} localization key for retrieving dialog content, and the {@code TRANSPORT}
+     * speaker for delivering the message.</p>
      *
      * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data
      *                 required for constructing the nag dialog.
@@ -67,8 +67,15 @@ public class UnableToAffordJumpNagDialog extends ImmersiveDialogNag {
         final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
 
         Money nextJumpCost = getNextJumpCost(campaign);
+        Money currentFunds = campaign.getFunds();
+        Money deficit = nextJumpCost.minus(currentFunds);
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, key + ".ic", commanderAddress, nextJumpCost.toAmountString());
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              key + ".ic",
+              commanderAddress,
+              nextJumpCost.toAmountString(),
+              currentFunds.toAmountString(),
+              deficit.toAmountString());
     }
 
     /**
