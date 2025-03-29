@@ -69,6 +69,8 @@ jobs:
 
       - name: "Check out MekHQ"
         uses: actions/checkout@v4
+        with:
+          path: mekhq
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
