@@ -92,7 +92,7 @@ public class ImmersiveDialogSimple extends ImmersiveDialogCore {
               null,
               useVerticalLayout,
               null,
-              imageIcon,
+              imageIcon == null ? campaign.getCampaignFactionIcon() : imageIcon,
               true);
     }
 

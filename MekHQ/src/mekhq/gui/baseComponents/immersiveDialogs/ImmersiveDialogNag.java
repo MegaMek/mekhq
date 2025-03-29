@@ -145,7 +145,7 @@ public class ImmersiveDialogNag {
               null,
               true,
               null,
-              null,
+              campaign.getCampaignFactionIcon(),
               true);
     }
 

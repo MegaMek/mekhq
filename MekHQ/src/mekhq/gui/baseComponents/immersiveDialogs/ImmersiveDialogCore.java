@@ -267,17 +267,6 @@ public class ImmersiveDialogCore extends JDialog {
         // Buttons panel
         JPanel buttonPanel = populateButtonPanel(buttons, isVerticalLayout, spinnerPanel);
 
-        // Create a JLabel for the image above the JEditorPane
-        JLabel imageLabel = new JLabel();
-        if (imageIcon != null) {
-            if (imageIcon.getIconWidth() > IMAGE_WIDTH) {
-                imageIcon = ImageUtilities.scaleImageIconToWidth(imageIcon, CENTER_WIDTH);
-            }
-            imageLabel.setIcon(imageIcon);
-            imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            imageLabel.setBorder(BorderFactory.createEmptyBorder(PADDING, 0, PADDING, 0));
-        }
-
         // Create a JEditorPane for the center message
         JEditorPane editorPane = new JEditorPane();
         editorPane.setContentType("text/html");
@@ -307,6 +296,23 @@ public class ImmersiveDialogCore extends JDialog {
         JPanel scrollPaneContainer = new JPanel(new BorderLayout());
         scrollPaneContainer.setBorder(BorderFactory.createEmptyBorder(PADDING, 0, PADDING, 0));
         scrollPaneContainer.add(scrollPane, BorderLayout.CENTER);
+
+        // Create a JLabel for the image above the JEditorPane
+        JLabel imageLabel = new JLabel();
+        if (imageIcon != null) {
+            if (imageIcon.getIconWidth() > CENTER_WIDTH) {
+                imageIcon = ImageUtilities.scaleImageIcon(imageIcon, CENTER_WIDTH, true);
+            }
+
+            int heightLimit = max(1, CENTER_WIDTH / 3); // I went with 3 because that provided the best feel
+            if (imageIcon.getIconHeight() > heightLimit) {
+                imageIcon = ImageUtilities.scaleImageIcon(imageIcon, heightLimit, false);
+            }
+
+            imageLabel.setIcon(imageIcon);
+            imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            imageLabel.setBorder(BorderFactory.createEmptyBorder(PADDING, 0, PADDING, 0));
+        }
 
         // Create a panel for the image and editorPane
         JPanel contentPanel = new JPanel();
