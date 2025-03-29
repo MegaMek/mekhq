@@ -27,8 +27,33 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
+import static java.io.File.separator;
+import static megamek.common.Board.START_SW;
+import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
+import static mekhq.campaign.personnel.SkillType.S_SMALL_ARMS;
+import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
+import static mekhq.campaign.randomEvents.prisoners.enums.MobType.HUGE;
+import static mekhq.campaign.randomEvents.prisoners.enums.MobType.LARGE;
+import static mekhq.campaign.randomEvents.prisoners.enums.MobType.MEDIUM;
+import static mekhq.campaign.randomEvents.prisoners.enums.MobType.SMALL;
+import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
+import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
+import static mekhq.campaign.stratcon.StratconRulesManager.getAvailableForceIDs;
+import static mekhq.campaign.stratcon.StratconRulesManager.sortForcesByMapType;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.*;
+import megamek.common.Crew;
+import megamek.common.Entity;
+import megamek.common.MekFileParser;
+import megamek.common.MekSummary;
+import megamek.common.MekSummaryCache;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -45,30 +70,13 @@ import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerEscapeeScenarioDialog;
 
-import java.util.*;
-
-import static java.io.File.separator;
-import static megamek.common.Board.START_SW;
-import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
-import static mekhq.campaign.personnel.SkillType.S_SMALL_ARMS;
-import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
-import static mekhq.campaign.randomEvents.prisoners.enums.MobType.HUGE;
-import static mekhq.campaign.randomEvents.prisoners.enums.MobType.LARGE;
-import static mekhq.campaign.randomEvents.prisoners.enums.MobType.MEDIUM;
-import static mekhq.campaign.randomEvents.prisoners.enums.MobType.SMALL;
-import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
-import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
-import static mekhq.campaign.stratcon.StratconRulesManager.getAvailableForceIDs;
-import static mekhq.campaign.stratcon.StratconRulesManager.sortForcesByMapType;
-
 /**
  * Handles the generation and setup of a scenario involving escaped prisoners attempting to flee.
  *
  * <p>This class is responsible for creating scenarios where captured prisoners have been tracked
- * down and are attempting to regroup with allied forces. It dynamically builds the necessary mobs
- * (representing groups of escapees), generates the associated game scenario, assigns escapees to
- * these mobs, and sets up their behavior within the scenario.</p>
+ * down and are attempting to regroup with allied forces. It dynamically builds the necessary mobs (representing groups
+ * of escapees), generates the associated game scenario, assigns escapees to these mobs, and sets up their behavior
+ * within the scenario.</p>
  *
  * <p>Once the scenario is prepared, the player is notified via a dialog that a special scenario
  * has been spawned.</p>
@@ -84,15 +92,12 @@ public class PrisonEscapeScenario {
      * Constructs the escape scenario for escaped prisoners.
      *
      * <p>This constructor initializes the creation of mobs based on the escaped prisoners, assigns
-     * prisoners to these mobs, and generates the associated game scenario where their interception
-     * will occur.</p>
+     * prisoners to these mobs, and generates the associated game scenario where their interception will occur.</p>
      *
-     * @param campaign  The current campaign instance, which provides contextual information and
-     *                 game state.
-     * @param contract  The AtB contract related to the campaign, used to manage scenario
-     *                 generation and details.
-     * @param escapees  A set of {@link Person} objects representing the escaped prisoners to be
-     *                 included in the scenario.
+     * @param campaign The current campaign instance, which provides contextual information and game state.
+     * @param contract The AtB contract related to the campaign, used to manage scenario generation and details.
+     * @param escapees A set of {@link Person} objects representing the escaped prisoners to be included in the
+     *                 scenario.
      */
     public PrisonEscapeScenario(Campaign campaign, AtBContract contract, Set<Person> escapees) {
         this.campaign = campaign;
@@ -107,8 +112,8 @@ public class PrisonEscapeScenario {
      * Finds and creates game units (mobs) representing groups of escapees.
      *
      * <p>This method generates a list of mobs based on the size of the escapee group. Each mob is
-     * created as a unit, and the prisoners are assigned roles within these units. If a prisoner
-     * lacks the required skills to serve in the mob, the necessary skills are added automatically.</p>
+     * created as a unit, and the prisoners are assigned roles within these units. If a prisoner lacks the required
+     * skills to serve in the mob, the necessary skills are added automatically.</p>
      *
      * @return A list of {@link Unit} objects containing the generated mobs with assigned escapees.
      */
@@ -167,6 +172,7 @@ public class PrisonEscapeScenario {
      * large, or huge). The corresponding entity is created using predefined mob types.</p>
      *
      * @param escapeeCount The number of escapees to consider for the mob entity creation.
+     *
      * @return The created mob {@link Entity}, or {@code null} if the creation failed.
      */
     private Entity createMobEntity(int escapeeCount) {
@@ -189,10 +195,11 @@ public class PrisonEscapeScenario {
      * Creates and returns an {@link Entity} representing a mob with the specified name.
      *
      * <p>This method attempts to retrieve the map entry corresponding to the specified mob name
-     * for creation. If the mob entry cannot be found or is invalid, an error is logged, and
-     * {@code null} is returned.</p>
+     * for creation. If the mob entry cannot be found or is invalid, an error is logged, and {@code null} is
+     * returned.</p>
      *
      * @param mobName The name of the mob to be created.
+     *
      * @return The created mob {@link Entity}, or {@code null} if the creation failed.
      */
     public @Nullable Entity createMob(String mobName) {
@@ -218,8 +225,8 @@ public class PrisonEscapeScenario {
      * Creates and sets up the escapee interception scenario.
      *
      * <p>This method generates a scenario using predefined templates and inserts the generated mob
-     * units as part of the escaping forces. It determines the track and coordinates for the
-     * interception and assigns necessary behavior settings to the mob forces.</p>
+     * units as part of the escaping forces. It determines the track and coordinates for the interception and assigns
+     * necessary behavior settings to the mob forces.</p>
      *
      * <p>If the scenario generation is successful, a dialog is triggered to inform the player
      * about the event.</p>
@@ -250,7 +257,7 @@ public class PrisonEscapeScenario {
             return;
         }
 
-        StratconCoords coords = getUnoccupiedCoords(track, false);
+        StratconCoords coords = getUnoccupiedCoords(track);
 
         if (coords == null) {
             logger.info("Failed to fetch a free set of coords");
@@ -259,7 +266,8 @@ public class PrisonEscapeScenario {
 
         List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract, false);
         Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs,
-              campaign.getHangar(), campaign.getAllForces());
+              campaign.getHangar(),
+              campaign.getAllForces());
 
         int randomForceIndex = randomInt(availableForceIDs.size());
         int randomForceID = availableForceIDs.get(randomForceIndex);
@@ -273,8 +281,15 @@ public class PrisonEscapeScenario {
             sortedAvailableForceIDs.get(AllGroundTerrain).removeIf(id -> id.equals(randomForceID));
         }
 
-        StratconScenario scenario = generateExternalScenario(campaign, contract, track, coords,
-            template, false, 0);
+        StratconScenario scenario = generateExternalScenario(campaign,
+              contract,
+              track,
+              coords,
+              template,
+              false,
+              false,
+              false,
+              0);
 
         if (scenario == null) {
             logger.info("Failed to generate a scenario");
