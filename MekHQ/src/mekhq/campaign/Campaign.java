@@ -48,6 +48,7 @@ import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomM
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
 import static mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement.isCommandersDay;
+import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWinterHolidayMajorDay;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenUsage;
@@ -173,6 +174,7 @@ import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
 import mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement;
+import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
@@ -5240,6 +5242,11 @@ public class Campaign implements ITechManager {
         final LocalDate yesterday = currentDay;
         currentDay = currentDay.plusDays(1);
 
+        // Check for important dates
+        if (campaignOptions.isShowLifeEventDialogCelebrations()) {
+            fetchCelebrationDialogs();
+        }
+
         // Determine if we have an active contract or not, as this can get used
         // elsewhere before we actually hit the AtB new day (e.g., personnel market)
         if (campaignOptions.isUseAtB()) {
@@ -5346,6 +5353,15 @@ public class Campaign implements ITechManager {
         // This must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
+    }
+
+    /**
+     * Fetches and handles the celebration dialogs specific to the current day.
+     */
+    private void fetchCelebrationDialogs() {
+        if (isWinterHolidayMajorDay(currentDay)) {
+            new WinterHolidayAnnouncement(this);
+        }
     }
 
     /**
