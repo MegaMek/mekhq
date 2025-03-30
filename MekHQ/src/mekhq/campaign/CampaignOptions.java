@@ -553,11 +553,12 @@ public class CampaignOptions {
 
     // Contract Market
     private ContractMarketMethod contractMarketMethod;
-    private int contractSearchRadius;
-    private boolean variableContractLength;
-    private boolean contractMarketReportRefresh;
-    private int contractMaxSalvagePercentage;
-    private int dropShipBonusPercentage;
+    private int                  contractSearchRadius;
+    private boolean              variableContractLength;
+    private boolean useDynamicDifficulty;
+    private boolean              contractMarketReportRefresh;
+    private int                  contractMaxSalvagePercentage;
+    private int                  dropShipBonusPercentage;
     // endregion Markets Tab
 
     // region RATs Tab
@@ -1163,6 +1164,7 @@ public class CampaignOptions {
         setContractMarketMethod(ContractMarketMethod.NONE);
         setContractSearchRadius(800);
         setVariableContractLength(true);
+        setUseDynamicDifficulty(false);
         setContractMarketReportRefresh(true);
         setContractMaxSalvagePercentage(100);
         setDropShipBonusPercentage(0);
@@ -3439,7 +3441,8 @@ public class CampaignOptions {
         return personnelMarketRandomRemovalTargets;
     }
 
-    public void setPersonnelMarketRandomRemovalTargets(final Map<SkillLevel, Integer> personnelMarketRandomRemovalTargets) {
+    public void setPersonnelMarketRandomRemovalTargets(
+          final Map<SkillLevel, Integer> personnelMarketRandomRemovalTargets) {
         this.personnelMarketRandomRemovalTargets = personnelMarketRandomRemovalTargets;
     }
 
@@ -3541,6 +3544,14 @@ public class CampaignOptions {
 
     public void setVariableContractLength(final boolean variableContractLength) {
         this.variableContractLength = variableContractLength;
+    }
+
+    public boolean isUseDynamicDifficulty() {
+        return useDynamicDifficulty;
+    }
+
+    public void setUseDynamicDifficulty(final boolean useDynamicDifficulty) {
+        this.useDynamicDifficulty = useDynamicDifficulty;
     }
 
     public boolean isContractMarketReportRefresh() {
@@ -5233,6 +5244,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMarketMethod", getContractMarketMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractSearchRadius", getContractSearchRadius());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "variableContractLength", isVariableContractLength());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDynamicDifficulty", isUseDynamicDifficulty());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMarketReportRefresh", isContractMarketReportRefresh());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMaxSalvagePercentage", getContractMaxSalvagePercentage());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dropShipBonusPercentage", getDropShipBonusPercentage());
@@ -6183,6 +6195,8 @@ public class CampaignOptions {
                     retVal.setContractSearchRadius(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("variableContractLength")) {
                     retVal.setVariableContractLength(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useDynamicDifficulty")) {
+                    retVal.setUseDynamicDifficulty(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketReportRefresh")) {
                     retVal.setContractMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractMaxSalvagePercentage")) {

@@ -66,23 +66,39 @@ public class AutosaveService implements IAutosaveService {
         final LocalDate today = campaign.getLocalDate();
         if (MekHQ.getMHQOptions().getAutosaveDailyValue()) {
             performAutosave(campaign);
-        } else if (MekHQ.getMHQOptions().getAutosaveWeeklyValue()
-                && (today.getDayOfWeek() == DayOfWeek.SUNDAY)) {
+        } else if (MekHQ.getMHQOptions().getAutosaveWeeklyValue() && (today.getDayOfWeek() == DayOfWeek.SUNDAY)) {
             performAutosave(campaign);
-        } else if (MekHQ.getMHQOptions().getAutosaveMonthlyValue()
-                && (today.getDayOfMonth() == today.lengthOfMonth())) {
+        } else if (MekHQ.getMHQOptions().getAutosaveMonthlyValue() &&
+                         (today.getDayOfMonth() == today.lengthOfMonth())) {
             performAutosave(campaign);
-        } else if (MekHQ.getMHQOptions().getAutosaveYearlyValue()
-                && (today.getDayOfYear() == today.lengthOfYear())) {
+        } else if (MekHQ.getMHQOptions().getAutosaveYearlyValue() && (today.getDayOfYear() == today.lengthOfYear())) {
+            performAutosave(campaign);
+        }
+    }
+
+    /**
+     * @deprecated Use {@code requestBeforeScenarioAutosave} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    @Override
+    public void requestBeforeMissionAutosave(final Campaign campaign) {
+        requestBeforeScenarioAutosave(campaign);
+    }
+
+    @Override
+    public void requestBeforeScenarioAutosave(final Campaign campaign) {
+        Objects.requireNonNull(campaign);
+
+        if (MekHQ.getMHQOptions().getAutosaveBeforeScenariosValue()) {
             performAutosave(campaign);
         }
     }
 
     @Override
-    public void requestBeforeMissionAutosave(final Campaign campaign) {
+    public void requestBeforeMissionEndAutosave(final Campaign campaign) {
         Objects.requireNonNull(campaign);
 
-        if (MekHQ.getMHQOptions().getAutosaveBeforeMissionsValue()) {
+        if (MekHQ.getMHQOptions().getAutosaveBeforeMissionEndValue()) {
             performAutosave(campaign);
         }
     }
@@ -92,9 +108,9 @@ public class AutosaveService implements IAutosaveService {
             final String fileName = getAutosaveFilename(campaign);
             if (!StringUtility.isNullOrBlank(fileName)) {
                 try (FileOutputStream fos = new FileOutputStream(fileName);
-                        GZIPOutputStream gos = new GZIPOutputStream(fos);
-                        OutputStreamWriter osw = new OutputStreamWriter(gos, StandardCharsets.UTF_8);
-                        PrintWriter writer = new PrintWriter(osw)) {
+                      GZIPOutputStream gos = new GZIPOutputStream(fos);
+                      OutputStreamWriter osw = new OutputStreamWriter(gos, StandardCharsets.UTF_8);
+                      PrintWriter writer = new PrintWriter(osw)) {
                     campaign.writeToXML(writer);
                     writer.flush();
                 }
@@ -113,9 +129,9 @@ public class AutosaveService implements IAutosaveService {
         final File[] files = folder.listFiles();
         if (files != null) {
             final List<File> autosaveFiles = Arrays.stream(files)
-                    .filter(f -> f.getName().startsWith("Autosave-"))
-                    .sorted(Comparator.comparing(File::lastModified))
-                    .collect(Collectors.toList());
+                                                   .filter(f -> f.getName().startsWith("Autosave-"))
+                                                   .sorted(Comparator.comparing(File::lastModified))
+                                                   .collect(Collectors.toList());
 
             // Delete older autosave files if needed
             final int maxNumberAutosaves = MekHQ.getMHQOptions().getMaximumNumberOfAutosavesValue();
@@ -125,7 +141,7 @@ public class AutosaveService implements IAutosaveService {
                 if (autosaveFiles.get(index).delete()) {
                     autosaveFiles.remove(index);
                 } else {
-                    logger.error("Unable to delete file " + autosaveFiles.get(index).getName());
+                    logger.error("Unable to delete file {}", autosaveFiles.get(index).getName());
                     index++;
                 }
             }
@@ -136,10 +152,12 @@ public class AutosaveService implements IAutosaveService {
             boolean repeatedName = true;
             index = 1;
             while (repeatedName) {
-                fileName = String.format("Autosave-%d-%s-%s.cpnx.gz", index++, campaign.getName(),
-                        campaign.getLocalDate().format(DateTimeFormatter
-                                .ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
-                                .withLocale(MekHQ.getMHQOptions().getDateLocale())));
+                fileName = String.format("Autosave-%d-%s-%s.cpnx.gz",
+                      index++,
+                      campaign.getName(),
+                      campaign.getLocalDate()
+                            .format(DateTimeFormatter.ofPattern(MHQConstants.FILENAME_DATE_FORMAT)
+                                          .withLocale(MekHQ.getMHQOptions().getDateLocale())));
 
                 repeatedName = false;
                 for (final File file : autosaveFiles) {

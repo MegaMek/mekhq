@@ -28,7 +28,12 @@
 
 package mekhq.campaign.unit;
 
-import megamek.common.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.Vector;
+
+import megamek.common.Transporter;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
@@ -36,8 +41,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.utilities.CampaignTransportUtilities;
-
-import java.util.*;
 
 /**
  * Tracks what units this transport is transporting, and its current capacity for its different transporter types.
@@ -52,7 +55,7 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
      * @param transport unit this summary is about
      */
     public ShipTransportedUnitsSummary(Unit transport) {
-        super(transport);
+        super(transport, CampaignTransportType.SHIP_TRANSPORT);
     }
 
     /**

@@ -27,7 +27,10 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import static mekhq.campaign.personnel.SkillDeprecationTool.DEPRECATED_SKILLS;
+
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import megamek.common.Compute;
@@ -127,9 +130,13 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         // roll random secondary skill
         if (Utilities.rollProbability(rskillPrefs.getSecondSkillProb())) {
-            final List<String> possibleSkills = Arrays.stream(SkillType.skillList)
-                                                      .filter(stype -> !person.getSkills().hasSkill(stype))
-                                                      .toList();
+            List<String> possibleSkills = new ArrayList<>();
+            for (String stype : SkillType.skillList) {
+                if (!person.getSkills().hasSkill(stype) && !DEPRECATED_SKILLS.contains(SkillType.getType(stype))) {
+                    possibleSkills.add(stype);
+                }
+            }
+
             String selSkill = possibleSkills.get(Compute.randomInt(possibleSkills.size()));
             int secondLvl = Utilities.generateExpLevel(rskillPrefs.getSecondSkillBonus());
             addSkill(person, selSkill, secondLvl, rskillPrefs.randomizeSkill(), bonus);
