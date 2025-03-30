@@ -27,6 +27,20 @@
  */
 package mekhq.gui.campaignOptions;
 
+import static java.lang.Math.round;
+import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createSubTabs;
+
+import java.time.LocalDate;
+import java.util.Map;
+import java.util.ResourceBundle;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+
 import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.MekHQ;
@@ -41,28 +55,15 @@ import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.contents.*;
 
-import javax.swing.*;
-import java.time.LocalDate;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import static java.lang.Math.round;
-import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
-import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
-import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createSubTabs;
-
 /**
- * The {@code CampaignOptionsPane} class represents a tabbed pane used for displaying
- * and managing various campaign options in MekHQ. It organizes these options
- * into tabs and sub-tabs, enabling users to configure different aspects of a campaign.
- * This component serves as the central UI for campaign settings management.
+ * The {@code CampaignOptionsPane} class represents a tabbed pane used for displaying and managing various campaign
+ * options in MekHQ. It organizes these options into tabs and sub-tabs, enabling users to configure different aspects of
+ * a campaign. This component serves as the central UI for campaign settings management.
  *
  * <p>
- * The pane is initialized with a {@link Campaign} instance, which provides the campaign's
- * data and allows options to be applied directly to the active campaign.
- * The dialog supports multiple modes, such as {@code NORMAL}, {@code ABRIDGED},
- * and {@code STARTUP}, to determine the level of detail and features shown.
+ * The pane is initialized with a {@link Campaign} instance, which provides the campaign's data and allows options to be
+ * applied directly to the active campaign. The dialog supports multiple modes, such as {@code NORMAL},
+ * {@code ABRIDGED}, and {@code STARTUP}, to determine the level of detail and features shown.
  * </p>
  *
  * <strong>Key Features:</strong>
@@ -100,9 +101,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private RulesetsTab rulesetsTab;
 
     /**
-     * Constructs a {@code CampaignOptionsPane} for managing campaign settings.
-     * This initializes the tabbed pane and populates it with categories and sub-tabs
-     * based on the provided {@link Campaign} instance and dialog mode.
+     * Constructs a {@code CampaignOptionsPane} for managing campaign settings. This initializes the tabbed pane and
+     * populates it with categories and sub-tabs based on the provided {@link Campaign} instance and dialog mode.
      *
      * @param frame    the parent {@link JFrame} for this pane
      * @param campaign the {@link Campaign} object representing the current campaign
@@ -118,19 +118,20 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     /**
-     * Initializes the campaign options pane by creating all parent tabs and adding
-     * sub-tabs for various campaign settings categories. Dynamically adjusts tab fonts
-     * and layout based on UI scaling settings.
+     * Initializes the campaign options pane by creating all parent tabs and adding sub-tabs for various campaign
+     * settings categories. Dynamically adjusts tab fonts and layout based on UI scaling settings.
      */
     @Override
     protected void initialize() {
         double uiScale = 1;
         try {
             uiScale = Double.parseDouble(System.getProperty("flatlaf.uiScale"));
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
-        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", round(HEADER_FONT_SIZE * uiScale),
-            resources.getString("generalPanel.title")), createGeneralTab(mode));
+        addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              round(HEADER_FONT_SIZE * uiScale),
+              resources.getString("generalPanel.title")), createGeneralTab(mode));
 
         JTabbedPane humanResourcesParentTab = createHumanResourcesParentTab();
         createTab("humanResourcesParentTab", humanResourcesParentTab);
@@ -146,9 +147,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     /**
-     * Adds a new tab to the pane. Wrapper method for adding a resource-labeled tab
-     * containing a {@link JScrollPane} to the campaign options pane. Dynamically adjusts font size
-     * for consistent scaling across all UI elements.
+     * Adds a new tab to the pane. Wrapper method for adding a resource-labeled tab containing a {@link JScrollPane} to
+     * the campaign options pane. Dynamically adjusts font size for consistent scaling across all UI elements.
      *
      * @param resourceName the resource string key to locate the tab title
      * @param tab          the {@link JTabbedPane} to add as content for the tab
@@ -164,19 +164,19 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         double uiScale = 1;
         try {
             uiScale = Double.parseDouble(System.getProperty("flatlaf.uiScale"));
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         if (mode != ABRIDGED && mode != STARTUP_ABRIDGED) {
             addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-                round(HEADER_FONT_SIZE * uiScale),
-                resources.getString(resourceName + ".title")),
-                tabScrollPane);
+                  round(HEADER_FONT_SIZE * uiScale),
+                  resources.getString(resourceName + ".title")), tabScrollPane);
         }
     }
 
     /**
-     * Creates the panel for general campaign options. Loads settings for general preferences
-     * and initializes it with current campaign options.
+     * Creates the panel for general campaign options. Loads settings for general preferences and initializes it with
+     * current campaign options.
      *
      * @param mode the state in which the dialog was triggered.
      *
@@ -191,8 +191,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     /**
-     * Creates the "Human Resources" parent tab. This tab organizes related sub-tabs concerning
-     * personnel management, relationships, turnover, and biography options.
+     * Creates the "Human Resources" parent tab. This tab organizes related sub-tabs concerning personnel management,
+     * relationships, turnover, and biography options.
      *
      * @return a {@link JTabbedPane} containing sub-tabs for the human resources category
      */
@@ -203,63 +203,81 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Personnel
         personnelTab = new PersonnelTab(campaignOptions);
 
-        JTabbedPane personnelContentTabs = createSubTabs(Map.of(
-            "personnelGeneralTab", personnelTab.createGeneralTab(),
-            "personnelInformationTab", personnelTab.createPersonnelInformationTab(),
-            "awardsTab", personnelTab.createAwardsTab(),
-            "prisonersAndDependentsTab", personnelTab.createPrisonersAndDependentsTab(),
-            "medicalTab", personnelTab.createMedicalTab(),
-            "salariesTab", personnelTab.createSalariesTab()));
+        JTabbedPane personnelContentTabs = createSubTabs(Map.of("personnelGeneralTab",
+              personnelTab.createGeneralTab(),
+              "personnelInformationTab",
+              personnelTab.createPersonnelInformationTab(),
+              "awardsTab",
+              personnelTab.createAwardsTab(),
+              "prisonersAndDependentsTab",
+              personnelTab.createPrisonersAndDependentsTab(),
+              "medicalTab",
+              personnelTab.createMedicalTab(),
+              "salariesTab",
+              personnelTab.createSalariesTab()));
         personnelTab.loadValuesFromCampaignOptions();
 
         // Biography
-        biographyTab = new BiographyTab(campaign);
+        biographyTab = new BiographyTab(campaign, generalTab);
 
-        JTabbedPane biographyContentTabs = createSubTabs(Map.of(
-            "biographyGeneralTab", biographyTab.createGeneralTab(),
-            "backgroundsTab", biographyTab.createBackgroundsTab(),
-            "deathTab", biographyTab.createDeathTab(),
-            "educationTab", biographyTab.createEducationTab(),
-            "nameAndPortraitGenerationTab", biographyTab.createNameAndPortraitGenerationTab(),
-            "rankTab", biographyTab.createRankTab()));
+        JTabbedPane biographyContentTabs = createSubTabs(Map.of("biographyGeneralTab",
+              biographyTab.createGeneralTab(),
+              "backgroundsTab",
+              biographyTab.createBackgroundsTab(),
+              "deathTab",
+              biographyTab.createDeathTab(),
+              "educationTab",
+              biographyTab.createEducationTab(),
+              "nameAndPortraitGenerationTab",
+              biographyTab.createNameAndPortraitGenerationTab(),
+              "rankTab",
+              biographyTab.createRankTab()));
         biographyTab.loadValuesFromCampaignOptions();
 
         // Relationships
         relationshipsTab = new RelationshipsTab(campaignOptions);
 
-        JTabbedPane relationshipsContentTabs = createSubTabs(Map.of(
-            "marriageTab", relationshipsTab.createMarriageTab(),
-            "divorceTab", relationshipsTab.createDivorceTab(),
-            "procreationTab", relationshipsTab.createProcreationTab()));
+        JTabbedPane relationshipsContentTabs = createSubTabs(Map.of("marriageTab",
+              relationshipsTab.createMarriageTab(),
+              "divorceTab",
+              relationshipsTab.createDivorceTab(),
+              "procreationTab",
+              relationshipsTab.createProcreationTab()));
         relationshipsTab.loadValuesFromCampaignOptions();
 
         // Turnover and Retention
         turnoverAndRetentionTab = new TurnoverAndRetentionTab(campaignOptions);
 
-        JTabbedPane turnoverAndRetentionContentTabs = createSubTabs(Map.of(
-            "turnoverTab", turnoverAndRetentionTab.createTurnoverTab(),
-            "fatigueTab", turnoverAndRetentionTab.createFatigueTab()));
+        JTabbedPane turnoverAndRetentionContentTabs = createSubTabs(Map.of("turnoverTab",
+              turnoverAndRetentionTab.createTurnoverTab(),
+              "fatigueTab",
+              turnoverAndRetentionTab.createFatigueTab()));
         turnoverAndRetentionTab.loadValuesFromCampaignOptions();
 
         // Add Tabs
-        humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("personnelContentTabs.title")), personnelContentTabs);
-        humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("biographyContentTabs.title")), biographyContentTabs);
-        humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("relationshipsContentTabs.title")), relationshipsContentTabs);
-        humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("turnoverAndRetentionContentTabs.title")), turnoverAndRetentionContentTabs);
+        humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4,
+              resources.getString("personnelContentTabs.title")), personnelContentTabs);
+        humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4,
+              resources.getString("biographyContentTabs.title")), biographyContentTabs);
+        humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4,
+              resources.getString("relationshipsContentTabs.title")), relationshipsContentTabs);
+        humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4,
+              resources.getString("turnoverAndRetentionContentTabs.title")), turnoverAndRetentionContentTabs);
 
-        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("humanResourcesParentTab.title")), humanResourcesParentTab);
+        addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4,
+              resources.getString("humanResourcesParentTab.title")), humanResourcesParentTab);
 
         return humanResourcesParentTab;
     }
 
     /**
-     * Creates the "Advancement" parent tab. This tab organizes related sub-tabs for awards,
-     * skill randomization, general skill management, and special pilot abilities (SPAs).
+     * Creates the "Advancement" parent tab. This tab organizes related sub-tabs for awards, skill randomization,
+     * general skill management, and special pilot abilities (SPAs).
      *
      * @return a {@link JTabbedPane} containing sub-tabs for the advancement category
      */
@@ -270,45 +288,55 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Advancement
         advancementTab = new AdvancementTab(campaign);
 
-        JTabbedPane awardsAndRandomizationContentTabs = createSubTabs(Map.of(
-            "xpAwardsTab", advancementTab.xpAwardsTab(),
-            "randomizationTab", advancementTab.skillRandomizationTab()));
+        JTabbedPane awardsAndRandomizationContentTabs = createSubTabs(Map.of("1xpAwardsTab",
+              advancementTab.xpAwardsTab(),
+              "0randomizationTab",
+              advancementTab.skillRandomizationTab(),
+              "2recruitmentBonusesTab",
+              advancementTab.recruitmentBonusesTab()));
         advancementTab.loadValuesFromCampaignOptions();
 
         // Skills
         skillsTab = new SkillsTab(campaignOptions);
 
-        JTabbedPane skillsContentTabs = createSubTabs(Map.of(
-            "combatSkillsTab", skillsTab.createSkillsTab(true),
-            "supportSkillsTab", skillsTab.createSkillsTab(false)));
+        JTabbedPane skillsContentTabs = createSubTabs(Map.of("combatSkillsTab",
+              skillsTab.createSkillsTab(true),
+              "supportSkillsTab",
+              skillsTab.createSkillsTab(false)));
         skillsTab.loadValuesFromCampaignOptions();
 
         // SPAs
         abilitiesTab = new AbilitiesTab();
 
-        JTabbedPane abilityContentTabs = createSubTabs(Map.of(
-            "combatAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.COMBAT_ABILITY),
-            "maneuveringAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.MANEUVERING_ABILITY),
-            "utilityAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.UTILITY_ABILITY)));
+        JTabbedPane abilityContentTabs = createSubTabs(Map.of("combatAbilitiesTab",
+              abilitiesTab.createAbilitiesTab(AbilityCategory.COMBAT_ABILITY),
+              "maneuveringAbilitiesTab",
+              abilitiesTab.createAbilitiesTab(AbilityCategory.MANEUVERING_ABILITY),
+              "utilityAbilitiesTab",
+              abilitiesTab.createAbilitiesTab(AbilityCategory.UTILITY_ABILITY)));
         // the loading of values from the campaign is built into the AbilitiesTab class so not called here.
 
         // Add Tabs
-        advancementParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("awardsAndRandomizationContentTabs.title")), awardsAndRandomizationContentTabs);
-        advancementParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("skillsContentTabs.title")), skillsContentTabs);
-        advancementParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("abilityContentTabs.title")), abilityContentTabs);
+        advancementParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4,
+              resources.getString("awardsAndRandomizationContentTabs.title")), awardsAndRandomizationContentTabs);
+        advancementParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4,
+              resources.getString("skillsContentTabs.title")), skillsContentTabs);
+        advancementParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4,
+              resources.getString("abilityContentTabs.title")), abilityContentTabs);
 
-        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("advancementParentTab.title")), advancementParentTab);
+        addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4,
+              resources.getString("advancementParentTab.title")), advancementParentTab);
 
         return advancementParentTab;
     }
 
     /**
-     * Creates the "Logistics and Maintenance" parent tab. This tab organizes related sub-tabs
-     * for equipment acquisition, repair, maintenance, and supply management options.
+     * Creates the "Logistics and Maintenance" parent tab. This tab organizes related sub-tabs for equipment
+     * acquisition, repair, maintenance, and supply management options.
      *
      * @return a {@link JTabbedPane} containing sub-tabs for the logistics and maintenance category
      */
@@ -319,35 +347,41 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Repair and Maintenance
         repairAndMaintenanceTab = new RepairAndMaintenanceTab(campaignOptions);
 
-        JTabbedPane repairsAndMaintenanceContentTabs = createSubTabs(Map.of(
-            "repairTab", repairAndMaintenanceTab.createRepairTab(),
-            "maintenanceTab", repairAndMaintenanceTab.createMaintenanceTab()));
+        JTabbedPane repairsAndMaintenanceContentTabs = createSubTabs(Map.of("repairTab",
+              repairAndMaintenanceTab.createRepairTab(),
+              "maintenanceTab",
+              repairAndMaintenanceTab.createMaintenanceTab()));
         repairAndMaintenanceTab.loadValuesFromCampaignOptions();
 
         // Supplies and Acquisition
         equipmentAndSuppliesTab = new EquipmentAndSuppliesTab(campaignOptions);
 
-        JTabbedPane suppliesAndAcquisitionContentTabs = createSubTabs(Map.of(
-            "acquisitionTab", equipmentAndSuppliesTab.createAcquisitionTab(),
-            "planetaryAcquisitionTab", equipmentAndSuppliesTab.createPlanetaryAcquisitionTab(),
-            "techLimitsTab", equipmentAndSuppliesTab.createTechLimitsTab()));
+        JTabbedPane suppliesAndAcquisitionContentTabs = createSubTabs(Map.of("acquisitionTab",
+              equipmentAndSuppliesTab.createAcquisitionTab(),
+              "planetaryAcquisitionTab",
+              equipmentAndSuppliesTab.createPlanetaryAcquisitionTab(),
+              "techLimitsTab",
+              equipmentAndSuppliesTab.createTechLimitsTab()));
         equipmentAndSuppliesTab.loadValuesFromCampaignOptions();
 
         // Add tabs
-        equipmentAndSuppliesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("suppliesAndAcquisitionContentTabs.title")), suppliesAndAcquisitionContentTabs);
-        equipmentAndSuppliesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("repairsAndMaintenanceContentTabs.title")), repairsAndMaintenanceContentTabs);
+        equipmentAndSuppliesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4,
+              resources.getString("suppliesAndAcquisitionContentTabs.title")), suppliesAndAcquisitionContentTabs);
+        equipmentAndSuppliesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4,
+              resources.getString("repairsAndMaintenanceContentTabs.title")), repairsAndMaintenanceContentTabs);
 
-        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("logisticsAndMaintenanceParentTab.title")), equipmentAndSuppliesParentTab);
+        addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4,
+              resources.getString("logisticsAndMaintenanceParentTab.title")), equipmentAndSuppliesParentTab);
 
         return equipmentAndSuppliesParentTab;
     }
 
     /**
-     * Creates the "Strategic Operations" parent tab. This tab organizes related sub-tabs for
-     * finances, market management (personnel, units, and contracts), and ruleset configuration.
+     * Creates the "Strategic Operations" parent tab. This tab organizes related sub-tabs for finances, market
+     * management (personnel, units, and contracts), and ruleset configuration.
      *
      * @return a {@link JTabbedPane} containing sub-tabs for the strategic operations category
      */
@@ -358,53 +392,60 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Finances
         financesTab = new FinancesTab(campaign);
 
-        JTabbedPane financesContentTabs = createSubTabs(Map.of(
-            "financesGeneralTab", financesTab.createFinancesGeneralOptionsTab(),
-            "priceMultipliersTab", financesTab.createPriceMultipliersTab()));
+        JTabbedPane financesContentTabs = createSubTabs(Map.of("financesGeneralTab",
+              financesTab.createFinancesGeneralOptionsTab(),
+              "priceMultipliersTab",
+              financesTab.createPriceMultipliersTab()));
         financesTab.loadValuesFromCampaignOptions();
 
         // Markets
         marketsTab = new MarketsTab(campaign);
 
-        JTabbedPane marketsContentTabs = createSubTabs(Map.of(
-            "personnelMarketTab", marketsTab.createPersonnelMarketTab(),
-            "unitMarketTab", marketsTab.createUnitMarketTab(),
-            "contractMarketTab", marketsTab.createContractMarketTab()));
+        JTabbedPane marketsContentTabs = createSubTabs(Map.of("personnelMarketTab",
+              marketsTab.createPersonnelMarketTab(),
+              "unitMarketTab",
+              marketsTab.createUnitMarketTab(),
+              "contractMarketTab",
+              marketsTab.createContractMarketTab()));
         marketsTab.loadValuesFromCampaignOptions();
 
         // Rulesets
         rulesetsTab = new RulesetsTab(campaignOptions);
 
-        JTabbedPane rulesetsContentTabs = createSubTabs(Map.of(
-            "stratConGeneralTab", rulesetsTab.createStratConTab(),
-            "legacyTab", rulesetsTab.createLegacyTab()));
+        JTabbedPane rulesetsContentTabs = createSubTabs(Map.of("stratConGeneralTab",
+              rulesetsTab.createStratConTab(),
+              "legacyTab",
+              rulesetsTab.createLegacyTab()));
         rulesetsTab.loadValuesFromCampaignOptions();
 
         // Add tabs
-        strategicOperationsParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("financesContentTabs.title")), financesContentTabs);
-        strategicOperationsParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("marketsContentTabs.title")), marketsContentTabs);
-        strategicOperationsParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("rulesetsContentTabs.title")), rulesetsContentTabs);
+        strategicOperationsParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4,
+              resources.getString("financesContentTabs.title")), financesContentTabs);
+        strategicOperationsParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4,
+              resources.getString("marketsContentTabs.title")), marketsContentTabs);
+        strategicOperationsParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4,
+              resources.getString("rulesetsContentTabs.title")), rulesetsContentTabs);
 
-        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("strategicOperationsParentTab.title")), strategicOperationsParentTab);
+        addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+              4,
+              resources.getString("strategicOperationsParentTab.title")), strategicOperationsParentTab);
 
         return strategicOperationsParentTab;
     }
 
     /**
-     * Applies the currently configured campaign options to the active {@link Campaign}.
-     * This method processes all tabs in the dialog, applying the options to the campaign
-     * in logical order (e.g., "General" first, followed by other categories).
+     * Applies the currently configured campaign options to the active {@link Campaign}. This method processes all tabs
+     * in the dialog, applying the options to the campaign in logical order (e.g., "General" first, followed by other
+     * categories).
      *
-     * @param preset      an optional {@link CampaignPreset} used to override campaign options
-     * @param isStartUp   specifies whether this is run as part of a startup initialization
+     * @param preset       an optional {@link CampaignPreset} used to override campaign options
+     * @param isStartUp    specifies whether this is run as part of a startup initialization
      * @param isSaveAction determines if this action is saving options to a preset
      */
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset, boolean isStartUp,
-                                               boolean isSaveAction) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset, boolean isStartUp, boolean isSaveAction) {
         CampaignOptions options = this.campaignOptions;
         RandomSkillPreferences presetRandomSkillPreferences = null;
         Map<String, SkillType> presetSkills = null;
@@ -452,9 +493,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     /**
-     * Applies the values from a {@link CampaignPreset} to all tabs in the dialog. This propagates
-     * preset-specific configuration to all associated components and sub-tabs, including
-     * campaign-related properties such as dates, factions, and skills.
+     * Applies the values from a {@link CampaignPreset} to all tabs in the dialog. This propagates preset-specific
+     * configuration to all associated components and sub-tabs, including campaign-related properties such as dates,
+     * factions, and skills.
      *
      * @param campaignPreset the {@link CampaignPreset} containing the preset options to apply
      */
@@ -472,13 +513,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Human Resources
         personnelTab.loadValuesFromCampaignOptions(presetCampaignOptions);
         biographyTab.loadValuesFromCampaignOptions(presetCampaignOptions,
-            presetCampaignOptions.getRandomOriginOptions(), campaignPreset.getRankSystem());
+              presetCampaignOptions.getRandomOriginOptions(),
+              campaignPreset.getRankSystem());
         relationshipsTab.loadValuesFromCampaignOptions(presetCampaignOptions);
         turnoverAndRetentionTab.loadValuesFromCampaignOptions(presetCampaignOptions);
 
         // Advancement
-        advancementTab.loadValuesFromCampaignOptions(presetCampaignOptions,
-            campaignPreset.getRandomSkillPreferences());
+        advancementTab.loadValuesFromCampaignOptions(presetCampaignOptions, campaignPreset.getRandomSkillPreferences());
         skillsTab.loadValuesFromCampaignOptions(presetCampaignOptions, campaignPreset.getSkills());
         // The ability tab is a special case, so handled differently to other tabs
         abilitiesTab.buildAllAbilityInfo(campaignPreset.getSpecialAbilities());

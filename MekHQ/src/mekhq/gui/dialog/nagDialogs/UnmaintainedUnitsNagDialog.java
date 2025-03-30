@@ -27,43 +27,121 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import mekhq.MHQConstants;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.unit.Unit;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog;
-
-import java.util.Collection;
-
+import static mekhq.MHQConstants.NAG_UNMAINTAINED_UNITS;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnmaintainedUnitsNagLogic.campaignHasUnmaintainedUnits;
 
+import java.util.Collection;
+import java.util.List;
+
+import megamek.common.annotations.Nullable;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.Campaign.AdministratorSpecialization;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
+
 /**
- * A nag dialog that alerts the user about unmaintained units in the campaign's hangar.
+ * A dialog class used to notify players about unmaintained units within the campaign.
  *
- * <p>
- * This dialog identifies units that require maintenance but have not received it yet,
- * excluding units marked as salvage. It provides a reminder to the player to keep
- * active units in proper working order.
- * </p>
+ * <p>The {@code UnmaintainedUnitsNagDialog} extends {@link ImmersiveDialogNag} and is specifically designed
+ * to alert players when there are units in the campaign that have not received necessary maintenance. It uses
+ * predefined constants, such as {@code NAG_UNMAINTAINED_UNITS}, to configure the dialog's behavior and content.</p>
  */
-public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
+public class UnmaintainedUnitsNagDialog extends ImmersiveDialogNag {
     /**
-     * Constructs the nag dialog for unmaintained units.
+     * Constructs a new {@code UnmaintainedUnitsNagDialog} to display a warning about unmaintained units.
      *
-     * <p>
-     * This constructor initializes the dialog with relevant campaign details and
-     * formats the displayed message to include context for the commander.
-     * </p>
+     * <p>This constructor initializes the dialog with preconfigured values, including the
+     * {@code NAG_UNMAINTAINED_UNITS}
+     * constant for managing dialog suppression and the {@code "UnmaintainedUnitsNagDialog"} localization key for
+     * retrieving dialog content. This dialog does not associate a specific speaker.</p>
      *
-     * @param campaign The {@link Campaign} object representing the current campaign.
+     * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data
+     *                 required for constructing the nag dialog.
      */
     public UnmaintainedUnitsNagDialog(final Campaign campaign) {
-        super(campaign, MHQConstants.NAG_UNMAINTAINED_UNITS);
+        super(campaign, null, NAG_UNMAINTAINED_UNITS, "UnmaintainedUnitsNagDialog");
+    }
 
-        final String DIALOG_BODY = "UnmaintainedUnitsNagDialog.text";
-        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
-            campaign.getCommanderAddress(false)));
-        showDialog();
+    /**
+     * Retrieves the appropriate speaker for a campaign dialog based on personnel specialization and rank.
+     *
+     * <p>This method evaluates the active personnel within the campaign to determine the most suitable speaker.
+     * It prioritizes personnel with technical specialization, using rank and skills to select the optimal candidate. If
+     * no technical specialist is available, the method falls back to senior administrators with the "HR" or "COMMAND"
+     * specialization, ensuring a valid speaker is selected whenever possible.</p>
+     *
+     * <p>If the campaign instance is {@code null} or there are no active personnel available, a fallback mechanism is
+     * employed to determine the speaker based on senior administrators.</p>
+     *
+     * @param campaign       The {@link Campaign} instance providing access to personnel and administrator data.
+     * @param specialization The {@link AdministratorSpecialization} used as a criterion for selecting the speaker.
+     *
+     * @return The {@link Person} designated as the speaker, prioritizing technical specialists, then senior
+     *       administrators with "HR" or "COMMAND" specializations. Returns {@code null} if no suitable speaker can be
+     *       found.
+     */
+    @Override
+    protected @Nullable Person getSpeaker(@Nullable Campaign campaign, @Nullable Campaign.AdministratorSpecialization specialization) {
+        if (campaign == null) {
+            return null;
+        }
+
+        List<Person> potentialSpeakers = campaign.getActivePersonnel(false);
+
+        if (potentialSpeakers.isEmpty()) {
+            return getFallbackSpeaker(campaign);
+        }
+
+        Person speaker = null;
+
+        for (Person person : potentialSpeakers) {
+            if (!person.isTech()) {
+                continue;
+            }
+
+            if (speaker == null) {
+                speaker = person;
+                continue;
+            }
+
+            if (person.outRanksUsingSkillTiebreaker(campaign, speaker)) {
+                speaker = person;
+            }
+        }
+
+        // First fallback
+        if (speaker == null) {
+            return getFallbackSpeaker(campaign);
+        } else {
+            return speaker;
+        }
+    }
+
+    /**
+     * Retrieves a fallback speaker based on senior administrators within the campaign.
+     *
+     * <p>This method attempts to retrieve a senior administrator with the "LOGISTICS" specialization first.
+     * If no such administrator is available, it falls back to one with the "COMMAND" specialization.</p>
+     *
+     * @param campaign The {@link Campaign} instance providing access to administrator data.
+     *
+     * @return The {@link Person} designated as the fallback speaker. Returns {@code null} if no suitable administrator
+     *       is available.
+     */
+    private @Nullable Person getFallbackSpeaker(Campaign campaign) {
+        Person speaker = campaign.getSeniorAdminPerson(LOGISTICS);
+
+        if (speaker == null) {
+            speaker = campaign.getSeniorAdminPerson(COMMAND);
+        } else {
+            return speaker;
+        }
+
+        return speaker;
     }
 
     /**
@@ -76,16 +154,16 @@ public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
      *     <li>The campaign's hangar contains unmaintained units that are not salvage.</li>
      * </ul>
      *
-     * @param units A {@link Collection} of {@link Unit} objects representing the campaign's hangar units.
+     * @param units              A {@link Collection} of {@link Unit} objects representing the campaign's hangar units.
      * @param isCheckMaintenance A flag indicating whether to check for unmaintained units.
-     * @return {@code true} if the nag dialog should be displayed due to unmaintained units,
-     *         {@code false} otherwise.
+     *
+     * @return {@code true} if the nag dialog should be displayed due to unmaintained units, {@code false} otherwise.
      */
     public static boolean checkNag(Collection<Unit> units, boolean isCheckMaintenance) {
-        final String NAG_KEY = MHQConstants.NAG_UNMAINTAINED_UNITS;
+        final String NAG_KEY = NAG_UNMAINTAINED_UNITS;
 
-        return isCheckMaintenance
-              && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-              && campaignHasUnmaintainedUnits(units);
+        return isCheckMaintenance &&
+                     !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) &&
+                     campaignHasUnmaintainedUnits(units);
     }
 }

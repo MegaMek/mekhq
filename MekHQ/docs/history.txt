@@ -1,6 +1,88 @@
 MEKHQ VERSION HISTORY:
 ---------------
 0.50.05-SNAPSHOT
++ PR #6284: Fixed Unique Interaction when Loading Player Campaigns with Custom Rank Systems
++ PR #6285: Added Mercenary Auction Events
++ Fix #910, #3644, #4762, #6179: Added Auto-Optimize Medical Assignments Feature
++ Fix #1159: Added Right Click Display Medical History to Infirmary
++ PR #6293: Added Level Attribute To Intelligence Enum
++ PR #6295: Updated 'Immersive Dialog' System
++ PR #6335: Updated Rank Systems Version for 50.05
++ PR #6168: Improved the Distinguishing of Brand New Parts Handling
++ Fix #6265: Refactored Fatigue and Addressed Fatigue Use of Vessel Crews
++ PR #6277: Enhanced Ronin Event
++ Fix #6324: Added Status-Based Tinted Personnel Portraits
++ Fix #6316: Refactored Injury Description Logic In Patient Table Model
++ Fix #6336: Fixed Prisoners Check Logic in NagController
++ Fix #6337: Deploying to an Allied Facility No Longer Blocks Scanning
++ Fix #6343: Updated Allied Air Garrison Spawn Location
++ PR #6347: Allow Jump Jets and Mek Mechanical Boosters
++ PR #6348: Allow setting MekHQ Options from splash screen
++ Fix #6333: Stopped Factions from Traveling Back in Time to Invade the Inner Sphere Before Their Inception
++ PR #6371: Removed Player Deployment Zone "ANY" From Scenario Templates 
++ PR #6370: Sorted Personality Quirks Alphabetically in Quirk Picker 
++ PR #6369: Fixed Logic Error In Prisoners Nag Yet Again 
++ PR #6368: Updated Date and Faction Handling in Campaign Options IIC
++ PR #6366: Updated BV Display in TO&E to Account for C3
++ PR #6365: Added Tooltips to SPA Purchase Dropdown
++ PR #6364: Updated Untreated Injuries Nag Dialog to Account for AutoInfirmary
++ PR #6363: Changed Default Value for Advance Day Selection 
++ PR #6361: Improved Immersive Dialog Behavior 
++ PR #6360: Fixed Force Type Changing Being Unavailable in Non-StratCon, Non-AtB Campaigns 
++ PR #6359: Fixed Missing Scenarios 
++ PR #6358: Fixed Fatigue Status Report Update Messages
++ PR #6372: Enabled MekHQ Prisoner Capture Style for Non-AtB, Non-StratCon Campaigns
++ PR #6375: Moved and Renamed Immersive Dialog Base Classes
++ Updated Admin Strain Nag to Use Immersive Dialog #6376
++ PR #6377: Fixed Scroll Pane Starting Position In Immersive Dialogs
++ PR #6378: Fixed MekHQ Lockup Caused by Consecutive Glossary Dialogs; Fixed Scroll Pane Start Position in Glossary Dialogs
++ PR #6382: Updated Deployment Shortfall Nag To Use Immersive Dialog
++ PR #6383: Updated Contract End Nag To Use Immersive Dialog
++ PR #6384: Updated Insufficient Astechs Nag To Use Immersive Dialog
++ PR #6385: Updated Insufficient Astech Time Nag To Use Immersive Dialog
++ PR #6386: Adjusted Glossary Dialog Dimensions
++ fix #6388: Removed Deprecated methods from MMLogger and updated impacted calls
++ PR #6389: Updated Insufficient Medics Nag To Use Immersive Dialog
++ PR #6398: Updated Invalid Faction Nag To Use Immersive Dialog
++ Fix #6373: Increase random off-board distance range
++ PR #6379: Added New Glossary Entries for Nag Terms
++ Fix #6391: Fixed Error in Retirement Defection Checker if 'Use Commander Leadership Only' is Selected But No Campaign Commander Has Been Chosen
++ PR #6393: Expanded Prisoner End of Contract Events to Missions
++ PR  #6395: Updated Prisoner Capacity Event OOC Text
++ Fix #6396: Adjusted Prisoner Event Chances; Updated Prisoner Documentation
++ PR #6401: Created ImmersiveDialogNag Base Class; Rolled Out Base Class to Previously Edited Nags
++ PR #6402, #6403, #6405, #6406, #6407, #6408, #6410, #6411, #6413, #6414: Refactored Nag Dialogs To Use Immersive Dialog Framework
++ PR #6404: Marked AbstractMHQNagDialog as Deprecated
++ PR #6415: Post-Nag Upgrade Adjustments
++ PR #6426: Removed Turnover Checks While in Transit
++ PR #6427: Restored Campaign Options to Apply Skill Level Modifiers When Creating Characters
++ PR #6430: Added Skill Deprecation Tool For Managing Deprecated Skills; Deprecated the 'Scrounge' Skill
++ PR #6431: Replaced Scrounge With Negotiation or Removed It Across Academy Curricula
++ Fix #6434: Corrected Briefing Room Combat Team Counter
++ PR #6442: Added Additional Error Tracking to Scenario Resolution in Attempt to Identify Bug Root Cause
++ Fix #6399: Load Entity in Specific Transporter when Recalculating Free Space
++ Fix #4353: Improved StratCon Fog of War Clarity
++ Fix #4506: Added Optional Autosave at Mission/Contract End
++ Fix #6424: Refactored Command Rights Calculation For Contracts
++ Fix #6380: Fixed Infirmary Assign/Unassign Interactions
++ PR #6441: Added Administration Curriculum to Various Tech Qualifications
++ PR #6445: Fixed "Every Monday is a Gray Monday" Bug
++ PR #6447: Updated Scenario and Deployment Labels in StratCon
++ PR #6448: Disabled StratCon Debug Mouse-Click Visualization
++ PR #6450: Added Dynamic Contract Difficulty Option; Fixed Clan OpFor Skill Level Generation
++ PR #6452: Company Generator & Contract Market Now Trigger On New Campaign; Adjusted StratCon Promo Trigger
++ PR #6453: Increased the Number of Contracts Generated for New Campaigns
++ PR #6456: Fixed Daily Medical Optimization Option
++ PR #6457: Added the GM Ability to Inflict Random Advanced Medical Injuries
++ PR #6458: Enforced Blind Drop Settings in Briefing Room
++ PR #6461: Added Early Arrival Dialog for Contracts
++ PR #6462: Updated Campaign Options UI with New Option Indicators
++ PR #6464: Enhanced Deprecation Skill Handling
++ PR #6467: Fixed Skill Value Out-Of-Range Errors in Dialogs
++ PR #6468: Refactored Intelligence XP Costs and Skill Calculations; Blocked Illegal Skill Progression
++ PR #6471: Updated Combat Team Training Duration and Documentation
++ PR #6472: Added Helper Methods to PersonnelTableMouseAdapter for Cleaner Campaign and Frame Access
++ PR #6474: Removed Pending Scenario Check When Completing Missions/Contracts
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times

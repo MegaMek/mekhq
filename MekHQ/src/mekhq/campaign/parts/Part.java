@@ -203,7 +203,7 @@ public abstract class Part implements IPartWork, ITechnology {
         this.usedForRefitPlanning = false;
         this.daysToArrival = 0;
         this.campaign = c;
-        this.brandNew = true;
+        this.brandNew = false;
         this.quantity = 1;
         this.quality = PartQuality.QUALITY_D;
         this.childParts = new ArrayList<>();
@@ -1271,19 +1271,39 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     /**
-     * Increments the number of parts in stock by one.
+     * Adjusts the quantity of parts in stock by a specified delta value. The new quantity is
+     * calculated by adding the given delta to the current quantity. The part will be removed if
+     * the final quantity is less than 1.
+     *
+     * @param delta The value by which to change the quantity. A positive value increases the
+     *             stock, while a negative value decreases it.
      */
-    public void incrementQuantity() {
-        setQuantity(getQuantity() + 1);
+    public void changeQuantity(int delta) {
+        setQuantity(quantity + delta);
     }
 
     /**
-     * Decrements the number of parts in stock by one,
-     * and removes the part from the campaign if it
-     * reaches zero.
+     * Increases the stock quantity of the part by one. The method calls {@link #changeQuantity(int)}
+     * with a delta of {@code 1}. The part will be removed if the final quantity is less than 1.
+     *
+     * @deprecated Use {@link #changeQuantity(int)} directly with a delta of {@code 1} for more
+     * explicit control over quantity adjustments.
      */
+    @Deprecated (since="0.50.04")
+    public void incrementQuantity() {
+        changeQuantity(1);
+    }
+
+    /**
+     * Decreases the stock quantity of the part by one. The method calls {@link #changeQuantity(int)}
+     * with a delta of {@code -1}. The part will be removed if the final quantity is less than 1.
+     *
+     * @deprecated Use {@link #changeQuantity(int)} directly with a delta of {@code -1} for more
+     * explicit control over quantity adjustments.
+     */
+    @Deprecated (since="0.50.04")
     public void decrementQuantity() {
-        setQuantity(getQuantity() - 1);
+        changeQuantity(-1);
     }
 
     /**

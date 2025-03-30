@@ -27,30 +27,33 @@
  */
 package mekhq.gui.campaignOptions;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
+import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.ResourceBundle;
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
+
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
 import mekhq.MekHQ;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 
-import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import java.awt.*;
-import java.util.ResourceBundle;
-
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
-
 /**
- * A dialog for selecting campaign presets. Extends {@link JDialog}.
- * Keeps track of the selected preset and return state.
- * Provides options to select a preset, customize a preset, or cancel the operation.
+ * A dialog for selecting campaign presets. Extends {@link JDialog}. Keeps track of the selected preset and return
+ * state. Provides options to select a preset, customize a preset, or cancel the operation.
  */
 public class SelectPresetDialog extends JDialog {
-    private static String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
+    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE,
-        MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
 
     private static final MMLogger logger = MMLogger.create(SelectPresetDialog.class);
 
@@ -82,8 +85,8 @@ public class SelectPresetDialog extends JDialog {
     /**
      * Constructs a dialog window for selecting a campaign preset.
      *
-     * @param frame                     the parent {@link JFrame} for the dialog
-     * @param includePresetSelectOption whether to include the option to select a preset
+     * @param frame                        the parent {@link JFrame} for the dialog
+     * @param includePresetSelectOption    whether to include the option to select a preset
      * @param includeCustomizePresetOption whether to include the option to customize a preset
      */
     public SelectPresetDialog(JFrame frame, boolean includePresetSelectOption, boolean includeCustomizePresetOption) {
@@ -105,14 +108,15 @@ public class SelectPresetDialog extends JDialog {
         centerPanel.setLayout(layout);
 
         JLabel descriptionLabel = new JLabel(String.format(
-            "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
-            DIALOG_WIDTH, resources.getString("presetDialog.description")));
+              "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
+              DIALOG_WIDTH,
+              resources.getString("presetDialog.description")));
 
         final DefaultListModel<CampaignPreset> campaignPresets = new DefaultListModel<>();
         campaignPresets.addAll(CampaignPreset.getCampaignPresets());
 
         if (campaignPresets.isEmpty()) {
-            logger.error("No campaign presets found", "Error");
+            logger.errorDialog("Error", "No campaign presets found");
         }
 
         JComboBox<CampaignPreset> comboBox = new JComboBox<>();
@@ -120,9 +124,7 @@ public class SelectPresetDialog extends JDialog {
 
         DefaultListCellRenderer listRenderer = new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value,
-                                                          int index, boolean isSelected,
-                                                          boolean cellHasFocus) {
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 if (value instanceof CampaignPreset preset) {
                     setText(preset.getTitle());
                 }
@@ -135,18 +137,14 @@ public class SelectPresetDialog extends JDialog {
         };
         comboBox.setRenderer(listRenderer);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(descriptionLabel)
-                .addPreferredGap(ComponentPlacement.UNRELATED, INSERT_SIZE, INSERT_SIZE)
-                .addComponent(comboBox)
-        );
+        layout.setVerticalGroup(layout.createSequentialGroup()
+                                      .addComponent(descriptionLabel)
+                                      .addPreferredGap(ComponentPlacement.UNRELATED, INSERT_SIZE, INSERT_SIZE)
+                                      .addComponent(comboBox));
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.CENTER)
-                .addComponent(descriptionLabel)
-                .addComponent(comboBox)
-        );
+        layout.setHorizontalGroup(layout.createParallelGroup(Alignment.CENTER)
+                                        .addComponent(descriptionLabel)
+                                        .addComponent(comboBox));
 
         JPanel outerPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -171,14 +169,14 @@ public class SelectPresetDialog extends JDialog {
             Object selectedItem = comboBox.getSelectedItem();
             if (selectedItem instanceof CampaignPreset preset) {
                 newLabel.setText(String.format(
-                    "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
-                    DIALOG_WIDTH * 0.9,
-                    preset.getDescription()));
+                      "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
+                      DIALOG_WIDTH * 0.9,
+                      preset.getDescription()));
             } else {
                 newLabel.setText(String.format(
-                    "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
-                    DIALOG_WIDTH * 0.9,
-                    "No description available."));
+                      "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
+                      DIALOG_WIDTH * 0.9,
+                      "No description available."));
             }
             revalidate();
             repaint();
@@ -188,14 +186,14 @@ public class SelectPresetDialog extends JDialog {
         Object initialItem = comboBox.getSelectedItem();
         if (initialItem instanceof CampaignPreset preset) {
             newLabel.setText(String.format(
-                "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
-                DIALOG_WIDTH * 0.9,
-                preset.getDescription()));
+                  "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
+                  DIALOG_WIDTH * 0.9,
+                  preset.getDescription()));
         } else {
             newLabel.setText(String.format(
-                "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
-                DIALOG_WIDTH * 0.9,
-                "No description available."));
+                  "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
+                  DIALOG_WIDTH * 0.9,
+                  "No description available."));
         }
 
         add(outerPanel, BorderLayout.CENTER);
@@ -240,10 +238,10 @@ public class SelectPresetDialog extends JDialog {
      * Converts a {@link DefaultListModel} of {@link CampaignPreset} objects to a {@link DefaultComboBoxModel}.
      *
      * @param listModel The {@link DefaultListModel} to convert.
+     *
      * @return The converted {@link DefaultComboBoxModel}.
      */
-    private DefaultComboBoxModel<CampaignPreset> convertPresetListModelToComboBoxModel(
-        DefaultListModel<CampaignPreset> listModel) {
+    private DefaultComboBoxModel<CampaignPreset> convertPresetListModelToComboBoxModel(DefaultListModel<CampaignPreset> listModel) {
 
         // Create a new DefaultComboBoxModel
         DefaultComboBoxModel<CampaignPreset> comboBoxModel = new DefaultComboBoxModel<>();

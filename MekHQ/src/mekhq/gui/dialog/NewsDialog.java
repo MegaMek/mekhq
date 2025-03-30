@@ -32,7 +32,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.NewsItem;
-import mekhq.gui.baseComponents.MHQDialogImmersive;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
 import javax.swing.*;
 import java.awt.*;
@@ -42,13 +42,13 @@ import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
- * NewsDialog is a dialog window for displaying news items within the context of a campaign.
- * It includes information about a network, its image, headline, and other relevant details.
+ * NewsDialog is a dialog window for displaying news items within the context of a campaign. It includes information
+ * about a network, its image, headline, and other relevant details.
  * <p>
  * This dialog is a part of MekHQ and displays immersive content in the game GUI.
  * </p>
  */
-public class NewsDialog extends MHQDialogImmersive {
+public class NewsDialog extends ImmersiveDialogCore {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.NewsDialog";
 
     private static final int OPERATION_KLONDIKE = 2822;
@@ -61,11 +61,19 @@ public class NewsDialog extends MHQDialogImmersive {
      * Constructs a new NewsDialog to display a given {@link NewsItem}.
      *
      * @param campaign The campaign instance containing relevant game details.
-     * @param news The {@link NewsItem} to be displayed in the dialog.
+     * @param news     The {@link NewsItem} to be displayed in the dialog.
      */
     public NewsDialog(Campaign campaign, NewsItem news) {
-        super(campaign, new Person(campaign), null, news.getFullDescription(),
-            createButtons(), null, UIUtil.scaleForGUI(400), false);
+        super(campaign,
+              new Person(campaign),
+              null,
+              news.getFullDescription(),
+              createButtons(),
+              null,
+              UIUtil.scaleForGUI(400),
+              false,
+              null,
+              true);
     }
 
     /**
@@ -74,8 +82,8 @@ public class NewsDialog extends MHQDialogImmersive {
      * @return A list of {@link ButtonLabelTooltipPair} containing buttons for the dialog.
      */
     private static List<ButtonLabelTooltipPair> createButtons() {
-        ButtonLabelTooltipPair btnClose = new ButtonLabelTooltipPair(
-            getFormattedTextAt(RESOURCE_BUNDLE, "newsReport.button"), null);
+        ButtonLabelTooltipPair btnClose = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
+              "newsReport.button"), null);
 
         return List.of(btnClose);
     }
@@ -88,8 +96,9 @@ public class NewsDialog extends MHQDialogImmersive {
     /**
      * Builds the speaker panel that consists of the network's image and descriptive text.
      *
-     * @param speaker The {@link Person} representing the speaker (may be {@code null}).
+     * @param speaker  The {@link Person} representing the speaker (may be {@code null}).
      * @param campaign The {@link Campaign} object providing relevant game details.
+     *
      * @return A {@link JPanel} containing the speaker's image and description.
      */
     @Override
@@ -112,9 +121,10 @@ public class NewsDialog extends MHQDialogImmersive {
 
         // Speaker description (below the icon)
         StringBuilder speakerDescription = getNetworkDescription(campaign, NETWORK);
-        JLabel leftDescription = new JLabel(
-            String.format("<html><div style='width:%dpx; text-align:center;'>%s</div></html>",
-                IMAGE_WIDTH, speakerDescription));
+        JLabel leftDescription = new JLabel(String.format(
+              "<html><div style='width:%dpx; text-align:center;'>%s</div></html>",
+              IMAGE_WIDTH,
+              speakerDescription));
         leftDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Add the image and description to the speakerBox
@@ -128,7 +138,8 @@ public class NewsDialog extends MHQDialogImmersive {
      * Generates a description string for the news network, including its code, name, and slogan.
      *
      * @param campaign The campaign data used to retrieve faction information.
-     * @param network The news network for which the description is generated.
+     * @param network  The news network for which the description is generated.
+     *
      * @return A {@link StringBuilder} containing the formatted network description.
      */
     private static StringBuilder getNetworkDescription(Campaign campaign, NewsNetwork network) {
@@ -165,6 +176,7 @@ public class NewsDialog extends MHQDialogImmersive {
      * Determines the most suitable news network for the campaign's current context.
      *
      * @param campaign The campaign context, including the current year and faction information.
+     *
      * @return The appropriate {@link NewsNetwork} for the campaign.
      */
     private NewsNetwork getNetwork(Campaign campaign) {
@@ -195,44 +207,58 @@ public class NewsDialog extends MHQDialogImmersive {
      */
     private static List<NewsNetwork> getNewsNetworks() {
         // TODO Replace placeholder images
-        NewsNetwork terranNewsNetwork = new NewsNetwork(
-            "terranNewsNetwork", 0, 2314,
-            "data/images/force/Pieces/Logos/Inner Sphere/Terran Hegemony.png");
-        NewsNetwork hegemonyNewsNetwork = new NewsNetwork(
-            "hegemonyNewsNetwork", 2315, 2767,
-            "data/images/force/Pieces/Logos/Inner Sphere/Terran Hegemony (Alternate, House Cameron).png");
-        NewsNetwork starlightBroadcasting = new NewsNetwork(
-            "starlightBroadcasting", 2570, 2780,
-            "data/images/force/Pieces/Logos/Inner Sphere/Star League.png");
-        NewsNetwork comStarNewsBureau = new NewsNetwork(
-            "comStarNewsBureau", 2826, 3061,
-            "data/images/universe/factions/logo_comstar.png");
-        NewsNetwork interstellarNewsNetwork = new NewsNetwork(
-            "interstellarNewsNetwork", 3062, 3152,
-            "data/images/universe/factions/logo_solaris_VII.png");
+        NewsNetwork terranNewsNetwork = new NewsNetwork("terranNewsNetwork",
+              0,
+              2314,
+              "data/images/force/Pieces/Logos/Inner Sphere/Terran Hegemony.png");
+        NewsNetwork hegemonyNewsNetwork = new NewsNetwork("hegemonyNewsNetwork",
+              2315,
+              2767,
+              "data/images/force/Pieces/Logos/Inner Sphere/Terran Hegemony (Alternate, House Cameron).png");
+        NewsNetwork starlightBroadcasting = new NewsNetwork("starlightBroadcasting",
+              2570,
+              2780,
+              "data/images/force/Pieces/Logos/Inner Sphere/Star League.png");
+        NewsNetwork comStarNewsBureau = new NewsNetwork("comStarNewsBureau",
+              2826,
+              3061,
+              "data/images/universe/factions/logo_comstar.png");
+        NewsNetwork interstellarNewsNetwork = new NewsNetwork("interstellarNewsNetwork",
+              3062,
+              3152,
+              "data/images/universe/factions/logo_solaris_VII.png");
 
         // These two should always be last
-        NewsNetwork chatterweb = new NewsNetwork(CHATTERWEB_NETWORK_NAME, 0, 0,
-            "data/images/universe/factions/logo_star_league.png");
-        NewsNetwork affiliateNewsNetworks = new NewsNetwork(
-            AFFILIATE_NETWORK_NAME, 0, 0,
-            "data/images/universe/factions/logo_mercenaries.png");
+        NewsNetwork chatterweb = new NewsNetwork(CHATTERWEB_NETWORK_NAME,
+              0,
+              0,
+              "data/images/universe/factions/logo_star_league.png");
+        NewsNetwork affiliateNewsNetworks = new NewsNetwork(AFFILIATE_NETWORK_NAME,
+              0,
+              0,
+              "data/images/universe/factions/logo_mercenaries.png");
 
-        return List.of(terranNewsNetwork, hegemonyNewsNetwork, starlightBroadcasting, comStarNewsBureau,
-            interstellarNewsNetwork, chatterweb, affiliateNewsNetworks);
+        return List.of(terranNewsNetwork,
+              hegemonyNewsNetwork,
+              starlightBroadcasting,
+              comStarNewsBureau,
+              interstellarNewsNetwork,
+              chatterweb,
+              affiliateNewsNetworks);
     }
 
     /**
-     * Represents a news network with associated metadata such as its name,
-     * inception year, closure year, and the address for its associated image.
+     * Represents a news network with associated metadata such as its name, inception year, closure year, and the
+     * address for its associated image.
      * <p>
      * This record is immutable and provides a compact way to store information about a news network.
      * </p>
      *
-     * @param name The name of the news network.
+     * @param name          The name of the news network.
      * @param inceptionYear The year the news network was established or started broadcasting.
-     * @param closureYear The year the news network ceased operations.
-     * @param imageAddress The path or URL to an image representing the news network.
+     * @param closureYear   The year the news network ceased operations.
+     * @param imageAddress  The path or URL to an image representing the news network.
      */
-    private record NewsNetwork(String name, int inceptionYear, int closureYear, String imageAddress) {}
+    private record NewsNetwork(String name, int inceptionYear, int closureYear, String imageAddress) {
+    }
 }

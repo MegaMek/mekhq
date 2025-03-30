@@ -162,6 +162,21 @@ public enum Greed {
     }
 
     /**
+     * Retrieves the message displayed when a Ronin warrior expresses interest in joining the campaign.
+     *
+     * <p>This method formats a message using a resource key derived from the current object and
+     * includes the commander's address as part of the message formatting.</p>
+     *
+     * @param commanderAddress the address or name of the commander to include in the message.
+     * @return the formatted Ronin message as a {@link String}.
+     */
+    public String getRoninMessage(String commanderAddress) {
+        final String RESOURCE_KEY = name() + ".ronin";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, commanderAddress);
+    }
+
+    /**
      * @return {@code true} if the personality trait is considered positive,
      *         {@code false} otherwise.
      */

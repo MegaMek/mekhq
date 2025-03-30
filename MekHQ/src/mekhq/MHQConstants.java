@@ -27,11 +27,11 @@
  */
 package mekhq;
 
-import megamek.SuiteConstants;
-
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
+
+import megamek.SuiteConstants;
 
 /**
  * These are constants that hold across MekHQ.
@@ -50,7 +50,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final int FACTION_GENERATOR_BORDER_RANGE_CLAN = 90;
     public static final int FACTION_GENERATOR_BORDER_RANGE_NEAR_PERIPHERY = 90;
     public static final int FACTION_GENERATOR_BORDER_RANGE_DEEP_PERIPHERY = 210; // a bit more than this distance
-                                                                                 // between HL and NC
+    // between HL and NC
     public static final LocalDate FORTRESS_REPUBLIC = LocalDate.of(3135, Month.NOVEMBER, 1);
     // endregion Faction Generation Constants
 
@@ -66,7 +66,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String LONG_DISPLAY_DATE_FORMAT = "longDisplayDateFormat";
     public static final String HISTORICAL_DAILY_LOG = "historicalDailyLog";
     public static final int MAX_HISTORICAL_LOG_DAYS = 120; // max number of days that will be stored in the history,
-                                                           // also used as a limit in the UI
+    // also used as a limit in the UI
     public static final String COMPANY_GENERATOR_STARTUP = "companyGeneratorStartup";
     public static final String SHOW_COMPANY_GENERATOR = "showCompanyGenerator";
     public static final String SHOW_UNIT_PICTURES_ON_TOE = "showUnitPicturesOnTOE";
@@ -153,7 +153,13 @@ public final class MHQConstants extends SuiteConstants {
     public static final String SAVE_WEEKLY_KEY = "saveWeekly";
     public static final String SAVE_MONTHLY_KEY = "saveMonthly";
     public static final String SAVE_YEARLY_KEY = "saveYearly";
+    /**
+     * @deprecated use {@link #SAVE_BEFORE_SCENARIOS_KEY} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public static final String SAVE_BEFORE_MISSIONS_KEY = "saveBeforeMissions";
+    public static final String SAVE_BEFORE_SCENARIOS_KEY = "saveBeforeScenarios";
+    public static final String SAVE_BEFORE_MISSION_END = "saveBeforeMissionEnd";
     public static final String MAXIMUM_NUMBER_SAVES_KEY = "maximumNumberAutoSaves";
     public static final int DEFAULT_NUMBER_SAVES = 5;
     // endregion Autosave
@@ -163,6 +169,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NEW_DAY_ASTECH_POOL_FILL = "newDayAstechPoolFill";
     public static final String NEW_DAY_MEDIC_POOL_FILL = "newDayMedicPoolFill";
     public static final String NEW_DAY_MRMS = "newDayMRMS";
+    public static final String NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS = "NewDayOptimizeMedicalAssignments";
     public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS = "newDayForceIconOperationalStatus";
     public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE = "newDayForceIconOperationalStatusStyle";
     // endregion New Day
@@ -309,16 +316,26 @@ public final class MHQConstants extends SuiteConstants {
     // endregion StoryArcs
 
     // region Backgrounds
-    public static final String NAME_MIDDLE_WORD_CORPORATE = Paths.get("data/universe/backgrounds/randomCompanyNameGenerator/middleWordCorporate.csv").toString();
-    public static final String NAME_MIDDLE_WORD_CORPORATE_USER = Paths.get("userdata/data/universe/backgrounds/randomCompanyNameGenerator/middleWordCorporate.csv").toString();
-    public static final String NAME_END_WORD_CORPORATE = Paths.get("data/universe/backgrounds/randomCompanyNameGenerator/endWordCorporate.csv").toString();
-    public static final String NAME_END_WORD_CORPORATE_USER = Paths.get("userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordCorporate.csv").toString();
-    public static final String NAME_MIDDLE_WORD_MERCENARY = Paths.get("data/universe/backgrounds/randomCompanyNameGenerator/middleWordMercenary.csv").toString();
-    public static final String NAME_MIDDLE_WORD_MERCENARY_USER = Paths.get("userdata/data/universe/backgrounds/randomCompanyNameGenerator/middleWordMercenary.csv").toString();
-    public static final String NAME_END_WORD_MERCENARY = Paths.get("data/universe/backgrounds/randomCompanyNameGenerator/endWordMercenary.csv").toString();
-    public static final String NAME_END_WORD_MERCENARY_USER = Paths.get("userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordMercenary.csv").toString();
-    public static final String NAME_PRE_FAB = Paths.get("data/universe/backgrounds/randomCompanyNameGenerator/preFab.csv").toString();
-    public static final String NAME_PRE_FAB_USER = Paths.get("userdata/data/universe/backgrounds/randomCompanyNameGenerator/preFab.csv").toString();
+    public static final String NAME_MIDDLE_WORD_CORPORATE = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/middleWordCorporate.csv").toString();
+    public static final String NAME_MIDDLE_WORD_CORPORATE_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/middleWordCorporate.csv").toString();
+    public static final String NAME_END_WORD_CORPORATE = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/endWordCorporate.csv").toString();
+    public static final String NAME_END_WORD_CORPORATE_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordCorporate.csv").toString();
+    public static final String NAME_MIDDLE_WORD_MERCENARY = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/middleWordMercenary.csv").toString();
+    public static final String NAME_MIDDLE_WORD_MERCENARY_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/middleWordMercenary.csv").toString();
+    public static final String NAME_END_WORD_MERCENARY = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/endWordMercenary.csv").toString();
+    public static final String NAME_END_WORD_MERCENARY_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordMercenary.csv").toString();
+    public static final String NAME_PRE_FAB = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/preFab.csv").toString();
+    public static final String NAME_PRE_FAB_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/preFab.csv").toString();
     // endregion Backgrounds
 
     // endregion File Paths

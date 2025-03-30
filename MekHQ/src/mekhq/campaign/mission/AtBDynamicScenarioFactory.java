@@ -4201,7 +4201,7 @@ public class AtBDynamicScenarioFactory {
     private static int calculateAtBSpeed(Entity entity) {
         int speed = entity.getWalkMP(); // Get the base walk MP of the entity
 
-        if (entity.getJumpMP() > 0) {
+        if (entity.getAnyTypeMaxJumpMP() > 0) {
             // If the entity has jump capability, adjust the speed
             if (entity instanceof Infantry) {
                 // For infantry, use jump MP instead of walk MP
@@ -4314,7 +4314,11 @@ public class AtBDynamicScenarioFactory {
      */
     private static void deployArtilleryOffBoard(List<Entity> entityList) {
         OffBoardDirection direction = OffBoardDirection.getDirection(randomInt(4));
-        int distance = (randomInt(2) + 1) * 17;
+
+        // Set distance to max of 1/2 the 1-turn flight time distance in boards so that Counter-Battery
+        // duels don't require interminable waiting.
+        // TODO: add logic for own ranges, strategic targets, and enemy off-board artillery assets.
+        int distance = (randomInt(4) + 1) * 17;
 
         for (Entity entity : entityList) {
             entity.setOffBoard(distance, direction);

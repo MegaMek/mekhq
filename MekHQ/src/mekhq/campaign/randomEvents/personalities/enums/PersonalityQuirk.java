@@ -27,16 +27,20 @@
  */
 package mekhq.campaign.randomEvents.personalities.enums;
 
+import static megamek.codeUtilities.MathUtility.clamp;
+import static mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR;
+import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.randomEvents.personalities.PersonalityController.PronounData;
 import mekhq.campaign.universe.Faction;
-
-import static megamek.codeUtilities.MathUtility.clamp;
-import static mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR;
-import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * Represents various personality quirks that can define an individual's behavior or habits.
@@ -405,10 +409,20 @@ public enum PersonalityQuirk {
             pronounData.possessivePronoun(), pronounData.possessivePronounLowerCase(), lanceLabelUppercase,
             lanceLabelLowercase, pronounData.pluralizer());
     }
+
+    /**
+     * Returns a list of Personality Quirks sorted alphabetically by their label.
+     *
+     * @return a sorted {@link List} of {@link PersonalityQuirk} objects by their label.
+     */
+    public static List<PersonalityQuirk> personalityQuirksSortedAlphabetically() {
+        List<PersonalityQuirk> quirks = new ArrayList<>(List.of(PersonalityQuirk.values()));
+        quirks.sort(Comparator.comparing(PersonalityQuirk::getLabel));
+        return quirks;
+    }
     // endregion Getters
 
     // region Boolean Comparison Methods
-
     public boolean isNone() {
         return this == NONE;
     }

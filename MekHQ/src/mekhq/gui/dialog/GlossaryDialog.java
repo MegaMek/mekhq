@@ -27,32 +27,36 @@
  */
 package mekhq.gui.dialog;
 
+import static java.lang.Math.round;
+import static javax.swing.BorderFactory.createEmptyBorder;
+import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.handleImmersiveHyperlinkClick;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
+import javax.swing.event.HyperlinkEvent.EventType;
+
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent.EventType;
-import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-import static java.lang.Math.round;
-import static javax.swing.BorderFactory.createEmptyBorder;
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.gui.baseComponents.MHQDialogImmersive.handleImmersiveHyperlinkClick;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
-
 /**
- * The {@code GlossaryDialog} class represents a dialog window for displaying glossary entries.
- * It displays detailed information about a glossary term, including its title and description,
- * in a styled HTML format.
+ * The {@code GlossaryDialog} class represents a dialog window for displaying glossary entries. It displays detailed
+ * information about a glossary term, including its title and description, in a styled HTML format.
  *
  * <p>
- * This class uses a {@link JEditorPane} to render glossary entry content and supports hyperlink
- * interactions for related glossary entries. If a related term is clicked, a new {@code GlossaryDialog}
- * is opened to show its details.
+ * This class uses a {@link JEditorPane} to render glossary entry content and supports hyperlink interactions for
+ * related glossary entries. If a related term is clicked, a new {@code GlossaryDialog} is opened to show its details.
  * </p>
  */
 public class GlossaryDialog extends JDialog {
@@ -61,8 +65,8 @@ public class GlossaryDialog extends JDialog {
     private final JDialog parent;
     private final Campaign campaign;
 
-    private int CENTER_WIDTH = UIUtil.scaleForGUI(400);
-    private int CENTER_HEIGHT = UIUtil.scaleForGUI(300);
+    private int CENTER_WIDTH = UIUtil.scaleForGUI(800);
+    private int CENTER_HEIGHT = UIUtil.scaleForGUI(400);
     private int PADDING = UIUtil.scaleForGUI(10);
 
     private final String GLOSSARY_BUNDLE = "mekhq.resources.Glossary";
@@ -71,14 +75,14 @@ public class GlossaryDialog extends JDialog {
      * Creates a new {@code GlossaryDialog} instance to display information about a glossary term.
      *
      * <p>
-     * The dialog retrieves the glossary term's title and description using the provided key
-     * and displays the content in a styled format. During its construction, the parent dialog
-     * is hidden to ensure that only this dialog is visible to the user.
+     * The dialog retrieves the glossary term's title and description using the provided key and displays the content in
+     * a styled format. During its construction, the parent dialog is hidden to ensure that only this dialog is visible
+     * to the user.
      * </p>
      *
-     * @param parent The parent {@link JDialog} that is temporarily hidden while this dialog is displayed.
+     * @param parent   The parent {@link JDialog} that is temporarily hidden while this dialog is displayed.
      * @param campaign The {@link Campaign} object containing resources and glossary entries.
-     * @param key The unique identifier for the glossary term to be displayed.
+     * @param key      The unique identifier for the glossary term to be displayed.
      */
     public GlossaryDialog(JDialog parent, Campaign campaign, String key) {
         this.parent = parent;
@@ -92,9 +96,8 @@ public class GlossaryDialog extends JDialog {
      * Builds the Glossary Dialog by setting its title and definition based on the key provided.
      *
      * <p>
-     * This method fetches the title and definition strings for the glossary term from the
-     * resource bundle. If the title is invalid (i.e., the resource key is not found),
-     * it logs an error and terminates the dialog building process.
+     * This method fetches the title and definition strings for the glossary term from the resource bundle. If the title
+     * is invalid (i.e., the resource key is not found), it logs an error and terminates the dialog building process.
      * </p>
      *
      * @param key The resource key used to retrieve the glossary term's title and definition.
@@ -122,24 +125,23 @@ public class GlossaryDialog extends JDialog {
 
         // Use inline CSS to set font family, size, and other style properties
         String fontStyle = "font-family: Noto Sans;";
-        editorPane.setText(String.format(
-            "<div style='width: %s; %s'>"
-                + "<h1 style='text-align: center;'>%s</h1>"
-                + "%s</div>",
-            CENTER_WIDTH, fontStyle, title, description
-        ));
+        editorPane.setText(String.format("<div style='width: %s; %s'>" +
+                                               "<h1 style='text-align: center;'>%s</h1>" +
+                                               "%s</div>", CENTER_WIDTH, fontStyle, title, description));
         setFontScaling(editorPane, false, 1.1);
 
         // Add a HyperlinkListener to capture hyperlink clicks
         editorPane.addHyperlinkListener(evt -> {
             if (evt.getEventType() == EventType.ACTIVATED) {
-                handleImmersiveHyperlinkClick(parent, campaign, evt.getDescription());
+                handleImmersiveHyperlinkClick(this, campaign, evt.getDescription());
             }
         });
 
         // Wrap the JEditorPane in a JScrollPane
         JScrollPane scrollPane = new JScrollPane(editorPane);
         scrollPane.setMinimumSize(new Dimension(CENTER_WIDTH, scrollPane.getHeight()));
+        // This line ensures the scroll pane starts scrolled to the top, not bottom.
+        SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
 
         // Create a JPanel with padding
         JPanel paddedPanel = new JPanel(new BorderLayout());
@@ -167,8 +169,7 @@ public class GlossaryDialog extends JDialog {
      * Handles user interactions when the dialog is closed.
      *
      * <p>
-     * This method ensures the parent dialog is made visible again after the glossary
-     * dialog is closed.
+     * This method ensures the parent dialog is made visible again after the glossary dialog is closed.
      * </p>
      */
     private void onCloseAction() {

@@ -848,7 +848,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                  */
                 alliesPlayer.stream().filter(Objects::nonNull).forEach(entity -> {
                     int speed = entity.getWalkMP();
-                    if (entity.getJumpMP() > 0) {
+                    if (entity.getAnyTypeMaxJumpMP() > 0) {
                         if (entity instanceof Infantry) {
                             speed = entity.getJumpMP();
                         } else {
@@ -859,7 +859,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 });
                 allyEntities.stream().filter(Objects::nonNull).forEach(entity -> {
                     int speed = entity.getWalkMP();
-                    if (entity.getJumpMP() > 0) {
+                    if (entity.getAnyTypeMaxJumpMP() > 0) {
                         if (entity instanceof Infantry) {
                             speed = entity.getJumpMP();
                         } else {

@@ -27,32 +27,44 @@
  */
 package mekhq.gui.baseComponents;
 
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerDescription;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerIcon;
+import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.ResourceBundle;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
 import megamek.client.ui.swing.util.UIUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.personnel.Person;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.ResourceBundle;
-
-import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
-import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
-
 /**
  * An abstract base class for displaying a nag dialog within MekHQ.
  * <p>
- * This dialog is used to show certain informational or warning messages during a campaign,
- * with the option for users to ignore future messages of the same type.
- * It includes visual elements for presenting a speaker image, description, and some configurable
- * details, along with buttons and a checkbox for user input.
+ * This dialog is used to show certain informational or warning messages during a campaign, with the option for users to
+ * ignore future messages of the same type. It includes visual elements for presenting a speaker image, description, and
+ * some configurable details, along with buttons and a checkbox for user input.
  * </p>
  *
  * <p>
- * Extending this class allows customization of the dialog’s behavior and content,
- * while maintaining a consistent design across the application.
+ * Extending this class allows customization of the dialog’s behavior and content, while maintaining a consistent design
+ * across the application.
  * </p>
  *
  * <strong>Features:</strong>
@@ -62,15 +74,16 @@ import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
  *   <li>Localized using resource bundles.</li>
  * </ul>
  */
+@Deprecated(since = "0.50.05", forRemoval = true)
 public abstract class AbstractMHQNagDialog extends JDialog {
     /**
-     * Unique key for this nag dialog, used to track if the dialog has been ignored
-     * by the user in the campaign settings.
+     * Unique key for this nag dialog, used to track if the dialog has been ignored by the user in the campaign
+     * settings.
      */
     private final String nagKey;
     /**
-     * The right-side description label which displays the message.
-     * Dynamically updated when {@link #setRightDescriptionMessage(String)} is called.
+     * The right-side description label which displays the message. Dynamically updated when
+     * {@link #setRightDescriptionMessage(String)} is called.
      */
     private JLabel rightDescription;
     private String rightDescriptionMessage;
@@ -81,10 +94,10 @@ public abstract class AbstractMHQNagDialog extends JDialog {
     /**
      * Indicates whether the user selected the "Advance Day" option.
      */
-    private boolean advanceDaySelected = true;
+    private boolean advanceDaySelected = false;
 
-    protected final transient ResourceBundle resources = ResourceBundle.getBundle(
-        "mekhq.resources.GUI", MekHQ.getMHQOptions().getLocale());
+    protected final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
+          MekHQ.getMHQOptions().getLocale());
 
     /**
      * Constructs an AbstractMHQNagDialog with the provided campaign and nag key.
@@ -127,9 +140,10 @@ public abstract class AbstractMHQNagDialog extends JDialog {
 
         // Speaker description (below the icon)
         StringBuilder speakerDescription = getSpeakerDescription(campaign, speaker, speakerName);
-        JLabel leftDescription = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                LEFT_WIDTH, speakerDescription));
+        JLabel leftDescription = new JLabel(String.format(
+              "<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              LEFT_WIDTH,
+              speakerDescription));
         leftDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Add the image and description to the leftBox
@@ -146,9 +160,9 @@ public abstract class AbstractMHQNagDialog extends JDialog {
         // Right box: Just a message
         JPanel rightBox = new JPanel(new BorderLayout());
         rightBox.setBorder(BorderFactory.createEtchedBorder());
-        rightDescription = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                RIGHT_WIDTH, rightDescriptionMessage));
+        rightDescription = new JLabel(String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              RIGHT_WIDTH,
+              rightDescriptionMessage));
         rightBox.add(rightDescription);
 
         // Add rightBox to mainPanel
@@ -200,8 +214,8 @@ public abstract class AbstractMHQNagDialog extends JDialog {
      * Displays the dialog to the user and waits for a response.
      *
      * <p>
-     * This method makes the dialog visible and halts further execution until the user
-     * either dismisses or interacts with the dialog (e.g., clicks a button).
+     * This method makes the dialog visible and halts further execution until the user either dismisses or interacts
+     * with the dialog (e.g., clicks a button).
      * </p>
      */
     public void showDialog() {
@@ -221,9 +235,9 @@ public abstract class AbstractMHQNagDialog extends JDialog {
         this.rightDescriptionMessage = rightDescriptionMessage;
 
         // Update the right description JLabel
-        rightDescription.setText(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                RIGHT_WIDTH, rightDescriptionMessage));
+        rightDescription.setText(String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+              RIGHT_WIDTH,
+              rightDescriptionMessage));
 
         repaint();
         pack();
@@ -233,9 +247,9 @@ public abstract class AbstractMHQNagDialog extends JDialog {
      * Checks if the user selected the "Advance Day" action.
      *
      * <p>
-     * This result is set when the user interacts with the dialog’s buttons, either
-     * advancing to the next day or cancelling the dialog. This value will be {@code true}
-     * if the "Advance Day" button was selected, otherwise {@code false}.
+     * This result is set when the user interacts with the dialog’s buttons, either advancing to the next day or
+     * cancelling the dialog. This value will be {@code true} if the "Advance Day" button was selected, otherwise
+     * {@code false}.
      * </p>
      *
      * @return {@code true} if "Advance Day" was canceled, otherwise {@code false}.
