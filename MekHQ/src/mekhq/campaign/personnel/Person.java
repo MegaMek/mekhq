@@ -32,6 +32,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -70,6 +71,7 @@ import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.enums.BloodGroup;
 import mekhq.campaign.personnel.enums.ManeiDominiClass;
 import mekhq.campaign.personnel.enums.ManeiDominiRank;
 import mekhq.campaign.personnel.enums.ModifierValue;
@@ -102,20 +104,6 @@ import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import static java.lang.Math.abs;
-import static megamek.codeUtilities.MathUtility.clamp;
-import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -1386,11 +1374,11 @@ public class Person {
     }
 
     /**
-     * Retrieves the blood group of the person. If the blood group has not been set, it generates a
-     * random blood group using {@link BloodGroup#getRandomBloodGroup()}.
+     * Retrieves the blood group of the person. If the blood group has not been set, it generates a random blood group
+     * using {@link BloodGroup#getRandomBloodGroup()}.
      *
-     * @return The {@link BloodGroup} of the entity. If no blood group is previously assigned,
-     *         a random one is generated and returned.
+     * @return The {@link BloodGroup} of the entity. If no blood group is previously assigned, a random one is generated
+     *       and returned.
      */
     public BloodGroup getBloodGroup() {
         if (bloodGroup == null) {
