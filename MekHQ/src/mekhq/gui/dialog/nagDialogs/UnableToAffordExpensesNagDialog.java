@@ -28,7 +28,7 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_UNABLE_TO_AFFORD_EXPENSES;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordExpensesNagLogic.getMonthlyExpenses;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordExpensesNagLogic.unableToAffordExpenses;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -45,7 +45,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
  *
  * <p>The {@code UnableToAffordExpensesNagDialog} extends {@link ImmersiveDialogNag} and is specifically designed
  * to alert players about financial issues in the campaign. It utilizes predefined constants, including the
- * {@code TRANSPORT} speaker and the {@code NAG_UNABLE_TO_AFFORD_EXPENSES} identifier, to configure the dialog's
+ * {@code LOGISTICS} speaker and the {@code NAG_UNABLE_TO_AFFORD_EXPENSES} identifier, to configure the dialog's
  * behavior and content.</p>
  */
 public class UnableToAffordExpensesNagDialog extends ImmersiveDialogNag {
@@ -55,15 +55,15 @@ public class UnableToAffordExpensesNagDialog extends ImmersiveDialogNag {
      * expenses.
      *
      * <p>This constructor initializes the dialog with preconfigured values, such as the
-     * {@code NAG_UNABLE_TO_AFFORD_EXPENSES}
-     * constant for managing dialog suppression, the {@code "UnableToAffordExpensesNagDialog"} localization key for
-     * retrieving dialog content, and the {@code TRANSPORT} speaker for delivering the message.</p>
+     * {@code NAG_UNABLE_TO_AFFORD_EXPENSES} constant for managing dialog suppression, the
+     * {@code "UnableToAffordExpensesNagDialog"} localization key for retrieving dialog content, and the
+     * {@code LOGISTICS} speaker for delivering the message.</p>
      *
      * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data
      *                 required for constructing the nag dialog.
      */
     public UnableToAffordExpensesNagDialog(final Campaign campaign) {
-        super(campaign, TRANSPORT, NAG_UNABLE_TO_AFFORD_EXPENSES, "UnableToAffordExpensesNagDialog");
+        super(campaign, LOGISTICS, NAG_UNABLE_TO_AFFORD_EXPENSES, "UnableToAffordExpensesNagDialog");
     }
 
     @Override
@@ -71,8 +71,15 @@ public class UnableToAffordExpensesNagDialog extends ImmersiveDialogNag {
         final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
 
         Money monthlyExpenses = getMonthlyExpenses(campaign);
+        Money currentFunds = campaign.getFunds();
+        Money deficit = monthlyExpenses.minus(currentFunds);
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, key + ".ic", commanderAddress, monthlyExpenses.toAmountString());
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              key + ".ic",
+              commanderAddress,
+              monthlyExpenses.toAmountString(),
+              currentFunds.toAmountString(),
+              deficit.toAmountString());
     }
 
     /**
