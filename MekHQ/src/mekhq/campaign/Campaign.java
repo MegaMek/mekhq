@@ -57,6 +57,7 @@ import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMAN;
+import static mekhq.campaign.stratcon.StratconRulesManager.processIgnoredDynamicScenario;
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
@@ -4511,23 +4512,15 @@ public class Campaign implements ITechManager {
                             return;
                         }
 
-                        final boolean stub = StratconRulesManager.processIgnoredScenario((AtBDynamicScenario) scenario,
-                              campaignState);
+                        processIgnoredDynamicScenario(scenario.getId(), campaignState);
 
-                        if (stub) {
-                            ScenarioType scenarioType = scenario.getStratConScenarioType();
-                            if (scenarioType.isSpecial()) {
-                                campaignState.updateVictoryPoints(-1);
-                            }
-
-                            if (scenarioType.isResupply()) {
-                                processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
-                            }
-
-                            scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
-                        } else {
-                            scenario.clearAllForcesAndPersonnel(this);
+                        ScenarioType scenarioType = scenario.getStratConScenarioType();
+                        if (scenarioType.isResupply()) {
+                            processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
                         }
+
+                        scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
+                        scenario.clearAllForcesAndPersonnel(this);
                     } else {
                         scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
                         contract.addPlayerMinorBreach();
