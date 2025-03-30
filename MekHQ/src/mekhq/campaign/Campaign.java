@@ -48,6 +48,7 @@ import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomM
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
 import static mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement.isCommandersDay;
+import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewYear;
 import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWinterHolidayMajorDay;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
@@ -174,6 +175,7 @@ import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
 import mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement;
+import mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
@@ -5357,10 +5359,17 @@ public class Campaign implements ITechManager {
 
     /**
      * Fetches and handles the celebration dialogs specific to the current day.
+     *
+     * <p><b>Note:</b> Commanders day is handled as a part of the personnel processing, so we don't need to parse
+     * personnel twice.</p>
      */
     private void fetchCelebrationDialogs() {
         if (isWinterHolidayMajorDay(currentDay)) {
             new WinterHolidayAnnouncement(this);
+        }
+
+        if (isNewYear(currentDay)) {
+            new NewYearsDayAnnouncement(this);
         }
     }
 

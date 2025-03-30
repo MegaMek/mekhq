@@ -42,6 +42,17 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
+/**
+ * This class is responsible for managing the immersive announcement for Commander's Day. It generates both in-character
+ * (IC) and out-of-character (OOC) messages, displays them in an interactive dialog, and allows users to suppress future
+ * announcements if desired.
+ *
+ * <p>Commander's Day is a special event date that recognizes the campaign's commander and promotes camaraderie
+ * within the unit. This class defines handling for this event and ensures appropriate messaging is shown based on the
+ * campaign context.</p>
+ *
+ * @since 0.50.05
+ */
 public class CommandersDayAnnouncement {
     private static String RESOURCE_BUNDLE = "mekhq.resources." + CommandersDayAnnouncement.class.getSimpleName();
 
@@ -49,8 +60,18 @@ public class CommandersDayAnnouncement {
 
     private final static int COMMANDERS_DAY_MONTH = 6;
     private final static int COMMANDERS_DAY_DAY = 16;
+
     private final static int SUPPRESS_DIALOG_RESPONSE_INDEX = 3;
 
+    /**
+     * Constructs a new {@code CommandersDayAnnouncement}.
+     *
+     * <p>Initializes the announcement for Commander's Day by generating immersive in-character (IC) and
+     * out-of-character (OOC) messages. These messages are displayed in an interactive dialog, allowing users to select
+     * options or suppress future events related to Commander's Day.</p>
+     *
+     * @param campaign the {@link Campaign} instance containing the relevant context for the announcement
+     */
     public CommandersDayAnnouncement(Campaign campaign) {
         this.campaign = campaign;
 
@@ -68,10 +89,17 @@ public class CommandersDayAnnouncement {
 
         if (dialog.getDialogChoice() == SUPPRESS_DIALOG_RESPONSE_INDEX) {
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
-            //            campaignOptions.setShowLifeEventDialogBirths(false);
+            campaignOptions.setShowLifeEventDialogCelebrations(false);
         }
     }
 
+
+    /**
+     * Generates and retrieves the in-character (IC) message to be displayed during the Commander's Day announcement.
+     * This message is personalized with the commander's information, such as their address and surname.
+     *
+     * @return the generated IC message as a {@link String}
+     */
     private String getInCharacterMessage() {
         // Commander Data
         Person commander = campaign.getFlaggedCommander();
@@ -90,6 +118,13 @@ public class CommandersDayAnnouncement {
         return getFormattedTextAt(RESOURCE_BUNDLE, resourceKey, commanderAddress, commanderSurname);
     }
 
+
+    /**
+     * Retrieves a {@link Person} who will act as the in-character speaker for the Commander's Day announcement. The
+     * speaker is typically chosen from the campaign's administrative personnel, prioritizing HR, then COMMAND.
+     *
+     * @return the selected {@link Person}, or {@code null} if no suitable speaker is available
+     */
     private @Nullable Person getSpeaker() {
         Person speaker = campaign.getSeniorAdminPerson(HR);
 
@@ -102,6 +137,13 @@ public class CommandersDayAnnouncement {
         return speaker;
     }
 
+
+    /**
+     * Generates and retrieves a list of button labels for the dialog interaction during Commander's Day. These labels
+     * represent user options, such as positive, neutral, or negative responses and a suppression option.
+     *
+     * @return a {@link List} of button label strings for dialog interactions
+     */
     private List<String> getButtonLabels() {
         return List.of(getFormattedTextAt(RESOURCE_BUNDLE, "button.response.positive"),
               getFormattedTextAt(RESOURCE_BUNDLE, "button.response.neutral"),
@@ -109,6 +151,15 @@ public class CommandersDayAnnouncement {
               getFormattedTextAt(RESOURCE_BUNDLE, "button.response.suppress"));
     }
 
+
+    /**
+     * Checks if the provided {@link LocalDate} corresponds to Commander's Day, which is predetermined to occur on June
+     * 16th.
+     *
+     * @param date the {@link LocalDate} to check
+     *
+     * @return {@code true} if the provided date is Commander's Day; {@code false} otherwise
+     */
     public static boolean isCommandersDay(LocalDate date) {
         return date.getMonthValue() == COMMANDERS_DAY_MONTH && date.getDayOfMonth() == COMMANDERS_DAY_DAY;
     }
