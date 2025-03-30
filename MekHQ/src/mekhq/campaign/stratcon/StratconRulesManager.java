@@ -604,7 +604,12 @@ public class StratconRulesManager {
      *       coordinates in the provided {@link StratconTrackState} are occupied (and therefore, scenario placement is
      *       not possible).
      */
-    public static @Nullable StratconScenario addHiddenExternalScenario(Campaign campaign, AtBContract contract, @Nullable StratconTrackState trackState, @Nullable ScenarioTemplate template, @Nullable Integer daysTilDeployment) {
+    public static @Nullable StratconScenario addHiddenExternalScenario(Campaign campaign,
+                                                                       AtBContract contract,
+                                                                       @Nullable StratconTrackState trackState,
+                                                                       @Nullable ScenarioTemplate template,
+                                                                       boolean allowPlayerFacilities,
+                                                                       @Nullable Integer daysTilDeployment) {
         // If we're not generating for a specific track, randomly pick one.
         if (trackState == null) {
             trackState = getRandomTrack(contract);
@@ -3094,101 +3099,75 @@ public class StratconRulesManager {
     }
 
     /**
-     * Processes an ignored dynamic scenario - locates it on one of the tracks and calls the standared 'ignored
-     * scenario' routine.
+     * Processes an ignored dynamic scenario by locating it on one of the tracks and invoking the standard 'ignored
+     * scenario' routine for additional processing.
      *
-     * @return Whether or not we also need to get rid of the backing scenario from the campaign
+     * <p>This method iterates over the tracks in the campaign state to find the specified scenario by its ID. Once
+     * located, it processes the scenario using the appropriate logic to handle ignored scenarios.</p>
+     *
+     * @param scenarioId    The ID of the dynamic scenario to be processed.
+     * @param campaignState The state of the current campaign, used to access tracks and scenarios.
      */
-    public static boolean processIgnoredScenario(AtBDynamicScenario scenario, StratconCampaignState campaignState) {
-        return campaignState.getTracks()
-                     .stream()
-                     .filter(track -> track.getBackingScenariosMap().containsKey(scenario.getId()))
-                     .findFirst()
-                     .map(track -> processIgnoredScenario(track.getBackingScenariosMap().get(scenario.getId()),
-                           campaignState))
-                     .orElse(true);
+    public static void processIgnoredDynamicScenario(int scenarioId, StratconCampaignState campaignState) {
+        for (StratconTrackState track : campaignState.getTracks()) {
+            Map<Integer, StratconScenario> backingScenarios = track.getBackingScenariosMap();
+            StratconScenario stratConScenario = backingScenarios.get(scenarioId);
 
+            if (stratConScenario != null) {
+                processIgnoredStratConScenario(stratConScenario, track, campaignState);
+                break;
+            }
+        }
     }
 
     /**
-     * Processes an ignored Stratcon scenario
+     * Processes an ignored StratCon scenario by removing it from the campaign state and updating related state
+     * variables, including victory points, facility ownership, and objectives.
      *
-     * @return Whether or not we also need to get rid of the backing scenario from the campaign
+     * <p>This method is called when a StratCon scenario is ignored, and it ensures that the state of the campaign is
+     * updated accordingly. The following operations are performed:</p>
+     *
+     * <ul>
+     *   <li><b>Victory Points Adjustment:</b>
+     *       If the scenario is marked as "special" or a "turning point," the campaign's victory points are reduced by 1
+     *       to reflect a penalty before the scenario is removed.</li>
+     *   <li><b>Scenario Removal:</b>
+     *       The ignored scenario is removed from its associated track.</li>
+     *   <li><b>Facility Ownership and Objective Status:</b>
+     *       <ul>
+     *         <li>If no facility is associated with the scenario's coordinates, the objective tied to the scenario's
+     *         location is marked as failed.</li>
+     *         <li>If a facility exists at the scenario's location and is owned by allied forces, ownership is flipped
+     *         to the opposing forces.</li>
+     *       </ul>
+     *   </li>
+     * </ul>
+     *
+     * @param scenario      The {@link StratconScenario} that is being ignored and processed for removal. This includes
+     *                      information such as the scenario type and coordinates.
+     * @param track         The {@link StratconTrackState} representing the track the scenario is located on, which will
+     *                      be updated to reflect scenario removal and any resulting state changes.
+     * @param campaignState The {@link StratconCampaignState} representing the overall state of the campaign, which will
+     *                      be updated during the processing (e.g., victory points adjustments).
      */
-    public static boolean processIgnoredScenario(StratconScenario scenario, StratconCampaignState campaignState) {
-        for (StratconTrackState track : campaignState.getTracks()) {
-            if (track.getScenarios().containsKey(scenario.getCoords())) {
-                // subtract VP if scenario is 'required'
-                if (scenario.isTurningPoint()) {
-                    campaignState.updateVictoryPoints(-1);
-                }
-
-                track.removeScenario(scenario);
-
-                ScenarioType scenarioType = scenario.getBackingScenario().getStratConScenarioType();
-                if (scenarioType.isResupply() || scenarioType.isJailBreak()) {
-                    return true;
-                }
-
-                StratconFacility localFacility = track.getFacility(scenario.getCoords());
-                if (localFacility != null) {
-                    // if the ignored scenario was on top of an allied facility
-                    // then it'll get captured, and the player will possibly lose a SO
-                    if (localFacility.getOwner() == Allied) {
-                        localFacility.setOwner(Opposing);
-                    }
-
-                    return true;
-                } else {
-                    // if it's an open-field
-                    // move scenario towards nearest allied facility
-                    StratconCoords closestAlliedFacilityCoords = track.findClosestAlliedFacilityCoords(scenario.getCoords());
-
-                    if (closestAlliedFacilityCoords != null) {
-                        StratconCoords newCoords = scenario.getCoords()
-                                                         .translate(scenario.getCoords()
-                                                                          .direction(closestAlliedFacilityCoords));
-
-                        boolean objectiveMoved = track.moveObjective(scenario.getCoords(), newCoords);
-                        if (!objectiveMoved) {
-                            track.failObjective(scenario.getCoords());
-                        }
-
-                        scenario.setCoords(newCoords);
-
-                        int daysForward = max(1, track.getDeploymentTime());
-
-                        scenario.setDeploymentDate(scenario.getDeploymentDate().plusDays(daysForward));
-                        scenario.setActionDate(scenario.getActionDate().plusDays(daysForward));
-                        scenario.setReturnDate(scenario.getReturnDate().plusDays(daysForward));
-
-                        // refresh the scenario's position on the track
-                        track.addScenario(scenario);
-
-                        // TODO: Write some functionality to "copy" a scenario's bot forces
-                        // over between scenarios
-
-                        // TODO: if the allied facility is in the new coords, replace this scenario
-                        // with a facility defense, with the opfor coming directly from all hostiles
-                        // assigned to this scenario
-
-                        // update the scenario's biome
-                        setScenarioParametersFromBiome(track, scenario);
-                        scenario.setCurrentState(ScenarioState.UNRESOLVED);
-                        return false;
-                    } else {
-                        track.failObjective(scenario.getCoords());
-                        // TODO: if there's no allied facilities here, add its forces to track
-                        // reinforcement pool
-                        return true;
-                    }
-                }
-            }
+    public static void processIgnoredStratConScenario(StratconScenario scenario, StratconTrackState track, StratconCampaignState campaignState) {
+        // Update victory points if the scenario is marked as "special" or "turning point"
+        if (scenario.isSpecial() || scenario.isTurningPoint()) {
+            campaignState.updateVictoryPoints(-1);
         }
 
-        // if we couldn't find the scenario on any tracks, then let's just
-        // rid of any underlying AtB scenarios as well
-        return true;
+        // Remove the scenario from the track
+        track.removeScenario(scenario);
+
+        // Check the facility associated with the scenario, if any
+        StratconFacility localFacility = track.getFacility(scenario.getCoords());
+        if (localFacility == null) {
+            // Fail the objective if no facility is found
+            track.failObjective(scenario.getCoords());
+        } else if (localFacility.getOwner() == Allied) {
+            // Update the facility's ownership if it belongs to allies
+            localFacility.setOwner(Opposing);
+        }
     }
 
     public void startup() {
@@ -3234,7 +3213,7 @@ public class StratconRulesManager {
                         if ((scenario.getDeploymentDate() != null) &&
                                   scenario.getDeploymentDate().isBefore(campaign.getLocalDate()) &&
                                   scenario.getPrimaryForceIDs().isEmpty()) {
-                            processIgnoredScenario(scenario, campaignState);
+                            processIgnoredStratConScenario(scenario, track, campaignState);
                         }
                     }
 
