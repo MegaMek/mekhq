@@ -28,6 +28,7 @@
  */
 package mekhq.gui;
 
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
@@ -41,6 +42,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
@@ -107,6 +109,7 @@ import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
@@ -2498,6 +2501,10 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
+        if (checkForInvalidFaction(dayEndingEvent)) {
+            return;
+        }
+
         if (checkForDueScenarios(dayEndingEvent)) {
             return;
         }
@@ -2582,6 +2589,47 @@ public class CampaignGUI extends JPanel {
 
             new ImmersiveDialogSimple(campaign,
                   campaign.getSeniorAdminPerson(LOGISTICS),
+                  null,
+                  inCharacterMessage,
+                  null,
+                  outOfCharacterMessage,
+                  false);
+
+            dayEndingEvent.cancel();
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks whether the player’s current faction in the campaign is invalid for the current date, and if so, displays
+     * a warning dialog and cancels the current event.
+     *
+     * <p>This method retrieves the campaign's current date and faction, then verifies if the faction
+     * is valid using the {@link Faction#validIn(LocalDate)} method. If the faction is invalid, both an in-character and
+     * an out-of-character message are displayed using an {@link ImmersiveDialogSimple} dialog. The event is
+     * subsequently canceled, and the method returns {@code true} to indicate that an invalid faction was detected.</p>
+     *
+     * @param dayEndingEvent The {@link DayEndingEvent} instance that represents the end-of-day event. This event will
+     *                       be canceled if an invalid faction is found.
+     *
+     * @return {@code true} if the faction was found to be invalid and the event was canceled; {@code false} otherwise.
+     */
+    private boolean checkForInvalidFaction(DayEndingEvent dayEndingEvent) {
+        Campaign campaign = getCampaign();
+        Faction campaignFaction = campaign.getFaction();
+        LocalDate currentDate = campaign.getLocalDate();
+
+        if (!campaignFaction.validIn(currentDate)) {
+            String inCharacterMessage = getFormattedTextAt(resourceMap.getBaseBundleName(),
+                  "dialogInvalidFaction.ic",
+                  campaign.getCommanderAddress(false));
+            String outOfCharacterMessage = getFormattedTextAt(resourceMap.getBaseBundleName(),
+                  "dialogInvalidFaction.ooc");
+
+            new ImmersiveDialogSimple(campaign,
+                  campaign.getSeniorAdminPerson(COMMAND),
                   null,
                   inCharacterMessage,
                   null,
