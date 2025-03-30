@@ -5371,13 +5371,13 @@ public class Campaign implements ITechManager {
                 new WinterHolidayAnnouncement(this);
             }
 
-            if (isNewYear(currentDay)) {
-                new NewYearsDayAnnouncement(this);
-            }
-
             if (isFreedomDay(currentDay)) {
                 new FreedomDayAnnouncement(this);
             }
+        }
+
+        if (isNewYear(currentDay)) {
+            new NewYearsDayAnnouncement(this);
         }
     }
 
