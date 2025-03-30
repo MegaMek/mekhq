@@ -61,6 +61,7 @@ public class WinterHolidayAnnouncement {
     private final Campaign campaign;
 
     // Constants for significant holiday-related dates.
+    private final static int WINTER_HOLIDAY_START_YEAR = 2957;
     private final static int WINTER_HOLIDAY_MONTH = 12;
     private final static int WINTER_HOLIDAY_DAY_ZERO = 10;
     private final static int WINTER_HOLIDAY_DAY_ONE = 17;
@@ -274,6 +275,10 @@ public class WinterHolidayAnnouncement {
      * @return {@link true} if the specified date is a major Winter Holiday day, {@link false} otherwise
      */
     public static boolean isWinterHolidayMajorDay(LocalDate date) {
+        if (date.getYear() < WINTER_HOLIDAY_START_YEAR) {
+            return false;
+        }
+
         if (date.getMonthValue() != WINTER_HOLIDAY_MONTH) {
             return false;
         }
