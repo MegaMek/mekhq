@@ -48,6 +48,7 @@ import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomM
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
 import static mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement.isCommandersDay;
+import static mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement.isFreedomDay;
 import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewYear;
 import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWinterHolidayMajorDay;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
@@ -175,6 +176,7 @@ import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
 import mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement;
+import mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
@@ -4834,7 +4836,7 @@ public class Campaign implements ITechManager {
                 }
             }
 
-            if (isCommandersDay && (peopleWhoCelebrateCommandersDay < commanderDayTargetNumber)) {
+            if (isCommandersDay && !faction.isClan() && (peopleWhoCelebrateCommandersDay < commanderDayTargetNumber)) {
                 int age = person.getAge(currentDay);
                 if (age >= 6 && age <= 12) {
                     peopleWhoCelebrateCommandersDay++;
@@ -5364,12 +5366,18 @@ public class Campaign implements ITechManager {
      * personnel twice.</p>
      */
     private void fetchCelebrationDialogs() {
-        if (isWinterHolidayMajorDay(currentDay)) {
-            new WinterHolidayAnnouncement(this);
-        }
+        if (!faction.isClan()) {
+            if (isWinterHolidayMajorDay(currentDay)) {
+                new WinterHolidayAnnouncement(this);
+            }
 
-        if (isNewYear(currentDay)) {
-            new NewYearsDayAnnouncement(this);
+            if (isNewYear(currentDay)) {
+                new NewYearsDayAnnouncement(this);
+            }
+
+            if (isFreedomDay(currentDay)) {
+                new FreedomDayAnnouncement(this);
+            }
         }
     }
 
