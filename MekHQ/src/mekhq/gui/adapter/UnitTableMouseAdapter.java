@@ -406,8 +406,14 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                         RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
                         boolean useExtraRandomness = randomSkillPreferences.randomizeSkill();
 
-                        // We don't care about admin settings, as we're not going to have an admin here
-                        overrideSkills(false, false, useExtraRandomness, person, person.getPrimaryRole(), skillLevel);
+                        // We don't care about admin or doctor settings, as we're not going to have an admin or doctor here
+                        overrideSkills(false,
+                              false,
+                              false,
+                              useExtraRandomness,
+                              person,
+                              person.getPrimaryRole(),
+                              skillLevel);
                     }
                 }
             }

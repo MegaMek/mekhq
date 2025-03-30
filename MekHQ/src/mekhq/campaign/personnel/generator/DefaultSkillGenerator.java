@@ -29,12 +29,14 @@ package mekhq.campaign.personnel.generator;
 
 import static mekhq.campaign.personnel.SkillDeprecationTool.DEPRECATED_SKILLS;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 
 import megamek.common.Compute;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -102,21 +104,28 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             }
         }
 
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
         // roll artillery skill
-        if (campaign.getCampaignOptions().isUseArtillery() &&
+        if (campaignOptions.isUseArtillery() &&
                   (primaryRole.isMekWarrior() || primaryRole.isVehicleGunner() || primaryRole.isSoldier()) &&
                   Utilities.rollProbability(rskillPrefs.getArtilleryProb())) {
             generateArtillerySkill(person, bonus);
         }
 
         // roll Negotiation skill
-        if (campaign.getCampaignOptions().isAdminsHaveNegotiation() && (primaryRole.isAdministrator())) {
+        if (campaignOptions.isAdminsHaveNegotiation() && (primaryRole.isAdministrator())) {
             addSkill(person, SkillType.S_NEG, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
         }
 
         // roll Scrounge skill
-        if (campaign.getCampaignOptions().isAdminsHaveScrounge() && (primaryRole.isAdministrator())) {
+        if (campaignOptions.isAdminsHaveScrounge() && (primaryRole.isAdministrator())) {
             addSkill(person, SkillType.S_SCROUNGE, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
+        }
+
+        // roll Administration skill
+        if (campaignOptions.isDoctorsUseAdministration() && (primaryRole.isDoctor())) {
+            addSkill(person, SkillType.S_ADMIN, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
         }
 
         // roll random secondary skill
