@@ -47,6 +47,7 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
+import static mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement.isCommandersDay;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenUsage;
@@ -171,6 +172,7 @@ import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
+import mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
@@ -4770,6 +4772,9 @@ public class Campaign implements ITechManager {
         }
 
         // Process personnel
+        int peopleWhoCelebrateCommandersDay = 0;
+        int commanderDayTargetNumber = 5;
+        boolean isCommandersDay = isCommandersDay(currentDay) && getFlaggedCommander() != null;
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
@@ -4824,6 +4829,13 @@ public class Campaign implements ITechManager {
                     }
                 }
             }
+
+            if (isCommandersDay && (peopleWhoCelebrateCommandersDay < commanderDayTargetNumber)) {
+                int age = person.getAge(currentDay);
+                if (age >= 6 && age <= 12) {
+                    peopleWhoCelebrateCommandersDay++;
+                }
+            }
         }
 
         if (!personnelWhoAdvancedInXP.isEmpty()) {
@@ -4831,6 +4843,11 @@ public class Campaign implements ITechManager {
                   spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                   personnelWhoAdvancedInXP.size(),
                   CLOSING_SPAN_TAG));
+        }
+
+        // Commander's Day!
+        if (isCommandersDay && (peopleWhoCelebrateCommandersDay >= commanderDayTargetNumber)) {
+            new CommandersDayAnnouncement(this);
         }
 
         // Update the force icons based on the end-of-day unit status if desired
@@ -5255,7 +5272,6 @@ public class Campaign implements ITechManager {
         // TODO : AbstractContractMarket : Uncomment
         // getContractMarket().processNewDay(this);
         unitMarket.processNewDay(this);
-
 
         updateFieldKitchenCapacity();
 
