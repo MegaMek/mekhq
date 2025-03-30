@@ -29,6 +29,7 @@
 package mekhq.campaign.personnel;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.randomInt;
 
@@ -325,7 +326,8 @@ public class Person {
         this(givenName, surname, campaign, campaign.getFactionCode());
     }
 
-    public Person(final String givenName, final String surname, final @Nullable Campaign campaign, final String factionCode) {
+    public Person(final String givenName, final String surname, final @Nullable Campaign campaign,
+                  final String factionCode) {
         this("", givenName, surname, "", campaign, factionCode);
     }
 
@@ -339,7 +341,8 @@ public class Person {
      * @param campaign    the campaign this person is a part of, or null (unit testing only)
      * @param factionCode the faction this person was borne into
      */
-    public Person(final String preNominal, final String givenName, final String surname, final String postNominal, final @Nullable Campaign campaign, final String factionCode) {
+    public Person(final String preNominal, final String givenName, final String surname, final String postNominal,
+                  final @Nullable Campaign campaign, final String factionCode) {
         // We assign the variables in XML file order
         id = UUID.randomUUID();
 
@@ -1269,7 +1272,8 @@ public class Person {
      *                   initial change
      * @param isVerbose  a boolean indicating whether the method should generate a report if the loyalty has changed
      */
-    public void performForcedDirectionLoyaltyChange(Campaign campaign, boolean isPositive, boolean isMajor, boolean isVerbose) {
+    public void performForcedDirectionLoyaltyChange(Campaign campaign, boolean isPositive, boolean isMajor,
+                                                    boolean isVerbose) {
         int originalLoyalty = loyalty;
 
         Consumer<Integer> applyLoyaltyChange = (roll) -> {
@@ -1661,10 +1665,23 @@ public class Person {
     // endregion Pregnancy
 
     // region Experience
+
+    /**
+     * @return the current experience points (XP) of the character.
+     */
     public int getXP() {
         return xp;
     }
 
+    /**
+     * Awards experience points (XP) to the character and optionally tracks the total XP earnings if enabled.
+     *
+     * <p>This method increments the current XP by the specified amount and, if the campaign
+     * option for tracking total XP earnings is enabled, updates the total XP earnings as well.</p>
+     *
+     * @param campaign the {@link Campaign} instance providing the campaign options
+     * @param xp       the amount of XP to be awarded
+     */
     public void awardXP(final Campaign campaign, final int xp) {
         this.xp += xp;
         if (campaign.getCampaignOptions().isTrackTotalXPEarnings()) {
@@ -1672,10 +1689,28 @@ public class Person {
         }
     }
 
+    /**
+     * Spends (deducts) experience points (XP) from the character's current XP total.
+     *
+     * <p>This method decrements the current XP by the specified amount.</p>
+     *
+     * @param xp the amount of XP to deduct
+     */
     public void spendXP(final int xp) {
         this.xp -= xp;
     }
 
+    /**
+     * Sets the current experience points (XP) for the character and optionally tracks the adjustment in total XP
+     * earnings if enabled.
+     *
+     * <p>This method updates the current XP to the specified value. If the campaign option for tracking total XP
+     * earnings is enabled, it also calculates and updates the total XP earnings based on the difference between the new
+     * and current XP values.</p>
+     *
+     * @param campaign the {@link Campaign} instance providing the campaign options
+     * @param xp       the new XP value to set
+     */
     public void setXP(final Campaign campaign, final int xp) {
         if (campaign.getCampaignOptions().isTrackTotalXPEarnings()) {
             changeTotalXPEarnings(xp - getXP());
@@ -1683,7 +1718,17 @@ public class Person {
         setXPDirect(xp);
     }
 
-    private void setXPDirect(final int xp) {
+    /**
+     * Directly sets the experience points (XP) for the entity without adjusting total XP earnings tracking.
+     *
+     * <p>This method updates the XP value directly, bypassing any optional campaign-related tracking logic.</p>
+     *
+     * <p><b>Usage:</b> Generally this should only be used in special circumstances, as it bypasses the tracking of
+     * experience point gains. For most use cases {@code #awardXP()} or {@code #setXP()} are preferred.</p>
+     *
+     * @param xp the new XP value to set
+     */
+    public void setXPDirect(final int xp) {
         this.xp = xp;
     }
 
@@ -2454,8 +2499,8 @@ public class Person {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "person");
     }
 
-    public static Person generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        Person retVal = new Person(c);
+    public static Person generateInstanceFromXML(Node wn, Campaign campaign, Version version) {
+        Person person = new Person(campaign);
 
         try {
             // Okay, now load Person-specific fields!
@@ -2469,153 +2514,153 @@ public class Person {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("preNominal")) {
-                    retVal.setPreNominalDirect(wn2.getTextContent().trim());
+                    person.setPreNominalDirect(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("givenName")) {
-                    retVal.setGivenNameDirect(wn2.getTextContent().trim());
+                    person.setGivenNameDirect(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("surname")) {
-                    retVal.setSurnameDirect(wn2.getTextContent().trim());
+                    person.setSurnameDirect(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("postNominal")) {
-                    retVal.setPostNominalDirect(wn2.getTextContent().trim());
+                    person.setPostNominalDirect(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("maidenName")) {
-                    retVal.setMaidenName(wn2.getTextContent().trim());
+                    person.setMaidenName(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("callsign")) {
-                    retVal.setCallsignDirect(wn2.getTextContent().trim());
+                    person.setCallsignDirect(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
-                    retVal.setOriginFaction(Factions.getInstance().getFaction(wn2.getTextContent().trim()));
+                    person.setOriginFaction(Factions.getInstance().getFaction(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetId")) {
                     String systemId = "", planetId = "";
                     try {
                         systemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
                         planetId = wn2.getTextContent().trim();
-                        PlanetarySystem ps = c.getSystemById(systemId);
+                        PlanetarySystem ps = campaign.getSystemById(systemId);
                         Planet p = null;
                         if (ps == null) {
-                            ps = c.getSystemByName(systemId);
+                            ps = campaign.getSystemByName(systemId);
                         }
                         if (ps != null) {
                             p = ps.getPlanetById(planetId);
                         }
-                        retVal.originPlanet = p;
+                        person.originPlanet = p;
                     } catch (NullPointerException e) {
                         logger.error("Error loading originPlanet for {}, {}", systemId, planetId, e);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("becomingBondsmanEndDate")) {
-                    retVal.becomingBondsmanEndDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                    person.becomingBondsmanEndDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
-                    retVal.phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
+                    person.phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bloodname")) {
-                    retVal.bloodname = wn2.getTextContent();
+                    person.bloodname = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
-                    retVal.biography = wn2.getTextContent();
+                    person.biography = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("primaryRole")) {
                     final PersonnelRole primaryRole = PersonnelRole.parseFromString(wn2.getTextContent().trim());
-                    retVal.setPrimaryRoleDirect(primaryRole);
+                    person.setPrimaryRoleDirect(primaryRole);
                 } else if (wn2.getNodeName().equalsIgnoreCase("secondaryRole")) {
-                    retVal.setSecondaryRoleDirect(PersonnelRole.parseFromString(wn2.getTextContent().trim()));
+                    person.setSecondaryRoleDirect(PersonnelRole.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("acquisitions")) {
-                    retVal.acquisitions = Integer.parseInt(wn2.getTextContent());
+                    person.acquisitions = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("primaryDesignator")) {
-                    retVal.primaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
+                    person.primaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("secondaryDesignator")) {
-                    retVal.secondaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
+                    person.secondaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToWaitForHealing")) {
-                    retVal.daysToWaitForHealing = Integer.parseInt(wn2.getTextContent());
+                    person.daysToWaitForHealing = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("vocationalXPTimer")
                                  // <50.03 compatibility handler
                                  || wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
-                    retVal.vocationalXPTimer = Integer.parseInt(wn2.getTextContent());
+                    person.vocationalXPTimer = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
-                    retVal.id = UUID.fromString(wn2.getTextContent());
+                    person.id = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("genealogy")) {
-                    retVal.getGenealogy().fillFromXML(wn2.getChildNodes());
+                    person.getGenealogy().fillFromXML(wn2.getChildNodes());
                 } else if (wn2.getNodeName().equalsIgnoreCase("dueDate")) {
-                    retVal.dueDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                    person.dueDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("expectedDueDate")) {
-                    retVal.expectedDueDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                    person.expectedDueDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase(Portrait.XML_TAG)) {
-                    retVal.setPortrait(Portrait.parseFromXML(wn2));
+                    person.setPortrait(Portrait.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase("xp")) {
-                    retVal.setXPDirect(Integer.parseInt(wn2.getTextContent().trim()));
+                    person.setXPDirect(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("totalXPEarnings")) {
-                    retVal.setTotalXPEarnings(Integer.parseInt(wn2.getTextContent().trim()));
+                    person.setTotalXPEarnings(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("nTasks")) {
-                    retVal.nTasks = Integer.parseInt(wn2.getTextContent());
+                    person.nTasks = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
-                    retVal.hits = Integer.parseInt(wn2.getTextContent());
+                    person.hits = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("hitsPrior")) {
-                    retVal.hitsPrior = Integer.parseInt(wn2.getTextContent());
+                    person.hitsPrior = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
-                    retVal.setGender(Gender.parseFromString(wn2.getTextContent().trim()));
+                    person.setGender(Gender.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
                     final RankSystem rankSystem = Ranks.getRankSystemFromCode(wn2.getTextContent().trim());
 
                     if (rankSystem != null) {
-                        retVal.setRankSystemDirect(rankSystem);
+                        person.setRankSystemDirect(rankSystem);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
-                    retVal.setRank(Integer.parseInt(wn2.getTextContent().trim()));
+                    person.setRank(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankLevel")) {
-                    retVal.setRankLevel(Integer.parseInt(wn2.getTextContent().trim()));
+                    person.setRankLevel(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiClass")) {
-                    retVal.setManeiDominiClassDirect(ManeiDominiClass.parseFromString(wn2.getTextContent().trim()));
+                    person.setManeiDominiClassDirect(ManeiDominiClass.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiRank")) {
-                    retVal.setManeiDominiRankDirect(ManeiDominiRank.parseFromString(wn2.getTextContent().trim()));
+                    person.setManeiDominiRankDirect(ManeiDominiRank.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
                     if (!wn2.getTextContent().equals("null")) {
-                        retVal.doctorId = UUID.fromString(wn2.getTextContent());
+                        person.doctorId = UUID.fromString(wn2.getTextContent());
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
                     if (!wn2.getTextContent().equals("null")) {
-                        retVal.unit = new PersonUnitRef(UUID.fromString(wn2.getTextContent()));
+                        person.unit = new PersonUnitRef(UUID.fromString(wn2.getTextContent()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
-                    retVal.setStatus(PersonnelStatus.fromString(wn2.getTextContent().trim()));
+                    person.setStatus(PersonnelStatus.fromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("prisonerStatus")) {
-                    retVal.prisonerStatus = PrisonerStatus.parseFromString(wn2.getTextContent().trim());
+                    person.prisonerStatus = PrisonerStatus.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("salary")) {
-                    retVal.salary = Money.fromXmlString(wn2.getTextContent().trim());
+                    person.salary = Money.fromXmlString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("totalEarnings")) {
-                    retVal.totalEarnings = Money.fromXmlString(wn2.getTextContent().trim());
+                    person.totalEarnings = Money.fromXmlString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("minutesLeft")) {
-                    retVal.minutesLeft = Integer.parseInt(wn2.getTextContent());
+                    person.minutesLeft = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("overtimeLeft")) {
-                    retVal.overtimeLeft = Integer.parseInt(wn2.getTextContent());
+                    person.overtimeLeft = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
-                    retVal.birthday = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                    person.birthday = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("deathday")) {
-                    retVal.dateOfDeath = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                    person.dateOfDeath = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("recruitment")) {
-                    retVal.recruitment = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                    person.recruitment = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("joinedCampaign")) {
-                    retVal.joinedCampaign = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                    person.joinedCampaign = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastRankChangeDate")) {
-                    retVal.lastRankChangeDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                    person.lastRankChangeDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("autoAwardSupportPoints")) {
-                    retVal.setAutoAwardSupportPoints(Integer.parseInt(wn2.getTextContent().trim()));
+                    person.setAutoAwardSupportPoints(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("retirement")) {
-                    retVal.setRetirement(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
+                    person.setRetirement(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("loyalty")) {
-                    retVal.loyalty = Integer.parseInt(wn2.getTextContent());
+                    person.loyalty = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("fatigue")) {
-                    retVal.fatigue = Integer.parseInt(wn2.getTextContent());
+                    person.fatigue = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("isRecoveringFromFatigue")) {
-                    retVal.isRecoveringFromFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    person.isRecoveringFromFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
                     edge = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edgeAvailable")) {
-                    retVal.currentEdge = Integer.parseInt(wn2.getTextContent());
+                    person.currentEdge = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("implants")) {
                     implants = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("toughness")) {
-                    retVal.toughness = Integer.parseInt(wn2.getTextContent());
+                    person.toughness = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("pilotHits")) {
-                    retVal.hits = Integer.parseInt(wn2.getTextContent());
+                    person.hits = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("skill")) {
                     Skill s = Skill.generateInstanceFromXML(wn2);
                     if ((s != null) && (s.getType() != null)) {
-                        retVal.skills.addSkill(s.getType().getName(), s);
+                        person.skills.addSkill(s.getType().getName(), s);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("techUnitIds")) {
                     NodeList nl2 = wn2.getChildNodes();
@@ -2630,7 +2675,7 @@ public class Person {
                             logger.error("Unknown node type not loaded in techUnitIds nodes: {}", wn3.getNodeName());
                             continue;
                         }
-                        retVal.addTechUnit(new PersonUnitRef(UUID.fromString(wn3.getTextContent())));
+                        person.addTechUnit(new PersonUnitRef(UUID.fromString(wn3.getTextContent())));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelLog")) {
                     NodeList nl2 = wn2.getChildNodes();
@@ -2649,7 +2694,7 @@ public class Person {
 
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
-                            retVal.addLogEntry(logEntry);
+                            person.addLogEntry(logEntry);
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioLog")) {
@@ -2669,7 +2714,7 @@ public class Person {
 
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
-                            retVal.addScenarioLogEntry(logEntry);
+                            person.addScenarioLogEntry(logEntry);
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("awards")) {
@@ -2686,7 +2731,7 @@ public class Person {
                             continue;
                         }
 
-                        retVal.getAwardController()
+                        person.getAwardController()
                               .addAwardFromXml(AwardsFactory.getInstance().generateNewFromXML(wn3));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("injuries")) {
@@ -2702,24 +2747,24 @@ public class Person {
                             logger.error("Unknown node type not loaded in injury nodes: {}", wn3.getNodeName());
                             continue;
                         }
-                        retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
+                        person.injuries.add(Injury.generateInstanceFromXML(wn3));
                     }
-                    LocalDate now = c.getLocalDate();
-                    retVal.injuries.stream()
+                    LocalDate now = campaign.getLocalDate();
+                    person.injuries.stream()
                           .filter(inj -> (null == inj.getStart()))
                           .forEach(inj -> inj.setStart(now.minusDays(inj.getOriginalTime() - inj.getTime())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitWeight")) {
-                    retVal.originalUnitWeight = Integer.parseInt(wn2.getTextContent());
+                    person.originalUnitWeight = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitTech")) {
-                    retVal.originalUnitTech = Integer.parseInt(wn2.getTextContent());
+                    person.originalUnitTech = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitId")) {
-                    retVal.originalUnitId = UUID.fromString(wn2.getTextContent());
+                    person.originalUnitId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduHighestEducation")) {
-                    retVal.eduHighestEducation = EducationLevel.parseFromString(wn2.getTextContent());
+                    person.eduHighestEducation = EducationLevel.parseFromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduJourneyTime")) {
-                    retVal.eduJourneyTime = Integer.parseInt(wn2.getTextContent());
+                    person.eduJourneyTime = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravel")) {
-                    retVal.eduDaysOfTravel = Integer.parseInt(wn2.getTextContent());
+                    person.eduDaysOfTravel = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduTagAlongs")) {
                     if (wn2.getNodeName().equalsIgnoreCase("eduTagAlongs")) {
                         NodeList uuidNodes = wn2.getChildNodes();
@@ -2732,7 +2777,7 @@ public class Person {
 
                                 UUID uuid = UUID.fromString(uuidString);
 
-                                retVal.eduTagAlongs.add(uuid);
+                                person.eduTagAlongs.add(uuid);
                             }
                         }
                     }
@@ -2744,72 +2789,72 @@ public class Person {
                             Node node = nodes.item(j);
 
                             if (node.getNodeName().equalsIgnoreCase("eduFailedApplication")) {
-                                retVal.eduFailedApplications.add(node.getTextContent());
+                                person.eduFailedApplications.add(node.getTextContent());
                             }
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademySystem")) {
-                    retVal.eduAcademySystem = String.valueOf(wn2.getTextContent());
+                    person.eduAcademySystem = String.valueOf(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyName")) {
-                    retVal.eduAcademyName = String.valueOf(wn2.getTextContent());
+                    person.eduAcademyName = String.valueOf(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademySet")) {
-                    retVal.eduAcademySet = String.valueOf(wn2.getTextContent());
+                    person.eduAcademySet = String.valueOf(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyNameInSet")) {
-                    retVal.eduAcademyNameInSet = String.valueOf(wn2.getTextContent());
+                    person.eduAcademyNameInSet = String.valueOf(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyFaction")) {
-                    retVal.eduAcademyFaction = String.valueOf(wn2.getTextContent());
+                    person.eduAcademyFaction = String.valueOf(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduCourseIndex")) {
-                    retVal.eduCourseIndex = Integer.parseInt(wn2.getTextContent());
+                    person.eduCourseIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduEducationStage")) {
-                    retVal.eduEducationStage = EducationStage.parseFromString(wn2.getTextContent());
+                    person.eduEducationStage = EducationStage.parseFromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduEducationTime")) {
-                    retVal.eduEducationTime = Integer.parseInt(wn2.getTextContent());
+                    person.eduEducationTime = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("aggression")) {
-                    retVal.aggression = Aggression.fromString(wn2.getTextContent());
+                    person.aggression = Aggression.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("aggressionDescriptionIndex")) {
-                    retVal.aggressionDescriptionIndex = Integer.parseInt(wn2.getTextContent());
+                    person.aggressionDescriptionIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("ambition")) {
-                    retVal.ambition = Ambition.fromString(wn2.getTextContent());
+                    person.ambition = Ambition.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("ambitionDescriptionIndex")) {
-                    retVal.ambitionDescriptionIndex = Integer.parseInt(wn2.getTextContent());
+                    person.ambitionDescriptionIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("greed")) {
-                    retVal.greed = Greed.fromString(wn2.getTextContent());
+                    person.greed = Greed.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("greedDescriptionIndex")) {
-                    retVal.greedDescriptionIndex = Integer.parseInt(wn2.getTextContent());
+                    person.greedDescriptionIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("social")) {
-                    retVal.social = Social.fromString(wn2.getTextContent());
+                    person.social = Social.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("socialDescriptionIndex")) {
-                    retVal.socialDescriptionIndex = Integer.parseInt(wn2.getTextContent());
+                    person.socialDescriptionIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityQuirk")) {
-                    retVal.personalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent());
+                    person.personalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityQuirkDescriptionIndex")) {
-                    retVal.personalityQuirkDescriptionIndex = Integer.parseInt(wn2.getTextContent());
+                    person.personalityQuirkDescriptionIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("intelligence")) {
-                    retVal.intelligence = Intelligence.fromString(wn2.getTextContent());
+                    person.intelligence = Intelligence.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("intelligenceDescriptionIndex")) {
-                    retVal.intelligenceDescriptionIndex = Integer.parseInt(wn2.getTextContent());
+                    person.intelligenceDescriptionIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityDescription")) {
-                    retVal.personalityDescription = wn2.getTextContent();
+                    person.personalityDescription = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")) {
-                    retVal.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    person.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("commander")) {
-                    retVal.setCommander(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    person.setCommander(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("divorceable")) {
-                    retVal.setDivorceable(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    person.setDivorceable(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("founder")) {
-                    retVal.setFounder(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    person.setFounder(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("immortal")) {
-                    retVal.setImmortal(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    person.setImmortal(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("marriageable")) {
-                    retVal.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    person.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("tryingToConceive")) {
-                    retVal.setTryingToConceive(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    person.setTryingToConceive(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("extraData")) {
-                    retVal.extraData = ExtraData.createFromXml(wn2);
+                    person.extraData = ExtraData.createFromXml(wn2);
                 }
             }
 
-            retVal.setFullName(); // this sets the name based on the loaded values
+            person.setFullName(); // this sets the name based on the loaded values
 
             if ((advantages != null) && !advantages.isBlank()) {
                 StringTokenizer st = new StringTokenizer(advantages, "::");
@@ -2819,7 +2864,7 @@ public class Person {
                     Object value = Crew.parseAdvantageValue(adv);
 
                     try {
-                        retVal.getOptions().getOption(advName).setValue(value);
+                        person.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
                         logger.warn("Error restoring advantage: {}", adv);
                     }
@@ -2832,8 +2877,8 @@ public class Person {
                 // list of options for that group
                 edgeOptionList.remove(0);
 
-                updateOptions(edge, retVal, edgeOptionList);
-                removeUnusedEdgeTriggers(retVal, edgeOptionList);
+                updateOptions(edge, person, edgeOptionList);
+                removeUnusedEdgeTriggers(person, edgeOptionList);
             }
 
             if ((implants != null) && !implants.isBlank()) {
@@ -2844,7 +2889,7 @@ public class Person {
                     Object value = Crew.parseAdvantageValue(adv);
 
                     try {
-                        retVal.getOptions().getOption(advName).setValue(value);
+                        person.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
                         logger.error("Error restoring implants: {}", adv);
                     }
@@ -2852,35 +2897,35 @@ public class Person {
             }
 
             // Fixing Prisoner Ranks - 0.47.X Fix
-            if (retVal.getRankNumeric() < 0) {
-                retVal.setRank(0);
+            if (person.getRankNumeric() < 0) {
+                person.setRank(0);
             }
 
             // Fixing recruitment dates
             // I don't know when this metric was added, so we check all versions
-            if (retVal.getRecruitment() == null) {
-                retVal.setRecruitment(c.getLocalDate());
+            if (person.getRecruitment() == null) {
+                person.setRecruitment(campaign.getLocalDate());
             }
 
             // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
             // potentially as far back as 2014. The next two handlers should never be removed.
-            if (!retVal.canPerformRole(c.getLocalDate(), retVal.getPrimaryRole(), true)) {
-                retVal.setPrimaryRole(c, PersonnelRole.NONE);
+            if (!person.canPerformRole(campaign.getLocalDate(), person.getPrimaryRole(), true)) {
+                person.setPrimaryRole(campaign, PersonnelRole.NONE);
                 logger.info("{} was found to be ineligible for their primary role. That role has been removed and " +
-                                  "they were assigned the NONE role.", retVal.getFullTitle());
+                                  "they were assigned the NONE role.", person.getFullTitle());
             }
 
-            if (!retVal.canPerformRole(c.getLocalDate(), retVal.getSecondaryRole(), false)) {
-                retVal.setSecondaryRole(PersonnelRole.NONE);
+            if (!person.canPerformRole(campaign.getLocalDate(), person.getSecondaryRole(), false)) {
+                person.setSecondaryRole(PersonnelRole.NONE);
                 logger.info("{} was found to be ineligible for their secondary role. That role has been removed and " +
-                                  "they were assigned the NONE role.", retVal.getFullTitle());
+                                  "they were assigned the NONE role.", person.getFullTitle());
             }
         } catch (Exception e) {
-            logger.error(e, "Failed to read person {} from file", retVal.getFullName());
-            retVal = null;
+            logger.error(e, "Failed to read person {} from file", person.getFullName());
+            person = null;
         }
 
-        return retVal;
+        return person;
     }
     // endregion File I/O
 
@@ -3722,8 +3767,40 @@ public class Person {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
+    /**
+     * @deprecated Use {@link #getCostToImprove(String, boolean)} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public int getCostToImprove(final String skillName) {
-        return hasSkill(skillName) ? getSkill(skillName).getCostToImprove() : -1;
+        return getCostToImprove(skillName, false);
+    }
+
+    /**
+     * Calculates the cost to improve a specific skill, with an optional intelligence multiplier.
+     *
+     * <p>If the skill exists, the cost is based on its current level's improvement cost.</p>
+     *
+     * <p>If the skill does not exist, the method calculates the cost using the default cost for the skill type at
+     * level 0.</p>
+     *
+     * @param skillName       the name of the skill for which to calculate the improvement cost.
+     * @param useIntelligence a boolean indicating whether to apply {@link Intelligence} cost multipliers.
+     *
+     * @return the cost to improve the skill, adjusted by the intelligence multiplier if applicable, or the cost for
+     *       level 0 if the specified skill does not currently exist.
+     */
+    public int getCostToImprove(final String skillName, final boolean useIntelligence) {
+        int cost = hasSkill(skillName) ?
+                         getSkill(skillName).getCostToImprove() :
+                         SkillType.getType(skillName).getCost(0);
+
+        double multiplier = 1.0;
+
+        if (useIntelligence) {
+            multiplier = getIntelligenceXpCostMultiplier(useIntelligence);
+        }
+
+        return (int) round(cost * multiplier);
     }
     // endregion skill
 
@@ -4698,25 +4775,39 @@ public class Person {
         };
     }
 
-    /**
-     * @param campaignOptions the campaign options to determine whether to calculate the multiplier or to just return 1
-     *
-     * @return the intelligence experience cost multiplier based on campaign options.
-     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public double getIntelligenceXpCostMultiplier(CampaignOptions campaignOptions) {
-        if (campaignOptions.isUseRandomPersonalities() && campaignOptions.isUseIntelligenceXpMultiplier()) {
-            double intelligenceMultiplier = 0.025; // each rank in Intelligence should adjust costs by 2.5%
+        return getIntelligenceXpCostMultiplier(campaignOptions.isUseIntelligenceXpMultiplier());
+    }
 
-            int intelligence = getIntelligence().getIntelligenceScore();
-            double intelligenceScore = intelligence * intelligenceMultiplier;
-
-            if (intelligenceScore == 0) {
-                return 1;
-            } else {
-                return 1 - intelligenceScore;
-            }
+    /**
+     * Calculates the experience cost multiplier based on intelligence.
+     *
+     * <p>If intelligence adjustment is not enabled, the multiplier is 1 (no effect).</p>
+     *
+     * <p>Otherwise, the multiplier is determined by the intelligence score, where each point adjusts the cost by 2.5%.
+     * A neutral intelligence score (resulting in a modifier of 0) will also return a multiplier of 1.</p>
+     *
+     * @param useIntelligenceXpCostMultiplier a {@link Boolean} indicating whether to apply the intelligence-based
+     *                                        adjustment to the experience cost.
+     *
+     * @return the experience cost multiplier: - `1` if intelligence adjustment is disabled or {@link Intelligence} is
+     *       neutral. - A value adjusted by the formula `1 - (score * 0.025)` otherwise.
+     */
+    public double getIntelligenceXpCostMultiplier(final boolean useIntelligenceXpCostMultiplier) {
+        if (!useIntelligenceXpCostMultiplier) {
+            return 1;
         }
 
-        return 1;
+        double intelligenceMultiplier = 0.025; // each rank in Intelligence should adjust costs by 2.5%
+
+        int score = getIntelligence().getIntelligenceScore();
+        double modifier = score * intelligenceMultiplier;
+
+        if (modifier == 0) { // neutral intelligence
+            return 1;
+        } else {
+            return 1 - modifier;
+        }
     }
 }

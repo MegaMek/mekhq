@@ -1345,13 +1345,71 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * @return a list of all currently active contracts
+     * Retrieves a list of currently active contracts.
+     *
+     * <p>This method is a shorthand for {@link #getActiveContracts(boolean)} with {@code includeFutureContracts}
+     * set to {@code false}. It fetches all contracts from the list of missions and filters them for those that are
+     * currently active on the current local date.</p>
+     *
+     * @return A list of {@link Contract} objects that are currently active.
      */
     public List<Contract> getActiveContracts() {
-        return getMissions().stream()
-                     .filter(c -> (c instanceof Contract) && c.isActiveOn(getLocalDate()))
-                     .map(c -> (Contract) c)
-                     .collect(Collectors.toList());
+        return getActiveContracts(false);
+    }
+
+    /**
+     * Retrieves a list of active contracts, with an option to include future contracts.
+     *
+     * <p>This method iterates through all missions and checks if they are instances of {@link Contract}.
+     * If so, it filters them based on their active status, as determined by the
+     * {@link Contract#isActiveOn(LocalDate, boolean)} method.</p>
+     *
+     * @param includeFutureContracts If {@code true}, contracts that are scheduled to start in the future will also be
+     *                               included in the final result. If {@code false}, only contracts active on the
+     *                               current local date are included.
+     *
+     * @return A list of {@link Contract} objects that match the active criteria.
+     */
+    public List<Contract> getActiveContracts(boolean includeFutureContracts) {
+        List<Contract> activeContracts = new ArrayList<>();
+
+        for (Mission mission : getMissions()) {
+            // Skip if the mission is not a Contract
+            if (!(mission instanceof Contract contract)) {
+                continue;
+            }
+
+            if (contract.isActiveOn(getLocalDate(), includeFutureContracts)) {
+                activeContracts.add(contract);
+            }
+        }
+
+        return activeContracts;
+    }
+
+    /**
+     * Retrieves a list of future contracts.
+     *
+     * <p>This method fetches all missions and checks if they are instances of {@link Contract}. It filters the
+     * contracts where the start date is after the current day.</p>
+     *
+     * @return A list of {@link Contract} objects whose start dates are in the future.
+     */
+    public List<Contract> getFutureContracts() {
+        List<Contract> activeContracts = new ArrayList<>();
+
+        for (Mission mission : getMissions()) {
+            // Skip if the mission is not a Contract
+            if (!(mission instanceof Contract contract)) {
+                continue;
+            }
+
+            if (contract.getStartDate().isAfter(currentDay)) {
+                activeContracts.add(contract);
+            }
+        }
+
+        return activeContracts;
     }
 
     public List<AtBContract> getAtBContracts() {
@@ -1856,7 +1914,9 @@ public class Campaign implements ITechManager {
      *
      * @return A new {@link Person}.
      */
-    public Person newPerson(final PersonnelRole primaryRole, final PersonnelRole secondaryRole, final AbstractFactionSelector factionSelector, final AbstractPlanetSelector planetSelector, final Gender gender) {
+    public Person newPerson(final PersonnelRole primaryRole, final PersonnelRole secondaryRole,
+                            final AbstractFactionSelector factionSelector, final AbstractPlanetSelector planetSelector,
+                            final Gender gender) {
         return newPerson(primaryRole, secondaryRole, getPersonnelGenerator(factionSelector, planetSelector), gender);
     }
 
@@ -1882,7 +1942,8 @@ public class Campaign implements ITechManager {
      *
      * @return A new {@link Person} configured using {@code personnelGenerator}.
      */
-    public Person newPerson(final PersonnelRole primaryRole, final PersonnelRole secondaryRole, final AbstractPersonnelGenerator personnelGenerator, final Gender gender) {
+    public Person newPerson(final PersonnelRole primaryRole, final PersonnelRole secondaryRole,
+                            final AbstractPersonnelGenerator personnelGenerator, final Gender gender) {
         final Person person = personnelGenerator.generate(this, primaryRole, secondaryRole, gender);
 
         // Assign a random portrait after we generate a new person
@@ -2576,7 +2637,8 @@ public class Campaign implements ITechManager {
      *
      * @return An {@link AbstractPersonnelGenerator} to use when creating new personnel.
      */
-    public AbstractPersonnelGenerator getPersonnelGenerator(final AbstractFactionSelector factionSelector, final AbstractPlanetSelector planetSelector) {
+    public AbstractPersonnelGenerator getPersonnelGenerator(final AbstractFactionSelector factionSelector,
+                                                            final AbstractPlanetSelector planetSelector) {
         final DefaultPersonnelGenerator generator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
         generator.setNameGenerator(RandomNameGenerator.getInstance());
         generator.setSkillPreferences(getRandomSkillPreferences());
@@ -2756,7 +2818,8 @@ public class Campaign implements ITechManager {
      * @param ignoreMothballedUnits    if {@code true}, parts belonging to mothballed units are excluded.
      * @param ignoreSparesUnderQuality spares with a quality lower than this threshold are excluded from counting.
      */
-    private void updatePartInUseData(PartInUse partInUse, Part incomingPart, boolean ignoreMothballedUnits, PartQuality ignoreSparesUnderQuality) {
+    private void updatePartInUseData(PartInUse partInUse, Part incomingPart, boolean ignoreMothballedUnits,
+                                     PartQuality ignoreSparesUnderQuality) {
         Unit unit = incomingPart.getUnit();
         if (unit != null) {
             // Ignore conventional infantry
@@ -2801,7 +2864,8 @@ public class Campaign implements ITechManager {
      * @param ignoreMothballedUnits    don't count parts in mothballed units
      * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
      */
-    public void updatePartInUse(PartInUse partInUse, boolean ignoreMothballedUnits, PartQuality ignoreSparesUnderQuality) {
+    public void updatePartInUse(PartInUse partInUse, boolean ignoreMothballedUnits,
+                                PartQuality ignoreSparesUnderQuality) {
         partInUse.setUseCount(0);
         partInUse.setStoreCount(0);
         partInUse.setTransferCount(0);
@@ -2857,7 +2921,8 @@ public class Campaign implements ITechManager {
      *       result.
      */
 
-    public Set<PartInUse> getPartsInUse(boolean ignoreMothballedUnits, boolean isResupply, PartQuality ignoreSparesUnderQuality) {
+    public Set<PartInUse> getPartsInUse(boolean ignoreMothballedUnits, boolean isResupply,
+                                        PartQuality ignoreSparesUnderQuality) {
         // java.util.Set doesn't supply a get(Object) method, so we have to use a
         // java.util.Map
         Map<PartInUse, PartInUse> inUse = new HashMap<>();
@@ -3629,7 +3694,8 @@ public class Campaign implements ITechManager {
      *
      * @return The result of the rolls.
      */
-    public PartAcquisitionResult findContactForAcquisition(IAcquisitionWork acquisition, Person person, PlanetarySystem system) {
+    public PartAcquisitionResult findContactForAcquisition(IAcquisitionWork acquisition, Person person,
+                                                           PlanetarySystem system) {
         TargetRoll target = getTargetForAcquisition(acquisition, person);
 
         String impossibleSentencePrefix = person == null ?
@@ -3739,7 +3805,8 @@ public class Campaign implements ITechManager {
      * @return a boolean indicating whether the attempt to acquire equipment was
      *         successful.
      */
-    private boolean acquireEquipment(IAcquisitionWork acquisition, Person person, PlanetarySystem system, int transitDays) {
+    private boolean acquireEquipment(IAcquisitionWork acquisition, Person person, PlanetarySystem system,
+                                     int transitDays) {
         boolean found = false;
         String report = "";
 
@@ -6090,7 +6157,8 @@ public class Campaign implements ITechManager {
      * @param description       String displayed in the ledger and report
      * @param individualPayouts Map of Person to the Money they're owed
      */
-    public void payPersonnel(TransactionType type, Money quantity, String description, Map<Person, Money> individualPayouts) {
+    public void payPersonnel(TransactionType type, Money quantity, String description,
+                             Map<Person, Money> individualPayouts) {
         getFinances().debit(type,
               getLocalDate(),
               quantity,
@@ -7223,7 +7291,8 @@ public class Campaign implements ITechManager {
      * @return a {@link TargetRoll} object representing the roll required to successfully acquire the requested item, or
      *       an impossible/automatic result under specific circumstances.
      */
-    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition, final @Nullable Person person, final boolean checkDaysToWait) {
+    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition, final @Nullable Person person,
+                                              final boolean checkDaysToWait) {
         if (getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "Automatic Success");
         }
@@ -8245,15 +8314,15 @@ public class Campaign implements ITechManager {
         int currentTransitTime = (distance > 0) ? (int) Math.ceil(getCurrentSystem().getTimeToJumpPoint(1.0)) : 0;
         int originTransitTime = (distance > 0) ? (int) Math.ceil(system.getTimeToJumpPoint(1.0)) : 0;
 
-        // CO 51 (latest) has much longer average part times. Let's adjust
-        // amazonFreeShipping
-        // based on what getUnitTransitTime is set in the options in an attempt to get
-        // some
-        // delivery times more in line with RAW's one-month minimum. Default is
-        // TRANSIT_UNIT_MONTH
+        // CO 51 (errata) has much longer average part times.
+        // Let's adjust amazonFreeShipping
+        // based on what getUnitTransitTime is set in
+        // the options in an attempt to get some
+        // delivery times more in line with RAW's two-month minimum.
+        // Default campaign option is TRANSIT_UNIT_MONTH
         int amazonFreeShipping = switch (campaignOptions.getUnitTransitTime()) {
-            case TRANSIT_UNIT_MONTH -> 7 + (d6(7 * (1 + jumps)));
-            case TRANSIT_UNIT_WEEK -> 2 + (d6(2 * (1 + jumps)));
+            case TRANSIT_UNIT_MONTH -> 30 + (d6(14 * (1 + jumps)));
+            case TRANSIT_UNIT_WEEK -> 7 + (d6(4 * (1 + jumps)));
             default -> d6(1 + jumps);
         };
         return (recharges * 7) + currentTransitTime + originTransitTime + amazonFreeShipping;
@@ -8478,7 +8547,8 @@ public class Campaign implements ITechManager {
      *
      * @return units that have that transport type
      */
-    public Set<Unit> getTransportsByType(CampaignTransportType campaignTransportType, TransporterType transporterType, double unitSize) {
+    public Set<Unit> getTransportsByType(CampaignTransportType campaignTransportType, TransporterType transporterType,
+                                         double unitSize) {
         return Objects.requireNonNull(getCampaignTransporterMap(campaignTransportType))
                      .getTransportsByType(transporterType, unitSize);
     }
@@ -8930,6 +9000,7 @@ public class Campaign implements ITechManager {
         atbEventProcessor.shutdown();
     }
 
+    @Deprecated(forRemoval = true, since = "0.50.05")
     public boolean checkOverDueLoans() {
         Money overdueAmount = getFinances().checkOverdueLoanPayments(this);
         if (overdueAmount.isPositive()) {
@@ -8946,13 +9017,22 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Checks if a turnover prompt should be displayed based on campaign options and current date.
+     * Checks if an employee turnover prompt should be displayed based on campaign options, current date, and other
+     * conditions (like transit status and campaign start date).
      *
-     * @return An integer representing the user's choice: -1 if turnover prompt should not be displayed. 0 to indicate
-     *       the user selected "Employee Turnover". 1 to indicate the user selected "Advance Day Regardless". 2 to
-     *       indicate the user selected "Cancel Advance Day".
+     * <p>The turnover prompt is triggered based on the configured turnover frequency (weekly, monthly, quarterly, or
+     * annually), but only after the campaign has been running for at least 6 days and when not in transit.<p>
+     *
+     * <p>The dialog will show different messages depending on whether there are pending retirees.</p>
+     *
+     * @return An integer representing the outcome: -1 if turnover prompt should not be displayed, 0 if user selected
+     *       "Employee Turnover", 1 if user selected "Advance Day Regardless", 2 if user selected "Cancel Advance Day"
      */
     public int checkTurnoverPrompt() {
+        if (location.isInTransit()) {
+            return -1;
+        }
+
         if (getLocalDate().isBefore(getCampaignStartDate().plusDays(6))) {
             return -1;
         }
