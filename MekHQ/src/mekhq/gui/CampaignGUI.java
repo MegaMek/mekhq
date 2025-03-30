@@ -29,6 +29,7 @@
 package mekhq.gui;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -2560,22 +2561,39 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * Checks if there are any overdue loans If the {@code checkOverDueLoans()} method of the {@link Campaign}
-     * associated with the given {@link DayEndingEvent} returns {@code true}, the funds get refreshed, a dialog shows up
-     * informing the user of the overdue loans, and the {@link DayEndingEvent} is canceled.
+     * Checks for overdue loan payments in the campaign and handles them by displaying a warning dialog and canceling
+     * the current event if overdue payments are found.
      *
-     * @param dayEndingEvent the {@link DayEndingEvent} being checked.
+     * <p>This method queries the campaign’s finances to determine whether there are any overdue loan payments.
+     * If an overdue amount is detected, it refreshes the campaign's funds, displays an immersive dialog containing both
+     * in-character and out-of-character messages, and cancels the current {@link DayEndingEvent}. The method then
+     * returns {@code true} to indicate that overdue payments were found and processed.</p>
      *
-     * @return {@code true} if there are overdue loans and {@code false} otherwise.
+     * @param dayEndingEvent The {@link DayEndingEvent} representing the end-of-day event. This event will be canceled
+     *                       if overdue payments are detected.
+     *
+     * @return {@code true} if overdue loan payments were detected and the event was canceled; {@code false} otherwise,
+     *       indicating no overdue loans.
      */
     private boolean checkForOverdueLoans(DayEndingEvent dayEndingEvent) {
-        if (getCampaign().checkOverDueLoans()) {
+        Campaign campaign = getCampaign();
+        Money overdueAmount = campaign.getFinances().checkOverdueLoanPayments(campaign);
+        if (overdueAmount.isPositive()) {
             refreshFunds();
 
-            JOptionPane.showMessageDialog(null,
-                  getResourceMap().getString("dialogOverdueLoans.text"),
-                  getResourceMap().getString("dialogOverdueLoans.title"),
-                  JOptionPane.WARNING_MESSAGE);
+            String inCharacterMessage = getFormattedTextAt(resourceMap.getBaseBundleName(),
+                  "dialogOverdueLoans.ic",
+                  campaign.getCommanderAddress(false));
+            String outOfCharacterMessage = getFormattedTextAt(resourceMap.getBaseBundleName(),
+                  "dialogOverdueLoans.ooc");
+
+            new ImmersiveDialogSimple(campaign,
+                  campaign.getSeniorAdminPerson(LOGISTICS),
+                  null,
+                  inCharacterMessage,
+                  null,
+                  outOfCharacterMessage,
+                  false);
 
             dayEndingEvent.cancel();
 
@@ -2622,6 +2640,7 @@ public class CampaignGUI extends JPanel {
 
             return true;
         }
+
         return false;
     }
 
