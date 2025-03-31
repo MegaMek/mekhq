@@ -4132,7 +4132,9 @@ public class Campaign implements ITechManager {
         }
         TargetRoll target = getTargetFor(theRefit, tech);
         // check that all parts have arrived
-        if (!theRefit.acquireParts()) {
+        int partsInTransit = theRefit.partsInTransit();
+        if (partsInTransit != 0) {
+            addReport(String.format("%s: waiting on %s parts.", theRefit.getPartName(), partsInTransit));
             return;
         }
         String report = tech.getHyperlinkedFullTitle() + " works on " + theRefit.getPartName();
@@ -5198,8 +5200,13 @@ public class Campaign implements ITechManager {
         List<Part> assignedParts = new ArrayList<>();
         List<Part> arrivedParts = new ArrayList<>();
         getWarehouse().forEachPart(part -> {
-            if (part instanceof Refit) {
-                return;
+  
+            if (part instanceof RefitKit) {
+                logger.info("REFIT KIT IN PNDU"); // FIXME: LOGGER
+            }
+
+            if (null != part.getRefitUnit()) {
+                logger.info("Refit Part PDNU: " + part); // FIXME: LOGGER
             }
 
             if (part.getTech() != null) {
@@ -7284,7 +7291,7 @@ public class Campaign implements ITechManager {
 
         final int minutes = Math.min(partWork.getTimeLeft(), techTime);
         if (minutes <= 0) {
-            logger.error("Attempting to get the target number for a part with zero time left.");
+            logger.error("Attempting to get the target number for a part with zero time left. " + partWork);
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "No part repair time remaining.");
         }
 

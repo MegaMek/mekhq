@@ -373,6 +373,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         Part newPart = getNewPart();
         newPart.setBrandNew(true);
         newPart.setDaysToArrival(transitDays);
+        newPart.setRefitUnit(getRefitUnit());
         StringBuilder toReturn = new StringBuilder();
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
