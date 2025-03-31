@@ -81,9 +81,6 @@ public class CampaignHasProblemOnLoad {
               createButtons(problemType),
               createOutOfCharacterMessage(problemType),
               null,
-              false,
-              null,
-              null,
               true);
 
         // There is deliberately no cancel option for NEW_VERSION_WITH_OLD_DATA
