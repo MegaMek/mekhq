@@ -29,7 +29,7 @@ package mekhq.gui.dialog.randomEvents;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import static mekhq.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.Component;
@@ -141,7 +141,7 @@ public class GrayMondayDialog extends ImmersiveDialogCore {
         }
 
         if (speakerIcon != null) {
-            speakerIcon = scaleImageIconToWidth(speakerIcon, IMAGE_WIDTH);
+            speakerIcon = scaleImageIcon(speakerIcon, IMAGE_WIDTH, true);
         }
         JLabel imageLabel = new JLabel();
         imageLabel.setIcon(speakerIcon);

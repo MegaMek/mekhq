@@ -27,7 +27,7 @@
  */
 package mekhq.gui.dialog;
 
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import static mekhq.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.Component;
@@ -118,7 +118,7 @@ public class NewsDialog extends ImmersiveDialogCore {
         // Get Network image
         String networkImage = NETWORK.imageAddress;
         ImageIcon networkIcon = new ImageIcon(networkImage);
-        networkIcon = scaleImageIconToWidth(networkIcon, IMAGE_WIDTH);
+        networkIcon = scaleImageIcon(networkIcon, IMAGE_WIDTH, true);
 
         JLabel imageLabel = new JLabel();
         imageLabel.setIcon(networkIcon);

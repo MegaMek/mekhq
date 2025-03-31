@@ -319,6 +319,7 @@ public class CampaignOptions {
 
     // Life Events
     private boolean showLifeEventDialogBirths;
+    private boolean showLifeEventDialogComingOfAge;
 
     // Marriage
     private boolean useManualMarriages;
@@ -895,6 +896,7 @@ public class CampaignOptions {
 
         // Life Events
         setShowLifeEventDialogBirths(true);
+        setShowLifeEventDialogComingOfAge(true);
 
         // Marriage
         setUseManualMarriages(true);
@@ -2275,13 +2277,21 @@ public class CampaignOptions {
     }
     // endregion anniversaries
 
-    //startregiona Life Events
+    //startregionn Life Events
     public boolean isShowLifeEventDialogBirths() {
         return showLifeEventDialogBirths;
     }
 
     public void setShowLifeEventDialogBirths(final boolean showLifeEventDialogBirths) {
         this.showLifeEventDialogBirths = showLifeEventDialogBirths;
+    }
+
+    public boolean isShowLifeEventDialogComingOfAge() {
+        return showLifeEventDialogComingOfAge;
+    }
+
+    public void setShowLifeEventDialogComingOfAge(final boolean showLifeEventDialogComingOfAge) {
+        this.showLifeEventDialogComingOfAge = showLifeEventDialogComingOfAge;
     }
     //endregion Life Events
 
@@ -5085,6 +5095,10 @@ public class CampaignOptions {
 
         // region Life Events
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "showLifeEventDialogBirths", isShowLifeEventDialogBirths());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "showLifeEventDialogComingOfAge",
+              isShowLifeEventDialogComingOfAge());
         // endregion Life Events
 
         // region Marriage
@@ -5844,6 +5858,8 @@ public class CampaignOptions {
                     retVal.setAnnounceChildBirthdays(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("showLifeEventDialogBirths")) {
                     retVal.setShowLifeEventDialogBirths(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("showLifeEventDialogComingOfAge")) {
+                    retVal.setShowLifeEventDialogComingOfAge(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     // endregion anniversaries
 
                     // region Marriage

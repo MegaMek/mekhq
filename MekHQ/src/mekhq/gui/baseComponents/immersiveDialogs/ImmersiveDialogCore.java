@@ -32,7 +32,7 @@ import static java.lang.Math.min;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.campaign.force.Force.FORCE_NONE;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import static mekhq.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.BorderLayout;
@@ -616,7 +616,7 @@ public class ImmersiveDialogCore extends JDialog {
         // Add speaker image (icon)
         ImageIcon speakerIcon = getSpeakerIcon(campaign, speaker);
         if (speakerIcon != null) {
-            speakerIcon = scaleImageIconToWidth(speakerIcon, IMAGE_WIDTH);
+            speakerIcon = scaleImageIcon(speakerIcon, IMAGE_WIDTH, true);
         }
         JLabel imageLabel = new JLabel();
         imageLabel.setIcon(speakerIcon);
