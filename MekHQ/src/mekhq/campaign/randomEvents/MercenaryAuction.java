@@ -91,7 +91,7 @@ public class MercenaryAuction {
         }
 
         int maximumBid = campaignState.getSupportPoints();
-        int minimumBid = maximumBid * requiredCombatTeams;
+        int minimumBid = requiredCombatTeams;
         boolean cannotAffordOpeningBid = (maximumBid < minimumBid) || (maximumBid == 0);
 
         // If the player can't afford the minimum bid, we just tell them about the opportunity and
@@ -125,7 +125,7 @@ public class MercenaryAuction {
               maximumBid,
               AUCTION_TIER_SUCCESS_PERCENT,
               max(requiredCombatTeams, 1));
-        int finalBid = mercenaryAuctionDialog.getSpinnerValue() * AUCTION_TIER_SUCCESS_PERCENT;
+        int finalBid = (mercenaryAuctionDialog.getSpinnerValue() / minimumBid) * AUCTION_TIER_SUCCESS_PERCENT;
 
         // If the player confirmed the auction (option 0) then check whether they were successful,
         // deliver the unit, and deduct funds.
