@@ -48,8 +48,6 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
-import mekhq.gui.dialog.CompanyGenerationDialog;
-import mekhq.gui.dialog.ContractMarketDialog;
 
 /**
  * The {@code CampaignOptionsDialog} class represents a dialog window for presenting and modifying the campaign options
@@ -165,7 +163,11 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             dispose();
 
             if (isStartup) {
-                triggerStartUpDialogs();
+                final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                if (campaignOptions.isUseStratCon()) {
+                    showStratConNotice();
+                }
+                ;
             }
         });
         pnlButtons.add(btnApplySettings);
@@ -188,42 +190,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         pnlButtons.add(btnCancel);
 
         return pnlButtons;
-    }
-
-    /**
-     * Displays the startup dialogs in sequence as part of the campaign initialization process.
-     *
-     * <p>This method executes the following sequence of dialogs during the campaign startup:</p>
-     * <ol>
-     *   <li><strong>StratCon Notice:</strong>
-     *       Displays a notice about the StratCon feature, but only if the campaign options indicate that
-     *       StratCon is enabled. The content of the notice includes promotional information, and the dialog blocks
-     *       further execution until the user interacts with it.</li>
-     *   <li><strong>Company Generation Dialog:</strong>
-     *       Launches the {@link CompanyGenerationDialog}, which allows the user to create and configure the initial
-     *       company for the ongoing campaign. This dialog is required for the campaign setup and ensures the user has
-     *       completed this configuration before moving forward.</li>
-     *   <li><strong>Contract Market Dialog:</strong>
-     *       If the campaign's contract market method is enabled, the {@link ContractMarketDialog} is displayed next.
-     *       This dialog allows the user to view and manage available contracts as part of the campaign configuration.</li>
-     * </ol>
-     *
-     * <p>All dialogs are modal and block execution until the user has interacted with and closed each dialog in
-     * sequence.</p>
-     */
-    private void triggerStartUpDialogs() {
-        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (campaignOptions.isUseStratCon()) {
-            showStratConNotice();
-        }
-
-        CompanyGenerationDialog companyCreatorDialog = new CompanyGenerationDialog(null, campaign);
-        companyCreatorDialog.setVisible(true);
-
-        if (!campaignOptions.getContractMarketMethod().isNone()) {
-            ContractMarketDialog contractMarketDialog = new ContractMarketDialog(null, campaign);
-            contractMarketDialog.setVisible(true);
-        }
     }
 
     /**
