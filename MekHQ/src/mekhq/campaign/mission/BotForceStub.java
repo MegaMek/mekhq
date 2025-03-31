@@ -32,14 +32,20 @@ import java.util.List;
 public class BotForceStub {
     private String name;
     private List<String> entityList;
+    private int team;
 
-    public BotForceStub(String name, List<String> entityList) {
+    public BotForceStub(String name, List<String> entityList, int team) {
         this.name = name;
         this.entityList = entityList;
+        this.team = team;
     }
 
     public String getName() {
         return name;
+    }
+
+    public int getTeam() {
+        return team;
     }
 
     public List<String> getEntityList() {

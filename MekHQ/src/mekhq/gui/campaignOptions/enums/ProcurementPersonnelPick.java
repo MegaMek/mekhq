@@ -45,17 +45,6 @@ import mekhq.campaign.personnel.Person;
  *   <li><b>LOGISTICS</b>: Only personnel with the Admin/Logistics role are allowed to make
  *       procurement checks.</li>
  * </ul>
- *
- * <b>Core Features:</b>
- * <ul>
- *   <li>Provides localized labels (e.g., {@code ALL.label = "Anyone"}) retrieved from a
- *       resource bundle to display user-friendly names in the UI.</li>
- *   <li>Provides localized descriptions (e.g., {@code SUPPORT.description = "Only personnel with
- *       non-combat roles..."}), offering explanatory text for each enum value.</li>
- *   <li>Supports safe parsing of string inputs or ordinal values into corresponding enum
- *       constants via the {@link #fromString(String)} method. Invalid inputs default to {@code NONE}.</li>
- *   <li>Overrides the {@link #toString()} method to return the localized label for display purposes.</li>
- * </ul>
  */
 public enum ProcurementPersonnelPick {
     NONE, ALL, SUPPORT, LOGISTICS;
@@ -110,7 +99,8 @@ public enum ProcurementPersonnelPick {
      * @return {@code true} if the person is ineligible to perform procurement based on the specified acquisition
      *       category, {@code false} otherwise.
      */
-    public static boolean isIneligibleToPerformProcurement(Person person, ProcurementPersonnelPick acquisitionCategory) {
+    public static boolean isIneligibleToPerformProcurement(Person person,
+                                                           ProcurementPersonnelPick acquisitionCategory) {
         switch (acquisitionCategory) {
             case NONE -> {
                 return true;

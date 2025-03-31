@@ -29,8 +29,11 @@
 package mekhq.campaign.personnel;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.randomInt;
+import static megamek.common.enums.SkillLevel.REGULAR;
+import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -325,7 +328,8 @@ public class Person {
         this(givenName, surname, campaign, campaign.getFactionCode());
     }
 
-    public Person(final String givenName, final String surname, final @Nullable Campaign campaign, final String factionCode) {
+    public Person(final String givenName, final String surname, final @Nullable Campaign campaign,
+                  final String factionCode) {
         this("", givenName, surname, "", campaign, factionCode);
     }
 
@@ -339,7 +343,8 @@ public class Person {
      * @param campaign    the campaign this person is a part of, or null (unit testing only)
      * @param factionCode the faction this person was borne into
      */
-    public Person(final String preNominal, final String givenName, final String surname, final String postNominal, final @Nullable Campaign campaign, final String factionCode) {
+    public Person(final String preNominal, final String givenName, final String surname, final String postNominal,
+                  final @Nullable Campaign campaign, final String factionCode) {
         // We assign the variables in XML file order
         id = UUID.randomUUID();
 
@@ -386,7 +391,6 @@ public class Person {
         hits = 0;
         hitsPrior = 0;
         toughness = 0;
-        resetMinutesLeft(); // this assigns minutesLeft and overtimeLeft
         dateOfDeath = null;
         recruitment = null;
         joinedCampaign = null;
@@ -434,6 +438,18 @@ public class Person {
         intelligence = Intelligence.AVERAGE;
         intelligenceDescriptionIndex = randomInt(Intelligence.MAXIMUM_VARIATIONS);
         personalityDescription = "";
+
+        // This assigns minutesLeft and overtimeLeft. Must be after skills to avoid an NPE.
+        if (campaign != null) {
+            // The reason for this paranoid checking is to allow us to Unit Test with real Person objects without
+            // needing
+            // to initialize CampaignOptions
+            CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
+            if (campaignOptions != null) {
+                resetMinutesLeft(campaignOptions.isTechsUseAdministration());
+            }
+        }
 
         // region Flags
         setClanPersonnel(originFaction.isClan());
@@ -998,7 +1014,7 @@ public class Person {
             case DOCTOR -> hasSkill(SkillType.S_DOCTOR);
             case MEDIC -> hasSkill(SkillType.S_MEDTECH);
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
-                  hasSkill(SkillType.S_ADMIN);
+                  hasSkill(S_ADMIN);
             case DEPENDENT, NONE -> true;
         };
     }
@@ -1269,7 +1285,8 @@ public class Person {
      *                   initial change
      * @param isVerbose  a boolean indicating whether the method should generate a report if the loyalty has changed
      */
-    public void performForcedDirectionLoyaltyChange(Campaign campaign, boolean isPositive, boolean isMajor, boolean isVerbose) {
+    public void performForcedDirectionLoyaltyChange(Campaign campaign, boolean isPositive, boolean isMajor,
+                                                    boolean isVerbose) {
         int originalLoyalty = loyalty;
 
         Consumer<Integer> applyLoyaltyChange = (roll) -> {
@@ -2250,9 +2267,7 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "toughness", toughness);
             }
 
-            if (minutesLeft > 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minutesLeft", minutesLeft);
-            }
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minutesLeft", minutesLeft);
 
             if (overtimeLeft > 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overtimeLeft", overtimeLeft);
@@ -3301,6 +3316,11 @@ public class Person {
 
     public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
         final PersonnelRole role = secondary ? getSecondaryRole() : getPrimaryRole();
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final boolean isAlternativeQualityAveraging = campaignOptions.isAlternativeQualityAveraging();
+        final boolean isDoctorsHaveAdministration = campaignOptions.isDoctorsUseAdministration();
+        final boolean isTechsHaveAdministration = campaignOptions.isTechsUseAdministration();
+
         switch (role) {
             case MEKWARRIOR:
                 if (hasSkill(SkillType.S_GUN_MEK) && hasSkill(SkillType.S_PILOT_MEK)) {
@@ -3308,7 +3328,7 @@ public class Person {
                      * Attempt to use higher precision averaging, but if it doesn't provide a clear result  due to
                      * non-standard experience thresholds then fall back on lower precision averaging See Bug #140
                      */
-                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
+                    if (isAlternativeQualityAveraging) {
                         int rawScore = (int) Math.floor((getSkill(SkillType.S_GUN_MEK).getLevel() +
                                                                getSkill(SkillType.S_PILOT_MEK).getLevel()) / 2.0);
                         if (getSkill(SkillType.S_GUN_MEK).getType().getExperienceLevel(rawScore) ==
@@ -3329,7 +3349,7 @@ public class Person {
                      * Attempt to use higher precision averaging, but if it doesn't provide a clear result due to
                      * non-standard experience thresholds then fall back on lower precision averaging See Bug #140
                      */
-                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
+                    if (isAlternativeQualityAveraging) {
                         int rawScore = (int) Math.floor((Stream.of(SkillType.S_GUN_MEK,
                               SkillType.S_PILOT_MEK,
                               SkillType.S_GUN_AERO,
@@ -3369,7 +3389,7 @@ public class Person {
                              getSkill(SkillType.S_PILOT_VTOL).getExperienceLevel() :
                              SkillType.EXP_NONE;
             case VEHICLE_GUNNER:
-                if (!campaign.getCampaignOptions().isUseArtillery()) {
+                if (!campaignOptions.isUseArtillery()) {
                     return hasSkill(SkillType.S_GUN_VEE) ?
                                  getSkill(SkillType.S_GUN_VEE).getExperienceLevel() :
                                  SkillType.EXP_NONE;
@@ -3385,13 +3405,35 @@ public class Person {
                         return SkillType.EXP_NONE;
                     }
                 }
-            case VEHICLE_CREW, MECHANIC:
+            case VEHICLE_CREW:
                 return hasSkill(SkillType.S_TECH_MECHANIC) ?
                              getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() :
                              SkillType.EXP_NONE;
+            case MECHANIC:
+                if (isTechsHaveAdministration) {
+                    if (hasSkill(SkillType.S_TECH_MECHANIC) && hasSkill(SkillType.S_ADMIN)) {
+                        if (isAlternativeQualityAveraging) {
+                            int rawScore = (int) Math.floor((getSkill(SkillType.S_TECH_MECHANIC).getLevel() +
+                                                                   getSkill(SkillType.S_ADMIN).getLevel()) / 2.0);
+                            if (getSkill(SkillType.S_TECH_MECHANIC).getType().getExperienceLevel(rawScore) ==
+                                      getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore)) {
+                                return getSkill(SkillType.S_TECH_MECHANIC).getType().getExperienceLevel(rawScore);
+                            }
+                        }
+
+                        return (int) Math.floor((getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() +
+                                                       getSkill(SkillType.S_ADMIN).getExperienceLevel()) / 2.0);
+                    } else {
+                        return SkillType.EXP_NONE;
+                    }
+                } else {
+                    return hasSkill(SkillType.S_TECH_MECHANIC) ?
+                                 getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() :
+                                 SkillType.EXP_NONE;
+                }
             case AEROSPACE_PILOT:
                 if (hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO)) {
-                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
+                    if (isAlternativeQualityAveraging) {
                         int rawScore = (int) Math.floor((getSkill(SkillType.S_GUN_AERO).getLevel() +
                                                                getSkill(SkillType.S_PILOT_AERO).getLevel()) / 2.0);
                         if (getSkill(SkillType.S_GUN_AERO).getType().getExperienceLevel(rawScore) ==
@@ -3407,7 +3449,7 @@ public class Person {
                 }
             case CONVENTIONAL_AIRCRAFT_PILOT:
                 if (hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET)) {
-                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
+                    if (isAlternativeQualityAveraging) {
                         int rawScore = (int) Math.floor((getSkill(SkillType.S_GUN_JET).getLevel() +
                                                                getSkill(SkillType.S_PILOT_JET).getLevel()) / 2.0);
                         if (getSkill(SkillType.S_GUN_JET).getType().getExperienceLevel(rawScore) ==
@@ -3427,7 +3469,7 @@ public class Person {
                              SkillType.EXP_NONE;
             case BATTLE_ARMOUR:
                 if (hasSkill(SkillType.S_GUN_BA) && hasSkill(SkillType.S_ANTI_MEK)) {
-                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
+                    if (isAlternativeQualityAveraging) {
                         int rawScore = (int) Math.floor((getSkill(SkillType.S_GUN_BA).getLevel() +
                                                                getSkill(SkillType.S_ANTI_MEK).getLevel()) / 2.0);
                         if (getSkill(SkillType.S_GUN_BA).getType().getExperienceLevel(rawScore) ==
@@ -3454,31 +3496,121 @@ public class Person {
                              getSkill(SkillType.S_GUN_SPACE).getExperienceLevel() :
                              SkillType.EXP_NONE;
             case VESSEL_CREW:
-                return hasSkill(SkillType.S_TECH_VESSEL) ?
-                             getSkill(SkillType.S_TECH_VESSEL).getExperienceLevel() :
-                             SkillType.EXP_NONE;
+                if (isTechsHaveAdministration) {
+                    if (hasSkill(SkillType.S_TECH_VESSEL) && hasSkill(SkillType.S_ADMIN)) {
+                        if (isAlternativeQualityAveraging) {
+                            int rawScore = (int) Math.floor((getSkill(SkillType.S_TECH_VESSEL).getLevel() +
+                                                                   getSkill(SkillType.S_ADMIN).getLevel()) / 2.0);
+                            if (getSkill(SkillType.S_TECH_VESSEL).getType().getExperienceLevel(rawScore) ==
+                                      getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore)) {
+                                return getSkill(SkillType.S_TECH_VESSEL).getType().getExperienceLevel(rawScore);
+                            }
+                        }
+
+                        return (int) Math.floor((getSkill(SkillType.S_TECH_VESSEL).getExperienceLevel() +
+                                                       getSkill(SkillType.S_ADMIN).getExperienceLevel()) / 2.0);
+                    } else {
+                        return SkillType.EXP_NONE;
+                    }
+                } else {
+                    return hasSkill(SkillType.S_TECH_VESSEL) ?
+                                 getSkill(SkillType.S_TECH_VESSEL).getExperienceLevel() :
+                                 SkillType.EXP_NONE;
+                }
             case VESSEL_NAVIGATOR:
                 return hasSkill(SkillType.S_NAV) ? getSkill(SkillType.S_NAV).getExperienceLevel() : SkillType.EXP_NONE;
             case MEK_TECH:
-                return hasSkill(SkillType.S_TECH_MEK) ?
-                             getSkill(SkillType.S_TECH_MEK).getExperienceLevel() :
-                             SkillType.EXP_NONE;
+                if (isTechsHaveAdministration) {
+                    if (hasSkill(SkillType.S_TECH_MEK) && hasSkill(SkillType.S_ADMIN)) {
+                        if (isAlternativeQualityAveraging) {
+                            int rawScore = (int) Math.floor((getSkill(SkillType.S_TECH_MEK).getLevel() +
+                                                                   getSkill(SkillType.S_ADMIN).getLevel()) / 2.0);
+                            if (getSkill(SkillType.S_TECH_MEK).getType().getExperienceLevel(rawScore) ==
+                                      getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore)) {
+                                return getSkill(SkillType.S_TECH_MEK).getType().getExperienceLevel(rawScore);
+                            }
+                        }
+
+                        return (int) Math.floor((getSkill(SkillType.S_TECH_MEK).getExperienceLevel() +
+                                                       getSkill(SkillType.S_ADMIN).getExperienceLevel()) / 2.0);
+                    } else {
+                        return SkillType.EXP_NONE;
+                    }
+                } else {
+                    return hasSkill(SkillType.S_TECH_MEK) ?
+                                 getSkill(SkillType.S_TECH_MEK).getExperienceLevel() :
+                                 SkillType.EXP_NONE;
+                }
             case AERO_TEK:
-                return hasSkill(SkillType.S_TECH_AERO) ?
-                             getSkill(SkillType.S_TECH_AERO).getExperienceLevel() :
-                             SkillType.EXP_NONE;
+                if (isTechsHaveAdministration) {
+                    if (hasSkill(SkillType.S_TECH_AERO) && hasSkill(SkillType.S_ADMIN)) {
+                        if (isAlternativeQualityAveraging) {
+                            int rawScore = (int) Math.floor((getSkill(SkillType.S_TECH_AERO).getLevel() +
+                                                                   getSkill(SkillType.S_ADMIN).getLevel()) / 2.0);
+                            if (getSkill(SkillType.S_TECH_AERO).getType().getExperienceLevel(rawScore) ==
+                                      getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore)) {
+                                return getSkill(SkillType.S_TECH_AERO).getType().getExperienceLevel(rawScore);
+                            }
+                        }
+
+                        return (int) Math.floor((getSkill(SkillType.S_TECH_AERO).getExperienceLevel() +
+                                                       getSkill(SkillType.S_ADMIN).getExperienceLevel()) / 2.0);
+                    } else {
+                        return SkillType.EXP_NONE;
+                    }
+                } else {
+                    return hasSkill(SkillType.S_TECH_AERO) ?
+                                 getSkill(SkillType.S_TECH_AERO).getExperienceLevel() :
+                                 SkillType.EXP_NONE;
+                }
             case BA_TECH:
-                return hasSkill(SkillType.S_TECH_BA) ?
-                             getSkill(SkillType.S_TECH_BA).getExperienceLevel() :
-                             SkillType.EXP_NONE;
+                if (isTechsHaveAdministration) {
+                    if (hasSkill(SkillType.S_TECH_BA) && hasSkill(SkillType.S_ADMIN)) {
+                        if (isAlternativeQualityAveraging) {
+                            int rawScore = (int) Math.floor((getSkill(SkillType.S_TECH_BA).getLevel() +
+                                                                   getSkill(SkillType.S_ADMIN).getLevel()) / 2.0);
+                            if (getSkill(SkillType.S_TECH_BA).getType().getExperienceLevel(rawScore) ==
+                                      getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore)) {
+                                return getSkill(SkillType.S_TECH_BA).getType().getExperienceLevel(rawScore);
+                            }
+                        }
+
+                        return (int) Math.floor((getSkill(SkillType.S_TECH_BA).getExperienceLevel() +
+                                                       getSkill(SkillType.S_ADMIN).getExperienceLevel()) / 2.0);
+                    } else {
+                        return SkillType.EXP_NONE;
+                    }
+                } else {
+                    return hasSkill(SkillType.S_TECH_BA) ?
+                                 getSkill(SkillType.S_TECH_BA).getExperienceLevel() :
+                                 SkillType.EXP_NONE;
+                }
             case ASTECH:
                 return hasSkill(SkillType.S_ASTECH) ?
                              getSkill(SkillType.S_ASTECH).getExperienceLevel() :
                              SkillType.EXP_NONE;
             case DOCTOR:
-                return hasSkill(SkillType.S_DOCTOR) ?
-                             getSkill(SkillType.S_DOCTOR).getExperienceLevel() :
-                             SkillType.EXP_NONE;
+                if (isDoctorsHaveAdministration) {
+                    if (hasSkill(SkillType.S_DOCTOR) && hasSkill(SkillType.S_ADMIN)) {
+                        if (isAlternativeQualityAveraging) {
+                            int rawScore = (int) Math.floor((getSkill(SkillType.S_DOCTOR).getLevel() +
+                                                                   getSkill(SkillType.S_ADMIN).getLevel()) / 2.0);
+                            if (getSkill(SkillType.S_DOCTOR).getType().getExperienceLevel(rawScore) ==
+                                      getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore)) {
+                                return getSkill(SkillType.S_DOCTOR).getType().getExperienceLevel(rawScore);
+                            }
+                        }
+
+                        return (int) Math.floor((getSkill(SkillType.S_DOCTOR).getExperienceLevel() +
+                                                       getSkill(SkillType.S_ADMIN).getExperienceLevel()) / 2.0);
+                    } else {
+                        return SkillType.EXP_NONE;
+                    }
+                } else {
+                    return hasSkill(SkillType.S_DOCTOR) ?
+                                 getSkill(SkillType.S_DOCTOR).getExperienceLevel() :
+                                 SkillType.EXP_NONE;
+                }
             case MEDIC:
                 return hasSkill(SkillType.S_MEDTECH) ?
                              getSkill(SkillType.S_MEDTECH).getExperienceLevel() :
@@ -3487,7 +3619,7 @@ public class Person {
             case ADMINISTRATOR_LOGISTICS:
             case ADMINISTRATOR_TRANSPORT:
             case ADMINISTRATOR_HR:
-                int adminLevel = getSkillLevelOrNegative(SkillType.S_ADMIN);
+                int adminLevel = getSkillLevelOrNegative(S_ADMIN);
                 int negotiationLevel = getSkillLevelOrNegative(SkillType.S_NEG);
                 int scroungeLevel = getSkillLevelOrNegative(SkillType.S_SCROUNGE);
 
@@ -3592,7 +3724,7 @@ public class Person {
             case DOCTOR -> List.of(SkillType.S_DOCTOR);
             case MEDIC -> List.of(SkillType.S_MEDTECH);
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
-                  List.of(SkillType.S_ADMIN, SkillType.S_NEG, SkillType.S_SCROUNGE);
+                  List.of(S_ADMIN, SkillType.S_NEG, SkillType.S_SCROUNGE);
             case DEPENDENT, NONE -> List.of(String.valueOf(SkillType.EXP_NONE));
         };
     }
@@ -3763,8 +3895,40 @@ public class Person {
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
+    /**
+     * @deprecated Use {@link #getCostToImprove(String, boolean)} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public int getCostToImprove(final String skillName) {
-        return hasSkill(skillName) ? getSkill(skillName).getCostToImprove() : -1;
+        return getCostToImprove(skillName, false);
+    }
+
+    /**
+     * Calculates the cost to improve a specific skill, with an optional intelligence multiplier.
+     *
+     * <p>If the skill exists, the cost is based on its current level's improvement cost.</p>
+     *
+     * <p>If the skill does not exist, the method calculates the cost using the default cost for the skill type at
+     * level 0.</p>
+     *
+     * @param skillName       the name of the skill for which to calculate the improvement cost.
+     * @param useIntelligence a boolean indicating whether to apply {@link Intelligence} cost multipliers.
+     *
+     * @return the cost to improve the skill, adjusted by the intelligence multiplier if applicable, or the cost for
+     *       level 0 if the specified skill does not currently exist.
+     */
+    public int getCostToImprove(final String skillName, final boolean useIntelligence) {
+        int cost = hasSkill(skillName) ?
+                         getSkill(skillName).getCostToImprove() :
+                         SkillType.getType(skillName).getCost(0);
+
+        double multiplier = 1.0;
+
+        if (useIntelligence) {
+            multiplier = getIntelligenceXpCostMultiplier(useIntelligence);
+        }
+
+        return (int) round(cost * multiplier);
     }
     // endregion skill
 
@@ -4084,10 +4248,39 @@ public class Person {
     }
 
     /**
-     * @return the person's current daily available tech time. This does NOT account for any expended time.
+     * @deprecated Use {@link #getDailyAvailableTechTime(boolean)}.
      */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public int getDailyAvailableTechTime() {
-        return (getPrimaryRole().isTech() ? PRIMARY_ROLE_SUPPORT_TIME : SECONDARY_ROLE_SUPPORT_TIME) -
+        return getDailyAvailableTechTime(false);
+    }
+
+    /**
+     * Calculates and retrieves the person's current daily available tech time. This does NOT account for any expended
+     * time, but it factors in administrative adjustments if specified.
+     *
+     * <p>The returned value is determined based on the person's role:</p>
+     * <ul>
+     *   <li>If the primary role is a technician, the primary role's base support
+     *       time is used.</li>
+     *   <li>Otherwise, the secondary role's base support time is used.</li>
+     * </ul>
+     *
+     * <p>The base time is then adjusted by a multiplier if administrative adjustments
+     * are enabled (via the {@code isTechsUseAdministration} parameter). Maintenance
+     * time is also deducted from the result.</p>
+     *
+     * @param isTechsUseAdministration Determines whether administrative adjustments should be applied when calculating
+     *                                 the person's time.
+     *
+     * @return The person's current daily available tech time, after applying the multiplier for administrative
+     *       adjustments (if applicable) and deducting maintenance time.
+     */
+    public int getDailyAvailableTechTime(final boolean isTechsUseAdministration) {
+        int baseTime = (getPrimaryRole().isTech() ? PRIMARY_ROLE_SUPPORT_TIME : SECONDARY_ROLE_SUPPORT_TIME);
+
+        // TODO maintenance time should only be deducted when we make a maintenance check
+        return (int) round(baseTime * calculateTechTimeMultiplier(isTechsUseAdministration)) -
                      getMaintenanceTimeUsing();
     }
 
@@ -4188,13 +4381,64 @@ public class Person {
         }
     }
 
+    /**
+     * @deprecated Use {@link #resetMinutesLeft(boolean)}.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public void resetMinutesLeft() {
-        if (getPrimaryRole().isTech() || getPrimaryRole().isDoctor()) {
+        resetMinutesLeft(false);
+    }
+
+    /**
+     * Resets the number of minutes and overtime minutes a person has left for tasks, based on their primary or
+     * secondary role. Administrative adjustments may be applied for technicians if specified.
+     *
+     * <p>This method calculates and assigns task and overtime time values depending on whether
+     * the person is identified as a technician or doctor, and whether their role is primary or secondary. If
+     * administrative adjustments are enabled (via the {@code isTechsUseAdministration} parameter), a multiplier is
+     * applied to calculate the adjusted task time for technicians.</p>
+     *
+     * <ul>
+     *   <li>If the primary role is a doctor, the base support time values for the primary role
+     *       are assigned without any adjustments.</li>
+     *   <li>If the secondary role is a doctor, the base support time values for the secondary role
+     *       are assigned without any adjustments.</li>
+     *   <li>If the primary role is a technician and administrative adjustments are enabled, the primary
+     *       role's support time is multiplied by the administrative adjustment multiplier and assigned.</li>
+     *   <li>If the secondary role is a technician (secondary-specific), and administrative adjustments
+     *       are enabled, the secondary role's support time is multiplied by the adjustment multiplier and assigned.</li>
+     *   <li>If administrative adjustments are not enabled for technicians, base (non-adjusted) time values
+     *       are used for both primary and secondary roles.</li>
+     * </ul>
+     *
+     * <p>If the person has both primary and secondary roles applicable (e.g., a doctor as the primary
+     * and a technician as the secondary), the logic prioritizes the roles as listed above, with primary roles
+     * taking precedence.</p>
+     *
+     * @param isTechsUseAdministration Indicates whether administrative adjustments should be applied to the time
+     *                                 calculations for technicians.
+     */
+    public void resetMinutesLeft(boolean isTechsUseAdministration) {
+        // Doctors and Technicians without adjustments
+        if (primaryRole.isDoctor() || (primaryRole.isTech() && !isTechsUseAdministration)) {
             this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
             this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
-        } else if (getSecondaryRole().isTechSecondary() || getSecondaryRole().isDoctor()) {
+        } else if (secondaryRole.isDoctor() || (secondaryRole.isTech() && !isTechsUseAdministration)) {
             this.minutesLeft = SECONDARY_ROLE_SUPPORT_TIME;
             this.overtimeLeft = SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
+        }
+
+        // Technicians with adjustments
+        if (primaryRole.isTech()) {
+            double techTimeMultiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
+
+            this.minutesLeft = (int) round(PRIMARY_ROLE_SUPPORT_TIME * techTimeMultiplier);
+            this.overtimeLeft = (int) round(PRIMARY_ROLE_OVERTIME_SUPPORT_TIME * techTimeMultiplier);
+        } else if (secondaryRole.isTechSecondary()) {
+            double techTimeMultiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
+
+            this.minutesLeft = (int) round(SECONDARY_ROLE_SUPPORT_TIME * techTimeMultiplier);
+            this.overtimeLeft = (int) round(SECONDARY_ROLE_OVERTIME_SUPPORT_TIME * techTimeMultiplier);
         }
     }
 
@@ -4257,12 +4501,96 @@ public class Person {
         return hasSkill && (getPrimaryRole().isBATech() || getSecondaryRole().isBATech());
     }
 
+    /**
+     * Calculates the tech availability time multiplier for tasks based on the technician's experience level and
+     * administration skill.
+     *
+     * <p>The method considers whether administration skills should be applied to improve efficiency. If
+     * administration is enabled, the multiplier is adjusted based on the technician's baseline experience level and
+     * their administration skill level.</p>
+     *
+     * @param isTechsUseAdministration {@code true} if administration skills are considered for task calculation;
+     *                                 {@code false} otherwise.
+     *
+     * @return the calculated time multiplier, where:
+     *       <ul>
+     *         <li>0.0 indicates the person is not a technician.</li>
+     *         <li>1.0 indicates no adjustment is applied.</li>
+     *         <li>Values greater or less than 1.0 adjust task times accordingly.</li>
+     *       </ul>
+     */
+    public double calculateTechTimeMultiplier(boolean isTechsUseAdministration) {
+        final double TECH_ADMINISTRATION_MULTIPLIER = 0.05;
+        final int REGULAR_EXPERIENCE_LEVEL = REGULAR.getExperienceLevel();
+
+        if (!isTech()) {
+            return 0;
+        }
+
+        if (!isTechsUseAdministration) {
+            return 1.0;
+        }
+
+        double administrationMultiplier = 1.0 - (TECH_ADMINISTRATION_MULTIPLIER * REGULAR_EXPERIENCE_LEVEL);
+
+        Skill administration = skills.getSkill(SkillType.S_ADMIN);
+        int experienceLevel = SkillLevel.NONE.getExperienceLevel();
+
+        if (administration != null) {
+            experienceLevel = administration.getExperienceLevel();
+        }
+
+        administrationMultiplier += experienceLevel * TECH_ADMINISTRATION_MULTIPLIER;
+
+        return administrationMultiplier;
+    }
+
     public boolean isAdministrator() {
         return (getPrimaryRole().isAdministrator() || getSecondaryRole().isAdministrator());
     }
 
     public boolean isDoctor() {
         return hasSkill(SkillType.S_DOCTOR) && (getPrimaryRole().isDoctor() || getSecondaryRole().isDoctor());
+    }
+
+    /**
+     * Calculates the medical capacity of a doctor based on their administrative skills, and the base number of hospital
+     * beds they are responsible for. If the entity represented is not a doctor, the capacity is returned as 0.
+     *
+     * @param doctorsUseAdministration A flag indicating whether the doctor's administrative skills should be considered
+     *                                 in the calculation. If {@code true}, administrative skills are included in the
+     *                                 performance multiplier adjustment. If {@code false}, {@code baseBedCount} is
+     *                                 returned, instead.
+     * @param baseBedCount             The base number of hospital beds assigned to the doctor. This value is adjusted
+     *                                 by the calculated multiplier to determine the doctor's effective capacity.
+     *
+     * @return The calculated medical capacity of the doctor, as an {@link Integer} representing their ability to
+     *       effectively manage hospital beds. If the entity is not a doctor, returns {@code 0}.
+     */
+    public int getDoctorMedicalCapacity(final boolean doctorsUseAdministration, final int baseBedCount) {
+        final double DOCTOR_ADMINISTRATION_MULTIPLIER = 0.2;
+        final int REGULAR_EXPERIENCE_LEVEL = REGULAR.getExperienceLevel();
+
+        if (!isDoctor()) {
+            return 0;
+        }
+
+        if (!doctorsUseAdministration) {
+            return baseBedCount;
+        }
+
+        double administrationMultiplier = 1.0 - (DOCTOR_ADMINISTRATION_MULTIPLIER * REGULAR_EXPERIENCE_LEVEL);
+
+        Skill administration = skills.getSkill(SkillType.S_ADMIN);
+        int experienceLevel = SkillLevel.NONE.getExperienceLevel();
+
+        if (administration != null) {
+            experienceLevel = administration.getExperienceLevel();
+        }
+
+        administrationMultiplier += experienceLevel * DOCTOR_ADMINISTRATION_MULTIPLIER;
+
+        return (int) round(baseBedCount * administrationMultiplier);
     }
 
     public boolean isSupport() {
@@ -4739,25 +5067,39 @@ public class Person {
         };
     }
 
-    /**
-     * @param campaignOptions the campaign options to determine whether to calculate the multiplier or to just return 1
-     *
-     * @return the intelligence experience cost multiplier based on campaign options.
-     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public double getIntelligenceXpCostMultiplier(CampaignOptions campaignOptions) {
-        if (campaignOptions.isUseRandomPersonalities() && campaignOptions.isUseIntelligenceXpMultiplier()) {
-            double intelligenceMultiplier = 0.025; // each rank in Intelligence should adjust costs by 2.5%
+        return getIntelligenceXpCostMultiplier(campaignOptions.isUseIntelligenceXpMultiplier());
+    }
 
-            int intelligence = getIntelligence().getIntelligenceScore();
-            double intelligenceScore = intelligence * intelligenceMultiplier;
-
-            if (intelligenceScore == 0) {
-                return 1;
-            } else {
-                return 1 - intelligenceScore;
-            }
+    /**
+     * Calculates the experience cost multiplier based on intelligence.
+     *
+     * <p>If intelligence adjustment is not enabled, the multiplier is 1 (no effect).</p>
+     *
+     * <p>Otherwise, the multiplier is determined by the intelligence score, where each point adjusts the cost by 2.5%.
+     * A neutral intelligence score (resulting in a modifier of 0) will also return a multiplier of 1.</p>
+     *
+     * @param useIntelligenceXpCostMultiplier a {@link Boolean} indicating whether to apply the intelligence-based
+     *                                        adjustment to the experience cost.
+     *
+     * @return the experience cost multiplier: - `1` if intelligence adjustment is disabled or {@link Intelligence} is
+     *       neutral. - A value adjusted by the formula `1 - (score * 0.025)` otherwise.
+     */
+    public double getIntelligenceXpCostMultiplier(final boolean useIntelligenceXpCostMultiplier) {
+        if (!useIntelligenceXpCostMultiplier) {
+            return 1;
         }
 
-        return 1;
+        double intelligenceMultiplier = 0.025; // each rank in Intelligence should adjust costs by 2.5%
+
+        int score = getIntelligence().getIntelligenceScore();
+        double modifier = score * intelligenceMultiplier;
+
+        if (modifier == 0) { // neutral intelligence
+            return 1;
+        } else {
+            return 1 - modifier;
+        }
     }
 }

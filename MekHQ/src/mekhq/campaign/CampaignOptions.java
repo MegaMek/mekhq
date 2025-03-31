@@ -76,28 +76,28 @@ import org.w3c.dom.NodeList;
  * @author natit
  */
 public class CampaignOptions {
-    private static final MMLogger          logger             = MMLogger.create(CampaignOptions.class);
+    private static final MMLogger logger = MMLogger.create(CampaignOptions.class);
     private static final ClientPreferences CLIENT_PREFERENCES = PreferenceManager.getClientPreferences();
     // region Magic Numbers
-    public static final  int               TECH_INTRO         = 0;
-    public static final  int               TECH_STANDARD      = 1;
-    public static final  int               TECH_ADVANCED      = 2;
-    public static final  int               TECH_EXPERIMENTAL  = 3;
-    public static final  int               TECH_UNOFFICIAL    = 4;
+    public static final int TECH_INTRO = 0;
+    public static final int TECH_STANDARD = 1;
+    public static final int TECH_ADVANCED = 2;
+    public static final int TECH_EXPERIMENTAL = 3;
+    public static final int TECH_UNOFFICIAL = 4;
     // This must always be the highest tech level to hide parts
     // that haven't been invented yet, or that are completely extinct
-    public static final  int               TECH_UNKNOWN       = 5;
+    public static final int TECH_UNKNOWN = 5;
 
-    public static final int TRANSIT_UNIT_WEEK  = 1;
+    public static final int TRANSIT_UNIT_WEEK = 1;
     public static final int TRANSIT_UNIT_MONTH = 2;
 
     public static final String S_TECH = "Tech";
     public static final String S_AUTO = "Automatic Success";
 
-    public static final double MAXIMUM_COMBAT_EQUIPMENT_PERCENT   = 5.0;
+    public static final double MAXIMUM_COMBAT_EQUIPMENT_PERCENT = 5.0;
     public static final double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
     public static final double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
-    public static final double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT  = 1.0;
+    public static final double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
 
     public static final int REPUTATION_PERFORMANCE_CUT_OFF_YEARS = 10;
 
@@ -116,10 +116,10 @@ public class CampaignOptions {
     // region Variable Declarations
     // region General Tab
     private UnitRatingMethod unitRatingMethod;
-    private int              manualUnitRatingModifier;
-    private boolean          clampReputationPayMultiplier;
-    private boolean          reduceReputationPerformanceModifier;
-    private boolean          reputationPerformanceModifierCutOff;
+    private int manualUnitRatingModifier;
+    private boolean clampReputationPayMultiplier;
+    private boolean reduceReputationPerformanceModifier;
+    private boolean reputationPerformanceModifierCutOff;
     // endregion General Tab
 
     // region Repair and Maintenance Tab
@@ -127,34 +127,35 @@ public class CampaignOptions {
     private boolean useEraMods;
     private boolean assignedTechFirst;
     private boolean resetToFirstTech;
+    private boolean techsUseAdministration;
     private boolean useQuirks;
     private boolean useAeroSystemHits;
     private boolean destroyByMargin;
-    private int     destroyMargin;
-    private int     destroyPartTarget;
+    private int destroyMargin;
+    private int destroyPartTarget;
 
     // Maintenance
     private boolean checkMaintenance;
-    private int     maintenanceCycleDays;
-    private int     maintenanceBonus;
+    private int maintenanceCycleDays;
+    private int maintenanceBonus;
     private boolean useQualityMaintenance;
     private boolean reverseQualityNames;
     private boolean useRandomUnitQualities;
     private boolean usePlanetaryModifiers;
     private boolean useUnofficialMaintenance;
     private boolean logMaintenance;
-    private int     defaultMaintenanceTime;
+    private int defaultMaintenanceTime;
 
     // Mass Repair / Mass Salvage
-    private boolean          mrmsUseRepair;
-    private boolean          mrmsUseSalvage;
-    private boolean          mrmsUseExtraTime;
-    private boolean          mrmsUseRushJob;
-    private boolean          mrmsAllowCarryover;
-    private boolean          mrmsOptimizeToCompleteToday;
-    private boolean          mrmsScrapImpossible;
-    private boolean          mrmsUseAssignedTechsFirst;
-    private boolean          mrmsReplacePod;
+    private boolean mrmsUseRepair;
+    private boolean mrmsUseSalvage;
+    private boolean mrmsUseExtraTime;
+    private boolean mrmsUseRushJob;
+    private boolean mrmsAllowCarryover;
+    private boolean mrmsOptimizeToCompleteToday;
+    private boolean mrmsScrapImpossible;
+    private boolean mrmsUseAssignedTechsFirst;
+    private boolean mrmsReplacePod;
     private List<MRMSOption> mrmsOptions;
     // endregion Repair and Maintenance Tab
 
@@ -183,16 +184,16 @@ public class CampaignOptions {
     private int unitTransitTime;
 
     // Planetary Acquisition
-    private       boolean                          usePlanetaryAcquisition;
-    private       int                              maxJumpsPlanetaryAcquisition;
-    private       PlanetaryAcquisitionFactionLimit planetAcquisitionFactionLimit;
-    private       boolean                          planetAcquisitionNoClanCrossover;
-    private       boolean                          noClanPartsFromIS;
-    private       int                              penaltyClanPartsFromIS;
-    private       boolean                          planetAcquisitionVerbose;
-    private final int[]                            planetTechAcquisitionBonus;
-    private final int[]                            planetIndustryAcquisitionBonus;
-    private final int[]                            planetOutputAcquisitionBonus;
+    private boolean usePlanetaryAcquisition;
+    private int maxJumpsPlanetaryAcquisition;
+    private PlanetaryAcquisitionFactionLimit planetAcquisitionFactionLimit;
+    private boolean planetAcquisitionNoClanCrossover;
+    private boolean noClanPartsFromIS;
+    private int penaltyClanPartsFromIS;
+    private boolean planetAcquisitionVerbose;
+    private final int[] planetTechAcquisitionBonus;
+    private final int[] planetIndustryAcquisitionBonus;
+    private final int[] planetOutputAcquisitionBonus;
     // endregion Supplies and Acquisition Tab
 
     // region Tech Limits Tab
@@ -202,7 +203,7 @@ public class CampaignOptions {
     private boolean allowISPurchases;
     private boolean allowCanonOnly;
     private boolean allowCanonRefitOnly;
-    private int     techLevel;
+    private int techLevel;
     private boolean variableTechLevel;
     private boolean factionIntroDate;
     private boolean useAmmoByType; // Unofficial
@@ -230,13 +231,13 @@ public class CampaignOptions {
     private boolean displayKillRecord;
 
     // Expanded Personnel Information
-    private boolean             useTimeInService;
+    private boolean useTimeInService;
     private TimeInDisplayFormat timeInServiceDisplayFormat;
-    private boolean             useTimeInRank;
+    private boolean useTimeInRank;
     private TimeInDisplayFormat timeInRankDisplayFormat;
-    private boolean             trackTotalEarnings;
-    private boolean             trackTotalXPEarnings;
-    private boolean             showOriginFaction;
+    private boolean trackTotalEarnings;
+    private boolean trackTotalXPEarnings;
+    private boolean showOriginFaction;
 
     // Admin
     private boolean adminsHaveNegotiation;
@@ -246,12 +247,13 @@ public class CampaignOptions {
 
     // Medical
     private boolean useAdvancedMedical; // Unofficial
-    private int     healWaitingPeriod;
-    private int     naturalHealingWaitingPeriod;
-    private int     minimumHitsForVehicles;
+    private int healWaitingPeriod;
+    private int naturalHealingWaitingPeriod;
+    private int minimumHitsForVehicles;
     private boolean useRandomHitsForVehicles;
     private boolean tougherHealing;
-    private int     maximumPatients;
+    private int maximumPatients;
+    private boolean doctorsUseAdministration;
 
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
@@ -266,45 +268,45 @@ public class CampaignOptions {
     private boolean useRemovalExemptRetirees;
 
     // Salary
-    private boolean                 disableSecondaryRoleSalary;
-    private double                  salaryAntiMekMultiplier;
-    private double                  salarySpecialistInfantryMultiplier;
+    private boolean disableSecondaryRoleSalary;
+    private double salaryAntiMekMultiplier;
+    private double salarySpecialistInfantryMultiplier;
     private Map<SkillLevel, Double> salaryXPMultipliers;
-    private Money[]                 roleBaseSalaries;
+    private Money[] roleBaseSalaries;
 
     // Awards
     private AwardBonus awardBonusStyle;
-    private boolean    enableAutoAwards;
-    private boolean    issuePosthumousAwards;
-    private boolean    issueBestAwardOnly;
-    private boolean    ignoreStandardSet;
-    private int        awardTierSize;
-    private boolean    enableContractAwards;
-    private boolean    enableFactionHunterAwards;
-    private boolean    enableInjuryAwards;
-    private boolean    enableIndividualKillAwards;
-    private boolean    enableFormationKillAwards;
-    private boolean    enableRankAwards;
-    private boolean    enableScenarioAwards;
-    private boolean    enableSkillAwards;
-    private boolean    enableTheatreOfWarAwards;
-    private boolean    enableTimeAwards;
-    private boolean    enableTrainingAwards;
-    private boolean    enableMiscAwards;
-    private String     awardSetFilterList;
+    private boolean enableAutoAwards;
+    private boolean issuePosthumousAwards;
+    private boolean issueBestAwardOnly;
+    private boolean ignoreStandardSet;
+    private int awardTierSize;
+    private boolean enableContractAwards;
+    private boolean enableFactionHunterAwards;
+    private boolean enableInjuryAwards;
+    private boolean enableIndividualKillAwards;
+    private boolean enableFormationKillAwards;
+    private boolean enableRankAwards;
+    private boolean enableScenarioAwards;
+    private boolean enableSkillAwards;
+    private boolean enableTheatreOfWarAwards;
+    private boolean enableTimeAwards;
+    private boolean enableTrainingAwards;
+    private boolean enableMiscAwards;
+    private String awardSetFilterList;
     // endregion Personnel Tab
 
     // region Life Paths Tab
     // Personnel Randomization
     private boolean useDylansRandomXP; // Unofficial
-    private int     nonBinaryDiceSize;
+    private int nonBinaryDiceSize;
 
     // Random Histories
     private RandomOriginOptions randomOriginOptions;
-    private boolean             useRandomPersonalities;
-    private boolean             useRandomPersonalityReputation;
-    private boolean             useIntelligenceXpMultiplier;
-    private boolean             useSimulatedRelationships;
+    private boolean useRandomPersonalities;
+    private boolean useRandomPersonalityReputation;
+    private boolean useIntelligenceXpMultiplier;
+    private boolean useSimulatedRelationships;
 
     // Family
     private FamilialRelationshipDisplayLevel familyDisplayLevel;
@@ -316,53 +318,53 @@ public class CampaignOptions {
     private boolean announceChildBirthdays;
 
     // Marriage
-    private boolean                           useManualMarriages;
-    private boolean                           useClanPersonnelMarriages;
-    private boolean                           usePrisonerMarriages;
-    private int                               checkMutualAncestorsDepth;
-    private int                               noInterestInMarriageDiceSize;
-    private boolean                           logMarriageNameChanges;
+    private boolean useManualMarriages;
+    private boolean useClanPersonnelMarriages;
+    private boolean usePrisonerMarriages;
+    private int checkMutualAncestorsDepth;
+    private int noInterestInMarriageDiceSize;
+    private boolean logMarriageNameChanges;
     private Map<MergingSurnameStyle, Integer> marriageSurnameWeights;
-    private RandomMarriageMethod              randomMarriageMethod;
-    private boolean                           useRandomSameSexMarriages; // legacy, pre-50.01
-    private boolean                           useRandomClanPersonnelMarriages;
-    private boolean                           useRandomPrisonerMarriages;
-    private int                               randomMarriageAgeRange;
-    private int                               randomMarriageDiceSize;
-    private int                               randomSameSexMarriageDiceSize;
-    private int                               randomNewDependentMarriage;
+    private RandomMarriageMethod randomMarriageMethod;
+    private boolean useRandomSameSexMarriages; // legacy, pre-50.01
+    private boolean useRandomClanPersonnelMarriages;
+    private boolean useRandomPrisonerMarriages;
+    private int randomMarriageAgeRange;
+    private int randomMarriageDiceSize;
+    private int randomSameSexMarriageDiceSize;
+    private int randomNewDependentMarriage;
 
     // Divorce
-    private boolean                             useManualDivorce;
-    private boolean                             useClanPersonnelDivorce;
-    private boolean                             usePrisonerDivorce;
+    private boolean useManualDivorce;
+    private boolean useClanPersonnelDivorce;
+    private boolean usePrisonerDivorce;
     private Map<SplittingSurnameStyle, Integer> divorceSurnameWeights;
-    private RandomDivorceMethod                 randomDivorceMethod;
-    private boolean                             useRandomOppositeSexDivorce;
-    private boolean                             useRandomSameSexDivorce;
-    private boolean                             useRandomClanPersonnelDivorce;
-    private boolean                             useRandomPrisonerDivorce;
-    private int                                 randomDivorceDiceSize;
+    private RandomDivorceMethod randomDivorceMethod;
+    private boolean useRandomOppositeSexDivorce;
+    private boolean useRandomSameSexDivorce;
+    private boolean useRandomClanPersonnelDivorce;
+    private boolean useRandomPrisonerDivorce;
+    private int randomDivorceDiceSize;
 
     // Procreation
-    private boolean                 useManualProcreation;
-    private boolean                 useClanPersonnelProcreation;
-    private boolean                 usePrisonerProcreation;
-    private int                     multiplePregnancyOccurrences;
-    private BabySurnameStyle        babySurnameStyle;
-    private boolean                 assignNonPrisonerBabiesFounderTag;
-    private boolean                 assignChildrenOfFoundersFounderTag;
-    private boolean                 useMaternityLeave;
-    private boolean                 determineFatherAtBirth;
-    private boolean                 displayTrueDueDate;
-    private int                     noInterestInChildrenDiceSize;
-    private boolean                 logProcreation;
+    private boolean useManualProcreation;
+    private boolean useClanPersonnelProcreation;
+    private boolean usePrisonerProcreation;
+    private int multiplePregnancyOccurrences;
+    private BabySurnameStyle babySurnameStyle;
+    private boolean assignNonPrisonerBabiesFounderTag;
+    private boolean assignChildrenOfFoundersFounderTag;
+    private boolean useMaternityLeave;
+    private boolean determineFatherAtBirth;
+    private boolean displayTrueDueDate;
+    private int noInterestInChildrenDiceSize;
+    private boolean logProcreation;
     private RandomProcreationMethod randomProcreationMethod;
-    private boolean                 useRelationshiplessRandomProcreation;
-    private boolean                 useRandomClanPersonnelProcreation;
-    private boolean                 useRandomPrisonerProcreation;
-    private int                     randomProcreationRelationshipDiceSize;
-    private int                     randomProcreationRelationshiplessDiceSize;
+    private boolean useRelationshiplessRandomProcreation;
+    private boolean useRandomClanPersonnelProcreation;
+    private boolean useRandomPrisonerProcreation;
+    private int randomProcreationRelationshipDiceSize;
+    private int randomProcreationRelationshiplessDiceSize;
 
     // Education
     private boolean useEducationModule;
@@ -374,8 +376,8 @@ public class CampaignOptions {
     private boolean enableUnitEducation;
     private boolean enableOverrideRequirements;
     private boolean enableShowIneligibleAcademies;
-    private int     entranceExamBaseTargetNumber;
-    private Double  facultyXpRate;
+    private int entranceExamBaseTargetNumber;
+    private Double facultyXpRate;
     private boolean enableBonuses;
     private Integer adultDropoutChance;
     private Integer childrenDropoutChance;
@@ -384,25 +386,25 @@ public class CampaignOptions {
 
     // Death
     private Map<AgeGroup, Boolean> enabledRandomDeathAgeGroups;
-    private boolean                useRandomDeathSuicideCause;
-    private double                 randomDeathMultiplier;
+    private boolean useRandomDeathSuicideCause;
+    private double randomDeathMultiplier;
     // endregion Life Paths Tab
 
     // region Turnover and Retention
     private boolean useRandomRetirement;
 
-    private int               turnoverFixedTargetNumber;
-    private boolean           aeroRecruitsHaveUnits;
-    private boolean           trackOriginalUnit;
+    private int turnoverFixedTargetNumber;
+    private boolean aeroRecruitsHaveUnits;
+    private boolean trackOriginalUnit;
     private TurnoverFrequency turnoverFrequency;
-    private boolean           useContractCompletionRandomRetirement;
-    private boolean           useRandomFounderTurnover;
-    private boolean           useFounderRetirement;
-    private boolean           useSubContractSoldiers;
-    private int               serviceContractDuration;
-    private int               serviceContractModifier;
-    private boolean           payBonusDefault;
-    private int               payBonusDefaultThreshold;
+    private boolean useContractCompletionRandomRetirement;
+    private boolean useRandomFounderTurnover;
+    private boolean useFounderRetirement;
+    private boolean useSubContractSoldiers;
+    private int serviceContractDuration;
+    private int serviceContractModifier;
+    private boolean payBonusDefault;
+    private int payBonusDefaultThreshold;
 
     private boolean useCustomRetirementModifiers;
     private boolean useFatigueModifiers;
@@ -416,64 +418,64 @@ public class CampaignOptions {
     private boolean useLoyaltyModifiers;
     private boolean useHideLoyalty;
 
-    private int     payoutRateOfficer;
-    private int     payoutRateEnlisted;
-    private int     payoutRetirementMultiplier;
+    private int payoutRateOfficer;
+    private int payoutRateEnlisted;
+    private int payoutRetirementMultiplier;
     private boolean usePayoutServiceBonus;
-    private int     payoutServiceBonusRate;
+    private int payoutServiceBonusRate;
 
     private boolean useAdministrativeStrain;
-    private int     administrativeCapacity;
-    private int     multiCrewStrainDivider;
+    private int administrativeCapacity;
+    private int multiCrewStrainDivider;
 
     private boolean useManagementSkill;
     private boolean useCommanderLeadershipOnly;
-    private int     managementSkillPenalty;
+    private int managementSkillPenalty;
 
     private boolean useFatigue;
-    private int     fatigueRate;
+    private int fatigueRate;
     private boolean useInjuryFatigue;
-    private int     fieldKitchenCapacity;
+    private int fieldKitchenCapacity;
     private boolean fieldKitchenIgnoreNonCombatants;
-    private int     fatigueLeaveThreshold;
+    private int fatigueLeaveThreshold;
     // endregion Turnover and Retention
 
     // region Finance tab
-    private boolean               payForParts;
-    private boolean               payForRepairs;
-    private boolean               payForUnits;
-    private boolean               payForSalaries;
-    private boolean               payForOverhead;
-    private boolean               payForMaintain;
-    private boolean               payForTransport;
-    private boolean               sellUnits;
-    private boolean               sellParts;
-    private boolean               payForRecruitment;
-    private boolean               useLoanLimits;
-    private boolean               usePercentageMaint; // Unofficial
-    private boolean               infantryDontCount; // Unofficial
-    private boolean               usePeacetimeCost;
-    private boolean               useExtendedPartsModifier;
-    private boolean               showPeacetimeCost;
+    private boolean payForParts;
+    private boolean payForRepairs;
+    private boolean payForUnits;
+    private boolean payForSalaries;
+    private boolean payForOverhead;
+    private boolean payForMaintain;
+    private boolean payForTransport;
+    private boolean sellUnits;
+    private boolean sellParts;
+    private boolean payForRecruitment;
+    private boolean useLoanLimits;
+    private boolean usePercentageMaint; // Unofficial
+    private boolean infantryDontCount; // Unofficial
+    private boolean usePeacetimeCost;
+    private boolean useExtendedPartsModifier;
+    private boolean showPeacetimeCost;
     private FinancialYearDuration financialYearDuration;
-    private boolean               newFinancialYearFinancesToCSVExport;
-    private boolean               simulateGrayMonday;
+    private boolean newFinancialYearFinancesToCSVExport;
+    private boolean simulateGrayMonday;
 
     // Price Multipliers
-    private double   commonPartPriceMultiplier;
-    private double   innerSphereUnitPriceMultiplier;
-    private double   innerSpherePartPriceMultiplier;
-    private double   clanUnitPriceMultiplier;
-    private double   clanPartPriceMultiplier;
-    private double   mixedTechUnitPriceMultiplier;
+    private double commonPartPriceMultiplier;
+    private double innerSphereUnitPriceMultiplier;
+    private double innerSpherePartPriceMultiplier;
+    private double clanUnitPriceMultiplier;
+    private double clanPartPriceMultiplier;
+    private double mixedTechUnitPriceMultiplier;
     private double[] usedPartPriceMultipliers;
-    private double   damagedPartsValueMultiplier;
-    private double   unrepairablePartsValueMultiplier;
-    private double   cancelledOrderRefundMultiplier;
+    private double damagedPartsValueMultiplier;
+    private double unrepairablePartsValueMultiplier;
+    private double cancelledOrderRefundMultiplier;
 
     // Taxes
     private boolean useTaxes;
-    private int     taxesPercentage;
+    private int taxesPercentage;
 
     // Shares
     private boolean useShareSystem;
@@ -482,33 +484,33 @@ public class CampaignOptions {
 
     // region Mercenary Tab
     private boolean equipmentContractBase;
-    private double  equipmentContractPercent;
+    private double equipmentContractPercent;
     private boolean equipmentContractSaleValue;
-    private double  dropShipContractPercent;
-    private double  jumpShipContractPercent;
-    private double  warShipContractPercent;
+    private double dropShipContractPercent;
+    private double jumpShipContractPercent;
+    private double warShipContractPercent;
     private boolean blcSaleValue;
     private boolean overageRepaymentInFinalPayment;
     // endregion Mercenary Tab
 
     // region Experience Tab
     private double xpCostMultiplier;
-    private int    scenarioXP;
-    private int    killXPAward;
-    private int    killsForXP;
-    private int    tasksXP;
-    private int    nTasksXP;
-    private int    successXP;
-    private int    mistakeXP;
-    private int    vocationalXP;
-    private int    vocationalXPCheckFrequency;
-    private int    vocationalXPTargetNumber;
-    private int    contractNegotiationXP;
-    private int    adminXP;
-    private int    adminXPPeriod;
-    private int    missionXpFail;
-    private int    missionXpSuccess;
-    private int    missionXpOutstandingSuccess;
+    private int scenarioXP;
+    private int killXPAward;
+    private int killsForXP;
+    private int tasksXP;
+    private int nTasksXP;
+    private int successXP;
+    private int mistakeXP;
+    private int vocationalXP;
+    private int vocationalXPCheckFrequency;
+    private int vocationalXPTargetNumber;
+    private int contractNegotiationXP;
+    private int adminXP;
+    private int adminXPPeriod;
+    private int missionXpFail;
+    private int missionXpSuccess;
+    private int missionXpOutstandingSuccess;
 
     private int edgeCost;
     // endregion Experience Tab
@@ -527,47 +529,48 @@ public class CampaignOptions {
     // endregion Rank System Tab
 
     // region Name and Portrait Generation
-    private       boolean   useOriginFactionForNames;
+    private boolean useOriginFactionForNames;
     private final boolean[] usePortraitForRole;
-    private       boolean   assignPortraitOnRoleChange;
-    private       boolean   allowDuplicatePortraits;
+    private boolean assignPortraitOnRoleChange;
+    private boolean allowDuplicatePortraits;
     // endregion Name and Portrait Generation
 
     // region Markets Tab
     // Personnel Market
-    private String                   personnelMarketName;
-    private boolean                  personnelMarketReportRefresh;
+    private String personnelMarketName;
+    private boolean personnelMarketReportRefresh;
     private Map<SkillLevel, Integer> personnelMarketRandomRemovalTargets;
-    private double                   personnelMarketDylansWeight;
-    private boolean                  usePersonnelHireHiringHallOnly;
+    private double personnelMarketDylansWeight;
+    private boolean usePersonnelHireHiringHallOnly;
 
     // Unit Market
     private UnitMarketMethod unitMarketMethod;
-    private boolean          unitMarketRegionalMekVariations;
-    private int              unitMarketSpecialUnitChance;
-    private int              unitMarketRarityModifier;
-    private boolean          instantUnitMarketDelivery;
-    private boolean          mothballUnitMarketDeliveries;
-    private boolean          unitMarketReportRefresh;
+    private boolean unitMarketRegionalMekVariations;
+    private int unitMarketSpecialUnitChance;
+    private int unitMarketRarityModifier;
+    private boolean instantUnitMarketDelivery;
+    private boolean mothballUnitMarketDeliveries;
+    private boolean unitMarketReportRefresh;
 
     // Contract Market
     private ContractMarketMethod contractMarketMethod;
     private int                  contractSearchRadius;
     private boolean              variableContractLength;
+    private boolean useDynamicDifficulty;
     private boolean              contractMarketReportRefresh;
     private int                  contractMaxSalvagePercentage;
     private int                  dropShipBonusPercentage;
     // endregion Markets Tab
 
     // region RATs Tab
-    private boolean  useStaticRATs;
+    private boolean useStaticRATs;
     private String[] rats;
-    private boolean  ignoreRATEra;
+    private boolean ignoreRATEra;
     // endregion RATs Tab
 
     // region Against the Bot Tab
-    private boolean    useAtB;
-    private boolean    useStratCon;
+    private boolean useAtB;
+    private boolean useStratCon;
     private SkillLevel skillLevel;
 
     // Unit Administration
@@ -576,47 +579,47 @@ public class CampaignOptions {
     private boolean clanVehicles;
 
     // Contract Operations
-    private       boolean mercSizeLimited;
-    private       boolean restrictPartsByMission;
-    private       boolean limitLanceWeight;
-    private       boolean limitLanceNumUnits;
-    private       boolean useStrategy;
-    private       int     baseStrategyDeployment;
-    private       int     additionalStrategyDeployment;
-    private final int[]   atbBattleChance;
-    private       boolean generateChases;
+    private boolean mercSizeLimited;
+    private boolean restrictPartsByMission;
+    private boolean limitLanceWeight;
+    private boolean limitLanceNumUnits;
+    private boolean useStrategy;
+    private int baseStrategyDeployment;
+    private int additionalStrategyDeployment;
+    private final int[] atbBattleChance;
+    private boolean generateChases;
 
     // Scenarios
-    private boolean           useGenericBattleValue;
-    private boolean           useVerboseBidding;
-    private boolean           doubleVehicles;
-    private int               opForLanceTypeMeks;
-    private int               opForLanceTypeMixed;
-    private int               opForLanceTypeVehicles;
-    private boolean           opForUsesVTOLs;
-    private boolean           allowOpForAeros;
-    private int               opForAeroChance;
-    private boolean           allowOpForLocalUnits;
-    private int               opForLocalUnitChance;
-    private boolean           adjustPlayerVehicles;
-    private boolean           regionalMekVariations;
-    private boolean           attachedPlayerCamouflage;
-    private boolean           playerControlsAttachedUnits;
-    private boolean           useDropShips;
-    private boolean           useWeatherConditions;
-    private boolean           useLightConditions;
-    private boolean           usePlanetaryConditions;
-    private int               fixedMapChance;
-    private int               spaUpgradeIntensity;
-    private int               scenarioModMax;
-    private int               scenarioModChance;
-    private int               scenarioModBV;
-    private boolean           autoConfigMunitions;
+    private boolean useGenericBattleValue;
+    private boolean useVerboseBidding;
+    private boolean doubleVehicles;
+    private int opForLanceTypeMeks;
+    private int opForLanceTypeMixed;
+    private int opForLanceTypeVehicles;
+    private boolean opForUsesVTOLs;
+    private boolean allowOpForAeros;
+    private int opForAeroChance;
+    private boolean allowOpForLocalUnits;
+    private int opForLocalUnitChance;
+    private boolean adjustPlayerVehicles;
+    private boolean regionalMekVariations;
+    private boolean attachedPlayerCamouflage;
+    private boolean playerControlsAttachedUnits;
+    private boolean useDropShips;
+    private boolean useWeatherConditions;
+    private boolean useLightConditions;
+    private boolean usePlanetaryConditions;
+    private int fixedMapChance;
+    private int spaUpgradeIntensity;
+    private int scenarioModMax;
+    private int scenarioModChance;
+    private int scenarioModBV;
+    private boolean autoConfigMunitions;
     private AutoResolveMethod autoResolveMethod;
-    private String            strategicViewMinimapTheme;
-    private boolean           autoResolveVictoryChanceEnabled;
-    private int               autoResolveNumberOfScenarios;
-    private boolean           autoResolveExperimentalPacarGuiEnabled;
+    private String strategicViewMinimapTheme;
+    private boolean autoResolveVictoryChanceEnabled;
+    private int autoResolveNumberOfScenarios;
+    private boolean autoResolveExperimentalPacarGuiEnabled;
     // endregion Against the Bot Tab
     // endregion Variable Declarations
 
@@ -626,35 +629,36 @@ public class CampaignOptions {
         final PersonnelRole[] personnelRoles = PersonnelRole.values();
 
         // region General Tab
-        unitRatingMethod                    = UnitRatingMethod.CAMPAIGN_OPS;
-        manualUnitRatingModifier            = 0;
-        clampReputationPayMultiplier        = false;
+        unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
+        manualUnitRatingModifier = 0;
+        clampReputationPayMultiplier = false;
         reduceReputationPerformanceModifier = false;
         reputationPerformanceModifierCutOff = false;
         // endregion General Tab
 
         // region Repair and Maintenance Tab
         // Repair
-        useEraMods        = false;
+        useEraMods = false;
         assignedTechFirst = false;
         resetToFirstTech  = false;
+        techsUseAdministration = false;
         useQuirks         = false;
         useAeroSystemHits = false;
-        destroyByMargin   = false;
-        destroyMargin     = 4;
+        destroyByMargin = false;
+        destroyMargin = 4;
         destroyPartTarget = 10;
 
         // Maintenance
-        checkMaintenance      = true;
-        maintenanceCycleDays  = 7;
-        maintenanceBonus      = -1;
+        checkMaintenance = true;
+        maintenanceCycleDays = 7;
+        maintenanceBonus = -1;
         useQualityMaintenance = true;
-        reverseQualityNames   = false;
+        reverseQualityNames = false;
         setUseRandomUnitQualities(true);
         setUsePlanetaryModifiers(true);
         useUnofficialMaintenance = false;
-        logMaintenance           = false;
-        defaultMaintenanceTime   = 4;
+        logMaintenance = false;
+        defaultMaintenanceTime = 4;
 
         // Mass Repair / Mass Salvage
         setMRMSUseRepair(true);
@@ -682,63 +686,63 @@ public class CampaignOptions {
         maxAcquisitions             = 0;
 
         // autoLogistics
-        autoLogisticsHeatSink              = 50;
-        autoLogisticsMekHead               = 40;
-        autoLogisticsMekLocation           = 25;
+        autoLogisticsHeatSink = 50;
+        autoLogisticsMekHead = 40;
+        autoLogisticsMekLocation = 25;
         autoLogisticsNonRepairableLocation = 0;
-        autoLogisticsArmor                 = 100;
-        autoLogisticsAmmunition            = 100;
-        autoLogisticsActuators             = 100;
-        autoLogisticsJumpJets              = 50;
-        autoLogisticsEngines               = 0;
-        autoLogisticsOther                 = 0;
+        autoLogisticsArmor = 100;
+        autoLogisticsAmmunition = 100;
+        autoLogisticsActuators = 100;
+        autoLogisticsJumpJets = 50;
+        autoLogisticsEngines = 0;
+        autoLogisticsOther = 0;
 
         // Delivery
         unitTransitTime = TRANSIT_UNIT_MONTH;
 
         // Planetary Acquisition
-        usePlanetaryAcquisition          = false;
-        maxJumpsPlanetaryAcquisition     = 2;
-        planetAcquisitionFactionLimit    = PlanetaryAcquisitionFactionLimit.NEUTRAL;
+        usePlanetaryAcquisition = false;
+        maxJumpsPlanetaryAcquisition = 2;
+        planetAcquisitionFactionLimit = PlanetaryAcquisitionFactionLimit.NEUTRAL;
         planetAcquisitionNoClanCrossover = true;
-        noClanPartsFromIS                = true;
-        penaltyClanPartsFromIS           = 4;
-        planetAcquisitionVerbose         = false;
+        noClanPartsFromIS = true;
+        penaltyClanPartsFromIS = 4;
+        planetAcquisitionVerbose = false;
         // Planet Socio-Industrial Modifiers
-        planetTechAcquisitionBonus                             = new int[6];
-        planetTechAcquisitionBonus[EquipmentType.RATING_A]     = -1;
-        planetTechAcquisitionBonus[EquipmentType.RATING_B]     = 0;
-        planetTechAcquisitionBonus[EquipmentType.RATING_C]     = 1;
-        planetTechAcquisitionBonus[EquipmentType.RATING_D]     = 2;
-        planetTechAcquisitionBonus[EquipmentType.RATING_E]     = 4;
-        planetTechAcquisitionBonus[EquipmentType.RATING_F]     = 8;
-        planetIndustryAcquisitionBonus                         = new int[6];
+        planetTechAcquisitionBonus = new int[6];
+        planetTechAcquisitionBonus[EquipmentType.RATING_A] = -1;
+        planetTechAcquisitionBonus[EquipmentType.RATING_B] = 0;
+        planetTechAcquisitionBonus[EquipmentType.RATING_C] = 1;
+        planetTechAcquisitionBonus[EquipmentType.RATING_D] = 2;
+        planetTechAcquisitionBonus[EquipmentType.RATING_E] = 4;
+        planetTechAcquisitionBonus[EquipmentType.RATING_F] = 8;
+        planetIndustryAcquisitionBonus = new int[6];
         planetIndustryAcquisitionBonus[EquipmentType.RATING_A] = 0;
         planetIndustryAcquisitionBonus[EquipmentType.RATING_B] = 0;
         planetIndustryAcquisitionBonus[EquipmentType.RATING_C] = 0;
         planetIndustryAcquisitionBonus[EquipmentType.RATING_D] = 0;
         planetIndustryAcquisitionBonus[EquipmentType.RATING_E] = 0;
         planetIndustryAcquisitionBonus[EquipmentType.RATING_F] = 0;
-        planetOutputAcquisitionBonus                           = new int[6];
-        planetOutputAcquisitionBonus[EquipmentType.RATING_A]   = -1;
-        planetOutputAcquisitionBonus[EquipmentType.RATING_B]   = 0;
-        planetOutputAcquisitionBonus[EquipmentType.RATING_C]   = 1;
-        planetOutputAcquisitionBonus[EquipmentType.RATING_D]   = 2;
-        planetOutputAcquisitionBonus[EquipmentType.RATING_E]   = 4;
-        planetOutputAcquisitionBonus[EquipmentType.RATING_F]   = 8;
+        planetOutputAcquisitionBonus = new int[6];
+        planetOutputAcquisitionBonus[EquipmentType.RATING_A] = -1;
+        planetOutputAcquisitionBonus[EquipmentType.RATING_B] = 0;
+        planetOutputAcquisitionBonus[EquipmentType.RATING_C] = 1;
+        planetOutputAcquisitionBonus[EquipmentType.RATING_D] = 2;
+        planetOutputAcquisitionBonus[EquipmentType.RATING_E] = 4;
+        planetOutputAcquisitionBonus[EquipmentType.RATING_F] = 8;
         // endregion Supplies and Acquisitions Tab
 
         // region Tech Limits Tab
-        limitByYear          = true;
+        limitByYear = true;
         disallowExtinctStuff = false;
-        allowClanPurchases   = true;
-        allowISPurchases     = true;
-        allowCanonOnly       = false;
-        allowCanonRefitOnly  = false;
-        techLevel            = TECH_EXPERIMENTAL;
-        variableTechLevel    = false;
-        factionIntroDate     = false;
-        useAmmoByType        = false;
+        allowClanPurchases = true;
+        allowISPurchases = true;
+        allowCanonOnly = false;
+        allowCanonRefitOnly = false;
+        techLevel = TECH_EXPERIMENTAL;
+        variableTechLevel = false;
+        factionIntroDate = false;
+        useAmmoByType = false;
         // endregion Tech Limits Tab
 
         // region Personnel Tab
@@ -785,6 +789,7 @@ public class CampaignOptions {
         setUseRandomHitsForVehicles(false);
         setTougherHealing(false);
         setMaximumPatients(25);
+        setDoctorsUseAdministration(false);
 
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.NONE);
@@ -1032,25 +1037,25 @@ public class CampaignOptions {
         // endregion Turnover and Retention
 
         // region Finances Tab
-        payForParts              = false;
-        payForRepairs            = false;
-        payForUnits              = false;
-        payForSalaries           = false;
-        payForOverhead           = false;
-        payForMaintain           = false;
-        payForTransport          = false;
-        sellUnits                = false;
-        sellParts                = false;
-        payForRecruitment        = false;
-        useLoanLimits            = false;
-        usePercentageMaint       = false;
-        infantryDontCount        = false;
-        usePeacetimeCost         = false;
+        payForParts = false;
+        payForRepairs = false;
+        payForUnits = false;
+        payForSalaries = false;
+        payForOverhead = false;
+        payForMaintain = false;
+        payForTransport = false;
+        sellUnits = false;
+        sellParts = false;
+        payForRecruitment = false;
+        useLoanLimits = false;
+        usePercentageMaint = false;
+        infantryDontCount = false;
+        usePeacetimeCost = false;
         useExtendedPartsModifier = false;
-        showPeacetimeCost        = false;
+        showPeacetimeCost = false;
         setFinancialYearDuration(FinancialYearDuration.ANNUAL);
         newFinancialYearFinancesToCSVExport = false;
-        simulateGrayMonday                  = false;
+        simulateGrayMonday = false;
 
         // Price Multipliers
         setCommonPartPriceMultiplier(1.0);
@@ -1074,35 +1079,35 @@ public class CampaignOptions {
         // endregion Finances Tab
 
         // region Mercenary Tab
-        equipmentContractBase      = false;
-        equipmentContractPercent   = 5.0;
+        equipmentContractBase = false;
+        equipmentContractPercent = 5.0;
         equipmentContractSaleValue = false;
         setDropShipContractPercent(1.0);
         setJumpShipContractPercent(0.0);
         setWarShipContractPercent(0.0);
-        blcSaleValue                   = false;
+        blcSaleValue = false;
         overageRepaymentInFinalPayment = false;
         // endregion Mercenary Tab
 
         // region Experience Tab
-        xpCostMultiplier            = 1.00;
-        scenarioXP                  = 1;
-        killXPAward                 = 0;
-        killsForXP                  = 0;
-        tasksXP                     = 1;
-        nTasksXP                    = 25;
-        successXP                   = 0;
-        mistakeXP                   = 0;
-        vocationalXP                = 1;
-        vocationalXPCheckFrequency  = 1;
-        vocationalXPTargetNumber    = 7;
-        contractNegotiationXP       = 0;
-        adminXP                     = 0;
-        adminXPPeriod               = 1;
-        missionXpFail               = 1;
-        missionXpSuccess            = 3;
+        xpCostMultiplier = 1.00;
+        scenarioXP = 1;
+        killXPAward = 0;
+        killsForXP = 0;
+        tasksXP = 1;
+        nTasksXP = 25;
+        successXP = 0;
+        mistakeXP = 0;
+        vocationalXP = 1;
+        vocationalXPCheckFrequency = 1;
+        vocationalXPTargetNumber = 7;
+        contractNegotiationXP = 0;
+        adminXP = 0;
+        adminXPPeriod = 1;
+        missionXpFail = 1;
+        missionXpSuccess = 3;
         missionXpOutstandingSuccess = 5;
-        edgeCost                    = 10;
+        edgeCost = 10;
         // endregion Experience Tab
 
         // region Skills Tab
@@ -1112,13 +1117,13 @@ public class CampaignOptions {
         // endregion Special Abilities Tab
 
         // region Skill Randomization Tab
-        phenotypeProbabilities                                 = new int[Phenotype.getExternalPhenotypes().size()];
+        phenotypeProbabilities = new int[Phenotype.getExternalPhenotypes().size()];
         phenotypeProbabilities[Phenotype.MEKWARRIOR.ordinal()] = 95;
-        phenotypeProbabilities[Phenotype.ELEMENTAL.ordinal()]  = 100;
-        phenotypeProbabilities[Phenotype.AEROSPACE.ordinal()]  = 95;
-        phenotypeProbabilities[Phenotype.VEHICLE.ordinal()]    = 0;
-        phenotypeProbabilities[Phenotype.PROTOMEK.ordinal()]   = 95;
-        phenotypeProbabilities[Phenotype.NAVAL.ordinal()]      = 25;
+        phenotypeProbabilities[Phenotype.ELEMENTAL.ordinal()] = 100;
+        phenotypeProbabilities[Phenotype.AEROSPACE.ordinal()] = 95;
+        phenotypeProbabilities[Phenotype.VEHICLE.ordinal()] = 0;
+        phenotypeProbabilities[Phenotype.PROTOMEK.ordinal()] = 95;
+        phenotypeProbabilities[Phenotype.NAVAL.ordinal()] = 25;
         // endregion Skill Randomization Tab
 
         // region Rank System Tab
@@ -1126,11 +1131,11 @@ public class CampaignOptions {
 
         // region Name and Portrait Generation Tab
         useOriginFactionForNames = true;
-        usePortraitForRole       = new boolean[personnelRoles.length];
+        usePortraitForRole = new boolean[personnelRoles.length];
         Arrays.fill(usePortraitForRole, false);
         usePortraitForRole[PersonnelRole.MEKWARRIOR.ordinal()] = true;
-        assignPortraitOnRoleChange                             = false;
-        allowDuplicatePortraits                                = true;
+        assignPortraitOnRoleChange = false;
+        allowDuplicatePortraits = true;
         // endregion Name and Portrait Generation Tab
 
         // region Markets Tab
@@ -1161,6 +1166,7 @@ public class CampaignOptions {
         setContractMarketMethod(ContractMarketMethod.NONE);
         setContractSearchRadius(800);
         setVariableContractLength(true);
+        setUseDynamicDifficulty(false);
         setContractMarketReportRefresh(true);
         setContractMaxSalvagePercentage(100);
         setDropShipBonusPercentage(0);
@@ -1173,38 +1179,38 @@ public class CampaignOptions {
         // endregion RATs Tab
 
         // region Against the Bot Tab
-        useAtB      = false;
+        useAtB = false;
         useStratCon = false;
         setSkillLevel(SkillLevel.REGULAR);
-        autoResolveMethod                      = AutoResolveMethod.PRINCESS;
-        autoResolveVictoryChanceEnabled        = false;
-        autoResolveNumberOfScenarios           = 100;
+        autoResolveMethod = AutoResolveMethod.PRINCESS;
+        autoResolveVictoryChanceEnabled = false;
+        autoResolveNumberOfScenarios = 100;
         autoResolveExperimentalPacarGuiEnabled = false;
-        strategicViewMinimapTheme              = "gbc green.theme";
+        strategicViewMinimapTheme = "gbc green.theme";
         // Unit Administration
-        useAero      = false;
-        useVehicles  = true;
+        useAero = false;
+        useVehicles = true;
         clanVehicles = false;
 
         // Contract Operations
-        mercSizeLimited                                 = false;
-        restrictPartsByMission                          = true;
-        limitLanceWeight                                = true;
-        limitLanceNumUnits                              = true;
-        useStrategy                                     = true;
-        baseStrategyDeployment                          = 3;
-        additionalStrategyDeployment                    = 1;
-        atbBattleChance                                 = new int[CombatRole.values().length - 1];
-        atbBattleChance[CombatRole.MANEUVER.ordinal()]  = 40;
+        mercSizeLimited = false;
+        restrictPartsByMission = true;
+        limitLanceWeight = true;
+        limitLanceNumUnits = true;
+        useStrategy = true;
+        baseStrategyDeployment = 3;
+        additionalStrategyDeployment = 1;
+        atbBattleChance = new int[CombatRole.values().length - 1];
+        atbBattleChance[CombatRole.MANEUVER.ordinal()] = 40;
         atbBattleChance[CombatRole.FRONTLINE.ordinal()] = 20;
-        atbBattleChance[CombatRole.PATROL.ordinal()]    = 60;
-        atbBattleChance[CombatRole.TRAINING.ordinal()]  = 10;
-        generateChases                                  = true;
+        atbBattleChance[CombatRole.PATROL.ordinal()] = 60;
+        atbBattleChance[CombatRole.TRAINING.ordinal()] = 10;
+        generateChases = true;
 
         // Scenarios
         useGenericBattleValue = true;
-        useVerboseBidding     = false;
-        doubleVehicles        = false;
+        useVerboseBidding = false;
+        doubleVehicles = false;
         setOpForLanceTypeMeks(1);
         setOpForLanceTypeMixed(2);
         setOpForLanceTypeVehicles(3);
@@ -1215,15 +1221,15 @@ public class CampaignOptions {
         setOpForLocalUnitChance(5);
         setFixedMapChance(25);
         setSpaUpgradeIntensity(0);
-        adjustPlayerVehicles        = false;
-        regionalMekVariations       = false;
-        attachedPlayerCamouflage    = true;
+        adjustPlayerVehicles = false;
+        regionalMekVariations = false;
+        attachedPlayerCamouflage = true;
         playerControlsAttachedUnits = false;
-        useDropShips                = false;
-        useWeatherConditions        = true;
-        useLightConditions          = true;
-        usePlanetaryConditions      = false;
-        autoConfigMunitions         = true;
+        useDropShips = false;
+        useWeatherConditions = true;
+        useLightConditions = true;
+        usePlanetaryConditions = false;
+        autoConfigMunitions = true;
         setScenarioModMax(3);
         setScenarioModChance(25);
         setScenarioModBV(50);
@@ -1854,6 +1860,15 @@ public class CampaignOptions {
     public void setMaximumPatients(final int maximumPatients) {
         this.maximumPatients = maximumPatients;
     }
+
+    public boolean isDoctorsUseAdministration() {
+        return doctorsUseAdministration;
+    }
+
+    public void setDoctorsUseAdministration(final boolean doctorsUseAdministration) {
+        this.doctorsUseAdministration = doctorsUseAdministration;
+    }
+
     // endregion Medical
 
     // region Prisoners
@@ -3428,7 +3443,8 @@ public class CampaignOptions {
         return personnelMarketRandomRemovalTargets;
     }
 
-    public void setPersonnelMarketRandomRemovalTargets(final Map<SkillLevel, Integer> personnelMarketRandomRemovalTargets) {
+    public void setPersonnelMarketRandomRemovalTargets(
+          final Map<SkillLevel, Integer> personnelMarketRandomRemovalTargets) {
         this.personnelMarketRandomRemovalTargets = personnelMarketRandomRemovalTargets;
     }
 
@@ -3532,6 +3548,14 @@ public class CampaignOptions {
         this.variableContractLength = variableContractLength;
     }
 
+    public boolean isUseDynamicDifficulty() {
+        return useDynamicDifficulty;
+    }
+
+    public void setUseDynamicDifficulty(final boolean useDynamicDifficulty) {
+        this.useDynamicDifficulty = useDynamicDifficulty;
+    }
+
     public boolean isContractMarketReportRefresh() {
         return contractMarketReportRefresh;
     }
@@ -3606,6 +3630,31 @@ public class CampaignOptions {
 
     public void setResetToFirstTech(final boolean resetToFirstTech) {
         this.resetToFirstTech = resetToFirstTech;
+    }
+
+    /**
+     * Checks whether administrative adjustments are applied for technician time calculations.
+     *
+     * <p>This configuration determines if technicians' daily available time should be adjusted
+     * using administrative multipliers in relevant calculations.</p>
+     *
+     * @return {@code true} if administrative adjustments are enabled for technicians, {@code false} otherwise.
+     */
+    public boolean isTechsUseAdministration() {
+        return techsUseAdministration;
+    }
+
+    /**
+     * Sets whether administrative adjustments should be applied to technician time calculations.
+     *
+     * <p>Enabling this setting applies administrative multipliers to modify technicians' daily available time
+     * in relevant calculations.</p>
+     *
+     * @param techsUseAdministration {@code true} to enable administrative adjustments for technicians, {@code false} to
+     *                               disable them.
+     */
+    public void setTechsUseAdministration(final boolean techsUseAdministration) {
+        this.techsUseAdministration = techsUseAdministration;
     }
 
     /**
@@ -4730,6 +4779,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEraMods", useEraMods);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignedTechFirst", assignedTechFirst);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "resetToFirstTech", resetToFirstTech);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techsUseAdministration", techsUseAdministration);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useQuirks", useQuirks);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "xpCostMultiplier", xpCostMultiplier);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioXP", scenarioXP);
@@ -4874,6 +4924,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomHitsForVehicles", isUseRandomHitsForVehicles());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tougherHealing", isTougherHealing());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maximumPatients", getMaximumPatients());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "doctorsUseAdministration", isDoctorsUseAdministration());
         // endregion Medical
 
         // region Prisoners
@@ -5221,6 +5272,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMarketMethod", getContractMarketMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractSearchRadius", getContractSearchRadius());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "variableContractLength", isVariableContractLength());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDynamicDifficulty", isUseDynamicDifficulty());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMarketReportRefresh", isContractMarketReportRefresh());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMaxSalvagePercentage", getContractMaxSalvagePercentage());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dropShipBonusPercentage", getDropShipBonusPercentage());
@@ -5305,7 +5357,7 @@ public class CampaignOptions {
 
         wn.normalize();
         CampaignOptions retVal = new CampaignOptions();
-        NodeList        wList  = wn.getChildNodes();
+        NodeList wList = wn.getChildNodes();
 
         // Okay, let's iterate through the children, eh?
         for (int x = 0; x < wList.getLength(); x++) {
@@ -5372,6 +5424,8 @@ public class CampaignOptions {
                     retVal.assignedTechFirst = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("resetToFirstTech")) {
                     retVal.resetToFirstTech = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("techsUseAdministration")) {
+                    retVal.techsUseAdministration = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("useQuirks")) {
                     retVal.useQuirks = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("xpCostMultiplier")) {
@@ -5391,16 +5445,16 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("mistakeXP")) {
                     retVal.mistakeXP = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("vocationalXP")
-                           // <50.03 compatibility handler
-                           || wn2.getNodeName().equalsIgnoreCase("idleXP")) {
+                                 // <50.03 compatibility handler
+                                 || wn2.getNodeName().equalsIgnoreCase("idleXP")) {
                     retVal.vocationalXP = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("vocationalXPTargetNumber")
-                           // <50.03 compatibility handler
-                           || wn2.getNodeName().equalsIgnoreCase("targetIdleXP")) {
+                                 // <50.03 compatibility handler
+                                 || wn2.getNodeName().equalsIgnoreCase("targetIdleXP")) {
                     retVal.vocationalXPTargetNumber = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("vocationalXPCheckFrequency")
-                           // <50.03 compatibility handler
-                           || wn2.getNodeName().equalsIgnoreCase("monthsIdleXP")) {
+                                 // <50.03 compatibility handler
+                                 || wn2.getNodeName().equalsIgnoreCase("monthsIdleXP")) {
                     retVal.vocationalXPCheckFrequency = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractNegotiationXP")) {
                     retVal.contractNegotiationXP = Integer.parseInt(wn2.getTextContent().trim());
@@ -5500,7 +5554,7 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("techLevel")) {
                     retVal.techLevel = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitRatingMethod") ||
-                           wn2.getNodeName().equalsIgnoreCase("dragoonsRatingMethod")) {
+                                 wn2.getNodeName().equalsIgnoreCase("dragoonsRatingMethod")) {
                     retVal.setUnitRatingMethod(UnitRatingMethod.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("manualUnitRatingModifier")) {
                     retVal.setManualUnitRatingModifier(Integer.parseInt(wn2.getTextContent()));
@@ -5632,6 +5686,8 @@ public class CampaignOptions {
                     retVal.setTougherHealing(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("maximumPatients")) {
                     retVal.setMaximumPatients(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("doctorsUseAdministration")) {
+                    retVal.setDoctorsUseAdministration(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     // endregion Medical
 
                     // region Prisoners
@@ -5672,8 +5728,9 @@ public class CampaignOptions {
                         if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         }
-                        retVal.getSalaryXPMultipliers().put(SkillLevel.valueOf(wn3.getNodeName().trim()),
-                              Double.parseDouble(wn3.getTextContent().trim()));
+                        retVal.getSalaryXPMultipliers()
+                              .put(SkillLevel.valueOf(wn3.getNodeName().trim()),
+                                    Double.parseDouble(wn3.getTextContent().trim()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
                     retVal.setRoleBaseSalaries(Utilities.readMoneyArray(wn2, retVal.getRoleBaseSalaries().length));
@@ -5797,7 +5854,8 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageMethod")) {
                     retVal.setRandomMarriageMethod(RandomMarriageMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClanPersonnelMarriages") ||
-                           wn2.getNodeName().equalsIgnoreCase("useRandomClannerMarriages")) { // Legacy, 0.49.12 removal
+                                 wn2.getNodeName()
+                                       .equalsIgnoreCase("useRandomClannerMarriages")) { // Legacy, 0.49.12 removal
                     retVal.setUseRandomClanPersonnelMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPrisonerMarriages")) {
                     retVal.setUseRandomPrisonerMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -5832,8 +5890,9 @@ public class CampaignOptions {
                         if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         }
-                        retVal.getDivorceSurnameWeights().put(SplittingSurnameStyle.valueOf(wn3.getNodeName().trim()),
-                              Integer.parseInt(wn3.getTextContent().trim()));
+                        retVal.getDivorceSurnameWeights()
+                              .put(SplittingSurnameStyle.valueOf(wn3.getNodeName().trim()),
+                                    Integer.parseInt(wn3.getTextContent().trim()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomDivorceMethod")) {
                     retVal.setRandomDivorceMethod(RandomDivorceMethod.valueOf(wn2.getTextContent().trim()));
@@ -6166,6 +6225,8 @@ public class CampaignOptions {
                     retVal.setContractSearchRadius(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("variableContractLength")) {
                     retVal.setVariableContractLength(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useDynamicDifficulty")) {
+                    retVal.setUseDynamicDifficulty(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketReportRefresh")) {
                     retVal.setContractMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractMaxSalvagePercentage")) {
@@ -6397,18 +6458,22 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) { // Legacy
                     double intensity = Double.parseDouble(wn2.getTextContent().trim());
 
-                    retVal.atbBattleChance[CombatRole.MANEUVER.ordinal()]  = (int) Math.round(((40.0 * intensity) /
-                                                                                               (40.0 * intensity +
-                                                                                                60.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.MANEUVER.ordinal()] = (int) Math.round(((40.0 * intensity) /
+                                                                                                    (40.0 * intensity +
+                                                                                                           60.0)) *
+                                                                                                   100.0 + 0.5);
                     retVal.atbBattleChance[CombatRole.FRONTLINE.ordinal()] = (int) Math.round(((20.0 * intensity) /
-                                                                                               (20.0 * intensity +
-                                                                                                80.0)) * 100.0 + 0.5);
-                    retVal.atbBattleChance[CombatRole.PATROL.ordinal()]    = (int) Math.round(((60.0 * intensity) /
-                                                                                               (60.0 * intensity +
-                                                                                                40.0)) * 100.0 + 0.5);
-                    retVal.atbBattleChance[CombatRole.TRAINING.ordinal()]  = (int) Math.round(((10.0 * intensity) /
-                                                                                               (10.0 * intensity +
-                                                                                                90.0)) * 100.0 + 0.5);
+                                                                                                     (20.0 * intensity +
+                                                                                                            80.0)) *
+                                                                                                    100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.PATROL.ordinal()] = (int) Math.round(((60.0 * intensity) /
+                                                                                                  (60.0 * intensity +
+                                                                                                         40.0)) *
+                                                                                                 100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.TRAINING.ordinal()] = (int) Math.round(((10.0 * intensity) /
+                                                                                                    (10.0 * intensity +
+                                                                                                           90.0)) *
+                                                                                                   100.0 + 0.5);
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
                     retVal.personnelMarketName = PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent()
                                                                                                     .trim()));
@@ -6417,7 +6482,7 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("historicalDailyLog")) { // Legacy
                     MekHQ.getMHQOptions().setHistoricalDailyLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating") // Legacy
-                           || wn2.getNodeName().equalsIgnoreCase("useDragoonRating")) { // Legacy
+                                 || wn2.getNodeName().equalsIgnoreCase("useDragoonRating")) { // Legacy
                     if (!Boolean.parseBoolean(wn2.getTextContent())) {
                         retVal.setUnitRatingMethod(UnitRatingMethod.NONE);
                     }
@@ -6467,14 +6532,14 @@ public class CampaignOptions {
         // new default values. If they have, we save their changes and add the new
         // surname weights
         if ((weights[0] != getMarriageSurnameWeights().get(MergingSurnameStyle.NO_CHANGE)) ||
-            (weights[1] != getMarriageSurnameWeights().get(MergingSurnameStyle.YOURS) + 5) ||
-            (weights[2] != getMarriageSurnameWeights().get(MergingSurnameStyle.SPOUSE) + 5) ||
-            (weights[3] != getMarriageSurnameWeights().get(MergingSurnameStyle.HYPHEN_SPOUSE) + 5) ||
-            (weights[4] != getMarriageSurnameWeights().get(MergingSurnameStyle.BOTH_HYPHEN_SPOUSE) + 5) ||
-            (weights[5] != getMarriageSurnameWeights().get(MergingSurnameStyle.HYPHEN_YOURS) + 5) ||
-            (weights[6] != getMarriageSurnameWeights().get(MergingSurnameStyle.BOTH_HYPHEN_YOURS) + 5) ||
-            (weights[7] != getMarriageSurnameWeights().get(MergingSurnameStyle.MALE)) ||
-            (weights[8] != getMarriageSurnameWeights().get(MergingSurnameStyle.FEMALE))) {
+                  (weights[1] != getMarriageSurnameWeights().get(MergingSurnameStyle.YOURS) + 5) ||
+                  (weights[2] != getMarriageSurnameWeights().get(MergingSurnameStyle.SPOUSE) + 5) ||
+                  (weights[3] != getMarriageSurnameWeights().get(MergingSurnameStyle.HYPHEN_SPOUSE) + 5) ||
+                  (weights[4] != getMarriageSurnameWeights().get(MergingSurnameStyle.BOTH_HYPHEN_SPOUSE) + 5) ||
+                  (weights[5] != getMarriageSurnameWeights().get(MergingSurnameStyle.HYPHEN_YOURS) + 5) ||
+                  (weights[6] != getMarriageSurnameWeights().get(MergingSurnameStyle.BOTH_HYPHEN_YOURS) + 5) ||
+                  (weights[7] != getMarriageSurnameWeights().get(MergingSurnameStyle.MALE)) ||
+                  (weights[8] != getMarriageSurnameWeights().get(MergingSurnameStyle.FEMALE))) {
             getMarriageSurnameWeights().put(MergingSurnameStyle.NO_CHANGE, weights[0]);
             getMarriageSurnameWeights().put(MergingSurnameStyle.YOURS, weights[1]);
             getMarriageSurnameWeights().put(MergingSurnameStyle.SPOUSE, weights[2]);
@@ -6549,16 +6614,16 @@ public class CampaignOptions {
      * @param gameOptions the {@link GameOptions} whose values will be used to update the campaign options.
      */
     public void updateCampaignOptionsFromGameOptions(GameOptions gameOptions) {
-        useTactics         = gameOptions.getOption(RPG_COMMAND_INIT).booleanValue();
+        useTactics = gameOptions.getOption(RPG_COMMAND_INIT).booleanValue();
         useInitiativeBonus = gameOptions.getOption(RPG_INDIVIDUAL_INITIATIVE).booleanValue();
-        useToughness       = gameOptions.getOption(RPG_TOUGHNESS).booleanValue();
-        useArtillery       = gameOptions.getOption(RPG_ARTILLERY_SKILL).booleanValue();
-        useAbilities       = gameOptions.getOption(RPG_PILOT_ADVANTAGES).booleanValue();
-        useEdge            = gameOptions.getOption(EDGE).booleanValue();
-        useImplants        = gameOptions.getOption(RPG_MANEI_DOMINI).booleanValue();
-        useQuirks          = gameOptions.getOption(ADVANCED_STRATOPS_QUIRKS).booleanValue();
-        allowCanonOnly     = gameOptions.getOption(ALLOWED_CANON_ONLY).booleanValue();
-        techLevel          = getSimpleLevel(gameOptions.getOption(ALLOWED_TECHLEVEL).stringValue());
+        useToughness = gameOptions.getOption(RPG_TOUGHNESS).booleanValue();
+        useArtillery = gameOptions.getOption(RPG_ARTILLERY_SKILL).booleanValue();
+        useAbilities = gameOptions.getOption(RPG_PILOT_ADVANTAGES).booleanValue();
+        useEdge = gameOptions.getOption(EDGE).booleanValue();
+        useImplants = gameOptions.getOption(RPG_MANEI_DOMINI).booleanValue();
+        useQuirks = gameOptions.getOption(ADVANCED_STRATOPS_QUIRKS).booleanValue();
+        allowCanonOnly = gameOptions.getOption(ALLOWED_CANON_ONLY).booleanValue();
+        techLevel = getSimpleLevel(gameOptions.getOption(ALLOWED_TECHLEVEL).stringValue());
     }
 
     /**

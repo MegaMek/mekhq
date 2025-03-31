@@ -27,6 +27,26 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+
+import java.awt.GridBagConstraints;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.ResourceBundle;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
+import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
@@ -35,25 +55,18 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.personnel.Skills;
-import mekhq.gui.campaignOptions.components.*;
+import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
+import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
+import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 
-import javax.swing.*;
-import javax.swing.JSpinner.DefaultEditor;
-import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.ResourceBundle;
-
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
-
 /**
- * The {@code MarketsTab} class represents the campaign options tab related to market settings.
- * This tab provides configurations for three key market areas:
+ * The {@code MarketsTab} class represents the campaign options tab related to market settings. This tab provides
+ * configurations for three key market areas:
  * <ul>
  *     <li><b>Personnel Market</b>: Settings for managing personnel hiring, removal targets, and market types.</li>
  *     <li><b>Unit Market</b>: Configurations for purchasing units, special unit chances, rarity modifiers, etc.</li>
@@ -110,6 +123,7 @@ public class MarketsTab {
     private JLabel lblContractSearchRadius;
     private JSpinner spnContractSearchRadius;
     private JCheckBox chkVariableContractLength;
+    private JCheckBox chkUseDynamicDifficulty;
     private JCheckBox chkContractMarketReportRefresh;
     private JLabel lblCoontractMaxSalvagePercentage;
     private JSpinner spnContractMaxSalvagePercentage;
@@ -135,11 +149,11 @@ public class MarketsTab {
     //end Contract Market
 
     /**
-     * Constructs a {@code MarketsTab} with the provided campaign. Initializes the market
-     * configuration options based on the settings of the given {@link Campaign}.
+     * Constructs a {@code MarketsTab} with the provided campaign. Initializes the market configuration options based on
+     * the settings of the given {@link Campaign}.
      *
-     * @param campaign The {@link Campaign} associated with this market tab. This campaign
-     *                 is used to retrieve and modify {@link CampaignOptions}.
+     * @param campaign The {@link Campaign} associated with this market tab. This campaign is used to retrieve and
+     *                 modify {@link CampaignOptions}.
      */
     public MarketsTab(Campaign campaign) {
         this.campaign = campaign;
@@ -149,11 +163,11 @@ public class MarketsTab {
     }
 
     /**
-     * Initializes the market-related options tabs by setting up configurations
-     * for the Personnel Market, Unit Market, and Contract Market.
+     * Initializes the market-related options tabs by setting up configurations for the Personnel Market, Unit Market,
+     * and Contract Market.
      * <p>
-     * This method is invoked internally within the constructor to prepare the
-     * various market configurations for use in the UI.
+     * This method is invoked internally within the constructor to prepare the various market configurations for use in
+     * the UI.
      */
     private void initialize() {
         initializePersonnelMarket();
@@ -164,14 +178,13 @@ public class MarketsTab {
     /**
      * Initializes the settings and UI components related to the Personnel Market.
      * <p>
-     * This includes setting up labels, combo boxes for selecting the personnel market type,
-     * checkboxes for additional options, and spinners for configuring removal targets.
+     * This includes setting up labels, combo boxes for selecting the personnel market type, checkboxes for additional
+     * options, and spinners for configuring removal targets.
      */
     private void initializePersonnelMarket() {
         pnlPersonnelMarketGeneralOptions = new JPanel();
         lblPersonnelMarketType = new JLabel();
-        comboPersonnelMarketType = new MMComboBox<>("comboPersonnelMarketType",
-            getPersonnelMarketTypeOptions());
+        comboPersonnelMarketType = new MMComboBox<>("comboPersonnelMarketType", getPersonnelMarketTypeOptions());
         chkPersonnelMarketReportRefresh = new JCheckBox();
         chkUsePersonnelHireHiringHallOnly = new JCheckBox();
 
@@ -185,15 +198,14 @@ public class MarketsTab {
     /**
      * Retrieves the available personnel market type options for display in a combo box.
      * <p>
-     * These types are fetched from the {@link PersonnelMarketServiceManager} and represent
-     * the available personnel market methods configured for the campaign.
+     * These types are fetched from the {@link PersonnelMarketServiceManager} and represent the available personnel
+     * market methods configured for the campaign.
      *
      * @return A {@link DefaultComboBoxModel} containing the personnel market type options.
      */
     private static DefaultComboBoxModel<String> getPersonnelMarketTypeOptions() {
         final DefaultComboBoxModel<String> personnelMarketTypeModel = new DefaultComboBoxModel<>();
-        for (final PersonnelMarketMethod method : PersonnelMarketServiceManager.getInstance()
-            .getAllServices(true)) {
+        for (final PersonnelMarketMethod method : PersonnelMarketServiceManager.getInstance().getAllServices(true)) {
             personnelMarketTypeModel.addElement(method.getModuleName());
         }
         return personnelMarketTypeModel;
@@ -202,23 +214,22 @@ public class MarketsTab {
     /**
      * Creates and returns the JPanel representing the Personnel Market configuration tab.
      * <p>
-     * This tab includes general personnel market settings, as well as removal target
-     * configuration options for various skill levels.
+     * This tab includes general personnel market settings, as well as removal target configuration options for various
+     * skill levels.
      *
      * @return A {@link JPanel} for the Personnel Market configuration tab.
      */
     public JPanel createPersonnelMarketTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelMarketTab",
-            getImageDirectory() + "logo_st_ives_compact.png");
+              getImageDirectory() + "logo_st_ives_compact.png");
 
         // Contents
         pnlPersonnelMarketGeneralOptions = createPersonnelMarketGeneralOptionsPanel();
         pnlRemovalTargets = createPersonnelMarketRemovalOptionsPanel();
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelMarketTab", true,
-            "");
+        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelMarketTab", true, "");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridwidth = 5;
@@ -238,8 +249,8 @@ public class MarketsTab {
     }
 
     /**
-     * Builds the general options panel for the Personnel Market tab, which includes settings
-     * such as the personnel market type, Dylan's weight, and options like report refresh toggles.
+     * Builds the general options panel for the Personnel Market tab, which includes settings such as the personnel
+     * market type, Dylan's weight, and options like report refresh toggles.
      * <p>
      * These components are laid out into a panel and returned for use in the UI.
      *
@@ -248,20 +259,17 @@ public class MarketsTab {
     private JPanel createPersonnelMarketGeneralOptionsPanel() {
         // Contents
         lblPersonnelMarketType = new CampaignOptionsLabel("PersonnelMarketType");
-        comboPersonnelMarketType = new MMComboBox<>("comboPersonnelMarketType",
-            getPersonnelMarketTypeOptions());
+        comboPersonnelMarketType = new MMComboBox<>("comboPersonnelMarketType", getPersonnelMarketTypeOptions());
 
         lblPersonnelMarketDylansWeight = new CampaignOptionsLabel("PersonnelMarketDylansWeight");
-        spnPersonnelMarketDylansWeight = new CampaignOptionsSpinner("PersonnelMarketDylansWeight",
-            0.3, 0, 1, 0.1);
+        spnPersonnelMarketDylansWeight = new CampaignOptionsSpinner("PersonnelMarketDylansWeight", 0.3, 0, 1, 0.1);
 
         chkPersonnelMarketReportRefresh = new CampaignOptionsCheckBox("PersonnelMarketReportRefresh");
 
         chkUsePersonnelHireHiringHallOnly = new CampaignOptionsCheckBox("UsePersonnelHireHiringHallOnly");
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelMarketGeneralOptionsPanel", false,
-            "");
+        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelMarketGeneralOptionsPanel", false, "");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridx = 0;
@@ -291,9 +299,8 @@ public class MarketsTab {
     /**
      * Creates and configures the removal options panel for the Personnel Market tab.
      * <p>
-     * This panel includes settings for removal targets, which are based on various
-     * {@link SkillLevel} entries. Each skill level configuration includes both a label
-     * and an associated spinner for setting values.
+     * This panel includes settings for removal targets, which are based on various {@link SkillLevel} entries. Each
+     * skill level configuration includes both a label and an associated spinner for setting values.
      *
      * @return A {@link JPanel} containing removal options for the Personnel Market.
      */
@@ -303,8 +310,7 @@ public class MarketsTab {
             final JLabel jLabel = new JLabel(skillLevel.toString());
             lblPersonnelMarketRandomRemovalTargets.put(skillLevel, jLabel);
 
-            final JSpinner jSpinner = new JSpinner(
-                new SpinnerNumberModel(0, 0, 12, 1));
+            final JSpinner jSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 12, 1));
 
             DefaultEditor editor = (DefaultEditor) jSpinner.getEditor();
             editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
@@ -314,7 +320,8 @@ public class MarketsTab {
 
         // Layout the Panels
         final JPanel panel = new CampaignOptionsStandardPanel("PersonnelMarketRemovalOptionsPanel",
-            true, "PersonnelMarketRemovalOptionsPanel");
+              true,
+              "PersonnelMarketRemovalOptionsPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridx = 0;
@@ -364,8 +371,8 @@ public class MarketsTab {
     /**
      * Initializes the settings and UI components related to the Unit Market tab.
      * <p>
-     * This includes various elements such as labels, combo boxes, checkboxes, and
-     * spinners for settings like unit market methods, rarity modifiers, and delivery options.
+     * This includes various elements such as labels, combo boxes, checkboxes, and spinners for settings like unit
+     * market methods, rarity modifiers, and delivery options.
      */
     private void initializeUnitMarket() {
         lblUnitMarketMethod = new JLabel();
@@ -383,15 +390,14 @@ public class MarketsTab {
     /**
      * Creates and returns the JPanel representing the Unit Market configuration tab.
      * <p>
-     * This tab includes options such as unit market methods, rarity modifiers,
-     * special unit chance settings, and more.
+     * This tab includes options such as unit market methods, rarity modifiers, special unit chance settings, and more.
      *
      * @return A {@link JPanel} for the Unit Market configuration tab.
      */
     public JPanel createUnitMarketTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("UnitMarketTab",
-            getImageDirectory() + "logo_clan_ice_hellion.png");
+              getImageDirectory() + "logo_clan_ice_hellion.png");
 
         // Contents
         lblUnitMarketMethod = new CampaignOptionsLabel("UnitMarketMethod");
@@ -400,12 +406,10 @@ public class MarketsTab {
         chkUnitMarketRegionalMekVariations = new CampaignOptionsCheckBox("UnitMarketRegionalMekVariations");
 
         lblUnitMarketSpecialUnitChance = new CampaignOptionsLabel("UnitMarketSpecialUnitChance");
-        spnUnitMarketSpecialUnitChance = new CampaignOptionsSpinner("UnitMarketSpecialUnitChance",
-            30, 0, 100, 1);
+        spnUnitMarketSpecialUnitChance = new CampaignOptionsSpinner("UnitMarketSpecialUnitChance", 30, 0, 100, 1);
 
         lblUnitMarketRarityModifier = new CampaignOptionsLabel("UnitMarketRarityModifier");
-        spnUnitMarketRarityModifier = new CampaignOptionsSpinner("UnitMarketRarityModifier",
-            0, -10, 10, 1);
+        spnUnitMarketRarityModifier = new CampaignOptionsSpinner("UnitMarketRarityModifier", 0, -10, 10, 1);
 
         chkInstantUnitMarketDelivery = new CampaignOptionsCheckBox("InstantUnitMarketDelivery");
 
@@ -414,8 +418,7 @@ public class MarketsTab {
         chkUnitMarketReportRefresh = new CampaignOptionsCheckBox("UnitMarketReportRefresh");
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("UnitMarketTab", true,
-            "");
+        final JPanel panel = new CampaignOptionsStandardPanel("UnitMarketTab", true, "");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridwidth = 5;
@@ -464,8 +467,8 @@ public class MarketsTab {
     /**
      * Initializes the settings and UI components related to the Contract Market.
      * <p>
-     * This includes options for contract market methods, payment settings, salvage percentages,
-     * and other contract-specific configurations.
+     * This includes options for contract market methods, payment settings, salvage percentages, and other
+     * contract-specific configurations.
      */
     private void initializeContractMarket() {
         pnlContractMarketGeneralOptions = new JPanel();
@@ -474,6 +477,7 @@ public class MarketsTab {
         lblContractSearchRadius = new JLabel();
         spnContractSearchRadius = new JSpinner();
         chkVariableContractLength = new JCheckBox();
+        chkUseDynamicDifficulty = new JCheckBox();
         chkContractMarketReportRefresh = new JCheckBox();
         lblCoontractMaxSalvagePercentage = new JLabel();
         spnContractMaxSalvagePercentage = new JSpinner();
@@ -501,23 +505,22 @@ public class MarketsTab {
     /**
      * Creates and returns the JPanel representing the Contract Market configuration tab.
      * <p>
-     * This tab includes settings for configuring various aspects of contract acquisition,
-     * such as methods, search radius, payment options, and variable contract length.
+     * This tab includes settings for configuring various aspects of contract acquisition, such as methods, search
+     * radius, payment options, and variable contract length.
      *
      * @return A {@link JPanel} for the Contract Market configuration tab.
      */
     public JPanel createContractMarketTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("ContractMarketTab",
-            getImageDirectory() + "logo_federated_suns.png");
+              getImageDirectory() + "logo_federated_suns.png");
 
         // Contents
         pnlContractMarketGeneralOptions = createContractMarketGeneralOptionsPanel();
         pnlContractPay = createContractPayPanel();
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ContractMarketTab", true,
-            "");
+        final JPanel panel = new CampaignOptionsStandardPanel("ContractMarketTab", true, "");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridwidth = 5;
@@ -536,9 +539,8 @@ public class MarketsTab {
     }
 
     /**
-     * Builds the general settings panel for the Contract Market tab, which includes
-     * options for the contract market method, search radius, salvage percentages, and
-     * other general configurations.
+     * Builds the general settings panel for the Contract Market tab, which includes options for the contract market
+     * method, search radius, salvage percentages, and other general configurations.
      *
      * @return A {@link JPanel} representing general options within the Contract Market tab.
      */
@@ -551,20 +553,19 @@ public class MarketsTab {
         comboContractMarketMethod.setModel(model);
 
         lblContractSearchRadius = new CampaignOptionsLabel("ContractSearchRadius");
-        spnContractSearchRadius = new CampaignOptionsSpinner("ContractSearchRadius",
-            300, 100, 2500, 100);
+        spnContractSearchRadius = new CampaignOptionsSpinner("ContractSearchRadius", 300, 100, 2500, 100);
 
         chkVariableContractLength = new CampaignOptionsCheckBox("VariableContractLength");
+
+        chkUseDynamicDifficulty = new CampaignOptionsCheckBox("UseDynamicDifficulty");
 
         chkContractMarketReportRefresh = new CampaignOptionsCheckBox("ContractMarketReportRefresh");
 
         lblCoontractMaxSalvagePercentage = new CampaignOptionsLabel("CoontractMaxSalvagePercentage");
-        spnContractMaxSalvagePercentage = new CampaignOptionsSpinner("CoontractMaxSalvagePercentage",
-            100, 0, 100, 10);
+        spnContractMaxSalvagePercentage = new CampaignOptionsSpinner("CoontractMaxSalvagePercentage", 100, 0, 100, 10);
 
         lblDropShipBonusPercentage = new CampaignOptionsLabel("DropShipBonusPercentage");
-        spnDropShipBonusPercentage = new CampaignOptionsSpinner("DropShipBonusPercentage",
-            0, 0, 20, 5);
+        spnDropShipBonusPercentage = new CampaignOptionsSpinner("DropShipBonusPercentage", 0, 0, 20, 5);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ContractMarketGeneralOptionsPanel");
@@ -589,6 +590,9 @@ public class MarketsTab {
         panel.add(chkVariableContractLength, layout);
 
         layout.gridy++;
+        panel.add(chkUseDynamicDifficulty, layout);
+
+        layout.gridy++;
         panel.add(chkContractMarketReportRefresh, layout);
 
         layout.gridy++;
@@ -609,8 +613,8 @@ public class MarketsTab {
     /**
      * Creates the panel for configuring payment settings in the Contract Market tab.
      * <p>
-     * This panel contains options for configuring equipment-based payment percentages,
-     * override repayment rules, and toggles for contract payment methods.
+     * This panel contains options for configuring equipment-based payment percentages, override repayment rules, and
+     * toggles for contract payment methods.
      *
      * @return A {@link JPanel} containing payment configuration settings for the Contract Market.
      */
@@ -632,19 +636,31 @@ public class MarketsTab {
 
         lblEquipPercent = new CampaignOptionsLabel("EquipPercent");
         spnEquipPercent = new CampaignOptionsSpinner("EquipPercent",
-                0.1, 0, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
+              0.1,
+              0,
+              CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT,
+              0.1);
 
         lblDropShipPercent = new CampaignOptionsLabel("DropShipPercent");
         spnDropShipPercent = new CampaignOptionsSpinner("DropShipPercent",
-                0.1, 0, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
+              0.1,
+              0,
+              CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT,
+              0.1);
 
         lblJumpShipPercent = new CampaignOptionsLabel("JumpShipPercent");
         spnJumpShipPercent = new CampaignOptionsSpinner("JumpShipPercent",
-                0.1, 0, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
+              0.1,
+              0,
+              CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT,
+              0.1);
 
         lblWarShipPercent = new CampaignOptionsLabel("WarShipPercent");
         spnWarShipPercent = new CampaignOptionsSpinner("WarShipPercent",
-                0.1, 0, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
+              0.1,
+              0,
+              CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT,
+              0.1);
 
         chkBLCSaleValue = new CampaignOptionsCheckBox("BLCSaleValue");
 
@@ -655,8 +671,7 @@ public class MarketsTab {
         chkOverageRepaymentInFinalPayment = new CampaignOptionsCheckBox("OverageRepaymentInFinalPayment");
 
         // Layout the Panel
-        final JPanel panelValuePercent = new CampaignOptionsStandardPanel("ContractPayPanelValuePercent",
-            false);
+        final JPanel panelValuePercent = new CampaignOptionsStandardPanel("ContractPayPanelValuePercent", false);
         final GridBagConstraints layoutValuePercent = new CampaignOptionsGridBagConstraints(panelValuePercent);
 
         layoutValuePercent.gridx = 0;
@@ -687,8 +702,7 @@ public class MarketsTab {
         layoutValuePercent.gridx++;
         panelValuePercent.add(spnWarShipPercent, layoutValuePercent);
 
-        final JPanel panel = new CampaignOptionsStandardPanel("ContractPayPanel",
-            true, "ContractPayPanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("ContractPayPanel", true, "ContractPayPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridx = 0;
@@ -727,15 +741,13 @@ public class MarketsTab {
     }
 
     /**
-     * Loads the campaign options from the associated {@link Campaign} into
-     * the UI components of the market tabs. This includes personnel, unit,
-     * and contract market settings.
+     * Loads the campaign options from the associated {@link Campaign} into the UI components of the market tabs. This
+     * includes personnel, unit, and contract market settings.
      * <p>
      * If no preset options are provided, the current campaign options are loaded.
      *
-     * @param presetCampaignOptions A {@link CampaignOptions} object with previously
-     *                              configured settings, or {@code null} to use the
-     *                              current campaign's options.
+     * @param presetCampaignOptions A {@link CampaignOptions} object with previously configured settings, or
+     *                              {@code null} to use the current campaign's options.
      */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
@@ -765,6 +777,7 @@ public class MarketsTab {
         comboContractMarketMethod.setSelectedItem(options.getContractMarketMethod());
         spnContractSearchRadius.setValue(options.getContractSearchRadius());
         chkVariableContractLength.setSelected(options.isVariableContractLength());
+        chkUseDynamicDifficulty.setSelected(options.isUseDynamicDifficulty());
         chkContractMarketReportRefresh.setSelected(options.isContractMarketReportRefresh());
         spnContractMaxSalvagePercentage.setValue(options.getContractMaxSalvagePercentage());
         spnDropShipBonusPercentage.setValue(options.getDropShipBonusPercentage());
@@ -798,10 +811,8 @@ public class MarketsTab {
         options.setPersonnelMarketDylansWeight((double) spnPersonnelMarketDylansWeight.getValue());
         options.setUsePersonnelHireHiringHallOnly(chkUsePersonnelHireHiringHallOnly.isSelected());
         options.setPersonnelMarketReportRefresh(chkPersonnelMarketReportRefresh.isSelected());
-        for (final Entry<SkillLevel, JSpinner> entry : spnPersonnelMarketRandomRemovalTargets
-            .entrySet()) {
-            options.getPersonnelMarketRandomRemovalTargets().put(entry.getKey(),
-                (int) entry.getValue().getValue());
+        for (final Entry<SkillLevel, JSpinner> entry : spnPersonnelMarketRandomRemovalTargets.entrySet()) {
+            options.getPersonnelMarketRandomRemovalTargets().put(entry.getKey(), (int) entry.getValue().getValue());
         }
 
         // Unit Market
@@ -817,6 +828,7 @@ public class MarketsTab {
         options.setContractMarketMethod(comboContractMarketMethod.getSelectedItem());
         options.setContractSearchRadius((int) spnContractSearchRadius.getValue());
         options.setVariableContractLength(chkVariableContractLength.isSelected());
+        options.setUseDynamicDifficulty(chkUseDynamicDifficulty.isSelected());
         options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());
         options.setContractMaxSalvagePercentage((int) spnContractMaxSalvagePercentage.getValue());
         options.setDropShipBonusPercentage((int) spnDropShipBonusPercentage.getValue());
