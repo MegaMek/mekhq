@@ -27,6 +27,8 @@
  */
 package mekhq.campaign.personnel.procreation;
 
+import static mekhq.campaign.mod.am.InjuryTypes.POSTPARTUM_RECOVERY;
+import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -50,6 +52,7 @@ import mekhq.campaign.ExtraData.IntKey;
 import mekhq.campaign.ExtraData.StringKey;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PersonalLogger;
+import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
@@ -442,6 +445,15 @@ public abstract class AbstractProcreation {
             if (mother.getStatus().isStudent()) {
                 mother.addEduTagAlong(baby.getId());
                 baby.changeStatus(campaign, today, PersonnelStatus.ON_LEAVE);
+            }
+
+            // Apply postpartum effects
+            if (campaignOptions.isUseAdvancedMedical()) {
+                Injury injury = POSTPARTUM_RECOVERY.newInjury(campaign, mother, INTERNAL, 1);
+                mother.addInjury(injury);
+            } else {
+                int currentHits = mother.getHits();
+                mother.setHits(currentHits + 1);
             }
 
             // Alert the player
