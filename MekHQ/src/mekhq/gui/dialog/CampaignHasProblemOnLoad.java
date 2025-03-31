@@ -91,7 +91,7 @@ public class CampaignHasProblemOnLoad {
      * Indicates whether the operation or process was canceled by the user or system.
      *
      * @return {@code true} if the operation was explicitly interrupted or canceled. Otherwise, it returns
-     *       {@code false}, meaning the operation was allowed to continue or complete as normal.</p>
+     *       {@code false}, meaning the operation was allowed to continue or complete as normal.
      */
     public boolean wasCanceled() {
         return wasCanceled;
