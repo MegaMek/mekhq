@@ -27,22 +27,24 @@
  */
 package mekhq.gui.campaignOptions.components;
 
-import megamek.client.ui.swing.util.UIUtil;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ResourceBundle;
-
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import static mekhq.utilities.ImageUtilities.scaleImageIcon;
+
+import java.awt.GridBagConstraints;
+import java.util.ResourceBundle;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+
+import megamek.client.ui.swing.util.UIUtil;
 
 /**
  * A specialized {@link JPanel} designed for headers in the campaign options dialog.
  * <p>
- * This panel includes a header label, an image, and optionally a body label for additional text.
- * The text for the labels is dynamically loaded from a resource bundle based on the provided name.
- * The image is scaled to fit the layout, and font scaling is applied to the labels to ensure
- * consistent appearance.
+ * This panel includes a header label, an image, and optionally a body label for additional text. The text for the
+ * labels is dynamically loaded from a resource bundle based on the provided name. The image is scaled to fit the
+ * layout, and font scaling is applied to the labels to ensure consistent appearance.
  */
 public class CampaignOptionsHeaderPanel extends JPanel {
     /**
@@ -56,12 +58,11 @@ public class CampaignOptionsHeaderPanel extends JPanel {
     static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
 
     /**
-     * Constructs a new instance of {@link CampaignOptionsHeaderPanel} with a header label
-     * and an image.
+     * Constructs a new instance of {@link CampaignOptionsHeaderPanel} with a header label and an image.
      * <p>
-     * The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is
-     * fetched from a resource bundle using {@code "lbl" + name + ".text"}.
-     * The image is loaded from the specified file path and scaled appropriately.
+     * The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is fetched from a resource
+     * bundle using {@code "lbl" + name + ".text"}. The image is loaded from the specified file path and scaled
+     * appropriately.
      *
      * @param name         the name of the header panel, used to construct the resource bundle keys
      * @param imageAddress the file path of the image to be displayed in the panel
@@ -71,14 +72,13 @@ public class CampaignOptionsHeaderPanel extends JPanel {
     }
 
     /**
-     * Constructs a new instance of {@link CampaignOptionsHeaderPanel} with a header label,
-     * an image, and optionally a body label for descriptive text.
+     * Constructs a new instance of {@link CampaignOptionsHeaderPanel} with a header label, an image, and optionally a
+     * body label for descriptive text.
      * <p>
-     * The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is
-     * fetched from a resource bundle using {@code "lbl" + name + ".text"}. If {@code includeBodyText}
-     * is {@code true}, an additional body label is created using the resource key
-     * {@code "lbl" + name + "Body.text"}. The image is loaded from the specified file path
-     * and scaled appropriately.
+     * The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is fetched from a resource
+     * bundle using {@code "lbl" + name + ".text"}. If {@code includeBodyText} is {@code true}, an additional body label
+     * is created using the resource key {@code "lbl" + name + "Body.text"}. The image is loaded from the specified file
+     * path and scaled appropriately.
      *
      * @param name            the name of the header panel, used to construct the resource bundle keys
      * @param imageAddress    the file path of the image to be displayed in the panel
@@ -87,7 +87,7 @@ public class CampaignOptionsHeaderPanel extends JPanel {
     public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText) {
         // Load and scale the image using the provided file path
         ImageIcon imageIcon = new ImageIcon(imageAddress);
-        imageIcon = scaleImageIconToWidth(imageIcon, UIUtil.scaleForGUI(100));
+        imageIcon = scaleImageIcon(imageIcon, 100, true);
 
         // Create a JLabel to display the image in the panel
         JLabel lblImage = new JLabel(imageIcon);
@@ -100,10 +100,9 @@ public class CampaignOptionsHeaderPanel extends JPanel {
         // Optionally create a body label with additional text, if includeBodyText is true
         JLabel lblBody = new JLabel();
         if (includeBodyText) {
-            lblBody = new JLabel(String.format(
-                    "<html><div style='width: %s; text-align:justify;'>%s</div></html>",
-                    UIUtil.scaleForGUI(750),
-                    resources.getString("lbl" + name + "Body.text")), SwingConstants.CENTER);
+            lblBody = new JLabel(String.format("<html><div style='width: %s; text-align:justify;'>%s</div></html>",
+                  UIUtil.scaleForGUI(750),
+                  resources.getString("lbl" + name + "Body.text")), SwingConstants.CENTER);
             lblBody.setName("lbl" + name + "Body");
             setFontScaling(lblBody, false, 1);
         }

@@ -27,6 +27,41 @@
  */
 package mekhq.gui.stratcon;
 
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.scaleObjectiveTimeLimits;
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
+import static mekhq.campaign.personnel.SkillType.S_LEADER;
+import static mekhq.campaign.stratcon.StratconRulesManager.BASE_LEADERSHIP_BUDGET;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.DELAYED;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.FAILED;
+import static mekhq.campaign.stratcon.StratconRulesManager.calculateReinforcementTargetNumber;
+import static mekhq.campaign.stratcon.StratconRulesManager.getEligibleLeadershipUnits;
+import static mekhq.campaign.stratcon.StratconRulesManager.getReinforcementType;
+import static mekhq.campaign.stratcon.StratconRulesManager.processReinforcementDeployment;
+import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
+import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.REINFORCEMENTS_COMMITTED;
+import static mekhq.campaign.utilities.CampaignTransportUtilities.getLeadershipDropdownVectorPair;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerDescription;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerIcon;
+import static mekhq.utilities.ImageUtilities.scaleImageIcon;
+
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Minefield;
 import megamek.common.TargetRoll;
@@ -50,30 +85,6 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.MHQInternationalization;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.util.Pair;
-
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static mekhq.campaign.mission.AtBDynamicScenarioFactory.scaleObjectiveTimeLimits;
-import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
-import static mekhq.campaign.personnel.SkillType.S_LEADER;
-import static mekhq.campaign.stratcon.StratconRulesManager.*;
-import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.DELAYED;
-import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.FAILED;
-import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
-import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.REINFORCEMENTS_COMMITTED;
-import static mekhq.campaign.utilities.CampaignTransportUtilities.getLeadershipDropdownVectorPair;
-import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerDescription;
-import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerIcon;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
 /**
  * UI for managing force/unit assignments for individual StratCon scenarios.
@@ -131,7 +142,8 @@ public class StratconScenarioWizard extends JDialog {
      *                         <li>Initializes the user interface by calling {@link #setUI(boolean)}, passing the {@code isPrimaryForce} parameter.</li>
      *                       </ul>
      */
-    public void setCurrentScenario(StratconScenario scenario, StratconTrackState trackState, StratconCampaignState campaignState, boolean isPrimaryForce) {
+    public void setCurrentScenario(StratconScenario scenario, StratconTrackState trackState,
+                                   StratconCampaignState campaignState, boolean isPrimaryForce) {
         currentScenario = scenario;
         currentCampaignState = campaignState;
         currentTrackState = trackState;
@@ -468,7 +480,8 @@ public class StratconScenarioWizard extends JDialog {
     /**
      * Add an "available force list" to the given control
      */
-    private JList<Force> addAvailableForceList(JPanel parent, GridBagConstraints gbc, ScenarioForceTemplate forceTemplate) {
+    private JList<Force> addAvailableForceList(JPanel parent, GridBagConstraints gbc,
+                                               ScenarioForceTemplate forceTemplate) {
         JScrollPane forceListContainer = new JScrollPaneWithSpeed();
 
         ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign,
@@ -500,7 +513,8 @@ public class StratconScenarioWizard extends JDialog {
      *
      * @return A JList of units that can be selected.
      */
-    private JList<Unit> addIndividualUnitSelector(List<Unit> units, GridBagConstraints gridBagConstraints, int maxSelectionSize, boolean usesBV) {
+    private JList<Unit> addIndividualUnitSelector(List<Unit> units, GridBagConstraints gridBagConstraints,
+                                                  int maxSelectionSize, boolean usesBV) {
         // Create the panel for the individual unit selector
         JPanel unitPanel = new JPanel();
         unitPanel.setLayout(new GridBagLayout());
@@ -771,7 +785,7 @@ public class StratconScenarioWizard extends JDialog {
         // Add commandLiaison image (icon)
         ImageIcon speakerIcon = getSpeakerIcon(campaign, commandLiaison);
         if (speakerIcon != null) {
-            speakerIcon = scaleImageIconToWidth(speakerIcon, 100);
+            speakerIcon = scaleImageIcon(speakerIcon, 100, true);
         }
         JLabel imageLabel = new JLabel();
         imageLabel.setIcon(speakerIcon);
@@ -934,7 +948,8 @@ public class StratconScenarioWizard extends JDialog {
      * @param isGMReinforcement         {@code true} if the player is using GM powers to bypass the reinforcement check,
      *                                  {@code false} otherwise.
      */
-    private void btnCommitClicked(ActionEvent evt, @Nullable Integer reinforcementTargetNumber, boolean isGMReinforcement) {
+    private void btnCommitClicked(ActionEvent evt, @Nullable Integer reinforcementTargetNumber,
+                                  boolean isGMReinforcement) {
         if (parent != null) {
             parent.setCommitForces(true);
         }
@@ -1081,7 +1096,8 @@ public class StratconScenarioWizard extends JDialog {
      * @param usesBV              Whether we are tracking the BV of selected items, {@code true}, or simply the count of
      *                            selected items, {@code false}
      */
-    private void availableUnitSelectorChanged(ListSelectionEvent event, JLabel selectionCountLabel, JLabel unitStatusLabel, int maxSelectionSize, boolean usesBV) {
+    private void availableUnitSelectorChanged(ListSelectionEvent event, JLabel selectionCountLabel,
+                                              JLabel unitStatusLabel, int maxSelectionSize, boolean usesBV) {
         if (!(event.getSource() instanceof JList<?>)) {
             return;
         }
@@ -1149,7 +1165,8 @@ public class StratconScenarioWizard extends JDialog {
         ((JList<?>) event.getSource()).addListSelectionListener(listeners[0]);
     }
 
-    private void selectTransportedUnitsAndTransport(CampaignTransportType campaignTransportType, Unit unit, JList<Unit> changedList) {
+    private void selectTransportedUnitsAndTransport(CampaignTransportType campaignTransportType, Unit unit,
+                                                    JList<Unit> changedList) {
         if (campaignTransportType != null) {
             if (unit.hasTransportedUnits(campaignTransportType)) {
                 Set<Unit> potentialTransportedUnits = unit.getTransportedUnits(campaignTransportType);
