@@ -229,7 +229,6 @@ import mekhq.campaign.universe.selectors.planetSelectors.RangedPlanetSelector;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
-import mekhq.gui.sorter.PersonTitleSorter;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
@@ -3116,8 +3115,8 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Retrieves a list of active technicians, with options to include only those with time remaining,
-     * prioritize elite technicians, and expand the search to include technicians with additional roles.
+     * Retrieves a list of active technicians, with options to include only those with time remaining, prioritize elite
+     * technicians, and expand the search to include technicians with additional roles.
      *
      * <p>The resulting list includes {@link Person} objects who qualify as technicians ({@link Person#isTech()})
      * or, if specified, as expanded technicians ({@link Person#isTechExpanded()}). If the person is part of a
@@ -3140,11 +3139,11 @@ public class Campaign implements ITechManager {
      *
      * @param noZeroMinute If {@code true}, excludes technicians with no remaining available minutes.
      * @param eliteFirst   If {@code true}, sorts the list to place the most skilled technicians at the top.
-     * @param expanded     If {@code true}, includes technicians with expanded roles (e.g., those qualifying
-     *                     under {@link Person#isTechExpanded()}).
+     * @param expanded     If {@code true}, includes technicians with expanded roles (e.g., those qualifying under
+     *                     {@link Person#isTechExpanded()}).
      *
-     * @return A list of active {@link Person} objects who qualify as technicians or expanded technicians,
-     *         sorted by skill, available time, and rank as specified by the input parameters.
+     * @return A list of active {@link Person} objects who qualify as technicians or expanded technicians, sorted by
+     *       skill, available time, and rank as specified by the input parameters.
      */
     public List<Person> getTechsExpanded(final boolean noZeroMinute, final boolean eliteFirst, final boolean expanded) {
         final List<Person> techs = getActivePersonnel().stream()
@@ -3168,7 +3167,7 @@ public class Campaign implements ITechManager {
         }
 
         // sort based on available minutes (highest -> lowest)
-        techs.sort(Comparator.comparingInt(person -> person.getDailyAvailableTechTime(false)));
+        techs.sort(Comparator.comparingInt(person -> -person.getDailyAvailableTechTime(false)));
 
         // finally, sort based on rank (lowest -> highest)
         techs.sort((person1, person2) -> {
@@ -3451,13 +3450,12 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Retrieves a list of eligible logistics personnel who can perform procurement actions
-     * based on the current campaign options. If acquisitions are set to automatically succeed,
-     * an empty list is returned.
+     * Retrieves a list of eligible logistics personnel who can perform procurement actions based on the current
+     * campaign options. If acquisitions are set to automatically succeed, an empty list is returned.
      *
      * <p>This method evaluates active personnel to determine who is eligible for procurement
-     * actions under the current campaign configuration. Personnel are filtered and sorted
-     * based on specific criteria:</p>
+     * actions under the current campaign configuration. Personnel are filtered and sorted based on specific
+     * criteria:</p>
      * <ul>
      *   <li><strong>Automatic Success:</strong> If the acquisition skill equals {@code S_AUTO},
      *       an empty list is immediately returned.</li>
@@ -3477,8 +3475,8 @@ public class Campaign implements ITechManager {
      *   </li>
      * </ul>
      *
-     * @return A {@link List} of {@link Person} objects who are eligible and sorted to perform
-     *         logistical actions, or an empty list if acquisitions automatically succeed.
+     * @return A {@link List} of {@link Person} objects who are eligible and sorted to perform logistical actions, or an
+     *       empty list if acquisitions automatically succeed.
      */
     public List<Person> getLogisticsPersonnel() {
         final String skill = getCampaignOptions().getAcquisitionSkill();
@@ -7438,7 +7436,8 @@ public class Campaign implements ITechManager {
      * @return a {@link TargetRoll} object representing the roll required to successfully acquire the requested item, or
      *       an impossible/automatic result under specific circumstances.
      */
-    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition, final @Nullable Person person, final boolean checkDaysToWait) {
+    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition, final @Nullable Person person,
+                                              final boolean checkDaysToWait) {
         if (getCampaignOptions().getAcquisitionSkill().equals(S_AUTO)) {
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "Automatic Success");
         }
