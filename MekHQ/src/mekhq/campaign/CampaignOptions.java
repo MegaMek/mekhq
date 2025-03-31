@@ -317,6 +317,9 @@ public class CampaignOptions {
     private boolean announceOfficersOnly;
     private boolean announceChildBirthdays;
 
+    // Life Events
+    private boolean showLifeEventDialogBirths;
+
     // Marriage
     private boolean useManualMarriages;
     private boolean useClanPersonnelMarriages;
@@ -889,6 +892,9 @@ public class CampaignOptions {
         setAnnounceRecruitmentAnniversaries(true);
         setAnnounceOfficersOnly(true);
         setAnnounceChildBirthdays(true);
+
+        // Life Events
+        setShowLifeEventDialogBirths(true);
 
         // Marriage
         setUseManualMarriages(true);
@@ -2268,6 +2274,16 @@ public class CampaignOptions {
         this.announceChildBirthdays = announceChildBirthdays;
     }
     // endregion anniversaries
+
+    //startregiona Life Events
+    public boolean isShowLifeEventDialogBirths() {
+        return showLifeEventDialogBirths;
+    }
+
+    public void setShowLifeEventDialogBirths(final boolean showLifeEventDialogBirths) {
+        this.showLifeEventDialogBirths = showLifeEventDialogBirths;
+    }
+    //endregion Life Events
 
     // region Dependents
     public boolean isUseRandomDependentAddition() {
@@ -5067,6 +5083,10 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "announceChildBirthdays", isAnnounceChildBirthdays());
         // endregion Announcements
 
+        // region Life Events
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "showLifeEventDialogBirths", isShowLifeEventDialogBirths());
+        // endregion Life Events
+
         // region Marriage
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManualMarriages", isUseManualMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanPersonnelMarriages", isUseClanPersonnelMarriages());
@@ -5822,6 +5842,8 @@ public class CampaignOptions {
                     retVal.setAnnounceOfficersOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("announceChildBirthdays")) {
                     retVal.setAnnounceChildBirthdays(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("showLifeEventDialogBirths")) {
+                    retVal.setShowLifeEventDialogBirths(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     // endregion anniversaries
 
                     // region Marriage
