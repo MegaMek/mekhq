@@ -507,22 +507,6 @@ public class BiographyTab {
 
     private JPanel createLifeEventsPanel() {
         // Contents
-        chkShowLifeEventDialogBirths = new CampaignOptionsCheckBox("ShowLifeEventDialogBirths");
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("LifeEventsPanel", true, "LifeEventsPanel");
-        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
-
-        layoutParent.gridwidth = 5;
-        layoutParent.gridx = 0;
-        layoutParent.gridy = 0;
-        panel.add(chkShowLifeEventDialogBirths, layoutParent);
-
-        return panel;
-    }
-
-    private JPanel createLifeEventsPanel() {
-        // Contents
         chkShowLifeEventDialogComingOfAge = new CampaignOptionsCheckBox("ShowLifeEventDialogComingOfAge");
 
         // Layout the Panel
@@ -532,6 +516,7 @@ public class BiographyTab {
         layoutParent.gridwidth = 1;
         layoutParent.gridx = 0;
         layoutParent.gridy = 0;
+        panel.add(chkShowLifeEventDialogBirths, layoutParent);
         layoutParent.gridx++;
         panel.add(chkShowLifeEventDialogComingOfAge, layoutParent);
 
