@@ -76,7 +76,8 @@ public class MercenaryAuctionDialog extends ImmersiveDialogCore {
      * @param percentPerStep The percentage increment for the bid adjustments.
      * @param stepSize       The step size for each spinner adjustment.
      */
-    public MercenaryAuctionDialog(Campaign campaign, Entity entity, int minimumBid, int maximumBid, int percentPerStep, int stepSize) {
+    public MercenaryAuctionDialog(Campaign campaign, Entity entity, int minimumBid, int maximumBid, int percentPerStep,
+                                  int stepSize) {
         super(campaign,
               campaign.getSeniorAdminPerson(TRANSPORT),
               null,
@@ -86,6 +87,7 @@ public class MercenaryAuctionDialog extends ImmersiveDialogCore {
               null,
               false,
               createJSpinnerPanel(minimumBid, minimumBid, maximumBid, stepSize),
+              null,
               false);
 
         // This setup ensures the dialogs both operate as modal and also assign the entity being
@@ -169,7 +171,8 @@ public class MercenaryAuctionDialog extends ImmersiveDialogCore {
      *
      * @return The JPanel containing the spinner, or {@code null} if the default value is invalid.
      */
-    private static @Nullable JPanel createJSpinnerPanel(int defaultValue, int minimumValue, int maximumValue, int stepSize) {
+    private static @Nullable JPanel createJSpinnerPanel(int defaultValue, int minimumValue, int maximumValue,
+                                                        int stepSize) {
         JSpinner spinner = new JSpinner(new SpinnerNumberModel(defaultValue, minimumValue, maximumValue, stepSize));
         JLabel label = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE, "spinner.label.auction"));
 

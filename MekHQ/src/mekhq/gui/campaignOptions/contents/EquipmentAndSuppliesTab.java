@@ -27,6 +27,19 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.util.ResourceBundle;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.EquipmentType;
@@ -36,14 +49,13 @@ import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.gui.campaignOptions.components.*;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ResourceBundle;
-
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
+import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
+import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
+import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 
 /**
  * The {@code EquipmentAndSuppliesTab} class represents a graphical user interface (GUI)
@@ -73,8 +85,9 @@ public class EquipmentAndSuppliesTab {
     private JPanel pnlAcquisitions;
     private JLabel lblChoiceAcquireSkill;
     private MMComboBox<String> choiceAcquireSkill;
-    private JCheckBox chkSupportStaffOnly;
     private JLabel lblAcquireClanPenalty;
+    private JLabel lblProcurementPersonnelPick;
+    private MMComboBox<String> cboProcurementPersonnelPick;
     private JSpinner spnAcquireClanPenalty;
     private JLabel lblAcquireIsPenalty;
     private JSpinner spnAcquireIsPenalty;
@@ -253,7 +266,9 @@ public class EquipmentAndSuppliesTab {
         lblChoiceAcquireSkill = new JLabel();
         choiceAcquireSkill = new MMComboBox<>("choiceAcquireSkill", buildAcquireSkillComboOptions());
 
-        chkSupportStaffOnly = new JCheckBox();
+        lblProcurementPersonnelPick = new JLabel();
+        cboProcurementPersonnelPick = new MMComboBox<>("procurementPersonnelPick",
+              buildProcurementPersonnelPickComboOptions());
 
         lblAcquireClanPenalty = new JLabel();
         spnAcquireClanPenalty = new JSpinner();
@@ -369,7 +384,7 @@ public class EquipmentAndSuppliesTab {
         // Content
         lblChoiceAcquireSkill = new CampaignOptionsLabel("ChoiceAcquireSkill");
 
-        chkSupportStaffOnly = new CampaignOptionsCheckBox("SupportStaffOnly");
+        lblProcurementPersonnelPick = new CampaignOptionsLabel("ProcurementPersonnelPick");
 
         lblAcquireClanPenalty = new CampaignOptionsLabel("AcquireClanPenalty");
         spnAcquireClanPenalty = new CampaignOptionsSpinner("AcquireClanPenalty",
@@ -401,8 +416,9 @@ public class EquipmentAndSuppliesTab {
 
         layout.gridx = 0;
         layout.gridy++;
-        layout.gridwidth = 2;
-        panel.add(chkSupportStaffOnly, layout);
+        panel.add(lblProcurementPersonnelPick, layout);
+        layout.gridx++;
+        panel.add(cboProcurementPersonnelPick, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -937,6 +953,29 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
+     * Builds a {@link DefaultComboBoxModel} containing options for all available {@link ProcurementPersonnelPick}
+     * values.
+     *
+     * <p>This method iterates through all the values of the {@link ProcurementPersonnelPick}
+     * enumeration and adds their names as string elements to the combo box model. The resulting model can be used to
+     * populate a combo box in the user interface, allowing users to select a personnel category for procurement
+     * purposes.</p>
+     *
+     * @return A {@link DefaultComboBoxModel} populated with the names of all {@link ProcurementPersonnelPick} values.
+     *
+     * @see ProcurementPersonnelPick#values() Retrieves all defined personnel pick options.
+     */
+    private static DefaultComboBoxModel<String> buildProcurementPersonnelPickComboOptions() {
+        DefaultComboBoxModel<String> procurementPersonnelPick = new DefaultComboBoxModel<>();
+
+        for (ProcurementPersonnelPick pick : ProcurementPersonnelPick.values()) {
+            procurementPersonnelPick.addElement(pick.toString());
+        }
+
+        return procurementPersonnelPick;
+    }
+
+    /**
      * Creates and initializes the "Tech Limits" tab panel within a user interface.
      * The tab includes various settings and options related to technical limitations,
      * such as limiting by year, disallowing extinct technologies, allowing faction-specific purchases,
@@ -1053,7 +1092,7 @@ public class EquipmentAndSuppliesTab {
 
         // Acquisitions
         options.setAcquisitionSkill(choiceAcquireSkill.getSelectedItem());
-        options.setAcquisitionSupportStaffOnly(chkSupportStaffOnly.isSelected());
+        options.setAcquisitionPersonnelCategory(ProcurementPersonnelPick.values()[cboProcurementPersonnelPick.getSelectedIndex()]);
         options.setClanAcquisitionPenalty((int) spnAcquireClanPenalty.getValue());
         options.setIsAcquisitionPenalty((int) spnAcquireIsPenalty.getValue());
         options.setWaitingPeriod((int) spnAcquireWaitingPeriod.getValue());
@@ -1129,7 +1168,7 @@ public class EquipmentAndSuppliesTab {
 
         // Acquisitions
         choiceAcquireSkill.setSelectedItem(options.getAcquisitionSkill());
-        chkSupportStaffOnly.setSelected(options.isAcquisitionSupportStaffOnly());
+        cboProcurementPersonnelPick.setSelectedItem(options.getAcquisitionPersonnelCategory().toString());
         spnAcquireClanPenalty.setValue(options.getClanAcquisitionPenalty());
         spnAcquireIsPenalty.setValue(options.getIsAcquisitionPenalty());
         spnAcquireWaitingPeriod.setValue(options.getWaitingPeriod());

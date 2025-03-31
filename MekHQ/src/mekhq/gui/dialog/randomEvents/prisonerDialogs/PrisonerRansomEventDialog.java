@@ -27,15 +27,15 @@
  */
 package mekhq.gui.dialog.randomEvents.prisonerDialogs;
 
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.util.List;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
-
-import java.util.List;
-
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * Represents a dialog triggered when the enemy offers a ransom deal for prisoners.
@@ -66,6 +66,7 @@ public class PrisonerRansomEventDialog extends ImmersiveDialogCore {
               createOutOfCharacterMessage(isFriendlyPOWs),
               null,
               false,
+              null,
               null,
               false);
 
@@ -110,7 +111,8 @@ public class PrisonerRansomEventDialog extends ImmersiveDialogCore {
      *
      * @return A formatted HTML string containing the narrative in-character message for the dialog.
      */
-    private static String createInCharacterMessage(Campaign campaign, Money payment, List<Person> prisoners, boolean isFriendlyPOWs) {
+    private static String createInCharacterMessage(Campaign campaign, Money payment, List<Person> prisoners,
+                                                   boolean isFriendlyPOWs) {
         String commanderAddress = campaign.getCommanderAddress(false);
         StringBuilder message = new StringBuilder();
         String key = isFriendlyPOWs ? "pows" : "prisoners";

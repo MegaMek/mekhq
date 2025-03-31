@@ -81,7 +81,10 @@ public class CampaignHasProblemOnLoad {
               createButtons(problemType),
               createOutOfCharacterMessage(problemType),
               null,
-              false);
+              false,
+              null,
+              null,
+              true);
 
         // There is deliberately no cancel option for NEW_VERSION_WITH_OLD_DATA
         wasCanceled = (problemType != NEW_VERSION_WITH_OLD_DATA) && (dialog.getDialogChoice() == DIALOG_CANCEL_OPTION);

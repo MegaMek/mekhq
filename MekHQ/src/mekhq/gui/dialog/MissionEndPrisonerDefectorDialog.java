@@ -27,14 +27,14 @@
  */
 package mekhq.gui.dialog;
 
-import mekhq.campaign.Campaign;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import mekhq.campaign.Campaign;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
 /**
  * Represents a dialog triggered at the end of a mission when the player has Prisoner Defectors they can recruit.
@@ -62,6 +62,7 @@ public class MissionEndPrisonerDefectorDialog extends ImmersiveDialogCore {
               createOutOfCharacterMessage(),
               null,
               false,
+              null,
               null,
               true);
     }

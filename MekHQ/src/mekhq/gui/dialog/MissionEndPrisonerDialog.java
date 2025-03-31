@@ -52,7 +52,8 @@ public class MissionEndPrisonerDialog extends ImmersiveDialogCore {
      * @param isSuccess   Indicates whether the mission was successful.
      * @param isGoodEvent Indicates whether the event is positive.
      */
-    public MissionEndPrisonerDialog(Campaign campaign, Money ransom, boolean isAllied, boolean isSuccess, boolean isGoodEvent) {
+    public MissionEndPrisonerDialog(Campaign campaign, Money ransom, boolean isAllied, boolean isSuccess,
+                                    boolean isGoodEvent) {
         super(campaign,
               getSpeaker(campaign),
               null,
@@ -61,6 +62,7 @@ public class MissionEndPrisonerDialog extends ImmersiveDialogCore {
               createOutOfCharacterMessage(isAllied, isSuccess, isGoodEvent),
               null,
               false,
+              null,
               null,
               true);
     }
@@ -79,7 +81,8 @@ public class MissionEndPrisonerDialog extends ImmersiveDialogCore {
      *
      * @return A list of button-label and tooltip pairs to be displayed on the dialog.
      */
-    private static List<ButtonLabelTooltipPair> createButtons(boolean isAllied, boolean isSuccess, boolean isGoodEvent) {
+    private static List<ButtonLabelTooltipPair> createButtons(boolean isAllied, boolean isSuccess,
+                                                              boolean isGoodEvent) {
         List<ButtonLabelTooltipPair> buttons = new ArrayList<>();
 
         boolean isRansom = (!isAllied && isSuccess && isGoodEvent) ||
@@ -133,7 +136,8 @@ public class MissionEndPrisonerDialog extends ImmersiveDialogCore {
      *
      * @return A formatted string containing the in-character dialog message.
      */
-    private static String createInCharacterMessage(Campaign campaign, Money ransomSum, boolean isAllied, boolean isSuccess, boolean isGoodEvent) {
+    private static String createInCharacterMessage(Campaign campaign, Money ransomSum, boolean isAllied,
+                                                   boolean isSuccess, boolean isGoodEvent) {
         String key = "prisoners." +
                            (isAllied ? "player" : "enemy") +
                            '.' +
@@ -172,7 +176,8 @@ public class MissionEndPrisonerDialog extends ImmersiveDialogCore {
      *
      * @return A formatted string containing the OOC dialog message, or {@code null} if no message is required.
      */
-    private static @Nullable String createOutOfCharacterMessage(boolean isAllied, boolean isSuccess, boolean isGoodEvent) {
+    private static @Nullable String createOutOfCharacterMessage(boolean isAllied, boolean isSuccess,
+                                                                boolean isGoodEvent) {
         boolean showMessage = (isAllied && !isSuccess && isGoodEvent);
 
         if (showMessage) {

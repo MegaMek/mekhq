@@ -28,6 +28,28 @@
  */
 package mekhq.campaign.randomEvents;
 
+import static megamek.common.Compute.randomInt;
+import static megamek.common.enums.SkillLevel.VETERAN;
+import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
+import static mekhq.campaign.finances.enums.TransactionType.RECRUITMENT;
+import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
+import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
+import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
+import static mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT;
+import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.AGGRESSION;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.AMBITION;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.GREED;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.SOCIAL;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateBigPersonality;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
@@ -47,28 +69,6 @@ import mekhq.campaign.randomEvents.personalities.enums.Greed;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-
-import static megamek.common.Compute.randomInt;
-import static megamek.common.enums.SkillLevel.VETERAN;
-import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
-import static mekhq.campaign.finances.enums.TransactionType.RECRUITMENT;
-import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
-import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
-import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
-import static mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT;
-import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.AGGRESSION;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.AMBITION;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.GREED;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.PersonalityTraitType.SOCIAL;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateBigPersonality;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * Represents a dialog and associated logic for presenting the player with a Ronin offer. The Ronin offer involves
@@ -108,8 +108,8 @@ public class RoninOffer {
         RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
         boolean useExtraRandomness = randomSkillPreferences.randomizeSkill();
 
-        // We don't care about admin settings, as we're not going to have an admin here
-        overrideSkills(false, false, useExtraRandomness, ronin, role, VETERAN);
+        // We don't care about admin, doctor or tech settings, as they're not going to spawn here
+        overrideSkills(false, false, false, false, useExtraRandomness, ronin, role, VETERAN);
 
         generateBigPersonality(ronin);
 
@@ -131,7 +131,8 @@ public class RoninOffer {
      * @param campaignState       The optional {@link StratconCampaignState} providing strategic information.
      * @param requiredCombatTeams The number of combat teams required for the recruitment.
      */
-    private void displayAndProcessConversation(Campaign campaign, Person ronin, StratconCampaignState campaignState, int requiredCombatTeams) {
+    private void displayAndProcessConversation(Campaign campaign, Person ronin, StratconCampaignState campaignState,
+                                               int requiredCombatTeams) {
         String commanderAddress = campaign.getCommanderAddress(false);
         int response = displayInitialMessage(commanderAddress, ronin.getCallsign());
         if (response != ACCEPT_DIALOG_CHOICE_INDEX) {
@@ -188,6 +189,7 @@ public class RoninOffer {
               centerMessage,
               buttonLabels,
               null,
+              null,
               true);
 
         return initialMessage.getDialogChoice();
@@ -207,7 +209,8 @@ public class RoninOffer {
      *
      * @return An integer representing the player's choice from the dialog.
      */
-    private int displayRoninMessage(Person ronin, String commanderAddress, boolean useFallbackHiringFee, int requiredCombatTeams, @Nullable Integer availableSupportPoints) {
+    private int displayRoninMessage(Person ronin, String commanderAddress, boolean useFallbackHiringFee,
+                                    int requiredCombatTeams, @Nullable Integer availableSupportPoints) {
         String centerMessage = createRoninMessage(ronin, commanderAddress);
 
         List<String> buttonLabels = new ArrayList<>();
@@ -227,6 +230,7 @@ public class RoninOffer {
               centerMessage,
               buttonLabels,
               outOfCharacterMessage,
+              null,
               true);
 
         return initialMessage.getDialogChoice();
@@ -322,7 +326,8 @@ public class RoninOffer {
      *
      * @return A {@link String} containing formatted out-of-character details for the player.
      */
-    private String createRoninOutOfCharacterMessage(Person ronin, boolean useFallbackHiringFee, int requiredCombatTeams, @Nullable Integer availableSupportPoints) {
+    private String createRoninOutOfCharacterMessage(Person ronin, boolean useFallbackHiringFee, int requiredCombatTeams,
+                                                    @Nullable Integer availableSupportPoints) {
         StringBuilder report = new StringBuilder();
 
         report.append(buildCostString(useFallbackHiringFee, requiredCombatTeams, availableSupportPoints));
@@ -378,7 +383,8 @@ public class RoninOffer {
      *
      * @return A {@link String} containing the formatted cost information.
      */
-    private String buildCostString(boolean useFallbackHiringFee, int requiredCombatTeams, @Nullable Integer availableSupportPoints) {
+    private String buildCostString(boolean useFallbackHiringFee, int requiredCombatTeams,
+                                   @Nullable Integer availableSupportPoints) {
         String addendumKey = useFallbackHiringFee ? "message.ooc.cBills" : "message.ooc.supportPoints";
         String addendum = getFormattedTextAt(RESOURCE_BUNDLE, addendumKey);
 

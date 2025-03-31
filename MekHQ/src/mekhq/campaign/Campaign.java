@@ -31,6 +31,8 @@ package mekhq.campaign;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static megamek.common.Compute.d6;
+import static mekhq.campaign.CampaignOptions.S_AUTO;
+import static mekhq.campaign.CampaignOptions.S_TECH;
 import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_MONTH;
 import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_WEEK;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
@@ -47,6 +49,10 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
+import static mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement.isCommandersDay;
+import static mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement.isFreedomDay;
+import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewYear;
+import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWinterHolidayMajorDay;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenUsage;
@@ -57,9 +63,11 @@ import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMAN;
+import static mekhq.campaign.stratcon.StratconRulesManager.processIgnoredDynamicScenario;
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.isIneligibleToPerformProcurement;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -171,6 +179,11 @@ import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
+import mekhq.campaign.personnel.lifeEvents.ComingOfAgeAnnouncement;
+import mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement;
+import mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement;
+import mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement;
+import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
@@ -215,6 +228,7 @@ import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.RangedPlanetSelector;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.gui.sorter.PersonTitleSorter;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.service.AutosaveService;
@@ -3102,14 +3116,35 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Returns a list of active technicians.
+     * Retrieves a list of active technicians, with options to include only those with time remaining,
+     * prioritize elite technicians, and expand the search to include technicians with additional roles.
      *
-     * @param noZeroMinute If TRUE, then techs with no time remaining will be excluded from the list.
-     * @param eliteFirst   If TRUE and sorted also TRUE, then return the list sorted from best to worst
-     * @param expanded     If TRUE, then include techs with expanded roles (e.g. Tech/Vessel skill)
+     * <p>The resulting list includes {@link Person} objects who qualify as technicians ({@link Person#isTech()})
+     * or, if specified, as expanded technicians ({@link Person#isTechExpanded()}). If the person is part of a
+     * self-crewed unit (e.g., an engineer on a self-crewed vessel), they are also included in the list.</p>
      *
-     * @return The list of active {@link Person}s who qualify as technicians ({@link Person#isTech()}), or who qualify
-     *       as expanded technicians ({@link Person#isTechExpanded()}).
+     * <p>The returned list can be customized and sorted based on a variety of criteria:</p>
+     * <ul>
+     *   <li>Technicians with no remaining available time can be excluded if {@code noZeroMinute} is set to {@code true}.</li>
+     *   <li>The list can be sorted from elite (best) to least skilled if {@code eliteFirst} is set to {@code true}.</li>
+     *   <li>When {@code expanded} is set to {@code true}, technicians with expanded roles (e.g., dual skill sets) are included
+     *       in addition to regular technicians.</li>
+     *   <li>The list is further sorted in the following order:
+     *     <ol>
+     *       <li>By skill level (default: lowest to highest, or highest to lowest if elite-first enabled).</li>
+     *       <li>By available daily tech time (highest to lowest).</li>
+     *       <li>By rank (lowest to highest).</li>
+     *     </ol>
+     *   </li>
+     * </ul>
+     *
+     * @param noZeroMinute If {@code true}, excludes technicians with no remaining available minutes.
+     * @param eliteFirst   If {@code true}, sorts the list to place the most skilled technicians at the top.
+     * @param expanded     If {@code true}, includes technicians with expanded roles (e.g., those qualifying
+     *                     under {@link Person#isTechExpanded()}).
+     *
+     * @return A list of active {@link Person} objects who qualify as technicians or expanded technicians,
+     *         sorted by skill, available time, and rank as specified by the input parameters.
      */
     public List<Person> getTechsExpanded(final boolean noZeroMinute, final boolean eliteFirst, final boolean expanded) {
         final List<Person> techs = getActivePersonnel().stream()
@@ -3125,21 +3160,26 @@ public class Campaign implements ITechManager {
         }
 
         // Return the tech collection sorted worst to best Skill Level, or reversed if we want elites first
-        Comparator<Person> techSorter = Comparator.comparingInt(person -> person.getSkillLevel(this,
-              !person.getPrimaryRole().isTech() && person.getSecondaryRole().isTechSecondary()).ordinal());
+        techs.sort(Comparator.comparingInt(person -> person.getSkillLevel(this,
+              !person.getPrimaryRole().isTech() && person.getSecondaryRole().isTechSecondary()).ordinal()));
 
         if (eliteFirst) {
-            techSorter = techSorter.reversed()
-                               .thenComparing(Comparator.comparingInt(Person::getDailyAvailableTechTime).reversed());
-        } else {
-            techSorter = techSorter.thenComparing(Comparator.comparingInt(Person::getMinutesLeft).reversed());
+            Collections.reverse(techs);
         }
 
-        techSorter = techSorter.thenComparing(new PersonTitleSorter());
+        // sort based on available minutes (highest -> lowest)
+        techs.sort(Comparator.comparingInt(person -> person.getDailyAvailableTechTime(false)));
 
-        if (techs.size() > 1) {
-            techs.subList(1, techs.size()).sort(techSorter);
-        }
+        // finally, sort based on rank (lowest -> highest)
+        techs.sort((person1, person2) -> {
+            if (person1.outRanks(person2)) {
+                return 1; // person1 outranks person2 -> person2 should come first
+            } else if (person2.outRanks(person1)) {
+                return -1; // person2 outranks person1 -> person1 should come first
+            } else {
+                return 0; // They are considered equal
+            }
+        });
 
         return techs;
     }
@@ -3266,41 +3306,71 @@ public class Campaign implements ITechManager {
         return target;
     }
 
+    /**
+     * Retrieves the best logistics person based on the acquisition skill, personnel category, and maximum acquisitions
+     * allowed for the campaign.
+     *
+     * <p>This method evaluates all active personnel to determine the most suitable candidate
+     * for logistics tasks, depending on the specified acquisition skill and rules. The determination is made according
+     * to the following logic:</p>
+     * <ul>
+     *   <li>If the skill is {@code S_AUTO}, the method immediately returns {@code null}.</li>
+     *   <li>If the skill is {@code S_TECH}, the method evaluates personnel based on their technical
+     *       skill level, ignoring those who are ineligible for procurement or who exceed
+     *       the maximum acquisition limit.</li>
+     *   <li>For all other skills, the method evaluates personnel who possess the specified skill,
+     *       ensuring their eligibility for procurement and checking that they have not exceeded
+     *       the maximum acquisition limit.</li>
+     * </ul>
+     *
+     * <p>The "best" logistics person is selected as the one with the highest skill level (based on the skill being
+     * evaluated). If no suitable candidate is found, the method returns {@code null}.
+     *
+     * @return The {@link Person} representing the best logistics character, or {@code null} if no suitable person is
+     *       found.
+     */
     public @Nullable Person getLogisticsPerson() {
+        final String skill = campaignOptions.getAcquisitionSkill();
+        final ProcurementPersonnelPick acquisitionCategory = campaignOptions.getAcquisitionPersonnelCategory();
+        final int maxAcquisitions = campaignOptions.getMaxAcquisitions();
+
         int bestSkill = -1;
-        int maxAcquisitions = getCampaignOptions().getMaxAcquisitions();
-        Person admin = null;
-        String skill = getCampaignOptions().getAcquisitionSkill();
-        if (skill.equals(CampaignOptions.S_AUTO)) {
+        Person procurementCharacter = null;
+        if (skill.equals(S_AUTO)) {
             return null;
-        } else if (skill.equals(CampaignOptions.S_TECH)) {
-            for (Person p : getActivePersonnel()) {
-                if (getCampaignOptions().isAcquisitionSupportStaffOnly() && !p.hasSupportRole(true)) {
+        } else if (skill.equals(S_TECH)) {
+            for (Person person : getActivePersonnel(false)) {
+                if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
-                if (maxAcquisitions > 0 && (p.getAcquisitions() >= maxAcquisitions)) {
+
+                if (maxAcquisitions > 0 && (person.getAcquisitions() >= maxAcquisitions)) {
                     continue;
                 }
-                if ((p.getBestTechSkill() != null) && p.getBestTechSkill().getLevel() > bestSkill) {
-                    admin = p;
-                    bestSkill = p.getBestTechSkill().getLevel();
+
+                if ((person.getBestTechSkill() != null) && person.getBestTechSkill().getLevel() > bestSkill) {
+                    procurementCharacter = person;
+                    bestSkill = person.getBestTechSkill().getLevel();
                 }
             }
         } else {
-            for (Person p : getActivePersonnel()) {
-                if (getCampaignOptions().isAcquisitionSupportStaffOnly() && !p.hasSupportRole(true)) {
+            for (Person person : getActivePersonnel(false)) {
+                if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
-                if (maxAcquisitions > 0 && (p.getAcquisitions() >= maxAcquisitions)) {
+
+                if (maxAcquisitions > 0 && (person.getAcquisitions() >= maxAcquisitions)) {
                     continue;
                 }
-                if (p.hasSkill(skill) && (p.getSkill(skill).getLevel() > bestSkill)) {
-                    admin = p;
-                    bestSkill = p.getSkill(skill).getLevel();
+
+                if (person.hasSkill(skill) && (person.getSkill(skill).getLevel() > bestSkill)) {
+                    procurementCharacter = person;
+                    bestSkill = person.getSkill(skill).getLevel();
                 }
             }
         }
-        return admin;
+
+        return procurementCharacter;
     }
 
     /**
@@ -3381,36 +3451,65 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Gets a list of applicable logistics personnel, or an empty list if acquisitions automatically succeed.
+     * Retrieves a list of eligible logistics personnel who can perform procurement actions
+     * based on the current campaign options. If acquisitions are set to automatically succeed,
+     * an empty list is returned.
      *
-     * @return A <code>List</code> of {@link Person} who can perform logistical actions.
+     * <p>This method evaluates active personnel to determine who is eligible for procurement
+     * actions under the current campaign configuration. Personnel are filtered and sorted
+     * based on specific criteria:</p>
+     * <ul>
+     *   <li><strong>Automatic Success:</strong> If the acquisition skill equals {@code S_AUTO},
+     *       an empty list is immediately returned.</li>
+     *   <li><strong>Eligibility Filtering:</strong> The following checks are applied to filter personnel:
+     *       <ul>
+     *          <li>Personnel must not be ineligible based on the {@link ProcurementPersonnelPick} category.</li>
+     *          <li>Personnel must not have exceeded the maximum acquisition limit, if specified.</li>
+     *          <li>If the skill is {@code S_TECH}, the person must have a valid technical skill.</li>
+     *          <li>For other skills, the person must have the specified skill.</li>
+     *       </ul>
+     *    </li>
+     *   <li><b>Sorting:</b> The resulting list is sorted in descending order by skill level:
+     *       <ul>
+     *          <li>When the skill is {@code S_TECH}, sorting is based on the person's best technical skill level.</li>
+     *          <li>For other skills, sorting is based on the level of the specified skill.</li>
+     *       </ul>
+     *   </li>
+     * </ul>
+     *
+     * @return A {@link List} of {@link Person} objects who are eligible and sorted to perform
+     *         logistical actions, or an empty list if acquisitions automatically succeed.
      */
     public List<Person> getLogisticsPersonnel() {
-        String skill = getCampaignOptions().getAcquisitionSkill();
-        if (skill.equals(CampaignOptions.S_AUTO)) {
+        final String skill = getCampaignOptions().getAcquisitionSkill();
+
+        if (skill.equals(S_AUTO)) {
             return Collections.emptyList();
         } else {
+            final int maxAcquisitions = campaignOptions.getMaxAcquisitions();
+            final ProcurementPersonnelPick acquisitionCategory = campaignOptions.getAcquisitionPersonnelCategory();
             List<Person> logisticsPersonnel = new ArrayList<>();
-            int maxAcquisitions = getCampaignOptions().getMaxAcquisitions();
-            for (Person p : getActivePersonnel()) {
-                if (getCampaignOptions().isAcquisitionSupportStaffOnly() && !p.hasSupportRole(true)) {
+
+            for (Person person : getActivePersonnel()) {
+                if (isIneligibleToPerformProcurement(person, acquisitionCategory)) {
                     continue;
                 }
-                if ((maxAcquisitions > 0) && (p.getAcquisitions() >= maxAcquisitions)) {
+
+                if ((maxAcquisitions > 0) && (person.getAcquisitions() >= maxAcquisitions)) {
                     continue;
                 }
-                if (skill.equals(CampaignOptions.S_TECH)) {
-                    if (null != p.getBestTechSkill()) {
-                        logisticsPersonnel.add(p);
+                if (skill.equals(S_TECH)) {
+                    if (null != person.getBestTechSkill()) {
+                        logisticsPersonnel.add(person);
                     }
-                } else if (p.hasSkill(skill)) {
-                    logisticsPersonnel.add(p);
+                } else if (person.hasSkill(skill)) {
+                    logisticsPersonnel.add(person);
                 }
             }
 
             // Sort by their skill level, descending.
             logisticsPersonnel.sort((a, b) -> {
-                if (skill.equals(CampaignOptions.S_TECH)) {
+                if (skill.equals(S_TECH)) {
                     return Integer.compare(b.getBestTechSkill().getLevel(), a.getBestTechSkill().getLevel());
                 } else {
                     return Integer.compare(b.getSkill(skill).getLevel(), a.getSkill(skill).getLevel());
@@ -3437,7 +3536,7 @@ public class Campaign implements ITechManager {
             shoppingItem.decrementDaysToWait();
         }
 
-        if (getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
+        if (getCampaignOptions().getAcquisitionSkill().equals(S_AUTO)) {
             return goShoppingAutomatically(sList);
         } else if (!getCampaignOptions().isUsePlanetaryAcquisition()) {
             return goShoppingStandard(sList);
@@ -4043,7 +4142,8 @@ public class Campaign implements ITechManager {
             theRefit.addTimeSpent(tech.getMinutesLeft());
             tech.setMinutesLeft(0);
             report = report + ", " + theRefit.getTimeLeft() + " minutes left. Completion ";
-            int daysLeft = (int) Math.ceil((double) theRefit.getTimeLeft() / (double) tech.getDailyAvailableTechTime());
+            int daysLeft = (int) Math.ceil((double) theRefit.getTimeLeft() /
+                                                 (double) tech.getDailyAvailableTechTime(campaignOptions.isTechsUseAdministration()));
             if (daysLeft == 1) {
                 report += " tomorrow.</b>";
             } else {
@@ -4086,7 +4186,7 @@ public class Campaign implements ITechManager {
                         refit(theRefit);
                         report += " Completion ";
                         int daysLeft = (int) Math.ceil((double) theRefit.getTimeLeft() /
-                                                             (double) tech.getDailyAvailableTechTime());
+                                                             (double) tech.getDailyAvailableTechTime(campaignOptions.isTechsUseAdministration()));
                         if (daysLeft == 1) {
                             report += " tomorrow.</b>";
                         } else {
@@ -4222,10 +4322,11 @@ public class Campaign implements ITechManager {
                 report += " - <b>";
                 report += partWork.getTimeLeft();
                 report += " minutes left. Work";
-                if ((minutesUsed > 0) && (tech.getDailyAvailableTechTime() > 0)) {
+                if ((minutesUsed > 0) &&
+                          (tech.getDailyAvailableTechTime(campaignOptions.isTechsUseAdministration()) > 0)) {
                     report += " will be finished ";
                     int daysLeft = (int) Math.ceil((double) partWork.getTimeLeft() /
-                                                         (double) tech.getDailyAvailableTechTime());
+                                                         (double) tech.getDailyAvailableTechTime(campaignOptions.isTechsUseAdministration()));
                     if (daysLeft == 1) {
                         report += " tomorrow.</b>";
                     } else {
@@ -4511,23 +4612,15 @@ public class Campaign implements ITechManager {
                             return;
                         }
 
-                        final boolean stub = StratconRulesManager.processIgnoredScenario((AtBDynamicScenario) scenario,
-                              campaignState);
+                        processIgnoredDynamicScenario(scenario.getId(), campaignState);
 
-                        if (stub) {
-                            ScenarioType scenarioType = scenario.getStratConScenarioType();
-                            if (scenarioType.isSpecial()) {
-                                campaignState.updateVictoryPoints(-1);
-                            }
-
-                            if (scenarioType.isResupply()) {
-                                processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
-                            }
-
-                            scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
-                        } else {
-                            scenario.clearAllForcesAndPersonnel(this);
+                        ScenarioType scenarioType = scenario.getStratConScenarioType();
+                        if (scenarioType.isResupply()) {
+                            processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
                         }
+
+                        scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
+                        scenario.clearAllForcesAndPersonnel(this);
                     } else {
                         scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
                         contract.addPlayerMinorBreach();
@@ -4770,6 +4863,9 @@ public class Campaign implements ITechManager {
         }
 
         // Process personnel
+        int peopleWhoCelebrateCommandersDay = 0;
+        int commanderDayTargetNumber = 5;
+        boolean isCommandersDay = isCommandersDay(currentDay) && getFlaggedCommander() != null;
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
@@ -4793,7 +4889,7 @@ public class Campaign implements ITechManager {
                 }
             }
 
-            person.resetMinutesLeft();
+            person.resetMinutesLeft(campaignOptions.isTechsUseAdministration());
             person.setAcquisition(0);
 
             processAdvancedMedicalEvents(person);
@@ -4824,6 +4920,13 @@ public class Campaign implements ITechManager {
                     }
                 }
             }
+
+            if (isCommandersDay && !faction.isClan() && (peopleWhoCelebrateCommandersDay < commanderDayTargetNumber)) {
+                int age = person.getAge(currentDay);
+                if (age >= 6 && age <= 12) {
+                    peopleWhoCelebrateCommandersDay++;
+                }
+            }
         }
 
         if (!personnelWhoAdvancedInXP.isEmpty()) {
@@ -4831,6 +4934,11 @@ public class Campaign implements ITechManager {
                   spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                   personnelWhoAdvancedInXP.size(),
                   CLOSING_SPAN_TAG));
+        }
+
+        // Commander's Day!
+        if (isCommandersDay && (peopleWhoCelebrateCommandersDay >= commanderDayTargetNumber)) {
+            new CommandersDayAnnouncement(this);
         }
 
         // Update the force icons based on the end-of-day unit status if desired
@@ -4957,9 +5065,9 @@ public class Campaign implements ITechManager {
      * @param person The {@link Person} for whom the anniversaries will be processed
      */
     private void processAnniversaries(Person person) {
+        LocalDate birthday = person.getBirthday(getGameYear());
         if ((person.getRank().isOfficer()) || (!getCampaignOptions().isAnnounceOfficersOnly())) {
-            if ((person.getBirthday(getGameYear()).isEqual(getLocalDate())) &&
-                      (campaignOptions.isAnnounceBirthdays())) {
+            if (birthday.isEqual(currentDay) && campaignOptions.isAnnounceBirthdays()) {
                 addReport(String.format(resources.getString("anniversaryBirthday.text"),
                       person.getHyperlinkedFullTitle(),
                       ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions()
@@ -4973,7 +5081,7 @@ public class Campaign implements ITechManager {
                 LocalDate recruitmentAnniversary = recruitmentDate.withYear(getGameYear());
                 int yearsOfEmployment = (int) ChronoUnit.YEARS.between(recruitmentDate, currentDay);
 
-                if ((recruitmentAnniversary.isEqual(getLocalDate())) &&
+                if ((recruitmentAnniversary.isEqual(currentDay)) &&
                           (campaignOptions.isAnnounceRecruitmentAnniversaries())) {
                     addReport(String.format(resources.getString("anniversaryRecruitment.text"),
                           person.getHyperlinkedFullTitle(),
@@ -4985,13 +5093,19 @@ public class Campaign implements ITechManager {
                 }
             }
         } else if ((person.getAge(getLocalDate()) == 18) && (campaignOptions.isAnnounceChildBirthdays())) {
-            if (person.getBirthday(getGameYear()).isEqual(getLocalDate())) {
+            if (birthday.isEqual(currentDay)) {
                 addReport(String.format(resources.getString("anniversaryBirthday.text"),
                       person.getHyperlinkedFullTitle(),
                       ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions()
                                                                           .getFontColorPositiveHexColor()),
                       person.getAge(getLocalDate()),
                       CLOSING_SPAN_TAG));
+            }
+        }
+
+        if (campaignOptions.isShowLifeEventDialogComingOfAge()) {
+            if ((person.getAge(currentDay) == 16) && (birthday.isEqual(currentDay))) {
+                new ComingOfAgeAnnouncement(this, person);
             }
         }
     }
@@ -5065,7 +5179,7 @@ public class Campaign implements ITechManager {
             try {
                 u.resetEngineer();
                 if (null != u.getEngineer()) {
-                    u.getEngineer().resetMinutesLeft();
+                    u.getEngineer().resetMinutesLeft(campaignOptions.isTechsUseAdministration());
                 }
 
                 doMaintenance(u);
@@ -5223,6 +5337,11 @@ public class Campaign implements ITechManager {
         final LocalDate yesterday = currentDay;
         currentDay = currentDay.plusDays(1);
 
+        // Check for important dates
+        if (campaignOptions.isShowLifeEventDialogCelebrations()) {
+            fetchCelebrationDialogs();
+        }
+
         // Determine if we have an active contract or not, as this can get used
         // elsewhere before we actually hit the AtB new day (e.g., personnel market)
         if (campaignOptions.isUseAtB()) {
@@ -5255,7 +5374,6 @@ public class Campaign implements ITechManager {
         // TODO : AbstractContractMarket : Uncomment
         // getContractMarket().processNewDay(this);
         unitMarket.processNewDay(this);
-
 
         updateFieldKitchenCapacity();
 
@@ -5330,6 +5448,28 @@ public class Campaign implements ITechManager {
         // This must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
+    }
+
+    /**
+     * Fetches and handles the celebration dialogs specific to the current day.
+     *
+     * <p><b>Note:</b> Commanders day is handled as a part of the personnel processing, so we don't need to parse
+     * personnel twice.</p>
+     */
+    private void fetchCelebrationDialogs() {
+        if (!faction.isClan()) {
+            if (isWinterHolidayMajorDay(currentDay)) {
+                new WinterHolidayAnnouncement(this);
+            }
+
+            if (isFreedomDay(currentDay)) {
+                new FreedomDayAnnouncement(this);
+            }
+        }
+
+        if (isNewYear(currentDay)) {
+            new NewYearsDayAnnouncement(this);
+        }
     }
 
     /**
@@ -7298,9 +7438,8 @@ public class Campaign implements ITechManager {
      * @return a {@link TargetRoll} object representing the roll required to successfully acquire the requested item, or
      *       an impossible/automatic result under specific circumstances.
      */
-    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition, final @Nullable Person person,
-                                              final boolean checkDaysToWait) {
-        if (getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
+    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition, final @Nullable Person person, final boolean checkDaysToWait) {
+        if (getCampaignOptions().getAcquisitionSkill().equals(S_AUTO)) {
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "Automatic Success");
         }
 
@@ -9007,6 +9146,7 @@ public class Campaign implements ITechManager {
         atbEventProcessor.shutdown();
     }
 
+    @Deprecated(forRemoval = true, since = "0.50.05")
     public boolean checkOverDueLoans() {
         Money overdueAmount = getFinances().checkOverdueLoanPayments(this);
         if (overdueAmount.isPositive()) {

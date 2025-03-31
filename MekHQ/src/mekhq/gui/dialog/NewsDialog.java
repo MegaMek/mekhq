@@ -27,19 +27,23 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.awt.Component;
+import java.awt.Dimension;
+import java.util.List;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
-
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * NewsDialog is a dialog window for displaying news items within the context of a campaign. It includes information
@@ -72,6 +76,7 @@ public class NewsDialog extends ImmersiveDialogCore {
               null,
               UIUtil.scaleForGUI(400),
               false,
+              null,
               null,
               true);
     }
@@ -113,7 +118,7 @@ public class NewsDialog extends ImmersiveDialogCore {
         // Get Network image
         String networkImage = NETWORK.imageAddress;
         ImageIcon networkIcon = new ImageIcon(networkImage);
-        networkIcon = scaleImageIconToWidth(networkIcon, IMAGE_WIDTH);
+        networkIcon = scaleImageIcon(networkIcon, IMAGE_WIDTH, true);
 
         JLabel imageLabel = new JLabel();
         imageLabel.setIcon(networkIcon);

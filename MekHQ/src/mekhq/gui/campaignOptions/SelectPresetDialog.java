@@ -28,7 +28,7 @@
 package mekhq.gui.campaignOptions;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import static mekhq.utilities.ImageUtilities.scaleImageIcon;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -98,7 +98,7 @@ public class SelectPresetDialog extends JDialog {
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
         ImageIcon imageIcon = new ImageIcon("data/images/misc/megamek-splash.png");
-        imageIcon = scaleImageIconToWidth(imageIcon, UIUtil.scaleForGUI(400));
+        imageIcon = scaleImageIcon(imageIcon, 400, true);
 
         JLabel imageLabel = new JLabel(imageIcon);
         add(imageLabel, BorderLayout.NORTH);
@@ -124,7 +124,8 @@ public class SelectPresetDialog extends JDialog {
 
         DefaultListCellRenderer listRenderer = new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                                                          boolean cellHasFocus) {
                 if (value instanceof CampaignPreset preset) {
                     setText(preset.getTitle());
                 }
@@ -241,7 +242,8 @@ public class SelectPresetDialog extends JDialog {
      *
      * @return The converted {@link DefaultComboBoxModel}.
      */
-    private DefaultComboBoxModel<CampaignPreset> convertPresetListModelToComboBoxModel(DefaultListModel<CampaignPreset> listModel) {
+    private DefaultComboBoxModel<CampaignPreset> convertPresetListModelToComboBoxModel(
+          DefaultListModel<CampaignPreset> listModel) {
 
         // Create a new DefaultComboBoxModel
         DefaultComboBoxModel<CampaignPreset> comboBoxModel = new DefaultComboBoxModel<>();
