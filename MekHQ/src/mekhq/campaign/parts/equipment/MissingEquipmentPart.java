@@ -209,28 +209,35 @@ public class MissingEquipmentPart extends MissingPart {
     }
 
     /**
-     * Determines whether the attributes of the given {@link EquipmentPart} objects match. The comparison includes type,
-     * tonnage, size, and unit tonnage.
+     * Compares the attributes of two {@link EquipmentPart} objects to determine if they match. The comparison includes
+     * the type, tonnage, size, unit tonnage, and omni-podded status.
      *
-     * <p>Attributes compared:</p>
+     * <p><b>Attributes compared:</b></p>
      * <ul>
-     *   <li><b>Type:</b> Ensures the types of both equipment parts are the same using {@code getType()}.</li>
-     *   <li><b>Tonnage:</b> Compares their total tonnage values using {@code getTonnage()}.</li>
-     *   <li><b>Size:</b> Checks that the sizes of both parts match using {@code getSize()}.</li>
-     *   <li><b>Unit Tonnage:</b> Ensures their individual unit tonnage values match using {@code getUnitTonnage()}. This
-     *       comparison is critical, as unit tonnage determines the compatibility of equipment with a target unit and
-     *       prevents issues arising from interchangeable but incompatible parts.</li>
+     *   <li><b>Type:</b> Compares the equipment type of both parts using {@link EquipmentPart#getType()}.</li>
+     *   <li><b>Tonnage:</b> Ensures the total tonnage values of the parts match using {@link EquipmentPart#getTonnage()}.</li>
+     *   <li><b>Size:</b> Checks the physical size of the parts using {@link EquipmentPart#getSize()}.</li>
+     *   <li><b>Omni-Podded:</b> Verifies if both parts have the same omni-podded status.</li>
+     *   <li><b>Unit Tonnage:</b> For equipment where cost and compatibility are variable based on unit tonnage,
+     *   checks if the unit tonnage values match.</li>
      * </ul>
      *
-     * @param equipmentPart the {@link EquipmentPart} used as the reference for comparison.
-     * @param newPart       the {@link EquipmentPart} whose attributes will be checked against the reference.
+     * <p><b>Special Handling:</b></p>
+     * If the {@code EquipmentType} is an instance of {@link MiscType} and its cost is variable (determined by
+     * {@link MiscType#isCostVariable()}), the comparison will include the unit tonnage values of the equipment
+     * parts, as these affect compatibility with specific units.
      *
-     * @return {@code true} if all attributes (type, tonnage, size, and unit tonnage) match; otherwise, {@code false}.
+     * @param equipmentPart the {@link EquipmentPart} used as the baseline for comparison.
+     * @param newPart       the {@link EquipmentPart} whose attributes will be compared to the reference part.
+     *
+     * @return {@code true} if all attributes (type, tonnage, size, omni-podded status, and unit tonnage) match;
+     *       otherwise, {@code false}.
      */
     private boolean checkAttributesMatch(EquipmentPart equipmentPart, EquipmentPart newPart) {
         boolean typeMatches = getType().equals(equipmentPart.getType());
         boolean tonnageMatches = newPart.getTonnage() == equipmentPart.getTonnage();
         boolean sizeMatches = newPart.getSize() == equipmentPart.getSize();
+        boolean omniPoddedMatches = newPart.isOmniPodded() == equipmentPart.isOmniPodded();
 
         // According to official answer, if target unit tonnage differs, the item cannot be attached to a unit, even
         // if the equipment weight matches. The example in the below thread is a Mek Lance, the weight of which is
@@ -239,9 +246,15 @@ public class MissingEquipmentPart extends MissingPart {
         // a fixed sticker price of 0 C-Bills, which meant users were completely unable to replace those parts if
         // they were ever completely destroyed or removed. Now we compare unit tonnage.
         // https://bg.battletech.com/forums/index.php/topic,14741.msg340122.html#msg340122
-        boolean unitTonnageMatches = newPart.getUnitTonnage() == equipmentPart.getUnitTonnage();
+        boolean unitTonnageMatches = true;
+        EquipmentType equipmentType = equipmentPart.getType();
+        if (equipmentType instanceof MiscType) {
+            if (((MiscType) equipmentType).isCostVariable()) {
+                unitTonnageMatches = newPart.getUnitTonnage() == equipmentPart.getUnitTonnage();
+            }
+        }
 
-        return typeMatches && tonnageMatches && sizeMatches && unitTonnageMatches;
+        return typeMatches && tonnageMatches && sizeMatches && omniPoddedMatches && unitTonnageMatches;
     }
 
     protected @Nullable Mounted<?> getMounted() {
