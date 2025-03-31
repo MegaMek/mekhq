@@ -83,7 +83,7 @@
         <curriculum>Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Medical Apprenticeship</qualification>
-        <curriculum>MedTech, Doctor</curriculum>
+        <curriculum>MedTech, Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
@@ -118,7 +118,7 @@
         <curriculum>Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Medical Apprenticeship</qualification>
-        <curriculum>MedTech, Doctor</curriculum>
+        <curriculum>MedTech, Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>

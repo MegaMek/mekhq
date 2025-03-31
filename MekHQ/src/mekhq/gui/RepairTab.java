@@ -56,6 +56,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.MekView;
 import megamek.common.TargetRoll;
+import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -544,15 +545,22 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     @Override
-    public Person getSelectedTech() {
-        assert techTable != null;
-
-        int row = techTable.getSelectedRow();
-        if (row < 0) {
+    public @Nullable Person getSelectedTech() {
+        if (techTable == null) {
+            logger.error(new IllegalStateException(), "Tech table is not initialized.");
             return null;
         }
 
-        assert techsModel != null;
+        int row = techTable.getSelectedRow();
+        if (row < 0) {
+            return null; // No row is selected
+        }
+
+        if (techsModel == null) {
+            logger.error(new IllegalStateException(), "Tech model is not initialized.");
+            return null;
+        }
+
         return techsModel.getTechAt(techTable.convertRowIndexToModel(row));
     }
 
@@ -758,7 +766,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 } else if (tech.getMinutesLeft() <= 0) {
                     return false;
                 } else {
-                    return getCampaignOptions().isDestroyByMargin() ||
+                    return getCampaign().getCampaignOptions().isDestroyByMargin() ||
                                  (part.getSkillMin() <= (skill.getExperienceLevel() - modePenalty));
                 }
             }
@@ -855,13 +863,47 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         }
     }
 
+    /**
+     * Refreshes the list of technicians displayed in the techTable, updates their details, and ensures a valid row
+     * selection is maintained after any data changes.
+     *
+     * <p>This method performs the following steps:</p>
+     * <ul>
+     *   <li>Retrieves the selected row from the table prior to any updates.</li>
+     *   <li>Fetches the updated list of technicians who are available for work, sorted by skill
+     *       (with elites appearing at the bottom).</li>
+     *   <li>Updates the `techsModel` with the new list of technicians, and re-applies the row
+     *       filter through the `filterTechs()` method to ensure only valid rows are displayed.</li>
+     *   <li>Updates the AsTech pool statistics (minutes, overtime availability, and Astech count)
+     *       in the UI label.</li>
+     *   <li>Ensures the table selection is consistent after the updates:
+     *       <ul>
+     *         <li>If campaign options specify resetting to the first row, the first row is selected
+     *             (if it exists).</li>
+     *         <li>If a previously selected technician (`selectedTech`) is still valid, it is re-selected.</li>
+     *         <li>If the previously selected row index is still valid after updates, it is re-selected.</li>
+     *         <li>Otherwise, the row selection is cleared.</li>
+     *       </ul>
+     *   </li>
+     * </ul>
+     *
+     * <p><b>Edge case handling:</b></p>
+     * <ul>
+     *   <li>If the table's row count changes (due to filtering or updating), the previously
+     *       selected index and technician are checked for validity before re-selecting.</li>
+     *   <li>If the table becomes empty after filtering or updating, the selection is safely cleared.</li>
+     * </ul>
+     *
+     * @throws IllegalArgumentException if an invalid row index is provided to the selection methods. This exception is
+     *                                  prevented by validating indices against updated row counts.
+     */
     public void refreshTechsList() {
         int selected = techTable.getSelectedRow();
-        // The next gets all techs who have more than 0 minutes free, and sorted by
-        // skill descending (elites at bottom)
+        // Get all techs who have more than 0 minutes free, and sort by skill descending (elites at bottom)
         List<Person> techs = getCampaign().getTechs(true);
         techsModel.setData(techs);
         filterTechs();
+
         String astechString = "<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes();
         if (getCampaign().isOvertimeAllowed()) {
             astechString += " [" + getCampaign().getAstechPoolOvertime() + " overtime]";
@@ -869,20 +911,29 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         astechString += " (" + getCampaign().getNumberAstechs() + " Astechs)</html>";
         astechPoolLabel.setText(astechString);
 
-        // If requested, switch to top entry
+        // Ensuring valid row selection after refresh
         if (getCampaignOptions().isResetToFirstTech() && (techTable.getRowCount() > 0)) {
+            // Double-check the row count and safely select the first row
             techTable.setRowSelectionInterval(0, 0);
         } else if (selectedTech != null) {
-            // Or get the selected tech back
+            // If a specific tech was selected, try to match it
+            boolean techFound = false;
             for (int i = 0; i < techTable.getRowCount(); i++) {
-                Person p = techsModel.getTechAt(techTable.convertRowIndexToModel(i));
-                if (selectedTech.equals(p)) {
+                Person person = techsModel.getTechAt(techTable.convertRowIndexToModel(i));
+                if (selectedTech.equals(person)) {
                     techTable.setRowSelectionInterval(i, i);
+                    techFound = true;
                     break;
                 }
             }
-        } else if ((selected > -1) && (selected < techs.size())) {
+            if (!techFound) {
+                techTable.clearSelection(); // Clear selection if tech is no longer in the table
+            }
+        } else if ((selected >= 0) && (selected < techTable.getRowCount())) {
+            // Ensure selected index is valid after table updates
             techTable.setRowSelectionInterval(selected, selected);
+        } else {
+            techTable.clearSelection(); // Clear selection if there's no valid option
         }
     }
 
