@@ -42,6 +42,7 @@ import static mekhq.campaign.personnel.SkillType.S_DOCTOR;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
+import static mekhq.campaign.personnel.enums.education.EducationLevel.DOCTORATE;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 
@@ -140,6 +141,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_BEGIN_EDUCATION_RE_ENROLLMENT = "BEGIN_EDUCATION_RE_ENROLLMENT";
     private static final String CMD_COMPLETE_STAGE = "COMPLETE_STAGE";
     private static final String CMD_DROP_OUT = "DROP_OUT";
+    private static final String CMD_CHANGE_EDUCATION_LEVEL = "CHANGE_EDUCATION_LEVEL";
 
     private static final String CMD_EDIT_SALARY = "SALARY";
     private static final String CMD_GIVE_PAYMENT = "GIVE_PAYMENT";
@@ -159,6 +161,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_BUY_EDGE = "EDGE_BUY";
     private static final String CMD_SET_EDGE = "EDGE_SET";
     private static final String CMD_SET_XP = "XP_SET";
+    /**
+     * @deprecated use {@code CMD_ADD_XP} instead
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     private static final String CMD_ADD_1_XP = "XP_ADD_1";
     private static final String CMD_ADD_XP = "XP_ADD";
     private static final String CMD_EDIT_BIOGRAPHY = "BIOGRAPHY";
@@ -505,6 +511,26 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     autoAwardsController.PostGraduationController(getCampaign(),
                           graduatingPersonnel,
                           academyAttributesMap);
+                }
+                break;
+            }
+            case CMD_CHANGE_EDUCATION_LEVEL: {
+                EducationLevel educationLevel = EducationLevel.fromString(data[1]);
+
+                for (Person person : people) {
+                    person.setEduHighestEducation(educationLevel);
+
+                    if (educationLevel == DOCTORATE) {
+                        if (person.getPreNominal() == null || person.getPreNominal().isBlank()) {
+                            person.setPreNominal(resources.getString("eduDoctorPrenominal.text"));
+                        }
+                    } else {
+                        if (person.getPreNominal().equals(resources.getString("eduDoctorPrenominal.text"))) {
+                            person.setPreNominal("");
+                        }
+                    }
+
+                    MekHQ.triggerEvent(new PersonStatusChangedEvent(person));
                 }
                 break;
             }
@@ -928,13 +954,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 if (tad.wasChanged()) {
                     selectedPerson.setBiography(tad.getText());
                     MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
-                }
-                break;
-            }
-            case CMD_ADD_1_XP: {
-                for (Person person : people) {
-                    person.awardXP(getCampaign(), 1);
-                    MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
             }
@@ -2151,6 +2170,20 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 academyMenu.add(completeStage);
             }
 
+            if (campaign.isGM()) {
+                JMenu changeEducation = new JMenu(resources.getString("eduChangeEducation.text"));
+                changeEducation.setToolTipText(resources.getString("eduChangeEducation.toolTip"));
+                academyMenu.add(changeEducation);
+
+                for (EducationLevel level : EducationLevel.values()) {
+                    JMenuItem educationLevel = new JMenuItem(level.toString());
+                    educationLevel.setToolTipText(level.getToolTipText());
+                    educationLevel.setActionCommand(makeCommand(CMD_CHANGE_EDUCATION_LEVEL + '@' + level.name()));
+                    educationLevel.addActionListener(this);
+                    changeEducation.add(educationLevel);
+                }
+            }
+
             popup.add(academyMenu);
         }
         // endregion Education Menu
@@ -3239,11 +3272,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
             }
-
-            menuItem = new JMenuItem(resources.getString("add1XP.text"));
-            menuItem.setActionCommand(CMD_ADD_1_XP);
-            menuItem.addActionListener(this);
-            menu.add(menuItem);
 
             menuItem = new JMenuItem(resources.getString("addXP.text"));
             menuItem.setActionCommand(CMD_ADD_XP);

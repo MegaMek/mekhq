@@ -105,6 +105,7 @@ public class BiographyTab {
     private JCheckBox chkAnnounceChildBirthdays;
     private JCheckBox chkAnnounceRecruitmentAnniversaries;
     private JPanel pnlLifeEvents;
+    private JCheckBox chkShowLifeEventDialogBirths;
     private JCheckBox chkShowLifeEventDialogComingOfAge;
     //end General Tab
 
@@ -368,6 +369,7 @@ public class BiographyTab {
         chkAnnounceRecruitmentAnniversaries = new JCheckBox();
 
         pnlLifeEvents = new JPanel();
+        chkShowLifeEventDialogBirths = new JCheckBox();
         chkShowLifeEventDialogComingOfAge = new JCheckBox();
     }
 
@@ -499,6 +501,22 @@ public class BiographyTab {
 
         layoutParent.gridy++;
         panel.add(chkAnnounceChildBirthdays, layoutParent);
+
+        return panel;
+    }
+
+    private JPanel createLifeEventsPanel() {
+        // Contents
+        chkShowLifeEventDialogBirths = new CampaignOptionsCheckBox("ShowLifeEventDialogBirths");
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("LifeEventsPanel", true, "LifeEventsPanel");
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
+
+        layoutParent.gridwidth = 5;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panel.add(chkShowLifeEventDialogBirths, layoutParent);
 
         return panel;
     }
@@ -1356,6 +1374,7 @@ public class BiographyTab {
         chkAnnounceBirthdays.setSelected(options.isAnnounceBirthdays());
         chkAnnounceChildBirthdays.setSelected(options.isAnnounceChildBirthdays());
         chkAnnounceRecruitmentAnniversaries.setSelected(options.isAnnounceRecruitmentAnniversaries());
+        chkShowLifeEventDialogBirths.setSelected(options.isShowLifeEventDialogBirths());
         chkShowLifeEventDialogComingOfAge.setSelected(options.isShowLifeEventDialogComingOfAge());
 
         // Backgrounds
@@ -1445,6 +1464,7 @@ public class BiographyTab {
         options.setAnnounceBirthdays(chkAnnounceBirthdays.isSelected());
         options.setAnnounceChildBirthdays(chkAnnounceChildBirthdays.isSelected());
         options.setAnnounceRecruitmentAnniversaries(chkAnnounceRecruitmentAnniversaries.isSelected());
+        options.setShowLifeEventDialogBirths(chkShowLifeEventDialogBirths.isSelected());
         options.setShowLifeEventDialogComingOfAge(chkShowLifeEventDialogComingOfAge.isSelected());
 
         // Backgrounds

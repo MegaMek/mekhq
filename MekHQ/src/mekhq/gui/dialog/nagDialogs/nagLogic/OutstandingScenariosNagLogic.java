@@ -130,14 +130,14 @@ public class OutstandingScenariosNagLogic {
                               stratconScenario.getCoords().toBTString(),
                               addendum));
                     }
+                } else {
+                    // Add non-track scenarios
+                    activeScenarios.append("<p>- ")
+                          .append("<b>")
+                          .append(scenario.getName())
+                          .append("</b>, ")
+                          .append(contract.getName());
                 }
-
-                // Add non-track scenarios
-                activeScenarios.append("<p>- ")
-                      .append("<b>")
-                      .append(scenario.getName())
-                      .append("</b>, ")
-                      .append(contract.getName());
             }
         }
 

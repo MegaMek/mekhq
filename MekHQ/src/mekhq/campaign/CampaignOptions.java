@@ -30,6 +30,8 @@ package mekhq.campaign;
 
 import static megamek.common.TechConstants.getSimpleLevel;
 import static megamek.common.options.OptionsConstants.*;
+import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.ALL;
+import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.SUPPORT;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -64,6 +66,7 @@ import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.service.mrms.MRMSOption;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -124,6 +127,7 @@ public class CampaignOptions {
     private boolean useEraMods;
     private boolean assignedTechFirst;
     private boolean resetToFirstTech;
+    private boolean techsUseAdministration;
     private boolean useQuirks;
     private boolean useAeroSystemHits;
     private boolean destroyByMargin;
@@ -157,12 +161,12 @@ public class CampaignOptions {
 
     // region Supplies and Acquisition Tab
     // Acquisition
-    private int waitingPeriod;
-    private String acquisitionSkill;
-    private boolean acquisitionSupportStaffOnly;
-    private int clanAcquisitionPenalty;
-    private int isAcquisitionPenalty;
-    private int maxAcquisitions;
+    private int     waitingPeriod;
+    private String  acquisitionSkill;
+    private ProcurementPersonnelPick acquisitionPersonnelCategory;
+    private int     clanAcquisitionPenalty;
+    private int     isAcquisitionPenalty;
+    private int     maxAcquisitions;
 
     // autoLogistics
     private int autoLogisticsHeatSink;
@@ -249,6 +253,7 @@ public class CampaignOptions {
     private boolean useRandomHitsForVehicles;
     private boolean tougherHealing;
     private int maximumPatients;
+    private boolean doctorsUseAdministration;
 
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
@@ -313,6 +318,7 @@ public class CampaignOptions {
     private boolean announceChildBirthdays;
 
     // Life Events
+    private boolean showLifeEventDialogBirths;
     private boolean showLifeEventDialogComingOfAge;
 
     // Marriage
@@ -552,12 +558,12 @@ public class CampaignOptions {
 
     // Contract Market
     private ContractMarketMethod contractMarketMethod;
-    private int contractSearchRadius;
-    private boolean variableContractLength;
+    private int                  contractSearchRadius;
+    private boolean              variableContractLength;
     private boolean useDynamicDifficulty;
-    private boolean contractMarketReportRefresh;
-    private int contractMaxSalvagePercentage;
-    private int dropShipBonusPercentage;
+    private boolean              contractMarketReportRefresh;
+    private int                  contractMaxSalvagePercentage;
+    private int                  dropShipBonusPercentage;
     // endregion Markets Tab
 
     // region RATs Tab
@@ -638,8 +644,9 @@ public class CampaignOptions {
         // Repair
         useEraMods = false;
         assignedTechFirst = false;
-        resetToFirstTech = false;
-        useQuirks = false;
+        resetToFirstTech  = false;
+        techsUseAdministration = false;
+        useQuirks         = false;
         useAeroSystemHits = false;
         destroyByMargin = false;
         destroyMargin = 4;
@@ -675,12 +682,12 @@ public class CampaignOptions {
 
         // region Supplies and Acquisitions Tab
         // Acquisition
-        waitingPeriod = 7;
-        acquisitionSkill = S_TECH;
-        acquisitionSupportStaffOnly = true;
-        clanAcquisitionPenalty = 0;
-        isAcquisitionPenalty = 0;
-        maxAcquisitions = 0;
+        waitingPeriod               = 7;
+        acquisitionSkill            = S_TECH;
+        acquisitionPersonnelCategory = SUPPORT;
+        clanAcquisitionPenalty      = 0;
+        isAcquisitionPenalty        = 0;
+        maxAcquisitions             = 0;
 
         // autoLogistics
         autoLogisticsHeatSink = 50;
@@ -786,6 +793,7 @@ public class CampaignOptions {
         setUseRandomHitsForVehicles(false);
         setTougherHealing(false);
         setMaximumPatients(25);
+        setDoctorsUseAdministration(false);
 
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.NONE);
@@ -887,6 +895,7 @@ public class CampaignOptions {
         setAnnounceChildBirthdays(true);
 
         // Life Events
+        setShowLifeEventDialogBirths(true);
         setShowLifeEventDialogComingOfAge(true);
 
         // Marriage
@@ -1859,6 +1868,15 @@ public class CampaignOptions {
     public void setMaximumPatients(final int maximumPatients) {
         this.maximumPatients = maximumPatients;
     }
+
+    public boolean isDoctorsUseAdministration() {
+        return doctorsUseAdministration;
+    }
+
+    public void setDoctorsUseAdministration(final boolean doctorsUseAdministration) {
+        this.doctorsUseAdministration = doctorsUseAdministration;
+    }
+
     // endregion Medical
 
     // region Prisoners
@@ -2259,7 +2277,15 @@ public class CampaignOptions {
     }
     // endregion anniversaries
 
-    //startregion Life Events
+    //startregionn Life Events
+    public boolean isShowLifeEventDialogBirths() {
+        return showLifeEventDialogBirths;
+    }
+
+    public void setShowLifeEventDialogBirths(final boolean showLifeEventDialogBirths) {
+        this.showLifeEventDialogBirths = showLifeEventDialogBirths;
+    }
+
     public boolean isShowLifeEventDialogComingOfAge() {
         return showLifeEventDialogComingOfAge;
     }
@@ -3633,6 +3659,31 @@ public class CampaignOptions {
     }
 
     /**
+     * Checks whether administrative adjustments are applied for technician time calculations.
+     *
+     * <p>This configuration determines if technicians' daily available time should be adjusted
+     * using administrative multipliers in relevant calculations.</p>
+     *
+     * @return {@code true} if administrative adjustments are enabled for technicians, {@code false} otherwise.
+     */
+    public boolean isTechsUseAdministration() {
+        return techsUseAdministration;
+    }
+
+    /**
+     * Sets whether administrative adjustments should be applied to technician time calculations.
+     *
+     * <p>Enabling this setting applies administrative multipliers to modify technicians' daily available time
+     * in relevant calculations.</p>
+     *
+     * @param techsUseAdministration {@code true} to enable administrative adjustments for technicians, {@code false} to
+     *                               disable them.
+     */
+    public void setTechsUseAdministration(final boolean techsUseAdministration) {
+        this.techsUseAdministration = techsUseAdministration;
+    }
+
+    /**
      * @return true to use the origin faction for personnel names instead of a set faction
      */
     public boolean isUseOriginFactionForNames() {
@@ -3939,12 +3990,59 @@ public class CampaignOptions {
         this.acquisitionSkill = acquisitionSkill;
     }
 
+    /**
+     * @deprecated Use {@link #isAcquisitionPersonnelCategory(ProcurementPersonnelPick)} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public boolean isAcquisitionSupportStaffOnly() {
-        return acquisitionSupportStaffOnly;
+        return acquisitionPersonnelCategory == SUPPORT;
     }
 
+    /**
+     * @deprecated Use {@link #setAcquisitionPersonnelCategory(ProcurementPersonnelPick)} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public void setAcquisitionSupportStaffOnly(final boolean acquisitionSupportStaffOnly) {
-        this.acquisitionSupportStaffOnly = acquisitionSupportStaffOnly;
+        this.acquisitionPersonnelCategory = acquisitionSupportStaffOnly ? SUPPORT : ALL;
+    }
+
+    /**
+     * Checks if the acquisition personnel category matches a specified category.
+     *
+     * @param category The {@link ProcurementPersonnelPick} category to check against.
+     *
+     * @return {@code true} if the current acquisition personnel category matches the specified category, {@code false}
+     *       otherwise.
+     */
+    public boolean isAcquisitionPersonnelCategory(ProcurementPersonnelPick category) {
+        return acquisitionPersonnelCategory == category;
+    }
+
+    /**
+     * Retrieves the current acquisition personnel category.
+     *
+     * <p>This method returns the {@link ProcurementPersonnelPick} value assigned to indicate what
+     * personnel category can make acquisition checks.</p>
+     *
+     * <p><b>Usage:</b> Generally, for most use-cases, you'll want to use the shortcut method
+     * {@link #isAcquisitionPersonnelCategory(ProcurementPersonnelPick)} instead.</p>
+     *
+     * @return The current {@link ProcurementPersonnelPick} that represents the acquisition's personnel category.
+     */
+    public ProcurementPersonnelPick getAcquisitionPersonnelCategory() {
+        return acquisitionPersonnelCategory;
+    }
+
+    /**
+     * Sets the acquisition personnel category.
+     *
+     * <p>This method defines what personnel category (represented as a {@link ProcurementPersonnelPick})
+     * is eligible to make acquisition checks in the campaign system.</p>
+     *
+     * @param acquisitionPersonnelCategory The {@link ProcurementPersonnelPick} value to assign.
+     */
+    public void setAcquisitionPersonnelCategory(final ProcurementPersonnelPick acquisitionPersonnelCategory) {
+        this.acquisitionPersonnelCategory = acquisitionPersonnelCategory;
     }
 
     public int getUnitTransitTime() {
@@ -4707,6 +4805,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEraMods", useEraMods);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignedTechFirst", assignedTechFirst);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "resetToFirstTech", resetToFirstTech);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techsUseAdministration", techsUseAdministration);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useQuirks", useQuirks);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "xpCostMultiplier", xpCostMultiplier);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioXP", scenarioXP);
@@ -4737,7 +4836,10 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAmmoByType", useAmmoByType);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "waitingPeriod", waitingPeriod);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitionSkill", acquisitionSkill);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitionSupportStaffOnly", acquisitionSupportStaffOnly);
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "acquisitionPersonnelCategory",
+              acquisitionPersonnelCategory.name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techLevel", techLevel);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitTransitTime", unitTransitTime);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePlanetaryAcquisition", usePlanetaryAcquisition);
@@ -4848,6 +4950,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomHitsForVehicles", isUseRandomHitsForVehicles());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tougherHealing", isTougherHealing());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maximumPatients", getMaximumPatients());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "doctorsUseAdministration", isDoctorsUseAdministration());
         // endregion Medical
 
         // region Prisoners
@@ -4991,6 +5094,7 @@ public class CampaignOptions {
         // endregion Announcements
 
         // region Life Events
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "showLifeEventDialogBirths", isShowLifeEventDialogBirths());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "showLifeEventDialogComingOfAge",
@@ -5354,6 +5458,8 @@ public class CampaignOptions {
                     retVal.assignedTechFirst = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("resetToFirstTech")) {
                     retVal.resetToFirstTech = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("techsUseAdministration")) {
+                    retVal.techsUseAdministration = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("useQuirks")) {
                     retVal.useQuirks = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("xpCostMultiplier")) {
@@ -5455,7 +5561,12 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("overageRepaymentInFinalPayment")) {
                     retVal.setOverageRepaymentInFinalPayment(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSupportStaffOnly")) {
-                    retVal.acquisitionSupportStaffOnly = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    retVal.acquisitionPersonnelCategory = Boolean.parseBoolean(wn2.getTextContent().trim()) ?
+                                                                SUPPORT :
+                                                                ALL;
+                } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionPersonnelCategory")) {
+                    retVal.acquisitionPersonnelCategory = ProcurementPersonnelPick.fromString(wn2.getTextContent()
+                                                                                                    .trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("limitByYear")) {
                     retVal.limitByYear = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("disallowExtinctStuff")) {
@@ -5609,6 +5720,8 @@ public class CampaignOptions {
                     retVal.setTougherHealing(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("maximumPatients")) {
                     retVal.setMaximumPatients(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("doctorsUseAdministration")) {
+                    retVal.setDoctorsUseAdministration(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     // endregion Medical
 
                     // region Prisoners
@@ -5649,8 +5762,9 @@ public class CampaignOptions {
                         if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         }
-                        retVal.getSalaryXPMultipliers().put(SkillLevel.valueOf(wn3.getNodeName().trim()),
-                              Double.parseDouble(wn3.getTextContent().trim()));
+                        retVal.getSalaryXPMultipliers()
+                              .put(SkillLevel.valueOf(wn3.getNodeName().trim()),
+                                    Double.parseDouble(wn3.getTextContent().trim()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
                     retVal.setRoleBaseSalaries(Utilities.readMoneyArray(wn2, retVal.getRoleBaseSalaries().length));
@@ -5742,6 +5856,8 @@ public class CampaignOptions {
                     retVal.setAnnounceOfficersOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("announceChildBirthdays")) {
                     retVal.setAnnounceChildBirthdays(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("showLifeEventDialogBirths")) {
+                    retVal.setShowLifeEventDialogBirths(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("showLifeEventDialogComingOfAge")) {
                     retVal.setShowLifeEventDialogComingOfAge(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     // endregion anniversaries
