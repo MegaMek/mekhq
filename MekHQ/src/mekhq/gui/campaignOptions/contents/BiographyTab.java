@@ -107,6 +107,7 @@ public class BiographyTab {
     private JPanel pnlLifeEvents;
     private JCheckBox chkShowLifeEventDialogBirths;
     private JCheckBox chkShowLifeEventDialogComingOfAge;
+    private JCheckBox chkShowLifeEventDialogCelebrations;
     //end General Tab
 
     //start Backgrounds Tab
@@ -371,6 +372,7 @@ public class BiographyTab {
         pnlLifeEvents = new JPanel();
         chkShowLifeEventDialogBirths = new JCheckBox();
         chkShowLifeEventDialogComingOfAge = new JCheckBox();
+        chkShowLifeEventDialogCelebrations = new JCheckBox();
     }
 
     /**
@@ -509,6 +511,7 @@ public class BiographyTab {
         // Contents
         chkShowLifeEventDialogBirths = new CampaignOptionsCheckBox("ShowLifeEventDialogBirths");
         chkShowLifeEventDialogComingOfAge = new CampaignOptionsCheckBox("ShowLifeEventDialogComingOfAge");
+        chkShowLifeEventDialogCelebrations = new CampaignOptionsCheckBox("ShowLifeEventDialogCelebrations");
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("LifeEventsPanel", true, "LifeEventsPanel");
@@ -520,6 +523,10 @@ public class BiographyTab {
         panel.add(chkShowLifeEventDialogBirths, layoutParent);
         layoutParent.gridx++;
         panel.add(chkShowLifeEventDialogComingOfAge, layoutParent);
+
+        layoutParent.gridx = 0;
+        layoutParent.gridy++;
+        panel.add(chkShowLifeEventDialogCelebrations, layoutParent);
 
         return panel;
     }
@@ -1362,6 +1369,7 @@ public class BiographyTab {
         chkAnnounceRecruitmentAnniversaries.setSelected(options.isAnnounceRecruitmentAnniversaries());
         chkShowLifeEventDialogBirths.setSelected(options.isShowLifeEventDialogBirths());
         chkShowLifeEventDialogComingOfAge.setSelected(options.isShowLifeEventDialogComingOfAge());
+        chkShowLifeEventDialogCelebrations.setSelected(options.isShowLifeEventDialogCelebrations());
 
         // Backgrounds
         chkUseRandomPersonalities.setSelected(options.isUseRandomPersonalities());
@@ -1452,6 +1460,7 @@ public class BiographyTab {
         options.setAnnounceRecruitmentAnniversaries(chkAnnounceRecruitmentAnniversaries.isSelected());
         options.setShowLifeEventDialogBirths(chkShowLifeEventDialogBirths.isSelected());
         options.setShowLifeEventDialogComingOfAge(chkShowLifeEventDialogComingOfAge.isSelected());
+        options.setShowLifeEventDialogCelebrations(chkShowLifeEventDialogCelebrations.isSelected());
 
         // Backgrounds
         options.setUseRandomPersonalities(chkUseRandomPersonalities.isSelected());

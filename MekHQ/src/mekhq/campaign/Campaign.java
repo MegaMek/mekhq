@@ -49,6 +49,10 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
+import static mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement.isCommandersDay;
+import static mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement.isFreedomDay;
+import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewYear;
+import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWinterHolidayMajorDay;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenUsage;
@@ -176,6 +180,10 @@ import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
 import mekhq.campaign.personnel.lifeEvents.ComingOfAgeAnnouncement;
+import mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement;
+import mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement;
+import mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement;
+import mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
@@ -4855,6 +4863,9 @@ public class Campaign implements ITechManager {
         }
 
         // Process personnel
+        int peopleWhoCelebrateCommandersDay = 0;
+        int commanderDayTargetNumber = 5;
+        boolean isCommandersDay = isCommandersDay(currentDay) && getFlaggedCommander() != null;
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
@@ -4909,6 +4920,13 @@ public class Campaign implements ITechManager {
                     }
                 }
             }
+
+            if (isCommandersDay && !faction.isClan() && (peopleWhoCelebrateCommandersDay < commanderDayTargetNumber)) {
+                int age = person.getAge(currentDay);
+                if (age >= 6 && age <= 12) {
+                    peopleWhoCelebrateCommandersDay++;
+                }
+            }
         }
 
         if (!personnelWhoAdvancedInXP.isEmpty()) {
@@ -4916,6 +4934,11 @@ public class Campaign implements ITechManager {
                   spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                   personnelWhoAdvancedInXP.size(),
                   CLOSING_SPAN_TAG));
+        }
+
+        // Commander's Day!
+        if (isCommandersDay && (peopleWhoCelebrateCommandersDay >= commanderDayTargetNumber)) {
+            new CommandersDayAnnouncement(this);
         }
 
         // Update the force icons based on the end-of-day unit status if desired
@@ -5314,6 +5337,11 @@ public class Campaign implements ITechManager {
         final LocalDate yesterday = currentDay;
         currentDay = currentDay.plusDays(1);
 
+        // Check for important dates
+        if (campaignOptions.isShowLifeEventDialogCelebrations()) {
+            fetchCelebrationDialogs();
+        }
+
         // Determine if we have an active contract or not, as this can get used
         // elsewhere before we actually hit the AtB new day (e.g., personnel market)
         if (campaignOptions.isUseAtB()) {
@@ -5346,7 +5374,6 @@ public class Campaign implements ITechManager {
         // TODO : AbstractContractMarket : Uncomment
         // getContractMarket().processNewDay(this);
         unitMarket.processNewDay(this);
-
 
         updateFieldKitchenCapacity();
 
@@ -5421,6 +5448,28 @@ public class Campaign implements ITechManager {
         // This must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
+    }
+
+    /**
+     * Fetches and handles the celebration dialogs specific to the current day.
+     *
+     * <p><b>Note:</b> Commanders day is handled as a part of the personnel processing, so we don't need to parse
+     * personnel twice.</p>
+     */
+    private void fetchCelebrationDialogs() {
+        if (!faction.isClan()) {
+            if (isWinterHolidayMajorDay(currentDay)) {
+                new WinterHolidayAnnouncement(this);
+            }
+
+            if (isFreedomDay(currentDay)) {
+                new FreedomDayAnnouncement(this);
+            }
+        }
+
+        if (isNewYear(currentDay)) {
+            new NewYearsDayAnnouncement(this);
+        }
     }
 
     /**

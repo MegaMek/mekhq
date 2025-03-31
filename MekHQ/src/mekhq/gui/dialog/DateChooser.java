@@ -83,10 +83,10 @@ import mekhq.MekHQ;
 public class DateChooser extends JDialog implements ActionListener, FocusListener, KeyListener {
     private static final MMLogger logger = MMLogger.create(DateChooser.class);
 
-    public static final  int            OK_OPTION        = 1;
-    public static final  int            CANCEL_OPTION    = 2;
-    private static final String         RESOURCE_PACKAGE = "mekhq/resources/DateChooser";
-    private static final ResourceBundle resources        = ResourceBundle.getBundle(RESOURCE_PACKAGE,
+    public static final int OK_OPTION = 1;
+    public static final int CANCEL_OPTION = 2;
+    private static final String RESOURCE_PACKAGE = "mekhq/resources/DateChooser";
+    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE,
           MekHQ.getMHQOptions().getLocale());
 
     private static final List<String> monthNames;
@@ -109,10 +109,10 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
 
     private LocalDate date;
     private LocalDate workingDate;
-    private JLabel    monthLabel;
-    private JLabel    yearLabel;
-    private JPanel    dayGrid;
-    private boolean   ready;
+    private JLabel monthLabel;
+    private JLabel yearLabel;
+    private JPanel dayGrid;
+    private boolean ready;
 
     // Stores the user-input date.
     private JFormattedTextField dateField;
@@ -146,13 +146,13 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      * @param date  the initial date for the calendar
      */
     private void initialize(Component owner, LocalDate date) {
-        this.date   = date;
+        this.date = date;
         workingDate = this.date;
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
 
-        JPanel yearPane  = new JPanel();
+        JPanel yearPane = new JPanel();
         JPanel monthPane = new JPanel();
         yearPane.setLayout(new BoxLayout(yearPane, BoxLayout.X_AXIS));
         monthPane.setLayout(new BoxLayout(monthPane, BoxLayout.X_AXIS));
@@ -197,10 +197,10 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         topPane.add(Box.createRigidArea(new Dimension(20, 0)));
         topPane.add(yearPane);
 
-        ImageIcon originalIcon  = new ImageIcon("data/images/force/Pieces/Logos/Inner Sphere/Star League.png");
-        Image     originalImage = originalIcon.getImage();
-        Image     scaledImage   = originalImage.getScaledInstance(120, 63, Image.SCALE_FAST);
-        ImageIcon resizedIcon   = new ImageIcon(scaledImage);
+        ImageIcon originalIcon = new ImageIcon("data/images/force/Pieces/Logos/Inner Sphere/Star League.png");
+        Image originalImage = originalIcon.getImage();
+        Image scaledImage = originalImage.getScaledInstance(120, 63, Image.SCALE_FAST);
+        ImageIcon resizedIcon = new ImageIcon(scaledImage);
 
         JLabel imageLabel = new JLabel(resizedIcon);
         topPane.add(imageLabel, BorderLayout.BEFORE_FIRST_LINE);
@@ -255,7 +255,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         bottomPanel.add(eraPanel, BorderLayout.CENTER);
 
         // Create a separate panel for the confirmDate button
-        JPanel  confirmPanel  = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel confirmPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton confirmButton = new JButton(resources.getString("confirmDate.text"));
         confirmButton.addActionListener(e -> {
             if (updateDateFromDateField()) {
@@ -375,11 +375,11 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
             }
             default: {
                 int month = monthNames.indexOf(monthLabel.getText()) + 1;
-                int year  = 0;
-                int day   = 0;
+                int year = 0;
+                int day = 0;
                 try {
                     year = Integer.parseInt(yearLabel.getText());
-                    day  = Integer.parseInt(label);
+                    day = Integer.parseInt(label);
                 } catch (NumberFormatException e) {
                     logger.error("", e);
                 }
@@ -399,7 +399,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      */
     private void setDate(LocalDate date) {
         this.date = date;
-        ready     = true;
+        ready = true;
         monthLabel.setText(monthNames.get(date.getMonth().ordinal()));
         yearLabel.setText(String.valueOf(date.getYear()));
         dateField.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
@@ -416,7 +416,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
 
         // get the currently selected month and year
         int month = monthNames.indexOf(monthLabel.getText()) + 1;
-        int year  = 0;
+        int year = 0;
         try {
             year = Integer.parseInt(yearLabel.getText());
         } catch (NumberFormatException e) {
@@ -442,7 +442,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
 
         // display days of the month for this month
         JButton day;
-        int     workingDay = 1; // Start at the first day of the month.
+        int workingDay = 1; // Start at the first day of the month.
         for (int i = 1; i <= getLastDay(); i++) {
             dayGrid.add(day = new JButton(String.valueOf(i)));
             day.setToolTipText(resources.getString("dayPicker.tooltip"));
@@ -501,7 +501,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      */
     private int getLastDay() {
         int month = (monthNames.indexOf(monthLabel.getText()) + 1);
-        int year  = 0;
+        int year = 0;
         try {
             year = Integer.parseInt(yearLabel.getText());
         } catch (NumberFormatException e) {
@@ -536,9 +536,9 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      * @return the parsed date
      */
     private LocalDate parseDate(String dateString) {
-        DateTimeFormatter[] dateFormats = new DateTimeFormatter[] { DateTimeFormatter.ofPattern(MekHQ.getMHQOptions()
-                                                                                                      .getDisplayDateFormat()).withLocale(
-              MekHQ.getMHQOptions().getDateLocale()),
+        DateTimeFormatter[] dateFormats = new DateTimeFormatter[] {
+              DateTimeFormatter.ofPattern(MekHQ.getMHQOptions().getDisplayDateFormat()).withLocale(MekHQ.getMHQOptions()
+                                                                                                         .getDateLocale()),
               DateTimeFormatter.ofPattern(MekHQ.getMHQOptions()
                                                 .getLongDisplayDateFormat()).withLocale(MekHQ.getMHQOptions()
                                                                                               .getDateLocale()),
@@ -574,7 +574,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      * Updates the date of the {@link DateChooser} instance based on the value in the dateField. If the new date is
      * valid, the dialog's controls are updated with the new date.
      *
-     * @return {@link true} if the update is successful, {@link false} otherwise.
+     * @return {@code true} if the update is successful, {@code false} otherwise.
      */
     private boolean updateDateFromDateField() {
         final LocalDate MINIMUM_VIABLE_DATE = LocalDate.of(2200, 1, 1);
@@ -629,7 +629,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
             case 11 -> "eraIlClan";
             default ->
                   throw new IllegalStateException("Unexpected value mekhq/gui/dialog/DateChooser.java/createEraButton: " +
-                                                  era);
+                                                        era);
         };
 
         String label = String.format("<html><center>%s%s</center></html>",
@@ -667,16 +667,16 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         turningPointsDialog.setTitle(resources.getString("turningPoints.title"));
         turningPointsDialog.setModalityType(ModalityType.APPLICATION_MODAL);
 
-        JPanel                buttonPanel            = new JPanel();
+        JPanel buttonPanel = new JPanel();
         final List<LocalDate> finalTurningPointDates = turningPointData.turningPointDates();
 
         for (int index = 1; index <= turningPointData.turningPoints().size(); index++) {
             JButton eraButtonN = new JButton(String.format("<html><center><b>" +
-                                                           resources.getString(turningPointData.turningPoints()
-                                                                                     .get(index - 1) + ".text") +
-                                                           "</b><br>(" +
-                                                           finalTurningPointDates.get(index - 1).toString() +
-                                                           ")</center></html>"));
+                                                                 resources.getString(turningPointData.turningPoints()
+                                                                                           .get(index - 1) + ".text") +
+                                                                 "</b><br>(" +
+                                                                 finalTurningPointDates.get(index - 1).toString() +
+                                                                 ")</center></html>"));
             eraButtonN.setToolTipText(wordWrap(String.format(resources.getString(turningPointData.turningPoints()
                                                                                        .get(index - 1) + ".tooltip"))));
 
@@ -722,18 +722,18 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         final String LOGO_DIRECTORY = "data/images/universe/";
         final String LOGO_FILE_TYPE = ".png";
 
-        List<String>    turningPoints;
+        List<String> turningPoints;
         List<LocalDate> turningPointDates;
-        ImageIcon       eraLogo;
+        ImageIcon eraLogo;
 
         switch (era) {
             case 0 -> {
-                turningPoints     = List.of("TerranHegemonyFounded", "RiseOfTheBattleMek");
+                turningPoints = List.of("TerranHegemonyFounded", "RiseOfTheBattleMek");
                 turningPointDates = List.of(LocalDate.of(2315, 6, 2), LocalDate.of(2475, 1, 1));
-                eraLogo           = new ImageIcon(LOGO_DIRECTORY + "era_starleague" + LOGO_FILE_TYPE);
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_starleague" + LOGO_FILE_TYPE);
             }
             case 1 -> {
-                turningPoints     = List.of("ReunificationWar",
+                turningPoints = List.of("ReunificationWar",
                       "FirstHiddenWar",
                       "SecondHiddenWar",
                       "ThirdHiddenWar",
@@ -743,10 +743,10 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                       LocalDate.of(2725, 1, 1),
                       LocalDate.of(2741, 1, 1),
                       LocalDate.of(2766, 11, 26));
-                eraLogo           = new ImageIcon(LOGO_DIRECTORY + "era_starleague" + LOGO_FILE_TYPE);
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_starleague" + LOGO_FILE_TYPE);
             }
             case 2 -> {
-                turningPoints     = List.of("OperationExodus",
+                turningPoints = List.of("OperationExodus",
                       "OperationKlondike",
                       "SecondSuccessionWar",
                       "ThirdSuccessionWar");
@@ -754,67 +754,63 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                       LocalDate.of(2821, 7, 2),
                       LocalDate.of(2830, 1, 1),
                       LocalDate.of(2866, 1, 1));
-                eraLogo           = new ImageIcon(LOGO_DIRECTORY + "era_sw" + LOGO_FILE_TYPE);
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_sw" + LOGO_FILE_TYPE);
             }
             case 3 -> {
-                turningPoints     = List.of("OperationFreedom");
+                turningPoints = List.of("OperationFreedom");
                 turningPointDates = List.of(LocalDate.of(2866, 1, 1));
-                eraLogo           = new ImageIcon(LOGO_DIRECTORY + "era_sw" + LOGO_FILE_TYPE);
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_sw" + LOGO_FILE_TYPE);
             }
             case 4 -> {
-                turningPoints     = List.of("ThirdSuccessionWarEnds", "FourthSuccessionWar", "FRRFounded", "WarOf3039");
+                turningPoints = List.of("ThirdSuccessionWarEnds", "FourthSuccessionWar", "FRRFounded", "WarOf3039");
                 turningPointDates = List.of(LocalDate.of(3025, 1, 1),
                       LocalDate.of(3028, 8, 20),
                       LocalDate.of(3034, 3, 13),
                       LocalDate.of(3039, 4, 16));
-                eraLogo           = new ImageIcon(LOGO_DIRECTORY + "era_sw" + LOGO_FILE_TYPE);
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_sw" + LOGO_FILE_TYPE);
             }
             case 5 -> {
-                turningPoints     = List.of("FirstContact",
-                      "YearOfPeace",
-                      "Tukayyid",
-                      "RefusalWar",
-                      "OperationBulldog");
+                turningPoints = List.of("FirstContact", "YearOfPeace", "Tukayyid", "RefusalWar", "OperationBulldog");
                 turningPointDates = List.of(LocalDate.of(3049, 1, 1),
                       LocalDate.of(3050, 10, 31),
                       LocalDate.of(3052, 5, 1),
                       LocalDate.of(3057, 9, 1),
                       LocalDate.of(3059, 5, 1));
-                eraLogo           = new ImageIcon(LOGO_DIRECTORY + "era_claninvasion" + LOGO_FILE_TYPE);
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_claninvasion" + LOGO_FILE_TYPE);
             }
             case 6 -> {
-                turningPoints     = List.of("FCCWStarts", "JadeFalconOffensive");
+                turningPoints = List.of("FCCWStarts", "JadeFalconOffensive");
                 turningPointDates = List.of(LocalDate.of(3062, 11, 16), LocalDate.of(3064, 5, 10));
-                eraLogo           = new ImageIcon(LOGO_DIRECTORY + "era_civilwar" + LOGO_FILE_TYPE);
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_civilwar" + LOGO_FILE_TYPE);
             }
             case 7 -> {
-                turningPoints     = List.of("FirstBattleOfHarlech", "WarsOfReaving", "OperationScour");
+                turningPoints = List.of("FirstBattleOfHarlech", "WarsOfReaving", "OperationScour");
                 turningPointDates = List.of(LocalDate.of(3067, 10, 15),
                       LocalDate.of(3071, 12, 1),
                       LocalDate.of(3077, 1, 10));
-                eraLogo           = new ImageIcon(LOGO_DIRECTORY + "era_jihad" + LOGO_FILE_TYPE);
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_jihad" + LOGO_FILE_TYPE);
             }
             case 8 -> {
-                turningPoints     = List.of("RepublicFounded", "OperationGoldenDawn");
+                turningPoints = List.of("RepublicFounded", "OperationGoldenDawn");
                 turningPointDates = List.of(LocalDate.of(3081, 3, 7), LocalDate.of(3081, 4, 3));
-                eraLogo           = new ImageIcon(LOGO_DIRECTORY + "era_darkage" + LOGO_FILE_TYPE);
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_darkage" + LOGO_FILE_TYPE);
             }
             case 9 -> {
-                turningPoints     = List.of("SecondCombineDominionWar", "VictoriaWar", "CapellanCrusades");
+                turningPoints = List.of("SecondCombineDominionWar", "VictoriaWar", "CapellanCrusades");
                 turningPointDates = List.of(LocalDate.of(3098, 9, 14),
                       LocalDate.of(3103, 9, 7),
                       LocalDate.of(3111, 10, 11));
-                eraLogo           = new ImageIcon(LOGO_DIRECTORY + "era_darkage" + LOGO_FILE_TYPE);
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_darkage" + LOGO_FILE_TYPE);
             }
             case 10 -> {
-                turningPoints     = List.of("GreyMonday");
+                turningPoints = List.of("GreyMonday");
                 turningPointDates = List.of(LocalDate.of(3132, 8, 3));
-                eraLogo           = new ImageIcon(LOGO_DIRECTORY + "era_darkage" + LOGO_FILE_TYPE);
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_darkage" + LOGO_FILE_TYPE);
             }
             case 11 -> {
-                turningPoints     = List.of("BattleOfTerra");
+                turningPoints = List.of("BattleOfTerra");
                 turningPointDates = List.of(LocalDate.of(3151, 1, 1));
-                eraLogo           = new ImageIcon(LOGO_DIRECTORY + "era_ilclan" + LOGO_FILE_TYPE);
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_ilclan" + LOGO_FILE_TYPE);
             }
             default -> throw new IllegalStateException(
                   "Unexpected value mekhq/gui/turningPointsDialog/DateChooser.java/turningPointsDialog: " + era);
