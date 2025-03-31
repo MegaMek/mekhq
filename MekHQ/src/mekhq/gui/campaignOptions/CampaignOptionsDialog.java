@@ -27,28 +27,38 @@
  */
 package mekhq.gui.campaignOptions;
 
+import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
+
+import java.awt.Container;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.util.ResourceBundle;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
 import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ResourceBundle;
-
-import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
+import mekhq.gui.dialog.CompanyGenerationDialog;
+import mekhq.gui.dialog.ContractMarketDialog;
 
 /**
- * The {@code CampaignOptionsDialog} class represents a dialog window for presenting
- * and modifying the campaign options in MekHQ. It provides a user interface
- * for accessing, editing, and applying various gameplay-related settings for a campaign.
- * The dialog also supports applying presets and saving settings for future use.
+ * The {@code CampaignOptionsDialog} class represents a dialog window for presenting and modifying the campaign options
+ * in MekHQ. It provides a user interface for accessing, editing, and applying various gameplay-related settings for a
+ * campaign. The dialog also supports applying presets and saving settings for future use.
  * <p>
- * This dialog is an extension of {@link AbstractMHQButtonDialog} and integrates closely
- * with a {@link Campaign} instance, representing the current or a predefined campaign setup.
- * It facilitates user interaction for fine-tuning the game campaign experience.
+ * This dialog is an extension of {@link AbstractMHQButtonDialog} and integrates closely with a {@link Campaign}
+ * instance, representing the current or a predefined campaign setup. It facilitates user interaction for fine-tuning
+ * the game campaign experience.
  * </p>
  *
  * <strong>Key Features:</strong>
@@ -70,15 +80,12 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private boolean wasCanceled = true;
 
     public enum CampaignOptionsDialogMode {
-        NORMAL,
-        STARTUP,
-        STARTUP_ABRIDGED,
-        ABRIDGED
+        NORMAL, STARTUP, STARTUP_ABRIDGED, ABRIDGED
     }
 
     /**
-     * Constructs a {@code CampaignOptionsDialog} with the specified parent frame and
-     * campaign instance. Initializes the dialog using the default {@code NORMAL} mode.
+     * Constructs a {@code CampaignOptionsDialog} with the specified parent frame and campaign instance. Initializes the
+     * dialog using the default {@code NORMAL} mode.
      *
      * @param frame    the parent {@link JFrame} for this dialog
      * @param campaign the {@link Campaign} instance representing the current campaign
@@ -95,9 +102,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     /**
-     * Constructs a {@code CampaignOptionsDialog} with the specified parent frame,
-     * campaign instance, campaign preset, and mode. If a preset is provided, it is
-     * automatically applied to the campaign.
+     * Constructs a {@code CampaignOptionsDialog} with the specified parent frame, campaign instance, campaign preset,
+     * and mode. If a preset is provided, it is automatically applied to the campaign.
      *
      * @param frame    the parent {@link JFrame} for this dialog
      * @param campaign the {@link Campaign} instance for the current or preconfigured campaign
@@ -140,8 +146,8 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     /**
-     * Creates the button panel for the dialog, allowing the user to apply settings,
-     * load and save presets, or cancel the dialog.
+     * Creates the button panel for the dialog, allowing the user to apply settings, load and save presets, or cancel
+     * the dialog.
      *
      * @return a {@link JPanel} representing the button panel
      */
@@ -153,11 +159,14 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         JButton btnApplySettings = new CampaignOptionsButton("ApplySettings");
         btnApplySettings.addActionListener(evt -> {
             wasCanceled = false;
-            campaignOptionsPane.applyCampaignOptionsToCampaign(null,
-                mode == CampaignOptionsDialogMode.STARTUP || mode == CampaignOptionsDialogMode.STARTUP_ABRIDGED,
-                false);
+            boolean isStartup = mode == CampaignOptionsDialogMode.STARTUP ||
+                                      mode == CampaignOptionsDialogMode.STARTUP_ABRIDGED;
+            campaignOptionsPane.applyCampaignOptionsToCampaign(null, isStartup, false);
             dispose();
-            showStratConNotice();
+
+            if (isStartup) {
+                triggerStartUpDialogs();
+            }
         });
         pnlButtons.add(btnApplySettings);
 
@@ -182,12 +191,47 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     /**
-     * Handles the "Save Preset" button action. Opens a dialog to create a new preset and
-     * save the campaign configuration to a file if confirmed.
+     * Displays the startup dialogs in sequence as part of the campaign initialization process.
+     *
+     * <p>This method executes the following sequence of dialogs during the campaign startup:</p>
+     * <ol>
+     *   <li><strong>StratCon Notice:</strong>
+     *       Displays a notice about the StratCon feature, but only if the campaign options indicate that
+     *       StratCon is enabled. The content of the notice includes promotional information, and the dialog blocks
+     *       further execution until the user interacts with it.</li>
+     *   <li><strong>Company Generation Dialog:</strong>
+     *       Launches the {@link CompanyGenerationDialog}, which allows the user to create and configure the initial
+     *       company for the ongoing campaign. This dialog is required for the campaign setup and ensures the user has
+     *       completed this configuration before moving forward.</li>
+     *   <li><strong>Contract Market Dialog:</strong>
+     *       If the campaign's contract market method is enabled, the {@link ContractMarketDialog} is displayed next.
+     *       This dialog allows the user to view and manage available contracts as part of the campaign configuration.</li>
+     * </ol>
+     *
+     * <p>All dialogs are modal and block execution until the user has interacted with and closed each dialog in
+     * sequence.</p>
+     */
+    private void triggerStartUpDialogs() {
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (campaignOptions.isUseStratCon()) {
+            showStratConNotice();
+        }
+
+        CompanyGenerationDialog companyCreatorDialog = new CompanyGenerationDialog(null, campaign);
+        companyCreatorDialog.setVisible(true);
+
+        if (!campaignOptions.getContractMarketMethod().isNone()) {
+            ContractMarketDialog contractMarketDialog = new ContractMarketDialog(null, campaign);
+            contractMarketDialog.setVisible(true);
+        }
+    }
+
+    /**
+     * Handles the "Save Preset" button action. Opens a dialog to create a new preset and save the campaign
+     * configuration to a file if confirmed.
      */
     private void btnSaveActionPerformed() {
-        final CreateCampaignPreset createCampaignPresetDialog
-            = new CreateCampaignPreset(null, campaign, null);
+        final CreateCampaignPreset createCampaignPresetDialog = new CreateCampaignPreset(null, campaign, null);
 
         if (!createCampaignPresetDialog.showDialog().isConfirmed()) {
             return;
@@ -199,29 +243,26 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         }
 
         campaignOptionsPane.applyCampaignOptionsToCampaign(preset,
-            mode == CampaignOptionsDialogMode.STARTUP || mode == CampaignOptionsDialogMode.STARTUP_ABRIDGED,
-            true);
+              mode == CampaignOptionsDialogMode.STARTUP || mode == CampaignOptionsDialogMode.STARTUP_ABRIDGED,
+              true);
 
-        preset.writeToFile(null,
-            FileDialogs.saveCampaignPreset(null, preset).orElse(null));
+        preset.writeToFile(null, FileDialogs.saveCampaignPreset(null, preset).orElse(null));
     }
 
     /**
-     * Handles the "Load Preset" button action. Opens a preset selection dialog,
-     * and applies the selected preset to the current campaign options if a preset
-     * is selected and not canceled.
+     * Handles the "Load Preset" button action. Opens a preset selection dialog, and applies the selected preset to the
+     * current campaign options if a preset is selected and not canceled.
      */
     private void btnLoadActionPerformed() {
-        final SelectPresetDialog presetSelectionDialog =
-            new SelectPresetDialog(null, true, false);
+        final SelectPresetDialog presetSelectionDialog = new SelectPresetDialog(null, true, false);
         if (presetSelectionDialog.getReturnState() != PRESET_SELECTION_CANCELLED) {
             campaignOptionsPane.applyPreset(presetSelectionDialog.getSelectedPreset());
         }
     }
 
     /**
-     * Applies a preset to the campaign options pane. This allows the user to quickly
-     * configure the campaign settings based on predefined presets.
+     * Applies a preset to the campaign options pane. This allows the user to quickly configure the campaign settings
+     * based on predefined presets.
      *
      * @param preset the {@link CampaignPreset} instance to apply
      */
@@ -230,18 +271,16 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     /**
-     * Displays a promo notice for StratCon functionality when the campaign options dialog
-     * is closed if the campaign is starting on the first day, and StratCon is enabled.
+     * Displays the StratCon promotional notice dialog, if applicable.
+     *
+     * <p>This method shows a modal dialog to present promotional information about the StratCon feature
+     * in the form of an image and a message. The notice is presented with a title, an optional image, and a descriptive
+     * message, ensuring users are informed of the feature's introduction or importance. The dialog also includes a
+     * single button for the user to acknowledge and dismiss the notice.</p>
+     *
+     * @return
      */
     private void showStratConNotice() {
-        // we don't store whether this dialog has previously appeared,
-        // instead we just have it appear only when Campaign Options is closed,
-        // the current day is the first day of the campaign, and StratCon is enabled
-        if (!campaign.getCampaignOptions().isUseStratCon()
-                || !campaign.getLocalDate().equals(campaign.getCampaignStartDate())) {
-            return;
-        }
-
         ImageIcon imageIcon = new ImageIcon("data/images/stratcon/stratConPromo.png");
         JLabel imageLabel = new JLabel(imageIcon);
         JPanel imagePanel = new JPanel(new GridBagLayout());
@@ -259,11 +298,15 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         panel.add(imagePanel);
         panel.add(messagePanel);
 
-        Object[] options = {
-                resources.getString("stratConPromo.button")
-        };
+        Object[] options = { resources.getString("stratConPromo.button") };
 
-        JOptionPane.showOptionDialog(null, panel, title, JOptionPane.DEFAULT_OPTION,
-                JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+        JOptionPane.showOptionDialog(null,
+              panel,
+              title,
+              JOptionPane.DEFAULT_OPTION,
+              JOptionPane.INFORMATION_MESSAGE,
+              null,
+              options,
+              options[0]);
     }
 }

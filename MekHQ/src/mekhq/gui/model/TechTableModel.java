@@ -29,7 +29,6 @@ package mekhq.gui.model;
 
 import java.awt.Component;
 import java.util.ArrayList;
-
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
@@ -146,7 +145,7 @@ public class TechTableModel extends DataTableModel {
         toReturn.append("<br/>");
 
         toReturn.append(String.format("%d/%d minutes left", tech.getMinutesLeft(),
-                tech.getDailyAvailableTechTime()));
+              tech.getDailyAvailableTechTime(getCampaign().getCampaignOptions().isTechsUseAdministration())));
 
         if (overtimeAllowed) {
             toReturn.append(String.format(" + (%d overtime)", tech.getOvertimeLeft()));

@@ -28,8 +28,15 @@
 
 package mekhq.campaign.handler;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Stream;
+
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
@@ -42,12 +49,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.RetirementDefectionDialog;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Stream;
 
 /**
  * @author Luana Coppio
@@ -93,7 +94,20 @@ public class PostScenarioDialogHandler {
         cleanupTempImageFiles();
         // we need to trigger ScenarioResolvedEvent before stopping the thread or
         // currentScenario may become null
-        MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
+        try {
+            MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
+        } catch (Exception e) {
+            final MMLogger logger = MMLogger.create(PostScenarioDialogHandler.class);
+
+            logger.error("An error occurred during scenario resolution: {}", e.getMessage(), e);
+
+            logger.errorDialog(
+                  e,
+                  "A critical error has occurred during the scenario resolution. This issue is under investigation." +
+                        "\n\nPlease open an issue report and include your MekHQ log file for further assessment.",
+                  "Critical Error"
+            );
+        }
     }
 
     private static void restartRats(Campaign campaign) {
