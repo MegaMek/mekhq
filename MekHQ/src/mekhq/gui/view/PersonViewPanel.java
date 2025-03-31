@@ -27,6 +27,39 @@
  */
 package mekhq.gui.view;
 
+import static java.awt.Color.BLACK;
+import static java.awt.Color.RED;
+import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
+import static mekhq.campaign.personnel.Person.getLoyaltyName;
+import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
+import static mekhq.utilities.ImageUtilities.addTintToImageIcon;
+import static org.jfree.chart.ChartColor.DARK_BLUE;
+import static org.jfree.chart.ChartColor.DARK_RED;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dialog.ModalityType;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import javax.accessibility.AccessibleRelation;
+import javax.swing.*;
+import javax.swing.table.TableColumn;
+
 import megamek.codeUtilities.MathUtility;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
@@ -39,7 +72,11 @@ import mekhq.campaign.Kill;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.LogEntry;
-import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.Award;
+import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
@@ -55,28 +92,6 @@ import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.WrapLayout;
-
-import javax.accessibility.AccessibleRelation;
-import javax.swing.*;
-import javax.swing.table.TableColumn;
-import java.awt.*;
-import java.awt.Dialog.ModalityType;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static java.awt.Color.BLACK;
-import static java.awt.Color.RED;
-import static megamek.client.ui.WrapLayout.wordWrap;
-import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
-import static mekhq.campaign.personnel.Person.getLoyaltyName;
-import static mekhq.utilities.ImageUtilities.addTintToImage;
-import static org.jfree.chart.ChartColor.DARK_BLUE;
-import static org.jfree.chart.ChartColor.DARK_RED;
-import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
@@ -599,11 +614,11 @@ public class PersonViewPanel extends JScrollablePanel {
 
         PersonnelStatus status = person.getStatus();
         if (status.isDead()) {
-            portraitImageIcon = addTintToImage(portraitImageIcon.getImage(), DARK_RED);
+            portraitImageIcon = addTintToImageIcon(portraitImageIcon.getImage(), DARK_RED);
         } else if (status.isRetired()) {
-            portraitImageIcon = addTintToImage(portrait.getImage(100), DARK_BLUE);
+            portraitImageIcon = addTintToImageIcon(portrait.getImage(100), DARK_BLUE);
         } else if (status.isDepartedUnit()) {
-            portraitImageIcon = addTintToImage(portrait.getImage(100), BLACK);
+            portraitImageIcon = addTintToImageIcon(portrait.getImage(100), BLACK);
         }
 
         return portraitImageIcon;

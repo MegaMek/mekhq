@@ -30,6 +30,7 @@ package mekhq.gui.dialog.nagDialogs;
 import static mekhq.MHQConstants.NAG_UNTREATED_PERSONNEL;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UntreatedPersonnelNagLogic.calculateTotalDoctorCapacity;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UntreatedPersonnelNagLogic.campaignHasUntreatedInjuries;
 
 import java.util.List;
@@ -125,23 +126,25 @@ public class UntreatedPersonnelNagDialog extends ImmersiveDialogNag {
     }
 
     /**
-     * Determines whether a nag dialog should be displayed for untreated injuries among personnel.
+     * Determines whether a nag dialog should be displayed for untreated injuries among campaign personnel.
      *
-     * <p>This method evaluates two conditions to decide if the nag dialog should appear:</p>
-     * <ul>
-     *     <li>The user has not ignored the nag dialog for untreated personnel injuries in their options.</li>
-     *     <li>There are untreated injuries among the campaign's personnel.</li>
-     * </ul>
-     *
-     * @param activePersonnel A {@link List} of active personnel in the campaign.
-     * @param doctorCapacity  The maximum number of patients each doctor can medicate.
+     * @param activePersonnel            A {@link List} of active personnel in the campaign. This includes individuals
+     *                                   who may require treatment and doctors available to provide care.
+     * @param baseBedCount               The base number of patients each doctor can handle, serving as the foundation
+     *                                   for calculating total doctor capacity.
+     * @param isDoctorsUseAdministration A flag determining whether the administrative skills of doctors should be
+     *                                   factored into their capacity calculation.
      *
      * @return {@code true} if the nag dialog should be displayed due to untreated injuries, {@code false} otherwise.
      */
-    public static boolean checkNag(List<Person> activePersonnel, int doctorCapacity) {
+    public static boolean checkNag(List<Person> activePersonnel, int baseBedCount, boolean isDoctorsUseAdministration) {
         final String NAG_KEY = NAG_UNTREATED_PERSONNEL;
 
+        int totalDoctorCapacity = calculateTotalDoctorCapacity(activePersonnel,
+              isDoctorsUseAdministration,
+              baseBedCount);
+
         return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY) &&
-                     campaignHasUntreatedInjuries(activePersonnel, doctorCapacity);
+                     campaignHasUntreatedInjuries(activePersonnel, totalDoctorCapacity);
     }
 }

@@ -115,6 +115,21 @@ public class PersonUtility {
     }
 
     /**
+     * @deprecated use {@link #overrideSkills(boolean, boolean, boolean, boolean, boolean, Person, PersonnelRole, SkillLevel)}
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public static void overrideSkills(boolean isAdminsHaveNegotiation, boolean isAdminsHaveScrounge, boolean isUseExtraRandom, Person person, PersonnelRole primaryRole, SkillLevel skillLevel) {
+        overrideSkills(isAdminsHaveNegotiation,
+              isAdminsHaveScrounge,
+              false,
+              false,
+              isUseExtraRandom,
+              person,
+              primaryRole,
+              skillLevel);
+    }
+
+    /**
      * Overrides the skills of a {@link Person} based on their role, experience level, and various conditions.
      * This method applies specific skill sets to the person depending on their {@link PersonnelRole}, optionally
      * including administrator and tech specific skills or applying randomization to skill levels.

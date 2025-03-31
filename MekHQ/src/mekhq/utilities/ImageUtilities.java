@@ -27,14 +27,17 @@
  */
 package mekhq.utilities;
 
+import static java.lang.Math.round;
+
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import javax.swing.ImageIcon;
+
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-
-import static java.lang.Math.round;
 
 public class ImageUtilities {
     /**
@@ -88,10 +91,10 @@ public class ImageUtilities {
      *
      * @return an {@link ImageIcon} containing the tinted image.
      *
-     * @see #addTintToImage(Image, Color, boolean, Double) for more advanced configurations.
+     * @see #addTintToImageIcon(Image, Color, boolean, Double) for more advanced configurations.
      */
-    public static ImageIcon addTintToImage(Image image, Color tintColor) {
-        return addTintToImage(image, tintColor, true, null);
+    public static ImageIcon addTintToImageIcon(Image image, Color tintColor) {
+        return addTintToImageIcon(image, tintColor, true, null);
     }
 
     /**
@@ -113,9 +116,9 @@ public class ImageUtilities {
      *
      * @return an {@link ImageIcon} containing the image with the applied tint.
      *
-     * @see #addTintToImage(Image, Color) for default behavior.
+     * @see #addTintToImageIcon(Image, Color) for default behavior.
      */
-    public static ImageIcon addTintToImage(Image image, Color tint, boolean nonTransparentOnly,
+    public static ImageIcon addTintToImageIcon(Image image, Color tint, boolean nonTransparentOnly,
                                            @Nullable Double transparencyPercent) {
         BufferedImage tintedImage = new BufferedImage(
               image.getWidth(null),
@@ -142,6 +145,85 @@ public class ImageUtilities {
         return new ImageIcon(tintedImage);
     }
 
+    /**
+     * Applies a default tint to a {@link BufferedImage} and returns the modified image.
+     *
+     * <p>This method adds a tint overlay of the specified color to the provided {@link BufferedImage}.
+     * By default, the tint is applied only to non-transparent areas, and a transparency level of 50% is used if none is
+     * specified.
+     *
+     * @param image     The {@link BufferedImage} on which the tint will be applied.
+     * @param tintColor The {@link Color} to use as the tint.
+     *
+     * @return A new {@link BufferedImage} containing the original image with the tint applied.
+     *
+     * @see #addTintToBufferedImage(BufferedImage, Color, boolean, Double)
+     */
+    public static BufferedImage addTintToBufferedImage(BufferedImage image, Color tintColor) {
+        return addTintToBufferedImage(image, tintColor, true, null);
+    }
+
+    /**
+     * Applies a tint to a BufferedImage and returns the modified image.
+     *
+     * <p>The method overlays a specified color tint on the original image. You can optionally apply
+     * the tint only to non-transparent areas or specify the transparency level of the tint.
+     *
+     * @param image               The original {@link BufferedImage} to which the tint will be added.
+     * @param tint                The {@link Color} to use as the tint.
+     * @param nonTransparentOnly  If {@code true}, applies the tint only to non-transparent areas.
+     * @param transparencyPercent The transparency level of the tinted overlay (0.0 to 1.0), where {@code 1.0} is fully
+     *                            opaque and {@code 0.0} is fully transparent. If {@code null}, a default of 50%
+     *                            transparency is applied.
+     *
+     * @return A new {@link BufferedImage} with the specified tint applied.
+     */
+    public static BufferedImage addTintToBufferedImage(BufferedImage image, Color tint, boolean nonTransparentOnly, @Nullable Double transparencyPercent) {
+        // Create a new BufferedImage with the same dimensions and type as the original
+        BufferedImage tintedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+        // Draw the original image onto the new BufferedImage
+        Graphics2D graphics = tintedImage.createGraphics();
+        graphics.drawImage(image, 0, 0, null);
+
+        // If applying the tint only to non-transparent areas, set the appropriate composite
+        if (nonTransparentOnly) {
+            graphics.setComposite(AlphaComposite.SrcAtop);
+        }
+
+        // Generate a new color with the specified transparency
+        int alpha = getAlpha(transparencyPercent == null ? 0.5 : transparencyPercent);
+        graphics.setColor(new Color(tint.getRed(), tint.getGreen(), tint.getBlue(), alpha));
+
+        // Apply the tint color to the entire image
+        graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
+
+        // Dispose of the Graphics2D object to free resources
+        graphics.dispose();
+
+        // Return the tinted BufferedImage
+        return tintedImage;
+    }
+
+    /**
+     * Converts a transparency percentage into an alpha value for ARGB colors.
+     *
+     * <p>This method maps a transparency percentage (from {@code 0.0} to {@code 1.0})
+     * to an integer alpha value (from 0 to 255) usable with ARGB colors.</p>
+     * <ul>
+     *     <li>A value of {@code 1.0} (fully opaque) will return {@code 0} for maximum alpha.</li>
+     *     <li>A value of {@code 0.0} (fully transparent) will return {@code 255} for full transparency.</li>
+     * </ul>
+     *
+     * @param transparencyPercent A percentage representing transparency. Must be between {@code 0.0} and {@code 1.0},
+     *                            inclusive.
+     *
+     * @return An integer alpha value ranging from 0 (fully opaque) to 255 (fully transparent), calculated from the
+     *       provided percentage.
+     *
+     * @throws IllegalArgumentException If {@code transparencyPercent} is outside the range of {@code 0.0} to
+     *                                  {@code 1.0}.
+     */
     private static int getAlpha(double transparencyPercent) {
         if (transparencyPercent < 0.0 || transparencyPercent > 1.0) {
             throw new IllegalArgumentException("Transparency percent must be between 0.0 and 1.0.");
