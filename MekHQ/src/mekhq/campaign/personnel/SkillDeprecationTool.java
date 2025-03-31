@@ -181,6 +181,7 @@ public class SkillDeprecationTool {
                   getOutOfCharacterMessage(skillName, refundValue),
                   null,
                   false);
+
             if (dialog.getDialogChoice() == SKIP_ALL_DIALOG_OPTION_INDEX) {
                 skipAll = true;
             } else if (dialog.getDialogChoice() == REFUND_ALL_DIALOG_OPTION_INDEX) {

@@ -112,7 +112,8 @@ public class ImmersiveDialogNag {
      * @param messageKey     A {@code String} key to retrieve localized text for the in-character and out-of-character
      *                       messages from the resource bundle.
      */
-    public ImmersiveDialogNag(final Campaign campaign, final @Nullable AdministratorSpecialization specialization, final String nagConstant, final String messageKey) {
+    public ImmersiveDialogNag(final Campaign campaign, final @Nullable AdministratorSpecialization specialization,
+                              final String nagConstant, final String messageKey) {
         ImmersiveDialogCore dialog = constructDialog(campaign, specialization, messageKey);
         processDialogChoice(dialog.getDialogChoice(), nagConstant);
     }
@@ -133,7 +134,8 @@ public class ImmersiveDialogNag {
      * @return The constructed {@link ImmersiveDialogSimple} instance containing the specified speaker, messages, and
      *       button labels.
      */
-    protected ImmersiveDialogCore constructDialog(Campaign campaign, AdministratorSpecialization specialization, String messageKey) {
+    protected ImmersiveDialogCore constructDialog(Campaign campaign, AdministratorSpecialization specialization,
+                                                  String messageKey) {
         return new ImmersiveDialogCore(campaign,
               getSpeaker(campaign, specialization),
               null,
@@ -143,6 +145,7 @@ public class ImmersiveDialogNag {
               null,
               true,
               null,
+              campaign.getCampaignFactionIcon(),
               true);
     }
 

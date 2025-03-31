@@ -27,21 +27,6 @@
  */
 package mekhq.gui.dialog.resupplyAndCaches;
 
-import megamek.client.ui.swing.util.UIUtil;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.Campaign.AdministratorSpecialization;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
-import mekhq.campaign.mission.resupplyAndCaches.Resupply;
-import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
-
 import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.finances.enums.TransactionType.EQUIPMENT_PURCHASE;
@@ -57,8 +42,31 @@ import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getS
 import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.createPartsReport;
 import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.formatColumnData;
 import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.getEnemyFactionReference;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import static mekhq.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.awt.BorderLayout;
+import java.util.List;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+
+import megamek.client.ui.swing.util.UIUtil;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.Campaign.AdministratorSpecialization;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 
 /**
  * The {@code DialogItinerary} class generates and displays dialogs related to resupply operations. These include normal
@@ -117,17 +125,17 @@ public class DialogItinerary {
             }
 
             speakerIcon = getSpeakerIcon(campaign, speaker);
-            speakerIcon = scaleImageIconToWidth(speakerIcon, 100);
+            speakerIcon = scaleImageIcon(speakerIcon, 100, true);
         } else if (resupplyType.equals(RESUPPLY_SMUGGLER)) {
             speakerName = getFormattedTextAt(RESOURCE_BUNDLE, "guerrillaSpeaker.text");
 
             speakerIcon = getFactionLogo(campaign, "PIR", true);
-            speakerIcon = scaleImageIconToWidth(speakerIcon, 200);
+            speakerIcon = scaleImageIcon(speakerIcon, 200, true);
         } else {
             speakerName = contract.getEmployerName(campaign.getGameYear());
 
             speakerIcon = getFactionLogo(campaign, contract.getEmployerCode(), true);
-            speakerIcon = scaleImageIconToWidth(speakerIcon, 200);
+            speakerIcon = scaleImageIcon(speakerIcon, 200, true);
         }
 
         StringBuilder message = new StringBuilder(getInitialDescription(resupply));

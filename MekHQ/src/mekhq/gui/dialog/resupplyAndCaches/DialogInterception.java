@@ -27,6 +27,30 @@
  */
 package mekhq.gui.dialog.resupplyAndCaches;
 
+import static megamek.common.Compute.randomInt;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerDescription;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerIcon;
+import static mekhq.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
@@ -34,17 +58,6 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.personnel.Person;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import static megamek.common.Compute.randomInt;
-import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerDescription;
-import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerIcon;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * The {@code DialogInterception} class is responsible for displaying a UI dialog when an interception scenario occurs
@@ -116,7 +129,7 @@ public class DialogInterception extends JDialog {
         // Add speaker image (icon)
         ImageIcon speakerIcon = getSpeakerIcon(campaign, speaker);
         if (speakerIcon != null) {
-            speakerIcon = scaleImageIconToWidth(speakerIcon, 100);
+            speakerIcon = scaleImageIcon(speakerIcon, 100, true);
         }
         JLabel imageLabel = new JLabel();
         imageLabel.setIcon(speakerIcon);

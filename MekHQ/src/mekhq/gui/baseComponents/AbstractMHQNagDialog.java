@@ -29,7 +29,7 @@ package mekhq.gui.baseComponents;
 
 import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerDescription;
 import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerIcon;
-import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import static mekhq.utilities.ImageUtilities.scaleImageIcon;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -132,7 +132,7 @@ public abstract class AbstractMHQNagDialog extends JDialog {
         // Add speaker image (icon)
         ImageIcon speakerIcon = getSpeakerIcon(campaign, speaker);
         if (speakerIcon != null) {
-            speakerIcon = scaleImageIconToWidth(speakerIcon, 100);
+            speakerIcon = scaleImageIcon(speakerIcon, 100, true);
         }
         JLabel imageLabel = new JLabel();
         imageLabel.setIcon(speakerIcon);
