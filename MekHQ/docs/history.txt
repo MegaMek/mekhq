@@ -83,6 +83,8 @@ MEKHQ VERSION HISTORY:
 + PR #6471: Updated Combat Team Training Duration and Documentation
 + PR #6472: Added Helper Methods to PersonnelTableMouseAdapter for Cleaner Campaign and Frame Access
 + PR #6474: Removed Pending Scenario Check When Completing Missions/Contracts
++ PR #6480: Make planetary acquisitions even slower to be in line with RAW
++ PR #6484: Correct SUCS id on a few planets
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
