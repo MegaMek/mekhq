@@ -1662,19 +1662,19 @@ public class CampaignGUI extends JPanel {
                 }
 
                 name = "<html>" +
-                       tech.getFullName() +
-                       ", <b>" +
-                       SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false)) +
-                       "</b> " +
-                       tech.getPrimaryRoleDesc() +
-                       " (" +
-                       getCampaign().getTargetFor(r, tech).getValueAsString() +
-                       "+), " +
-                       tech.getMinutesLeft() +
-                       '/' +
+                             tech.getFullName() +
+                             ", <b>" +
+                             SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false)) +
+                             "</b> " +
+                             tech.getPrimaryRoleDesc() +
+                             " (" +
+                             getCampaign().getTargetFor(r, tech).getValueAsString() +
+                             "+), " +
+                             tech.getMinutesLeft() +
+                             '/' +
                              tech.getDailyAvailableTechTime(getCampaign().getCampaignOptions()
                                                                   .isTechsUseAdministration()) +
-                       " minutes</html>";
+                             " minutes</html>";
                 techHash.put(name, tech);
                 if (tech.isRightTechTypeFor(r)) {
                     techList.add(lastRightTech++, name);
@@ -2594,6 +2594,7 @@ public class CampaignGUI extends JPanel {
                   inCharacterMessage,
                   null,
                   outOfCharacterMessage,
+                  null,
                   false);
 
             dayEndingEvent.cancel();
@@ -2635,6 +2636,7 @@ public class CampaignGUI extends JPanel {
                   inCharacterMessage,
                   null,
                   outOfCharacterMessage,
+                  null,
                   false);
 
             dayEndingEvent.cancel();

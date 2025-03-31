@@ -106,6 +106,7 @@ public class ComingOfAgeAnnouncement {
               inCharacterMessage,
               getButtonLabels(birthdayHaverFirstName),
               outOfCharacterMessage,
+              null,
               true);
 
         if (dialog.getDialogChoice() == SUPPRESS_DIALOG_RESPONSE_INDEX) {

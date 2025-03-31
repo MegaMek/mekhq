@@ -27,17 +27,17 @@
  */
 package mekhq.gui.dialog;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.Person;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
+import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
-import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.Person;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
 /**
  * A dialog for managing the replacement of limbs in a campaign. This immersive dialog provides an in-character message
@@ -75,6 +75,7 @@ public class ReplacementLimbDialog extends ImmersiveDialogCore {
               null,
               false,
               null,
+              null,
               true);
     }
 
@@ -97,7 +98,8 @@ public class ReplacementLimbDialog extends ImmersiveDialogCore {
      *
      * @return A {@link List} of {@link ButtonLabelTooltipPair} objects representing the dialog buttons.
      */
-    private static List<ButtonLabelTooltipPair> createButtons(boolean hasQualifiedDoctor, boolean isPlanetside, boolean hasSufficientFunds) {
+    private static List<ButtonLabelTooltipPair> createButtons(boolean hasQualifiedDoctor, boolean isPlanetside,
+                                                              boolean hasSufficientFunds) {
         List<ButtonLabelTooltipPair> buttons = new ArrayList<>();
 
         if (!hasSufficientFunds || (!hasQualifiedDoctor && !isPlanetside)) {
@@ -131,7 +133,9 @@ public class ReplacementLimbDialog extends ImmersiveDialogCore {
      *
      * @return A {@link String} containing the localized in-character message for the dialog.
      */
-    private static String createInCharacterMessage(boolean isPlanetside, boolean hasQualifiedDoctors, String commanderAddress, Person patient, Money cost, boolean hasSufficientFunds) {
+    private static String createInCharacterMessage(boolean isPlanetside, boolean hasQualifiedDoctors,
+                                                   String commanderAddress, Person patient, Money cost,
+                                                   boolean hasSufficientFunds) {
         String keyAddendum = "normal";
 
         if (!hasQualifiedDoctors && hasSufficientFunds) {

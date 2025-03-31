@@ -86,6 +86,7 @@ public class BirthAnnouncement {
               inCharacterMessage,
               getButtonLabels(parentFirstName),
               outOfCharacterMessage,
+              null,
               true);
 
         if (dialog.getDialogChoice() == SUPPRESS_DIALOG_RESPONSE_INDEX) {

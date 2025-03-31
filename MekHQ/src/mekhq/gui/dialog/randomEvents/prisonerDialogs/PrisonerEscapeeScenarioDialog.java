@@ -27,15 +27,15 @@
  */
 package mekhq.gui.dialog.randomEvents.prisonerDialogs;
 
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.util.List;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
-
-import java.util.List;
-
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * Represents a dialog triggered after prisoners have been tracked down, culminating in a special scenario.
@@ -63,6 +63,7 @@ public class PrisonerEscapeeScenarioDialog extends ImmersiveDialogCore {
               createOutOfCharacterMessage(),
               null,
               false,
+              null,
               null,
               true);
     }

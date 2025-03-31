@@ -178,6 +178,7 @@ public class SkillDeprecationTool {
                   getInCharacterMessage(skillName),
                   getButtonLabels(),
                   getOutOfCharacterMessage(skillName, refundValue),
+                  null,
                   true);
         }
 

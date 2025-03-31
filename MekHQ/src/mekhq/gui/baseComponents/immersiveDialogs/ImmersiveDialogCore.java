@@ -60,6 +60,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.GlossaryDialog;
+import mekhq.utilities.ImageUtilities;
 
 /**
  * An immersive dialog used in MekHQ to display interactions between speakers, messages, and actions. The dialog
@@ -152,7 +153,8 @@ public class ImmersiveDialogCore extends JDialog {
     public ImmersiveDialogCore(Campaign campaign, @Nullable Person leftSpeaker, @Nullable Person rightSpeaker,
                                String centerMessage, List<ButtonLabelTooltipPair> buttons,
                                @Nullable String outOfCharacterMessage, @Nullable Integer centerWidth,
-                               boolean isVerticalLayout, @Nullable JPanel spinnerPanel, boolean isModal) {
+                               boolean isVerticalLayout, @Nullable JPanel spinnerPanel, @Nullable ImageIcon imageIcon,
+                               boolean isModal) {
         // Initialize
         this.campaign = campaign;
         this.leftSpeaker = leftSpeaker;
@@ -187,7 +189,7 @@ public class ImmersiveDialogCore extends JDialog {
         }
 
         // Center box for the message
-        JPanel pnlCenter = createCenterBox(centerMessage, buttons, isVerticalLayout, spinnerPanel);
+        JPanel pnlCenter = createCenterBox(centerMessage, buttons, isVerticalLayout, spinnerPanel, imageIcon);
         constraints.gridx = gridx;
         constraints.gridy = 0;
         constraints.weightx = 2;
@@ -259,12 +261,11 @@ public class ImmersiveDialogCore extends JDialog {
      * @return A {@link JPanel} with the message displayed in the center and buttons at the bottom.
      */
     private JPanel createCenterBox(String centerMessage, List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout,
-                                   @Nullable JPanel spinnerPanel) {
+                                   @Nullable JPanel spinnerPanel, @Nullable ImageIcon imageIcon) {
         northPanel = new JPanel(new BorderLayout());
 
         // Buttons panel
         JPanel buttonPanel = populateButtonPanel(buttons, isVerticalLayout, spinnerPanel);
-
 
         // Create a JEditorPane for the center message
         JEditorPane editorPane = new JEditorPane();
@@ -280,10 +281,9 @@ public class ImmersiveDialogCore extends JDialog {
               fontStyle,
               centerMessage));
         setFontScaling(editorPane, false, 1.1);
+
         // Add a HyperlinkListener to capture hyperlink clicks
-        editorPane.addHyperlinkListener(evt -> {
-            hyperlinkEventListenerActions(evt);
-        });
+        editorPane.addHyperlinkListener(this::hyperlinkEventListenerActions);
 
         // Wrap the JEditorPane in a JScrollPane
         JScrollPane scrollPane = new JScrollPane(editorPane);
@@ -297,12 +297,35 @@ public class ImmersiveDialogCore extends JDialog {
         scrollPaneContainer.setBorder(BorderFactory.createEmptyBorder(PADDING, 0, PADDING, 0));
         scrollPaneContainer.add(scrollPane, BorderLayout.CENTER);
 
-        // Add the scrollPane with padding to the northPanel
-        northPanel.add(scrollPaneContainer, BorderLayout.CENTER);
+        // Create a JLabel for the image above the JEditorPane
+        JLabel imageLabel = new JLabel();
+        if (imageIcon != null) {
+            if (imageIcon.getIconWidth() > CENTER_WIDTH) {
+                imageIcon = ImageUtilities.scaleImageIcon(imageIcon, CENTER_WIDTH, true);
+            }
 
-        // Ensure the scrollbars default to the top-left position
-        SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
+            int heightLimit = max(1, CENTER_WIDTH / 3); // I went with 3 because that provided the best feel
+            if (imageIcon.getIconHeight() > heightLimit) {
+                imageIcon = ImageUtilities.scaleImageIcon(imageIcon, heightLimit, false);
+            }
 
+            imageLabel.setIcon(imageIcon);
+            imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            imageLabel.setBorder(BorderFactory.createEmptyBorder(PADDING, 0, PADDING, 0));
+        }
+
+        // Create a panel for the image and editorPane
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BorderLayout());
+        if (imageIcon != null) {
+            contentPanel.add(imageLabel, BorderLayout.NORTH);
+        }
+        contentPanel.add(scrollPaneContainer, BorderLayout.CENTER);
+
+        // Add the contentPanel to the northPanel
+        northPanel.add(contentPanel, BorderLayout.CENTER);
+
+        // Add the buttons panel to the northPanel
         northPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         return northPanel;

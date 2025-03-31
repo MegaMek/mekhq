@@ -27,13 +27,6 @@
  */
 package mekhq.campaign.randomEvents;
 
-import megamek.common.Entity;
-import megamek.logging.MMLogger;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
-import mekhq.gui.dialog.MercenaryAuctionDialog;
-
 import static java.lang.Math.max;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
@@ -43,6 +36,13 @@ import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import megamek.common.Entity;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.dialog.MercenaryAuctionDialog;
 
 /**
  * This class handles the logic for determining auction eligibility based on the player's resources and provides the
@@ -66,7 +66,8 @@ public class MercenaryAuction {
      * @param campaign The current {@link Campaign} instance where the auction takes place.
      * @param unitType The type of unit being auctioned (e.g., `MECH`, `VEHICLE`).
      */
-    public MercenaryAuction(Campaign campaign, int requiredCombatTeams, StratconCampaignState campaignState, int unitType) {
+    public MercenaryAuction(Campaign campaign, int requiredCombatTeams, StratconCampaignState campaignState,
+                            int unitType) {
         String faction = campaign.getFaction().getShortName();
 
         Entity entity = getEntity(faction,
@@ -112,6 +113,7 @@ public class MercenaryAuction {
                   inCharacterMessage,
                   null,
                   outOfCharacterMessage,
+                  null,
                   true);
             return;
         }
@@ -148,6 +150,7 @@ public class MercenaryAuction {
                       getFormattedTextAt(RESOURCE_BUNDLE, "auction.successful", entity.getChassis(), deliveryTime),
                       null,
                       null,
+                      null,
                       true);
             } else {
                 // This dialog informs the player their bid was unsuccessful
@@ -155,6 +158,7 @@ public class MercenaryAuction {
                       campaign.getSeniorAdminPerson(TRANSPORT),
                       null,
                       getFormattedTextAt(RESOURCE_BUNDLE, "auction.failure", entity.getChassis()),
+                      null,
                       null,
                       null,
                       true);

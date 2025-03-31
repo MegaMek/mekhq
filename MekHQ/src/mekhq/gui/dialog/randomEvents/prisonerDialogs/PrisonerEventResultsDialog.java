@@ -27,15 +27,15 @@
  */
 package mekhq.gui.dialog.randomEvents.prisonerDialogs;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.util.List;
+
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
-
-import java.util.List;
-
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * Represents a dialog triggered after a random prisoner event to communicate its results to the player.
@@ -62,7 +62,8 @@ public class PrisonerEventResultsDialog extends ImmersiveDialogCore {
      * @param isSuccessful {@code true} if the event concluded successfully, {@code false} if the event failed.
      * @param eventReport  A detailed report of the event's outcome, presented out-of-character for additional clarity.
      */
-    public PrisonerEventResultsDialog(Campaign campaign, @Nullable Person speaker, PrisonerEvent event, int choiceIndex, boolean isSuccessful, String eventReport) {
+    public PrisonerEventResultsDialog(Campaign campaign, @Nullable Person speaker, PrisonerEvent event, int choiceIndex,
+                                      boolean isSuccessful, String eventReport) {
         super(campaign,
               speaker,
               null,
@@ -71,6 +72,7 @@ public class PrisonerEventResultsDialog extends ImmersiveDialogCore {
               eventReport,
               null,
               false,
+              null,
               null,
               true);
     }
@@ -108,7 +110,8 @@ public class PrisonerEventResultsDialog extends ImmersiveDialogCore {
      *
      * @return A formatted string containing the in-character message describing the event results.
      */
-    private static String createInCharacterMessage(Campaign campaign, PrisonerEvent event, int choiceIndex, boolean isSuccessful) {
+    private static String createInCharacterMessage(Campaign campaign, PrisonerEvent event, int choiceIndex,
+                                                   boolean isSuccessful) {
         String suffix = isSuccessful ? SUFFIX_SUCCESS : SUFFIX_FAILURE;
         String commanderAddress = campaign.getCommanderAddress(false);
         return getFormattedTextAt(RESOURCE_BUNDLE,
