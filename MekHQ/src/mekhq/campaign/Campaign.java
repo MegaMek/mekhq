@@ -3107,14 +3107,35 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Returns a list of active technicians.
+     * Retrieves a list of active technicians, with options to include only those with time remaining,
+     * prioritize elite technicians, and expand the search to include technicians with additional roles.
      *
-     * @param noZeroMinute If TRUE, then techs with no time remaining will be excluded from the list.
-     * @param eliteFirst   If TRUE and sorted also TRUE, then return the list sorted from best to worst
-     * @param expanded     If TRUE, then include techs with expanded roles (e.g. Tech/Vessel skill)
+     * <p>The resulting list includes {@link Person} objects who qualify as technicians ({@link Person#isTech()})
+     * or, if specified, as expanded technicians ({@link Person#isTechExpanded()}). If the person is part of a
+     * self-crewed unit (e.g., an engineer on a self-crewed vessel), they are also included in the list.</p>
      *
-     * @return The list of active {@link Person}s who qualify as technicians ({@link Person#isTech()}), or who qualify
-     *       as expanded technicians ({@link Person#isTechExpanded()}).
+     * <p>The returned list can be customized and sorted based on a variety of criteria:</p>
+     * <ul>
+     *   <li>Technicians with no remaining available time can be excluded if {@code noZeroMinute} is set to {@code true}.</li>
+     *   <li>The list can be sorted from elite (best) to least skilled if {@code eliteFirst} is set to {@code true}.</li>
+     *   <li>When {@code expanded} is set to {@code true}, technicians with expanded roles (e.g., dual skill sets) are included
+     *       in addition to regular technicians.</li>
+     *   <li>The list is further sorted in the following order:
+     *     <ol>
+     *       <li>By skill level (default: lowest to highest, or highest to lowest if elite-first enabled).</li>
+     *       <li>By available daily tech time (highest to lowest).</li>
+     *       <li>By rank (lowest to highest).</li>
+     *     </ol>
+     *   </li>
+     * </ul>
+     *
+     * @param noZeroMinute If {@code true}, excludes technicians with no remaining available minutes.
+     * @param eliteFirst   If {@code true}, sorts the list to place the most skilled technicians at the top.
+     * @param expanded     If {@code true}, includes technicians with expanded roles (e.g., those qualifying
+     *                     under {@link Person#isTechExpanded()}).
+     *
+     * @return A list of active {@link Person} objects who qualify as technicians or expanded technicians,
+     *         sorted by skill, available time, and rank as specified by the input parameters.
      */
     public List<Person> getTechsExpanded(final boolean noZeroMinute, final boolean eliteFirst, final boolean expanded) {
         final List<Person> techs = getActivePersonnel().stream()
@@ -3130,21 +3151,26 @@ public class Campaign implements ITechManager {
         }
 
         // Return the tech collection sorted worst to best Skill Level, or reversed if we want elites first
-        Comparator<Person> techSorter = Comparator.comparingInt(person -> person.getSkillLevel(this,
-              !person.getPrimaryRole().isTech() && person.getSecondaryRole().isTechSecondary()).ordinal());
+        techs.sort(Comparator.comparingInt(person -> person.getSkillLevel(this,
+              !person.getPrimaryRole().isTech() && person.getSecondaryRole().isTechSecondary()).ordinal()));
 
         if (eliteFirst) {
-            techSorter = techSorter.reversed()
-                               .thenComparing(Comparator.comparingInt(Person::getDailyAvailableTechTime).reversed());
-        } else {
-            techSorter = techSorter.thenComparing(Comparator.comparingInt(Person::getMinutesLeft).reversed());
+            Collections.reverse(techs);
         }
 
-        techSorter = techSorter.thenComparing(new PersonTitleSorter());
+        // sort based on available minutes (highest -> lowest)
+        techs.sort(Comparator.comparingInt(person -> person.getDailyAvailableTechTime(false)));
 
-        if (techs.size() > 1) {
-            techs.subList(1, techs.size()).sort(techSorter);
-        }
+        // finally, sort based on rank (lowest -> highest)
+        techs.sort((person1, person2) -> {
+            if (person1.outRanks(person2)) {
+                return 1; // person1 outranks person2 -> person2 should come first
+            } else if (person2.outRanks(person1)) {
+                return -1; // person2 outranks person1 -> person1 should come first
+            } else {
+                return 0; // They are considered equal
+            }
+        });
 
         return techs;
     }
@@ -4107,7 +4133,8 @@ public class Campaign implements ITechManager {
             theRefit.addTimeSpent(tech.getMinutesLeft());
             tech.setMinutesLeft(0);
             report = report + ", " + theRefit.getTimeLeft() + " minutes left. Completion ";
-            int daysLeft = (int) Math.ceil((double) theRefit.getTimeLeft() / (double) tech.getDailyAvailableTechTime());
+            int daysLeft = (int) Math.ceil((double) theRefit.getTimeLeft() /
+                                                 (double) tech.getDailyAvailableTechTime(campaignOptions.isTechsUseAdministration()));
             if (daysLeft == 1) {
                 report += " tomorrow.</b>";
             } else {
@@ -4150,7 +4177,7 @@ public class Campaign implements ITechManager {
                         refit(theRefit);
                         report += " Completion ";
                         int daysLeft = (int) Math.ceil((double) theRefit.getTimeLeft() /
-                                                             (double) tech.getDailyAvailableTechTime());
+                                                             (double) tech.getDailyAvailableTechTime(campaignOptions.isTechsUseAdministration()));
                         if (daysLeft == 1) {
                             report += " tomorrow.</b>";
                         } else {
@@ -4286,10 +4313,11 @@ public class Campaign implements ITechManager {
                 report += " - <b>";
                 report += partWork.getTimeLeft();
                 report += " minutes left. Work";
-                if ((minutesUsed > 0) && (tech.getDailyAvailableTechTime() > 0)) {
+                if ((minutesUsed > 0) &&
+                          (tech.getDailyAvailableTechTime(campaignOptions.isTechsUseAdministration()) > 0)) {
                     report += " will be finished ";
                     int daysLeft = (int) Math.ceil((double) partWork.getTimeLeft() /
-                                                         (double) tech.getDailyAvailableTechTime());
+                                                         (double) tech.getDailyAvailableTechTime(campaignOptions.isTechsUseAdministration()));
                     if (daysLeft == 1) {
                         report += " tomorrow.</b>";
                     } else {
@@ -4849,7 +4877,7 @@ public class Campaign implements ITechManager {
                 }
             }
 
-            person.resetMinutesLeft();
+            person.resetMinutesLeft(campaignOptions.isTechsUseAdministration());
             person.setAcquisition(0);
 
             processAdvancedMedicalEvents(person);
@@ -5121,7 +5149,7 @@ public class Campaign implements ITechManager {
             try {
                 u.resetEngineer();
                 if (null != u.getEngineer()) {
-                    u.getEngineer().resetMinutesLeft();
+                    u.getEngineer().resetMinutesLeft(campaignOptions.isTechsUseAdministration());
                 }
 
                 doMaintenance(u);

@@ -1662,18 +1662,19 @@ public class CampaignGUI extends JPanel {
                 }
 
                 name = "<html>" +
-                             tech.getFullName() +
-                             ", <b>" +
-                             SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false)) +
-                             "</b> " +
-                             tech.getPrimaryRoleDesc() +
-                             " (" +
-                             getCampaign().getTargetFor(r, tech).getValueAsString() +
-                             "+), " +
-                             tech.getMinutesLeft() +
-                             '/' +
-                             tech.getDailyAvailableTechTime() +
-                             " minutes</html>";
+                       tech.getFullName() +
+                       ", <b>" +
+                       SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false)) +
+                       "</b> " +
+                       tech.getPrimaryRoleDesc() +
+                       " (" +
+                       getCampaign().getTargetFor(r, tech).getValueAsString() +
+                       "+), " +
+                       tech.getMinutesLeft() +
+                       '/' +
+                             tech.getDailyAvailableTechTime(getCampaign().getCampaignOptions()
+                                                                  .isTechsUseAdministration()) +
+                       " minutes</html>";
                 techHash.put(name, tech);
                 if (tech.isRightTechTypeFor(r)) {
                     techList.add(lastRightTech++, name);

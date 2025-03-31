@@ -362,6 +362,7 @@ public class HireBulkPersonnelDialog extends JDialog {
                     overrideSkills(campaignOptions.isAdminsHaveNegotiation(),
                           campaignOptions.isAdminsHaveScrounge(),
                           campaignOptions.isDoctorsUseAdministration(),
+                          campaignOptions.isTechsUseAdministration(),
                           useExtraRandomness,
                           person,
                           selectedItem.getRole(),

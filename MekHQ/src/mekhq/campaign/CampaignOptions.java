@@ -127,6 +127,7 @@ public class CampaignOptions {
     private boolean useEraMods;
     private boolean assignedTechFirst;
     private boolean resetToFirstTech;
+    private boolean techsUseAdministration;
     private boolean useQuirks;
     private boolean useAeroSystemHits;
     private boolean destroyByMargin;
@@ -639,8 +640,9 @@ public class CampaignOptions {
         // Repair
         useEraMods = false;
         assignedTechFirst = false;
-        resetToFirstTech = false;
-        useQuirks = false;
+        resetToFirstTech  = false;
+        techsUseAdministration = false;
+        useQuirks         = false;
         useAeroSystemHits = false;
         destroyByMargin = false;
         destroyMargin = 4;
@@ -3631,6 +3633,31 @@ public class CampaignOptions {
     }
 
     /**
+     * Checks whether administrative adjustments are applied for technician time calculations.
+     *
+     * <p>This configuration determines if technicians' daily available time should be adjusted
+     * using administrative multipliers in relevant calculations.</p>
+     *
+     * @return {@code true} if administrative adjustments are enabled for technicians, {@code false} otherwise.
+     */
+    public boolean isTechsUseAdministration() {
+        return techsUseAdministration;
+    }
+
+    /**
+     * Sets whether administrative adjustments should be applied to technician time calculations.
+     *
+     * <p>Enabling this setting applies administrative multipliers to modify technicians' daily available time
+     * in relevant calculations.</p>
+     *
+     * @param techsUseAdministration {@code true} to enable administrative adjustments for technicians, {@code false} to
+     *                               disable them.
+     */
+    public void setTechsUseAdministration(final boolean techsUseAdministration) {
+        this.techsUseAdministration = techsUseAdministration;
+    }
+
+    /**
      * @return true to use the origin faction for personnel names instead of a set faction
      */
     public boolean isUseOriginFactionForNames() {
@@ -4752,6 +4779,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEraMods", useEraMods);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignedTechFirst", assignedTechFirst);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "resetToFirstTech", resetToFirstTech);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techsUseAdministration", techsUseAdministration);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useQuirks", useQuirks);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "xpCostMultiplier", xpCostMultiplier);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioXP", scenarioXP);
@@ -5396,6 +5424,8 @@ public class CampaignOptions {
                     retVal.assignedTechFirst = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("resetToFirstTech")) {
                     retVal.resetToFirstTech = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("techsUseAdministration")) {
+                    retVal.techsUseAdministration = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("useQuirks")) {
                     retVal.useQuirks = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("xpCostMultiplier")) {

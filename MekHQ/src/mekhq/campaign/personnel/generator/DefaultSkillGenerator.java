@@ -124,6 +124,10 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         }
 
         // roll Administration skill
+        if (campaignOptions.isTechsUseAdministration() && (person.isTech() || primaryRole.isVesselCrew())) {
+            addSkill(person, SkillType.S_ADMIN, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
+        }
+
         if (campaignOptions.isDoctorsUseAdministration() && (primaryRole.isDoctor())) {
             addSkill(person, SkillType.S_ADMIN, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
         }
