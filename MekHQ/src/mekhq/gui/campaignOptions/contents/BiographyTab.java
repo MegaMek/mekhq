@@ -507,6 +507,7 @@ public class BiographyTab {
 
     private JPanel createLifeEventsPanel() {
         // Contents
+        chkShowLifeEventDialogBirths = new CampaignOptionsCheckBox("ShowLifeEventDialogBirths");
         chkShowLifeEventDialogComingOfAge = new CampaignOptionsCheckBox("ShowLifeEventDialogComingOfAge");
 
         // Layout the Panel
