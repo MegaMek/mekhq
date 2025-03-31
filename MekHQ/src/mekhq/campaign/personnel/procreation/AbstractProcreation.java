@@ -30,6 +30,7 @@ package mekhq.campaign.personnel.procreation;
 import static mekhq.campaign.mod.am.InjuryTypes.POSTPARTUM_RECOVERY;
 import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -37,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.UUID;
 
 import megamek.codeUtilities.MathUtility;
