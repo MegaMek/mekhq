@@ -46,7 +46,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.options.IOption;
 import mekhq.MHQConstants;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.ExtraData.IntKey;
@@ -61,6 +60,7 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.lifeEvents.BirthAnnouncement;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -82,8 +82,7 @@ public abstract class AbstractProcreation {
     public static final IntKey PREGNANCY_CHILDREN_DATA = new IntKey("procreation:children");
     public static final StringKey PREGNANCY_FATHER_DATA = new StringKey("procreation:father");
 
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-          MekHQ.getMHQOptions().getLocale());
+    private static final String RESOURCE_BUNDLE = "mekhq.resources." + AbstractProcreation.class.getSimpleName();
     //endregion Variable Declarations
 
     //region Constructors
@@ -219,70 +218,70 @@ public abstract class AbstractProcreation {
      */
     public @Nullable String canProcreate(final LocalDate today, final Person person, final boolean randomProcreation) {
         if (person.getGender().isMale()) {
-            return resources.getString("cannotProcreate.Gender.text");
+            return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.Gender.text");
         }
 
         if (!person.isTryingToConceive()) {
-            return resources.getString("cannotProcreate.NotTryingForABaby.text");
+            return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.NotTryingForABaby.text");
         }
 
         if (person.isPregnant()) {
-            return resources.getString("cannotProcreate.AlreadyPregnant.text");
+            return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.AlreadyPregnant.text");
         }
 
         if (!person.getStatus().isActive()) {
-            return resources.getString("cannotProcreate.Inactive.text");
+            return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.Inactive.text");
         }
 
         if (person.isDeployed()) {
-            return resources.getString("cannotProcreate.Deployed.text");
+            return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.Deployed.text");
         }
 
         // Not allowing under-18s to procreate is project policy
         if (person.isChild(today, true)) {
-            return resources.getString("cannotProcreate.Child.text");
+            return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.Child.text");
         }
 
         if (person.getAge(today) >= 51) {
-            return resources.getString("cannotProcreate.TooOld.text");
+            return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.TooOld.text");
         }
 
         if (!isUseClanPersonnelProcreation() && person.isClanPersonnel()) {
-            return resources.getString("cannotProcreate.ClanPersonnel.text");
+            return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.ClanPersonnel.text");
         }
 
         if (!isUsePrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
-            return resources.getString("cannotProcreate.Prisoner.text");
+            return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.Prisoner.text");
         }
 
         if (randomProcreation) {
             if (!isUseRelationshiplessProcreation() && !person.getGenealogy().hasSpouse()) {
-                return resources.getString("cannotProcreate.NoSpouse.text");
+                return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.NoSpouse.text");
             }
 
             if (!isUseRandomClanPersonnelProcreation() && person.isClanPersonnel()) {
-                return resources.getString("cannotProcreate.RandomClanPersonnel.text");
+                return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.RandomClanPersonnel.text");
             }
 
             if (!isUseRandomPrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
-                return resources.getString("cannotProcreate.RandomPrisoner.text");
+                return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.RandomPrisoner.text");
             }
 
             if (person.getGenealogy().hasSpouse()) {
                 if (person.getGenealogy().getSpouse().getGender().isFemale()) {
-                    return resources.getString("cannotProcreate.FemaleSpouse.text");
+                    return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.FemaleSpouse.text");
                 }
 
                 if (!person.getGenealogy().getSpouse().isTryingToConceive()) {
-                    return resources.getString("cannotProcreate.SpouseNotTryingForABaby.text");
+                    return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.SpouseNotTryingForABaby.text");
                 }
 
                 if (!person.getGenealogy().getSpouse().getStatus().isActive()) {
-                    return resources.getString("cannotProcreate.InactiveSpouse.text");
+                    return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.InactiveSpouse.text");
                 }
 
                 if (person.getGenealogy().getSpouse().isDeployed()) {
-                    return resources.getString("cannotProcreate.DeployedSpouse.text");
+                    return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.DeployedSpouse.text");
                 }
 
                 // Not allowing under-18s to procreate is project policy
@@ -290,16 +289,16 @@ public abstract class AbstractProcreation {
                 // However, we're keeping it as we don't want campaigns from pre-policy
                 // implementation being able to circumnavigate project policy.
                 if (person.getGenealogy().getSpouse().isChild(today, true)) {
-                    return resources.getString("cannotProcreate.ChildSpouse.text");
+                    return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.ChildSpouse.text");
                 }
 
                 if (!isUseRandomClanPersonnelProcreation() && person.getGenealogy().getSpouse().isClanPersonnel()) {
-                    return resources.getString("cannotProcreate.ClanPersonnelSpouse.text");
+                    return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.ClanPersonnelSpouse.text");
                 }
 
                 if (!isUseRandomPrisonerProcreation() &&
                           person.getGenealogy().getSpouse().getPrisonerStatus().isCurrentPrisoner()) {
-                    return resources.getString("cannotProcreate.PrisonerSpouse.text");
+                    return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.PrisonerSpouse.text");
                 }
             }
         }
@@ -349,10 +348,11 @@ public abstract class AbstractProcreation {
               .set(PREGNANCY_FATHER_DATA,
                     mother.getGenealogy().hasSpouse() ? mother.getGenealogy().getSpouse().getId().toString() : null);
 
-        final String babyAmount = resources.getString("babyAmount.text").split(",")[size - 1];
+        final String babyAmount = getFormattedTextAt(RESOURCE_BUNDLE, "babyAmount.text").split(",")[size - 1];
 
         if (!isNoReport) {
-            campaign.addReport(String.format(resources.getString("babyConceived.report"),
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "babyConceived.report",
                   mother.getHyperlinkedName(),
                   babyAmount).trim());
         }
@@ -401,9 +401,10 @@ public abstract class AbstractProcreation {
 
         // Output a specific report to the campaign if they are giving birth to multiple children
         if (size > 1) {
-            campaign.addReport(String.format(resources.getString("multipleBabiesBorn.report"),
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "multipleBabiesBorn.report",
                   mother.getHyperlinkedName(),
-                  resources.getString("babyAmount.text").split(",")[size - 1]));
+                  getFormattedTextAt(RESOURCE_BUNDLE, "babyAmount.text").split(",")[size - 1]));
         }
 
         // Create Babies
@@ -412,23 +413,22 @@ public abstract class AbstractProcreation {
             final Person baby = campaign.newDependent(Gender.RANDOMIZE,
                   mother.getOriginFaction(),
                   campaign.getLocation().getPlanet());
-            baby.setSurname(campaign.getCampaignOptions()
-                                  .getBabySurnameStyle()
+            baby.setSurname(campaignOptions.getBabySurnameStyle()
                                   .generateBabySurname(mother, father, baby.getGender()));
             baby.setDateOfBirth(today);
 
             // Create reports and log the birth
-            campaign.addReport(String.format(resources.getString("babyBorn.report"),
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "babyBorn.report",
                   mother.getHyperlinkedName(),
                   baby.getHyperlinkedName(),
                   GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
             logAndUpdateFamily(campaign, today, mother, baby, father);
 
             // Founder Tag Assignment
-            if (campaign.getCampaignOptions().isAssignNonPrisonerBabiesFounderTag() &&
-                      !prisonerStatus.isCurrentPrisoner()) {
+            if (campaignOptions.isAssignNonPrisonerBabiesFounderTag() && !prisonerStatus.isCurrentPrisoner()) {
                 baby.setFounder(true);
-            } else if (campaign.getCampaignOptions().isAssignChildrenOfFoundersFounderTag()) {
+            } else if (campaignOptions.isAssignChildrenOfFoundersFounderTag()) {
                 baby.setFounder(baby.getGenealogy().getParents().stream().anyMatch(Person::isFounder));
             }
 
@@ -454,6 +454,11 @@ public abstract class AbstractProcreation {
             } else {
                 int currentHits = mother.getHits();
                 mother.setHits(currentHits + 1);
+            }
+
+            // Alert the player
+            if (campaignOptions.isShowLifeEventDialogBirths()) {
+                new BirthAnnouncement(campaign, mother, baby.getGender(), size);
             }
         }
 
