@@ -56,6 +56,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.MekView;
 import megamek.common.TargetRoll;
+import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -544,15 +545,22 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     @Override
-    public Person getSelectedTech() {
-        assert techTable != null;
-
-        int row = techTable.getSelectedRow();
-        if (row < 0) {
+    public @Nullable Person getSelectedTech() {
+        if (techTable == null) {
+            logger.error(new IllegalStateException(), "Tech table is not initialized.");
             return null;
         }
 
-        assert techsModel != null;
+        int row = techTable.getSelectedRow();
+        if (row < 0) {
+            return null; // No row is selected
+        }
+
+        if (techsModel == null) {
+            logger.error(new IllegalStateException(), "Tech model is not initialized.");
+            return null;
+        }
+
         return techsModel.getTechAt(techTable.convertRowIndexToModel(row));
     }
 
