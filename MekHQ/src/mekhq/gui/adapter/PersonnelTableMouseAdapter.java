@@ -42,6 +42,7 @@ import static mekhq.campaign.personnel.SkillType.S_DOCTOR;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
+import static mekhq.campaign.personnel.enums.education.EducationLevel.DOCTORATE;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 
@@ -140,6 +141,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_BEGIN_EDUCATION_RE_ENROLLMENT = "BEGIN_EDUCATION_RE_ENROLLMENT";
     private static final String CMD_COMPLETE_STAGE = "COMPLETE_STAGE";
     private static final String CMD_DROP_OUT = "DROP_OUT";
+    private static final String CMD_CHANGE_EDUCATION_LEVEL = "CHANGE_EDUCATION_LEVEL";
 
     private static final String CMD_EDIT_SALARY = "SALARY";
     private static final String CMD_GIVE_PAYMENT = "GIVE_PAYMENT";
@@ -509,6 +511,26 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     autoAwardsController.PostGraduationController(getCampaign(),
                           graduatingPersonnel,
                           academyAttributesMap);
+                }
+                break;
+            }
+            case CMD_CHANGE_EDUCATION_LEVEL: {
+                EducationLevel educationLevel = EducationLevel.fromString(data[1]);
+
+                for (Person person : people) {
+                    person.setEduHighestEducation(educationLevel);
+
+                    if (educationLevel == DOCTORATE) {
+                        if (person.getPreNominal() == null || person.getPreNominal().isBlank()) {
+                            person.setPreNominal(resources.getString("eduDoctorPrenominal.text"));
+                        }
+                    } else {
+                        if (person.getPreNominal().equals(resources.getString("eduDoctorPrenominal.text"))) {
+                            person.setPreNominal("");
+                        }
+                    }
+
+                    MekHQ.triggerEvent(new PersonStatusChangedEvent(person));
                 }
                 break;
             }
@@ -2146,6 +2168,20 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 completeStage.setActionCommand(makeCommand(CMD_COMPLETE_STAGE));
                 completeStage.addActionListener(this);
                 academyMenu.add(completeStage);
+            }
+
+            if (campaign.isGM()) {
+                JMenu changeEducation = new JMenu(resources.getString("eduChangeEducation.text"));
+                changeEducation.setToolTipText(resources.getString("eduChangeEducation.toolTip"));
+                academyMenu.add(changeEducation);
+
+                for (EducationLevel level : EducationLevel.values()) {
+                    JMenuItem educationLevel = new JMenuItem(level.toString());
+                    educationLevel.setToolTipText(level.getToolTipText());
+                    educationLevel.setActionCommand(makeCommand(CMD_CHANGE_EDUCATION_LEVEL + '@' + level.name()));
+                    educationLevel.addActionListener(this);
+                    changeEducation.add(educationLevel);
+                }
             }
 
             popup.add(academyMenu);
