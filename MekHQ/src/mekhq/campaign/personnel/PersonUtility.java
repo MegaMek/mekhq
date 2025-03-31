@@ -100,10 +100,13 @@ public class PersonUtility {
     }
 
     /**
-     * @deprecated use {@link #overrideSkills(boolean, boolean, boolean, boolean, boolean, Person, PersonnelRole, SkillLevel)}
+     * @deprecated use
+     *       {@link #overrideSkills(boolean, boolean, boolean, boolean, boolean, Person, PersonnelRole, SkillLevel)}
      */
     @Deprecated(since = "0.50.05", forRemoval = true)
-    public static void overrideSkills(boolean isAdminsHaveNegotiation, boolean isAdminsHaveScrounge, boolean isUseExtraRandom, Person person, PersonnelRole primaryRole, SkillLevel skillLevel) {
+    public static void overrideSkills(boolean isAdminsHaveNegotiation, boolean isAdminsHaveScrounge,
+                                      boolean isUseExtraRandom, Person person, PersonnelRole primaryRole,
+                                      SkillLevel skillLevel) {
         overrideSkills(isAdminsHaveNegotiation,
               isAdminsHaveScrounge,
               false,
@@ -115,41 +118,31 @@ public class PersonUtility {
     }
 
     /**
-     * @deprecated use {@link #overrideSkills(boolean, boolean, boolean, boolean, boolean, Person, PersonnelRole, SkillLevel)}
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
-    public static void overrideSkills(boolean isAdminsHaveNegotiation, boolean isAdminsHaveScrounge, boolean isUseExtraRandom, Person person, PersonnelRole primaryRole, SkillLevel skillLevel) {
-        overrideSkills(isAdminsHaveNegotiation,
-              isAdminsHaveScrounge,
-              false,
-              false,
-              isUseExtraRandom,
-              person,
-              primaryRole,
-              skillLevel);
-    }
-
-    /**
-     * Overrides the skills of a {@link Person} based on their role, experience level, and various conditions.
-     * This method applies specific skill sets to the person depending on their {@link PersonnelRole}, optionally
-     * including administrator and tech specific skills or applying randomization to skill levels.
+     * Overrides the skills of a {@link Person} based on their role, experience level, and various conditions. This
+     * method applies specific skill sets to the person depending on their {@link PersonnelRole}, optionally including
+     * administrator and tech specific skills or applying randomization to skill levels.
      *
      * <p>Roles are mapped to corresponding skills, administrators and techs can be optionally given additional
      * skills like Negotiation and Scrounge. Additional randomization can also be applied to skill levels.</p>
      *
      * <p>For roles not explicitly defined, no skills are applied by default.</p>
      *
-     * @param isAdminsHaveNegotiation Whether administrators should possess the Negotiation skill.
-     * @param isAdminsHaveScrounge    Whether administrators should possess the Scrounge skill.
-     * @param isDoctorsUseAdministration Whether doctors should possess the Administration skill in addition to medical skills.
-     * @param isTechsUseAdministration   Whether techs should possess the Administration skill in addition to technical skills.
-     * @param isUseExtraRandom        Whether additional randomization should be applied to adjust skill levels.
-     * @param person                  The {@link Person} whose skills are being overridden and assigned.
-     * @param primaryRole             The {@link PersonnelRole} of the person, which dictates the skill mapping.
-     * @param skillLevel              The {@link SkillLevel} corresponding to the experience level of the person.
-     *                                Determines specific values when adding skills to the person.
+     * @param isAdminsHaveNegotiation    Whether administrators should possess the Negotiation skill.
+     * @param isAdminsHaveScrounge       Whether administrators should possess the Scrounge skill.
+     * @param isDoctorsUseAdministration Whether doctors should possess the Administration skill in addition to medical
+     *                                   skills.
+     * @param isTechsUseAdministration   Whether techs should possess the Administration skill in addition to technical
+     *                                   skills.
+     * @param isUseExtraRandom           Whether additional randomization should be applied to adjust skill levels.
+     * @param person                     The {@link Person} whose skills are being overridden and assigned.
+     * @param primaryRole                The {@link PersonnelRole} of the person, which dictates the skill mapping.
+     * @param skillLevel                 The {@link SkillLevel} corresponding to the experience level of the person.
+     *                                   Determines specific values when adding skills to the person.
      */
-    public static void overrideSkills(boolean isAdminsHaveNegotiation, boolean isAdminsHaveScrounge, boolean isDoctorsUseAdministration, boolean isTechsUseAdministration, boolean isUseExtraRandom, Person person, PersonnelRole primaryRole, SkillLevel skillLevel) {
+    public static void overrideSkills(boolean isAdminsHaveNegotiation, boolean isAdminsHaveScrounge,
+                                      boolean isDoctorsUseAdministration, boolean isTechsUseAdministration,
+                                      boolean isUseExtraRandom, Person person, PersonnelRole primaryRole,
+                                      SkillLevel skillLevel) {
         // Role-to-Skill Mapping
         Map<PersonnelRole, List<String>> roleSkills = Map.ofEntries(Map.entry(MEKWARRIOR,
                     List.of(S_PILOT_MEK, S_GUN_MEK)),
@@ -212,7 +205,8 @@ public class PersonUtility {
      * @param randomize  {@code true} if the skill levels should be randomized after being added; {@code false}
      *                   otherwise.
      */
-    private static void addSkillsAndRandomize(Person person, List<String> skills, SkillLevel skillLevel, boolean randomize) {
+    private static void addSkillsAndRandomize(Person person, List<String> skills, SkillLevel skillLevel,
+                                              boolean randomize) {
         for (String skill : skills) {
             addSkillFixedExperienceLevel(person, skill, skillLevel);
         }
