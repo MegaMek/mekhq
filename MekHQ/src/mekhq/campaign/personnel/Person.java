@@ -440,7 +440,16 @@ public class Person {
         personalityDescription = "";
 
         // This assigns minutesLeft and overtimeLeft. Must be after skills to avoid an NPE.
-        resetMinutesLeft(campaign != null && campaign.getCampaignOptions().isTechsUseAdministration());
+        if (campaign != null) {
+            // The reason for this paranoid checking is to allow us to Unit Test with real Person objects without
+            // needing
+            // to initialize CampaignOptions
+            CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
+            if (campaignOptions != null) {
+                resetMinutesLeft(campaignOptions.isTechsUseAdministration());
+            }
+        }
 
         // region Flags
         setClanPersonnel(originFaction.isClan());
@@ -4383,14 +4392,15 @@ public class Person {
      * administration is enabled, the multiplier is adjusted based on the technician's baseline experience level and
      * their administration skill level.</p>
      *
-     * @param isTechsUseAdministration {@code true} if administration skills are considered
-     *                                  for task calculation; {@code false} otherwise.
+     * @param isTechsUseAdministration {@code true} if administration skills are considered for task calculation;
+     *                                 {@code false} otherwise.
+     *
      * @return the calculated time multiplier, where:
-     *         <ul>
-     *           <li>0.0 indicates the person is not a technician.</li>
-     *           <li>1.0 indicates no adjustment is applied.</li>
-     *           <li>Values greater or less than 1.0 adjust task times accordingly.</li>
-     *         </ul>
+     *       <ul>
+     *         <li>0.0 indicates the person is not a technician.</li>
+     *         <li>1.0 indicates no adjustment is applied.</li>
+     *         <li>Values greater or less than 1.0 adjust task times accordingly.</li>
+     *       </ul>
      */
     public double calculateTechTimeMultiplier(boolean isTechsUseAdministration) {
         final double TECH_ADMINISTRATION_MULTIPLIER = 0.05;
