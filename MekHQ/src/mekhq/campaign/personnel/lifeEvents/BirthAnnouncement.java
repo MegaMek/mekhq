@@ -37,6 +37,7 @@ import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static org.apache.commons.text.WordUtils.capitalize;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import megamek.common.annotations.Nullable;
@@ -161,7 +162,7 @@ public class BirthAnnouncement {
 
         // {17} Faction Lance-Level label (lance, star, etc)
         // {18} Baby Count
-        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+        return getFormattedTextAt(RESOURCE_BUNDLE,
               resourceKey,
               parentPronounData.pluralizer(),
               getRandomTimeOfDay(),
@@ -182,7 +183,6 @@ public class BirthAnnouncement {
               childPronounData.pluralizer(),
               lanceLabel,
               babyCount);
-        return inCharacterMessage;
     }
 
     /**
@@ -354,9 +354,12 @@ public class BirthAnnouncement {
      * @return A {@link List} of localized strings containing the button labels.
      */
     private List<String> getButtonLabels(String parentFirstName) {
-        return List.of(getFormattedTextAt(RESOURCE_BUNDLE, "button.response.positive"),
-              getFormattedTextAt(RESOURCE_BUNDLE, "button.response.neutral", parentFirstName),
-              getFormattedTextAt(RESOURCE_BUNDLE, "button.response.negative"),
-              getFormattedTextAt(RESOURCE_BUNDLE, "button.response.suppress"));
+        List<String> buttonLabels = new ArrayList<>();
+
+        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.response.positive"));
+        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.response.neutral", parentFirstName));
+        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.response.suppress"));
+
+        return buttonLabels;
     }
 }
