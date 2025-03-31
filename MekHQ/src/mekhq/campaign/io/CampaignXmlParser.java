@@ -442,6 +442,7 @@ public class CampaignXmlParser {
                       person,
                       refundAllDeprecatedSkills);
                 skipAllDeprecationChecks = deprecationTool.isSkipAll();
+                refundAllDeprecatedSkills = deprecationTool.isRefundAll();
             }
         }
 

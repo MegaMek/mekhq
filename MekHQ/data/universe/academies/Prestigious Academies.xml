@@ -12,7 +12,7 @@
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -605,7 +605,7 @@
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel, Administration, Administration</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -635,7 +635,7 @@
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Senior Medical Technician</qualification>
-        <curriculum>Doctor, Leadership</curriculum>
+        <curriculum>Doctor, Administration, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -667,7 +667,7 @@
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Senior Medical Technician</qualification>
-        <curriculum>Doctor, Leadership</curriculum>
+        <curriculum>Doctor, Administration, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -699,7 +699,7 @@
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel, Administration, Administration</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -1242,7 +1242,7 @@
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -1259,7 +1259,7 @@
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -1594,7 +1594,7 @@
         <curriculum>Piloting/Mek, Gunnery/Mek</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mek, Administration</curriculum>
@@ -2386,7 +2386,7 @@
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel, Administration, Administration</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mek, Administration</curriculum>
@@ -2455,7 +2455,7 @@
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Senior Medical Technician</qualification>
-        <curriculum>Doctor, Leadership</curriculum>
+        <curriculum>Doctor, Administration, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mek, Administration, Leadership</curriculum>
@@ -2598,7 +2598,7 @@
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mek, Administration</curriculum>
@@ -2903,7 +2903,7 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -3019,7 +3019,7 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -3108,7 +3108,7 @@
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mek, Administration</curriculum>
@@ -3146,7 +3146,7 @@
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Senior Medical Technician</qualification>
-        <curriculum>Doctor, Leadership</curriculum>
+        <curriculum>Doctor, Administration, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mek, Administration, Leadership</curriculum>
@@ -4338,7 +4338,7 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>General Sciences</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -4366,7 +4366,7 @@
         <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tech/Vessel, Administration</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Aerospace Technician</qualification>
         <curriculum>Tech/Aero, Administration</curriculum>
@@ -4428,7 +4428,7 @@
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel, Administration</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mek, Administration</curriculum>
@@ -4496,7 +4496,7 @@
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Senior Medical Technician</qualification>
-        <curriculum>Doctor, Leadership</curriculum>
+        <curriculum>Doctor, Administration, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mek, Administration, Leadership</curriculum>
@@ -4572,7 +4572,7 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>The College of Biology/Medicine</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>The College of Engineering (BattleMech)</qualification>
         <curriculum>Tech/Mech</curriculum>
@@ -4609,7 +4609,7 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>The College of Biology/Medicine</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>The College of Engineering (BattleMech)</qualification>
         <curriculum>Tech/Mech</curriculum>
@@ -4678,7 +4678,7 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -4995,7 +4995,7 @@
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel, Administration</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>300-Grade Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>300-Grade BattleMek Technician</qualification>
         <curriculum>Tech/Mek, Administration</curriculum>
@@ -5065,7 +5065,7 @@
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>400-Grade Medical Technician</qualification>
-        <curriculum>Doctor, Leadership</curriculum>
+        <curriculum>Doctor, Administration, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>400-Grade BattleMek Technician</qualification>
         <curriculum>Tech/Mek, Administration, Leadership</curriculum>
@@ -5191,7 +5191,7 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mek, Administration</curriculum>
@@ -5302,7 +5302,7 @@
         <curriculum>Small Arms, Anti-Mek, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Senior Medical Technician</qualification>
-        <curriculum>Doctor, Leadership</curriculum>
+        <curriculum>Doctor, Administration, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
         <curriculum>Tech/Mechanic, Administration, Leadership</curriculum>
@@ -5501,7 +5501,7 @@
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel, Administration</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Administration</curriculum>
@@ -6726,7 +6726,7 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Modern Medicine</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Interstellar Relations</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -6773,7 +6773,7 @@
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mek, Administration</curriculum>
@@ -6832,7 +6832,7 @@
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>High Path - Medical</qualification>
-        <curriculum>Doctor, Leadership</curriculum>
+        <curriculum>Doctor, Administration, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>High Path - BattleMek Technician</qualification>
         <curriculum>Tech/Mek, Administration, Leadership</curriculum>
@@ -7241,7 +7241,7 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -7298,7 +7298,7 @@
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Senior Medical Technician</qualification>
-        <curriculum>Doctor, Leadership</curriculum>
+        <curriculum>Doctor, Administration, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mek, Administration, Leadership</curriculum>
@@ -7367,7 +7367,7 @@
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Senior Medical Technician</qualification>
-        <curriculum>Doctor, Leadership</curriculum>
+        <curriculum>Doctor, Administration, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mek, Administration, Leadership</curriculum>
@@ -7777,7 +7777,7 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -7797,7 +7797,7 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -7817,7 +7817,7 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -7837,7 +7837,7 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -7858,7 +7858,7 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -7878,7 +7878,7 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -7915,7 +7915,7 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -7949,7 +7949,7 @@
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mek, Administration</curriculum>
@@ -7975,7 +7975,7 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -7995,7 +7995,7 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -8017,7 +8017,7 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -8053,7 +8053,7 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor</curriculum>
+        <curriculum>Doctor, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -8153,7 +8153,7 @@
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Senior Medical Technician</qualification>
-        <curriculum>Doctor, Leadership</curriculum>
+        <curriculum>Doctor, Administration, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mek, Administration, Leadership</curriculum>
@@ -8222,7 +8222,7 @@
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Senior Medical Technician</qualification>
-        <curriculum>Doctor, Leadership</curriculum>
+        <curriculum>Doctor, Administration, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mek, Administration, Leadership</curriculum>
@@ -8263,7 +8263,7 @@
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Astech</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Medical Technician</qualification>
-        <curriculum>Doctor, Astech</curriculum>
+        <curriculum>Doctor, Administration, Astech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mek, Administration, Astech</curriculum>

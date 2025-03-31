@@ -52,6 +52,7 @@ public class SkillDeprecationTool {
     private final String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
     private final int SKIP_ALL_DIALOG_OPTION_INDEX = 1;
+    private final int REFUND_DIALOG_OPTION_INDEX = 2;
     private final int REFUND_ALL_DIALOG_OPTION_INDEX = 3;
     /**
      * A list of deprecated skills.
@@ -178,14 +179,17 @@ public class SkillDeprecationTool {
                   getInCharacterMessage(skillName),
                   getButtonLabels(),
                   getOutOfCharacterMessage(skillName, refundValue),
-                  true);
+                  null,
+                  false);
+
+            if (dialog.getDialogChoice() == SKIP_ALL_DIALOG_OPTION_INDEX) {
+                skipAll = true;
+            } else if (dialog.getDialogChoice() == REFUND_ALL_DIALOG_OPTION_INDEX) {
+                refundAll = true;
+            }
         }
 
-        if (dialog != null && dialog.getDialogChoice() == SKIP_ALL_DIALOG_OPTION_INDEX) {
-            skipAll = true;
-        }
-
-        if (isRefundAll() || (dialog != null && dialog.getDialogChoice() == REFUND_ALL_DIALOG_OPTION_INDEX)) {
+        if (isRefundAll() || (dialog != null && dialog.getDialogChoice() == REFUND_DIALOG_OPTION_INDEX)) {
             skills.removeSkill(skillName);
             int currentXp = person.getXP();
             // We use 'setXPDirect' here as the xp gain has already been factored into the tracking of xp gain, so we

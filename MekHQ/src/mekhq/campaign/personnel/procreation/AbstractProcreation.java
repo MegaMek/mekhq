@@ -27,19 +27,32 @@
  */
 package mekhq.campaign.personnel.procreation;
 
+import static mekhq.campaign.mod.am.InjuryTypes.POSTPARTUM_RECOVERY;
+import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
+import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.UUID;
+
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.options.IOption;
 import mekhq.MHQConstants;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.ExtraData.IntKey;
 import mekhq.campaign.ExtraData.StringKey;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PersonalLogger;
+import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
@@ -47,6 +60,7 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.lifeEvents.BirthAnnouncement;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -60,9 +74,9 @@ import static mekhq.campaign.personnel.enums.BloodGroup.getInheritedBloodGroup;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 
 /**
- * AbstractProcreation is the baseline class for procreation and birth in MekHQ. It holds all the
- * common logic for procreation, and is implemented by classes defining how to determine if a female
- * person will randomly procreate on a given day.
+ * AbstractProcreation is the baseline class for procreation and birth in MekHQ. It holds all the common logic for
+ * procreation, and is implemented by classes defining how to determine if a female person will randomly procreate on a
+ * given day.
  */
 public abstract class AbstractProcreation {
     //region Variable Declarations
@@ -76,8 +90,7 @@ public abstract class AbstractProcreation {
     public static final IntKey PREGNANCY_CHILDREN_DATA = new IntKey("procreation:children");
     public static final StringKey PREGNANCY_FATHER_DATA = new StringKey("procreation:father");
 
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale());
+    private static final String RESOURCE_BUNDLE = "mekhq.resources." + AbstractProcreation.class.getSimpleName();
     //endregion Variable Declarations
 
     //region Constructors
@@ -138,10 +151,13 @@ public abstract class AbstractProcreation {
     //endregion Getters/Setters
 
     //region Determination Methods
+
     /**
      * This method determines the number of babies a person will give birth to.
-     * @param multiplePregnancyOccurrences the X occurrences for there to be a single multiple
-     *                                    child occurrence (i.e., 1 in X)
+     *
+     * @param multiplePregnancyOccurrences the X occurrences for there to be a single multiple child occurrence (i.e., 1
+     *                                     in X)
+     *
      * @return the number of babies the person will give birth to, limited to decuplets
      */
     protected int determineNumberOfBabies(final int multiplePregnancyOccurrences) {
@@ -153,8 +169,8 @@ public abstract class AbstractProcreation {
     }
 
     /**
-     * This method determines the duration for a pregnancy, with a variance determined through a
-     * Gaussian distribution with a maximum spread of approximately six weeks.
+     * This method determines the duration for a pregnancy, with a variance determined through a Gaussian distribution
+     * with a maximum spread of approximately six weeks.
      * <p>
      * TODO : Swap me to instead use a distribution function that generates an overall length,
      * TODO : Including pre-term and post-term births
@@ -164,8 +180,7 @@ public abstract class AbstractProcreation {
     private int determinePregnancyDuration() {
         // This creates a random range of approximately six weeks with which to modify the standard
         // pregnancy duration to create a randomized pregnancy duration
-        final double gaussian = Math.sqrt(-2.0 * Math.log(Math.random()))
-                * Math.cos(2.0 * Math.PI * Math.random());
+        final double gaussian = Math.sqrt(-2.0 * Math.log(Math.random())) * Math.cos(2.0 * Math.PI * Math.random());
         // To not get unusual results, we limit the variance to +/- 4.0 (almost 6 weeks).
         // A base length of 268 creates a solid enough duration for now.
         return 268 + (int) Math.round(MathUtility.clamp(gaussian, -4d, 4d) * 10.0);
@@ -173,105 +188,108 @@ public abstract class AbstractProcreation {
 
     /**
      * This determines the current week of the pregnancy
-     * @param today the current date
+     *
+     * @param today  the current date
      * @param person the pregnant person
+     *
      * @return the current week of their pregnancy
      */
     public int determinePregnancyWeek(final LocalDate today, final Person person) {
-        return (int) Math.max(Math.ceil(ChronoUnit.DAYS.between(
-                person.getExpectedDueDate().minusDays(MHQConstants.PREGNANCY_STANDARD_DURATION),
-                today) / 7f), 1);
+        return (int) Math.max(Math.ceil(ChronoUnit.DAYS.between(person.getExpectedDueDate()
+                                                                      .minusDays(MHQConstants.PREGNANCY_STANDARD_DURATION),
+              today) / 7f), 1);
     }
 
     /**
      * This determines the father of the baby.
      *
      * @param campaign the campaign the baby is part of
-     * @param mother the mother of the baby
+     * @param mother   the mother of the baby
      */
     protected @Nullable Person determineFather(final Campaign campaign, final Person mother) {
-        return (campaign.getCampaignOptions().isDetermineFatherAtBirth() && mother.getGenealogy().hasSpouse())
-                ? mother.getGenealogy().getSpouse()
-                : ((mother.getExtraData().get(PREGNANCY_FATHER_DATA) != null)
-                        ? campaign.getPerson(UUID.fromString(mother.getExtraData().get(PREGNANCY_FATHER_DATA)))
-                        : null);
+        return (campaign.getCampaignOptions().isDetermineFatherAtBirth() && mother.getGenealogy().hasSpouse()) ?
+                     mother.getGenealogy().getSpouse() :
+                     ((mother.getExtraData().get(PREGNANCY_FATHER_DATA) != null) ?
+                            campaign.getPerson(UUID.fromString(mother.getExtraData().get(PREGNANCY_FATHER_DATA))) :
+                            null);
     }
     //endregion Determination Methods
 
     /**
      * This is used to determine if a person can procreate
-     * @param today the current date
-     * @param person the person to determine for
+     *
+     * @param today             the current date
+     * @param person            the person to determine for
      * @param randomProcreation if this is for random procreation or manual procreation
+     *
      * @return null if they can, otherwise the reason why they cannot
      */
-    public @Nullable String canProcreate(final LocalDate today, final Person person,
-                                         final boolean randomProcreation) {
+    public @Nullable String canProcreate(final LocalDate today, final Person person, final boolean randomProcreation) {
         if (person.getGender().isMale()) {
-            return resources.getString("cannotProcreate.Gender.text");
+            return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.Gender.text");
         }
 
         if (!person.isTryingToConceive()) {
-            return resources.getString("cannotProcreate.NotTryingForABaby.text");
+            return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.NotTryingForABaby.text");
         }
 
         if (person.isPregnant()) {
-            return resources.getString("cannotProcreate.AlreadyPregnant.text");
+            return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.AlreadyPregnant.text");
         }
 
         if (!person.getStatus().isActive()) {
-            return resources.getString("cannotProcreate.Inactive.text");
+            return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.Inactive.text");
         }
 
         if (person.isDeployed()) {
-            return resources.getString("cannotProcreate.Deployed.text");
+            return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.Deployed.text");
         }
 
         // Not allowing under-18s to procreate is project policy
         if (person.isChild(today, true)) {
-            return resources.getString("cannotProcreate.Child.text");
+            return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.Child.text");
         }
 
         if (person.getAge(today) >= 51) {
-            return resources.getString("cannotProcreate.TooOld.text");
+            return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.TooOld.text");
         }
 
         if (!isUseClanPersonnelProcreation() && person.isClanPersonnel()) {
-            return resources.getString("cannotProcreate.ClanPersonnel.text");
+            return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.ClanPersonnel.text");
         }
 
         if (!isUsePrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
-            return resources.getString("cannotProcreate.Prisoner.text");
+            return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.Prisoner.text");
         }
 
         if (randomProcreation) {
             if (!isUseRelationshiplessProcreation() && !person.getGenealogy().hasSpouse()) {
-                return resources.getString("cannotProcreate.NoSpouse.text");
+                return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.NoSpouse.text");
             }
 
             if (!isUseRandomClanPersonnelProcreation() && person.isClanPersonnel()) {
-                return resources.getString("cannotProcreate.RandomClanPersonnel.text");
+                return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.RandomClanPersonnel.text");
             }
 
             if (!isUseRandomPrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
-                return resources.getString("cannotProcreate.RandomPrisoner.text");
+                return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.RandomPrisoner.text");
             }
 
             if (person.getGenealogy().hasSpouse()) {
                 if (person.getGenealogy().getSpouse().getGender().isFemale()) {
-                    return resources.getString("cannotProcreate.FemaleSpouse.text");
+                    return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.FemaleSpouse.text");
                 }
 
                 if (!person.getGenealogy().getSpouse().isTryingToConceive()) {
-                    return resources.getString("cannotProcreate.SpouseNotTryingForABaby.text");
+                    return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.SpouseNotTryingForABaby.text");
                 }
 
                 if (!person.getGenealogy().getSpouse().getStatus().isActive()) {
-                    return resources.getString("cannotProcreate.InactiveSpouse.text");
+                    return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.InactiveSpouse.text");
                 }
 
                 if (person.getGenealogy().getSpouse().isDeployed()) {
-                    return resources.getString("cannotProcreate.DeployedSpouse.text");
+                    return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.DeployedSpouse.text");
                 }
 
                 // Not allowing under-18s to procreate is project policy
@@ -279,16 +297,16 @@ public abstract class AbstractProcreation {
                 // However, we're keeping it as we don't want campaigns from pre-policy
                 // implementation being able to circumnavigate project policy.
                 if (person.getGenealogy().getSpouse().isChild(today, true)) {
-                    return resources.getString("cannotProcreate.ChildSpouse.text");
+                    return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.ChildSpouse.text");
                 }
 
                 if (!isUseRandomClanPersonnelProcreation() && person.getGenealogy().getSpouse().isClanPersonnel()) {
-                    return resources.getString("cannotProcreate.ClanPersonnelSpouse.text");
+                    return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.ClanPersonnelSpouse.text");
                 }
 
-                if (!isUseRandomPrisonerProcreation()
-                        && person.getGenealogy().getSpouse().getPrisonerStatus().isCurrentPrisoner()) {
-                    return resources.getString("cannotProcreate.PrisonerSpouse.text");
+                if (!isUseRandomPrisonerProcreation() &&
+                          person.getGenealogy().getSpouse().getPrisonerStatus().isCurrentPrisoner()) {
+                    return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.PrisonerSpouse.text");
                 }
             }
         }
@@ -298,33 +316,32 @@ public abstract class AbstractProcreation {
 
     /**
      * This method is how a person becomes pregnant.
-     * @param campaign the campaign the person is a part of
-     * @param today the current date
-     * @param mother the newly pregnant mother
+     *
+     * @param campaign   the campaign the person is a part of
+     * @param today      the current date
+     * @param mother     the newly pregnant mother
      * @param isNoReport true if no message should be posted to the daily report
      */
     public void addPregnancy(final Campaign campaign, final LocalDate today, final Person mother, boolean isNoReport) {
-        addPregnancy(
-                campaign,
-                today,
-                mother,
-                determineNumberOfBabies(campaign.getCampaignOptions().getMultiplePregnancyOccurrences()),
-                isNoReport
-        );
+        addPregnancy(campaign,
+              today,
+              mother,
+              determineNumberOfBabies(campaign.getCampaignOptions().getMultiplePregnancyOccurrences()),
+              isNoReport);
     }
 
     /**
-     * This method is how a person becomes pregnant with the specified number of children. They have
-     * their due date set, and the parentage of the pregnancy is determined.
+     * This method is how a person becomes pregnant with the specified number of children. They have their due date set,
+     * and the parentage of the pregnancy is determined.
      *
-     * @param campaign the campaign the person is a part of
-     * @param today the current date
-     * @param mother the newly pregnant mother
-     * @param size the number of children the mother is having
+     * @param campaign   the campaign the person is a part of
+     * @param today      the current date
+     * @param mother     the newly pregnant mother
+     * @param size       the number of children the mother is having
      * @param isNoReport true if no message should be posted to the daily report
      */
-    public void addPregnancy(final Campaign campaign, final LocalDate today, final Person mother,
-                             final int size, boolean isNoReport) {
+    public void addPregnancy(final Campaign campaign, final LocalDate today, final Person mother, final int size,
+                             boolean isNoReport) {
         if (size < 1) {
             return;
         }
@@ -335,15 +352,17 @@ public abstract class AbstractProcreation {
 
         mother.getExtraData().set(PREGNANCY_CHILDREN_DATA, size);
 
-        mother.getExtraData().set(PREGNANCY_FATHER_DATA, mother.getGenealogy().hasSpouse()
-                ? mother.getGenealogy().getSpouse().getId().toString() : null);
+        mother.getExtraData()
+              .set(PREGNANCY_FATHER_DATA,
+                    mother.getGenealogy().hasSpouse() ? mother.getGenealogy().getSpouse().getId().toString() : null);
 
-        final String babyAmount = resources.getString("babyAmount.text").split(",")[size - 1];
+        final String babyAmount = getFormattedTextAt(RESOURCE_BUNDLE, "babyAmount.text").split(",")[size - 1];
 
         if (!isNoReport) {
-            campaign.addReport(String.format(resources.getString("babyConceived.report"),
-                    mother.getHyperlinkedName(),
-                    babyAmount).trim());
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "babyConceived.report",
+                  mother.getHyperlinkedName(),
+                  babyAmount).trim());
         }
 
         if (campaign.getCampaignOptions().isLogProcreation()) {
@@ -351,13 +370,16 @@ public abstract class AbstractProcreation {
 
             if (mother.getGenealogy().hasSpouse()) {
                 PersonalLogger.spouseConceived(mother.getGenealogy().getSpouse(),
-                        mother.getFullName(), today, babyAmount);
+                      mother.getFullName(),
+                      today,
+                      babyAmount);
             }
         }
     }
 
     /**
      * Removes a pregnancy and clears all related data from the provided person
+     *
      * @param person the person to clear the pregnancy data for
      */
     public void removePregnancy(final Person person) {
@@ -368,14 +390,14 @@ public abstract class AbstractProcreation {
     }
 
     /**
-     * This method is how a mother gives birth to a number of babies and has them added to the
-     * campaign.
+     * This method is how a mother gives birth to a number of babies and has them added to the campaign.
      *
      * @param campaign the campaign to add the baby in question to
-     * @param today today's date
-     * @param mother the mother giving birth
+     * @param today    today's date
+     * @param mother   the mother giving birth
      */
     public void birth(final Campaign campaign, final LocalDate today, final Person mother) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
         // Determine the number of children
         final int size = mother.getExtraData().get(PREGNANCY_CHILDREN_DATA, 1);
 
@@ -387,33 +409,36 @@ public abstract class AbstractProcreation {
 
         // Output a specific report to the campaign if they are giving birth to multiple children
         if (size > 1) {
-            campaign.addReport(String.format(resources.getString("multipleBabiesBorn.report"),
-                    mother.getHyperlinkedName(),
-                    resources.getString("babyAmount.text").split(",")[size - 1]));
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "multipleBabiesBorn.report",
+                  mother.getHyperlinkedName(),
+                  getFormattedTextAt(RESOURCE_BUNDLE, "babyAmount.text").split(",")[size - 1]));
         }
 
         // Create Babies
         for (int i = 0; i < size; i++) {
             // Create a baby
-            final Person baby = campaign.newDependent(
-                Gender.RANDOMIZE, mother.getOriginFaction(), campaign.getLocation().getPlanet());
-            baby.setSurname(campaign.getCampaignOptions().getBabySurnameStyle()
-                    .generateBabySurname(mother, father, baby.getGender()));
+            final Person baby = campaign.newDependent(Gender.RANDOMIZE,
+                  mother.getOriginFaction(),
+                  campaign.getLocation().getPlanet());
+            baby.setSurname(campaignOptions.getBabySurnameStyle()
+                                  .generateBabySurname(mother, father, baby.getGender()));
             baby.setDateOfBirth(today);
             baby.setBloodGroup(getInheritedBloodGroup(mother.getBloodGroup(),
                   father == null ? getRandomBloodGroup() : father.getBloodGroup()));
 
             // Create reports and log the birth
-            campaign.addReport(String.format(resources.getString("babyBorn.report"),
-                    mother.getHyperlinkedName(), baby.getHyperlinkedName(),
-                    GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "babyBorn.report",
+                  mother.getHyperlinkedName(),
+                  baby.getHyperlinkedName(),
+                  GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
             logAndUpdateFamily(campaign, today, mother, baby, father);
 
             // Founder Tag Assignment
-            if (campaign.getCampaignOptions().isAssignNonPrisonerBabiesFounderTag()
-                    && !prisonerStatus.isCurrentPrisoner()) {
+            if (campaignOptions.isAssignNonPrisonerBabiesFounderTag() && !prisonerStatus.isCurrentPrisoner()) {
                 baby.setFounder(true);
-            } else if (campaign.getCampaignOptions().isAssignChildrenOfFoundersFounderTag()) {
+            } else if (campaignOptions.isAssignChildrenOfFoundersFounderTag()) {
                 baby.setFounder(baby.getGenealogy().getParents().stream().anyMatch(Person::isFounder));
             }
 
@@ -430,6 +455,20 @@ public abstract class AbstractProcreation {
             if (mother.getStatus().isStudent()) {
                 mother.addEduTagAlong(baby.getId());
                 baby.changeStatus(campaign, today, PersonnelStatus.ON_LEAVE);
+            }
+
+            // Apply postpartum effects
+            if (campaignOptions.isUseAdvancedMedical()) {
+                Injury injury = POSTPARTUM_RECOVERY.newInjury(campaign, mother, INTERNAL, 1);
+                mother.addInjury(injury);
+            } else {
+                int currentHits = mother.getHits();
+                mother.setHits(currentHits + 1);
+            }
+
+            // Alert the player
+            if (campaignOptions.isShowLifeEventDialogBirths()) {
+                new BirthAnnouncement(campaign, mother, baby.getGender(), size);
             }
         }
 
@@ -458,12 +497,13 @@ public abstract class AbstractProcreation {
      * Logs the birth of a baby and updates the genealogy information of the family.
      *
      * @param campaign the ongoing campaign
-     * @param today the current date
-     * @param mother the mother of the baby
-     * @param baby the newborn baby
-     * @param father the father of the baby, null if unknown
+     * @param today    the current date
+     * @param mother   the mother of the baby
+     * @param baby     the newborn baby
+     * @param father   the father of the baby, null if unknown
      */
-    private static void logAndUpdateFamily(Campaign campaign, LocalDate today, Person mother, Person baby, Person father) {
+    private static void logAndUpdateFamily(Campaign campaign, LocalDate today, Person mother, Person baby,
+                                           Person father) {
         if (campaign.getCampaignOptions().isLogProcreation()) {
             MedicalLogger.deliveredBaby(mother, baby, today);
             if (father != null) {
@@ -482,17 +522,19 @@ public abstract class AbstractProcreation {
     }
 
     /**
-     * Creates baby/babies and performs any necessary operations such as setting birthdate, creating reports,
-     * updating genealogy, setting education, loyalty, personality, and recruiting the baby.
-     * This version is for historic births that occur as part of a character's background.
+     * Creates baby/babies and performs any necessary operations such as setting birthdate, creating reports, updating
+     * genealogy, setting education, loyalty, personality, and recruiting the baby. This version is for historic births
+     * that occur as part of a character's background.
      *
      * @param campaign the campaign object
-     * @param today the current date
-     * @param mother the mother person object
-     * @param father the father person object, can be null if the father is unknown
+     * @param today    the current date
+     * @param mother   the mother person object
+     * @param father   the father person object, can be null if the father is unknown
+     *
      * @return the babies
      */
-    public List<Person> birthHistoric(final Campaign campaign, final LocalDate today, final Person mother, @Nullable final Person father) {
+    public List<Person> birthHistoric(final Campaign campaign, final LocalDate today, final Person mother,
+                                      @Nullable final Person father) {
         List<Person> babies = new ArrayList<>();
 
         // Determine the number of children
@@ -510,8 +552,9 @@ public abstract class AbstractProcreation {
 
             final Person baby = campaign.newDependent(Gender.RANDOMIZE, originFaction, originPlanet);
 
-            baby.setSurname(campaign.getCampaignOptions().getBabySurnameStyle()
-                    .generateBabySurname(mother, father, baby.getGender()));
+            baby.setSurname(campaign.getCampaignOptions()
+                                  .getBabySurnameStyle()
+                                  .generateBabySurname(mother, father, baby.getGender()));
 
             baby.setDateOfBirth(mother.getDueDate());
 
@@ -548,12 +591,12 @@ public abstract class AbstractProcreation {
 
     /**
      * This is used to process procreation when a person dies with the Pregnancy Complications status
+     *
      * @param campaign the campaign to add the baby to
-     * @param today the current date
-     * @param person the person to process
+     * @param today    the current date
+     * @param person   the person to process
      */
-    public void processPregnancyComplications(final Campaign campaign, final LocalDate today,
-                                              final Person person) {
+    public void processPregnancyComplications(final Campaign campaign, final LocalDate today, final Person person) {
         // The child might be able to be born, albeit into a world without their mother.
         // The status, however, can be manually set for males and for those who are not pregnant.
         // This is purposeful to allow for player customization, and thus we first check if they
@@ -574,6 +617,7 @@ public abstract class AbstractProcreation {
      * Calculates the chance of a baby being born based on the pregnancy week.
      *
      * @param pregnancyWeek the week of the pregnancy
+     *
      * @return the chance of a baby being born, ranging from 0.0 to 1.0
      */
     private static double getBabyBornChance(int pregnancyWeek) {
@@ -581,9 +625,9 @@ public abstract class AbstractProcreation {
             case 23 -> 1;
             case 24 -> 2;
             case 25 -> 3;
-            default -> (pregnancyWeek > 25 && pregnancyWeek <= 29) ? 4 :
-                    (pregnancyWeek > 29 && pregnancyWeek <=35) ? 5 :
-                            (pregnancyWeek > 35) ? 6 : 0;
+            default -> (pregnancyWeek > 25 && pregnancyWeek <= 29) ?
+                             4 :
+                             (pregnancyWeek > 29 && pregnancyWeek <= 35) ? 5 : (pregnancyWeek > 35) ? 6 : 0;
         };
 
         return switch (range) {
@@ -598,11 +642,13 @@ public abstract class AbstractProcreation {
     }
 
     //region New Day
+
     /**
      * Process new day procreation for an individual
+     *
      * @param campaign the campaign to process
-     * @param today the current day
-     * @param person the person to process
+     * @param today    the current day
+     * @param person   the person to process
      */
     public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person) {
         // Instantly return for male personnel
@@ -620,8 +666,7 @@ public abstract class AbstractProcreation {
             }
 
             if (campaign.getCampaignOptions().isUseMaternityLeave()) {
-                if (person.getStatus().isActive()
-                    && (person.getDueDate().minusWeeks(20).isBefore(today))) {
+                if (person.getStatus().isActive() && (person.getDueDate().minusWeeks(20).isBefore(today))) {
                     person.changeStatus(campaign, today, PersonnelStatus.ON_MATERNITY_LEAVE);
                 }
             }
@@ -634,26 +679,29 @@ public abstract class AbstractProcreation {
     }
 
     /**
-     * Checks if a person randomly procreates on the given day in the campaign.
-     * If the person does procreate, add a pregnancy to the campaign for the person.
+     * Checks if a person randomly procreates on the given day in the campaign. If the person does procreate, add a
+     * pregnancy to the campaign for the person.
      *
-     * @param campaign The campaign to check procreation for.
-     * @param today The current date.
-     * @param person The person to check for procreation.
+     * @param campaign   The campaign to check procreation for.
+     * @param today      The current date.
+     * @param person     The person to check for procreation.
      * @param isNoReport true, if the player shouldn't be informed, otherwise false
      */
-    public void processRandomProcreationCheck(final Campaign campaign, final LocalDate today,
-                                              final Person person, boolean isNoReport) {
+    public void processRandomProcreationCheck(final Campaign campaign, final LocalDate today, final Person person,
+                                              boolean isNoReport) {
         if (randomlyProcreates(today, person)) {
             addPregnancy(campaign, today, person, isNoReport);
         }
     }
 
     //region Random Procreation
+
     /**
      * Determines if a non-pregnant woman procreates on a given day
-     * @param today the current day
+     *
+     * @param today  the current day
      * @param person the person in question
+     *
      * @return true if they do, otherwise false
      */
     protected boolean randomlyProcreates(final LocalDate today, final Person person) {
@@ -666,7 +714,9 @@ public abstract class AbstractProcreation {
 
     /**
      * Determines if a person with an eligible partner procreates
+     *
      * @param person the person to determine for
+     *
      * @return true if they do, otherwise false
      */
     protected abstract boolean procreation(Person person);

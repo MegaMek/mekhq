@@ -27,6 +27,11 @@
  */
 package mekhq.campaign;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.zip.GZIPInputStream;
+
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import mekhq.MHQConstants;
@@ -36,14 +41,8 @@ import mekhq.campaign.io.CampaignXmlParseException;
 import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.gui.dialog.CampaignHasProblemOnLoad;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.zip.GZIPInputStream;
-
 /**
- * Defines a factory API that enables {@link Campaign} instances to be created
- * from its detected format.
+ * Defines a factory API that enables {@link Campaign} instances to be created from its detected format.
  */
 public class CampaignFactory {
     private MekHQ app;
@@ -52,7 +51,8 @@ public class CampaignFactory {
         NONE,
         CANT_LOAD_FROM_NEWER_VERSION,
         CANT_LOAD_FROM_OLDER_VERSION,
-        ACTIVE_OR_FUTURE_CONTRACT
+        ACTIVE_OR_FUTURE_CONTRACT,
+        NEW_VERSION_WITH_OLD_DATA
     }
 
     /**
@@ -73,19 +73,18 @@ public class CampaignFactory {
     }
 
     /**
-     * Creates a new instance of a {@link Campaign} from the input stream using
-     * the currently configured parameters.
+     * Creates a new instance of a {@link Campaign} from the input stream using the currently configured parameters.
      *
      * @param is The {@link InputStream} to create the {@link Campaign} from.
+     *
      * @return A new instance of a {@link Campaign}.
-     * @throws CampaignXmlParseException if the XML for the campaign cannot be
-     *                                   parsed.
-     * @throws IOException               if an IO error is encountered reading
-     *                                   the input stream.
+     *
+     * @throws CampaignXmlParseException if the XML for the campaign cannot be parsed.
+     * @throws IOException               if an IO error is encountered reading the input stream.
      * @throws NullEntityException       if the campaign contains a null entity
      */
     public @Nullable Campaign createCampaign(InputStream is)
-        throws CampaignXmlParseException, IOException, NullEntityException {
+          throws CampaignXmlParseException, IOException, NullEntityException {
         if (!is.markSupported()) {
             is = new BufferedInputStream(is);
         }
@@ -124,8 +123,9 @@ public class CampaignFactory {
      * issues, the method returns the given {@code Campaign} object.</p>
      *
      * @param campaign the {@link Campaign} object to validate and load
-     * @return the {@link Campaign} object if the user chooses to proceed with all problems or if no
-     *         problems are detected; {@code null} if the user chooses to cancel
+     *
+     * @return the {@link Campaign} object if the user chooses to proceed with all problems or if no problems are
+     *       detected; {@code null} if the user chooses to cancel
      */
     private static Campaign checkForLoadProblems(Campaign campaign) {
         final Version mhqVersion = MHQConstants.VERSION;
@@ -153,28 +153,33 @@ public class CampaignFactory {
             }
         }
 
+        // Check if the campaign has active or future AtB contracts (only if the user is changing versions)
+        if (campaignVersion.isLowerThan(mhqVersion)) {
+            if (triggerProblemDialog(campaign, CampaignProblemType.NEW_VERSION_WITH_OLD_DATA)) {
+                return null;
+            }
+        }
+
         // All checks passed, return the campaign
         return campaign;
     }
 
     /**
-     * Displays the {@link CampaignHasProblemOnLoad} dialog for a given problem type and returns
-     * whether the user cancelled the loading process.
+     * Displays the {@link CampaignHasProblemOnLoad} dialog for a given problem type and returns whether the user
+     * cancelled the loading process.
      *
      * <p>The dialog informs the user about the specific problem and allows them to either
-     * cancel the loading process or continue despite the problem. If the user selects
-     * "Cancel," the method returns {@code true}. Otherwise, it returns {@code false}.</p>
+     * cancel the loading process or continue despite the problem. If the user selects "Cancel," the method returns
+     * {@code true}. Otherwise, it returns {@code false}.</p>
      *
      * @param campaign    the {@link Campaign} object associated with the problem
      * @param problemType the {@link CampaignProblemType} specifying the current issue
+     *
      * @return {@code true} if the user chose to cancel loading, {@code false} otherwise
      */
     private static boolean triggerProblemDialog(Campaign campaign, CampaignProblemType problemType) {
-        final int USER_SELECTED_CANCEL = 0;
-
         CampaignHasProblemOnLoad problemDialog = new CampaignHasProblemOnLoad(campaign, problemType);
-
-        return problemDialog.getDialogChoice() == USER_SELECTED_CANCEL;
+        return problemDialog.wasCanceled();
     }
 
     private byte[] readHeader(InputStream is) throws IOException {

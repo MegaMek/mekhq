@@ -27,14 +27,14 @@
  */
 package mekhq.gui.dialog.randomEvents.prisonerDialogs;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.util.List;
+
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
-
-import java.util.List;
-
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * Represents a dialog prompted when the player has dangerously low prisoner capacity, risking a negative event.
@@ -66,6 +66,7 @@ public class PrisonerWarningDialog extends ImmersiveDialogCore {
               createOutOfCharacterMessage(),
               null,
               true,
+              null,
               null,
               true);
     }

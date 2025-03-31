@@ -27,84 +27,113 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.campaign.CampaignFactory.CampaignProblemType.CANT_LOAD_FROM_NEWER_VERSION;
+import static mekhq.campaign.CampaignFactory.CampaignProblemType.NEW_VERSION_WITH_OLD_DATA;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.util.List;
+
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory.CampaignProblemType;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
-
-import java.util.List;
-
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.campaign.CampaignFactory.CampaignProblemType.CANT_LOAD_FROM_NEWER_VERSION;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
- * Dialog to inform and handle campaign-loading problems within MekHQ.
+ * A dialog class for managing and addressing campaign load problems in MekHQ.
  *
- * <p>This dialog prompts the user with both in-character and out-of-character messages,
- * providing actionable options if any issues arise during campaign load, such as version incompatibility or missing
- * contracts.</p>
+ * <p>This class is responsible for creating a user-interactive dialog whenever issues arise while loading a campaign.
+ * It provides both informative messages (in-character and out-of-character) and actionable buttons tailored to the
+ * specific type of problem detected.</p>
  *
- * <p>The dialog presents two options: "Cancel" to abort loading the campaign or
- * "Continue Regardless" to proceed despite the detected issues. It dynamically generates text based on the problem type
- * and campaign information.</p>
+ * @since 0.50.04
  */
-public class CampaignHasProblemOnLoad extends ImmersiveDialogCore {
+public class CampaignHasProblemOnLoad {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignHasProblemOnLoad";
 
+    private final int DIALOG_CANCEL_OPTION = 0;
+
+    private final Campaign campaign;
+
+    private boolean wasCanceled = true;
+
     /**
-     * Constructs the dialog to handle campaign load problems.
+     * Constructs a dialog to handle problems encountered when loading a campaign.
      *
-     * <p>The dialog is built using localized messages for both
-     * in-character and out-of-character messages, following the detected problem type and campaign details. It also
-     * sets up predefined buttons for user interaction.</p>
+     * <p>This dialog provides messages and options to notify the user about the nature of the issue and allow
+     * interaction based on the specific problem type.</p>
      *
-     * @param campaign    the {@link Campaign} for which the load problem dialog is presented
-     * @param problemType the {@link CampaignProblemType} specifying the nature of the load problem
+     * <p>The dialog also determines whether the operation was canceled, based on the user's choice
+     * and the problem type.</p>
+     *
+     * @param campaign    the {@link Campaign} associated with the load problem
+     * @param problemType the {@link CampaignProblemType} describing the nature of the problem affecting the campaign
+     *                    load
      */
     public CampaignHasProblemOnLoad(Campaign campaign, CampaignProblemType problemType) {
-        super(campaign,
-              getSpeaker(campaign),
+        this.campaign = campaign;
+
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
+              getSpeaker(),
               null,
-              createInCharacterMessage(campaign, problemType),
+              createInCharacterMessage(problemType),
               createButtons(problemType),
               createOutOfCharacterMessage(problemType),
               null,
-              false,
-              null,
               true);
+
+        // There is deliberately no cancel option for NEW_VERSION_WITH_OLD_DATA
+        wasCanceled = (problemType != NEW_VERSION_WITH_OLD_DATA) && (dialog.getDialogChoice() == DIALOG_CANCEL_OPTION);
     }
 
     /**
-     * Generates the list of buttons for the dialog based on the specified problem type.
+     * Indicates whether the operation or process was canceled by the user or system.
      *
-     * <p>Buttons include:</p>
+     * @return {@code true} if the operation was explicitly interrupted or canceled. Otherwise, it returns
+     *       {@code false}, meaning the operation was allowed to continue or complete as normal.
+     */
+    public boolean wasCanceled() {
+        return wasCanceled;
+    }
+
+    /**
+     * Generates a list of localized button labels for the dialog based on the specified problem type.
+     *
+     * <p>The buttons include options to either cancel or continue with loading the campaign, with the
+     * available buttons determined by the nature of the problem:</p>
+     *
      * <ul>
-     *   <li>"Cancel" button: Stops loading the campaign in all scenarios.</li>
-     *   <li>"Continue" button: Allows proceeding with loading the campaign, provided the problem type permits it.</li>
+     *   <li><b>"Cancel":</b> Stops the campaign loading process in all scenarios.</li>
+     *   <li><b>"Continue":</b> Allows the user to proceed with loading the campaign (if permitted by the problem type).</li>
+     *   <li><b>"Continue with New Version":</b> Shown when handling issues with old campaign data usable in a newer version.</li>
      * </ul>
      *
-     * <p>If the problem type is {@code CANT_LOAD_FROM_NEWER_VERSION}, only the "Cancel" button is available
-     * because proceeding is not allowed for this issue. For other problem types, both "Cancel" and "Continue"
-     * buttons are included in the dialog.</p>
+     * <p>The button decisions are determined by the {@link CampaignProblemType} parameter:</p>
+     * <ul>
+     *   <li><b>{@code CANT_LOAD_FROM_NEWER_VERSION}</b>: Only the "Cancel" button is returned, as continuing is not allowed.</li>
+     *   <li><b>{@code NEW_VERSION_WITH_OLD_DATA}</b>: Only the "Continue with New Version" button is returned.</li>
+     *   <li><b>Other problem types:</b> Both "Cancel" and "Continue" buttons are included.</li>
+     * </ul>
      *
      * @param problemType the {@link CampaignProblemType} specifying the nature of the issue, which determines the
-     *                    buttons to display
+     *                    buttons that should be displayed
      *
-     * @return a {@link List} of {@link ButtonLabelTooltipPair} objects representing the dialog's buttons
+     * @return a {@link List} of {@link String} objects representing the localized labels of the dialog buttons
      */
-    private static List<ButtonLabelTooltipPair> createButtons(CampaignProblemType problemType) {
-        ButtonLabelTooltipPair btnCancel = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
-              "cancel.button"), null);
-
-        ButtonLabelTooltipPair btnContinue = new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE,
-              "continue.button"), null);
+    private List<String> createButtons(CampaignProblemType problemType) {
+        String btnCancel = getFormattedTextAt(RESOURCE_BUNDLE, "cancel.button");
+        String btnContinue = getFormattedTextAt(RESOURCE_BUNDLE, "continue.button");
+        String btnContinueNewVersion = getFormattedTextAt(RESOURCE_BUNDLE, "continue.newVersion.button");
 
         if (problemType == CANT_LOAD_FROM_NEWER_VERSION) {
             return List.of(btnCancel);
         } else {
-            return List.of(btnCancel, btnContinue);
+            if (problemType == NEW_VERSION_WITH_OLD_DATA) {
+                return List.of(btnContinueNewVersion);
+            } else {
+                return List.of(btnCancel, btnContinue);
+            }
         }
     }
 
@@ -114,11 +143,9 @@ public class CampaignHasProblemOnLoad extends ImmersiveDialogCore {
      * <p>The speaker is determined as the senior administrator for the campaign
      * with the "Command" specialization. If no such administrator is found, {@code null} is returned.</p>
      *
-     * @param campaign the {@link Campaign} whose senior administrator is to be retrieved
-     *
      * @return a {@link Person} representing the senior administrator, or {@code null} if none exists
      */
-    private static @Nullable Person getSpeaker(Campaign campaign) {
+    private @Nullable Person getSpeaker() {
         return campaign.getSeniorAdminPerson(COMMAND);
     }
 
@@ -128,12 +155,11 @@ public class CampaignHasProblemOnLoad extends ImmersiveDialogCore {
      * <p>This message is localized and assembled using resource bundles, with campaign-specific
      * information such as the commander's address.</p>
      *
-     * @param campaign    the {@link Campaign} for which the in-character message is generated
      * @param problemType the {@link CampaignProblemType} specifying the nature of the load problem
      *
      * @return a localized {@link String} containing the in-character message
      */
-    private static String createInCharacterMessage(Campaign campaign, CampaignProblemType problemType) {
+    private String createInCharacterMessage(CampaignProblemType problemType) {
         String typeKey = problemType.toString();
         String commanderAddress = campaign.getCommanderAddress(false);
 
@@ -150,7 +176,7 @@ public class CampaignHasProblemOnLoad extends ImmersiveDialogCore {
      *
      * @return a localized {@link String} containing the out-of-character message
      */
-    private static String createOutOfCharacterMessage(CampaignProblemType problemType) {
+    private String createOutOfCharacterMessage(CampaignProblemType problemType) {
         String typeKey = problemType.toString();
         return getFormattedTextAt(RESOURCE_BUNDLE, typeKey + ".ooc");
     }
