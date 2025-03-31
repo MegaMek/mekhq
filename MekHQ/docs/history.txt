@@ -85,6 +85,35 @@ MEKHQ VERSION HISTORY:
 + PR #6474: Removed Pending Scenario Check When Completing Missions/Contracts
 + PR #6480: Make planetary acquisitions even slower to be in line with RAW
 + PR #6484: Correct SUCS id on a few planets
++ PR #6417: Removed Unused Nag Dialog Strings From GUI Properties
++ PR #6418: Updated Nag Dialog Descriptions
++ PR #6419: Fixed Incorrect Duplicate Display of Scenarios in Outstanding Scenario Nag
++ PR #6420: Added Invalid Faction Validation During Day Advancement
++ PR #6421: Updated Overdue Loan Payment Nag to Use Immersive Dialog
++ PR #6423: Removed the Ability for Ignored StratCon Scenarios to 'Wander' if Friendly Facility is Present
++ PR #6425: Added Strategic Target Weighting for StratCon Scenario Generation
++ PR #6436: Added Administrative Skill Integration for Doctors; Fixed Medical Assignment Optimization
++ PR #6437: Updated Doctor Academy Curricula To Include Administration
++ PR #6438: Added Administrative Skill Integration for Techs
++ PR #6440: Refactored Experience Level Calculation for Personnel
++ PR #6444: Added the Ability to Specific Admin/Logistics Only Procurement
++ PR #6477: Removed Redundant 'Add 1 XP' Option
++ PR #6478: Added GM Option to Assign Specific Highest Education to Selected Personnel at Will
++ PR #6482: Added Birth Announcements
++ PR #6483: Added Postpartum Recovery Injury Type And Effects
++ PR #6486: Removed Redundant Artillery Role Entries in Scenario Templates
++ PR #6487: Updated Technician List Refresh Logic in RepairTab
++ PR #6488: Updated RepairTab to Improve Handling of null States in getSelectedTech
++ PR #6489: Simplified Campaign Options Access In RepairTab
++ PR #6491: Added "Coming of Age" Life Event Dialog
++ PR #6493: Added Support for Optional Image Icons in Immersive Dialogs
++ PR #6494: Replaced Old Image Scaling Method with New
++ PR #6498: Added Annual Inner Sphere Celebration Events
++ PR #6499: Updated Glossary Documentation Reference for Prisoner Capacity
++ PR #6500: Fixed Minimum Bid Calculation in Mercenary Auction
++ PR #6501: Added 'Upgrading Version' Instructional On-Campaign Load Nag
++ PR #6502: Fixed Skill Deprecator Refund & Refund All Options
+
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
