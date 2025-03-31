@@ -28,7 +28,6 @@
  */
 package mekhq.campaign.market.contractMarket;
 
-import static java.lang.Math.floor;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.d6;
 import static megamek.common.enums.SkillLevel.ELITE;
@@ -594,50 +593,12 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
         }
 
-        // Unofficial modifiers
-        double unofficialMultiplier = getUnofficialMultiplier(campaign, contract);
-
-        if (unofficialMultiplier > 0) {
-            multiplier *= (1.0 + unofficialMultiplier);
-        } else if (unofficialMultiplier < 0) {
-            multiplier *= (1.0 - unofficialMultiplier);
-        }
-
         // This should always be last
         if (isGrayMonday(campaign.getLocalDate(), campaign.getCampaignOptions().isSimulateGrayMonday())) {
             multiplier *= 0.25;
         }
 
         return multiplier;
-    }
-
-    private static double getUnofficialMultiplier(Campaign campaign, AtBContract contract) {
-        double modifier = 0; // we apply these modifiers all together to avoid spiking the final pay
-
-        // Adjust pay based on the percentage of the players' forces required by the contract
-        int maximumLanceCount = campaign.getAllCombatTeams().size();
-        int reserveLanceCount = (int) floor(maximumLanceCount / COMBAT_FORCE_DIVIDER);
-        int requiredCombatTeams = contract.getRequiredCombatTeams();
-
-        if (reserveLanceCount > 0) { // Ensure we don't divide by zero
-            double reservesDifference = ((requiredCombatTeams - reserveLanceCount) / (double) reserveLanceCount);
-
-            modifier += reservesDifference;
-        }
-
-        // Adjust pay based on difficulty if FG3 is enabled
-        if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
-            int difficulty = contract.calculateContractDifficulty(campaign);
-            int baseDifficulty = 5; // 2.5 skulls
-
-            if (difficulty > 0) {
-                double difficultyDifference = ((difficulty - baseDifficulty) / (double) baseDifficulty);
-
-                modifier += difficultyDifference;
-            }
-        }
-
-        return modifier;
     }
 
     @Override
