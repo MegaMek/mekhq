@@ -188,7 +188,7 @@ public class WinterHolidayAnnouncement {
     /**
      * Builds the in-character message for either Day Five or Day Eleven of the Winter Holiday event.
      *
-     * @param isDayFive {@link true} if building the message for Day Five, {@link false} for Day Eleven
+     * @param isDayFive {@code true} if building the message for Day Five, {@code false} for Day Eleven
      *
      * @return the message as a string for the specified day
      */
@@ -272,7 +272,7 @@ public class WinterHolidayAnnouncement {
      *
      * @param date the {@link LocalDate} to evaluate
      *
-     * @return {@link true} if the specified date is a major Winter Holiday day, {@link false} otherwise
+     * @return {@code true} if the specified date is a major Winter Holiday day, {@code false} otherwise
      */
     public static boolean isWinterHolidayMajorDay(LocalDate date) {
         if (date.getYear() < WINTER_HOLIDAY_START_YEAR) {
