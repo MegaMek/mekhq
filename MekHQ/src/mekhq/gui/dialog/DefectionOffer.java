@@ -27,14 +27,14 @@
  */
 package mekhq.gui.dialog;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.List;
 
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
 /**
  * Represents a dialog created when a prisoner wants to defect to the player's force.
@@ -64,6 +64,7 @@ public class DefectionOffer extends ImmersiveDialogCore {
               createOutOfCharacterMessage(isBondsman),
               null,
               false,
+              null,
               null,
               true);
     }

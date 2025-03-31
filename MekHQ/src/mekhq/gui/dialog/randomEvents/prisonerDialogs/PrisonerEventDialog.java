@@ -27,16 +27,16 @@
  */
 package mekhq.gui.dialog.randomEvents.prisonerDialogs;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * Represents a dialog triggered when a random prisoner event occurs, asking the player how they would like to resolve
@@ -74,6 +74,7 @@ public class PrisonerEventDialog extends ImmersiveDialogCore {
               createOutOfCharacterMessage(),
               null,
               true,
+              null,
               null,
               true);
     }

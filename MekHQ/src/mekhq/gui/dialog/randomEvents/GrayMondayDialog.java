@@ -61,6 +61,7 @@ public class GrayMondayDialog extends ImmersiveDialogCore {
               null,
               false,
               null,
+              null,
               true);
     }
 

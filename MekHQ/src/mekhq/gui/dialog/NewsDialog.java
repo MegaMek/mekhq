@@ -77,6 +77,7 @@ public class NewsDialog extends ImmersiveDialogCore {
               UIUtil.scaleForGUI(400),
               false,
               null,
+              null,
               true);
     }
 
