@@ -27,23 +27,6 @@
  */
 package mekhq.campaign;
 
-import megamek.common.Entity;
-import megamek.common.Infantry;
-import megamek.common.UnitType;
-import mekhq.MekHQ;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.enums.MissionStatus;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.unit.CargoStatistics;
-import mekhq.campaign.unit.HangarStatistics;
-import mekhq.campaign.unit.Unit;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
-
 import static mekhq.campaign.force.Force.FORCE_ORIGIN;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
@@ -56,9 +39,25 @@ import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.calcula
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
+
+import megamek.common.Entity;
+import megamek.common.Infantry;
+import megamek.common.UnitType;
+import mekhq.MekHQ;
+import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.unit.CargoStatistics;
+import mekhq.campaign.unit.HangarStatistics;
+import mekhq.campaign.unit.Unit;
+
 /**
- * calculates and stores summary information on a campaign for use in reporting,
- * mostly for the command center
+ * calculates and stores summary information on a campaign for use in reporting, mostly for the command center
  */
 public class CampaignSummary {
 
@@ -93,7 +92,6 @@ public class CampaignSummary {
     private int nDS;
 
     /**
-     *
      * @param c a {@link Campaign} for which a summary is desired
      */
     public CampaignSummary(Campaign c) {
@@ -102,9 +100,8 @@ public class CampaignSummary {
     }
 
     /**
-     * This will update all of the values in CampaignSummary to the latest from the
-     * campaign. It should
-     * be run before pulling out any reports
+     * This will update all of the values in CampaignSummary to the latest from the campaign. It should be run before
+     * pulling out any reports
      */
     public void updateInformation() {
 
@@ -136,8 +133,12 @@ public class CampaignSummary {
         int squadCount = 0;
         for (Unit u : campaign.getHangar().getUnits()) {
             Entity e = u.getEntity();
-            if (u.isUnmanned() || u.isSalvage() || u.isMothballed() || u.isMothballing() || !u.isPresent()
-                    || (null == e)) {
+            if (u.isUnmanned() ||
+                      u.isSalvage() ||
+                      u.isMothballed() ||
+                      u.isMothballing() ||
+                      !u.isPresent() ||
+                      (null == e)) {
                 continue;
             }
             countDamageStatus[u.getDamageState()]++;
@@ -189,31 +190,29 @@ public class CampaignSummary {
 
         // transport capacity
         HangarStatistics hangarStats = campaign.getHangarStatistics();
-        int noMek = Math.max(
-                hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MEK) - hangarStats.getOccupiedBays(Entity.ETYPE_MEK),
-                0);
-        int noSC = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT)
-                - hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
+        int noMek = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MEK) -
+                                   hangarStats.getOccupiedBays(Entity.ETYPE_MEK), 0);
+        int noSC = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) -
+                                  hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
         @SuppressWarnings("unused") // FIXME: What type of bays do ConvFighters use?
-        int noCF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER)
-                - hangarStats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
-        int noASF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACEFIGHTER)
-                - hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER), 0);
-        int nolv = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true)
-                - hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
-        int nohv = Math.max(
-                hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK) - hangarStats.getOccupiedBays(Entity.ETYPE_TANK),
-                0);
-        int noinf = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY)
-                - hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
-        int noBA = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR)
-                - hangarStats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
-        int noProto = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK)
-                - hangarStats.getOccupiedBays(Entity.ETYPE_PROTOMEK), 0);
+        int noCF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) -
+                                  hangarStats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
+        int noASF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACEFIGHTER) -
+                                   hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER), 0);
+        int nolv = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) -
+                                  hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
+        int nohv = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK) -
+                                  hangarStats.getOccupiedBays(Entity.ETYPE_TANK), 0);
+        int noinf = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) -
+                                   hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
+        int noBA = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) -
+                                  hangarStats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
+        int noProto = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK) -
+                                     hangarStats.getOccupiedBays(Entity.ETYPE_PROTOMEK), 0);
         int freehv = Math.max(hangarStats.getTotalHeavyVehicleBays() - hangarStats.getOccupiedBays(Entity.ETYPE_TANK),
-                0);
-        int freeSC = Math
-                .max(hangarStats.getTotalSmallCraftBays() - hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
+              0);
+        int freeSC = Math.max(hangarStats.getTotalSmallCraftBays() -
+                                    hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
 
         // check for free bays elsewhere
         noASF = Math.max(noASF - freeSC, 0);
@@ -221,26 +220,24 @@ public class CampaignSummary {
 
         unitsOver = noMek + noASF + nolv + nohv + noinf + noBA + noProto;
         unitsTransported = hangarStats.getOccupiedBays(Entity.ETYPE_MEK) +
-                hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT) +
-                hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER) +
-                hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true) +
-                hangarStats.getOccupiedBays(Entity.ETYPE_TANK) +
-                hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY) +
-                hangarStats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR) +
-                hangarStats.getOccupiedBays(Entity.ETYPE_PROTOMEK);
+                                 hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT) +
+                                 hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER) +
+                                 hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true) +
+                                 hangarStats.getOccupiedBays(Entity.ETYPE_TANK) +
+                                 hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY) +
+                                 hangarStats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR) +
+                                 hangarStats.getOccupiedBays(Entity.ETYPE_PROTOMEK);
 
         nDS = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
     }
 
     /**
-     * A report that gives numbers of combat and support personnel as well as
-     * injuries
+     * A report that gives numbers of combat and support personnel as well as injuries
      *
      * @return a <code>String</code> of the report
      */
     public String getPersonnelReport() {
-        return totalCombatPersonnel + " combat, " + totalSupportPersonnel + " support ("
-                + totalInjuries + " injured)";
+        return totalCombatPersonnel + " combat, " + totalSupportPersonnel + " support (" + totalInjuries + " injured)";
     }
 
     /**
@@ -249,15 +246,18 @@ public class CampaignSummary {
      * @return a <code>String</code> of the report
      */
     public String getForceRepairReport() {
-        return countDamageStatus[Entity.DMG_LIGHT] + " light, " +
-                countDamageStatus[Entity.DMG_MODERATE] + " moderate, " +
-                countDamageStatus[Entity.DMG_HEAVY] + " heavy, " +
-                countDamageStatus[Entity.DMG_CRIPPLED] + " crippled";
+        return countDamageStatus[Entity.DMG_LIGHT] +
+                     " light, " +
+                     countDamageStatus[Entity.DMG_MODERATE] +
+                     " moderate, " +
+                     countDamageStatus[Entity.DMG_HEAVY] +
+                     " heavy, " +
+                     countDamageStatus[Entity.DMG_CRIPPLED] +
+                     " crippled";
     }
 
     /**
-     * A report that gives the percentage composition of the force in mek, armor,
-     * infantry, and aero units.
+     * A report that gives the percentage composition of the force in mek, armor, infantry, and aero units.
      *
      * @return a <code>String</code> of the report
      */
@@ -284,22 +284,19 @@ public class CampaignSummary {
      * @return a <code>String</code> of the report
      */
     public String getMissionSuccessReport() {
-        int successRate = (int) Math.round((100 * countMissionByStatus[MissionStatus.SUCCESS.ordinal()])
-                / (double) completedMissions);
+        int successRate = (int) Math.round((100 * countMissionByStatus[MissionStatus.SUCCESS.ordinal()]) /
+                                                 (double) completedMissions);
         return successRate + "%";
     }
 
     /**
-     * Generates an HTML report about the current and maximum cargo capacity.
-     * The current cargo capacity (cargoTons) and maximum cargo capacity (cargoCapacity) are
-     * rounded to 1 decimal place. The comparison between the current and maximum cargo capacity
-     * determines the font's color in the report.
-     * - If the current cargo exceeds the maximum capacity, the color is set to MHQ's defined negative color.
-     * - If the current cargo equals the maximum capacity, the color is set to MHQ's defined warning color.
-     * - In other cases, the regular color is used.
+     * Generates an HTML report about the current and maximum cargo capacity. The current cargo capacity (cargoTons) and
+     * maximum cargo capacity (cargoCapacity) are rounded to 1 decimal place. The comparison between the current and
+     * maximum cargo capacity determines the font's color in the report. - If the current cargo exceeds the maximum
+     * capacity, the color is set to MHQ's defined negative color. - If the current cargo equals the maximum capacity,
+     * the color is set to MHQ's defined warning color. - In other cases, the regular color is used.
      *
-     * @return A {@link StringBuilder} object containing the HTML formatted report of cargo usage
-     * against capacity.
+     * @return A {@link StringBuilder} object containing the HTML formatted report of cargo usage against capacity.
      */
     public StringBuilder getCargoCapacityReport() {
         BigDecimal roundedCargo = new BigDecimal(Double.toString(cargoTons));
@@ -313,15 +310,10 @@ public class CampaignSummary {
         StringBuilder report = new StringBuilder("<html>");
 
         if (comparison > 0) {
-            report.append("<font color='")
-                    .append(MekHQ.getMHQOptions().getFontColorWarningHexColor())
-                    .append("'>");
+            report.append("<font color='").append(MekHQ.getMHQOptions().getFontColorWarningHexColor()).append("'>");
         }
 
-        report.append(roundedCargo)
-                .append(" tons (")
-                .append(roundedCapacity)
-                .append(" tons capacity)");
+        report.append(roundedCargo).append(" tons (").append(roundedCapacity).append(" tons capacity)");
 
         if (!report.toString().equals(roundedCargo + " tons (" + roundedCapacity + " tons capacity)")) {
             report.append("</font></html>");
@@ -354,23 +346,22 @@ public class CampaignSummary {
     /**
      * Generates an administrative capacity report for the Command Center.
      *
-     * @param campaign the campaign for which the administrative capacity report is
-     *                 generated
+     * @param campaign the campaign for which the administrative capacity report is generated
+     *
      * @return the administrative capacity report in HTML format
      */
     public String getAdministrativeCapacityReport(Campaign campaign) {
         int combinedSkillValues = getCombinedSkillValues(campaign, SkillType.S_ADMIN);
 
-        StringBuilder administrativeCapacityReport = new StringBuilder()
-                .append(getAdministrativeStrain(campaign)).append(" / ")
-                .append(campaign.getCampaignOptions().getAdministrativeCapacity() * combinedSkillValues)
-                .append(" personnel");
+        StringBuilder administrativeCapacityReport = new StringBuilder().append(getAdministrativeStrain(campaign))
+                                                           .append(" / ")
+                                                           .append(campaign.getCampaignOptions()
+                                                                         .getAdministrativeCapacity() *
+                                                                         combinedSkillValues)
+                                                           .append(" personnel");
 
         if (getAdministrativeStrainModifier(campaign) > 0) {
-            administrativeCapacityReport
-                    .append(" (+")
-                    .append(getAdministrativeStrainModifier(campaign))
-                    .append(')');
+            administrativeCapacityReport.append(" (+").append(getAdministrativeStrainModifier(campaign)).append(')');
         }
 
         return administrativeCapacityReport.toString();
@@ -394,22 +385,25 @@ public class CampaignSummary {
 
         // Field Kitchens
         if (campaignOptions.isUseFatigue()) {
-            List<Unit> unitsInToe = campaign.getForce(FORCE_ORIGIN).getAllUnitsAsUnits(campaign.getHangar(),
-                  false);
+            List<Unit> unitsInToe = campaign.getForce(FORCE_ORIGIN).getAllUnitsAsUnits(campaign.getHangar(), false);
 
             int fieldKitchenCapacity = checkFieldKitchenCapacity(unitsInToe, campaignOptions.getFieldKitchenCapacity());
             int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false),
                   campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
             boolean isWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
 
-            color = isWithinCapacity
-                ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor())
-                : "";
+            color = isWithinCapacity ?
+                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()) :
+                          "";
             closingSpan = isWithinCapacity ? "" : CLOSING_SPAN_TAG;
             colorBlindWarning = isWithinCapacity ? "" : WARNING;
 
-            report.append(String.format("Kitchens %s(%s/%s)%s%s", color, fieldKitchenUsage,
-                  fieldKitchenCapacity, closingSpan, colorBlindWarning));
+            report.append(String.format("Kitchens %s(%s/%s)%s%s",
+                  color,
+                  fieldKitchenUsage,
+                  fieldKitchenCapacity,
+                  closingSpan,
+                  colorBlindWarning));
         }
 
         // Hospital Beds
@@ -418,25 +412,32 @@ public class CampaignSummary {
                 report.append("<br>");
             }
 
-            int patients = (int) campaign.getPatients().stream()
-                    .filter(patient -> patient.getDoctorId() != null)
-                    .count();
+            int patients = (int) campaign.getPatients()
+                                       .stream()
+                                       .filter(patient -> patient.getDoctorId() != null)
+                                       .count();
 
-            int doctorCapacity = campaign.getActivePersonnel().stream()
-                    .filter(person -> (person.getPrimaryRole().isDoctor()) || (person.getSecondaryRole().isDoctor()))
-                    .mapToInt(person -> campaignOptions.getMaximumPatients())
-                    .sum();
+            final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
+            final int maximumPatients = campaignOptions.getMaximumPatients();
+            int doctorCapacity = 0;
+            for (Person person : campaign.getActivePersonnel(false)) {
+                doctorCapacity += person.getDoctorMedicalCapacity(isDoctorsUseAdministration, maximumPatients);
+            }
 
             exceedsCapacity = patients > doctorCapacity;
 
-            color = exceedsCapacity
-                ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
-                : "";
+            color = exceedsCapacity ?
+                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
+                          "";
             closingSpan = exceedsCapacity ? CLOSING_SPAN_TAG : "";
             colorBlindWarning = exceedsCapacity ? WARNING : "";
 
             report.append(String.format("Hospital Beds %s(%s/%s)%s%s",
-                color, patients, doctorCapacity, closingSpan, colorBlindWarning));
+                  color,
+                  patients,
+                  doctorCapacity,
+                  closingSpan,
+                  colorBlindWarning));
         }
 
         // Prisoners
@@ -450,16 +451,18 @@ public class CampaignSummary {
             exceedsCapacity = capacityUsage > prisonerCapacity;
 
             color = capacityUsage > (prisonerCapacity * 0.75) // at risk of a minor event
-                ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor())
-                : "";
+                          ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()) : "";
             color = exceedsCapacity // at risk of a major event
-                ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
-                : color;
+                          ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) : color;
             closingSpan = exceedsCapacity ? CLOSING_SPAN_TAG : "";
             colorBlindWarning = exceedsCapacity ? WARNING : "";
 
             report.append(String.format("Prisoners %s(%s/%s)%s%s",
-                color, capacityUsage, prisonerCapacity, closingSpan, colorBlindWarning));
+                  color,
+                  capacityUsage,
+                  prisonerCapacity,
+                  closingSpan,
+                  colorBlindWarning));
         }
 
         return report.append("</html>").toString();

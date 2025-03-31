@@ -27,6 +27,7 @@
  */
 package mekhq.utilities;
 
+import static java.lang.Math.max;
 import static java.lang.Math.round;
 
 import java.awt.AlphaComposite;
@@ -38,40 +39,60 @@ import javax.swing.ImageIcon;
 
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 
 public class ImageUtilities {
+    private static final MMLogger logger = MMLogger.create(ImageUtilities.class);
+
     /**
-     * Scales an {@link ImageIcon} to the specified width while maintaining its aspect ratio.
-     * The method dynamically determines the scaled height proportional to the original
-     * image dimensions to retain visual quality and appearance.
-     *
-     * <p>The scaling process follows these steps:</p>
-     * <ol>
-     *     <li>Adjusts the provided {@code width} to account for GUI scaling factors
-     *         by using {@link UIUtil#scaleForGUI(int)} to ensure consistent dimensions.</li>
-     *     <li>Calculates the new height required to maintain the image's original aspect ratio
-     *         using the formula {@code height = (width * originalHeight) / originalWidth}.</li>
-     *     <li>Uses {@link Image#getScaledInstance(int, int, int)} to create a resized image
-     *         with smooth scaling for better visual quality ({@code Image.SCALE_SMOOTH}).</li>
-     *     <li>Packages the resulting scaled image into a new {@link ImageIcon} object
-     *         and returns it.</li>
-     * </ol>
-     *
-     * <p>By dynamically scaling both width and height based on the GUI scaling factor,
-     * the method ensures that the resized icon adapts seamlessly across high-DPI displays
-     * and varying screen resolutions.</p>
-     *
-     * @param icon  the {@link ImageIcon} to be resized. This represents the source image
-     *              that requires scaling.
-     * @param width the desired width (in pixels) to scale the {@link ImageIcon} to.
-     *              The actual applied value will consider GUI scaling factors to ensure
-     *              consistent appearance across different display settings.
-     * @return a new {@link ImageIcon} instance representing the scaled image while
-     *         preserving the original aspect ratio.
+     * @deprecated use {@link #scaleImageIcon(ImageIcon, int, boolean)} instead.
      */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public static ImageIcon scaleImageIconToWidth(ImageIcon icon, int width) {
-        width = UIUtil.scaleForGUI(width);
-        int height = (int) Math.ceil((double) width * icon.getIconHeight() / icon.getIconWidth());
+        return scaleImageIcon(icon, width, true);
+    }
+
+    /**
+     * Scales an {@link ImageIcon} proportionally based on either the specified width or height.
+     *
+     * <p>This method preserves the aspect ratio of the original image while resizing. The size to scale
+     * is determined by the {@code size} parameter, and whether scaling is based on width or height is controlled by the
+     * {@code scaleByWidth} flag.</p>
+     *
+     * <p>If the provided {@link ImageIcon} is {@code null}, an empty {@link ImageIcon} will be returned, and
+     * an error will be logged.</p>
+     *
+     * @param icon         The {@link ImageIcon} to be scaled. If {@code null}, an empty {@link ImageIcon} is returned.
+     * @param size         The target size to scale to, either width or height depending on the {@code scaleByWidth}
+     *                     flag. This value will be scaled for the GUI using {@link UIUtil#scaleForGUI(int)}.
+     * @param scaleByWidth A {@code boolean} flag to determine the scaling mode:
+     *                     <ul>
+     *                       <li>If {@code true}, scales the image by the given width, and calculates the height
+     *                           proportionally.</li>
+     *                       <li>If {@code false}, scales the image by the given height, and calculates the width
+     *                           proportionally.</li>
+     *                     </ul>
+     *
+     * @return A scaled {@link ImageIcon}, resized to the specified target dimension while maintaining the aspect ratio.
+     *       If the provided {@link ImageIcon} is {@code null}, returns an empty {@link ImageIcon}.
+     */
+    public static ImageIcon scaleImageIcon(ImageIcon icon, int size, boolean scaleByWidth) {
+        if (icon == null) {
+            logger.error(new NullPointerException(),
+                  "ImageIcon is null in scaleImageIcon(ImageIcon, int, boolean). Returning an empty ImageIcon.");
+            return new ImageIcon();
+        }
+
+        int width, height;
+
+        if (scaleByWidth) {
+            // The uses of 'max' here are to prevent us risking a potential image with an illegal 0 px dimension.
+            width = max(1, UIUtil.scaleForGUI(size));
+            height = (int) Math.ceil((double) width * icon.getIconHeight() / icon.getIconWidth());
+        } else {
+            height = max(1, UIUtil.scaleForGUI(size));
+            width = (int) Math.ceil((double) height * icon.getIconWidth() / icon.getIconHeight());
+        }
 
         Image image = icon.getImage();
         Image scaledImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
@@ -83,8 +104,7 @@ public class ImageUtilities {
      * Adds a default tint to the provided image with standard transparency settings.
      *
      * <p>This is a simplified utility method that applies a given tint color to only the
-     * non-transparent portions of an image, with a default transparency level of 75%
-     * (25% opaque).</p>
+     * non-transparent portions of an image, with a default transparency level of 75% (25% opaque).</p>
      *
      * @param image     the {@link Image} to which the tint will be applied.
      * @param tintColor the {@link Color} used for the tint.
@@ -98,33 +118,30 @@ public class ImageUtilities {
     }
 
     /**
-     * Adds a customizable tint to the given image, with options to control the transparency
-     * and the areas of the image affected by the tint.
+     * Adds a customizable tint to the given image, with options to control the transparency and the areas of the image
+     * affected by the tint.
      *
      * <p>This method processes the input {@link Image} and applies a tint (a blend of the
-     * given color and transparency) across the image. You may specify whether the tint should
-     * apply only to non-transparent areas or the entire image. Additionally, the transparency
-     * level can be customized or left as the default (50% transparency, 50% opaque).</p>
+     * given color and transparency) across the image. You may specify whether the tint should apply only to
+     * non-transparent areas or the entire image. Additionally, the transparency level can be customized or left as the
+     * default (50% transparency, 50% opaque).</p>
      *
-     * @param image              the {@link Image} to which the tint will be applied.
-     * @param tint               the {@link Color} used for the tint.
-     * @param nonTransparentOnly if {@code true}, applies the tint only to non-transparent areas of
-     *                           the image. Otherwise, it applies the tint globally.
-     * @param transparencyPercent an optional transparency level for the tint. If {@code null}, it
-     *                            defaults to 50% transparency (0.5). Must be between {@code 0.0}
-     *                            and {@code 1.0}.
+     * @param image               the {@link Image} to which the tint will be applied.
+     * @param tint                the {@link Color} used for the tint.
+     * @param nonTransparentOnly  if {@code true}, applies the tint only to non-transparent areas of the image.
+     *                            Otherwise, it applies the tint globally.
+     * @param transparencyPercent an optional transparency level for the tint. If {@code null}, it defaults to 50%
+     *                            transparency (0.5). Must be between {@code 0.0} and {@code 1.0}.
      *
      * @return an {@link ImageIcon} containing the image with the applied tint.
      *
      * @see #addTintToImageIcon(Image, Color) for default behavior.
      */
     public static ImageIcon addTintToImageIcon(Image image, Color tint, boolean nonTransparentOnly,
-                                           @Nullable Double transparencyPercent) {
-        BufferedImage tintedImage = new BufferedImage(
-              image.getWidth(null),
+                                               @Nullable Double transparencyPercent) {
+        BufferedImage tintedImage = new BufferedImage(image.getWidth(null),
               image.getHeight(null),
-              BufferedImage.TYPE_INT_ARGB
-        );
+              BufferedImage.TYPE_INT_ARGB);
 
         Graphics2D graphics = tintedImage.createGraphics();
         graphics.drawImage(image, 0, 0, null);
@@ -134,7 +151,9 @@ public class ImageUtilities {
             graphics.setComposite(AlphaComposite.SrcAtop);
         }
 
-        graphics.setColor(new Color(tint.getRed(), tint.getGreen(), tint.getBlue(),
+        graphics.setColor(new Color(tint.getRed(),
+              tint.getGreen(),
+              tint.getBlue(),
               getAlpha(transparencyPercent == null ? 0.5 : transparencyPercent)));
         graphics.fillRect(0, 0, tintedImage.getWidth(), tintedImage.getHeight());
 
@@ -178,7 +197,8 @@ public class ImageUtilities {
      *
      * @return A new {@link BufferedImage} with the specified tint applied.
      */
-    public static BufferedImage addTintToBufferedImage(BufferedImage image, Color tint, boolean nonTransparentOnly, @Nullable Double transparencyPercent) {
+    public static BufferedImage addTintToBufferedImage(BufferedImage image, Color tint, boolean nonTransparentOnly,
+                                                       @Nullable Double transparencyPercent) {
         // Create a new BufferedImage with the same dimensions and type as the original
         BufferedImage tintedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
