@@ -5274,7 +5274,7 @@ public class Campaign implements ITechManager {
 
             // check to see if this part can now be combined with other spare parts
             if (part.isSpare() && (part.getQuantity() > 0)) {
-                getQuartermaster().addPart(part, 0);
+                getQuartermaster().addPart(part, 0, false);
             }
         }
 
@@ -9441,7 +9441,7 @@ public class Campaign implements ITechManager {
             int toBuy = findStockUpAmount(partInUse);
             while (toBuy > 0) {
                 IAcquisitionWork partToBuy = partInUse.getPartToBuy();
-                getQuartermaster().addPart((Part) partToBuy.getNewEquipment(), 0);
+                getQuartermaster().addPart((Part) partToBuy.getNewEquipment(), 0, true);
                 --toBuy;
             }
         }
