@@ -230,7 +230,7 @@ task stageFiles(type: Copy) {
 
     doLast {
         mkdir "${fileStagingDir}/${log}"
-        mkdir "${fileStagingDir}/${userdata}/${mmconf}/campaignPresets/"
+        mkdir "${fileStagingDir}/${userdata}/${data}/campaignPresets/"
     }
 }
 
