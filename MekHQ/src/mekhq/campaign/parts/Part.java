@@ -454,7 +454,8 @@ public abstract class Part implements IPartWork, ITechnology {
         }
 
         toReturn.append("<br> THIS IS TEST TEST ")
-              .append(campaign.getWarehouse().getSparePartsCount(this))
+              .append(campaign.getWarehouse()
+              .streamSpareParts().filter(p -> p.isSamePartType(this)).count())
               .append("xx");
 
         if (getSkillMin() <= SkillType.EXP_ELITE) {
