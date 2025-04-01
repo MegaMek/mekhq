@@ -42,6 +42,7 @@ import static mekhq.campaign.personnel.SkillType.S_DOCTOR;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.enums.education.EducationLevel.DOCTORATE;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
@@ -718,6 +719,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     for (Person person : people) {
                         if (person.getPrisonerStatus() != status) {
                             person.setPrisonerStatus(getCampaign(), status, true);
+
+                            if (status.isCurrentPrisoner()) {
+                                statusValidator(person, true);
+                            }
+
+                            MekHQ.triggerEvent(new PersonStatusChangedEvent(person));
                         }
                     }
                 } catch (Exception e) {
@@ -1650,7 +1657,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         menu = new JMenu(resources.getString("changeStatus.text"));
-        for (final PersonnelStatus status : PersonnelStatus.getImplementedStatuses()) {
+        boolean areAllFree = Stream.of(selected).allMatch(p -> p.getPrisonerStatus().isFreeOrBondsman());
+        for (final PersonnelStatus status : PersonnelStatus.getImplementedStatuses(areAllFree, false)) {
             cbMenuItem = new JCheckBoxMenuItem(status.toString());
             cbMenuItem.setToolTipText(status.getToolTipText());
             cbMenuItem.setSelected(person.getStatus() == status);
@@ -1658,8 +1666,19 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
         }
-        popup.add(menu);
 
+        JMenu cbMenu = new JMenu(resources.getString("changeStatus.causesOfDeath.text"));
+        for (final PersonnelStatus status : PersonnelStatus.getCauseOfDeathStatuses(areAllFree)) {
+            cbMenuItem = new JCheckBoxMenuItem(status.toString());
+            cbMenuItem.setToolTipText(status.getToolTipText());
+            cbMenuItem.setSelected(person.getStatus() == status);
+            cbMenuItem.setActionCommand(makeCommand(CMD_CHANGE_STATUS, status.name()));
+            cbMenuItem.addActionListener(this);
+            cbMenu.add(cbMenuItem);
+        }
+
+        menu.add(cbMenu);
+        popup.add(menu);
 
         if (StaticChecks.areAllPrisoners(selected)) {
             if (getCampaign().getLocation().isOnPlanet()) {
