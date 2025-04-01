@@ -36,6 +36,7 @@ import java.util.List;
 
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 
 /**
@@ -617,34 +618,33 @@ public enum PersonnelStatus {
     }
 
     /**
-     * Validates and updates the status of a person based on their prisoner status.
+     * Validates and updates the {@link PersonnelStatus} of a {@link Person} based on their prisoner status.
      *
-     * <p><b>Notes:</b> This method was created to handle <b>v0.50.05</b> campaigns where prisoners may have
-     * invalid statuses.</p>
+     * <p>This method is specifically designed to ensure data integrity in campaigns where invalid personnel statuses
+     * may exist for prisoners (introduced in version <b>v0.50.05</b>). It guarantees that prisoners have status values
+     * appropriate to their situation within the game context. </p>
      *
-     * @param person     the {@link Person} object whose status is to be validated and potentially updated. The method
-     *                   ensures that the current personnel status is appropriate for prisoners.
-     *                   <ul>
-     *                     <li>If the person is a prisoner and their status is not suitable
-     *                         for prisoners, the status is updated to {@code ACTIVE}.</li>
-     *                     <li>If the person is not a prisoner, no validation or update is performed.</li>
-     *                   </ul>
+     * @param campaign   the {@link Campaign} object representing the current campaign. It is used for updating the
+     *                   person's status with reference to the campaign context (e.g., current date).
+     * @param person     the {@link Person} whose status is to be validated and potentially updated. This will be
+     *                   modified only if they are marked as a prisoner and their status is deemed invalid.
      * @param isPrisoner a boolean flag indicating if the person is a prisoner:
      *                   <ul>
-     *                     <li>{@code true}: The person is a prisoner, and their status will be validated.</li>
-     *                     <li>{@code false}: The person is not a prisoner, and no further validation or updates are applied.</li>
+     *                     <li>{@code true}: The person is a prisoner, and their status will be validated
+     *                     and corrected if needed.</li>
+     *                     <li>{@code false}: No validation or updates are applied to the person's status.</li>
      *                   </ul>
      *
      * @since 0.50.05
      */
-    public static void statusValidator(Person person, boolean isPrisoner) {
+    public static void statusValidator(Campaign campaign, Person person, boolean isPrisoner) {
         if (!isPrisoner) {
             return;
         }
 
         PersonnelStatus status = person.getStatus();
         if (!status.isPrisonerSuitableStatus()) {
-            person.setStatus(ACTIVE);
+            person.changeStatus(campaign, campaign.getLocalDate(), ACTIVE);
         }
     }
 

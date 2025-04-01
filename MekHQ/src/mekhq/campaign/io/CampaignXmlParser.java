@@ -449,7 +449,7 @@ public class CampaignXmlParser {
             // Self-correct any invalid personnel statuses (handles <50.05 campaigns)
             // Any characters with invalid statuses will have their status set to 'Active'
             if (person.getPrisonerStatus().isCurrentPrisoner()) {
-                statusValidator(person, true);
+                statusValidator(campaign, person, true);
             }
         }
 

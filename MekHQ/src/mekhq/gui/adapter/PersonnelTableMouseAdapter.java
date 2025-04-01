@@ -721,7 +721,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             person.setPrisonerStatus(getCampaign(), status, true);
 
                             if (status.isCurrentPrisoner()) {
-                                statusValidator(person, true);
+                                statusValidator(getCampaign(), person, true);
                             }
 
                             MekHQ.triggerEvent(new PersonStatusChangedEvent(person));
