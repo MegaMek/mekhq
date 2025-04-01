@@ -29,10 +29,6 @@
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
-import java.util.Objects;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
@@ -44,10 +40,13 @@ import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -82,8 +81,8 @@ public class MissingEquipmentPart extends MissingPart {
         this(tonnage, et, equipNum, c, eTonnage, size, false);
     }
 
-    public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c,
-            double eTonnage, double size, boolean omniPodded) {
+    public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c, double eTonnage, double size,
+                                boolean omniPodded) {
         // TODO Memorize all entity attributes needed to calculate cost
         // As it is a part bought with one entity can be used on another entity
         // on which it would have a different price (only tonnage is taken into
@@ -102,8 +101,13 @@ public class MissingEquipmentPart extends MissingPart {
 
     @Override
     public MissingEquipmentPart clone() {
-        return new MissingEquipmentPart(getUnitTonnage(), getType(), getEquipmentNum(), getCampaign(),
-                getTonnage(), getSize(), isOmniPodded());
+        return new MissingEquipmentPart(getUnitTonnage(),
+              getType(),
+              getEquipmentNum(),
+              getCampaign(),
+              getTonnage(),
+              getSize(),
+              isOmniPodded());
     }
 
     @Override
@@ -190,9 +194,6 @@ public class MissingEquipmentPart extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        // According to official answer, if sticker prices are different then
-        // they are not acceptable substitutes, so we need to check for that as well
-        // http://bg.battletech.com/forums/strategic-operations/(answered)-can-a-lance-for-a-35-ton-mech-be-used-on-a-40-ton-mech-and-so-on/
         EquipmentPart newPart = getNewPart();
 
         // Don't replace with parts that don't match our expected type!
@@ -204,10 +205,57 @@ public class MissingEquipmentPart extends MissingPart {
 
         newPart.setEquipmentNum(getEquipmentNum());
         newPart.setUnit(unit); // CAW: find a way to do this without setting a unit
-        return getType().equals(equipmentPart.getType())
-                && (getTonnage() == equipmentPart.getTonnage())
-                && (getSize() == equipmentPart.getSize())
-                && Objects.equals(newPart.getStickerPrice(), equipmentPart.getStickerPrice());
+
+        return checkAttributesMatch(equipmentPart, newPart);
+    }
+
+    /**
+     * Compares the attributes of two {@link EquipmentPart} objects to determine if they are equivalent. The comparison
+     * checks several attributes, including type, tonnage, size, omni-podded status, sticker price, and unit tonnage
+     * when applicable.
+     *
+     * <p><b>Attributes Checked:</b></p>
+     * <ul>
+     *   <li><b>Type:</b> Verifies that the equipment types for both parts are identical.</li>
+     *   <li><b>Tonnage:</b> Ensures that the total tonnage of both parts matches.</li>
+     *   <li><b>Size:</b> Confirms that the physical sizes of the two parts are the same.</li>
+     *   <li><b>Omni-Podded:</b> Checks whether both parts share the same omni-podded attribute.</li>
+     *   <li><b>Sticker Price:</b> Compares the monetary sticker price of both parts.</li>
+     *   <li><b>Unit Tonnage:</b> For parts where sticker price does not match and sticker price returns 0 (for
+     *   example, {@link MissingPart} objects) we compare unit tonnage as a fallback.</li>
+     * </ul>
+     *
+     * @param equipmentPart the {@link EquipmentPart} used as the baseline for the comparison.
+     * @param newPart       the {@link EquipmentPart} whose attributes are being compared to the baseline part.
+     *
+     * @return {@code true} if all compared attributes (type, tonnage, size, omni-podded status, sticker price, and unit
+     *       tonnage where applicable) match; otherwise, {@code false}.
+     */
+    private boolean checkAttributesMatch(EquipmentPart equipmentPart, EquipmentPart newPart) {
+        boolean typeMatches = getType().equals(equipmentPart.getType());
+        boolean tonnageMatches = newPart.getTonnage() == equipmentPart.getTonnage();
+        boolean sizeMatches = newPart.getSize() == equipmentPart.getSize();
+        boolean omniPoddedMatches = newPart.isOmniPodded() == equipmentPart.isOmniPodded();
+
+        Money newPartPrice = newPart.getStickerPrice();
+        Money equipmentPartPrice = equipmentPart.getStickerPrice();
+        boolean stickerPriceOrTonnageMatches = newPartPrice.equals(equipmentPartPrice);
+
+        // According to official answer, if target unit tonnage differs, the item cannot be attached to a unit, even
+        // if the equipment weight matches. The example in the below thread is a Mek Lance, the weight of which is
+        // based on the unit it's mounted on. So while a 35-ton and 40-ton Mek would both use a 2-ton lance, they
+        // are not interchangeable. Originally we handled this by comparing sticker price, however, missing parts have
+        // a fixed sticker price of 0 C-Bills, which meant users were completely unable to replace those parts if
+        // they were ever completely destroyed or removed. Now we compare unit tonnage.
+        // https://bg.battletech.com/forums/index.php/topic,14741.msg340122.html#msg340122
+        EquipmentType equipmentType = equipmentPart.getType();
+        if (equipmentPartPrice.isZero() && !stickerPriceOrTonnageMatches && equipmentType instanceof MiscType) {
+            if (((MiscType) equipmentType).isCostVariable()) {
+                stickerPriceOrTonnageMatches = newPart.getUnitTonnage() == equipmentPart.getUnitTonnage();
+            }
+        }
+
+        return typeMatches && tonnageMatches && sizeMatches && omniPoddedMatches && stickerPriceOrTonnageMatches;
     }
 
     protected @Nullable Mounted<?> getMounted() {
@@ -263,8 +311,8 @@ public class MissingEquipmentPart extends MissingPart {
         final Unit unit = getUnit();
         final Mounted<?> mounted = getMounted();
         if ((unit != null) && (mounted != null)) {
-            return unit.hasBadHipOrShoulder(mounted.getLocation())
-                    || (mounted.isSplit() && unit.hasBadHipOrShoulder(mounted.getSecondLocation()));
+            return unit.hasBadHipOrShoulder(mounted.getLocation()) ||
+                         (mounted.isSplit() && unit.hasBadHipOrShoulder(mounted.getSecondLocation()));
         }
 
         return false;
@@ -323,14 +371,13 @@ public class MissingEquipmentPart extends MissingPart {
             return false;
         }
         if (type instanceof MiscType) {
-            return type.hasFlag(MiscType.F_MEK_EQUIPMENT)
-                    || type.hasFlag(MiscType.F_TANK_EQUIPMENT)
-                    || type.hasFlag(MiscType.F_FIGHTER_EQUIPMENT);
+            return type.hasFlag(MiscType.F_MEK_EQUIPMENT) ||
+                         type.hasFlag(MiscType.F_TANK_EQUIPMENT) ||
+                         type.hasFlag(MiscType.F_FIGHTER_EQUIPMENT);
         } else if (type instanceof WeaponType) {
-            return (type.hasFlag(WeaponType.F_MEK_WEAPON)
-                    || type.hasFlag(WeaponType.F_TANK_WEAPON)
-                    || type.hasFlag(WeaponType.F_AERO_WEAPON))
-                    && !((WeaponType) type).isCapital();
+            return (type.hasFlag(WeaponType.F_MEK_WEAPON) ||
+                          type.hasFlag(WeaponType.F_TANK_WEAPON) ||
+                          type.hasFlag(WeaponType.F_AERO_WEAPON)) && !((WeaponType) type).isCapital();
         }
         return true;
     }
@@ -353,7 +400,6 @@ public class MissingEquipmentPart extends MissingPart {
         }
 
         int location = unit.getEntity().getLocationFromAbbr(loc);
-        return (mounted.getLocation() == location)
-                || (mounted.isSplit() && (mounted.getSecondLocation() == location));
+        return (mounted.getLocation() == location) || (mounted.isSplit() && (mounted.getSecondLocation() == location));
     }
 }

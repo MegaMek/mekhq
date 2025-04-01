@@ -65,6 +65,14 @@ import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+
+import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
+import static mekhq.campaign.personnel.enums.BloodGroup.getInheritedBloodGroup;
+import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+
 /**
  * AbstractProcreation is the baseline class for procreation and birth in MekHQ. It holds all the common logic for
  * procreation, and is implemented by classes defining how to determine if a female person will randomly procreate on a
@@ -416,6 +424,8 @@ public abstract class AbstractProcreation {
             baby.setSurname(campaignOptions.getBabySurnameStyle()
                                   .generateBabySurname(mother, father, baby.getGender()));
             baby.setDateOfBirth(today);
+            baby.setBloodGroup(getInheritedBloodGroup(mother.getBloodGroup(),
+                  father == null ? getRandomBloodGroup() : father.getBloodGroup()));
 
             // Create reports and log the birth
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE,
