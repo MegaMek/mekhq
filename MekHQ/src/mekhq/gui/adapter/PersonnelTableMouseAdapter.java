@@ -726,17 +726,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_FREE: {
-                processPrisonerResolutionCommand(people, "confirmFree.format", "freeQ.text");
+                processPrisonerResolutionCommand(people, "confirmFree.format", "freeQ.text", false);
 
                 break;
             }
             case CMD_EXECUTE: {
-                processPrisonerResolutionCommand(people, "confirmExecute.format", "executeQ.text");
+                processPrisonerResolutionCommand(people, "confirmExecute.format", "executeQ.text", true);
 
                 break;
             }
             case CMD_JETTISON: {
-                processPrisonerResolutionCommand(people, "confirmJettison.format", "jettisonQ.text");
+                processPrisonerResolutionCommand(people, "confirmJettison.format", "jettisonQ.text", true);
 
                 break;
             }
@@ -1474,13 +1474,39 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     /**
-     * This method processes a prisoner resolution command.
-     *
-     * @param prisoners an array of Person objects representing the prisoners
-     * @param message   a String representing the message to display in the dialog
-     * @param title     a String representing the title of the dialog
+     * @deprecated use {@link #processPrisonerResolutionCommand(Person[], String, String, boolean)} instead.
      */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     private void processPrisonerResolutionCommand(Person[] prisoners, String message, String title) {
+        processPrisonerResolutionCommand(prisoners, message, title);
+    }
+
+    /**
+     * Processes a prisoner resolution command, allowing a user to confirm a specific action (e.g., releasing or
+     * executing prisoners) via a dialog box. If confirmed, this method removes the selected prisoners from the campaign
+     * and optionally triggers additional execution-specific logic.
+     *
+     * <p><b>Behavior:</b></p>
+     * <ul>
+     *   <li>Displays a confirmation dialog with a message and title for the given prisoners.</li>
+     *   <li>If the user confirms, the specified prisoners are removed from the campaign.</li>
+     *   <li>Handles single prisoners by showing their full title in the dialog, while grouping
+     *   multiple prisoners by count.</li>
+     *   <li>If the action involves execution, an additional execution-handling method is called,
+     *   which processes execution-specific logic.</li>
+     * </ul>
+     *
+     * @param prisoners   an array of {@link Person} objects representing the prisoners to process. If the array
+     *                    contains only one prisoner, their full title is displayed; otherwise, the count of prisoners
+     *                    is shown.
+     * @param message     a {@link String} key representing the resource for the dialog message. This resource key
+     *                    should be able to handle placeholders for details, such as prisoner count or name.
+     * @param title       a {@link String} key representing the resource for the dialog title.
+     * @param isExecution a {@code boolean} indicating whether the command is related to execution. If {@code true},
+     *                    additional logic is executed to handle executions.
+     */
+    private void processPrisonerResolutionCommand(Person[] prisoners, String message, String title,
+                                                  boolean isExecution) {
         String label;
 
         if (prisoners.length == 1) {
@@ -1499,7 +1525,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
         }
 
-        processAdHocExecution(getCampaign(), prisoners.length);
+        if (isExecution) {
+            processAdHocExecution(getCampaign(), prisoners.length);
+        }
     }
 
     private void loadGMToolsForPerson(Person person) {
