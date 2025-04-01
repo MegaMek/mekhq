@@ -2738,14 +2738,8 @@ public class Campaign implements ITechManager {
         return parts.getParts();
     }
 
-    private int getQuantity(Part p) {
-        if (p instanceof Armor) {
-            return ((Armor) p).getAmount();
-        }
-        if (p instanceof AmmoStorage) {
-            return ((AmmoStorage) p).getShots();
-        }
-        return (p.getUnit() != null) ? 1 : p.getQuantity();
+    private int getQuantity(Part part) {
+        return getWarehouse().getPartQuantity(part);
     }
 
     private PartInUse getPartInUse(Part part) {
