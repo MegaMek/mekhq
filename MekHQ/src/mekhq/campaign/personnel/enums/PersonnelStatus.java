@@ -545,7 +545,7 @@ public enum PersonnelStatus {
     // endregion Boolean Comparison Methods
 
     /**
-     * @deprecated use {@link #getImplementedStatuses(boolean)} instead.
+     * @deprecated use {@link #getImplementedStatuses(boolean, boolean)} instead.
      */
     @Deprecated(since = "0.50.05", forRemoval = true)
     public static List<PersonnelStatus> getImplementedStatuses() {
