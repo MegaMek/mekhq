@@ -117,7 +117,7 @@ MEKHQ VERSION HISTORY:
 + PR #6504: Removed Unofficial Multiplier From Contract Pay Calculation
 + PR #6506: Celebration Event Fixes
 + PR #6283: Added Blood Group Tracking For Personnel
-
++ Fix #6515, #6516: Allow Dynamically Priced Parts to be Replaced in Repair Bay
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
