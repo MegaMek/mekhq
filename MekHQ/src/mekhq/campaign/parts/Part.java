@@ -453,10 +453,11 @@ public abstract class Part implements IPartWork, ITechnology {
             toReturn.append("</b><br/>").append(getDetails()).append("<br/>");
         }
 
-        toReturn.append("<br> <b>In Warehouse:</b> ")
-              .append(campaign.getWarehouse()
-              .getSparePartsCount(this))
-              .append(' ');
+        if (campaign.getWarehouse() != null) {
+            toReturn.append("<br> <b>In Warehouse:</b> ")
+                  .append(campaign.getWarehouse().getSparePartsCount(this))
+                  .append(' ');
+        }
 
         if (getSkillMin() <= SkillType.EXP_ELITE) {
             toReturn.append(getTimeLeft())
