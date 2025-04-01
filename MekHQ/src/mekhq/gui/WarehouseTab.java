@@ -27,6 +27,8 @@
  */
 package mekhq.gui;
 
+import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -34,6 +36,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.Set;
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.table.TableColumn;
@@ -188,7 +191,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints.insets = new Insets(5, 5, 5, 0);
         panSupplies.add(choicePartsView, gridBagConstraints);
 
-        partsModel = new PartsTableModel();
+        Set<PartInUse> partsInUse = getCampaign().getPartsInUse(true, false, QUALITY_A);
+        partsModel = new PartsTableModel(partsInUse);
         partsTable = new JTable(partsModel);
         partsSorter = new TableRowSorter<>(partsModel);
         partsSorter.setComparator(PartsTableModel.COL_COST, new FormattedNumberSorter());
