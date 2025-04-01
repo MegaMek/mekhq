@@ -40,6 +40,7 @@ import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
@@ -209,35 +210,36 @@ public class MissingEquipmentPart extends MissingPart {
     }
 
     /**
-     * Compares the attributes of two {@link EquipmentPart} objects to determine if they match. The comparison includes
-     * the type, tonnage, size, unit tonnage, and omni-podded status.
+     * Compares the attributes of two {@link EquipmentPart} objects to determine if they are equivalent. The comparison
+     * checks several attributes, including type, tonnage, size, omni-podded status, sticker price, and unit tonnage
+     * when applicable.
      *
-     * <p><b>Attributes compared:</b></p>
+     * <p><b>Attributes Checked:</b></p>
      * <ul>
-     *   <li><b>Type:</b> Compares the equipment type of both parts using {@link EquipmentPart#getType()}.</li>
-     *   <li><b>Tonnage:</b> Ensures the total tonnage values of the parts match using {@link EquipmentPart#getTonnage()}.</li>
-     *   <li><b>Size:</b> Checks the physical size of the parts using {@link EquipmentPart#getSize()}.</li>
-     *   <li><b>Omni-Podded:</b> Verifies if both parts have the same omni-podded status.</li>
-     *   <li><b>Unit Tonnage:</b> For equipment where cost and compatibility are variable based on unit tonnage,
-     *   checks if the unit tonnage values match.</li>
+     *   <li><b>Type:</b> Verifies that the equipment types for both parts are identical.</li>
+     *   <li><b>Tonnage:</b> Ensures that the total tonnage of both parts matches.</li>
+     *   <li><b>Size:</b> Confirms that the physical sizes of the two parts are the same.</li>
+     *   <li><b>Omni-Podded:</b> Checks whether both parts share the same omni-podded attribute.</li>
+     *   <li><b>Sticker Price:</b> Compares the monetary sticker price of both parts.</li>
+     *   <li><b>Unit Tonnage:</b> For parts where sticker price does not match and sticker price returns 0 (for
+     *   example, {@link MissingPart} objects) we compare unit tonnage as a fallback.</li>
      * </ul>
      *
-     * <p><b>Special Handling:</b></p>
-     * If the {@code EquipmentType} is an instance of {@link MiscType} and its cost is variable (determined by
-     * {@link MiscType#isCostVariable()}), the comparison will include the unit tonnage values of the equipment
-     * parts, as these affect compatibility with specific units.
+     * @param equipmentPart the {@link EquipmentPart} used as the baseline for the comparison.
+     * @param newPart       the {@link EquipmentPart} whose attributes are being compared to the baseline part.
      *
-     * @param equipmentPart the {@link EquipmentPart} used as the baseline for comparison.
-     * @param newPart       the {@link EquipmentPart} whose attributes will be compared to the reference part.
-     *
-     * @return {@code true} if all attributes (type, tonnage, size, omni-podded status, and unit tonnage) match;
-     *       otherwise, {@code false}.
+     * @return {@code true} if all compared attributes (type, tonnage, size, omni-podded status, sticker price, and unit
+     *       tonnage where applicable) match; otherwise, {@code false}.
      */
     private boolean checkAttributesMatch(EquipmentPart equipmentPart, EquipmentPart newPart) {
         boolean typeMatches = getType().equals(equipmentPart.getType());
         boolean tonnageMatches = newPart.getTonnage() == equipmentPart.getTonnage();
         boolean sizeMatches = newPart.getSize() == equipmentPart.getSize();
         boolean omniPoddedMatches = newPart.isOmniPodded() == equipmentPart.isOmniPodded();
+
+        Money newPartPrice = newPart.getStickerPrice();
+        Money equipmentPartPrice = equipmentPart.getStickerPrice();
+        boolean stickerPriceOrTonnageMatches = newPartPrice.equals(equipmentPartPrice);
 
         // According to official answer, if target unit tonnage differs, the item cannot be attached to a unit, even
         // if the equipment weight matches. The example in the below thread is a Mek Lance, the weight of which is
@@ -246,15 +248,14 @@ public class MissingEquipmentPart extends MissingPart {
         // a fixed sticker price of 0 C-Bills, which meant users were completely unable to replace those parts if
         // they were ever completely destroyed or removed. Now we compare unit tonnage.
         // https://bg.battletech.com/forums/index.php/topic,14741.msg340122.html#msg340122
-        boolean unitTonnageMatches = true;
         EquipmentType equipmentType = equipmentPart.getType();
-        if (equipmentType instanceof MiscType) {
+        if (equipmentPartPrice.isZero() && !stickerPriceOrTonnageMatches && equipmentType instanceof MiscType) {
             if (((MiscType) equipmentType).isCostVariable()) {
-                unitTonnageMatches = newPart.getUnitTonnage() == equipmentPart.getUnitTonnage();
+                stickerPriceOrTonnageMatches = newPart.getUnitTonnage() == equipmentPart.getUnitTonnage();
             }
         }
 
-        return typeMatches && tonnageMatches && sizeMatches && omniPoddedMatches && unitTonnageMatches;
+        return typeMatches && tonnageMatches && sizeMatches && omniPoddedMatches && stickerPriceOrTonnageMatches;
     }
 
     protected @Nullable Mounted<?> getMounted() {
