@@ -3349,7 +3349,6 @@ public class Person {
         final boolean isAlternativeQualityAveraging = campaignOptions.isAlternativeQualityAveraging();
         final boolean isDoctorsHaveAdministration = campaignOptions.isDoctorsUseAdministration();
         final boolean isTechsHaveAdministration = campaignOptions.isTechsUseAdministration();
-        final boolean isUseAgeEffects = campaignOptions.isUseAgeEffects();
 
         switch (role) {
             case MEKWARRIOR:
