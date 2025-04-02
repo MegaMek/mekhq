@@ -30,6 +30,7 @@ package mekhq.gui.dialog;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
 import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
+import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -389,6 +390,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             }
 
             SkillLevel actualSkillLevel = person.getSkillLevel(campaign, false);
+            updateAllSkillAgeModifiers(today, person, false);
 
             reRollLoyalty(person, actualSkillLevel);
             reRollAdvantages(campaign, person, actualSkillLevel);

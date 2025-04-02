@@ -27,6 +27,11 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
+import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
+
+import java.util.Objects;
+
 import megamek.common.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
@@ -42,10 +47,6 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 
-import java.util.Objects;
-
-import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
-
 /**
  * Creates {@link Person} instances using the default MekHQ algorithm.
  */
@@ -56,6 +57,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
     /**
      * Creates a new DefaultPersonGenerator with a faction selector.
+     *
      * @param factionSelector The faction selector to use with all generated persons.
      */
     public DefaultPersonnelGenerator(AbstractFactionSelector factionSelector, AbstractPlanetSelector planetSelector) {
@@ -122,7 +124,8 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         // set interest in marriage and children flags
         int interestInMarriageDiceSize = campaign.getCampaignOptions().getNoInterestInMarriageDiceSize();
-        person.setMarriageable(((interestInMarriageDiceSize != 0) && (Compute.randomInt(interestInMarriageDiceSize)) != 0));
+        person.setMarriageable(((interestInMarriageDiceSize != 0) &&
+                                      (Compute.randomInt(interestInMarriageDiceSize)) != 0));
 
         int interestInChildren = campaign.getCampaignOptions().getNoInterestInChildrenDiceSize();
         person.setTryingToConceive(((interestInChildren != 0) && (Compute.randomInt(interestInChildren)) != 0));
@@ -133,9 +136,9 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         //check for Bloodname
         campaign.checkBloodnameAdd(person, false);
 
-        if (person.getOriginFaction().isClan()
-              && campaign.getCampaignOptions().isUseAbilities()
-              && !(person.getPrimaryRole().isSoldierOrBattleArmour() || person.getPrimaryRole().isProtoMekPilot())) {
+        if (person.getOriginFaction().isClan() &&
+                  campaign.getCampaignOptions().isUseAbilities() &&
+                  !(person.getPrimaryRole().isSoldierOrBattleArmour() || person.getPrimaryRole().isProtoMekPilot())) {
             if (SpecialAbility.getSpecialAbilities().containsKey("clan_pilot_training")) {
                 PersonnelOptions personnelOptions = person.getOptions();
                 personnelOptions.acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, "clan_pilot_training", true);
@@ -161,6 +164,9 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         // generate personality
         PersonalityController.generatePersonality(person);
+
+        // update skill age modifiers
+        updateAllSkillAgeModifiers(campaign.getLocalDate(), person, false);
 
         return person;
     }

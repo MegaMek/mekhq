@@ -3349,6 +3349,7 @@ public class Person {
         final boolean isAlternativeQualityAveraging = campaignOptions.isAlternativeQualityAveraging();
         final boolean isDoctorsHaveAdministration = campaignOptions.isDoctorsUseAdministration();
         final boolean isTechsHaveAdministration = campaignOptions.isTechsUseAdministration();
+        final boolean isUseAgeEffects = campaignOptions.isUseAgeEffects();
 
         switch (role) {
             case MEKWARRIOR:
@@ -3887,6 +3888,10 @@ public class Person {
 
     public void addSkill(final String skillName, final int level, final int bonus) {
         skills.addSkill(skillName, new Skill(skillName, level, bonus));
+    }
+
+    public void addSkill(final String skillName, final int level, final int bonus, final int ageModifier) {
+        skills.addSkill(skillName, new Skill(skillName, level, bonus, ageModifier));
     }
 
     public void removeSkill(final String skillName) {

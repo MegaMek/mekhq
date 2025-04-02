@@ -76,6 +76,8 @@ public enum SkillAttribute {
      */
     CHARISMA;
 
+    public static int NO_SKILL_ATTRIBUTE = -1;
+
     /**
      * Converts a string or integer input to its corresponding {@link SkillAttribute}.
      *
