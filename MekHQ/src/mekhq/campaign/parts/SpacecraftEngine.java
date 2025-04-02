@@ -30,26 +30,15 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import megamek.common.Aero;
-import megamek.common.CriticalSlot;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.Mek;
-import megamek.common.SimpleTechLevel;
-import megamek.common.SmallCraft;
-import megamek.common.TechAdvancement;
-import megamek.common.TechConstants;
-import megamek.common.Warship;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.SkillType;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)

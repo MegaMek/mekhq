@@ -28,6 +28,8 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
@@ -35,13 +37,11 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.ReportingUtilities;
-
-import java.io.PrintWriter;
 
 /**
  * A missing part is a placeholder on a unit to indicate that a replacement

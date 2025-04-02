@@ -27,22 +27,40 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.common.enums.SkillLevel.ELITE;
+import static megamek.common.enums.SkillLevel.GREEN;
+import static megamek.common.enums.SkillLevel.NONE;
+import static megamek.common.enums.SkillLevel.REGULAR;
+import static megamek.common.enums.SkillLevel.ULTRA_GREEN;
+import static megamek.common.enums.SkillLevel.VETERAN;
+import static megamek.common.enums.SkillLevel.parseFromInteger;
+import static mekhq.campaign.personnel.skills.SkillType.isCombatSkill;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+
+import java.awt.GridBagConstraints;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.gui.campaignOptions.components.*;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.*;
-import java.util.List;
-
-import static megamek.common.enums.SkillLevel.*;
-import static mekhq.campaign.personnel.SkillType.isCombatSkill;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
+import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
+import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
  * SkillsTab is a component of the campaign options user interface that allows players

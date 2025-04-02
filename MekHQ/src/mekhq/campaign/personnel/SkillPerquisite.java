@@ -28,43 +28,30 @@
  */
 package mekhq.campaign.personnel;
 
-import megamek.common.UnitType;
-import megamek.logging.MMLogger;
-import mekhq.utilities.MHQXMLUtility;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import megamek.common.UnitType;
+import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.Skills;
+import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 /**
- * This object tracks a specific skill prerequisite for a special ability. This
- * object can list more
- * than one skill and we will track these skills in a hashmap where the value
- * gives the minimum skill
- * level. The collection of skills is treated as an OR statement such that a
- * person possessing any of the
- * skills at the appropriate level will evaluate as eligible. To create AND
- * conditions, use multiple skill
- * prereqs in the SpecialAbility object.
- *
- * We are going to limit the skill levels by the Green, Regular, Veteran, Elite
- * notation such
- * that:
- * 0 - Any
- * 1 - Green
- * 2 - Regular
- * 3 - Veteran
- * 4 - Elite
- * This way, if the user changes the meaning of various skill levels, they won't
- * have to redo all of
- * their prereqs - we could consider expanding this to allow users to specify a
- * more specific numeric
- * skill level (to allow for better consistency with AToW) for example
+ * This object tracks a specific skill prerequisite for a special ability. This object can list more than one skill and
+ * we will track these skills in a hashmap where the value gives the minimum skill level. The collection of skills is
+ * treated as an OR statement such that a person possessing any of the skills at the appropriate level will evaluate as
+ * eligible. To create AND conditions, use multiple skill prereqs in the SpecialAbility object.
+ * <p>
+ * We are going to limit the skill levels by the Green, Regular, Veteran, Elite notation such that: 0 - Any 1 - Green 2
+ * - Regular 3 - Veteran 4 - Elite This way, if the user changes the meaning of various skill levels, they won't have to
+ * redo all of their prereqs - we could consider expanding this to allow users to specify a more specific numeric skill
+ * level (to allow for better consistency with AToW) for example
  *
  * @author Jay Lawson
- *
  */
 public class SkillPerquisite {
     private static final MMLogger logger = MMLogger.create(SkillPerquisite.class);
@@ -102,52 +89,44 @@ public class SkillPerquisite {
     }
 
     /**
-     * Determines if the given unit type "qualifies" for this skill pre-requisite.
-     * For now, we simply check whether the pre-requisite skills are required for
-     * the unit type
+     * Determines if the given unit type "qualifies" for this skill pre-requisite. For now, we simply check whether the
+     * pre-requisite skills are required for the unit type
      *
      * @param unitType the type of unit that is being checked
+     *
      * @return
      */
     public boolean qualifies(int unitType) {
         switch (unitType) {
             case UnitType.AERO:
             case UnitType.AEROSPACEFIGHTER:
-                return skillSet.containsKey(SkillType.S_PILOT_AERO) ||
-                        skillSet.containsKey(SkillType.S_GUN_AERO);
+                return skillSet.containsKey(SkillType.S_PILOT_AERO) || skillSet.containsKey(SkillType.S_GUN_AERO);
             case UnitType.BATTLE_ARMOR:
-                return skillSet.containsKey(SkillType.S_GUN_BA) ||
-                        skillSet.containsKey(SkillType.S_ANTI_MEK);
+                return skillSet.containsKey(SkillType.S_GUN_BA) || skillSet.containsKey(SkillType.S_ANTI_MEK);
             case UnitType.CONV_FIGHTER:
-                return skillSet.containsKey(SkillType.S_GUN_JET) ||
-                        skillSet.containsKey(SkillType.S_PILOT_JET);
+                return skillSet.containsKey(SkillType.S_GUN_JET) || skillSet.containsKey(SkillType.S_PILOT_JET);
             case UnitType.DROPSHIP:
             case UnitType.JUMPSHIP:
             case UnitType.WARSHIP:
             case UnitType.SPACE_STATION:
             case UnitType.SMALL_CRAFT:
                 return skillSet.containsKey(SkillType.S_PILOT_SPACE) ||
-                        skillSet.containsKey(SkillType.S_GUN_SPACE) ||
-                        skillSet.containsKey(SkillType.S_TECH_VESSEL) ||
-                        skillSet.containsKey(SkillType.S_NAV);
+                             skillSet.containsKey(SkillType.S_GUN_SPACE) ||
+                             skillSet.containsKey(SkillType.S_TECH_VESSEL) ||
+                             skillSet.containsKey(SkillType.S_NAV);
             case UnitType.GUN_EMPLACEMENT:
             case UnitType.TANK:
-                return skillSet.containsKey(SkillType.S_PILOT_GVEE) ||
-                        skillSet.containsKey(SkillType.S_GUN_VEE);
+                return skillSet.containsKey(SkillType.S_PILOT_GVEE) || skillSet.containsKey(SkillType.S_GUN_VEE);
             case UnitType.INFANTRY:
-                return skillSet.containsKey(SkillType.S_SMALL_ARMS) ||
-                        skillSet.containsKey(SkillType.S_ANTI_MEK);
+                return skillSet.containsKey(SkillType.S_SMALL_ARMS) || skillSet.containsKey(SkillType.S_ANTI_MEK);
             case UnitType.NAVAL:
-                return skillSet.containsKey(SkillType.S_PILOT_NVEE) ||
-                        skillSet.containsKey(SkillType.S_GUN_VEE);
+                return skillSet.containsKey(SkillType.S_PILOT_NVEE) || skillSet.containsKey(SkillType.S_GUN_VEE);
             case UnitType.PROTOMEK:
                 return skillSet.containsKey(SkillType.S_GUN_PROTO);
             case UnitType.VTOL:
-                return skillSet.containsKey(SkillType.S_PILOT_VTOL) ||
-                        skillSet.containsKey(SkillType.S_GUN_VEE);
+                return skillSet.containsKey(SkillType.S_PILOT_VTOL) || skillSet.containsKey(SkillType.S_GUN_VEE);
             case UnitType.MEK:
-                return skillSet.containsKey(SkillType.S_PILOT_MEK) ||
-                        skillSet.containsKey(SkillType.S_GUN_MEK);
+                return skillSet.containsKey(SkillType.S_PILOT_MEK) || skillSet.containsKey(SkillType.S_GUN_MEK);
             default:
                 return false;
         }
@@ -190,8 +169,10 @@ public class SkillPerquisite {
             if (lvl <= 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skill", key);
             } else {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skill",
-                        key + "::" + SkillType.getExperienceLevelName(lvl));
+                MHQXMLUtility.writeSimpleXMLTag(pw,
+                      indent,
+                      "skill",
+                      key + "::" + SkillType.getExperienceLevelName(lvl));
             }
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillPrereq");

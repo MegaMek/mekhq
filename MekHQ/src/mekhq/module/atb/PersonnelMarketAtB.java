@@ -34,8 +34,8 @@ import java.util.List;
 import megamek.common.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.module.api.PersonnelMarketMethod;
 
 /**

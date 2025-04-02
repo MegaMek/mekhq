@@ -27,7 +27,16 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import megamek.common.Aero;
+import megamek.common.Entity;
+import megamek.common.Mek;
+import megamek.common.Tank;
+import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -36,15 +45,10 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.utilities.ReportingUtilities;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * An abstraction of all the pod-mounted equipment within a single location of an omni unit. Used

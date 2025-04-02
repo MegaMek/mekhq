@@ -27,9 +27,8 @@
  */
 package mekhq.campaign.personnel.generator;
 
-import static mekhq.campaign.personnel.SkillDeprecationTool.DEPRECATED_SKILLS;
+import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,8 +38,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.SkillType;
 
 public class DefaultSkillGenerator extends AbstractSkillGenerator {
     //region Constructors

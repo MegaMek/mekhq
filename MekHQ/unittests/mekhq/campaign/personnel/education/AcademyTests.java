@@ -27,24 +27,24 @@
  */
 package mekhq.campaign.personnel.education;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.enums.education.AcademyType;
-import mekhq.campaign.personnel.enums.education.EducationLevel;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.PlanetarySystem;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
-import java.util.Arrays;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+import java.util.List;
+
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.education.AcademyType;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.PlanetarySystem;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 class AcademyTests {
     @Test

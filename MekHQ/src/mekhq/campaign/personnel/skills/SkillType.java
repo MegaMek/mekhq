@@ -26,9 +26,22 @@
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
  */
-package mekhq.campaign.personnel;
+package mekhq.campaign.personnel.skills;
 
-import megamek.common.*;
+import java.io.PrintWriter;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+
+import megamek.common.Aero;
+import megamek.common.BattleArmor;
+import megamek.common.ConvFighter;
+import megamek.common.Entity;
+import megamek.common.Infantry;
+import megamek.common.Jumpship;
+import megamek.common.ProtoMek;
+import megamek.common.SmallCraft;
+import megamek.common.Tank;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -37,11 +50,6 @@ import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Skill type will hold static information for each skill type like base target

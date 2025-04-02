@@ -27,28 +27,28 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
+import static mekhq.campaign.personnel.Person.MEKWARRIOR_AERO_RANSOM_VALUES;
+import static mekhq.campaign.personnel.Person.OTHER_RANSOM_VALUES;
+import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
+import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
+import static mekhq.campaign.personnel.skills.SkillType.S_GUN_MEK;
+import static mekhq.campaign.personnel.skills.SkillType.S_PILOT_MEK;
+import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent.GOOD_EVENT_CHANCE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+import java.util.List;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
-import java.util.List;
-
-import static mekhq.campaign.personnel.Person.MEKWARRIOR_AERO_RANSOM_VALUES;
-import static mekhq.campaign.personnel.Person.OTHER_RANSOM_VALUES;
-import static mekhq.campaign.personnel.SkillType.S_GUN_MEK;
-import static mekhq.campaign.personnel.SkillType.S_PILOT_MEK;
-import static mekhq.campaign.personnel.SkillType.S_SMALL_ARMS;
-import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
-import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
-import static mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent.GOOD_EVENT_CHANCE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * This class contains unit tests for the {@link PrisonerMissionEndEvent} class, focusing on the

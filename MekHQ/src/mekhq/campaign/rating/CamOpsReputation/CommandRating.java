@@ -29,7 +29,6 @@ package mekhq.campaign.rating.CamOpsReputation;
 
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_PARALYSIS;
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_SENSE;
-import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
 
 import java.util.HashMap;
@@ -41,7 +40,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 
 public class CommandRating {
     private static final MMLogger logger = MMLogger.create(CommandRating.class);
