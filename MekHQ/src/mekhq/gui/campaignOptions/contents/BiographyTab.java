@@ -28,6 +28,7 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static megamek.client.generator.RandomGenderGenerator.getPercentFemale;
+import static mekhq.campaign.personnel.skills.Aging.clearAllAgeModifiers;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
@@ -1467,7 +1468,12 @@ public class BiographyTab {
         options.setFamilyDisplayLevel(comboFamilyDisplayLevel.getSelectedItem());
         if (options.isUseAgeEffects() != chkUseAgeEffects.isSelected()) {
             for (Person person : campaign.getPersonnel()) {
-                updateAllSkillAgeModifiers(generalTab.getDate(), person, false);
+
+                if (chkUseAgeEffects.isSelected()) {
+                    updateAllSkillAgeModifiers(generalTab.getDate(), person);
+                } else {
+                    clearAllAgeModifiers(person);
+                }
             }
         }
         options.setUseAgeEffects(chkUseAgeEffects.isSelected());

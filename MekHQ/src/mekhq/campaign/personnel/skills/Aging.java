@@ -27,7 +27,6 @@
  */
 package mekhq.campaign.personnel.skills;
 
-import static java.lang.Integer.MIN_VALUE;
 import static mekhq.campaign.personnel.skills.enums.AgingMilestone.NONE;
 import static mekhq.campaign.personnel.skills.enums.AgingMilestone.TWENTY_FIVE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NO_SKILL_ATTRIBUTE;
@@ -49,12 +48,6 @@ public class Aging {
     private static final int AGING_SKILL_MODIFIER_DIVIDER = 100;
 
     /**
-     * Represents the default value indicating an unset or uninitialized state for aging skill modifiers within the
-     * aging calculation system.
-     */
-    public static int AGING_MODIFIER_NOT_SET = MIN_VALUE;
-
-    /**
      * Updates the aging modifiers for all skills of a given {@link Person} based on their current age and attributes.
      *
      * <p>This method calculates the appropriate aging modifier for each skill of a person using the person's age (as
@@ -66,17 +59,15 @@ public class Aging {
      *     <li>Determines the {@link AgingMilestone} based on the person's age.</li>
      *     <li>Iterates over all skills defined in {@link SkillType#skillList}.</li>
      *     <li>If the person doesn't have a specific skill, it skips processing that skill.</li>
-     *     <li>If {@code updateMissingOnly} is true, it skips skills that already have a set aging modifier.</li>
      *     <li>Retrieves the skill's attributes and calculates the aging modifier using {@link #getAgeModifier(AgingMilestone,
      *     SkillAttribute, SkillAttribute)}.</li>
      *     <li>Sets the calculated modifier for each applicable skill.</li>
      * </ul>
      *
-     * @param today             the current date used to calculate the person's age
-     * @param person            the {@link Person} whose skills should be updated
-     * @param updateMissingOnly if {@code true}, only updates skills with unset aging modifiers
+     * @param today  the current date used to calculate the person's age
+     * @param person the {@link Person} whose skills should be updated
      */
-    public static void updateAllSkillAgeModifiers(LocalDate today, Person person, boolean updateMissingOnly) {
+    public static void updateAllSkillAgeModifiers(LocalDate today, Person person) {
         AgingMilestone milestone = getMilestone(person.getAge(today));
 
         for (String skillName : SkillType.skillList) {
@@ -88,12 +79,6 @@ public class Aging {
 
             Skill skill = person.getSkill(skillName);
 
-            if (updateMissingOnly) {
-                if (skill.getAgingModifier() != AGING_MODIFIER_NOT_SET) {
-                    continue;
-                }
-            }
-
             SkillType type = SkillType.getType(skillName);
             SkillAttribute firstAttribute = type.getFirstAttribute();
             SkillAttribute secondAttribute = type.getSecondAttribute();
@@ -101,6 +86,19 @@ public class Aging {
             int modifier = getAgeModifier(milestone, firstAttribute, secondAttribute);
 
             skill.setAgingModifier(modifier);
+        }
+    }
+
+    public static void clearAllAgeModifiers(Person person) {
+        for (String skillName : SkillType.skillList) {
+            boolean hasSkill = person.hasSkill(skillName);
+
+            if (!hasSkill) {
+                continue;
+            }
+
+            Skill skill = person.getSkill(skillName);
+            skill.setAgingModifier(0);
         }
     }
 

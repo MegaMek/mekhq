@@ -30,7 +30,6 @@ package mekhq.campaign.personnel.skills;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static mekhq.campaign.personnel.skills.Aging.AGING_MODIFIER_NOT_SET;
 
 import java.io.PrintWriter;
 
@@ -82,7 +81,7 @@ public class Skill {
     private SkillType type;
     private int level;
     private int bonus;
-    private int agingModifier = AGING_MODIFIER_NOT_SET;
+    private int agingModifier;
 
     protected Skill() {
 
@@ -248,7 +247,6 @@ public class Skill {
      *     bonus. If the aging modifier is set, it is also added to the result.</li>
      *     <li>If the progression type is "count down," the value is calculated by subtracting the level and bonus from
      *     the target value. If the aging modifier is set, it is also subtracted from the result.</li>
-     *     <li>If the aging modifier is not set (indicated by a specific constant), it is ignored in the calculation.</li>
      * </ul>
      *
      * @return the calculated raw skill value, including the type's target value, level, bonus, and (when applicable)
@@ -258,20 +256,16 @@ public class Skill {
         int baseValue = type.getTarget();
         int valueAdjustment = isCountUp() ? level + bonus : -level - bonus;
 
-        if (agingModifier == AGING_MODIFIER_NOT_SET) {
-            return baseValue + valueAdjustment;
-        } else {
-            return baseValue + valueAdjustment + (isCountUp() ? agingModifier : -agingModifier);
-        }
+        return baseValue + valueAdjustment + (isCountUp() ? agingModifier : -agingModifier);
     }
 
     /**
-     * Calculates the total skill value by summing the level and bonus.
+     * Calculates the total skill value by summing the level, bonus, and aging modifier.
      *
      * @return The total skill value.
      */
     public int getTotalSkillLevel() {
-        return level + bonus;
+        return level + bonus + agingModifier;
     }
 
     public void improve() {
@@ -315,7 +309,7 @@ public class Skill {
     }
 
     public int getExperienceLevel() {
-        return type.getExperienceLevel(getLevel());
+        return type.getExperienceLevel(getTotalSkillLevel());
     }
 
     @Override

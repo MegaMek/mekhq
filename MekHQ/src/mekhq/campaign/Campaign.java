@@ -5119,9 +5119,10 @@ public class Campaign implements ITechManager {
             }
         }
 
-        // This is where we update all the aging modifiers for the character. If it's their birthday, we update all
-        // aging modifiers, if it isn't, we only care about those missing modifiers.
-        updateAllSkillAgeModifiers(currentDay, person, isBirthday);
+        if (campaignOptions.isUseAgeEffects() && isBirthday) {
+            // This is where we update all the aging modifiers for the character.
+            updateAllSkillAgeModifiers(currentDay, person);
+        }
     }
 
     /**

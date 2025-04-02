@@ -442,7 +442,9 @@ public abstract class AbstractMarriage {
         }
 
         // update skill age modifiers
-        updateAllSkillAgeModifiers(campaign.getLocalDate(), externalSpouse, false);
+        if (campaign.getCampaignOptions().isUseAgeEffects()) {
+            updateAllSkillAgeModifiers(campaign.getLocalDate(), externalSpouse);
+        }
 
         return externalSpouse;
     }

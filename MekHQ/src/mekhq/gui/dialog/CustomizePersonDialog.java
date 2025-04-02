@@ -182,7 +182,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         this.campaign = campaign;
         this.frame = parent;
         this.person = person;
-        updateAllSkillAgeModifiers(campaign.getLocalDate(), person, false);
+        if (campaign.getCampaignOptions().isUseAgeEffects()) {
+            updateAllSkillAgeModifiers(campaign.getLocalDate(), person);
+        }
         initializePilotAndOptions();
         setLocationRelativeTo(parent);
         setUserPreferences();
@@ -1258,7 +1260,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         }
 
         person.setDateOfBirth(birthdate);
-        updateAllSkillAgeModifiers(campaign.getLocalDate(), person, false);
+        if (campaign.getCampaignOptions().isUseAgeEffects()) {
+            updateAllSkillAgeModifiers(campaign.getLocalDate(), person);
+        }
         person.setRecruitment(recruitment);
         person.setLastRankChangeDate(lastRankChangeDate);
         person.setRetirement(retirement);

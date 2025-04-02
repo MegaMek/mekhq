@@ -285,7 +285,9 @@ public class NewRecruitDialog extends JDialog {
             randomPortrait();
         }
         refreshRanksCombo();
-        updateAllSkillAgeModifiers(getCampaign().getLocalDate(), person, false);
+        if (getCampaign().getCampaignOptions().isUseAgeEffects()) {
+            updateAllSkillAgeModifiers(getCampaign().getLocalDate(), person);
+        }
         refreshView();
     }
 
