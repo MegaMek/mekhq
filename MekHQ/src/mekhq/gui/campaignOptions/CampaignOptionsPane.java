@@ -29,6 +29,9 @@ package mekhq.gui.campaignOptions;
 
 import static java.lang.Math.round;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createSubTabs;
@@ -299,10 +302,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Skills
         skillsTab = new SkillsTab(campaignOptions);
 
-        JTabbedPane skillsContentTabs = createSubTabs(Map.of("combatSkillsTab",
-              skillsTab.createSkillsTab(true),
-              "supportSkillsTab",
-              skillsTab.createSkillsTab(false)));
+        JTabbedPane skillsContentTabs = createSubTabs(Map.of("0gunnerySkillsTab",
+              skillsTab.createSkillsTab(COMBAT_GUNNERY),
+              "1pilotingSkillsTab",
+              skillsTab.createSkillsTab(COMBAT_PILOTING),
+              "2supportSkillsTab",
+              skillsTab.createSkillsTab(SUPPORT)));
         skillsTab.loadValuesFromCampaignOptions();
 
         // SPAs
@@ -445,7 +450,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * @param isStartUp    specifies whether this is run as part of a startup initialization
      * @param isSaveAction determines if this action is saving options to a preset
      */
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset, boolean isStartUp, boolean isSaveAction) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset, boolean isStartUp,
+                                               boolean isSaveAction) {
         CampaignOptions options = this.campaignOptions;
         RandomSkillPreferences presetRandomSkillPreferences = null;
         Map<String, SkillType> presetSkills = null;
