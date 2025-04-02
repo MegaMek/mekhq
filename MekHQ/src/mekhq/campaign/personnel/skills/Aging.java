@@ -212,13 +212,13 @@ public class Aging {
      * Applies an aging adjustment to a given skill modifier sum.
      *
      * <p>The adjustment divides the sum by a predefined constant value, {@code AGING_SKILL_MODIFIER_DIVIDER},
-     * and rounds down to the nearest integer using {@code Math.floor}.</p>
+     * and rounds to the nearest integer using {@code Math.round}.</p>
      *
      * @param modifierSum the sum of the skill attribute modifiers
      *
      * @return the adjusted skill attribute modifier after applying aging rules
      */
     private static int applyAgingModifier(int modifierSum) {
-        return (int) Math.floor((double) modifierSum / AGING_SKILL_MODIFIER_DIVIDER);
+        return (int) Math.round((double) modifierSum / AGING_SKILL_MODIFIER_DIVIDER);
     }
 }
