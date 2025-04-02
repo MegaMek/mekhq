@@ -28,15 +28,32 @@
  */
 package mekhq.campaign.againstTheBot;
 
-import megamek.common.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.function.Function;
+import javax.xml.parsers.DocumentBuilder;
+
+import megamek.common.Compute;
+import megamek.common.EntityWeightClass;
+import megamek.common.MekSummary;
+import megamek.common.MekSummaryCache;
+import megamek.common.TargetRoll;
+import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.utilities.MHQXMLUtility;
@@ -44,14 +61,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import javax.xml.parsers.DocumentBuilder;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.function.Function;
 
 /**
  * @author Neoancient

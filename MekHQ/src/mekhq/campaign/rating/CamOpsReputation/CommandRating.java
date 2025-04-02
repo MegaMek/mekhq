@@ -27,17 +27,17 @@
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
-import megamek.logging.MMLogger;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.SkillType;
 
 public class CommandRating {
     private static final MMLogger logger = MMLogger.create(CommandRating.class);

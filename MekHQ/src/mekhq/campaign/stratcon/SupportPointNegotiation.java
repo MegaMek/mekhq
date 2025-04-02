@@ -27,19 +27,23 @@
  */
 package mekhq.campaign.stratcon;
 
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ResourceBundle;
+
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
-
-import java.util.*;
-
-import static mekhq.campaign.personnel.SkillType.S_ADMIN;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+import mekhq.campaign.personnel.skills.Skill;
 
 /**
  * This class handles Support Point negotiations for StratCon.

@@ -27,35 +27,6 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
-import megamek.common.annotations.Nullable;
-import megamek.common.enums.Gender;
-import megamek.logging.MMLogger;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.RandomOriginOptions;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
-import mekhq.campaign.randomEvents.prisoners.records.EventResult;
-import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
-import mekhq.campaign.randomEvents.prisoners.records.PrisonerResponseEntry;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
-import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
-
-import java.time.LocalDate;
-import java.util.*;
-
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -68,6 +39,41 @@ import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.RandomOriginOptions;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.records.EventResult;
+import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
+import mekhq.campaign.randomEvents.prisoners.records.PrisonerResponseEntry;
+import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
+import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
 
 /**
  * Manages the resolution and effects of prisoner events during a campaign.

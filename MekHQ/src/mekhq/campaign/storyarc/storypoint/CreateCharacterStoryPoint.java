@@ -27,6 +27,13 @@
  */
 package mekhq.campaign.storyarc.storypoint;
 
+import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
+
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.util.Enumeration;
+import java.util.UUID;
+
 import megamek.Version;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -37,10 +44,10 @@ import mekhq.campaign.event.PersonNewEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.unit.Unit;
@@ -51,13 +58,6 @@ import mekhq.gui.dialog.CreateCharacterDialog.NameRestrictions;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.util.Enumeration;
-import java.util.UUID;
-
-import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 
 /**
  * This StoryPoint opens a {@link CreateCharacterDialog CreateCharacterDialog}

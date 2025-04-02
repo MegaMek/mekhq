@@ -30,17 +30,16 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.finances.Money;
-import org.w3c.dom.Node;
-
 import megamek.common.CriticalSlot;
 import megamek.common.ProtoMek;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.skills.SkillType;
+import org.w3c.dom.Node;
 
 /**
  * Legacy part that represents standard ProtoMek jump jets.

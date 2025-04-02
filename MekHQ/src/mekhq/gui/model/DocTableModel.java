@@ -29,15 +29,14 @@ package mekhq.gui.model;
 
 import java.awt.Component;
 import java.util.ArrayList;
-
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.BasicInfo;
 
 /**

@@ -27,23 +27,30 @@
  */
 package mekhq.campaign;
 
-import megamek.common.UnitType;
-import megamek.logging.MMLogger;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.personnel.ranks.Rank;
-import mekhq.campaign.unit.Unit;
-
-import javax.swing.*;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
+import javax.swing.SwingWorker;
+
+import megamek.common.UnitType;
+import megamek.logging.MMLogger;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.unit.Unit;
 
 public class MercRosterAccess extends SwingWorker<Void, Void> {
     private static final MMLogger logger = MMLogger.create(MercRosterAccess.class);
