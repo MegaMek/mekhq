@@ -390,7 +390,9 @@ public class HireBulkPersonnelDialog extends JDialog {
             }
 
             SkillLevel actualSkillLevel = person.getSkillLevel(campaign, false);
-            updateAllSkillAgeModifiers(today, person, false);
+            if (campaign.getCampaignOptions().isUseAgeEffects()) {
+                updateAllSkillAgeModifiers(today, person);
+            }
 
             reRollLoyalty(person, actualSkillLevel);
             reRollAdvantages(campaign, person, actualSkillLevel);

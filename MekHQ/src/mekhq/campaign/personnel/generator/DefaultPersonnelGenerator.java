@@ -35,6 +35,7 @@ import java.util.Objects;
 import megamek.common.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -86,6 +87,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
     @Override
     public Person generate(Campaign campaign, PersonnelRole primaryRole, PersonnelRole secondaryRole, Gender gender) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
         Person person = createPerson(campaign);
 
         person.setPrimaryRoleDirect(primaryRole);
@@ -123,11 +125,11 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         }
 
         // set interest in marriage and children flags
-        int interestInMarriageDiceSize = campaign.getCampaignOptions().getNoInterestInMarriageDiceSize();
+        int interestInMarriageDiceSize = campaignOptions.getNoInterestInMarriageDiceSize();
         person.setMarriageable(((interestInMarriageDiceSize != 0) &&
                                       (Compute.randomInt(interestInMarriageDiceSize)) != 0));
 
-        int interestInChildren = campaign.getCampaignOptions().getNoInterestInChildrenDiceSize();
+        int interestInChildren = campaignOptions.getNoInterestInChildrenDiceSize();
         person.setTryingToConceive(((interestInChildren != 0) && (Compute.randomInt(interestInChildren)) != 0));
 
         // Do naming at the end, to ensure the keys are set
@@ -137,7 +139,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         campaign.checkBloodnameAdd(person, false);
 
         if (person.getOriginFaction().isClan() &&
-                  campaign.getCampaignOptions().isUseAbilities() &&
+                  campaignOptions.isUseAbilities() &&
                   !(person.getPrimaryRole().isSoldierOrBattleArmour() || person.getPrimaryRole().isProtoMekPilot())) {
             if (SpecialAbility.getSpecialAbilities().containsKey("clan_pilot_training")) {
                 PersonnelOptions personnelOptions = person.getOptions();
@@ -145,7 +147,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
             }
         }
 
-        person.setDaysToWaitForHealing(campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
+        person.setDaysToWaitForHealing(campaignOptions.getNaturalHealingWaitingPeriod());
 
         // set loyalty
         if (expLvl <= 0) {
@@ -166,7 +168,9 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         PersonalityController.generatePersonality(person);
 
         // update skill age modifiers
-        updateAllSkillAgeModifiers(campaign.getLocalDate(), person, false);
+        if (campaignOptions.isUseAgeEffects()) {
+            updateAllSkillAgeModifiers(campaign.getLocalDate(), person);
+        }
 
         return person;
     }
