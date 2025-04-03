@@ -28,6 +28,7 @@
 package mekhq.campaign.personnel.generator;
 
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
+import static mekhq.campaign.personnel.skills.SkillType.getRoleplaySkills;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,6 +101,13 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             leadershipSkillLevel = Utilities.generateExpLevel(rskillPrefs.getCommandSkillsModifier(expLvl));
             if (leadershipSkillLevel > SkillType.EXP_ULTRA_GREEN) {
                 addSkill(person, SkillType.S_LEADER, leadershipSkillLevel, rskillPrefs.randomizeSkill(), bonus);
+            }
+        }
+
+        for (SkillType skillType : getRoleplaySkills()) {
+            int roleplaySkillLevel = Utilities.generateExpLevel(rskillPrefs.getRoleplaySkillsModifier(expLvl));
+            if (roleplaySkillLevel > SkillType.EXP_ULTRA_GREEN) {
+                addSkill(person, skillType.getName(), roleplaySkillLevel, rskillPrefs.randomizeSkill(), bonus);
             }
         }
 

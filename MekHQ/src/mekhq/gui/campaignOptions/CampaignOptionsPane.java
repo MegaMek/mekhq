@@ -31,6 +31,7 @@ import static java.lang.Math.round;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_GENERAL;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
@@ -307,7 +308,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               "1pilotingSkillsTab",
               skillsTab.createSkillsTab(COMBAT_PILOTING),
               "2supportSkillsTab",
-              skillsTab.createSkillsTab(SUPPORT)));
+              skillsTab.createSkillsTab(SUPPORT),
+              "3roleplaySkillsTab",
+              skillsTab.createSkillsTab(ROLEPLAY_GENERAL)));
         skillsTab.loadValuesFromCampaignOptions();
 
         // SPAs
