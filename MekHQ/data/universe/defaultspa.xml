@@ -468,7 +468,7 @@
         <lookupName>atow_wealth_-01</lookupName>
         <displayName>Personal Wealth TP-1 (ATOW)</displayName>
         <desc>No mechanical effect. At Wealth 7, unit Reputation is increased by 1 if this character is the campaign commander.</desc>
-        <xpCost>100</xpCost>
+        <xpCost>-100</xpCost>
         <weight>1</weight>
         <invalidAbilities>atow_wealth_01</invalidAbilities>
         <invalidAbilities>atow_wealth_02</invalidAbilities>
