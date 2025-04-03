@@ -55,6 +55,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.accessibility.AccessibleRelation;
 import javax.swing.*;
@@ -1501,7 +1502,9 @@ public class PersonViewPanel extends JScrollablePanel {
                 }
                 if (type.isRoleplaySkill()) {
                     lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader.roleplay"),
-                          skillName.replaceAll(resourceMap.getString("format.itemHeader.roleplay.removal"), "")));
+                          skillName.replaceAll(' ' +
+                                                     Pattern.quote(resourceMap.getString("format.itemHeader.roleplay" +
+                                                                                               ".removal")), "")));
                 } else {
                     lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), skillName));
                 }
