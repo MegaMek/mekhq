@@ -4682,7 +4682,7 @@ public class Unit implements ITechnology {
             entity.getCrew().setClanPilot(commander.isClanPersonnel(), 0);
             entity.getCrew().setPortrait(commander.getPortrait().clone(), 0);
             entity.getCrew().setExternalIdAsString(commander.getId().toString(), 0);
-            entity.getCrew().setToughness(commander.getTotalToughness(), 0);
+            entity.getCrew().setToughness(commander.getToughness(), 0);
 
             if (entity instanceof Tank) {
                 ((Tank) entity).setCommanderHit(commander.getHits() > 0);
@@ -5136,7 +5136,7 @@ public class Unit implements ITechnology {
         entity.getCrew().setGunneryM(Math.min(max(gunnery, 0), 7), slot);
         entity.getCrew().setGunneryB(Math.min(max(gunnery, 0), 7), slot);
         entity.getCrew().setArtillery(Math.min(max(artillery, 0), 7), slot);
-        entity.getCrew().setToughness(p.getTotalToughness(), slot);
+        entity.getCrew().setToughness(p.getToughness(), slot);
 
         entity.getCrew().setExternalIdAsString(p.getId().toString(), slot);
         entity.getCrew().setMissing(false, slot);

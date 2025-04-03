@@ -761,7 +761,7 @@ public enum PersonnelTableModelColumn {
                                                  "NA.text" :
                                                  (person.isImmortal() ? "Yes.text" : "No.text"));
             case TOUGHNESS:
-                return Integer.toString(person.getTotalToughness());
+                return Integer.toString(person.getToughness());
             case FATIGUE:
                 return Integer.toString(getEffectiveFatigue(person.getFatigue(),
                       person.isClanPersonnel(),

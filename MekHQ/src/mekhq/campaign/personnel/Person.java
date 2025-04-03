@@ -33,7 +33,6 @@ import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
-import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 
@@ -4793,12 +4792,6 @@ public class Person {
         return doctorId;
     }
 
-    public int getTotalToughness() {
-        boolean hasGlassJaw = getOptions().booleanOption(FLAW_GLASS_JAW);
-
-        return toughness + (hasGlassJaw ? -2 : 0);
-    }
-
     public int getToughness() {
         return toughness;
     }
@@ -4873,10 +4866,10 @@ public class Person {
     public int getAbilityTimeModifier(final Campaign campaign) {
         int modifier = 100;
         if (campaign.getCampaignOptions().isUseToughness()) {
-            if (getTotalToughness() == 1) {
+            if (getToughness() == 1) {
                 modifier -= 10;
             }
-            if (getTotalToughness() > 1) {
+            if (getToughness() > 1) {
                 modifier -= 15;
             }
         } // TODO: Fully implement this for advanced healing

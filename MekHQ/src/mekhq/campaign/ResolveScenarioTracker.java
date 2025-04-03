@@ -1544,13 +1544,28 @@ public class ResolveScenarioTracker {
 
             MekHQ.triggerEvent(new PersonBattleFinishedEvent(person, status));
             if (status.getHits() > person.getHits()) {
-                if (campaign.getCampaignOptions().isUseInjuryFatigue()) {
-                    person.changeFatigue(campaign.getCampaignOptions().getFatigueRate() *
-                                               (status.getHits() - person.getHits()));
+                int statusHits = status.getHits();
+                int priorHits = person.getHits();
+                int newHits = statusHits - priorHits;
+                int extraHits = 0;
+
+                boolean hasGlassJaw = person.getOptions().booleanOption(FLAW_GLASS_JAW);
+
+                if (hasGlassJaw) {
+                    extraHits = newHits;
                 }
 
-                person.setHitsPrior(person.getHits());
-                person.setHits(status.getHits());
+                if (campaign.getCampaignOptions().isUseInjuryFatigue()) {
+                    int fatigueRate = campaign.getCampaignOptions().getFatigueRate();
+                    int fatigueIncrease = (hasGlassJaw ? fatigueRate * 2 : fatigueRate) * (newHits + extraHits);
+
+                    person.changeFatigue(fatigueIncrease);
+
+                    // The status update from this instance of changeFatigue is handled later
+                }
+
+                person.setHitsPrior(priorHits);
+                person.setHits(statusHits + extraHits);
             }
 
             if (status.wasDeployed()) {

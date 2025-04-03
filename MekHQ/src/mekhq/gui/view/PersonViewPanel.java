@@ -1632,7 +1632,7 @@ public class PersonViewPanel extends JScrollablePanel {
             firsty++;
         }
 
-        int totalToughness = person.getTotalToughness();
+        int totalToughness = person.getToughness();
         if ((campaign.getCampaignOptions().isUseToughness()) && (totalToughness != 0)) {
             lblTough1.setName("lblTough1");
             lblTough1.setText(resourceMap.getString("lblTough1.text"));
