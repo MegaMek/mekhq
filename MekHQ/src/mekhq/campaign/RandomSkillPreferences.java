@@ -28,6 +28,8 @@
  */
 package mekhq.campaign;
 
+import static java.lang.Math.max;
+
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
@@ -72,7 +74,7 @@ public class RandomSkillPreferences {
         supportSmallArmsBonus = -10;
         specialAbilityBonus = new int[] { -10, -10, -2, 0, 1 };
         commandSkillsModifier = new int[] { -10, -10, -7, -4, -1 };
-        roleplaySkillsModifier = new int[] { -10, -9, -8, -7, -6 };
+        roleplaySkillsModifier = new int[] { -12, -11, -10, -9, -8 };
         artilleryProb = 10;
         artilleryBonus = -2;
         secondSkillProb = 0;
@@ -213,8 +215,8 @@ public class RandomSkillPreferences {
         }
     }
 
-    public int getRoleplaySkillsModifier(int bonus) {
-        return roleplaySkillsModifier[bonus];
+    public int getRoleplaySkillsModifier(int experienceLevel) {
+        return roleplaySkillsModifier[max(0, experienceLevel)];
     }
 
     public void setRoleplaySkillsModifier(int level, int bonus) {
