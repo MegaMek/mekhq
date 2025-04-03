@@ -63,7 +63,27 @@ public enum SkillSubType {
     /**
      * Represents roleplay or narrative-based skills.
      */
-    ROLEPLAY;
+    ROLEPLAY_GENERAL,
+
+    /**
+     * Represents skills related to art or artistic pursuits within the roleplay or narrative context.
+     */
+    ROLEPLAY_ART,
+
+    /**
+     * Represents roleplay or narrative-based skills related to special interests.
+     */
+    ROLEPLAY_INTEREST,
+
+    /**
+     * Represents roleplay or narrative-based skills related to science or scientific disciplines.
+     */
+    ROLEPLAY_SCIENCE,
+
+    /**
+     * Represents roleplay or narrative-based skills related to security.
+     */
+    ROLEPLAY_SECURITY;
 
     /**
      * Converts a string or integer input to its corresponding {@link SkillSubType}.

@@ -35,6 +35,12 @@ import static megamek.common.enums.SkillLevel.ULTRA_GREEN;
 import static megamek.common.enums.SkillLevel.VETERAN;
 import static megamek.common.enums.SkillLevel.parseFromInteger;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_ART;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_GENERAL;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_INTEREST;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SCIENCE;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SECURITY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
@@ -149,10 +155,9 @@ public class SkillsTab {
      * Creates the main panel for the SkillsTab UI based on the provided {@link SkillSubType} category.
      *
      * <p>This method dynamically generates a tab for either combat, support, or roleplay skills. The tab displays
-     * skill
-     * panels associated with the specified category, allowing users to configure target numbers, costs, and milestones.
-     * It also includes buttons to toggle visibility of skill panels and manages layout to organize various UI
-     * components.</p>
+     * skill panels associated with the specified category, allowing users to configure target numbers, costs, and
+     * milestones. It also includes buttons to toggle visibility of skill panels and manages layout to organize various
+     * UI components.</p>
      *
      * @param category the {@link SkillSubType} representing the skill category. This determines which set of skills
      *                 will be displayed (e.g., {@code COMBAT_GUNNERY}, {@code COMBAT_PILOTING}, {@code SUPPORT}, or
@@ -181,10 +186,9 @@ public class SkillsTab {
                       getImageDirectory() + "logo_clan_goliath_scorpion.png");
                 panelName = "SupportSkillsTab";
             }
-            case ROLEPLAY -> {
+            case ROLEPLAY_GENERAL -> {
                 headerPanel = new CampaignOptionsHeaderPanel("RoleplaySkillsTab",
-                      getImageDirectory() + "logo_clan_jade_falcon.png",
-                      true);
+                      getImageDirectory() + "logo_clan_jade_falcon.png");
                 panelName = "RoleplaySkillsTab";
             }
         }
@@ -195,7 +199,24 @@ public class SkillsTab {
             SkillType skill = SkillType.getType(skillName);
             SkillSubType subType = skill.getSubType();
 
-            if (subType == category || (subType == null && category == COMBAT_GUNNERY)) {
+            boolean isCorrectType = switch (category) {
+                case COMBAT_GUNNERY -> subType == COMBAT_GUNNERY;
+                case COMBAT_PILOTING -> subType == COMBAT_PILOTING;
+                case SUPPORT -> subType == SUPPORT;
+                case ROLEPLAY_GENERAL -> subType == ROLEPLAY_GENERAL ||
+                                               subType == ROLEPLAY_ART ||
+                                               subType == ROLEPLAY_INTEREST ||
+                                               subType == ROLEPLAY_SCIENCE ||
+                                               subType == ROLEPLAY_SECURITY;
+                // These next four shouldn't get hit, but we include them just in case
+                case ROLEPLAY_ART -> subType == ROLEPLAY_ART;
+                case ROLEPLAY_INTEREST -> subType == ROLEPLAY_INTEREST;
+                case ROLEPLAY_SCIENCE -> subType == ROLEPLAY_SCIENCE;
+                case ROLEPLAY_SECURITY -> subType == ROLEPLAY_SECURITY;
+            };
+
+            // If the type is {@code null} for some reason, dump it into the combat category
+            if (isCorrectType || (subType == null && category == COMBAT_GUNNERY)) {
                 relevantSkills.add(skill);
             }
         }

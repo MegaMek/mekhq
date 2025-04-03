@@ -56,6 +56,7 @@ public class RandomSkillPreferences {
     private int combatSmallArmsBonus;
     private int supportSmallArmsBonus;
     private int[] commandSkillsModifier;
+    private int[] roleplaySkillsModifier;
     private int artilleryProb;
     private int artilleryBonus;
     private int secondSkillProb;
@@ -71,6 +72,7 @@ public class RandomSkillPreferences {
         supportSmallArmsBonus = -10;
         specialAbilityBonus = new int[] { -10, -10, -2, 0, 1 };
         commandSkillsModifier = new int[] { -10, -10, -7, -4, -1 };
+        roleplaySkillsModifier = new int[] { -10, -10, -10, -10, -10 };
         artilleryProb = 10;
         artilleryBonus = -2;
         secondSkillProb = 0;
@@ -211,6 +213,16 @@ public class RandomSkillPreferences {
         }
     }
 
+    public int getRoleplaySkillsModifier(int bonus) {
+        return roleplaySkillsModifier[bonus];
+    }
+
+    public void setRoleplaySkillsModifier(int level, int bonus) {
+        if (level < roleplaySkillsModifier.length) {
+            roleplaySkillsModifier[level] = bonus;
+        }
+    }
+
     public void setArtilleryProb(int b) {
         this.artilleryProb = b;
     }
@@ -253,6 +265,7 @@ public class RandomSkillPreferences {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "recruitmentBonuses");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "specialAbilityBonus", specialAbilityBonus);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandSkillsModifier", commandSkillsModifier);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "roleplaySkillsModifier", roleplaySkillsModifier);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeSkill", randomizeSkill);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanBonuses", useClanBonuses);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "antiMekProb", antiMekProb);
@@ -312,6 +325,11 @@ public class RandomSkillPreferences {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
                         retVal.commandSkillsModifier[i] = Integer.parseInt(values[i]);
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("roleplaySkillsModifier")) {
+                    String[] values = wn2.getTextContent().split(",");
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.roleplaySkillsModifier[i] = Integer.parseInt(values[i]);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("specialAbilityBonus")) {
                     String[] values = wn2.getTextContent().split(",");

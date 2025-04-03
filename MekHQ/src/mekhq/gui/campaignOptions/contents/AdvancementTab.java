@@ -159,6 +159,16 @@ public class AdvancementTab {
     private JSpinner spnSecondProb;
     private JLabel lblSecondBonus;
     private JSpinner spnSecondBonus;
+
+    private JPanel pnlRoleplaySkills;
+    private JLabel lblRoleplaySkillsGreen;
+    private JSpinner spnRoleplaySkillsGreen;
+    private JLabel lblRoleplaySkillsReg;
+    private JSpinner spnRoleplaySkillsReg;
+    private JLabel lblRoleplaySkillsVet;
+    private JSpinner spnRoleplaySkillsVet;
+    private JLabel lblRoleplaySkillsElite;
+    private JSpinner spnRoleplaySkillsElite;
     //end Skill Randomization Tab
 
     //start Recruitment Bonus Tab
@@ -542,6 +552,16 @@ public class AdvancementTab {
         lblSecondBonus = new JLabel();
         spnSecondBonus = new JSpinner();
 
+        pnlRoleplaySkills = new JPanel();
+        lblRoleplaySkillsGreen = new JLabel();
+        spnRoleplaySkillsGreen = new JSpinner();
+        lblRoleplaySkillsReg = new JLabel();
+        spnRoleplaySkillsReg = new JSpinner();
+        lblRoleplaySkillsVet = new JLabel();
+        spnRoleplaySkillsVet = new JSpinner();
+        lblRoleplaySkillsElite = new JLabel();
+        spnRoleplaySkillsElite = new JSpinner();
+
         pnlRandomAbilities = new JPanel();
         lblAbilityGreen = new JLabel();
         spnAbilityGreen = new JSpinner();
@@ -702,6 +722,7 @@ public class AdvancementTab {
         pnlSecondarySkills = createSecondarySkillPanel();
 
         pnlTactics = createTacticsPanel();
+        pnlRoleplaySkills = createRoleplaySkillsPanel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SkillGroupsPanel");
@@ -720,6 +741,10 @@ public class AdvancementTab {
         panel.add(pnlSecondarySkills, layout);
         layout.gridx++;
         panel.add(pnlArtillery, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(pnlRoleplaySkills, layout);
 
         return panel;
     }
@@ -767,6 +792,47 @@ public class AdvancementTab {
         panel.add(lblCommandSkillsElite, layout);
         layout.gridx++;
         panel.add(spnCommandSkillsElite, layout);
+
+        return panel;
+    }
+
+    private JPanel createRoleplaySkillsPanel() {
+        // Contents
+        lblRoleplaySkillsGreen = new CampaignOptionsLabel("RoleplaySkillsGreen");
+        spnRoleplaySkillsGreen = new CampaignOptionsSpinner("RoleplaySkillsGreen", 0, -10, 10, 1);
+
+        lblRoleplaySkillsReg = new CampaignOptionsLabel("RoleplaySkillsRegular");
+        spnRoleplaySkillsReg = new CampaignOptionsSpinner("RoleplaySkillsRegular", 0, -10, 10, 1);
+
+        lblRoleplaySkillsVet = new CampaignOptionsLabel("RoleplaySkillsVeteran");
+        spnRoleplaySkillsVet = new CampaignOptionsSpinner("RoleplaySkillsVeteran", 0, -10, 10, 1);
+
+        lblRoleplaySkillsElite = new CampaignOptionsLabel("RoleplaySkillsElite");
+        spnRoleplaySkillsElite = new CampaignOptionsSpinner("RoleplaySkillsElite", 0, -10, 10, 1);
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("RoleplaySkillsPanel", true, "RoleplaySkillsPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(lblRoleplaySkillsGreen, layout);
+        layout.gridx++;
+        panel.add(spnRoleplaySkillsGreen, layout);
+        layout.gridx++;
+        panel.add(lblRoleplaySkillsReg, layout);
+        layout.gridx++;
+        panel.add(spnRoleplaySkillsReg, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblRoleplaySkillsVet, layout);
+        layout.gridx++;
+        panel.add(spnRoleplaySkillsVet, layout);
+        layout.gridx++;
+        panel.add(lblRoleplaySkillsElite, layout);
+        layout.gridx++;
+        panel.add(spnRoleplaySkillsElite, layout);
 
         return panel;
     }
@@ -1009,7 +1075,8 @@ public class AdvancementTab {
      * @param presetRandomSkillPreferences Optional {@code RandomSkillPreferences} object to load values from; if
      *                                     {@code null}, values are loaded from the current skill preferences.
      */
-    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions, @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
+                                              @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -1086,7 +1153,8 @@ public class AdvancementTab {
      * @param presetRandomSkillPreferences Optional {@code RandomSkillPreferences} object to set values to; if
      *                                     {@code null}, values are applied to the current skill preferences.
      */
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions, @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions,
+                                               @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
