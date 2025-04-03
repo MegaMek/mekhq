@@ -63,29 +63,29 @@ public class PersonnelOptions extends PilotOptions {
     public static final String TECH_FIXER = "tech_fixer";
     public static final String TECH_MAINTAINER = "tech_maintainer";
 
-    public static final String ATOW_CONNECTIONS_1 = "atow_connections_1";
-    public static final String ATOW_CONNECTIONS_2 = "atow_connections_2";
-    public static final String ATOW_CONNECTIONS_3 = "atow_connections_3";
-    public static final String ATOW_CONNECTIONS_4 = "atow_connections_4";
-    public static final String ATOW_CONNECTIONS_5 = "atow_connections_5";
-    public static final String ATOW_CONNECTIONS_6 = "atow_connections_6";
-    public static final String ATOW_CONNECTIONS_7 = "atow_connections_7";
-    public static final String ATOW_CONNECTIONS_8 = "atow_connections_8";
-    public static final String ATOW_CONNECTIONS_9 = "atow_connections_9";
+    public static final String atow_connections_01 = "atow_connections_01";
+    public static final String atow_connections_02 = "atow_connections_02";
+    public static final String atow_connections_03 = "atow_connections_03";
+    public static final String atow_connections_04 = "atow_connections_04";
+    public static final String atow_connections_05 = "atow_connections_05";
+    public static final String atow_connections_06 = "atow_connections_06";
+    public static final String atow_connections_07 = "atow_connections_07";
+    public static final String atow_connections_08 = "atow_connections_08";
+    public static final String atow_connections_09 = "atow_connections_09";
     public static final String ATOW_CONNECTIONS_10 = "atow_connections_10";
 
-    public static final String ATOW_WEALTH_NEGATIVE_1 = "atow_wealth_negative_1";
-    public static final String ATOW_WEALTH_0 = "atow_wealth_0";
-    public static final String ATOW_WEALTH_1 = "atow_wealth_1";
-    public static final String ATOW_WEALTH_2 = "atow_wealth_2";
-    public static final String ATOW_WEALTH_3 = "atow_wealth_3";
-    public static final String ATOW_WEALTH_4 = "atow_wealth_4";
-    public static final String ATOW_WEALTH_5 = "atow_wealth_5";
-    public static final String ATOW_WEALTH_6 = "atow_wealth_6";
-    public static final String ATOW_WEALTH_7 = "atow_wealth_7";
-    public static final String ATOW_WEALTH_8 = "atow_wealth_8";
-    public static final String ATOW_WEALTH_9 = "atow_wealth_9";
-    public static final String ATOW_WEALTH_10 = "atow_wealth_10";
+    public static final String atow_wealth_negative_1 = "atow_wealth_-01";
+    public static final String atow_wealth_00 = "atow_wealth_00";
+    public static final String atow_wealth_01 = "atow_wealth_01";
+    public static final String atow_wealth_02 = "atow_wealth_02";
+    public static final String atow_wealth_03 = "atow_wealth_03";
+    public static final String atow_wealth_04 = "atow_wealth_04";
+    public static final String atow_wealth_05 = "atow_wealth_05";
+    public static final String atow_wealth_06 = "atow_wealth_06";
+    public static final String atow_wealth_07 = "atow_wealth_07";
+    public static final String atow_wealth_08 = "atow_wealth_08";
+    public static final String atow_wealth_09 = "atow_wealth_09";
+    public static final String atow_wealth_10 = "atow_wealth_10";
 
     @Override
     public void initialize() {
@@ -130,29 +130,29 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, TECH_FIXER, false);
         addOption(l3a, TECH_MAINTAINER, false);
 
-        addOption(l3a, ATOW_CONNECTIONS_1, false);
-        addOption(l3a, ATOW_CONNECTIONS_2, false);
-        addOption(l3a, ATOW_CONNECTIONS_3, false);
-        addOption(l3a, ATOW_CONNECTIONS_4, false);
-        addOption(l3a, ATOW_CONNECTIONS_5, false);
-        addOption(l3a, ATOW_CONNECTIONS_6, false);
-        addOption(l3a, ATOW_CONNECTIONS_7, false);
-        addOption(l3a, ATOW_CONNECTIONS_8, false);
-        addOption(l3a, ATOW_CONNECTIONS_9, false);
+        addOption(l3a, atow_connections_01, false);
+        addOption(l3a, atow_connections_02, false);
+        addOption(l3a, atow_connections_03, false);
+        addOption(l3a, atow_connections_04, false);
+        addOption(l3a, atow_connections_05, false);
+        addOption(l3a, atow_connections_06, false);
+        addOption(l3a, atow_connections_07, false);
+        addOption(l3a, atow_connections_08, false);
+        addOption(l3a, atow_connections_09, false);
         addOption(l3a, ATOW_CONNECTIONS_10, false);
 
-        addOption(l3a, ATOW_WEALTH_NEGATIVE_1, false);
-        addOption(l3a, ATOW_WEALTH_0, false);
-        addOption(l3a, ATOW_WEALTH_1, false);
-        addOption(l3a, ATOW_WEALTH_2, false);
-        addOption(l3a, ATOW_WEALTH_3, false);
-        addOption(l3a, ATOW_WEALTH_4, false);
-        addOption(l3a, ATOW_WEALTH_5, false);
-        addOption(l3a, ATOW_WEALTH_6, false);
-        addOption(l3a, ATOW_WEALTH_7, false);
-        addOption(l3a, ATOW_WEALTH_8, false);
-        addOption(l3a, ATOW_WEALTH_9, false);
-        addOption(l3a, ATOW_WEALTH_10, false);
+        addOption(l3a, atow_wealth_negative_1, false);
+        addOption(l3a, atow_wealth_00, false);
+        addOption(l3a, atow_wealth_01, false);
+        addOption(l3a, atow_wealth_02, false);
+        addOption(l3a, atow_wealth_03, false);
+        addOption(l3a, atow_wealth_04, false);
+        addOption(l3a, atow_wealth_05, false);
+        addOption(l3a, atow_wealth_06, false);
+        addOption(l3a, atow_wealth_07, false);
+        addOption(l3a, atow_wealth_08, false);
+        addOption(l3a, atow_wealth_09, false);
+        addOption(l3a, atow_wealth_10, false);
 
         addOption(edge, EDGE_MEDICAL, true);
         addOption(edge, EDGE_REPAIR_BREAK_PART, true);

@@ -27,6 +27,8 @@
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
+import static megamek.common.options.OptionsConstants.ATOW_COMBAT_PARALYSIS;
+import static megamek.common.options.OptionsConstants.ATOW_COMBAT_SENSE;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
 
@@ -90,43 +92,47 @@ public class CommandRating {
     }
 
     private static int getATOWTraitValues(Person commander) {
+        if (commander == null) {
+            return 0;
+        }
+
         int traitScore = 0;
         PersonnelOptions options = commander.getOptions();
 
         // Connections
-        if (options.booleanOption(ATOW_CONNECTIONS_1)) {
+        if (options.booleanOption(atow_connections_01)) {
             traitScore += 1;
         }
 
-        if (options.booleanOption(ATOW_CONNECTIONS_2)) {
+        if (options.booleanOption(atow_connections_02)) {
             traitScore += 2;
         }
 
-        if (options.booleanOption(ATOW_CONNECTIONS_3)) {
+        if (options.booleanOption(atow_connections_03)) {
             traitScore += 3;
         }
 
-        if (options.booleanOption(ATOW_CONNECTIONS_4)) {
+        if (options.booleanOption(atow_connections_04)) {
             traitScore += 4;
         }
 
-        if (options.booleanOption(ATOW_CONNECTIONS_5)) {
+        if (options.booleanOption(atow_connections_05)) {
             traitScore += 5;
         }
 
-        if (options.booleanOption(ATOW_CONNECTIONS_6)) {
+        if (options.booleanOption(atow_connections_06)) {
             traitScore += 6;
         }
 
-        if (options.booleanOption(ATOW_CONNECTIONS_7)) {
+        if (options.booleanOption(atow_connections_07)) {
             traitScore += 7;
         }
 
-        if (options.booleanOption(ATOW_CONNECTIONS_8)) {
+        if (options.booleanOption(atow_connections_08)) {
             traitScore += 8;
         }
 
-        if (options.booleanOption(ATOW_CONNECTIONS_9)) {
+        if (options.booleanOption(atow_connections_09)) {
             traitScore += 9;
         }
 
@@ -134,10 +140,18 @@ public class CommandRating {
             traitScore += 10;
         }
 
-        boolean hasSufficientWealth = options.booleanOption(ATOW_WEALTH_7) ||
-                                            options.booleanOption(ATOW_WEALTH_8) ||
-                                            options.booleanOption(ATOW_WEALTH_9) ||
-                                            options.booleanOption(ATOW_WEALTH_10);
+        if (options.booleanOption(ATOW_COMBAT_SENSE)) {
+            traitScore += 1;
+        }
+
+        if (options.booleanOption(ATOW_COMBAT_PARALYSIS)) {
+            traitScore -= 1;
+        }
+
+        boolean hasSufficientWealth = options.booleanOption(atow_wealth_07) ||
+                                            options.booleanOption(atow_wealth_08) ||
+                                            options.booleanOption(atow_wealth_09) ||
+                                            options.booleanOption(atow_wealth_10);
 
         if (hasSufficientWealth) {
             traitScore += 1;
