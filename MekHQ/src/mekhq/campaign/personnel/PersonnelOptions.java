@@ -27,21 +27,24 @@
  */
 package mekhq.campaign.personnel;
 
-import megamek.common.annotations.Nullable;
-import megamek.common.options.*;
-import megamek.logging.MMLogger;
-
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
+import megamek.common.annotations.Nullable;
+import megamek.common.options.AbstractOptionsInfo;
+import megamek.common.options.IBasicOptionGroup;
+import megamek.common.options.IOption;
+import megamek.common.options.IOptionGroup;
+import megamek.common.options.IOptionInfo;
+import megamek.common.options.OptionsConstants;
+import megamek.common.options.PilotOptions;
+import megamek.logging.MMLogger;
+
 /**
- * An extension of PilotOptions that adds MekHQ-specific SPAs and edge triggers
- * for support and command
- * actions. Display names and descriptions are taken from SpecialAbility when
- * present, otherwise
- * from the MM option.
+ * An extension of PilotOptions that adds MekHQ-specific SPAs and edge triggers for support and command actions. Display
+ * names and descriptions are taken from SpecialAbility when present, otherwise from the MM option.
  *
  * @author Neoancient
  */
@@ -60,6 +63,30 @@ public class PersonnelOptions extends PilotOptions {
     public static final String TECH_FIXER = "tech_fixer";
     public static final String TECH_MAINTAINER = "tech_maintainer";
 
+    public static final String ATOW_CONNECTIONS_1 = "atow_connections_1";
+    public static final String ATOW_CONNECTIONS_2 = "atow_connections_2";
+    public static final String ATOW_CONNECTIONS_3 = "atow_connections_3";
+    public static final String ATOW_CONNECTIONS_4 = "atow_connections_4";
+    public static final String ATOW_CONNECTIONS_5 = "atow_connections_5";
+    public static final String ATOW_CONNECTIONS_6 = "atow_connections_6";
+    public static final String ATOW_CONNECTIONS_7 = "atow_connections_7";
+    public static final String ATOW_CONNECTIONS_8 = "atow_connections_8";
+    public static final String ATOW_CONNECTIONS_9 = "atow_connections_9";
+    public static final String ATOW_CONNECTIONS_10 = "atow_connections_10";
+
+    public static final String ATOW_WEALTH_NEGATIVE_1 = "atow_wealth_negative_1";
+    public static final String ATOW_WEALTH_0 = "atow_wealth_0";
+    public static final String ATOW_WEALTH_1 = "atow_wealth_1";
+    public static final String ATOW_WEALTH_2 = "atow_wealth_2";
+    public static final String ATOW_WEALTH_3 = "atow_wealth_3";
+    public static final String ATOW_WEALTH_4 = "atow_wealth_4";
+    public static final String ATOW_WEALTH_5 = "atow_wealth_5";
+    public static final String ATOW_WEALTH_6 = "atow_wealth_6";
+    public static final String ATOW_WEALTH_7 = "atow_wealth_7";
+    public static final String ATOW_WEALTH_8 = "atow_wealth_8";
+    public static final String ATOW_WEALTH_9 = "atow_wealth_9";
+    public static final String ATOW_WEALTH_10 = "atow_wealth_10";
+
     @Override
     public void initialize() {
         super.initialize();
@@ -67,7 +94,7 @@ public class PersonnelOptions extends PilotOptions {
         IBasicOptionGroup l3a = null;
         IBasicOptionGroup edge = null;
         IBasicOptionGroup md = null;
-        for (Enumeration<IBasicOptionGroup> e = getOptionsInfoImp().getGroups(); e.hasMoreElements();) {
+        for (Enumeration<IBasicOptionGroup> e = getOptionsInfoImp().getGroups(); e.hasMoreElements(); ) {
             final IBasicOptionGroup group = e.nextElement();
             if ((null == l3a) && group.getKey().equals(PilotOptions.LVL3_ADVANTAGES)) {
                 l3a = group;
@@ -103,6 +130,30 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, TECH_FIXER, false);
         addOption(l3a, TECH_MAINTAINER, false);
 
+        addOption(l3a, ATOW_CONNECTIONS_1, false);
+        addOption(l3a, ATOW_CONNECTIONS_2, false);
+        addOption(l3a, ATOW_CONNECTIONS_3, false);
+        addOption(l3a, ATOW_CONNECTIONS_4, false);
+        addOption(l3a, ATOW_CONNECTIONS_5, false);
+        addOption(l3a, ATOW_CONNECTIONS_6, false);
+        addOption(l3a, ATOW_CONNECTIONS_7, false);
+        addOption(l3a, ATOW_CONNECTIONS_8, false);
+        addOption(l3a, ATOW_CONNECTIONS_9, false);
+        addOption(l3a, ATOW_CONNECTIONS_10, false);
+
+        addOption(l3a, ATOW_WEALTH_NEGATIVE_1, false);
+        addOption(l3a, ATOW_WEALTH_0, false);
+        addOption(l3a, ATOW_WEALTH_1, false);
+        addOption(l3a, ATOW_WEALTH_2, false);
+        addOption(l3a, ATOW_WEALTH_3, false);
+        addOption(l3a, ATOW_WEALTH_4, false);
+        addOption(l3a, ATOW_WEALTH_5, false);
+        addOption(l3a, ATOW_WEALTH_6, false);
+        addOption(l3a, ATOW_WEALTH_7, false);
+        addOption(l3a, ATOW_WEALTH_8, false);
+        addOption(l3a, ATOW_WEALTH_9, false);
+        addOption(l3a, ATOW_WEALTH_10, false);
+
         addOption(edge, EDGE_MEDICAL, true);
         addOption(edge, EDGE_REPAIR_BREAK_PART, true);
         addOption(edge, EDGE_REPAIR_FAILED_REFIT, true);
@@ -122,8 +173,8 @@ public class PersonnelOptions extends PilotOptions {
                     break;
                 default:
                     throw new IllegalStateException(
-                            "Unexpected value in mekhq/campaign/personnel/PersonnelOptions.java/initialize: "
-                                    + option.getGroup());
+                          "Unexpected value in mekhq/campaign/personnel/PersonnelOptions.java/initialize: " +
+                                option.getGroup());
             }
         }
     }
@@ -143,7 +194,7 @@ public class PersonnelOptions extends PilotOptions {
      * Returns the options of the given category that this pilot has
      */
     public Enumeration<IOption> getOptions(String grpKey) {
-        for (Enumeration<IOptionGroup> i = getGroups(); i.hasMoreElements();) {
+        for (Enumeration<IOptionGroup> i = getGroups(); i.hasMoreElements(); ) {
             IOptionGroup group = i.nextElement();
 
             if (group.getKey().equalsIgnoreCase(grpKey)) {
@@ -165,7 +216,7 @@ public class PersonnelOptions extends PilotOptions {
         if (null != spa) {
             toRemove = spa.getRemovedAbilities();
         }
-        for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements();) {
+        for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             if (ability.getName().equals(name)) {
                 ability.setValue(value);
@@ -185,11 +236,9 @@ public class PersonnelOptions extends PilotOptions {
     }
 
     /**
-     * Custom IOptionsInfo class that allows adding additional options to the base
-     * MegaMek
-     * options before finalizing and also holds a hash of IOptionInfo objects for
-     * the abilities
-     * so we can provide names and descriptions for the MekHQ-specific options.
+     * Custom IOptionsInfo class that allows adding additional options to the base MegaMek options before finalizing and
+     * also holds a hash of IOptionInfo objects for the abilities so we can provide names and descriptions for the
+     * MekHQ-specific options.
      *
      * @author Neoancient
      */
@@ -224,11 +273,8 @@ public class PersonnelOptions extends PilotOptions {
     }
 
     /**
-     * Access to ability names and descriptions from <code>SpecialAbility</code> if
-     * the ability
-     * has an entry, otherwise checks for the ability the MM PilotOptions class. If
-     * not found
-     * in either place, returns the lookup key instead.
+     * Access to ability names and descriptions from <code>SpecialAbility</code> if the ability has an entry, otherwise
+     * checks for the ability the MM PilotOptions class. If not found in either place, returns the lookup key instead.
      *
      * @author Neoancient
      */

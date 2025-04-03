@@ -465,6 +465,423 @@
 
     <!-- Misc SPA -->
     <ability>
+        <lookupName>atow_wealth_negative_1</lookupName>
+        <displayName>Personal Wealth TP-1 (ATOW)</displayName>
+        <desc>No mechanical effect. At Wealth 7, unit Reputation is increased by 1 if this character is the campaign commander.</desc>
+        <xpCost>-100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_wealth_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_2</invalidAbilities>
+        <invalidAbilities>atow_wealth_3</invalidAbilities>
+        <invalidAbilities>atow_wealth_4</invalidAbilities>
+        <invalidAbilities>atow_wealth_5</invalidAbilities>
+        <invalidAbilities>atow_wealth_6</invalidAbilities>
+        <invalidAbilities>atow_wealth_7</invalidAbilities>
+        <invalidAbilities>atow_wealth_8</invalidAbilities>
+        <invalidAbilities>atow_wealth_9</invalidAbilities>
+        <invalidAbilities>atow_wealth_10</invalidAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_wealth_0</lookupName>
+        <displayName>Personal Wealth TP0 (ATOW)</displayName>
+        <desc>No mechanical effect. At Wealth 7, unit Reputation is increased by 1 if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_wealth_negative_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_2</invalidAbilities>
+        <invalidAbilities>atow_wealth_3</invalidAbilities>
+        <invalidAbilities>atow_wealth_4</invalidAbilities>
+        <invalidAbilities>atow_wealth_5</invalidAbilities>
+        <invalidAbilities>atow_wealth_6</invalidAbilities>
+        <invalidAbilities>atow_wealth_7</invalidAbilities>
+        <invalidAbilities>atow_wealth_8</invalidAbilities>
+        <invalidAbilities>atow_wealth_9</invalidAbilities>
+        <invalidAbilities>atow_wealth_10</invalidAbilities>
+        <removeAbilities>atow_wealth_negative_1</removeAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_wealth_1</lookupName>
+        <displayName>Personal Wealth TP1 (ATOW)</displayName>
+        <desc>No mechanical effect. At Wealth 7, unit Reputation is increased by 1 if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_wealth_negative_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_0</invalidAbilities>
+        <invalidAbilities>atow_wealth_3</invalidAbilities>
+        <invalidAbilities>atow_wealth_4</invalidAbilities>
+        <invalidAbilities>atow_wealth_5</invalidAbilities>
+        <invalidAbilities>atow_wealth_6</invalidAbilities>
+        <invalidAbilities>atow_wealth_7</invalidAbilities>
+        <invalidAbilities>atow_wealth_8</invalidAbilities>
+        <invalidAbilities>atow_wealth_9</invalidAbilities>
+        <invalidAbilities>atow_wealth_10</invalidAbilities>
+        <prereqAbilities>atow_wealth_0</prereqAbilities>
+        <removeAbilities>atow_wealth_0</removeAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_wealth_2</lookupName>
+        <displayName>Personal Wealth TP2 (ATOW)</displayName>
+        <desc>No mechanical effect. At Wealth 7, unit Reputation is increased by 1 if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_wealth_negative_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_0</invalidAbilities>
+        <invalidAbilities>atow_wealth_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_4</invalidAbilities>
+        <invalidAbilities>atow_wealth_5</invalidAbilities>
+        <invalidAbilities>atow_wealth_6</invalidAbilities>
+        <invalidAbilities>atow_wealth_7</invalidAbilities>
+        <invalidAbilities>atow_wealth_8</invalidAbilities>
+        <invalidAbilities>atow_wealth_9</invalidAbilities>
+        <invalidAbilities>atow_wealth_10</invalidAbilities>
+        <prereqAbilities>atow_wealth_1</prereqAbilities>
+        <removeAbilities>atow_wealth_1</removeAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_wealth_3</lookupName>
+        <displayName>Personal Wealth TP3 (ATOW)</displayName>
+        <desc>No mechanical effect. At Wealth 7, unit Reputation is increased by 1 if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_wealth_negative_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_0</invalidAbilities>
+        <invalidAbilities>atow_wealth_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_2</invalidAbilities>
+        <invalidAbilities>atow_wealth_5</invalidAbilities>
+        <invalidAbilities>atow_wealth_6</invalidAbilities>
+        <invalidAbilities>atow_wealth_7</invalidAbilities>
+        <invalidAbilities>atow_wealth_8</invalidAbilities>
+        <invalidAbilities>atow_wealth_9</invalidAbilities>
+        <invalidAbilities>atow_wealth_10</invalidAbilities>
+        <prereqAbilities>atow_wealth_2</prereqAbilities>
+        <removeAbilities>atow_wealth_2</removeAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_wealth_4</lookupName>
+        <displayName>Personal Wealth TP4 (ATOW)</displayName>
+        <desc>No mechanical effect. At Wealth 7, unit Reputation is increased by 1 if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_wealth_negative_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_0</invalidAbilities>
+        <invalidAbilities>atow_wealth_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_2</invalidAbilities>
+        <invalidAbilities>atow_wealth_3</invalidAbilities>
+        <invalidAbilities>atow_wealth_6</invalidAbilities>
+        <invalidAbilities>atow_wealth_7</invalidAbilities>
+        <invalidAbilities>atow_wealth_8</invalidAbilities>
+        <invalidAbilities>atow_wealth_9</invalidAbilities>
+        <invalidAbilities>atow_wealth_10</invalidAbilities>
+        <prereqAbilities>atow_wealth_3</prereqAbilities>
+        <removeAbilities>atow_wealth_3</removeAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_wealth_5</lookupName>
+        <displayName>Personal Wealth TP5(ATOW)</displayName>
+        <desc>No mechanical effect. At Wealth 7, unit Reputation is increased by 1 if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_wealth_negative_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_0</invalidAbilities>
+        <invalidAbilities>atow_wealth_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_2</invalidAbilities>
+        <invalidAbilities>atow_wealth_3</invalidAbilities>
+        <invalidAbilities>atow_wealth_4</invalidAbilities>
+        <invalidAbilities>atow_wealth_7</invalidAbilities>
+        <invalidAbilities>atow_wealth_8</invalidAbilities>
+        <invalidAbilities>atow_wealth_9</invalidAbilities>
+        <invalidAbilities>atow_wealth_10</invalidAbilities>
+        <prereqAbilities>atow_wealth_4</prereqAbilities>
+        <removeAbilities>atow_wealth_4</removeAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_wealth_6</lookupName>
+        <displayName>Personal Wealth TP6 (ATOW)</displayName>
+        <desc>No mechanical effect. At Wealth 7, unit Reputation is increased by 1 if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_wealth_negative_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_0</invalidAbilities>
+        <invalidAbilities>atow_wealth_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_2</invalidAbilities>
+        <invalidAbilities>atow_wealth_3</invalidAbilities>
+        <invalidAbilities>atow_wealth_4</invalidAbilities>
+        <invalidAbilities>atow_wealth_5</invalidAbilities>
+        <invalidAbilities>atow_wealth_8</invalidAbilities>
+        <invalidAbilities>atow_wealth_9</invalidAbilities>
+        <invalidAbilities>atow_wealth_10</invalidAbilities>
+        <prereqAbilities>atow_wealth_5</prereqAbilities>
+        <removeAbilities>atow_wealth_5</removeAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_wealth_7</lookupName>
+        <displayName>Personal Wealth TP7 (ATOW)</displayName>
+        <desc>Unit Reputation is increased by 1 total if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_wealth_negative_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_0</invalidAbilities>
+        <invalidAbilities>atow_wealth_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_2</invalidAbilities>
+        <invalidAbilities>atow_wealth_3</invalidAbilities>
+        <invalidAbilities>atow_wealth_4</invalidAbilities>
+        <invalidAbilities>atow_wealth_5</invalidAbilities>
+        <invalidAbilities>atow_wealth_6</invalidAbilities>
+        <invalidAbilities>atow_wealth_9</invalidAbilities>
+        <invalidAbilities>atow_wealth_10</invalidAbilities>
+        <prereqAbilities>atow_wealth_6</prereqAbilities>
+        <removeAbilities>atow_wealth_6</removeAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_wealth_8</lookupName>
+        <displayName>Personal Wealth TP8 (ATOW)</displayName>
+        <desc>Unit Reputation is increased by 1 total if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_wealth_negative_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_0</invalidAbilities>
+        <invalidAbilities>atow_wealth_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_2</invalidAbilities>
+        <invalidAbilities>atow_wealth_3</invalidAbilities>
+        <invalidAbilities>atow_wealth_4</invalidAbilities>
+        <invalidAbilities>atow_wealth_5</invalidAbilities>
+        <invalidAbilities>atow_wealth_6</invalidAbilities>
+        <invalidAbilities>atow_wealth_7</invalidAbilities>
+        <invalidAbilities>atow_wealth_10</invalidAbilities>
+        <prereqAbilities>atow_wealth_7</prereqAbilities>
+        <removeAbilities>atow_wealth_7</removeAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_wealth_9</lookupName>
+        <displayName>Personal Wealth TP9 (ATOW)</displayName>
+        <desc>Unit Reputation is increased by 1 total if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_wealth_negative_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_0</invalidAbilities>
+        <invalidAbilities>atow_wealth_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_2</invalidAbilities>
+        <invalidAbilities>atow_wealth_3</invalidAbilities>
+        <invalidAbilities>atow_wealth_4</invalidAbilities>
+        <invalidAbilities>atow_wealth_5</invalidAbilities>
+        <invalidAbilities>atow_wealth_6</invalidAbilities>
+        <invalidAbilities>atow_wealth_7</invalidAbilities>
+        <invalidAbilities>atow_wealth_8</invalidAbilities>
+        <prereqAbilities>atow_wealth_9</prereqAbilities>
+        <removeAbilities>atow_wealth_9</removeAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_wealth_10</lookupName>
+        <displayName>Personal Wealth TP10 (ATOW)</displayName>
+        <desc>Unit Reputation is increased by 1 total if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_wealth_negative_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_0</invalidAbilities>
+        <invalidAbilities>atow_wealth_1</invalidAbilities>
+        <invalidAbilities>atow_wealth_2</invalidAbilities>
+        <invalidAbilities>atow_wealth_3</invalidAbilities>
+        <invalidAbilities>atow_wealth_4</invalidAbilities>
+        <invalidAbilities>atow_wealth_5</invalidAbilities>
+        <invalidAbilities>atow_wealth_6</invalidAbilities>
+        <invalidAbilities>atow_wealth_7</invalidAbilities>
+        <invalidAbilities>atow_wealth_8</invalidAbilities>
+        <invalidAbilities>atow_wealth_9</invalidAbilities>
+        <prereqAbilities>atow_wealth_10</prereqAbilities>
+        <removeAbilities>atow_wealth_10</removeAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_connections_1</lookupName>
+        <displayName>Connections TP1 (ATOW)</displayName>
+        <desc>Unit Reputation is increased by 1 if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_connections_3</invalidAbilities>
+        <invalidAbilities>atow_connections_4</invalidAbilities>
+        <invalidAbilities>atow_connections_5</invalidAbilities>
+        <invalidAbilities>atow_connections_6</invalidAbilities>
+        <invalidAbilities>atow_connections_7</invalidAbilities>
+        <invalidAbilities>atow_connections_8</invalidAbilities>
+        <invalidAbilities>atow_connections_9</invalidAbilities>
+        <invalidAbilities>atow_connections_10</invalidAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_connections_2</lookupName>
+        <displayName>Connections TP2 (ATOW)</displayName>
+        <desc>Unit Reputation is increased by 1 (2, total) if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_connections_1</invalidAbilities>
+        <invalidAbilities>atow_connections_4</invalidAbilities>
+        <invalidAbilities>atow_connections_5</invalidAbilities>
+        <invalidAbilities>atow_connections_6</invalidAbilities>
+        <invalidAbilities>atow_connections_7</invalidAbilities>
+        <invalidAbilities>atow_connections_8</invalidAbilities>
+        <invalidAbilities>atow_connections_9</invalidAbilities>
+        <invalidAbilities>atow_connections_10</invalidAbilities>
+        <prereqAbilities>atow_connections_1</prereqAbilities>
+        <removeAbilities>atow_connections_1</removeAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_connections_3</lookupName>
+        <displayName>Connections TP3 (ATOW)</displayName>
+        <desc>Unit Reputation is increased by 1 (3, total) if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_connections_1</invalidAbilities>
+        <invalidAbilities>atow_connections_2</invalidAbilities>
+        <invalidAbilities>atow_connections_5</invalidAbilities>
+        <invalidAbilities>atow_connections_6</invalidAbilities>
+        <invalidAbilities>atow_connections_7</invalidAbilities>
+        <invalidAbilities>atow_connections_8</invalidAbilities>
+        <invalidAbilities>atow_connections_9</invalidAbilities>
+        <invalidAbilities>atow_connections_10</invalidAbilities>
+        <prereqAbilities>atow_connections_2</prereqAbilities>
+        <removeAbilities>atow_connections_2</removeAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_connections_4</lookupName>
+        <displayName>Connections TP4 (ATOW)</displayName>
+        <desc>Unit Reputation is increased by 1 (4, total) if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_connections_1</invalidAbilities>
+        <invalidAbilities>atow_connections_2</invalidAbilities>
+        <invalidAbilities>atow_connections_3</invalidAbilities>
+        <invalidAbilities>atow_connections_6</invalidAbilities>
+        <invalidAbilities>atow_connections_7</invalidAbilities>
+        <invalidAbilities>atow_connections_8</invalidAbilities>
+        <invalidAbilities>atow_connections_9</invalidAbilities>
+        <invalidAbilities>atow_connections_10</invalidAbilities>
+        <prereqAbilities>atow_connections_3</prereqAbilities>
+        <removeAbilities>atow_connections_3</removeAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_connections_5</lookupName>
+        <displayName>Connections TP5 (ATOW)</displayName>
+        <desc>Unit Reputation is increased by 1 (5, total) if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_connections_1</invalidAbilities>
+        <invalidAbilities>atow_connections_2</invalidAbilities>
+        <invalidAbilities>atow_connections_3</invalidAbilities>
+        <invalidAbilities>atow_connections_4</invalidAbilities>
+        <invalidAbilities>atow_connections_7</invalidAbilities>
+        <invalidAbilities>atow_connections_8</invalidAbilities>
+        <invalidAbilities>atow_connections_9</invalidAbilities>
+        <invalidAbilities>atow_connections_10</invalidAbilities>
+        <prereqAbilities>atow_connections_4</prereqAbilities>
+        <removeAbilities>atow_connections_4</removeAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_connections_6</lookupName>
+        <displayName>Connections TP6 (ATOW)</displayName>
+        <desc>Unit Reputation is increased by 1 (6, total) if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_connections_1</invalidAbilities>
+        <invalidAbilities>atow_connections_2</invalidAbilities>
+        <invalidAbilities>atow_connections_3</invalidAbilities>
+        <invalidAbilities>atow_connections_4</invalidAbilities>
+        <invalidAbilities>atow_connections_5</invalidAbilities>
+        <invalidAbilities>atow_connections_8</invalidAbilities>
+        <invalidAbilities>atow_connections_9</invalidAbilities>
+        <invalidAbilities>atow_connections_10</invalidAbilities>
+        <prereqAbilities>atow_connections_5</prereqAbilities>
+        <removeAbilities>atow_connections_5</removeAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_connections_7</lookupName>
+        <displayName>Connections TP7 (ATOW)</displayName>
+        <desc>Unit Reputation is increased by 1 (7, total) if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_connections_1</invalidAbilities>
+        <invalidAbilities>atow_connections_2</invalidAbilities>
+        <invalidAbilities>atow_connections_3</invalidAbilities>
+        <invalidAbilities>atow_connections_4</invalidAbilities>
+        <invalidAbilities>atow_connections_5</invalidAbilities>
+        <invalidAbilities>atow_connections_6</invalidAbilities>
+        <invalidAbilities>atow_connections_9</invalidAbilities>
+        <invalidAbilities>atow_connections_10</invalidAbilities>
+        <prereqAbilities>atow_connections_6</prereqAbilities>
+        <removeAbilities>atow_connections_6</removeAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_connections_8</lookupName>
+        <displayName>Connections TP8 (ATOW)</displayName>
+        <desc>Unit Reputation is increased by 1 (8, total) if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_connections_1</invalidAbilities>
+        <invalidAbilities>atow_connections_2</invalidAbilities>
+        <invalidAbilities>atow_connections_3</invalidAbilities>
+        <invalidAbilities>atow_connections_4</invalidAbilities>
+        <invalidAbilities>atow_connections_5</invalidAbilities>
+        <invalidAbilities>atow_connections_6</invalidAbilities>
+        <invalidAbilities>atow_connections_7</invalidAbilities>
+        <invalidAbilities>atow_connections_10</invalidAbilities>
+        <prereqAbilities>atow_connections_7</prereqAbilities>
+        <removeAbilities>atow_connections_7</removeAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_connections_9</lookupName>
+        <displayName>Connections TP9 (ATOW)</displayName>
+        <desc>Unit Reputation is increased by 1 (9, total) if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_connections_1</invalidAbilities>
+        <invalidAbilities>atow_connections_2</invalidAbilities>
+        <invalidAbilities>atow_connections_3</invalidAbilities>
+        <invalidAbilities>atow_connections_4</invalidAbilities>
+        <invalidAbilities>atow_connections_5</invalidAbilities>
+        <invalidAbilities>atow_connections_6</invalidAbilities>
+        <invalidAbilities>atow_connections_7</invalidAbilities>
+        <invalidAbilities>atow_connections_8</invalidAbilities>
+        <prereqAbilities>atow_connections_8</prereqAbilities>
+        <removeAbilities>atow_connections_8</removeAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_connections_10</lookupName>
+        <displayName>Connections TP10 (ATOW)</displayName>
+        <desc>Unit Reputation is increased by 1 (10, total) if this character is the campaign commander.</desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <invalidAbilities>atow_connections_1</invalidAbilities>
+        <invalidAbilities>atow_connections_2</invalidAbilities>
+        <invalidAbilities>atow_connections_3</invalidAbilities>
+        <invalidAbilities>atow_connections_4</invalidAbilities>
+        <invalidAbilities>atow_connections_5</invalidAbilities>
+        <invalidAbilities>atow_connections_6</invalidAbilities>
+        <invalidAbilities>atow_connections_7</invalidAbilities>
+        <invalidAbilities>atow_connections_8</invalidAbilities>
+        <invalidAbilities>atow_connections_9</invalidAbilities>
+        <prereqAbilities>atow_connections_9</prereqAbilities>
+        <removeAbilities>atow_connections_9</removeAbilities>
+        <skillPrereq/>
+    </ability>
+    <ability>
         <lookupName>eagle_eyes</lookupName>
         <xpCost>100</xpCost>
         <weight>2</weight>
@@ -728,12 +1145,12 @@
     </ability>
     <ability>
         <lookupName>small_pilot</lookupName>
-        <xpCost>50</xpCost>
+        <xpCost>-1</xpCost>
         <weight>1</weight>
     </ability>
     <ability>
         <lookupName>clan_pilot_training</lookupName>
-        <xpCost>0</xpCost>
+        <xpCost>-1</xpCost>
         <weight>0</weight>
     </ability>
 

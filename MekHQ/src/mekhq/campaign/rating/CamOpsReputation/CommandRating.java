@@ -27,17 +27,19 @@
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
-import megamek.logging.MMLogger;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
+import static mekhq.campaign.personnel.PersonnelOptions.*;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.SkillType;
 
 public class CommandRating {
     private static final MMLogger logger = MMLogger.create(CommandRating.class);
@@ -47,14 +49,12 @@ public class CommandRating {
      *
      * @param campaign  the campaign the commander belongs to
      * @param commander the commander to calculate the rating for
-     * @return a map containing the commander's rating in different areas:
-     *         - "leadership": the commander's leadership skill value
-     *         - "tactics": the commander's tactics skill value
-     *         - "strategy": the commander's strategy skill value
-     *         - "negotiation": the commander's negotiation skill value
-     *         - "traits": the commander's traits (not currently tracked, always 0)
-     *         - "personality": the value of the commander's personality
-     *         characteristics (or 0, if disabled)
+     *
+     * @return a map containing the commander's rating in different areas: - "leadership": the commander's leadership
+     *       skill value - "tactics": the commander's tactics skill value - "strategy": the commander's strategy skill
+     *       value - "negotiation": the commander's negotiation skill value - "traits": the commander's traits (not
+     *       currently tracked, always 0) - "personality": the value of the commander's personality characteristics (or
+     *       0, if disabled)
      */
     protected static Map<String, Integer> calculateCommanderRating(Campaign campaign, Person commander) {
         Map<String, Integer> commandRating = new HashMap<>();
@@ -64,36 +64,95 @@ public class CommandRating {
         commandRating.put("strategy", getSkillValue(commander, SkillType.S_STRATEGY));
         commandRating.put("negotiation", getSkillValue(commander, SkillType.S_NEG));
 
-        // ATOW traits are not currently tracked by mhq, but when they are, this is
-        // where we'd add that data
-        commandRating.put("traits", 0);
+        commandRating.put("traits", getATOWTraitValues(commander));
 
         int personalityValue = 0;
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
         if (campaignOptions.isUseRandomPersonalityReputation() && commander != null) {
             personalityValue = getPersonalityValue(campaignOptions.isUseRandomPersonalities(),
-                commander.getAggression(), commander.getAmbition(), commander.getGreed(),
-                commander.getSocial());
+                  commander.getAggression(),
+                  commander.getAmbition(),
+                  commander.getGreed(),
+                  commander.getSocial());
         }
         commandRating.put("personality", personalityValue);
 
         commandRating.put("total", commandRating.values().stream().mapToInt(rating -> rating).sum());
 
         logger.debug("Command Rating = {}",
-                commandRating.keySet().stream()
-                        .map(key -> key + ": " + commandRating.get(key) + '\n')
-                        .collect(Collectors.joining()));
+              commandRating.keySet()
+                    .stream()
+                    .map(key -> key + ": " + commandRating.get(key) + '\n')
+                    .collect(Collectors.joining()));
 
         return commandRating;
     }
 
+    private static int getATOWTraitValues(Person commander) {
+        int traitScore = 0;
+        PersonnelOptions options = commander.getOptions();
+
+        // Connections
+        if (options.booleanOption(ATOW_CONNECTIONS_1)) {
+            traitScore += 1;
+        }
+
+        if (options.booleanOption(ATOW_CONNECTIONS_2)) {
+            traitScore += 2;
+        }
+
+        if (options.booleanOption(ATOW_CONNECTIONS_3)) {
+            traitScore += 3;
+        }
+
+        if (options.booleanOption(ATOW_CONNECTIONS_4)) {
+            traitScore += 4;
+        }
+
+        if (options.booleanOption(ATOW_CONNECTIONS_5)) {
+            traitScore += 5;
+        }
+
+        if (options.booleanOption(ATOW_CONNECTIONS_6)) {
+            traitScore += 6;
+        }
+
+        if (options.booleanOption(ATOW_CONNECTIONS_7)) {
+            traitScore += 7;
+        }
+
+        if (options.booleanOption(ATOW_CONNECTIONS_8)) {
+            traitScore += 8;
+        }
+
+        if (options.booleanOption(ATOW_CONNECTIONS_9)) {
+            traitScore += 9;
+        }
+
+        if (options.booleanOption(ATOW_CONNECTIONS_10)) {
+            traitScore += 10;
+        }
+
+        boolean hasSufficientWealth = options.booleanOption(ATOW_WEALTH_7) ||
+                                            options.booleanOption(ATOW_WEALTH_8) ||
+                                            options.booleanOption(ATOW_WEALTH_9) ||
+                                            options.booleanOption(ATOW_WEALTH_10);
+
+        if (hasSufficientWealth) {
+            traitScore += 1;
+        }
+
+        // TODO: REPUTATION
+
+        return traitScore;
+    }
+
     /**
-     * @return the final skill value for the given skill,
-     *         or 0 if the person does not have the skill
-     *
      * @param person the person
      * @param skill  the skill
+     *
+     * @return the final skill value for the given skill, or 0 if the person does not have the skill
      */
     private static int getSkillValue(Person person, String skill) {
         int skillValue = 0;
