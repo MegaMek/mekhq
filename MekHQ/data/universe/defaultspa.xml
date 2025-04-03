@@ -465,6 +465,14 @@
 
     <!-- Misc SPA -->
     <ability>
+        <lookupName>flaw_glass_jaw</lookupName>
+        <displayName>Glass Jaw (Unofficial)</displayName>
+        <desc>-2 Toughness, Fatigue gain is doubled.</desc>
+        <xpCost>-300</xpCost>
+        <weight>2</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
         <lookupName>eagle_eyes</lookupName>
         <xpCost>100</xpCost>
         <weight>2</weight>

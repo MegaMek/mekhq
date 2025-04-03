@@ -452,7 +452,8 @@ public enum PersonnelTableModelColumn {
     }
     // endregion Boolean Comparison Methods
 
-    public String getCellValue(final Campaign campaign, final PersonnelMarket personnelMarket, final Person person, final boolean loadAssignmentFromMarket, final boolean groupByUnit) {
+    public String getCellValue(final Campaign campaign, final PersonnelMarket personnelMarket, final Person person,
+                               final boolean loadAssignmentFromMarket, final boolean groupByUnit) {
         String sign;
 
         switch (this) {
@@ -760,7 +761,7 @@ public enum PersonnelTableModelColumn {
                                                  "NA.text" :
                                                  (person.isImmortal() ? "Yes.text" : "No.text"));
             case TOUGHNESS:
-                return Integer.toString(person.getToughness());
+                return Integer.toString(person.getTotalToughness());
             case FATIGUE:
                 return Integer.toString(getEffectiveFatigue(person.getFatigue(),
                       person.isClanPersonnel(),

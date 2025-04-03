@@ -48,6 +48,7 @@ import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGround
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosphere;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.SkillType.S_TACTICS;
 import static mekhq.campaign.personnel.SkillType.getSkillHash;
@@ -1583,7 +1584,10 @@ public class StratconRulesManager {
     private static void increaseFatigue(int forceID, Campaign campaign) {
         for (UUID unit : campaign.getForce(forceID).getAllUnits(false)) {
             for (Person person : campaign.getUnit(unit).getCrew()) {
-                person.changeFatigue(campaign.getCampaignOptions().getFatigueRate());
+                int fatigueChangeRate = campaign.getCampaignOptions().getFatigueRate();
+                boolean hasGlassJaw = person.getOptions().booleanOption(FLAW_GLASS_JAW);
+
+                person.changeFatigue(hasGlassJaw ? fatigueChangeRate * 2 : fatigueChangeRate);
 
                 if (campaign.getCampaignOptions().isUseFatigue()) {
                     Fatigue.processFatigueActions(campaign, person);

@@ -28,6 +28,7 @@
 package mekhq.campaign.personnel.education;
 
 import static java.lang.Math.round;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.SkillType.EXP_GREEN;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -75,14 +76,6 @@ public class TrainingCombatTeams {
 
     private static final String BUNDLE_NAME = "mekhq.resources.Education";
     private static ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME, MekHQ.getMHQOptions().getLocale());
-
-    /**
-     * Represents the fatigue gained by combat team members during training.
-     *
-     * <p>This is currently set to 3 which, when factoring in fatigue recovery, will result in a
-     * gain of 2 Fatigue per week.</p>
-     */
-    private final static int FATIGUE_GAIN = 2;
 
     /**
      * Processes all training combat teams in the campaign.
@@ -177,8 +170,10 @@ public class TrainingCombatTeams {
 
             for (Person trainee : unit.getActiveCrew()) {
                 if (campaign.getCampaignOptions().isUseFatigue()) {
+                    int fatigueChangeRate = campaign.getCampaignOptions().getFatigueRate();
+                    boolean hasGlassJaw = trainee.getOptions().booleanOption(FLAW_GLASS_JAW);
 
-                    trainee.changeFatigue(FATIGUE_GAIN);
+                    trainee.changeFatigue(fatigueChangeRate * (hasGlassJaw ? 4 : 2));
                 }
 
                 if (commander.getUnit().getActiveCrew().contains(trainee)) {
