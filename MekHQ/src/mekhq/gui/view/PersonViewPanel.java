@@ -1493,16 +1493,22 @@ public class PersonViewPanel extends JScrollablePanel {
 
         int j = 0;
         for (int i = 0; i < SkillType.getSkillList().length; i++) {
-            if (person.hasSkill(SkillType.getSkillList()[i])) {
+            String skillName = SkillType.getSkillList()[i];
+            SkillType type = SkillType.getType(skillName);
+            if (person.hasSkill(skillName)) {
                 j++;
                 if (j == colBreak) {
                     addition = 2;
                     firsty = 0;
                     weight = 1.0;
                 }
-                lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"),
-                      SkillType.getSkillList()[i]));
-                lblValue = new JLabel(person.getSkill(SkillType.getSkillList()[i]).toString());
+                if (type.isRoleplaySkill()) {
+                    lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader.roleplay"),
+                          skillName.replaceAll(resourceMap.getString("format.itemHeader.roleplay.removal"), "")));
+                } else {
+                    lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), skillName));
+                }
+                lblValue = new JLabel(person.getSkill(skillName).toString());
                 lblName.setLabelFor(lblValue);
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = addition;
