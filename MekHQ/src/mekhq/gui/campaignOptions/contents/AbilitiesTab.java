@@ -27,6 +27,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.CHARACTER_CREATION_ONLY;
 import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.CHARACTER_FLAW;
 import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.COMBAT_ABILITY;
 import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.MANEUVERING_ABILITY;
@@ -85,6 +86,7 @@ public class AbilitiesTab {
     private JPanel maneuveringTab;
     private JPanel utilityTab;
     private JPanel characterFlawsTab;
+    private JPanel characterCreationOnlyTab;
 
     /**
      * Constructor for the {@code AbilitiesTab} class. Initializes the tab by creating containers for ability categories
@@ -106,6 +108,7 @@ public class AbilitiesTab {
         maneuveringTab = new JPanel();
         utilityTab = new JPanel();
         characterFlawsTab = new JPanel();
+        characterCreationOnlyTab = new JPanel();
         buildAllAbilityInfo(SpecialAbility.getSpecialAbilities());
     }
 
@@ -163,6 +166,7 @@ public class AbilitiesTab {
         refreshTabContents(maneuveringTab, MANEUVERING_ABILITY);
         refreshTabContents(utilityTab, UTILITY_ABILITY);
         refreshTabContents(characterFlawsTab, CHARACTER_FLAW);
+        refreshTabContents(characterCreationOnlyTab, CHARACTER_CREATION_ONLY);
     }
 
     /**
@@ -216,8 +220,16 @@ public class AbilitiesTab {
      * @return The {@code AbilityCategory} for the specified ability.
      */
     private AbilityCategory getCategory(SpecialAbility ability) {
+        int cost = ability.getCost();
+        // is the ability classified as Character Creation only?
+        boolean isCharacterCreationOnly = cost == -1;
+
+        if (isCharacterCreationOnly) {
+            return CHARACTER_CREATION_ONLY;
+        }
+
         // Is the ability classified as a Flaw?
-        boolean isFlaw = ability.getCost() < 0;
+        boolean isFlaw = cost < 0;
 
         if (isFlaw) {
             return CHARACTER_FLAW;
@@ -275,6 +287,8 @@ public class AbilitiesTab {
                   getImageDirectory() + "logo_circinus_federation.png");
             case CHARACTER_FLAW ->
                   new CampaignOptionsHeaderPanel("CharacterFlawsTab", getImageDirectory() + "logo_word_of_blake.png");
+            case CHARACTER_CREATION_ONLY -> new CampaignOptionsHeaderPanel("CharacterCreationOnlyTab",
+                  getImageDirectory() + "logo_tortuga_dominions.png");
         };
 
         // Contents
@@ -352,6 +366,10 @@ public class AbilitiesTab {
             case CHARACTER_FLAW -> {
                 characterFlawsTab = parentPanel;
                 yield characterFlawsTab;
+            }
+            case CHARACTER_CREATION_ONLY -> {
+                characterCreationOnlyTab = parentPanel;
+                yield characterCreationOnlyTab;
             }
         };
     }

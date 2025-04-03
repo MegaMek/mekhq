@@ -48,7 +48,7 @@ public class CampaignOptionsAbilityInfo {
      * </ul>
      */
     public enum AbilityCategory {
-        COMBAT_ABILITY, MANEUVERING_ABILITY, UTILITY_ABILITY, CHARACTER_FLAW
+        COMBAT_ABILITY, MANEUVERING_ABILITY, UTILITY_ABILITY, CHARACTER_FLAW, CHARACTER_CREATION_ONLY
     }
 
     /**

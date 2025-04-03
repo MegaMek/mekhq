@@ -29,6 +29,7 @@ package mekhq.gui.campaignOptions;
 
 import static java.lang.Math.round;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.CHARACTER_CREATION_ONLY;
 import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.CHARACTER_FLAW;
 import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.COMBAT_ABILITY;
 import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.MANEUVERING_ABILITY;
@@ -318,7 +319,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
               "2utilityAbilitiesTab",
               abilitiesTab.createAbilitiesTab(UTILITY_ABILITY),
               "3characterFlawsTab",
-              abilitiesTab.createAbilitiesTab(CHARACTER_FLAW)));
+              abilitiesTab.createAbilitiesTab(CHARACTER_FLAW),
+              "4characterCreationOnlyTab",
+              abilitiesTab.createAbilitiesTab(CHARACTER_CREATION_ONLY)));
         // the loading of values from the campaign is built into the AbilitiesTab class so not called here.
 
         // Add Tabs
