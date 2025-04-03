@@ -29,6 +29,10 @@ package mekhq.gui.campaignOptions;
 
 import static java.lang.Math.round;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.CHARACTER_FLAW;
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.COMBAT_ABILITY;
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.MANEUVERING_ABILITY;
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.UTILITY_ABILITY;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createSubTabs;
@@ -51,7 +55,6 @@ import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
-import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.contents.*;
 
@@ -308,12 +311,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // SPAs
         abilitiesTab = new AbilitiesTab();
 
-        JTabbedPane abilityContentTabs = createSubTabs(Map.of("combatAbilitiesTab",
-              abilitiesTab.createAbilitiesTab(AbilityCategory.COMBAT_ABILITY),
-              "maneuveringAbilitiesTab",
-              abilitiesTab.createAbilitiesTab(AbilityCategory.MANEUVERING_ABILITY),
-              "utilityAbilitiesTab",
-              abilitiesTab.createAbilitiesTab(AbilityCategory.UTILITY_ABILITY)));
+        JTabbedPane abilityContentTabs = createSubTabs(Map.of("0combatAbilitiesTab",
+              abilitiesTab.createAbilitiesTab(COMBAT_ABILITY),
+              "1maneuveringAbilitiesTab",
+              abilitiesTab.createAbilitiesTab(MANEUVERING_ABILITY),
+              "2utilityAbilitiesTab",
+              abilitiesTab.createAbilitiesTab(UTILITY_ABILITY),
+              "3characterFlawsTab",
+              abilitiesTab.createAbilitiesTab(CHARACTER_FLAW)));
         // the loading of values from the campaign is built into the AbilitiesTab class so not called here.
 
         // Add Tabs
@@ -445,7 +450,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * @param isStartUp    specifies whether this is run as part of a startup initialization
      * @param isSaveAction determines if this action is saving options to a preset
      */
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset, boolean isStartUp, boolean isSaveAction) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset, boolean isStartUp,
+                                               boolean isSaveAction) {
         CampaignOptions options = this.campaignOptions;
         RandomSkillPreferences presetRandomSkillPreferences = null;
         Map<String, SkillType> presetSkills = null;

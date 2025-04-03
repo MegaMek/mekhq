@@ -30,9 +30,8 @@ package mekhq.gui.campaignOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 
 /**
- * The {@code AbilityInfo} class represents information about a specific ability,
- * encapsulating its name, the associated {@link SpecialAbility}, its active status,
- * and its category.
+ * The {@code AbilityInfo} class represents information about a specific ability, encapsulating its name, the associated
+ * {@link SpecialAbility}, its active status, and its category.
  */
 public class CampaignOptionsAbilityInfo {
     private String name;
@@ -41,8 +40,7 @@ public class CampaignOptionsAbilityInfo {
     private AbilityCategory category;
 
     /**
-     * Enum {@code AbilityCategory} represents the categories abilities can belong to.
-     * Categories available:
+     * Enum {@code AbilityCategory} represents the categories abilities can belong to. Categories available:
      * <ul>
      *     <li>{@code COMBAT_ABILITIES}: Abilities related to combat actions</li>
      *     <li>{@code MANEUVERING_ABILITIES}: Abilities related to movement and maneuvering</li>
@@ -50,7 +48,7 @@ public class CampaignOptionsAbilityInfo {
      * </ul>
      */
     public enum AbilityCategory {
-        COMBAT_ABILITY, MANEUVERING_ABILITY, UTILITY_ABILITY
+        COMBAT_ABILITY, MANEUVERING_ABILITY, UTILITY_ABILITY, CHARACTER_FLAW
     }
 
     /**
@@ -61,7 +59,8 @@ public class CampaignOptionsAbilityInfo {
      * @param isEnabled {@code true} if the ability is enabled, otherwise {@code false}
      * @param category  the category of the ability, represented as an {@link AbilityCategory}
      */
-    public CampaignOptionsAbilityInfo(String name, SpecialAbility ability, boolean isEnabled, AbilityCategory category) {
+    public CampaignOptionsAbilityInfo(String name, SpecialAbility ability, boolean isEnabled,
+                                      AbilityCategory category) {
         this.name = name;
         this.ability = ability;
         this.isEnabled = isEnabled;

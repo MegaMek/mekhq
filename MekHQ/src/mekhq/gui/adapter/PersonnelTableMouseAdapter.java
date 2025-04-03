@@ -2214,13 +2214,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     cost = (int) round(spa.getCost() * intelligenceXpCostMultiplier);
                     cost = (int) round(cost * xpCostMultiplier);
 
-                    String costDesc;
-                    if (cost < 0) {
-                        costDesc = resources.getString("costNotPossible.text");
-                    } else {
-                        costDesc = String.format(resources.getString("costValue.format"), cost);
-                    }
-                    boolean available = (cost >= 0) && (person.getXP() >= cost);
+                    String costDesc = String.format(resources.getString("costValue.format"), cost);
+                    boolean available = person.getXP() >= cost;
                     if (spa.getName().equals(OptionsConstants.GUNNERY_WEAPON_SPECIALIST)) {
                         Unit u = person.getUnit();
                         if (null != u) {
