@@ -105,7 +105,6 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, TECH_ENGINEER, false);
         addOption(l3a, TECH_FIXER, false);
         addOption(l3a, TECH_MAINTAINER, false);
-
         addOption(edge, EDGE_MEDICAL, true);
         addOption(edge, EDGE_REPAIR_BREAK_PART, true);
         addOption(edge, EDGE_REPAIR_FAILED_REFIT, true);
