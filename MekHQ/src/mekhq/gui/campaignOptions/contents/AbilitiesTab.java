@@ -216,14 +216,14 @@ public class AbilitiesTab {
      * @return The {@code AbilityCategory} for the specified ability.
      */
     private AbilityCategory getCategory(SpecialAbility ability) {
+        // Is the ability classified as a Flaw?
+        boolean isFlaw = ability.getCost() < 0;
+
+        if (isFlaw) {
+            return CHARACTER_FLAW;
+        }
+
         for (SkillPerquisite skillPerquisite : ability.getPrereqSkills()) {
-            // Is the ability classified as a Flaw?
-            boolean isFlaw = ability.getCost() < 0;
-
-            if (isFlaw) {
-                return CHARACTER_FLAW;
-            }
-
             // Is the ability classified as a Combat Ability?
             boolean isCombatAbility = false;
             for (String word : new String[] { "Gunnery", "Artillery", "Small Arms" }) {
