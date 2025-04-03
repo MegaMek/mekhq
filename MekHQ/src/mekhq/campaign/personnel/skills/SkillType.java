@@ -43,6 +43,7 @@ import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_INTERE
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SCIENCE;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SECURITY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
 
 import java.io.PrintWriter;
@@ -1334,7 +1335,7 @@ public class SkillType {
         skill.name = S_TACTICS;
         skill.target = 0;
         skill.countUp = true;
-        skill.subType = SUPPORT;
+        skill.subType = SUPPORT_COMMAND;
         skill.firstAttribute = INTELLIGENCE;
         skill.secondAttribute = WILLPOWER;
         skill.costs = new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 };
@@ -1347,7 +1348,7 @@ public class SkillType {
         skill.name = S_STRATEGY;
         skill.target = 0;
         skill.countUp = true;
-        skill.subType = SUPPORT;
+        skill.subType = SUPPORT_COMMAND;
         skill.firstAttribute = INTELLIGENCE;
         skill.secondAttribute = WILLPOWER;
         skill.costs = new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 };
@@ -1373,7 +1374,7 @@ public class SkillType {
         skill.name = S_LEADER;
         skill.target = 0;
         skill.countUp = true;
-        skill.subType = SUPPORT;
+        skill.subType = SUPPORT_COMMAND;
         skill.firstAttribute = WILLPOWER;
         skill.secondAttribute = CHARISMA;
         skill.costs = new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 };
