@@ -958,6 +958,7 @@
             If individual initiative is enabled, this penalty applies only to the pilot's unit. Otherwise, the penalty is applied only if the pilot's unit is the force commander.
         </desc>
         <skillPrereq/>
+        <removeAbilities>atow_combat_sense</removeAbilities>
     </ability>
     <ability>
         <lookupName>atow_combat_sense</lookupName>
@@ -986,6 +987,7 @@
             <skill>Gunnery/Aircraft::Veteran</skill>
             <skill>Gunnery/Vehicle::Veteran</skill>
         </skillPrereq>
+        <removeAbilities>atow_combat_paralysis</removeAbilities>
     </ability>
     <ability>
         <lookupName>tactical_genius</lookupName>
