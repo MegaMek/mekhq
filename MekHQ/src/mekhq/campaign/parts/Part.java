@@ -453,7 +453,13 @@ public abstract class Part implements IPartWork, ITechnology {
             toReturn.append("</b><br/>").append(getDetails()).append("<br/>");
         }
 
-        if (campaign.getWarehouse() != null) {
+        if (this instanceof mekhq.campaign.parts.equipment.AmmoBin ammoBin) {
+            if (campaign.getQuartermaster() != null) {
+                toReturn.append("<br> <b>In Warehouse:</b> ")
+                      .append(campaign.getQuartermaster().getAmmoAvailable(ammoBin.getType()))
+                      .append(' ');
+            }
+        } else if (campaign.getWarehouse() != null) {
             toReturn.append("<br> <b>In Warehouse:</b> ")
                   .append(campaign.getWarehouse().getSparePartsCount(this))
                   .append(' ');
