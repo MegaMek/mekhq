@@ -28,7 +28,6 @@
 package mekhq.campaign.personnel.generator;
 
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
-import static mekhq.campaign.personnel.skills.SkillType.getRoleplaySkills;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,26 +90,21 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         if (primaryRole.isCombat()) {
             int leadershipSkillLevel = Utilities.generateExpLevel(rskillPrefs.getCommandSkillsModifier(expLvl));
             if (leadershipSkillLevel > SkillType.EXP_ULTRA_GREEN) {
-                addSkill(person, SkillType.S_TACTICS, leadershipSkillLevel, rskillPrefs.randomizeSkill(), bonus);
+                addSkill(person, SkillType.S_TACTICS, leadershipSkillLevel, rskillPrefs.randomizeSkill(), 0);
             }
 
             leadershipSkillLevel = Utilities.generateExpLevel(rskillPrefs.getCommandSkillsModifier(expLvl));
             if (leadershipSkillLevel > SkillType.EXP_ULTRA_GREEN) {
-                addSkill(person, SkillType.S_STRATEGY, leadershipSkillLevel, rskillPrefs.randomizeSkill(), bonus);
+                addSkill(person, SkillType.S_STRATEGY, leadershipSkillLevel, rskillPrefs.randomizeSkill(), 0);
             }
 
             leadershipSkillLevel = Utilities.generateExpLevel(rskillPrefs.getCommandSkillsModifier(expLvl));
             if (leadershipSkillLevel > SkillType.EXP_ULTRA_GREEN) {
-                addSkill(person, SkillType.S_LEADER, leadershipSkillLevel, rskillPrefs.randomizeSkill(), bonus);
+                addSkill(person, SkillType.S_LEADER, leadershipSkillLevel, rskillPrefs.randomizeSkill(), 0);
             }
         }
 
-        for (SkillType skillType : getRoleplaySkills()) {
-            int roleplaySkillLevel = Utilities.generateExpLevel(rskillPrefs.getRoleplaySkillsModifier(expLvl));
-            if (roleplaySkillLevel > SkillType.EXP_ULTRA_GREEN) {
-                addSkill(person, skillType.getName(), roleplaySkillLevel, rskillPrefs.randomizeSkill(), bonus);
-            }
-        }
+        generateRoleplaySkills(person, expLvl);
 
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
@@ -123,21 +117,21 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         // roll Negotiation skill
         if (campaignOptions.isAdminsHaveNegotiation() && (primaryRole.isAdministrator())) {
-            addSkill(person, SkillType.S_NEG, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
+            addSkill(person, SkillType.S_NEG, expLvl, rskillPrefs.randomizeSkill(), 0, mod);
         }
 
         // roll Scrounge skill
         if (campaignOptions.isAdminsHaveScrounge() && (primaryRole.isAdministrator())) {
-            addSkill(person, SkillType.S_SCROUNGE, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
+            addSkill(person, SkillType.S_SCROUNGE, expLvl, rskillPrefs.randomizeSkill(), 0, mod);
         }
 
         // roll Administration skill
         if (campaignOptions.isTechsUseAdministration() && (person.isTech() || primaryRole.isVesselCrew())) {
-            addSkill(person, SkillType.S_ADMIN, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
+            addSkill(person, SkillType.S_ADMIN, expLvl, rskillPrefs.randomizeSkill(), 0, mod);
         }
 
         if (campaignOptions.isDoctorsUseAdministration() && (primaryRole.isDoctor())) {
-            addSkill(person, SkillType.S_ADMIN, expLvl, rskillPrefs.randomizeSkill(), bonus, mod);
+            addSkill(person, SkillType.S_ADMIN, expLvl, rskillPrefs.randomizeSkill(), 0, mod);
         }
 
         // roll random secondary skill
@@ -151,7 +145,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
             String selSkill = possibleSkills.get(Compute.randomInt(possibleSkills.size()));
             int secondLvl = Utilities.generateExpLevel(rskillPrefs.getSecondSkillBonus());
-            addSkill(person, selSkill, secondLvl, rskillPrefs.randomizeSkill(), bonus);
+            addSkill(person, selSkill, secondLvl, rskillPrefs.randomizeSkill(), 0);
         }
     }
 }

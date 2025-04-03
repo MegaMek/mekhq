@@ -131,6 +131,8 @@ public class AdvancementTab {
     private JPanel pnlSkillGroups;
 
     private JPanel pnlTactics;
+    private JLabel lblCommandSkillsUltraGreen;
+    private JSpinner spnCommandSkillsUltraGreen;
     private JLabel lblCommandSkillsGreen;
     private JSpinner spnCommandSkillsGreen;
     private JLabel lblCommandSkillsReg;
@@ -161,6 +163,8 @@ public class AdvancementTab {
     private JSpinner spnSecondBonus;
 
     private JPanel pnlRoleplaySkills;
+    private JLabel lblRoleplaySkillsUltraGreen;
+    private JSpinner spnRoleplaySkillsUltraGreen;
     private JLabel lblRoleplaySkillsGreen;
     private JSpinner spnRoleplaySkillsGreen;
     private JLabel lblRoleplaySkillsReg;
@@ -523,6 +527,8 @@ public class AdvancementTab {
         pnlSkillGroups = new JPanel();
 
         pnlTactics = new JPanel();
+        lblCommandSkillsUltraGreen = new JLabel();
+        spnCommandSkillsUltraGreen = new JSpinner();
         lblCommandSkillsGreen = new JLabel();
         spnCommandSkillsGreen = new JSpinner();
         lblCommandSkillsReg = new JLabel();
@@ -553,6 +559,8 @@ public class AdvancementTab {
         spnSecondBonus = new JSpinner();
 
         pnlRoleplaySkills = new JPanel();
+        lblRoleplaySkillsUltraGreen = new JLabel();
+        spnRoleplaySkillsUltraGreen = new JSpinner();
         lblRoleplaySkillsGreen = new JLabel();
         spnRoleplaySkillsGreen = new JSpinner();
         lblRoleplaySkillsReg = new JLabel();
@@ -672,15 +680,15 @@ public class AdvancementTab {
     private JPanel createAbilityPanel() {
         // Contents
         lblAbilityGreen = new CampaignOptionsLabel("AbilityGreen");
-        spnAbilityGreen = new CampaignOptionsSpinner("AbilityGreen", 0, -10, 10, 1);
+        spnAbilityGreen = new CampaignOptionsSpinner("AbilityGreen", 0, -12, 12, 1);
         lblAbilityReg = new CampaignOptionsLabel("AbilityRegular");
-        spnAbilityReg = new CampaignOptionsSpinner("AbilityRegular", 0, -10, 10, 1);
+        spnAbilityReg = new CampaignOptionsSpinner("AbilityRegular", 0, -12, 12, 1);
 
         lblAbilityVet = new CampaignOptionsLabel("AbilityVeteran");
-        spnAbilityVet = new CampaignOptionsSpinner("AbilityVeteran", 0, -10, 10, 1);
+        spnAbilityVet = new CampaignOptionsSpinner("AbilityVeteran", 0, -12, 12, 1);
 
         lblAbilityElite = new CampaignOptionsLabel("AbilityElite");
-        spnAbilityElite = new CampaignOptionsSpinner("AbilityElite", 0, -10, 10, 1);
+        spnAbilityElite = new CampaignOptionsSpinner("AbilityElite", 0, -12, 12, 1);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AbilityPanel", true, "AbilityPanel");
@@ -717,12 +725,11 @@ public class AdvancementTab {
      */
     private JPanel createSkillGroupPanel() {
         // Contents
+        pnlTactics = createTacticsPanel();
+        pnlRoleplaySkills = createRoleplaySkillsPanel();
         pnlArtillery = createArtilleryPanel();
         pnlSmallArms = createSmallArmsPanel();
         pnlSecondarySkills = createSecondarySkillPanel();
-
-        pnlTactics = createTacticsPanel();
-        pnlRoleplaySkills = createRoleplaySkillsPanel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SkillGroupsPanel");
@@ -732,19 +739,17 @@ public class AdvancementTab {
         layout.gridy = 0;
         panel.add(pnlTactics, layout);
         layout.gridx++;
-        panel.add(pnlSmallArms, layout);
-        layout.gridx++;
-        panel.add(pnlSecondarySkills, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(pnlSecondarySkills, layout);
-        layout.gridx++;
-        panel.add(pnlArtillery, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
         panel.add(pnlRoleplaySkills, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(pnlArtillery, layout);
+        layout.gridx++;
+        panel.add(pnlSmallArms, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(pnlSecondarySkills, layout);
 
         return panel;
     }
@@ -757,17 +762,20 @@ public class AdvancementTab {
      */
     private JPanel createTacticsPanel() {
         // Contents
+        lblCommandSkillsUltraGreen = new CampaignOptionsLabel("CommandSkillsUltraGreen");
+        spnCommandSkillsUltraGreen = new CampaignOptionsSpinner("CommandSkillsUltraGreen", 0, -12, 12, 1);
+
         lblCommandSkillsGreen = new CampaignOptionsLabel("CommandSkillsGreen");
-        spnCommandSkillsGreen = new CampaignOptionsSpinner("CommandSkillsGreen", 0, -10, 10, 1);
+        spnCommandSkillsGreen = new CampaignOptionsSpinner("CommandSkillsGreen", 0, -12, 12, 1);
 
         lblCommandSkillsReg = new CampaignOptionsLabel("CommandSkillsRegular");
-        spnCommandSkillsReg = new CampaignOptionsSpinner("CommandSkillsRegular", 0, -10, 10, 1);
+        spnCommandSkillsReg = new CampaignOptionsSpinner("CommandSkillsRegular", 0, -12, 12, 1);
 
         lblCommandSkillsVet = new CampaignOptionsLabel("CommandSkillsVeteran");
-        spnCommandSkillsVet = new CampaignOptionsSpinner("CommandSkillsVeteran", 0, -10, 10, 1);
+        spnCommandSkillsVet = new CampaignOptionsSpinner("CommandSkillsVeteran", 0, -12, 12, 1);
 
         lblCommandSkillsElite = new CampaignOptionsLabel("CommandSkillsElite");
-        spnCommandSkillsElite = new CampaignOptionsSpinner("CommandSkillsElite", 0, -10, 10, 1);
+        spnCommandSkillsElite = new CampaignOptionsSpinner("CommandSkillsElite", 0, -12, 12, 1);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("CommandSkillsPanel", true, "CommandSkillsPanel");
@@ -775,20 +783,26 @@ public class AdvancementTab {
         layout.gridwidth = 1;
         layout.gridx = 0;
         layout.gridy = 0;
+        panel.add(lblCommandSkillsUltraGreen, layout);
+        layout.gridx++;
+        panel.add(spnCommandSkillsUltraGreen, layout);
+        layout.gridx++;
         panel.add(lblCommandSkillsGreen, layout);
         layout.gridx++;
         panel.add(spnCommandSkillsGreen, layout);
-        layout.gridx++;
-        panel.add(lblCommandSkillsReg, layout);
-        layout.gridx++;
-        panel.add(spnCommandSkillsReg, layout);
 
         layout.gridx = 0;
         layout.gridy++;
+        panel.add(lblCommandSkillsReg, layout);
+        layout.gridx++;
+        panel.add(spnCommandSkillsReg, layout);
+        layout.gridx++;
         panel.add(lblCommandSkillsVet, layout);
         layout.gridx++;
         panel.add(spnCommandSkillsVet, layout);
-        layout.gridx++;
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(lblCommandSkillsElite, layout);
         layout.gridx++;
         panel.add(spnCommandSkillsElite, layout);
@@ -798,17 +812,20 @@ public class AdvancementTab {
 
     private JPanel createRoleplaySkillsPanel() {
         // Contents
+        lblRoleplaySkillsUltraGreen = new CampaignOptionsLabel("RoleplaySkillsUltraGreen");
+        spnRoleplaySkillsUltraGreen = new CampaignOptionsSpinner("RoleplaySkillsUltraGreen", 0, -12, 12, 1);
+
         lblRoleplaySkillsGreen = new CampaignOptionsLabel("RoleplaySkillsGreen");
-        spnRoleplaySkillsGreen = new CampaignOptionsSpinner("RoleplaySkillsGreen", 0, -10, 10, 1);
+        spnRoleplaySkillsGreen = new CampaignOptionsSpinner("RoleplaySkillsGreen", 0, -12, 12, 1);
 
         lblRoleplaySkillsReg = new CampaignOptionsLabel("RoleplaySkillsRegular");
-        spnRoleplaySkillsReg = new CampaignOptionsSpinner("RoleplaySkillsRegular", 0, -10, 10, 1);
+        spnRoleplaySkillsReg = new CampaignOptionsSpinner("RoleplaySkillsRegular", 0, -12, 12, 1);
 
         lblRoleplaySkillsVet = new CampaignOptionsLabel("RoleplaySkillsVeteran");
-        spnRoleplaySkillsVet = new CampaignOptionsSpinner("RoleplaySkillsVeteran", 0, -10, 10, 1);
+        spnRoleplaySkillsVet = new CampaignOptionsSpinner("RoleplaySkillsVeteran", 0, -12, 12, 1);
 
         lblRoleplaySkillsElite = new CampaignOptionsLabel("RoleplaySkillsElite");
-        spnRoleplaySkillsElite = new CampaignOptionsSpinner("RoleplaySkillsElite", 0, -10, 10, 1);
+        spnRoleplaySkillsElite = new CampaignOptionsSpinner("RoleplaySkillsElite", 0, -12, 12, 1);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("RoleplaySkillsPanel", true, "RoleplaySkillsPanel");
@@ -816,20 +833,26 @@ public class AdvancementTab {
         layout.gridwidth = 1;
         layout.gridx = 0;
         layout.gridy = 0;
+        panel.add(lblRoleplaySkillsUltraGreen, layout);
+        layout.gridx++;
+        panel.add(spnRoleplaySkillsUltraGreen, layout);
+        layout.gridx++;
         panel.add(lblRoleplaySkillsGreen, layout);
         layout.gridx++;
         panel.add(spnRoleplaySkillsGreen, layout);
-        layout.gridx++;
-        panel.add(lblRoleplaySkillsReg, layout);
-        layout.gridx++;
-        panel.add(spnRoleplaySkillsReg, layout);
 
         layout.gridx = 0;
         layout.gridy++;
+        panel.add(lblRoleplaySkillsReg, layout);
+        layout.gridx++;
+        panel.add(spnRoleplaySkillsReg, layout);
+        layout.gridx++;
         panel.add(lblRoleplaySkillsVet, layout);
         layout.gridx++;
         panel.add(spnRoleplaySkillsVet, layout);
-        layout.gridx++;
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(lblRoleplaySkillsElite, layout);
         layout.gridx++;
         panel.add(spnRoleplaySkillsElite, layout);
@@ -846,10 +869,10 @@ public class AdvancementTab {
     private JPanel createSmallArmsPanel() {
         // Contents
         lblCombatSA = new CampaignOptionsLabel("CombatSmallArms");
-        spnCombatSA = new CampaignOptionsSpinner("CombatSmallArms", 0, -10, 10, 1);
+        spnCombatSA = new CampaignOptionsSpinner("CombatSmallArms", 0, -12, 12, 1);
 
         lblSupportSA = new CampaignOptionsLabel("NonCombatSmallArms");
-        spnSupportSA = new CampaignOptionsSpinner("NonCombatSmallArms", 0, -10, 10, 1);
+        spnSupportSA = new CampaignOptionsSpinner("NonCombatSmallArms", 0, -12, 12, 1);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SmallArmsPanel", true, "SmallArmsPanel");
@@ -880,7 +903,7 @@ public class AdvancementTab {
         spnArtyProb = new CampaignOptionsSpinner("ArtilleryChance", 0, 0, 100, 1);
 
         lblArtyBonus = new CampaignOptionsLabel("ArtilleryBonus");
-        spnArtyBonus = new CampaignOptionsSpinner("ArtilleryBonus", 0, -10, 10, 1);
+        spnArtyBonus = new CampaignOptionsSpinner("ArtilleryBonus", 0, -12, 12, 1);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ArtilleryPanel", true, "ArtilleryPanel");
@@ -914,7 +937,7 @@ public class AdvancementTab {
         spnSecondProb = new CampaignOptionsSpinner("SecondarySkillChance", 0, 0, 100, 1);
 
         lblSecondBonus = new CampaignOptionsLabel("SecondarySkillBonus");
-        spnSecondBonus = new CampaignOptionsSpinner("SecondarySkillBonus", 0, -10, 10, 1);
+        spnSecondBonus = new CampaignOptionsSpinner("SecondarySkillBonus", 0, -12, 12, 1);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SecondarySkillPanel", true, "SecondarySkillPanel");
@@ -1116,10 +1139,12 @@ public class AdvancementTab {
         spnAbilityReg.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_REGULAR));
         spnAbilityVet.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_VETERAN));
         spnAbilityElite.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_ELITE));
+        spnCommandSkillsUltraGreen.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_ULTRA_GREEN));
         spnCommandSkillsGreen.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_GREEN));
         spnCommandSkillsReg.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_REGULAR));
         spnCommandSkillsVet.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_VETERAN));
         spnCommandSkillsElite.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_ELITE));
+        spnRoleplaySkillsUltraGreen.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_ULTRA_GREEN));
         spnRoleplaySkillsGreen.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_GREEN));
         spnRoleplaySkillsReg.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_REGULAR));
         spnRoleplaySkillsVet.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_VETERAN));
@@ -1199,10 +1224,13 @@ public class AdvancementTab {
         skillPreferences.setArtilleryBonus((int) spnArtyBonus.getValue());
         skillPreferences.setSecondSkillProb((int) spnSecondProb.getValue());
         skillPreferences.setSecondSkillBonus((int) spnSecondBonus.getValue());
+        skillPreferences.setCommandSkillsMod(SkillType.EXP_ULTRA_GREEN, (int) spnCommandSkillsUltraGreen.getValue());
         skillPreferences.setCommandSkillsMod(SkillType.EXP_GREEN, (int) spnCommandSkillsGreen.getValue());
         skillPreferences.setCommandSkillsMod(SkillType.EXP_REGULAR, (int) spnCommandSkillsReg.getValue());
         skillPreferences.setCommandSkillsMod(SkillType.EXP_VETERAN, (int) spnCommandSkillsVet.getValue());
         skillPreferences.setCommandSkillsMod(SkillType.EXP_ELITE, (int) spnCommandSkillsElite.getValue());
+        skillPreferences.setRoleplaySkillsModifier(SkillType.EXP_ULTRA_GREEN,
+              (int) spnRoleplaySkillsUltraGreen.getValue());
         skillPreferences.setRoleplaySkillsModifier(SkillType.EXP_GREEN, (int) spnRoleplaySkillsGreen.getValue());
         skillPreferences.setRoleplaySkillsModifier(SkillType.EXP_REGULAR, (int) spnRoleplaySkillsReg.getValue());
         skillPreferences.setRoleplaySkillsModifier(SkillType.EXP_VETERAN, (int) spnRoleplaySkillsVet.getValue());
