@@ -583,9 +583,7 @@ public class SkillType {
     }
 
     public static @Nullable SkillType getType(String skillName) {
-        SkillType skillType = lookupHash.get(skillName);
-
-        return skillType;
+        return lookupHash.get(skillName);
     }
 
     public static String getDrivingSkillFor(Entity en) {
@@ -662,7 +660,6 @@ public class SkillType {
 
             if (type.isSubTypeOf(SkillSubType.ROLEPLAY_SECURITY)) {
                 roleplaySkillsSecurity.add(type);
-                continue;
             }
         }
 

@@ -72,7 +72,7 @@ public class RandomSkillPreferences {
         supportSmallArmsBonus = -10;
         specialAbilityBonus = new int[] { -10, -10, -2, 0, 1 };
         commandSkillsModifier = new int[] { -10, -10, -7, -4, -1 };
-        roleplaySkillsModifier = new int[] { -10, -10, -10, -10, -10 };
+        roleplaySkillsModifier = new int[] { -10, -9, -8, -7, -6 };
         artilleryProb = 10;
         artilleryBonus = -2;
         secondSkillProb = 0;
