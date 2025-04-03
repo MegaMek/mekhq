@@ -42,6 +42,7 @@ import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_INTERE
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SCIENCE;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_SECURITY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
@@ -202,13 +203,14 @@ public class SkillsTab {
             boolean isCorrectType = switch (category) {
                 case COMBAT_GUNNERY -> subType == COMBAT_GUNNERY;
                 case COMBAT_PILOTING -> subType == COMBAT_PILOTING;
-                case SUPPORT -> subType == SUPPORT;
+                case SUPPORT -> subType == SUPPORT || subType == SUPPORT_COMMAND;
                 case ROLEPLAY_GENERAL -> subType == ROLEPLAY_GENERAL ||
                                                subType == ROLEPLAY_ART ||
                                                subType == ROLEPLAY_INTEREST ||
                                                subType == ROLEPLAY_SCIENCE ||
                                                subType == ROLEPLAY_SECURITY;
-                // These next four shouldn't get hit, but we include them just in case
+                // These next few cases shouldn't get hit, but we include them just in case
+                case SUPPORT_COMMAND -> subType == SUPPORT_COMMAND;
                 case ROLEPLAY_ART -> subType == ROLEPLAY_ART;
                 case ROLEPLAY_INTEREST -> subType == ROLEPLAY_INTEREST;
                 case ROLEPLAY_SCIENCE -> subType == ROLEPLAY_SCIENCE;

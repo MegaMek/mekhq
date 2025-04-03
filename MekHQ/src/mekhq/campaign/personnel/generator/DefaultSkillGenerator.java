@@ -28,6 +28,7 @@
 package mekhq.campaign.personnel.generator;
 
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -136,9 +137,12 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         // roll random secondary skill
         if (Utilities.rollProbability(rskillPrefs.getSecondSkillProb())) {
             List<String> possibleSkills = new ArrayList<>();
-            for (String stype : SkillType.skillList) {
-                if (!person.getSkills().hasSkill(stype) && !DEPRECATED_SKILLS.contains(SkillType.getType(stype))) {
-                    possibleSkills.add(stype);
+            for (String skillType : SkillType.skillList) {
+                SkillType type = SkillType.getType(skillType);
+                if (!person.getSkills().hasSkill(skillType) && !DEPRECATED_SKILLS.contains(type)
+                          // The next two are to prevent double-dipping
+                          && !type.isSubTypeOf(SUPPORT_COMMAND) && !type.isRoleplaySkill()) {
+                    possibleSkills.add(skillType);
                 }
             }
 
