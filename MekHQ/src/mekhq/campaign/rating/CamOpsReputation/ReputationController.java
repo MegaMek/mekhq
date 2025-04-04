@@ -47,6 +47,7 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 import megamek.client.ui.swing.util.UIUtil;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
@@ -730,17 +731,18 @@ public class ReputationController {
                 if (workingNode2.getNodeName().equalsIgnoreCase("averageSkillLevel")) {
                     this.averageSkillLevel = SkillLevel.valueOf(workingNode2.getTextContent().toUpperCase());
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("averageExperienceRating")) {
-                    this.averageExperienceRating = Integer.parseInt(workingNode2.getTextContent().replaceAll("-", "_"));
+                    this.averageExperienceRating = MathUtility.parseInt(workingNode2.getTextContent()
+                                                                              .replaceAll("-", "_"));
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("atbModifier")) {
-                    this.atbModifier = Integer.parseInt(workingNode2.getTextContent());
+                    this.atbModifier = MathUtility.parseInt(workingNode2.getTextContent());
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("commanderMap")) {
                     this.parseSubNode(workingNode2, commanderMap, false);
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("commanderRating")) {
-                    this.commanderRating = Integer.parseInt(workingNode2.getTextContent());
+                    this.commanderRating = MathUtility.parseInt(workingNode2.getTextContent());
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("combatRecordMap")) {
                     this.parseSubNode(workingNode2, combatRecordMap, false);
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("combatRecordRating")) {
-                    this.combatRecordRating = Integer.parseInt(workingNode2.getTextContent());
+                    this.combatRecordRating = MathUtility.parseInt(workingNode2.getTextContent());
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("transportationCapacities")) {
                     this.parseSubNode(workingNode2, transportationCapacities, false);
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("transportationRequirements")) {
@@ -748,7 +750,7 @@ public class ReputationController {
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("transportationValues")) {
                     this.parseSubNode(workingNode2, transportationValues, false);
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("transportationRating")) {
-                    this.transportationRating = Integer.parseInt(workingNode2.getTextContent());
+                    this.transportationRating = MathUtility.parseInt(workingNode2.getTextContent());
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("administrationRequirements")) {
                     this.parseSubNode(workingNode2, administrationRequirements, false);
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("crewRequirements")) {
@@ -756,23 +758,23 @@ public class ReputationController {
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("technicianRequirements")) {
                     this.parseSubNode(workingNode2, null, true);
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("supportRating")) {
-                    this.supportRating = Integer.parseInt(workingNode2.getTextContent());
+                    this.supportRating = MathUtility.parseInt(workingNode2.getTextContent());
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("financialRatingMap")) {
                     this.parseSubNode(workingNode2, financialRatingMap, false);
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("financialRating")) {
-                    this.financialRating = Integer.parseInt(workingNode2.getTextContent());
+                    this.financialRating = MathUtility.parseInt(workingNode2.getTextContent());
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("dateOfLastCrime")) {
                     this.dateOfLastCrime = LocalDate.parse(workingNode2.getTextContent());
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("crimeRatingMap")) {
                     this.parseSubNode(workingNode2, crimeRatingMap, false);
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("crimeRating")) {
-                    this.crimeRating = Integer.parseInt(workingNode2.getTextContent());
+                    this.crimeRating = MathUtility.parseInt(workingNode2.getTextContent());
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("otherModifiersMap")) {
                     this.parseSubNode(workingNode2, otherModifiersMap, false);
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("otherModifiers")) {
-                    this.otherModifiers = Integer.parseInt(workingNode2.getTextContent());
+                    this.otherModifiers = MathUtility.parseInt(workingNode2.getTextContent());
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("reputationRating")) {
-                    this.reputationRating = Integer.parseInt(workingNode2.getTextContent());
+                    this.reputationRating = MathUtility.parseInt(workingNode2.getTextContent());
                 }
             }
         } catch (Exception ex) {
@@ -809,7 +811,7 @@ public class ReputationController {
                     }
                 } else {
                     try {
-                        map.put(node.getNodeName(), Integer.parseInt(node.getTextContent()));
+                        map.put(node.getNodeName(), MathUtility.parseInt(node.getTextContent()));
                     } catch (Exception ex) {
                         logger.error("Could not parse {}: ", map, ex);
                     }
