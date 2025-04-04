@@ -5664,6 +5664,11 @@ public class Campaign implements ITechManager {
             if (EducationController.processNewDay(this, person, false)) {
                 Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
 
+                if (academy == null) {
+                    logger.debug("Found null academy for {} skipping", person.getFullTitle());
+                    continue;
+                }
+
                 graduatingPersonnel.add(person.getId());
 
                 individualAcademyAttributes.add(academy.getEducationLevel(person));

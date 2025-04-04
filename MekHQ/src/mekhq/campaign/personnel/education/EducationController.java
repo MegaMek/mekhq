@@ -46,6 +46,7 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 
 import megamek.common.Compute;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -512,6 +513,11 @@ public class EducationController {
         ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME, MekHQ.getMHQOptions().getLocale());
         Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
 
+        if (academy == null) {
+            logger.debug("Found null academy for {} skipping", person.getFullTitle());
+            return false;
+        }
+
         EducationStage educationStage = person.getEduEducationStage();
 
         // is person in transit to the institution?
@@ -706,7 +712,7 @@ public class EducationController {
      *
      * @return The Academy that matches the provided parameters or null if no match is found.
      */
-    public static Academy getAcademy(String academySetName, String academyNameInSet) {
+    public static @Nullable Academy getAcademy(String academySetName, String academyNameInSet) {
 
         List<String> setNames = AcademyFactory.getInstance().getAllSetNames();
 
