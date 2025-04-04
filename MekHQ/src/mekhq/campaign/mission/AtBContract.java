@@ -846,7 +846,7 @@ public class AtBContract extends Contract {
                         yield true;
                     } else {
                         campaign.addReport("Bonus: Support Point");
-                        stratconCampaignState.setSupportPoints(1);
+                        stratconCampaignState.changeSupportPoints(1);
                         yield false;
                     }
                 }
