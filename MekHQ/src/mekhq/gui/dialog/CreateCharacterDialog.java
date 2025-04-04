@@ -30,9 +30,6 @@ package mekhq.gui.dialog;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.codeUtilities.MathUtility.clamp;
-import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
-import static mekhq.campaign.personnel.skills.Skill.getCountDownMaxValue;
-import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
 import static mekhq.campaign.personnel.Person.MAXIMUM_CONNECTIONS;
 import static mekhq.campaign.personnel.Person.MAXIMUM_REPUTATION;
 import static mekhq.campaign.personnel.Person.MAXIMUM_UNLUCKY;
@@ -41,6 +38,7 @@ import static mekhq.campaign.personnel.Person.MINIMUM_CONNECTIONS;
 import static mekhq.campaign.personnel.Person.MINIMUM_REPUTATION;
 import static mekhq.campaign.personnel.Person.MINIMUM_UNLUCKY;
 import static mekhq.campaign.personnel.Person.MINIMUM_WEALTH;
+import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.Skill.getCountDownMaxValue;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.personalityQuirksSortedAlphabetically;
@@ -74,6 +72,7 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.Crew;
 import megamek.common.EquipmentType;
 import megamek.common.enums.Gender;
@@ -87,8 +86,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
@@ -187,8 +184,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
     /** Creates new form CustomizePilotDialog */
     public CreateCharacterDialog(JFrame parent, boolean modal, Person person, Campaign campaign, int xpPool,
-                                 String instructions, boolean editOrigin, boolean editBirthday, boolean editGender,
-                                 NameRestrictions nameRestrictions, boolean limitFaction) {
+          String instructions, boolean editOrigin, boolean editBirthday, boolean editGender,
+          NameRestrictions nameRestrictions, boolean limitFaction) {
         super(parent, modal);
         this.campaign = campaign;
         this.frame = parent;
@@ -434,7 +431,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         choiceFaction.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
-                                                          final boolean isSelected, final boolean cellHasFocus) {
+                  final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof Faction faction) {
                     setText(String.format("%s [%s]",
@@ -487,7 +484,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         choiceSystem.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
-                                                          final boolean isSelected, final boolean cellHasFocus) {
+                  final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PlanetarySystem system) {
                     setText(system.getName(campaign.getLocalDate()));
@@ -542,7 +539,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         choicePlanet.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
-                                                          final boolean isSelected, final boolean cellHasFocus) {
+                  final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof Planet planet) {
                     setText(planet.getName(campaign.getLocalDate()));
@@ -1114,7 +1111,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     }
 
     private void updatePlanetsComboBoxModel(DefaultComboBoxModel<Planet> planetsModel,
-                                            PlanetarySystem planetarySystem) {
+          PlanetarySystem planetarySystem) {
         planetsModel.removeAllElements();
         if (planetarySystem != null) {
             planetsModel.addElement(planetarySystem.getPrimaryPlanet());
@@ -1595,42 +1592,22 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         person.setClanPersonnel(chkClan.isSelected());
 
         if (campaign.getCampaignOptions().isUseToughness()) {
-            try {
-                person.setToughness(Integer.parseInt(textToughness.getText()));
-            } catch (NumberFormatException ignored) {
-            }
+            person.setToughness(MathUtility.parseInt(textToughness.getText(), person.getToughness()));
         }
 
-        try {
-            int newValue = Integer.parseInt(textConnections.getText());
-            person.setConnections(clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
-        } catch (NumberFormatException ignored) {
-        }
+        int newValue = MathUtility.parseInt(textConnections.getText(), person.getConnections());
+        person.setConnections(clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
 
-        try {
-            int newValue = Integer.parseInt(textWealth.getText());
-            person.setWealth(clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH));
-        } catch (NumberFormatException ignored) {
-        }
+        newValue = MathUtility.parseInt(textWealth.getText(), person.getWealth());
+        person.setWealth(clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH));
 
-        try {
-            int newValue = Integer.parseInt(textReputation.getText());
-            person.setReputation(clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
-        } catch (NumberFormatException ignored) {
-        }
+        newValue = MathUtility.parseInt(textReputation.getText(), person.getReputation());
+        person.setReputation(clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
 
-        try {
-            int newValue = Integer.parseInt(textUnlucky.getText());
-            person.setUnlucky(clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
-        } catch (NumberFormatException ignored) {
-        }
+        newValue = MathUtility.parseInt(textUnlucky.getText(), person.getUnlucky());
+        person.setUnlucky(clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
 
-        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-            try {
-                person.setLoyalty(Integer.parseInt(textLoyalty.getText()));
-            } catch (NumberFormatException ignored) {
-            }
-        }
+        person.setLoyalty(MathUtility.parseInt(textLoyalty.getText(), person.getLoyalty()));
 
         if (campaign.getCampaignOptions().isUseEducationModule()) {
             person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
