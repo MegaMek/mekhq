@@ -45,11 +45,21 @@ import org.w3c.dom.NodeList;
  * we will track these skills in a hashmap where the value gives the minimum skill level. The collection of skills is
  * treated as an OR statement such that a person possessing any of the skills at the appropriate level will evaluate as
  * eligible. To create AND conditions, use multiple skill prereqs in the SpecialAbility object.
- * <p>
- * We are going to limit the skill levels by the Green, Regular, Veteran, Elite notation such that: 0 - Any 1 - Green 2
- * - Regular 3 - Veteran 4 - Elite This way, if the user changes the meaning of various skill levels, they won't have to
- * redo all of their prereqs - we could consider expanding this to allow users to specify a more specific numeric skill
- * level (to allow for better consistency with AToW) for example
+ *
+ * <p>We are going to limit the skill levels by the Green, Regular, Veteran, Elite notation such that:</p>
+ * <ul>
+ *   <li>0 - Any</li>
+ *   <li>1 - Green</li>
+ *   <li>2 - Regular</li>
+ *   <li>3 - Veteran</li>
+ *   <li>4 - Elite</li>
+ *   <li>5 - Heroic</li>
+ *   <li>6 - Legendary</li>
+ * </ul>
+ *
+ * <p>This way, if the user changes the meaning of various skill levels, they won't have to redo all of their prereqs
+ * - we could consider expanding this to allow users to specify a more specific numeric skill level (to allow for
+ * better consistency with AToW) for example.</p>
  *
  * @author Jay Lawson
  */

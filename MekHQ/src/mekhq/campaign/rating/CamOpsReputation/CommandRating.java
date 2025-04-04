@@ -27,12 +27,6 @@
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import static java.lang.Math.max;
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_PARALYSIS;
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_SENSE;
@@ -46,14 +40,6 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 
@@ -66,11 +52,15 @@ public class CommandRating {
      * @param campaign  the campaign the commander belongs to
      * @param commander the commander to calculate the rating for
      *
-     * @return a map containing the commander's rating in different areas: - "leadership": the commander's leadership
-     *       skill value - "tactics": the commander's tactics skill value - "strategy": the commander's strategy skill
-     *       value - "negotiation": the commander's negotiation skill value - "traits": the commander's traits (not
-     *       currently tracked, always 0) - "personality": the value of the commander's personality characteristics (or
-     *       0, if disabled)
+     * @return A map containing the commander's rating in different areas:
+     *       <ul>
+     *           <li>"leadership": the commander's leadership skill value</li>
+     *           <li>"tactics": the commander's tactics skill value</li>
+     *           <li>"strategy": the commander's strategy skill value</li>
+     *           <li>"negotiation": the commander's negotiation skill value</li>
+     *           <li>"traits": the commander's trait score (see CamOps pg34)</li>
+     *           <li>"personality": the value of the commander's personality characteristics (or 0, if disabled)</li>
+     *       </ul>
      */
     protected static Map<String, Integer> calculateCommanderRating(Campaign campaign, Person commander) {
         Map<String, Integer> commandRating = new HashMap<>();
@@ -110,8 +100,8 @@ public class CommandRating {
      * Calculates the ATOW (A Time of War) trait values for the provided commander.
      *
      * <p>The trait score is determined by summing various attribute scores, including connection levels,
-     * combat-related traits, wealth, and reputation. The score has a minimum value of 1 regardless of
-     * calculated modifiers.</p>
+     * combat-related traits, wealth, and reputation. The score has a minimum value of 1 regardless of calculated
+     * modifiers.</p>
      *
      * <p>Trait scoring includes:
      * <ul>
@@ -121,8 +111,8 @@ public class CommandRating {
      *   <li>Reputation: Adds or subtracts scores based on positive and negative reputation levels.</li>
      * </ul>
      *
-     * @param commander The {@link Person} representing the commander whose trait values need to be calculated.
-     *                  Can be {@code null}, in which case the output is 0.
+     * @param commander The {@link Person} representing the commander whose trait values need to be calculated. Can be
+     *                  {@code null}, in which case the output is 0.
      *
      * @return The calculated trait score for the commander, with a minimum value of 1.
      */
