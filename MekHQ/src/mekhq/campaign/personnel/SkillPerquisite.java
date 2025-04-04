@@ -30,6 +30,8 @@ package mekhq.campaign.personnel;
 
 import megamek.common.UnitType;
 import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.Skills;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

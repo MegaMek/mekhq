@@ -42,7 +42,7 @@ import megamek.common.Mek;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)

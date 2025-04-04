@@ -36,7 +36,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.autoresolve.AutoResolveMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
-import mekhq.campaign.personnel.Skills;
+import mekhq.campaign.personnel.skills.Skills;
 import mekhq.gui.campaignOptions.components.*;
 
 import javax.swing.*;

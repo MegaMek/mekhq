@@ -45,7 +45,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.IPlayerSettings;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.CrewType;
@@ -69,7 +69,7 @@ import java.util.Map.Entry;
 import java.util.function.Consumer;
 
 import static java.lang.Math.max;
-import static mekhq.campaign.personnel.SkillType.*;
+import static mekhq.campaign.personnel.skills.SkillType.*;
 
 public class Utilities {
     private static final MMLogger logger = MMLogger.create(Utilities.class);

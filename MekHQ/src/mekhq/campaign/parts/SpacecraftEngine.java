@@ -49,7 +49,7 @@ import megamek.common.TechConstants;
 import megamek.common.Warship;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
