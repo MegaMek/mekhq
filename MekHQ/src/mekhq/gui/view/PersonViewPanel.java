@@ -1458,6 +1458,12 @@ public class PersonViewPanel extends JScrollablePanel {
         // abilities and implants
         JLabel lblTough1 = new JLabel();
         JLabel lblTough2 = new JLabel();
+        JLabel lblConnections1 = new JLabel();
+        JLabel lblConnections2 = new JLabel();
+        JLabel lblWealth1 = new JLabel();
+        JLabel lblWealth2 = new JLabel();
+        JLabel lblReputation1 = new JLabel();
+        JLabel lblReputation2 = new JLabel();
         JLabel lblEdge1 = new JLabel();
         JLabel lblEdge2 = new JLabel();
         JLabel lblEdgeAvail1 = new JLabel();
@@ -1508,7 +1514,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 } else {
                     lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), skillName));
                 }
-                lblValue = new JLabel(person.getSkill(skillName).toString());
+                lblValue = new JLabel(person.getSkill(skillName).toString(person.getOptions(), person.getReputation()));
                 lblName.setLabelFor(lblValue);
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = addition;
@@ -1663,6 +1669,84 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSkills.add(lblTough2, gridBagConstraints);
+
+            firsty++;
+        }
+
+        if (person.getConnections() > 0) {
+            lblConnections1.setName("lblConnections1");
+            lblConnections1.setText(resourceMap.getString("lblConnections1.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblConnections1, gridBagConstraints);
+
+            lblConnections2.setName("lblConnections2");
+            lblConnections2.setText(person.getConnections() + "");
+            lblConnections1.setLabelFor(lblConnections2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblConnections2, gridBagConstraints);
+
+            firsty++;
+        }
+
+        if (person.getWealth() != 0) {
+            lblWealth1.setName("lblWealth1");
+            lblWealth1.setText(resourceMap.getString("lblWealth1.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblWealth1, gridBagConstraints);
+
+            lblWealth2.setName("lblWealth2");
+            lblWealth2.setText(person.getWealth() + "");
+            lblWealth1.setLabelFor(lblWealth2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblWealth2, gridBagConstraints);
+
+            firsty++;
+        }
+
+        if (person.getReputation() != 0) {
+            lblReputation1.setName("lblReputation1");
+            lblReputation1.setText(resourceMap.getString("lblReputation1.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblReputation1, gridBagConstraints);
+
+            lblReputation2.setName("lblReputation2");
+            lblReputation2.setText(person.getReputation() + "");
+            lblReputation1.setLabelFor(lblReputation2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblReputation2, gridBagConstraints);
 
             firsty++;
         }

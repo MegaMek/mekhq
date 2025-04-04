@@ -1761,7 +1761,7 @@ public class StratconRulesManager {
         Skill tactics = commander.getSkill(S_TACTICS);
 
         if (tactics != null) {
-            targetNumber -= tactics.getFinalSkillValue();
+            targetNumber -= tactics.getFinalSkillValue(commander.getOptions());
         } else {
             // Effectively a -1 penalty for being unskilled
             targetNumber++;
@@ -1899,7 +1899,7 @@ public class StratconRulesManager {
             Skill skill = commandLiaison.getSkill(S_ADMIN);
 
             if (skill != null) {
-                skillTargetNumber = skill.getFinalSkillValue();
+                skillTargetNumber = skill.getFinalSkillValue(commandLiaison.getOptions());
             }
 
             reinforcementTargetNumber.addModifier(skillTargetNumber,

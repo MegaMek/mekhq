@@ -780,7 +780,7 @@ public class Resupply {
             Skill skill = negotiator.getSkill(SkillType.S_NEG);
 
             if (skill != null) {
-                int skillLevel = skill.getFinalSkillValue();
+                int skillLevel = skill.getFinalSkillValue(negotiator.getOptions(), negotiator.getReputation());
                 negotiatorSkill = skill.getType().getExperienceLevel(skillLevel);
             }
         }

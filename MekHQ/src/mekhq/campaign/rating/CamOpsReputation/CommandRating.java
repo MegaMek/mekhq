@@ -27,6 +27,9 @@
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
+import static java.lang.Math.max;
+import static megamek.common.options.OptionsConstants.ATOW_COMBAT_PARALYSIS;
+import static megamek.common.options.OptionsConstants.ATOW_COMBAT_SENSE;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
 
 import java.util.HashMap;
@@ -37,6 +40,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 
 public class CommandRating {
@@ -76,7 +80,8 @@ public class CommandRating {
         }
         commandRating.put("personality", personalityValue);
 
-        commandRating.put("total", commandRating.values().stream().mapToInt(rating -> rating).sum());
+        // CamOps pg34 states any score less than 1 is treated as 1
+        commandRating.put("total", max(1, commandRating.values().stream().mapToInt(rating -> rating).sum()));
 
         logger.debug("Command Rating = {}",
               commandRating.keySet()
@@ -85,6 +90,60 @@ public class CommandRating {
                     .collect(Collectors.joining()));
 
         return commandRating;
+    }
+
+    /**
+     * Calculates the ATOW (A Time of War) trait values for the provided commander.
+     *
+     * <p>The trait score is determined by summing various attribute scores, including connection levels,
+     * combat-related traits, wealth, and reputation. The score has a minimum value of 1 regardless of
+     * calculated modifiers.</p>
+     *
+     * <p>Trait scoring includes:
+     * <ul>
+     *   <li>Connections: Adds a score based on connection levels ranging from 1 to 10.</li>
+     *   <li>Combat Traits: Adds or subtracts points based on "Combat Sense" (+1) and "Combat Paralysis" (-1).</li>
+     *   <li>Wealth: Adds 1 point if the commander has sufficient wealth.</li>
+     *   <li>Reputation: Adds or subtracts scores based on positive and negative reputation levels.</li>
+     * </ul>
+     *
+     * @param commander The {@link Person} representing the commander whose trait values need to be calculated.
+     *                  Can be {@code null}, in which case the output is 0.
+     *
+     * @return The calculated trait score for the commander, with a minimum value of 1.
+     */
+    private static int getATOWTraitValues(Person commander) {
+        if (commander == null) {
+            return 0;
+        }
+
+        int traitScore = 0;
+        PersonnelOptions options = commander.getOptions();
+
+        // Connections
+        traitScore += commander.getConnections();
+
+        // Wealth
+        traitScore += commander.getWealth() >= 7 ? 1 : 0;
+
+        // Reputation
+        int reputation = commander.getReputation();
+        if (reputation < 0) {
+            traitScore -= 1;
+        } else if (reputation > 0) {
+            traitScore += 1;
+        }
+
+        // Combat-related traits
+        if (options.booleanOption(ATOW_COMBAT_SENSE)) {
+            traitScore += 1;
+        }
+
+        if (options.booleanOption(ATOW_COMBAT_PARALYSIS)) {
+            traitScore -= 1;
+        }
+
+        return traitScore;
     }
 
     /**

@@ -30,6 +30,14 @@ package mekhq.gui.dialog;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.codeUtilities.MathUtility.clamp;
+import static mekhq.campaign.personnel.Person.MAXIMUM_CONNECTIONS;
+import static mekhq.campaign.personnel.Person.MAXIMUM_REPUTATION;
+import static mekhq.campaign.personnel.Person.MAXIMUM_UNLUCKY;
+import static mekhq.campaign.personnel.Person.MAXIMUM_WEALTH;
+import static mekhq.campaign.personnel.Person.MINIMUM_CONNECTIONS;
+import static mekhq.campaign.personnel.Person.MINIMUM_REPUTATION;
+import static mekhq.campaign.personnel.Person.MINIMUM_UNLUCKY;
+import static mekhq.campaign.personnel.Person.MINIMUM_WEALTH;
 import static mekhq.campaign.personnel.skills.Skill.getCountDownMaxValue;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.personalityQuirksSortedAlphabetically;
@@ -133,6 +141,10 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private JPanel panSkills;
     private JPanel panOptions;
     private JTextField textToughness;
+    private JTextField textConnections;
+    private JTextField textWealth;
+    private JTextField textReputation;
+    private JTextField textUnlucky;
     private JComboBox<EducationLevel> textEducationLevel;
     private JTextField textLoyalty;
 
@@ -222,8 +234,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         pack();
     }
 
-    private JPanel getDemogPanel() {
-
+    private JScrollPane getDemogPanel() {
         JPanel demogPanel = new JPanel(new GridBagLayout());
         JLabel lblName = new JLabel();
         JLabel lblGender = new JLabel();
@@ -236,6 +247,14 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         textBloodname = new JTextField();
         textToughness = new JTextField();
         JLabel lblToughness = new JLabel();
+        textConnections = new JTextField();
+        JLabel lblConnections = new JLabel();
+        textWealth = new JTextField();
+        JLabel lblWealth = new JLabel();
+        textReputation = new JTextField();
+        JLabel lblReputation = new JLabel();
+        textUnlucky = new JTextField();
+        JLabel lblUnlucky = new JLabel();
         textEducationLevel = new JComboBox<>();
         textLoyalty = new JTextField();
         JLabel lblLoyalty = new JLabel();
@@ -636,28 +655,89 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             y++;
         }
 
-        lblToughness.setText(resourceMap.getString("lblToughness.text")); // NOI18N
-        lblToughness.setName("lblToughness"); // NOI18N
+        lblConnections.setText(resourceMap.getString("lblConnections.text"));
+        lblConnections.setName("lblConnections");
 
-        textToughness.setText(Integer.toString(person.getToughness()));
-        textToughness.setName("textToughness"); // NOI18N
+        textConnections.setText(Integer.toString(person.getConnections()));
+        textConnections.setName("textConnections");
 
-        if (campaign.getCampaignOptions().isUseToughness()) {
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(lblToughness, gridBagConstraints);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            demogPanel.add(textToughness, gridBagConstraints);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        demogPanel.add(lblConnections, gridBagConstraints);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        demogPanel.add(textConnections, gridBagConstraints);
 
-            y++;
-        }
+        y++;
+
+        lblWealth.setText(resourceMap.getString("lblWealth.text"));
+        lblWealth.setName("lblWealth");
+
+        textWealth.setText(Integer.toString(person.getWealth()));
+        textWealth.setName("textWealth");
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        demogPanel.add(lblWealth, gridBagConstraints);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        demogPanel.add(textWealth, gridBagConstraints);
+
+        y++;
+
+        lblReputation.setText(resourceMap.getString("lblReputation.text"));
+        lblReputation.setName("lblReputation");
+
+        textReputation.setText(Integer.toString(person.getReputation()));
+        textReputation.setName("textReputation");
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        demogPanel.add(lblReputation, gridBagConstraints);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        demogPanel.add(textReputation, gridBagConstraints);
+
+        y++;
+
+        lblUnlucky.setText(resourceMap.getString("lblUnlucky.text"));
+        lblReputation.setName("lblUnlucky");
+
+        textUnlucky.setText(Integer.toString(person.getReputation()));
+        textUnlucky.setName("textUnlucky");
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+        demogPanel.add(lblUnlucky, gridBagConstraints);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        demogPanel.add(textUnlucky, gridBagConstraints);
+
+        y++;
 
         lblEducationLevel.setText(resourceMap.getString("lblEducationLevel.text"));
         lblEducationLevel.setName("lblEducationLevel");
@@ -847,7 +927,12 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         demogPanel.add(txtBio, gridBagConstraints);
 
-        return demogPanel;
+        // Wrap the demogPanel in a JScrollPane
+        JScrollPane scrollPane = new JScrollPane(demogPanel);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+        return scrollPane;
     }
 
     private JPanel getRightPanel() {
@@ -1072,7 +1157,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             lblName = new JLabel(type);
             lblValue = new JLabel();
             if (person.hasSkill(type)) {
-                lblValue.setText(person.getSkill(type).toString());
+                lblValue.setText(person.getSkill(type).toString(person.getOptions(), person.getReputation()));
             } else {
                 lblValue.setText("-");
             }
@@ -1506,6 +1591,30 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                 person.setToughness(Integer.parseInt(textToughness.getText()));
             } catch (NumberFormatException ignored) {
             }
+        }
+
+        try {
+            int newValue = Integer.parseInt(textConnections.getText());
+            person.setConnections(clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
+        } catch (NumberFormatException ignored) {
+        }
+
+        try {
+            int newValue = Integer.parseInt(textWealth.getText());
+            person.setWealth(clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH));
+        } catch (NumberFormatException ignored) {
+        }
+
+        try {
+            int newValue = Integer.parseInt(textReputation.getText());
+            person.setReputation(clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
+        } catch (NumberFormatException ignored) {
+        }
+
+        try {
+            int newValue = Integer.parseInt(textUnlucky.getText());
+            person.setUnlucky(clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
+        } catch (NumberFormatException ignored) {
         }
 
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {

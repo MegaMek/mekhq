@@ -119,6 +119,26 @@ public class Person {
     public static final Map<Integer, Money> MEKWARRIOR_AERO_RANSOM_VALUES;
     public static final Map<Integer, Money> OTHER_RANSOM_VALUES;
 
+    // Traits
+    public static final int TRAIT_MODIFICATION_COST = 100;
+
+    public static final String CONNECTIONS_LABEL = "CONNECTIONS";
+    public static final int MINIMUM_CONNECTIONS = 0;
+    public static final int MAXIMUM_CONNECTIONS = 10;
+
+    public static final String REPUTATION_LABEL = "REPUTATION";
+    public static final int MINIMUM_REPUTATION = -5;
+    public static final int MAXIMUM_REPUTATION = 5;
+
+    public static final String WEALTH_LABEL = "WEALTH";
+    public static final int MINIMUM_WEALTH = -1;
+    public static final int MAXIMUM_WEALTH = 10;
+
+    public static final String UNLUCKY_LABEL = "UNLUCKY";
+    public static final int MINIMUM_UNLUCKY = 0;
+    public static final int MAXIMUM_UNLUCKY = 5;
+
+
     private PersonAwardController awardController;
 
     // region Family Variables
@@ -174,6 +194,10 @@ public class Person {
     private Skills skills;
     private PersonnelOptions options;
     private int toughness;
+    private int connections;
+    private int wealth;
+    private int reputation;
+    private int unlucky;
 
     private PersonnelStatus status;
     private int xp;
@@ -398,6 +422,10 @@ public class Person {
         hits = 0;
         hitsPrior = 0;
         toughness = 0;
+        connections = 0;
+        wealth = 0;
+        reputation = 0;
+        unlucky = 0;
         dateOfDeath = null;
         recruitment = null;
         joinedCampaign = null;
@@ -2294,6 +2322,22 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "toughness", toughness);
             }
 
+            if (connections != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "connections", connections);
+            }
+
+            if (wealth != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wealth", wealth);
+            }
+
+            if (reputation != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reputation", reputation);
+            }
+
+            if (unlucky != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unlucky", unlucky);
+            }
+
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minutesLeft", minutesLeft);
 
             if (overtimeLeft > 0) {
@@ -2695,6 +2739,14 @@ public class Person {
                     implants = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("toughness")) {
                     person.toughness = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("connections")) {
+                    person.connections = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("wealth")) {
+                    person.wealth = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("reputation")) {
+                    person.reputation = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("unlucky")) {
+                    person.unlucky = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("pilotHits")) {
                     person.hits = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("skill")) {
@@ -4110,7 +4162,7 @@ public class Person {
 
     // region edge
     public int getEdge() {
-        return getOptions().intOption(OptionsConstants.EDGE);
+        return getOptions().intOption(OptionsConstants.EDGE) - unlucky;
     }
 
     public void setEdge(final int edge) {
@@ -4651,28 +4703,28 @@ public class Person {
         }
 
         if (part.isRightTechType(SkillType.S_TECH_BA) && hasSkill(SkillType.S_TECH_BA)) {
-            if ((skill == null) || (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_BA).getFinalSkillValue())) {
+            if ((skill == null) || (skill.getFinalSkillValue(options, reputation) > getSkill(SkillType.S_TECH_BA).getFinalSkillValue(options, reputation))) {
                 skill = getSkill(SkillType.S_TECH_BA);
             }
         }
 
         if (part.isRightTechType(SkillType.S_TECH_AERO) && hasSkill(SkillType.S_TECH_AERO)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue())) {
+                      (skill.getFinalSkillValue(options, reputation) > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue(options, reputation))) {
                 skill = getSkill(SkillType.S_TECH_AERO);
             }
         }
 
         if (part.isRightTechType(SkillType.S_TECH_MECHANIC) && hasSkill(SkillType.S_TECH_MECHANIC)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue())) {
+                      (skill.getFinalSkillValue(options, reputation) > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue(options, reputation))) {
                 skill = getSkill(SkillType.S_TECH_MECHANIC);
             }
         }
 
         if (part.isRightTechType(SkillType.S_TECH_VESSEL) && hasSkill(SkillType.S_TECH_VESSEL)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue())) {
+                      (skill.getFinalSkillValue(options, reputation) > getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue(options, reputation))) {
                 skill = getSkill(SkillType.S_TECH_VESSEL);
             }
         }
@@ -4688,21 +4740,21 @@ public class Person {
         }
 
         if (hasSkill(SkillType.S_TECH_BA)) {
-            if ((skill == null) || (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_BA).getFinalSkillValue())) {
+            if ((skill == null) || (skill.getFinalSkillValue(options, reputation) > getSkill(SkillType.S_TECH_BA).getFinalSkillValue(options, reputation))) {
                 skill = getSkill(SkillType.S_TECH_BA);
             }
         }
 
         if (hasSkill(SkillType.S_TECH_MECHANIC)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue())) {
+                      (skill.getFinalSkillValue(options, reputation) > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue(options, reputation))) {
                 skill = getSkill(SkillType.S_TECH_MECHANIC);
             }
         }
 
         if (hasSkill(SkillType.S_TECH_AERO)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue())) {
+                      (skill.getFinalSkillValue(options, reputation) > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue(options, reputation))) {
                 skill = getSkill(SkillType.S_TECH_AERO);
             }
         }
@@ -4801,6 +4853,38 @@ public class Person {
 
     public void setToughness(final int toughness) {
         this.toughness = toughness;
+    }
+
+    public int getConnections() {
+        return connections;
+    }
+
+    public void setConnections(final int connections) {
+        this.connections = connections;
+    }
+
+    public int getWealth() {
+        return wealth;
+    }
+
+    public void setWealth(final int wealth) {
+        this.wealth = wealth;
+    }
+
+    public int getReputation() {
+        return reputation;
+    }
+
+    public void setReputation(final int reputation) {
+        this.reputation = reputation;
+    }
+
+    public int getUnlucky() {
+        return unlucky;
+    }
+
+    public void setUnlucky(final int unlucky) {
+        this.unlucky = unlucky;
     }
 
     public void resetSkillTypes() {

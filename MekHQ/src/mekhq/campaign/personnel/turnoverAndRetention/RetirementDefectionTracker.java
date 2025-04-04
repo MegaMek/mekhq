@@ -217,7 +217,7 @@ public class RetirementDefectionTracker {
                 if (campaign.getCampaignOptions().isUseCommanderLeadershipOnly()) {
                     Person flaggedCommander = campaign.getFlaggedCommander();
                     if (flaggedCommander != null && flaggedCommander.hasSkill((SkillType.S_LEADER))) {
-                        modifier -= flaggedCommander.getSkill(SkillType.S_LEADER).getFinalSkillValue();
+                        modifier -= flaggedCommander.getSkill(SkillType.S_LEADER).getFinalSkillValue(flaggedCommander.getOptions());
                     }
                 } else {
                     modifier -= getManagementSkillModifier(person);
@@ -617,7 +617,7 @@ public class RetirementDefectionTracker {
      */
     private static int getIndividualCommanderLeadership(Person commander) {
         if (commander.hasSkill(SkillType.S_LEADER)) {
-            return commander.getSkill(SkillType.S_LEADER).getFinalSkillValue();
+            return commander.getSkill(SkillType.S_LEADER).getFinalSkillValue(commander.getOptions());
         } else {
             return 0;
         }
