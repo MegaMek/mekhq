@@ -27,6 +27,21 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+
+import java.awt.GridBagConstraints;
+import java.util.ResourceBundle;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import megamek.client.ui.baseComponents.FileNameComboBoxModel;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.GUIPreferences;
@@ -47,6 +62,14 @@ import java.util.ResourceBundle;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import mekhq.campaign.personnel.skills.Skills;
+import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
+import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
+import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
+import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
  * Represents a tab in the campaign options UI for managing ruleset configurations in campaigns.

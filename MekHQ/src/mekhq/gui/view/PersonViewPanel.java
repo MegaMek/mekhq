@@ -55,6 +55,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.accessibility.AccessibleRelation;
 import javax.swing.*;
@@ -83,6 +84,7 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
@@ -1492,16 +1494,24 @@ public class PersonViewPanel extends JScrollablePanel {
 
         int j = 0;
         for (int i = 0; i < SkillType.getSkillList().length; i++) {
-            if (person.hasSkill(SkillType.getSkillList()[i])) {
+            String skillName = SkillType.getSkillList()[i];
+            SkillType type = SkillType.getType(skillName);
+            if (person.hasSkill(skillName)) {
                 j++;
                 if (j == colBreak) {
                     addition = 2;
                     firsty = 0;
                     weight = 1.0;
                 }
-                lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"),
-                      SkillType.getSkillList()[i]));
-                lblValue = new JLabel(person.getSkill(SkillType.getSkillList()[i]).toString());
+                if (type.isRoleplaySkill()) {
+                    lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader.roleplay"),
+                          skillName.replaceAll(' ' +
+                                                     Pattern.quote(resourceMap.getString("format.itemHeader.roleplay" +
+                                                                                               ".removal")), "")));
+                } else {
+                    lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), skillName));
+                }
+                lblValue = new JLabel(person.getSkill(skillName).toString());
                 lblName.setLabelFor(lblValue);
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = addition;

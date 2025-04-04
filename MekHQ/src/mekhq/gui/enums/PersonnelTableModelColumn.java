@@ -52,6 +52,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
@@ -517,7 +518,7 @@ public enum PersonnelTableModelColumn {
                 return GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());
             case SKILL_LEVEL:
                 return "<html>" +
-                             SkillType.getColoredExperienceLevelName(person.getSkillLevel(campaign, false)) +
+                             SkillType.getColoredExperienceLevelName(person.getExperienceLevel(campaign, false)) +
                              "</html>";
             case PERSONNEL_ROLE:
                 return person.getRoleDesc();

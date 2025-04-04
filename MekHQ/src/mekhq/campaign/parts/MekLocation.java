@@ -35,9 +35,6 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.IntStream;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.codeUtilities.MathUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
@@ -54,6 +51,8 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)

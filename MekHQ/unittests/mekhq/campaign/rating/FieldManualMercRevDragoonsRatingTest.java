@@ -44,9 +44,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import megamek.common.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -56,7 +53,11 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)

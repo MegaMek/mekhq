@@ -27,11 +27,21 @@
  */
 package mekhq.campaign.mission.atb;
 
+import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.*;
+
+import java.util.UUID;
+
 import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.ModifiedConstantSkillGenerator;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.*;
+import megamek.common.Board;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.HitData;
+import megamek.common.Mounted;
+import megamek.common.ToHitData;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
@@ -49,11 +59,6 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
-
-import java.util.UUID;
-
-import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
-import static mekhq.campaign.mission.AtBDynamicScenarioFactory.*;
 
 /**
  * Class that handles the application of scenario modifier actions to

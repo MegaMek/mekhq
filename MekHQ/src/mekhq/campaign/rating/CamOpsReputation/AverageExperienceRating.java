@@ -27,16 +27,20 @@
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
+import static java.lang.Math.max;
+
 import megamek.codeUtilities.MathUtility;
-import megamek.common.*;
+import megamek.common.Crew;
+import megamek.common.Entity;
+import megamek.common.Infantry;
+import megamek.common.Jumpship;
+import megamek.common.ProtoMek;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
-
-import static java.lang.Math.max;
 
 public class AverageExperienceRating {
     private static final MMLogger logger = MMLogger.create(AverageExperienceRating.class);

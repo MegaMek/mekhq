@@ -54,6 +54,7 @@ import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
+import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;

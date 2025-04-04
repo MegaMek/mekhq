@@ -27,6 +27,17 @@
  */
 package mekhq.gui.model;
 
+import java.awt.Component;
+import java.awt.Image;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.JTable;
+import javax.swing.table.TableCellRenderer;
+
 import megamek.common.TargetRoll;
 import mekhq.IconPackage;
 import mekhq.campaign.parts.MissingPart;
@@ -39,16 +50,6 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.ITechWorkPanel;
 import mekhq.gui.RepairTaskInfo;
-
-import javax.swing.*;
-import javax.swing.table.TableCellRenderer;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * A table model for displaying work items

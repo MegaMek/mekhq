@@ -29,7 +29,6 @@ package mekhq.gui.model;
 
 import java.awt.Component;
 import java.util.ArrayList;
-
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 

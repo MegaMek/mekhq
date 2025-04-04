@@ -35,6 +35,8 @@ import static megamek.common.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -3887,6 +3889,10 @@ public class Person {
 
     public void addSkill(final String skillName, final int level, final int bonus) {
         skills.addSkill(skillName, new Skill(skillName, level, bonus));
+    }
+
+    public void addSkill(final String skillName, final int level, final int bonus, final int ageModifier) {
+        skills.addSkill(skillName, new Skill(skillName, level, bonus, ageModifier));
     }
 
     public void removeSkill(final String skillName) {

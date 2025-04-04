@@ -28,6 +28,8 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static megamek.client.generator.RandomGenderGenerator.getPercentFemale;
+import static mekhq.campaign.personnel.skills.Aging.clearAllAgeModifiers;
+import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
@@ -49,6 +51,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomOriginOptions;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -99,6 +102,7 @@ public class BiographyTab {
     private JSpinner spnNonBinaryDiceSize;
     private JLabel lblFamilyDisplayLevel;
     private MMComboBox<FamilialRelationshipDisplayLevel> comboFamilyDisplayLevel;
+    private JCheckBox chkUseAgeEffects;
     private JPanel pnlAnniversariesPanel;
     private JCheckBox chkAnnounceOfficersOnly;
     private JCheckBox chkAnnounceBirthdays;
@@ -362,6 +366,7 @@ public class BiographyTab {
         lblFamilyDisplayLevel = new JLabel();
         comboFamilyDisplayLevel = new MMComboBox<>("comboFamilyDisplayLevel",
               FamilialRelationshipDisplayLevel.values());
+        chkUseAgeEffects = new JCheckBox();
 
         pnlAnniversariesPanel = new JPanel();
         chkAnnounceOfficersOnly = new JCheckBox();
@@ -417,6 +422,8 @@ public class BiographyTab {
 
         lblFamilyDisplayLevel = new CampaignOptionsLabel("FamilyDisplayLevel");
 
+        chkUseAgeEffects = new CampaignOptionsCheckBox("UseAgeEffects");
+
         pnlAnniversariesPanel = createAnniversariesPanel();
 
         pnlLifeEvents = createLifeEventsPanel();
@@ -447,6 +454,10 @@ public class BiographyTab {
         panelLeft.add(lblFamilyDisplayLevel, layoutLeft);
         layoutLeft.gridx++;
         panelLeft.add(comboFamilyDisplayLevel, layoutLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(chkUseAgeEffects, layoutLeft);
 
         final JPanel panelParent = new CampaignOptionsStandardPanel("BiographyGeneralTab", true);
         final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
@@ -1363,6 +1374,7 @@ public class BiographyTab {
         sldGender.setValue(getPercentFemale()); // 'getPercentFemale' is not stored in a Preset
         spnNonBinaryDiceSize.setValue(options.getNonBinaryDiceSize());
         comboFamilyDisplayLevel.setSelectedItem(options.getFamilyDisplayLevel());
+        chkUseAgeEffects.setSelected(options.isUseAgeEffects());
         chkAnnounceOfficersOnly.setSelected(options.isAnnounceOfficersOnly());
         chkAnnounceBirthdays.setSelected(options.isAnnounceBirthdays());
         chkAnnounceChildBirthdays.setSelected(options.isAnnounceChildBirthdays());
@@ -1454,6 +1466,17 @@ public class BiographyTab {
         RandomGenderGenerator.setPercentFemale(sldGender.getValue());
         options.setNonBinaryDiceSize((int) spnNonBinaryDiceSize.getValue());
         options.setFamilyDisplayLevel(comboFamilyDisplayLevel.getSelectedItem());
+        if (options.isUseAgeEffects() != chkUseAgeEffects.isSelected()) {
+            for (Person person : campaign.getPersonnel()) {
+
+                if (chkUseAgeEffects.isSelected()) {
+                    updateAllSkillAgeModifiers(generalTab.getDate(), person);
+                } else {
+                    clearAllAgeModifiers(person);
+                }
+            }
+        }
+        options.setUseAgeEffects(chkUseAgeEffects.isSelected());
         options.setAnnounceOfficersOnly(chkAnnounceOfficersOnly.isSelected());
         options.setAnnounceBirthdays(chkAnnounceBirthdays.isSelected());
         options.setAnnounceChildBirthdays(chkAnnounceChildBirthdays.isSelected());

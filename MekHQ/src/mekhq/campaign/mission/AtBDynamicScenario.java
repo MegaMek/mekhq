@@ -27,6 +27,20 @@
  */
 package mekhq.campaign.mission;
 
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getPlanetOwnerAlignment;
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getPlanetOwnerFaction;
+import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
+import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.PlanetOwner;
+
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import megamek.Version;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
@@ -47,15 +61,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.util.*;
-
-import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getPlanetOwnerAlignment;
-import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getPlanetOwnerFaction;
-import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
-import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.PlanetOwner;
 
 /**
  * Data structure intended to hold data relevant to AtB Dynamic Scenarios (AtB 3.0)

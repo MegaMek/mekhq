@@ -63,26 +63,26 @@ public class EditSkillPerquisiteDialog extends JDialog {
     private boolean cancelled;
 
     private Hashtable<String, JComboBox<SkillLevel>> skillLevels = new Hashtable<>();
-    private Hashtable<String, JCheckBox>             skillChks   = new Hashtable<>();
+    private Hashtable<String, JCheckBox> skillChks = new Hashtable<>();
 
     public EditSkillPerquisiteDialog(final JFrame frame, final SkillPerquisite pre) {
         super(frame, true);
         cancelled = false;
-        prereq    = pre;
+        prereq = pre;
         initComponents();
         setLocationRelativeTo(frame);
         setUserPreferences();
     }
 
     private void initComponents() {
-        btnOK    = new JButton();
+        btnOK = new JButton();
         btnClose = new JButton();
 
         JPanel panMain = new JPanel(new GridLayout(SkillType.skillList.length, 2));
 
         for (int i = 0; i < SkillType.getSkillList().length; i++) {
-            final String type     = SkillType.getSkillList()[i];
-            JCheckBox    chkSkill = new JCheckBox(type);
+            final String type = SkillType.getSkillList()[i];
+            JCheckBox chkSkill = new JCheckBox(type);
             chkSkill.setSelected(prereq.getSkillLevel(type) > -1);
             chkSkill.addItemListener(evt -> changeLevelEnabled(type));
             skillChks.put(type, chkSkill);

@@ -44,6 +44,7 @@ import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.enums.education.EducationLevel.DOCTORATE;
+import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 
@@ -79,6 +80,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Kill;
+import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.event.PersonStatusChangedEvent;
@@ -87,7 +89,14 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
-import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.Award;
+import mekhq.campaign.personnel.AwardsFactory;
+import mekhq.campaign.personnel.BodyLocation;
+import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.InjuryType;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
@@ -103,6 +112,8 @@ import mekhq.campaign.personnel.enums.ROMDesignation;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
+import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
+import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -195,6 +206,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_LOYALTY = "LOYALTY";
     private static final String CMD_PERSONALITY = "PERSONALITY";
     private static final String CMD_ADD_RANDOM_ABILITY = "ADD_RANDOM_ABILITY";
+    private static final String CMD_GENERATE_ROLEPLAY_SKILLS = "GENERATE_ROLEPLAY_SKILLS";
 
     private static final String CMD_FREE = "FREE";
     private static final String CMD_EXECUTE = "EXECUTE";
@@ -1283,6 +1295,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
                 for (Person person : people) {
                     singleSpecialAbilityGenerator.rollSPA(getCampaign(), person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
+            case CMD_GENERATE_ROLEPLAY_SKILLS: {
+                RandomSkillPreferences skillPreferences = getCampaign().getRandomSkillPreferences();
+                AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPreferences);
+                for (Person person : people) {
+                    skillGenerator.generateRoleplaySkills(person, person.getExperienceLevel(getCampaign(), false));
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -3435,6 +3456,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
             }
+
+            menuItem = new JMenuItem(resources.getString("generateRoleplaySkills.text"));
+            menuItem.setActionCommand(CMD_GENERATE_ROLEPLAY_SKILLS);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
 
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }

@@ -31,14 +31,13 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class MRMSOption {
     private static final MMLogger logger = MMLogger.create(MRMSOption.class);
