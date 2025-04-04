@@ -121,6 +121,7 @@ MEKHQ VERSION HISTORY:
 + Fix #6507: Fixed Missing Dates from Past Scenarios
 + Fix #6510: Fixed NPE In Armor Repair
 + Fix #6515, #6516: Allow Dynamically Priced Parts to be Replaced in Repair Bay
++ PR #6542: Fixes Compatibility for AC Ammo in MHQ
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
