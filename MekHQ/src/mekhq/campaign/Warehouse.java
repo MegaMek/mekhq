@@ -27,6 +27,17 @@
  */
 package mekhq.campaign;
 
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.TreeMap;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PartChangedEvent;
@@ -36,13 +47,6 @@ import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.utilities.MHQXMLUtility;
-
-import java.io.PrintWriter;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Stores parts for a Campaign.
@@ -274,6 +278,28 @@ public class Warehouse {
         return getParts().stream()
                 .filter(Part::isSpare)
                 .collect(Collectors.toList());
+    }
+
+    public int getSparePartsCount(Part targetPart) {
+        int count = 0;
+        for (Part warehousePart : getParts()) {
+            if (warehousePart.isSpare() && warehousePart.isSamePartType(targetPart)) {
+                count += getPartQuantity(warehousePart);
+            }
+        }
+
+        return count;
+    }
+
+    //TODO: getPartQuantity should be an overloaded method in Part.java, I'm just getting it out of campaign
+    public int getPartQuantity(Part p) {
+        if (p instanceof Armor) {
+            return ((Armor) p).getAmount();
+        }
+        if (p instanceof AmmoStorage) {
+            return ((AmmoStorage) p).getShots();
+        }
+        return (p.getUnit() != null) ? 1 : p.getQuantity();
     }
 
     /**

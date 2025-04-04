@@ -27,13 +27,13 @@
  */
 package mekhq.utilities;
 
-import static java.lang.Math.max;
 import static java.lang.Math.round;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 
@@ -79,23 +79,32 @@ public class ImageUtilities {
     public static ImageIcon scaleImageIcon(ImageIcon icon, int size, boolean scaleByWidth) {
         if (icon == null) {
             logger.error(new NullPointerException(),
-                  "ImageIcon is null in scaleImageIcon(ImageIcon, int, boolean). Returning an empty ImageIcon.");
+                  "ImageIcon is null in scaleImageIconHighQuality(ImageIcon, int, boolean). Returning an empty ImageIcon.");
             return new ImageIcon();
         }
 
         int width, height;
 
         if (scaleByWidth) {
-            // The uses of 'max' here are to prevent us risking a potential image with an illegal 0 px dimension.
-            width = max(1, UIUtil.scaleForGUI(size));
+            width = Math.max(1, UIUtil.scaleForGUI(size));
             height = (int) Math.ceil((double) width * icon.getIconHeight() / icon.getIconWidth());
         } else {
-            height = max(1, UIUtil.scaleForGUI(size));
+            height = Math.max(1, UIUtil.scaleForGUI(size));
             width = (int) Math.ceil((double) height * icon.getIconWidth() / icon.getIconHeight());
         }
 
-        Image image = icon.getImage();
-        Image scaledImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        // Create a new BufferedImage with the desired dimensions
+        BufferedImage scaledImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        // Get the Graphics2D object and set rendering hints for quality
+        Graphics2D g2d = scaledImage.createGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // Draw the scaled image with high-quality rendering
+        g2d.drawImage(icon.getImage(), 0, 0, width, height, null);
+        g2d.dispose();
 
         return new ImageIcon(scaledImage);
     }
@@ -138,7 +147,7 @@ public class ImageUtilities {
      * @see #addTintToImageIcon(Image, Color) for default behavior.
      */
     public static ImageIcon addTintToImageIcon(Image image, Color tint, boolean nonTransparentOnly,
-                                               @Nullable Double transparencyPercent) {
+          @Nullable Double transparencyPercent) {
         BufferedImage tintedImage = new BufferedImage(image.getWidth(null),
               image.getHeight(null),
               BufferedImage.TYPE_INT_ARGB);
@@ -198,7 +207,7 @@ public class ImageUtilities {
      * @return A new {@link BufferedImage} with the specified tint applied.
      */
     public static BufferedImage addTintToBufferedImage(BufferedImage image, Color tint, boolean nonTransparentOnly,
-                                                       @Nullable Double transparencyPercent) {
+          @Nullable Double transparencyPercent) {
         // Create a new BufferedImage with the same dimensions and type as the original
         BufferedImage tintedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 

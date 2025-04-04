@@ -1810,27 +1810,31 @@ public class PersonViewPanel extends JScrollablePanel {
                         Academy academy = EducationController.getAcademy(person.getEduAcademySet(),
                               person.getEduAcademyNameInSet());
 
-                        lblEducationDays2.setName("lblEducationDays2");
-                        if (academy.isPrepSchool()) {
-                            educationText = String.format(resourceMap.getString("lblEducationDurationAge.text"),
-                                  academy.getAgeMax());
+                        if (academy == null) {
+                            logger.debug("Found null academy for {} skipping", person.getFullTitle());
                         } else {
-                            educationText = String.format(resourceMap.getString("lblEducationDurationDays.text"),
-                                  person.getEduEducationTime());
-                        }
+                            lblEducationDays2.setName("lblEducationDays2");
+                            if (academy.isPrepSchool()) {
+                                educationText = String.format(resourceMap.getString("lblEducationDurationAge.text"),
+                                      academy.getAgeMax());
+                            } else {
+                                educationText = String.format(resourceMap.getString("lblEducationDurationDays.text"),
+                                      person.getEduEducationTime());
+                            }
 
-                        lblEducationDays2.setName("lblEducationDays2");
-                        lblEducationDays2.setText(educationText);
-                        lblEducationDays2.setLabelFor(lblEducationDays2);
-                        gridBagConstraints = new GridBagConstraints();
-                        gridBagConstraints.gridx = 1;
-                        gridBagConstraints.gridy = firsty;
-                        gridBagConstraints.gridwidth = 3;
-                        gridBagConstraints.weightx = 1.0;
-                        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-                        gridBagConstraints.fill = GridBagConstraints.NONE;
-                        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-                        pnlSkills.add(lblEducationDays2, gridBagConstraints);
+                            lblEducationDays2.setName("lblEducationDays2");
+                            lblEducationDays2.setText(educationText);
+                            lblEducationDays2.setLabelFor(lblEducationDays2);
+                            gridBagConstraints = new GridBagConstraints();
+                            gridBagConstraints.gridx = 1;
+                            gridBagConstraints.gridy = firsty;
+                            gridBagConstraints.gridwidth = 3;
+                            gridBagConstraints.weightx = 1.0;
+                            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                            gridBagConstraints.fill = GridBagConstraints.NONE;
+                            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                            pnlSkills.add(lblEducationDays2, gridBagConstraints);
+                        }
 
                         break;
                     case JOURNEY_TO_CAMPUS:
