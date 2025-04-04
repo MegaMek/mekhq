@@ -139,7 +139,12 @@ MEKHQ VERSION HISTORY:
 + PR #6536: Deprecated Unused Method And Adjusted Formatting 
 + PR #6538: Added Character Flaws as a New SPA Category 
 + PR #6549: Improved Image Scaling Utility; Improved Portrait Display in Immersive Dialogs
-+ PR #6550: Moved Skill Classes into a Discrete Package 
++ PR #6550: Moved Skill Classes into a Discrete Package
++ PR #6534: Added ATOW Attributes to Skills; Improved Combat vs. Non-Combat Skill Handling
++ PR #6535: Implemented ATOW-lite Aging Effects
++ PR #6537: Added ATOW Skills
++ PR #6539: Added "Glass Jaw" SPA
++ PR #6505: Refactored Advanced Medical Edit Injury Dialog To Improve Error Handling
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
