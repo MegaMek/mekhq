@@ -3890,6 +3890,10 @@ public class Person {
         skills.addSkill(skillName, new Skill(skillName, level, bonus));
     }
 
+    public void addSkill(final String skillName, final int level, final int bonus, final int ageModifier) {
+        skills.addSkill(skillName, new Skill(skillName, level, bonus, ageModifier));
+    }
+
     public void removeSkill(final String skillName) {
         skills.removeSkill(skillName);
     }

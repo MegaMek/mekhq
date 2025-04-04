@@ -30,6 +30,8 @@ package mekhq.campaign.personnel.procreation;
 import static mekhq.campaign.mod.am.InjuryTypes.POSTPARTUM_RECOVERY;
 import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
 import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
+import static mekhq.campaign.personnel.enums.BloodGroup.getInheritedBloodGroup;
+import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
@@ -64,14 +66,6 @@ import mekhq.campaign.personnel.lifeEvents.BirthAnnouncement;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
-
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-
-import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
-import static mekhq.campaign.personnel.enums.BloodGroup.getInheritedBloodGroup;
-import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 
 /**
  * AbstractProcreation is the baseline class for procreation and birth in MekHQ. It holds all the common logic for
@@ -424,6 +418,15 @@ public abstract class AbstractProcreation {
             baby.setSurname(campaignOptions.getBabySurnameStyle()
                                   .generateBabySurname(mother, father, baby.getGender()));
             baby.setDateOfBirth(today);
+            baby.removeAllSkills();// Limit skills by age for children and adolescents
+
+            // re-roll SPAs to include in any age and skill adjustments
+            Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);
+
+            for (IOption option : Collections.list(options)) {
+                baby.getOptions().getOption(option.getName()).clearValue();
+            }
+
             baby.setBloodGroup(getInheritedBloodGroup(mother.getBloodGroup(),
                   father == null ? getRandomBloodGroup() : father.getBloodGroup()));
 
@@ -557,7 +560,6 @@ public abstract class AbstractProcreation {
                                   .generateBabySurname(mother, father, baby.getGender()));
 
             baby.setDateOfBirth(mother.getDueDate());
-
             baby.removeAllSkills();// Limit skills by age for children and adolescents
 
             // re-roll SPAs to include in any age and skill adjustments

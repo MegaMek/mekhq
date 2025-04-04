@@ -81,6 +81,7 @@ public class Skill {
     private SkillType type;
     private int level;
     private int bonus;
+    private int agingModifier;
 
     protected Skill() {
 
@@ -91,14 +92,25 @@ public class Skill {
         this.level = this.type.getLevelFromExperience(SkillType.EXP_REGULAR);
     }
 
-    public Skill(String type, int level, int bns) {
-        this(SkillType.getType(type), level, bns);
+    public Skill(String type, int level, int bonus) {
+        this(SkillType.getType(type), level, bonus);
+    }
+
+    public Skill(String type, int level, int bonus, int agingModifier) {
+        this(SkillType.getType(type), level, bonus, agingModifier);
     }
 
     public Skill(SkillType type, int level, int bonus) {
         this.type = type;
         this.level = level;
         this.bonus = bonus;
+    }
+
+    public Skill(SkillType type, int level, int bonus, int agingModifier) {
+        this.type = type;
+        this.level = level;
+        this.bonus = bonus;
+        this.agingModifier = agingModifier;
     }
 
     /**
@@ -197,6 +209,10 @@ public class Skill {
         this.bonus = b;
     }
 
+    public void setAgingModifier(int agingModifier) {
+        this.agingModifier = agingModifier;
+    }
+
     public SkillType getType() {
         return type;
     }
@@ -219,29 +235,33 @@ public class Skill {
     }
 
     /**
-     * Calculates the raw skill value based on the type's progression rules, level, and bonus.
+     * Calculates the raw skill value based on the skill type's progression rules, level, bonus, and aging modifier.
      *
-     * <p>For "count up" progression types, the skill value is determined by adding the target value, level, and bonus.
-     * For "count down" progression types, it is determined by subtracting the level and bonus from the target
-     * value.</p>
+     * <p>This method determines the skill value using the following logic:</p>
+     * <ul>
+     *     <li>If the progression type is "count up," the value is calculated by adding the target value, level, and
+     *     bonus. If the aging modifier is set, it is also added to the result.</li>
+     *     <li>If the progression type is "count down," the value is calculated by subtracting the level and bonus from
+     *     the target value. If the aging modifier is set, it is also subtracted from the result.</li>
+     * </ul>
      *
-     * @return the calculated raw skill value before applying any boundaries or limits.
+     * @return the calculated raw skill value, including the type's target value, level, bonus, and (when applicable)
+     *       the aging modifier.
      */
     private int getSkillValue() {
-        if (isCountUp()) {
-            return type.getTarget() + level + bonus;
-        } else {
-            return type.getTarget() - level - bonus;
-        }
+        int baseValue = type.getTarget();
+        int valueAdjustment = isCountUp() ? level + bonus : -level - bonus;
+
+        return baseValue + valueAdjustment + (isCountUp() ? agingModifier : -agingModifier);
     }
 
     /**
-     * Calculates the total skill value by summing the level and bonus.
+     * Calculates the total skill value by summing the level, bonus, and aging modifier.
      *
      * @return The total skill value.
      */
     public int getTotalSkillLevel() {
-        return level + bonus;
+        return level + bonus + agingModifier;
     }
 
     public void improve() {
@@ -285,7 +305,7 @@ public class Skill {
     }
 
     public int getExperienceLevel() {
-        return type.getExperienceLevel(getLevel());
+        return type.getExperienceLevel(getTotalSkillLevel());
     }
 
     @Override
@@ -302,6 +322,7 @@ public class Skill {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", type.getName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "level", level);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bonus", bonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "agingModifier", agingModifier);
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skill");
     }
 
@@ -324,6 +345,8 @@ public class Skill {
                     retVal.level = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bonus")) {
                     retVal.bonus = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("agingModifier")) {
+                    retVal.agingModifier = Integer.parseInt(wn2.getTextContent());
                 }
             }
         } catch (Exception ex) {

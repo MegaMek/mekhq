@@ -453,7 +453,8 @@ public enum PersonnelTableModelColumn {
     }
     // endregion Boolean Comparison Methods
 
-    public String getCellValue(final Campaign campaign, final PersonnelMarket personnelMarket, final Person person, final boolean loadAssignmentFromMarket, final boolean groupByUnit) {
+    public String getCellValue(final Campaign campaign, final PersonnelMarket personnelMarket, final Person person,
+                               final boolean loadAssignmentFromMarket, final boolean groupByUnit) {
         String sign;
 
         switch (this) {
@@ -517,7 +518,7 @@ public enum PersonnelTableModelColumn {
                 return GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());
             case SKILL_LEVEL:
                 return "<html>" +
-                             SkillType.getColoredExperienceLevelName(person.getSkillLevel(campaign, false)) +
+                             SkillType.getColoredExperienceLevelName(person.getExperienceLevel(campaign, false)) +
                              "</html>";
             case PERSONNEL_ROLE:
                 return person.getRoleDesc();

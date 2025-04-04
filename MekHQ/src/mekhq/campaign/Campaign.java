@@ -53,6 +53,7 @@ import static mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement.isCo
 import static mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement.isFreedomDay;
 import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewYear;
 import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWinterHolidayMajorDay;
+import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenUsage;
@@ -5072,12 +5073,13 @@ public class Campaign implements ITechManager {
      */
     private void processAnniversaries(Person person) {
         LocalDate birthday = person.getBirthday(getGameYear());
-        if ((person.getRank().isOfficer()) || (!getCampaignOptions().isAnnounceOfficersOnly())) {
-            if (birthday.isEqual(currentDay) && campaignOptions.isAnnounceBirthdays()) {
+        boolean isBirthday = birthday != null && birthday.equals(currentDay);
+
+        if ((person.getRank().isOfficer()) || (!campaignOptions.isAnnounceOfficersOnly())) {
+            if (isBirthday && campaignOptions.isAnnounceBirthdays()) {
                 addReport(String.format(resources.getString("anniversaryBirthday.text"),
                       person.getHyperlinkedFullTitle(),
-                      ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions()
-                                                                          .getFontColorPositiveHexColor()),
+                      spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                       person.getAge(getLocalDate()),
                       CLOSING_SPAN_TAG));
             }
@@ -5091,28 +5093,31 @@ public class Campaign implements ITechManager {
                           (campaignOptions.isAnnounceRecruitmentAnniversaries())) {
                     addReport(String.format(resources.getString("anniversaryRecruitment.text"),
                           person.getHyperlinkedFullTitle(),
-                          ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions()
-                                                                              .getFontColorPositiveHexColor()),
+                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                           yearsOfEmployment,
                           CLOSING_SPAN_TAG,
                           name));
                 }
             }
         } else if ((person.getAge(getLocalDate()) == 18) && (campaignOptions.isAnnounceChildBirthdays())) {
-            if (birthday.isEqual(currentDay)) {
+            if (isBirthday) {
                 addReport(String.format(resources.getString("anniversaryBirthday.text"),
                       person.getHyperlinkedFullTitle(),
-                      ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions()
-                                                                          .getFontColorPositiveHexColor()),
+                      spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                       person.getAge(getLocalDate()),
                       CLOSING_SPAN_TAG));
             }
         }
 
         if (campaignOptions.isShowLifeEventDialogComingOfAge()) {
-            if ((person.getAge(currentDay) == 16) && (birthday.isEqual(currentDay))) {
+            if ((person.getAge(currentDay) == 16) && (isBirthday)) {
                 new ComingOfAgeAnnouncement(this, person);
             }
+        }
+
+        if (campaignOptions.isUseAgeEffects() && isBirthday) {
+            // This is where we update all the aging modifiers for the character.
+            updateAllSkillAgeModifiers(currentDay, person);
         }
     }
 
