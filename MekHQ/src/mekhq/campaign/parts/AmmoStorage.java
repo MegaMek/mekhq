@@ -31,9 +31,6 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.Objects;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.AmmoType;
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
@@ -48,6 +45,8 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This will be a special type of part that will only exist as spares
@@ -152,6 +151,8 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
      * is compatible with this instance's ammo.
      *
      * @param otherAmmoType The other {@code AmmoType}.
+     * @return False if the ammo does not support "compatibility" or is not compatible, true if the ammo type
+     * supports compatibility and is compatible
      */
     public boolean isCompatibleAmmo(AmmoType otherAmmoType) {
         return getType().isCompatibleWith(otherAmmoType);
