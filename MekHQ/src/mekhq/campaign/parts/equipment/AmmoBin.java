@@ -490,8 +490,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         // AmmoType and number of rounds of ammo (i.e. they are the same
         // irrespective of "munition type" or "bomb type").
         return (getClass() == part.getClass()) &&
-               getType().isCompatibleWith(((AmmoBin) part).getType()) &&
-               (((AmmoBin) part).getFullShots() == getFullShots());
+            ((getType().isCompatibleWith(((AmmoBin) part).getType())) ||
+                   (getType().equals(((AmmoBin) part).getType()))) &&
+            (((AmmoBin) part).getFullShots() == getFullShots());
     }
 
     @Override
