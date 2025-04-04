@@ -27,6 +27,29 @@
  */
 package mekhq.campaign.parts.equipment;
 
+import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+
 import megamek.Version;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
@@ -43,24 +66,12 @@ import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
 
 public class AmmoBinTest {
     @Test
@@ -1459,5 +1470,47 @@ public class AmmoBinTest {
 
         // ... but the correct amount of our original ammo type unloaded from the bin.
         assertEquals(ammoType.getShots(), quartermaster.getAmmoAvailable(ammoType));
+    }
+
+    @Nested
+    class AmmoBinSamePartTypeTests {
+        Campaign mockCampaign;
+        AmmoType ammo1;
+        AmmoType ammo2;
+        int shotsNeeded = 1;
+        int equipmentNum = 42;
+
+        @BeforeEach
+        void beforeEach() {
+            mockCampaign = mock(Campaign.class);
+
+            AmmoMounted mockAmmoRack1 = mock(AmmoMounted.class);
+            AmmoMounted mockAmmoRack2 = mock(AmmoMounted.class);
+
+            when(mockAmmoRack1.getType()).thenReturn(ammo1);
+            when(mockAmmoRack2.getType()).thenReturn(ammo2);
+        }
+
+        @Test void matchingACAmmo () {
+            ammo1 = (AmmoType) AmmoType.get("ISAC5 Ammo");
+            ammo2 = (AmmoType) AmmoType.get("ISAC5 Ammo");
+
+            // Create an Ammo Bin with some ammo ...
+            AmmoBin ammoBin1 = new AmmoBin(0, ammo1, equipmentNum, shotsNeeded, false, false, mockCampaign);
+            AmmoBin ammoBin2 = new AmmoBin(0, ammo2, equipmentNum, shotsNeeded, false, false, mockCampaign);
+
+            assertTrue(ammoBin1.isSamePartType(ammoBin2));
+        }
+
+        @Test void mismatchedACAmmo () {
+            ammo1 = (AmmoType) AmmoType.get("ISAC5 Ammo");
+            ammo2 = (AmmoType) AmmoType.get("ISAC10 Ammo");
+
+            // Create an Ammo Bin with some ammo ...
+            AmmoBin ammoBin1 = new AmmoBin(0, ammo1, equipmentNum, shotsNeeded, false, false, mockCampaign);
+            AmmoBin ammoBin2 = new AmmoBin(0, ammo2, equipmentNum, shotsNeeded, false, false, mockCampaign);
+
+            assertFalse(ammoBin1.isSamePartType(ammoBin2));
+        }
     }
 }
