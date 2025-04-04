@@ -48,13 +48,10 @@ import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGround
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosphere;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
 import static mekhq.campaign.personnel.skills.SkillType.getSkillHash;
-import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
-import static mekhq.campaign.personnel.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.SkillType.S_TACTICS;
-import static mekhq.campaign.personnel.SkillType.getSkillHash;
 import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType.AUXILIARY;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.DELAYED;
@@ -196,7 +193,7 @@ public class StratconRulesManager {
      * @param track         The StratCon campaign track.
      */
     public static void generateScenariosDatesForWeek(Campaign campaign, StratconCampaignState campaignState,
-                                                     AtBContract contract, StratconTrackState track) {
+          AtBContract contract, StratconTrackState track) {
         // maps scenarios to force IDs
         final boolean autoAssignLances = contract.getCommandRights().isIntegrated();
         List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract, false);
@@ -259,7 +256,7 @@ public class StratconRulesManager {
      * @param scenarioCount The number of scenarios to generate.
      */
     public static void generateDailyScenariosForTrack(Campaign campaign, StratconCampaignState campaignState,
-                                                      AtBContract contract, int scenarioCount) {
+          AtBContract contract, int scenarioCount) {
         final boolean autoAssignLances = contract.getCommandRights().isIntegrated();
 
         // get this list just so we have it available
@@ -456,13 +453,9 @@ public class StratconRulesManager {
      * @throws IllegalArgumentException If {@code scenarioCoords} is specified while {@code track} is {@code null}.
      */
     public static @Nullable StratconScenario generateExternalScenario(Campaign campaign, AtBContract contract,
-                                                                      @Nullable StratconTrackState track,
-                                                                      @Nullable StratconCoords scenarioCoords,
-                                                                      @Nullable ScenarioTemplate template,
-                                                                      boolean allowPlayerFacilities,
-                                                                      boolean allowPlayerForces,
-                                                                      boolean emphasizeStrategicTargets,
-                                                                      @Nullable Integer daysTilDeployment) {
+          @Nullable StratconTrackState track, @Nullable StratconCoords scenarioCoords,
+          @Nullable ScenarioTemplate template, boolean allowPlayerFacilities, boolean allowPlayerForces,
+          boolean emphasizeStrategicTargets, @Nullable Integer daysTilDeployment) {
         // If we're not generating for a specific track, randomly pick one.
         if (track == null) {
             track = getRandomTrack(contract);
@@ -574,11 +567,8 @@ public class StratconRulesManager {
      * @param interceptedForce the {@link Force} that's being intercepted in the scenario
      */
     public static @Nullable void generateReinforcementInterceptionScenario(Campaign campaign,
-                                                                           StratconScenario linkedScenario,
-                                                                           AtBContract contract,
-                                                                           StratconTrackState track,
-                                                                           ScenarioTemplate template,
-                                                                           Force interceptedForce) {
+          StratconScenario linkedScenario, AtBContract contract, StratconTrackState track, ScenarioTemplate template,
+          Force interceptedForce) {
         StratconCoords scenarioCoords = getUnoccupiedCoords(track);
 
         StratconScenario scenario = setupScenario(scenarioCoords,
@@ -631,12 +621,8 @@ public class StratconRulesManager {
      *       </ul>
      */
     public static @Nullable StratconScenario addHiddenExternalScenario(Campaign campaign, AtBContract contract,
-                                                                       @Nullable StratconTrackState trackState,
-                                                                       @Nullable ScenarioTemplate template,
-                                                                       boolean allowPlayerFacilities,
-                                                                       boolean allowPlayerForces,
-                                                                       boolean emphasizeStrategicTargets,
-                                                                       @Nullable Integer daysTilDeployment) {
+          @Nullable StratconTrackState trackState, @Nullable ScenarioTemplate template, boolean allowPlayerFacilities,
+          boolean allowPlayerForces, boolean emphasizeStrategicTargets, @Nullable Integer daysTilDeployment) {
         // If we're not generating for a specific track, randomly pick one.
         if (trackState == null) {
             trackState = getRandomTrack(contract);
@@ -715,8 +701,7 @@ public class StratconRulesManager {
      * @param scenario         The {@link StratconScenario} scenario to be finalized.
      */
     public static void finalizeBackingScenario(Campaign campaign, AtBContract contract,
-                                               @Nullable StratconTrackState track, boolean autoAssignLances,
-                                               StratconScenario scenario) {
+          @Nullable StratconTrackState track, boolean autoAssignLances, StratconScenario scenario) {
         final AtBDynamicScenario backingScenario = scenario.getBackingScenario();
 
         // First determine if the scenario is a Turning Point (that win/lose will affect CVP)
@@ -955,7 +940,7 @@ public class StratconRulesManager {
      * @return The total count of units (both bot and custom bot forces) linked to the template.
      */
     private static int calculateUnitCount(StratconScenario scenario, Campaign campaign,
-                                          ScenarioForceTemplate scenarioForceTemplate) {
+          ScenarioForceTemplate scenarioForceTemplate) {
         int unitCount = 0;
 
         // Count bot unit templates that match the force name
@@ -1039,7 +1024,7 @@ public class StratconRulesManager {
      *       {@code false} otherwise.
      */
     private static boolean isValidUnitForScenario(Unit unit, ScenarioForceTemplate scenarioForceTemplate,
-                                                  boolean isUsePlayerDropShips) {
+          boolean isUsePlayerDropShips) {
         // Check if DropShips are allowed and the correct unit type matches
         if (scenarioForceTemplate.getAllowedUnitType() == 11 && !isUsePlayerDropShips) {
             return false;
@@ -1062,9 +1047,7 @@ public class StratconRulesManager {
      * @return The newly generated {@link StratconScenario}.
      */
     public static @Nullable StratconScenario generateScenarioForExistingForces(StratconCoords scenarioCoords,
-                                                                               Set<Integer> forceIDs,
-                                                                               AtBContract contract, Campaign campaign,
-                                                                               StratconTrackState track) {
+          Set<Integer> forceIDs, AtBContract contract, Campaign campaign, StratconTrackState track) {
         return generateScenarioForExistingForces(scenarioCoords, forceIDs, contract, campaign, track, null, null);
     }
 
@@ -1085,11 +1068,8 @@ public class StratconRulesManager {
      * @return The newly generated {@link StratconScenario}.
      */
     public static @Nullable StratconScenario generateScenarioForExistingForces(StratconCoords scenarioCoords,
-                                                                               Set<Integer> forceIDs,
-                                                                               AtBContract contract, Campaign campaign,
-                                                                               StratconTrackState track,
-                                                                               @Nullable ScenarioTemplate template,
-                                                                               @Nullable Integer daysTilDeployment) {
+          Set<Integer> forceIDs, AtBContract contract, Campaign campaign, StratconTrackState track,
+          @Nullable ScenarioTemplate template, @Nullable Integer daysTilDeployment) {
         boolean firstForce = true;
         StratconScenario scenario = null;
 
@@ -1162,7 +1142,7 @@ public class StratconRulesManager {
      *                 at the deployment location without automatically updating their position.
      */
     public static void deployForceToCoords(StratconCoords coords, int forceID, Campaign campaign, AtBContract contract,
-                                           StratconTrackState track, boolean sticky) {
+          StratconTrackState track, boolean sticky) {
         CombatTeam combatTeam = campaign.getCombatTeamsTable().get(forceID);
 
         // This shouldn't be possible, but never hurts to have a little insurance
@@ -1270,7 +1250,7 @@ public class StratconRulesManager {
      * @return a randomly selected unoccupied adjacent coordinate, or {@code null} if none are available
      */
     private static @Nullable StratconCoords getUnoccupiedAdjacentCoords(StratconCoords originCoords,
-                                                                        StratconTrackState trackState) {
+          StratconTrackState trackState) {
         // We need to reduce width/height by one because coordinates index from 0, not 1
         final int trackWidth = trackState.getWidth() - 1;
         final int trackHeight = trackState.getHeight() - 1;
@@ -1321,7 +1301,7 @@ public class StratconRulesManager {
      * @return The newly set up {@link StratconScenario}.
      */
     public static @Nullable StratconScenario setupScenario(StratconCoords coords, int forceID, Campaign campaign,
-                                                           AtBContract contract, StratconTrackState track) {
+          AtBContract contract, StratconTrackState track) {
         return setupScenario(coords, forceID, campaign, contract, track, null, false, null);
     }
 
@@ -1348,10 +1328,8 @@ public class StratconRulesManager {
      * @return The newly set up {@link StratconScenario}.
      */
     public static @Nullable StratconScenario setupScenario(StratconCoords coords, int forceID, Campaign campaign,
-                                                           AtBContract contract, StratconTrackState track,
-                                                           @Nullable ScenarioTemplate template,
-                                                           boolean ignoreFacilities,
-                                                           @Nullable Integer daysTilDeployment) {
+          AtBContract contract, StratconTrackState track, @Nullable ScenarioTemplate template, boolean ignoreFacilities,
+          @Nullable Integer daysTilDeployment) {
         StratconScenario scenario;
 
         if (track.getFacilities().containsKey(coords) && !ignoreFacilities) {
@@ -1430,7 +1408,7 @@ public class StratconRulesManager {
      * Applies time-sensitive facility effects.
      */
     private static void processFacilityEffects(StratconTrackState track, StratconCampaignState campaignState,
-                                               boolean isStartOfMonth) {
+          boolean isStartOfMonth) {
         for (StratconFacility facility : track.getFacilities().values()) {
             if (isStartOfMonth) {
                 campaignState.changeSupportPoints(facility.getMonthlySPModifier());
@@ -1459,7 +1437,7 @@ public class StratconRulesManager {
      * @param sticky   Whether the force should remain persistently assigned to this track.
      */
     public static void processForceDeployment(StratconCoords coords, int forceID, Campaign campaign,
-                                              StratconTrackState track, boolean sticky) {
+          StratconTrackState track, boolean sticky) {
         scanNeighboringCoords(coords, forceID, campaign, track);
 
         // the force may be located in other places on the track - clear it out
@@ -1482,7 +1460,7 @@ public class StratconRulesManager {
      * @param track    The {@link StratconTrackState} where the deployment and scanning are being tracked.
      */
     private static void scanNeighboringCoords(StratconCoords coords, int forceID, Campaign campaign,
-                                              StratconTrackState track) {
+          StratconTrackState track) {
         // we want to ensure we only increase Fatigue once
         boolean hasFatigueIncreased = false;
 
@@ -1633,11 +1611,8 @@ public class StratconRulesManager {
      *       </ul>
      */
     public static ReinforcementResultsType processReinforcementDeployment(Force force,
-                                                                          ReinforcementEligibilityType reinforcementType,
-                                                                          StratconCampaignState campaignState,
-                                                                          StratconScenario scenario, Campaign campaign,
-                                                                          int reinforcementTargetNumber,
-                                                                          boolean isGMReinforcement) {
+          ReinforcementEligibilityType reinforcementType, StratconCampaignState campaignState,
+          StratconScenario scenario, Campaign campaign, int reinforcementTargetNumber, boolean isGMReinforcement) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AtBStratCon",
               MekHQ.getMHQOptions().getLocale());
 
@@ -1938,7 +1913,7 @@ public class StratconRulesManager {
      * Assigns a force to the scenario such that the majority of the force can be deployed
      */
     private static void assignAppropriateExtraForceToScenario(StratconScenario scenario,
-                                                              Map<MapLocation, List<Integer>> sortedAvailableForceIDs) {
+          Map<MapLocation, List<Integer>> sortedAvailableForceIDs) {
         // the goal of this function is to avoid assigning ground units to air battles
         // and ground units/conventional fighters to space battle
 
@@ -1969,7 +1944,7 @@ public class StratconRulesManager {
      * it to the track
      */
     public static void commitPrimaryForces(Campaign campaign, StratconScenario scenario,
-                                           StratconTrackState trackState) {
+          StratconTrackState trackState) {
         trackState.addScenario(scenario);
 
         // set up dates for the scenario if doesn't have them already
@@ -2053,7 +2028,7 @@ public class StratconRulesManager {
      *       force IDs that can operate in that map type.
      */
     public static Map<MapLocation, List<Integer>> sortForcesByMapType(List<Integer> forceIDs, Hangar hangar,
-                                                                      List<Force> allForces) {
+          List<Force> allForces) {
         boolean airborneOnly;
         boolean aerospaceOnly;
 
@@ -2116,9 +2091,7 @@ public class StratconRulesManager {
      * @return the generated {@link StratconScenario}, or {@code null} if scenario generation fails
      */
     private static @Nullable StratconScenario generateScenario(Campaign campaign, AtBContract contract,
-                                                               StratconTrackState track, int forceID,
-                                                               StratconCoords coords,
-                                                               @Nullable Integer daysTilDeployment) {
+          StratconTrackState track, int forceID, StratconCoords coords, @Nullable Integer daysTilDeployment) {
         int unitType = campaign.getForce(forceID).getPrimaryUnitType(campaign);
         ScenarioTemplate template = StratconScenarioFactory.getRandomScenario(unitType);
         // useful for debugging specific scenario types
@@ -2160,8 +2133,8 @@ public class StratconRulesManager {
      * @return the generated {@link StratconScenario}, or {@code null} if scenario generation failed
      */
     static @Nullable StratconScenario generateScenario(Campaign campaign, AtBContract contract,
-                                                       StratconTrackState track, int forceID, StratconCoords coords,
-                                                       ScenarioTemplate template, @Nullable Integer daysTilDeployment) {
+          StratconTrackState track, int forceID, StratconCoords coords, ScenarioTemplate template,
+          @Nullable Integer daysTilDeployment) {
         StratconScenario scenario = new StratconScenario();
 
         if (template == null) {
@@ -2241,7 +2214,7 @@ public class StratconRulesManager {
      * Applies scenario modifiers from the current track to the given scenario.
      */
     private static void applyFacilityModifiers(StratconScenario scenario, StratconTrackState track,
-                                               StratconCoords coords) {
+          StratconCoords coords) {
         // loop through all the facilities on the track
         // if a facility has been revealed, then it has a 100% chance to apply its
         // effect
@@ -2327,7 +2300,7 @@ public class StratconRulesManager {
      * campaign date. Takes a fixed deployment day of X days from campaign's today date.
      */
     private static void setScenarioDates(int deploymentDay, StratconTrackState track, Campaign campaign,
-                                         StratconScenario scenario) {
+          StratconScenario scenario) {
         // set up deployment day, battle day, return day here
         // safety code to prevent attempts to generate random int with upper bound of 0
         // which is apparently illegal
@@ -2399,7 +2372,7 @@ public class StratconRulesManager {
      *       deployment.
      */
     public static List<Integer> getAvailableForceIDs(Campaign campaign, AtBContract contract,
-                                                     boolean bypassRoleRestrictions) {
+          boolean bypassRoleRestrictions) {
         // First, build a list of all combat teams in the campaign
         ArrayList<CombatTeam> combatTeams = campaign.getAllCombatTeams();
 
@@ -2476,10 +2449,8 @@ public class StratconRulesManager {
      * @return a {@link List} of unique force IDs that meet all deployment criteria.
      */
     public static List<Integer> getAvailableForceIDsForManualDeployment(int unitType, Campaign campaign,
-                                                                        StratconTrackState currentTrack,
-                                                                        boolean reinforcements,
-                                                                        @Nullable StratconScenario currentScenario,
-                                                                        StratconCampaignState campaignState) {
+          StratconTrackState currentTrack, boolean reinforcements, @Nullable StratconScenario currentScenario,
+          StratconCampaignState campaignState) {
         List<Integer> retVal = new ArrayList<>();
 
         // assemble a set of all force IDs that are currently assigned to tracks that are not this one
@@ -2688,7 +2659,7 @@ public class StratconRulesManager {
      * @return A list of {@code Unit} objects eligible for deployment as leadership units.
      */
     public static List<Unit> getEligibleLeadershipUnits(Campaign campaign, StratconScenario currentScenario,
-                                                        int leadershipSkill) {
+          int leadershipSkill) {
         List<Integer> forceIds = currentScenario.getPrimaryForceIDs();
         List<Unit> leadershipUnits = new ArrayList<>();
 
@@ -2750,7 +2721,7 @@ public class StratconRulesManager {
      * @return {@code true} if the unit is valid for leadership deployment; {@code false} otherwise.
      */
     private static boolean isUnitValidForLeadershipDeployment(@Nullable Unit unit, int generalUnitType,
-                                                              int totalBudget) {
+          int totalBudget) {
         if (unit == null) {
             return false;
         }
@@ -2832,8 +2803,7 @@ public class StratconRulesManager {
      * Determines what rules to use when deploying a force for reinforcements to the given track.
      */
     public static ReinforcementEligibilityType getReinforcementType(int forceID, StratconTrackState trackState,
-                                                                    Campaign campaign,
-                                                                    StratconCampaignState campaignState) {
+          Campaign campaign, StratconCampaignState campaignState) {
         // if the force is deployed elsewhere, it cannot be deployed as reinforcements
         if (campaign.getActiveAtBContracts()
                   .stream()
@@ -2871,7 +2841,7 @@ public class StratconRulesManager {
      * Can any force be manually deployed to the given coordinates on the given track for the given contract?
      */
     public static boolean canManuallyDeployAnyForce(StratconCoords coords, StratconTrackState track,
-                                                    AtBContract contract) {
+          AtBContract contract) {
         // Rules: can't manually deploy under integrated command
         // can't manually deploy if there's already a force deployed there
         // exception: on allied facilities
@@ -2935,7 +2905,7 @@ public class StratconRulesManager {
      * Removes the facility associated with the given scenario from the relevant track
      */
     public static void updateFacilityForScenario(AtBScenario scenario, AtBContract contract, boolean destroy,
-                                                 boolean capture) {
+          boolean capture) {
         if (contract.getStratconCampaignState() == null) {
             return;
         }
@@ -3058,7 +3028,7 @@ public class StratconRulesManager {
      * Should only be used after a scenario is resolved
      */
     public static void linkedScenarioProcessing(ResolveScenarioTracker tracker,
-                                                HashMap<Integer, List<UUID>> linkedForces) {
+          HashMap<Integer, List<UUID>> linkedForces) {
         Scenario nextScenario = tracker.getCampaign().getScenario(tracker.getScenario().getLinkedScenario());
         Campaign campaign = tracker.getCampaign();
 
@@ -3100,7 +3070,7 @@ public class StratconRulesManager {
      * For example, "win scenario A" or "win X scenarios".
      */
     private static void updateStrategicObjectives(boolean victory, StratconScenario scenario,
-                                                  StratconTrackState track) {
+          StratconTrackState track) {
 
         // first, we check if this scenario is associated with any specific scenario
         // objectives
@@ -3234,7 +3204,7 @@ public class StratconRulesManager {
      *                      be updated during the processing (e.g., victory points adjustments).
      */
     public static void processIgnoredStratConScenario(StratconScenario scenario, StratconTrackState track,
-                                                      StratconCampaignState campaignState) {
+          StratconCampaignState campaignState) {
         // Update victory points if the scenario is marked as "special" or "turning point"
         if (scenario.isSpecial() || scenario.isTurningPoint()) {
             campaignState.updateVictoryPoints(-1);

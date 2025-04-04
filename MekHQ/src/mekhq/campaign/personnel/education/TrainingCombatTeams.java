@@ -28,9 +28,8 @@
 package mekhq.campaign.personnel.education;
 
 import static java.lang.Math.round;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
-import static mekhq.campaign.personnel.SkillType.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -161,7 +160,7 @@ public class TrainingCombatTeams {
      * @param educatorSkills a map of skills and their experience levels available for teaching
      */
     private static void performTraining(Campaign campaign, Force force, Person commander,
-                                        Map<String, Integer> educatorSkills) {
+          Map<String, Integer> educatorSkills) {
         for (UUID unitId : force.getAllUnits(true)) {
             Unit unit = campaign.getUnit(unitId);
 
@@ -231,7 +230,7 @@ public class TrainingCombatTeams {
      * @param skillsBeingTrained a list of eligible {@link Skill} objects for training
      */
     private static void processEducationTime(Campaign campaign, Person commander, Person trainee,
-                                             List<Skill> skillsBeingTrained) {
+          List<Skill> skillsBeingTrained) {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final String EDUCATION_STRING = "TRAINING_COMBAT_TEAM"; // Never change this
         final int WEEK_DURATION = 7; // days

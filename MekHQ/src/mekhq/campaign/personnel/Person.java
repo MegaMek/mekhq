@@ -33,9 +33,8 @@ import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
-import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -337,7 +336,7 @@ public class Person {
     }
 
     public Person(final String givenName, final String surname, final @Nullable Campaign campaign,
-                  final String factionCode) {
+          final String factionCode) {
         this("", givenName, surname, "", campaign, factionCode);
     }
 
@@ -352,7 +351,7 @@ public class Person {
      * @param factionCode the faction this person was borne into
      */
     public Person(final String preNominal, final String givenName, final String surname, final String postNominal,
-                  final @Nullable Campaign campaign, final String factionCode) {
+          final @Nullable Campaign campaign, final String factionCode) {
         // We assign the variables in XML file order
         id = UUID.randomUUID();
 
@@ -1294,7 +1293,7 @@ public class Person {
      * @param isVerbose  a boolean indicating whether the method should generate a report if the loyalty has changed
      */
     public void performForcedDirectionLoyaltyChange(Campaign campaign, boolean isPositive, boolean isMajor,
-                                                    boolean isVerbose) {
+          boolean isVerbose) {
         int originalLoyalty = loyalty;
 
         Consumer<Integer> applyLoyaltyChange = (roll) -> {
