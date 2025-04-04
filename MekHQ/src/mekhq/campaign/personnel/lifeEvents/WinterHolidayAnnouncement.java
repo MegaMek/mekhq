@@ -83,7 +83,7 @@ public class WinterHolidayAnnouncement {
         this.campaign = campaign;
 
         String inCharacterMessage = getInCharacterMessage();
-        String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "commandersDay.message.ooc");
+        String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "winterHoliday.message.ooc");
 
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
               getSpeaker(),
@@ -261,10 +261,13 @@ public class WinterHolidayAnnouncement {
             return new ArrayList<>();
         }
 
-        // Generate common labels for the specified day
-        return List.of(getFormattedTextAt(RESOURCE_BUNDLE, "button.response." + dayKey + ".positive"),
-              getFormattedTextAt(RESOURCE_BUNDLE, "button.response." + dayKey + ".neutral"),
-              getFormattedTextAt(RESOURCE_BUNDLE, "button.response." + dayKey + ".negative"));
+        List<String> buttonLabels = new ArrayList<>();
+
+        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.response." + dayKey + ".positive"));
+        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.response." + dayKey + ".neutral"));
+        buttonLabels.add(getFormattedTextAt(RESOURCE_BUNDLE, "button.response." + dayKey + ".negative"));
+
+        return buttonLabels;
     }
 
     /**

@@ -115,7 +115,13 @@ MEKHQ VERSION HISTORY:
 + PR #6502: Fixed Skill Deprecator Refund & Refund All Options
 + PR #6503: Removed Company Generator on Start Up
 + PR #6504: Removed Unofficial Multiplier From Contract Pay Calculation
-
++ PR #6506: Celebration Event Fixes
++ PR #6283: Added Blood Group Tracking For Personnel
++ Fix #2368: Added GM Methods to Warehouse: remove x parts and toggle newness
++ Fix #6507: Fixed Missing Dates from Past Scenarios
++ Fix #6510: Fixed NPE In Armor Repair
++ Fix #6515, #6516: Allow Dynamically Priced Parts to be Replaced in Repair Bay
++ PR #6542: Fixes Compatibility for AC Ammo in MHQ
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
