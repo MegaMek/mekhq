@@ -62,6 +62,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String TECH_ENGINEER = "tech_engineer";
     public static final String TECH_FIXER = "tech_fixer";
     public static final String TECH_MAINTAINER = "tech_maintainer";
+    public static final String FLAW_GLASS_JAW = "flaw_glass_jaw";
 
     @Override
     public void initialize() {
@@ -105,6 +106,8 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, TECH_ENGINEER, false);
         addOption(l3a, TECH_FIXER, false);
         addOption(l3a, TECH_MAINTAINER, false);
+        addOption(l3a, FLAW_GLASS_JAW, false);
+
         addOption(edge, EDGE_MEDICAL, true);
         addOption(edge, EDGE_REPAIR_BREAK_PART, true);
         addOption(edge, EDGE_REPAIR_FAILED_REFIT, true);
