@@ -40,7 +40,7 @@ import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 
 /**
  * Legacy part that represents standard ProtoMek jump jets.

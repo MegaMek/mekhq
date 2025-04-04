@@ -41,7 +41,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 
 /**

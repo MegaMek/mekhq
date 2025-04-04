@@ -27,7 +27,7 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import static mekhq.campaign.personnel.SkillType.S_DOCTOR;
+import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DOCTOR;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UntreatedPersonnelNagLogic.campaignHasUntreatedInjuries;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -41,7 +41,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.dialog.nagDialogs.UntreatedPersonnelNagDialog;

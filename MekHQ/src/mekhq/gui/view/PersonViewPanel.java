@@ -76,7 +76,7 @@ import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
@@ -93,21 +93,7 @@ import mekhq.gui.model.PersonnelKillLogModel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.WrapLayout;
 
-import javax.accessibility.AccessibleRelation;
-import javax.swing.*;
-import javax.swing.table.TableColumn;
-import java.awt.*;
-import java.awt.Dialog.ModalityType;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
-import static mekhq.campaign.personnel.Person.getLoyaltyName;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record

@@ -39,7 +39,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;

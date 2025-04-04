@@ -38,7 +38,7 @@ import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_COST_HAND_TYPE_
 import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_COST_LEG_TYPE_5;
 import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5;
 import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_RECOVERY;
-import static mekhq.campaign.personnel.SkillType.S_DOCTOR;
+import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
@@ -107,6 +107,8 @@ import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;

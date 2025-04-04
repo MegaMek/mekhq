@@ -33,11 +33,11 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
+import mekhq.campaign.personnel.skills.Skill;
 
 import java.util.*;
 
-import static mekhq.campaign.personnel.SkillType.S_ADMIN;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 

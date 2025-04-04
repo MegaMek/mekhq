@@ -29,7 +29,7 @@ package mekhq.campaign.io;
 
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_NONE;
-import static mekhq.campaign.personnel.SkillDeprecationTool.DEPRECATED_SKILLS;
+import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
 import java.io.File;
@@ -108,8 +108,8 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingMASC;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.SkillDeprecationTool;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillDeprecationTool;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;

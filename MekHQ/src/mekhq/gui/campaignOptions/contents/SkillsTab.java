@@ -31,7 +31,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.campaignOptions.components.*;
 
 import javax.swing.*;
@@ -40,7 +40,7 @@ import java.util.*;
 import java.util.List;
 
 import static megamek.common.enums.SkillLevel.*;
-import static mekhq.campaign.personnel.SkillType.isCombatSkill;
+import static mekhq.campaign.personnel.skills.SkillType.isCombatSkill;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 

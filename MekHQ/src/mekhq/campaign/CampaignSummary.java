@@ -51,7 +51,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;

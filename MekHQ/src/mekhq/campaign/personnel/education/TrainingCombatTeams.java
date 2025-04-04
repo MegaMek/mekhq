@@ -28,7 +28,7 @@
 package mekhq.campaign.personnel.education;
 
 import static java.lang.Math.round;
-import static mekhq.campaign.personnel.SkillType.EXP_GREEN;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -43,7 +43,7 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.unit.Unit;
 
 /**

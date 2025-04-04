@@ -31,7 +31,7 @@ import megamek.common.Aero;
 import megamek.common.Tank;
 import megamek.common.VTOL;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 

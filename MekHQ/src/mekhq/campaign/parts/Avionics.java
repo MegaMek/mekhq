@@ -45,7 +45,7 @@ import megamek.common.Jumpship;
 import megamek.common.LandAirMek;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)

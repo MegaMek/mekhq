@@ -86,7 +86,7 @@ import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.enums.CrewAssignmentState;
 import mekhq.campaign.unit.enums.TransporterType;

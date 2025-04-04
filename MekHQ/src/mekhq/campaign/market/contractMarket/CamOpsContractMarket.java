@@ -49,7 +49,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;

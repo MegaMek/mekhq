@@ -33,7 +33,7 @@ import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartModeChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;

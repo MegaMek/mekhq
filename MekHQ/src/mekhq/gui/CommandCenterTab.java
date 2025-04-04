@@ -40,6 +40,7 @@ import mekhq.campaign.event.*;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.report.CargoReport;
@@ -242,7 +243,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             // This seems to be overwritten completely and immediately by refresh
             StringBuilder experienceString = new StringBuilder(64);
             experienceString.append("<html><b>")
-                .append(mekhq.campaign.personnel.SkillType.getColoredExperienceLevelName(getCampaign().getReputation().getAverageSkillLevel()))
+                .append(SkillType.getColoredExperienceLevelName(getCampaign().getReputation().getAverageSkillLevel()))
                 .append("</b></html>");
             lblExperience.setText(experienceString.toString());
         }
@@ -600,7 +601,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
             StringBuilder experienceString = new StringBuilder(64);
             experienceString.append("<html><b>")
-                .append(mekhq.campaign.personnel.SkillType.getColoredExperienceLevelName(campaign.getReputation().getAverageSkillLevel()))
+                .append(SkillType.getColoredExperienceLevelName(campaign.getReputation().getAverageSkillLevel()))
                 .append("</b></html>");
             lblExperience.setText(experienceString.toString());
         }

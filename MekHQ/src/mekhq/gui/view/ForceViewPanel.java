@@ -52,7 +52,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceType;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;

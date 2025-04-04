@@ -26,7 +26,7 @@
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
  */
-package mekhq.campaign.personnel;
+package mekhq.campaign.personnel.skills;
 
 import megamek.common.*;
 import megamek.common.enums.SkillLevel;
