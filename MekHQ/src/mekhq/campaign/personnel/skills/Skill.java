@@ -209,10 +209,6 @@ public class Skill {
         this.bonus = b;
     }
 
-    public int getAgingModifier() {
-        return agingModifier;
-    }
-
     public void setAgingModifier(int agingModifier) {
         this.agingModifier = agingModifier;
     }

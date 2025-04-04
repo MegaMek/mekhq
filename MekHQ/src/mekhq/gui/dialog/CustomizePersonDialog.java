@@ -1358,6 +1358,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         JLabel lblValue;
         JLabel lblLevel;
         JLabel lblBonus;
+        JLabel lblAging;
         JSpinner spnLevel;
         JSpinner spnBonus;
 
@@ -1391,10 +1392,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             }
             skillValues.put(type, lblValue);
 
-            SkillType skillType = SkillType.getType(type);
-            int ageModifier = getAgeModifier(milestone, skillType.getFirstAttribute(), skillType.getSecondAttribute());
-            skillAgeModifiers.put(type, new JLabel(ageModifier + ""));
-
             lblLevel = new JLabel(resourceMap.getString("lblLevel.text"));
             lblBonus = new JLabel(resourceMap.getString("lblBonus.text"));
             int level = 0;
@@ -1414,6 +1411,11 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             spnBonus.setEnabled(chkSkill.isSelected());
             skillLevels.put(type, spnLevel);
             skillBonus.put(type, spnBonus);
+
+            SkillType skillType = SkillType.getType(type);
+            lblAging = new JLabel(resourceMap.getString("lblAging.text"));
+            int ageModifier = getAgeModifier(milestone, skillType.getFirstAttribute(), skillType.getSecondAttribute());
+            skillAgeModifiers.put(type, new JLabel(ageModifier + ""));
 
             c.anchor = GridBagConstraints.WEST;
             c.weightx = 0;
@@ -1444,10 +1446,16 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             c.weightx = 1.0;
             skillsPanel.add(spnBonus, c);
 
-            c.gridx = 7;
-            c.anchor = GridBagConstraints.WEST;
-            c.weightx = 1.0;
-            skillsPanel.add(skillAgeModifiers.get(type), c);
+            if (campaign.getCampaignOptions().isUseAgeEffects()) {
+                c.gridx = 7;
+                c.anchor = GridBagConstraints.WEST;
+                skillsPanel.add(lblAging, c);
+
+                c.gridx = 8;
+                c.anchor = GridBagConstraints.WEST;
+                c.weightx = 1.0;
+                skillsPanel.add(skillAgeModifiers.get(type), c);
+            }
         }
     }
 
