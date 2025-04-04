@@ -27,6 +27,8 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import static mekhq.campaign.personnel.skills.SkillType.getRoleplaySkills;
+
 import java.util.Objects;
 
 import mekhq.Utilities;
@@ -188,6 +190,15 @@ public abstract class AbstractSkillGenerator {
         final int experienceLevel = Utilities.generateExpLevel(rskillPrefs.getArtilleryBonus());
         if (experienceLevel > SkillType.EXP_ULTRA_GREEN) {
             addSkill(person, SkillType.S_ARTILLERY, experienceLevel, rskillPrefs.randomizeSkill(), bonus);
+        }
+    }
+
+    public void generateRoleplaySkills(final Person person, final int experienceLevel) {
+        for (SkillType skillType : getRoleplaySkills()) {
+            int roleplaySkillLevel = Utilities.generateExpLevel(rskillPrefs.getRoleplaySkillsModifier(experienceLevel));
+            if (roleplaySkillLevel > SkillType.EXP_ULTRA_GREEN) {
+                addSkill(person, skillType.getName(), roleplaySkillLevel, rskillPrefs.randomizeSkill(), 0);
+            }
         }
     }
 

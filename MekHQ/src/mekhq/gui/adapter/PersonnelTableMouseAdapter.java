@@ -80,6 +80,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Kill;
+import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.event.PersonStatusChangedEvent;
@@ -111,6 +112,8 @@ import mekhq.campaign.personnel.enums.ROMDesignation;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
+import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
+import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -203,6 +206,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_LOYALTY = "LOYALTY";
     private static final String CMD_PERSONALITY = "PERSONALITY";
     private static final String CMD_ADD_RANDOM_ABILITY = "ADD_RANDOM_ABILITY";
+    private static final String CMD_GENERATE_ROLEPLAY_SKILLS = "GENERATE_ROLEPLAY_SKILLS";
 
     private static final String CMD_FREE = "FREE";
     private static final String CMD_EXECUTE = "EXECUTE";
@@ -1291,6 +1295,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
                 for (Person person : people) {
                     singleSpecialAbilityGenerator.rollSPA(getCampaign(), person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
+            case CMD_GENERATE_ROLEPLAY_SKILLS: {
+                RandomSkillPreferences skillPreferences = getCampaign().getRandomSkillPreferences();
+                AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPreferences);
+                for (Person person : people) {
+                    skillGenerator.generateRoleplaySkills(person, person.getExperienceLevel(getCampaign(), false));
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -3443,6 +3456,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
             }
+
+            menuItem = new JMenuItem(resources.getString("generateRoleplaySkills.text"));
+            menuItem.setActionCommand(CMD_GENERATE_ROLEPLAY_SKILLS);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
 
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }

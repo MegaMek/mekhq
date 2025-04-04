@@ -34,15 +34,8 @@ import megamek.logging.MMLogger;
  *
  * <p>The available skill sub-types are:</p>
  *
- * <ul>
- *     <li>{@link #COMBAT_GUNNERY}: Representing gunnery-related combat skills.</li>
- *     <li>{@link #COMBAT_PILOTING}: Representing piloting-related combat skills.</li>
- *     <li>{@link #SUPPORT}: Representing non-combat, support-related skills.</li>
- *     <li>{@link #ROLEPLAY}: Representing skills for roleplay or narrative elements.</li>
- * </ul>
- * <p>
- * This enum also includes a utility method for parsing {@link SkillSubType} values from strings
- * or integers.
+ * <p>This enum also includes a utility method for parsing {@link SkillSubType} values from strings
+ * or integers.</p>
  */
 public enum SkillSubType {
     /**
@@ -61,9 +54,34 @@ public enum SkillSubType {
     SUPPORT,
 
     /**
+     * Represents command-related support (non-combat) skills.
+     */
+    SUPPORT_COMMAND,
+
+    /**
      * Represents roleplay or narrative-based skills.
      */
-    ROLEPLAY;
+    ROLEPLAY_GENERAL,
+
+    /**
+     * Represents skills related to art or artistic pursuits within the roleplay or narrative context.
+     */
+    ROLEPLAY_ART,
+
+    /**
+     * Represents roleplay or narrative-based skills related to special interests.
+     */
+    ROLEPLAY_INTEREST,
+
+    /**
+     * Represents roleplay or narrative-based skills related to science or scientific disciplines.
+     */
+    ROLEPLAY_SCIENCE,
+
+    /**
+     * Represents roleplay or narrative-based skills related to security.
+     */
+    ROLEPLAY_SECURITY;
 
     /**
      * Converts a string or integer input to its corresponding {@link SkillSubType}.
