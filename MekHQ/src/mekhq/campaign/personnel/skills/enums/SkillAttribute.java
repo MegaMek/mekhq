@@ -105,6 +105,8 @@ public enum SkillAttribute {
 
         try {
             // Attempt to parse as an integer and use as ordinal.
+            // We're using Integer.parseInt() here and not MathUtility.parseInt as we want to have a log in the event
+            // parsing fails, rather than just silently failing.
             return SkillAttribute.values()[Integer.parseInt(text)];
         } catch (Exception ignored) {
         }
