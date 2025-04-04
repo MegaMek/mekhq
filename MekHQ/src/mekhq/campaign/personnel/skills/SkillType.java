@@ -805,10 +805,6 @@ public class SkillType {
                 }
             }
 
-            if ("Gunnery/Protomek".equals(skillType.getName())) { // Renamed in 0.49.12
-                skillType.name = "Gunnery/ProtoMek";
-            }
-
             // <50.05 compatibility handler
             if (skillType.getSubType() == null ||
                       skillType.getFirstAttribute() == null ||
