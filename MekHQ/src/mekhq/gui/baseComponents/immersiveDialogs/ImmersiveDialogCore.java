@@ -27,10 +27,12 @@
  */
 package mekhq.gui.baseComponents.immersiveDialogs;
 
+import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -50,7 +52,6 @@ import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 
-import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -60,7 +61,6 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.GlossaryDialog;
-import mekhq.utilities.ImageUtilities;
 
 /**
  * An immersive dialog used in MekHQ to display interactions between speakers, messages, and actions. The dialog
@@ -79,10 +79,10 @@ public class ImmersiveDialogCore extends JDialog {
 
     private Campaign campaign;
 
-    private int CENTER_WIDTH = UIUtil.scaleForGUI(400);
+    private int CENTER_WIDTH = scaleForGUI(400);
 
-    private final int PADDING = UIUtil.scaleForGUI(5);
-    protected final int IMAGE_WIDTH = 125; // This is scaled to GUI by 'scaleImageIconToWidth'
+    private final int PADDING = scaleForGUI(5);
+    protected final int IMAGE_WIDTH = 250; // This is scaled to GUI by 'scaleImageIconToWidth'
 
     private JPanel northPanel;
     private JPanel southPanel;
@@ -151,10 +151,9 @@ public class ImmersiveDialogCore extends JDialog {
      *                              panel; use {@code null} if not applicable.
      */
     public ImmersiveDialogCore(Campaign campaign, @Nullable Person leftSpeaker, @Nullable Person rightSpeaker,
-                               String centerMessage, List<ButtonLabelTooltipPair> buttons,
-                               @Nullable String outOfCharacterMessage, @Nullable Integer centerWidth,
-                               boolean isVerticalLayout, @Nullable JPanel spinnerPanel, @Nullable ImageIcon imageIcon,
-                               boolean isModal) {
+          String centerMessage, List<ButtonLabelTooltipPair> buttons, @Nullable String outOfCharacterMessage,
+          @Nullable Integer centerWidth, boolean isVerticalLayout, @Nullable JPanel spinnerPanel,
+          @Nullable ImageIcon imageIcon, boolean isModal) {
         // Initialize
         this.campaign = campaign;
         this.leftSpeaker = leftSpeaker;
@@ -169,7 +168,7 @@ public class ImmersiveDialogCore extends JDialog {
         // Main Panel to hold all boxes
         JPanel mainPanel = new JPanel(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
-        constraints.insets = new Insets(PADDING, PADDING, PADDING, PADDING);
+        constraints.insets = new Insets(PADDING, 0, PADDING, 0);
         constraints.fill = GridBagConstraints.BOTH;
         constraints.weighty = 1;
 
@@ -261,7 +260,7 @@ public class ImmersiveDialogCore extends JDialog {
      * @return A {@link JPanel} with the message displayed in the center and buttons at the bottom.
      */
     private JPanel createCenterBox(String centerMessage, List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout,
-                                   @Nullable JPanel spinnerPanel, @Nullable ImageIcon imageIcon) {
+          @Nullable JPanel spinnerPanel, @Nullable ImageIcon imageIcon) {
         northPanel = new JPanel(new BorderLayout());
 
         // Buttons panel
@@ -287,31 +286,29 @@ public class ImmersiveDialogCore extends JDialog {
 
         // Wrap the JEditorPane in a JScrollPane
         JScrollPane scrollPane = new JScrollPane(editorPane);
-        scrollPane.setMinimumSize(new Dimension(CENTER_WIDTH, scrollPane.getHeight()));
+        scrollPane.setMinimumSize(scaleForGUI(CENTER_WIDTH, scrollPane.getHeight()));
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         // This line ensures the scroll pane starts scrolled to the top, not bottom.
         SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
 
         // Create a container with a border for the padding
         JPanel scrollPaneContainer = new JPanel(new BorderLayout());
-        scrollPaneContainer.setBorder(BorderFactory.createEmptyBorder(PADDING, 0, PADDING, 0));
         scrollPaneContainer.add(scrollPane, BorderLayout.CENTER);
 
         // Create a JLabel for the image above the JEditorPane
         JLabel imageLabel = new JLabel();
         if (imageIcon != null) {
             if (imageIcon.getIconWidth() > CENTER_WIDTH) {
-                imageIcon = ImageUtilities.scaleImageIcon(imageIcon, CENTER_WIDTH, true);
+                imageIcon = scaleImageIcon(imageIcon, CENTER_WIDTH, true);
             }
 
             int heightLimit = max(1, CENTER_WIDTH / 3); // I went with 3 because that provided the best feel
             if (imageIcon.getIconHeight() > heightLimit) {
-                imageIcon = ImageUtilities.scaleImageIcon(imageIcon, heightLimit, false);
+                imageIcon = scaleImageIcon(imageIcon, heightLimit, false);
             }
 
             imageLabel.setIcon(imageIcon);
             imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            imageLabel.setBorder(BorderFactory.createEmptyBorder(PADDING, 0, PADDING, 0));
         }
 
         // Create a panel for the image and editorPane
@@ -403,9 +400,7 @@ public class ImmersiveDialogCore extends JDialog {
         setFontScaling(editorPane, false, 1);
 
         // Add a HyperlinkListener to capture hyperlink clicks
-        editorPane.addHyperlinkListener(evt -> {
-            hyperlinkEventListenerActions(evt);
-        });
+        editorPane.addHyperlinkListener(this::hyperlinkEventListenerActions);
 
         // Add the editor pane to the panel
         pnlOutOfCharacter.add(editorPane);
@@ -442,7 +437,7 @@ public class ImmersiveDialogCore extends JDialog {
      *                         {@code false} for horizontal arrangement.
      */
     protected JPanel populateButtonPanel(List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout,
-                                         @Nullable JPanel spinnerPanel) {
+          @Nullable JPanel spinnerPanel) {
         final int padding = getPADDING();
 
         // Main container panel to hold the spinner and button panel
@@ -466,7 +461,7 @@ public class ImmersiveDialogCore extends JDialog {
         gbc.fill = GridBagConstraints.NONE;
 
         List<JButton> buttonList = new ArrayList<>();
-        Dimension largestSize = new Dimension(0, 0);
+        Dimension largestSize = scaleForGUI(0, 0);
 
         // First pass: Create buttons and determine the largest size
         for (ButtonLabelTooltipPair buttonStrings : buttons) {
@@ -605,7 +600,7 @@ public class ImmersiveDialogCore extends JDialog {
         JPanel speakerBox = new JPanel();
         speakerBox.setLayout(new BoxLayout(speakerBox, BoxLayout.Y_AXIS));
         speakerBox.setAlignmentX(Component.CENTER_ALIGNMENT);
-        speakerBox.setMaximumSize(new Dimension(IMAGE_WIDTH, Integer.MAX_VALUE));
+        speakerBox.setMaximumSize(scaleForGUI(IMAGE_WIDTH, MAX_VALUE));
 
         // Get speaker details
         String speakerName = campaign.getName();
