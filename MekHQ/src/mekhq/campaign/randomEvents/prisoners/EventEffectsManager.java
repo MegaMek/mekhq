@@ -34,6 +34,7 @@ import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static mekhq.campaign.force.ForceType.SECURITY;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -63,8 +64,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
@@ -81,13 +81,12 @@ import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
  * Manages the resolution and effects of prisoner events during a campaign.
  *
  * <p>This class applies the effects of prisoner-related events, such as injuries, capacity
- * changes, escapes, and loyalty adjustments. It processes event details and effects, manages
- * affected campaign state or personnel, and generates a comprehensive report summarizing the
- * outcomes.</p>
+ * changes, escapes, and loyalty adjustments. It processes event details and effects, manages affected campaign state or
+ * personnel, and generates a comprehensive report summarizing the outcomes.</p>
  *
  * <p>The effects manager handles a wide variety of event consequences, including unique cases for
- * specific prisoner events. It also tracks and exposes information like escapees for further
- * processing in the campaign.</p>
+ * specific prisoner events. It also tracks and exposes information like escapees for further processing in the
+ * campaign.</p>
  */
 public class EventEffectsManager {
     private static final MMLogger logger = MMLogger.create(EventEffectsManager.class);
@@ -103,23 +102,20 @@ public class EventEffectsManager {
      * Constructs an {@link EventEffectsManager} object and processes the given event effects.
      *
      * <p>Based on the event data and the player's chosen response, this constructor processes the
-     * potential effects of the event, applying their impact to the campaign. These effects are
-     * compiled into an event report for further use.</p>
+     * potential effects of the event, applying their impact to the campaign. These effects are compiled into an event
+     * report for further use.</p>
      *
      * @param campaign      The campaign in which the event occurs.
      * @param eventData     The data related to the prisoner event being processed.
      * @param choiceIndex   The index of the user-selected choice for the event.
      * @param wasSuccessful Indicates whether the selected choice was successful.
      */
-    public EventEffectsManager(Campaign campaign, PrisonerEventData eventData, int choiceIndex,
-                               boolean wasSuccessful) {
+    public EventEffectsManager(Campaign campaign, PrisonerEventData eventData, int choiceIndex, boolean wasSuccessful) {
         this.campaign = campaign;
 
         PrisonerResponseEntry responseEntry = eventData.responseEntries().get(choiceIndex);
 
-        List<EventResult> results = wasSuccessful
-            ? responseEntry.effectsSuccess()
-            : responseEntry.effectsFailure();
+        List<EventResult> results = wasSuccessful ? responseEntry.effectsSuccess() : responseEntry.effectsFailure();
 
         StringBuilder report = new StringBuilder();
         for (EventResult result : results) {
@@ -169,21 +165,21 @@ public class EventEffectsManager {
      * <p>The returned set can be used to track and handle additional consequences of the escapes,
      * such as updating campaign statistics or creating follow-up events.</p>
      *
-     * @return A {@link Set} of {@link Person} objects representing the prisoners who escaped,
-     * or an empty set if no escapes occurred.
+     * @return A {@link Set} of {@link Person} objects representing the prisoners who escaped, or an empty set if no
+     *       escapes occurred.
      */
     public Set<Person> getEscapees() {
         return escapees;
     }
 
     /**
-     * Selects a random target for an event effect based on whether the target is a guard or a
-     * prisoner.
+     * Selects a random target for an event effect based on whether the target is a guard or a prisoner.
      *
      * <p>Guards are selected from security forces, while prisoners are selected from the current
      * prisoner list. The selection excludes any invalid targets.</p>
      *
      * @param isGuard {@code true} to select a guard, {@code false} to select a prisoner.
+     *
      * @return The randomly selected {@link Person}, or {@code null} if no valid target exists.
      */
     private @Nullable Person getRandomTarget(final boolean isGuard) {
@@ -200,6 +196,7 @@ public class EventEffectsManager {
      * Retrieves all potential targets for an event effect, either guards or prisoners.
      *
      * @param isGuard {@code true} to retrieve guards, {@code false} to retrieve prisoners.
+     *
      * @return A {@link List} of {@link Person} objects representing the potential targets.
      */
     private List<Person> getAllPotentialTargets(final boolean isGuard) {
@@ -234,10 +231,10 @@ public class EventEffectsManager {
      * Applies an effect to adjust the temporary prisoner capacity and generates a report.
      *
      * <p>This effect changes the available capacity based on the magnitude, with positive values
-     * increasing capacity and negative values decreasing it. The outcome is logged as part of the
-     * event report.</p>
+     * increasing capacity and negative values decreasing it. The outcome is logged as part of the event report.</p>
      *
      * @param result The {@link EventResult} detailing the effect and its magnitude.
+     *
      * @return A {@link String} summarizing the effect of the operation.
      */
     String eventEffectPrisonerCapacity(EventResult result) {
@@ -246,25 +243,28 @@ public class EventEffectsManager {
 
         campaign.setTemporaryPrisonerCapacity(currentTemporarilyPrisonerCapacity + magnitude);
 
-        String colorOpen = magnitude > 0
-            ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor())
-            : spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
+        String colorOpen = magnitude > 0 ?
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()) :
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
 
-        String direction = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0
-            ? "change.increased" : "change.decreased");
+        String direction = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0 ? "change.increased" : "change.decreased");
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, "PRISONER_CAPACITY.report",
-            colorOpen, direction, CLOSING_SPAN_TAG, magnitude);
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "PRISONER_CAPACITY.report",
+              colorOpen,
+              direction,
+              CLOSING_SPAN_TAG,
+              magnitude);
     }
 
     /**
      * Handles the effects of an "injury" event, causing injuries to a random target.
      *
      * <p>The injury amount is determined by the magnitude of the event effect. Injuries are
-     * applied up to the maximum allowable level per target. The outcome is added to the event
-     * report.</p>
+     * applied up to the maximum allowable level per target. The outcome is added to the event report.</p>
      *
      * @param result The {@link EventResult} detailing the injury effect.
+     *
      * @return A {@link String} summarizing the injury effect.
      */
     String eventEffectInjury(EventResult result) {
@@ -294,27 +294,24 @@ public class EventEffectsManager {
             target.diagnose(campaign, wounds);
         }
 
-        String colorOpen = isGuard
-            ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
-            : spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+        String colorOpen = isGuard ?
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
 
-        String context = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0
-            ? "context.guard.singular"
-            : "context.prisoner.singular");
+        String context = getFormattedTextAt(RESOURCE_BUNDLE,
+              magnitude > 0 ? "context.guard.singular" : "context.prisoner.singular");
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, "INJURY.report",
-            colorOpen, context, CLOSING_SPAN_TAG);
+        return getFormattedTextAt(RESOURCE_BUNDLE, "INJURY.report", colorOpen, context, CLOSING_SPAN_TAG);
     }
 
     /**
-     * Handles the effects of a "death" event, removing personnel from the campaign due to
-     * fatalities.
+     * Handles the effects of a "death" event, removing personnel from the campaign due to fatalities.
      *
      * <p>The affected individuals are determined based on the event's magnitude, with guards being
-     * marked as KIA and prisoners being removed completely. The outcome is added to the event
-     * report.</p>
+     * marked as KIA and prisoners being removed completely. The outcome is added to the event report.</p>
      *
      * @param result The {@link EventResult} detailing the death effect.
+     *
      * @return A {@link String} summarizing the death effect.
      */
     String eventEffectInjuryPercent(EventResult result) {
@@ -351,27 +348,28 @@ public class EventEffectsManager {
             potentialTargets.remove(target);
         }
 
-        String colorOpen = isGuard
-            ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
-            : spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+        String colorOpen = isGuard ?
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
 
         String context;
         if (isGuard) {
-            context = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1
-                ? "context.guard.plural"
-                : "context.guard.singular");
+            context = getFormattedTextAt(RESOURCE_BUNDLE,
+                  targetCount != 1 ? "context.guard.plural" : "context.guard.singular");
         } else {
-            context = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1
-                ? "context.prisoner.plural"
-                : "context.prisoner.singular");
+            context = getFormattedTextAt(RESOURCE_BUNDLE,
+                  targetCount != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
         }
 
-        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1
-            ? "pluralizer.have"
-            : "pluralizer.has");
+        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1 ? "pluralizer.have" : "pluralizer.has");
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, "INJURY_PERCENT.report",
-            targetCount, colorOpen, context, CLOSING_SPAN_TAG, haveOrHas);
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "INJURY_PERCENT.report",
+              targetCount,
+              colorOpen,
+              context,
+              CLOSING_SPAN_TAG,
+              haveOrHas);
     }
 
     /**
@@ -381,6 +379,7 @@ public class EventEffectsManager {
      * are logged for further actions. An escape report is generated as part of the event handling.</p>
      *
      * @param result The {@link EventResult} detailing the escape effect and its magnitude.
+     *
      * @return A {@link String} summarizing the escape effect.
      */
     String eventEffectDeath(EventResult result) {
@@ -409,31 +408,32 @@ public class EventEffectsManager {
             potentialTargets.remove(target);
         }
 
-        String colorOpen = isGuard
-            ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
-            : spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+        String colorOpen = isGuard ?
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
 
         String context;
         if (isGuard) {
-            context = getFormattedTextAt(RESOURCE_BUNDLE, magnitude != 1
-                ? "context.guard.plural"
-                : "context.guard.singular");
+            context = getFormattedTextAt(RESOURCE_BUNDLE,
+                  magnitude != 1 ? "context.guard.plural" : "context.guard.singular");
         } else {
-            context = getFormattedTextAt(RESOURCE_BUNDLE, magnitude != 1
-                ? "context.prisoner.plural"
-                : "context.prisoner.singular");
+            context = getFormattedTextAt(RESOURCE_BUNDLE,
+                  magnitude != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
         }
 
-        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, magnitude != 1
-            ? "pluralizer.have"
-            : "pluralizer.has");
+        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, magnitude != 1 ? "pluralizer.have" : "pluralizer.has");
 
-        String bodyOrBodies = getFormattedTextAt(RESOURCE_BUNDLE, magnitude != 1
-            ? "DEATH.body.plural"
-            : "DEATH.body.singular");
+        String bodyOrBodies = getFormattedTextAt(RESOURCE_BUNDLE,
+              magnitude != 1 ? "DEATH.body.plural" : "DEATH.body.singular");
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, "DEATH.report",
-            magnitude, colorOpen, context, CLOSING_SPAN_TAG, haveOrHas, bodyOrBodies);
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "DEATH.report",
+              magnitude,
+              colorOpen,
+              context,
+              CLOSING_SPAN_TAG,
+              haveOrHas,
+              bodyOrBodies);
     }
 
     /**
@@ -442,7 +442,8 @@ public class EventEffectsManager {
      * <p>This method processes special cases that require custom logic, such as skill removal,
      * faction changes, or morale adjustments. The exact behavior depends on the event type.</p>
      *
-     * @param result    The {@link EventResult} describing the unique effect.
+     * @param result The {@link EventResult} describing the unique effect.
+     *
      * @return A {@link String} summarizing the unique effect.
      */
     private String eventEffectDeathPercent(EventResult result) {
@@ -471,32 +472,33 @@ public class EventEffectsManager {
             potentialTargets.remove(target);
         }
 
-        String colorOpen = isGuard
-            ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
-            : spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+        String colorOpen = isGuard ?
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
 
         String context;
         if (isGuard) {
-            context = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1
-                ? "context.guard.plural"
-                : "context.guard.singular");
+            context = getFormattedTextAt(RESOURCE_BUNDLE,
+                  targetCount != 1 ? "context.guard.plural" : "context.guard.singular");
         } else {
-            context = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1
-                ? "context.prisoner.plural"
-                : "context.prisoner.singular");
+            context = getFormattedTextAt(RESOURCE_BUNDLE,
+                  targetCount != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
         }
 
-        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1
-            ? "pluralizer.have"
-            : "pluralizer.has");
+        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1 ? "pluralizer.have" : "pluralizer.has");
 
-        String bodyOrBodies = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1
-            ? "DEATH.body.plural"
-            : "DEATH.body.singular");
+        String bodyOrBodies = getFormattedTextAt(RESOURCE_BUNDLE,
+              targetCount != 1 ? "DEATH.body.plural" : "DEATH.body.singular");
 
         // We can reuse the same report as the DEATH effect, here too
-        return getFormattedTextAt(RESOURCE_BUNDLE, "DEATH.report",
-            targetCount, colorOpen, context, CLOSING_SPAN_TAG, haveOrHas, bodyOrBodies);
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "DEATH.report",
+              targetCount,
+              colorOpen,
+              context,
+              CLOSING_SPAN_TAG,
+              haveOrHas,
+              bodyOrBodies);
     }
 
     /**
@@ -506,6 +508,7 @@ public class EventEffectsManager {
      * added to the event report.</p>
      *
      * @param result The {@link EventResult} specifying the fatigue effect and its magnitude.
+     *
      * @return A {@link String} summarizing the fatigue effect.
      */
     private String eventEffectSkill(EventResult result) {
@@ -551,13 +554,17 @@ public class EventEffectsManager {
 
         String colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
 
-        String context = getFormattedTextAt(RESOURCE_BUNDLE, isGuard
-            ? "context.guard.singular"
-            : "context.prisoner.singular");
+        String context = getFormattedTextAt(RESOURCE_BUNDLE,
+              isGuard ? "context.guard.singular" : "context.prisoner.singular");
 
         // We can reuse the same report as the DEATH effect, here too
-        return getFormattedTextAt(RESOURCE_BUNDLE, "SKILL.report",
-            colorOpen, context, CLOSING_SPAN_TAG, magnitude, skillName);
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "SKILL.report",
+              colorOpen,
+              context,
+              CLOSING_SPAN_TAG,
+              magnitude,
+              skillName);
     }
 
     /**
@@ -567,8 +574,8 @@ public class EventEffectsManager {
      * decreased by the effect's magnitude.</p>
      *
      * @param result The {@link EventResult} detailing the loyalty effect and its magnitude.
-     * @return A {@link String} summarizing the loyalty adjustment or an empty string if loyalty
-     * modifiers are disabled.
+     *
+     * @return A {@link String} summarizing the loyalty adjustment or an empty string if loyalty modifiers are disabled.
      */
     String eventEffectLoyaltyOne(EventResult result) {
         boolean isUseLoyalty = campaign.getCampaignOptions().isUseLoyaltyModifiers();
@@ -588,19 +595,22 @@ public class EventEffectsManager {
 
         target.changeLoyalty(magnitude);
 
-        String context = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0
-            ? "context.guard.singular"
-            : "context.prisoner.singular");
+        String context = getFormattedTextAt(RESOURCE_BUNDLE,
+              magnitude > 0 ? "context.guard.singular" : "context.prisoner.singular");
 
-        String colorOpen = magnitude > 0
-            ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor())
-            : spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+        String colorOpen = magnitude > 0 ?
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()) :
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
 
-        String direction = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0
-            ? "change.increased" : "change.decreased");
+        String direction = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0 ? "change.increased" : "change.decreased");
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, "LOYALTY_ONE.report",
-            context, colorOpen, direction, CLOSING_SPAN_TAG, magnitude);
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "LOYALTY_ONE.report",
+              context,
+              colorOpen,
+              direction,
+              CLOSING_SPAN_TAG,
+              magnitude);
     }
 
     /**
@@ -610,8 +620,9 @@ public class EventEffectsManager {
      * prisoners, as determined by the event effect's configuration.</p>
      *
      * @param result The {@link EventResult} detailing the loyalty effect and its magnitude.
-     * @return A {@link String} summarizing the collective loyalty adjustment or an empty string
-     * if loyalty modifiers are disabled.
+     *
+     * @return A {@link String} summarizing the collective loyalty adjustment or an empty string if loyalty modifiers
+     *       are disabled.
      */
     private String eventEffectLoyaltyAll(EventResult result) {
         boolean isUseLoyalty = campaign.getCampaignOptions().isUseLoyaltyModifiers();
@@ -635,24 +646,26 @@ public class EventEffectsManager {
 
         String context;
         if (isGuard) {
-            context = getFormattedTextAt(RESOURCE_BUNDLE, targets.size() != 1
-                ? "context.guard.plural"
-                : "context.guard.singular");
+            context = getFormattedTextAt(RESOURCE_BUNDLE,
+                  targets.size() != 1 ? "context.guard.plural" : "context.guard.singular");
         } else {
-            context = getFormattedTextAt(RESOURCE_BUNDLE, targets.size() != 1
-                ? "context.prisoner.plural"
-                : "context.prisoner.singular");
+            context = getFormattedTextAt(RESOURCE_BUNDLE,
+                  targets.size() != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
         }
 
-        String colorOpen = magnitude > 0
-            ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor())
-            : spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+        String colorOpen = magnitude > 0 ?
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()) :
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
 
-        String direction = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0
-            ? "change.increased" : "change.decreased");
+        String direction = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0 ? "change.increased" : "change.decreased");
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, "LOYALTY_ALL.report",
-            context, colorOpen, direction, CLOSING_SPAN_TAG, magnitude);
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "LOYALTY_ALL.report",
+              context,
+              colorOpen,
+              direction,
+              CLOSING_SPAN_TAG,
+              magnitude);
     }
 
     /**
@@ -662,6 +675,7 @@ public class EventEffectsManager {
      * are logged for follow-up actions or reporting purposes.</p>
      *
      * @param result The {@link EventResult} detailing the escape effect and its magnitude.
+     *
      * @return A {@link String} summarizing the escape effect.
      */
     private String eventEffectEscape(EventResult result) {
@@ -689,15 +703,18 @@ public class EventEffectsManager {
 
         String colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
 
-        String context = getFormattedTextAt(RESOURCE_BUNDLE, magnitude != 1 ?
-            "context.prisoner.plural" : "context.prisoner.singular");
+        String context = getFormattedTextAt(RESOURCE_BUNDLE,
+              magnitude != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
 
-        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, magnitude != 1
-            ? "pluralizer.have"
-            : "pluralizer.has");
+        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, magnitude != 1 ? "pluralizer.have" : "pluralizer.has");
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, "ESCAPE.report",
-            magnitude, context, haveOrHas, colorOpen, CLOSING_SPAN_TAG);
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "ESCAPE.report",
+              magnitude,
+              context,
+              haveOrHas,
+              colorOpen,
+              CLOSING_SPAN_TAG);
     }
 
     /**
@@ -707,6 +724,7 @@ public class EventEffectsManager {
      * Escapees are logged for tracking, and a summary report is generated.</p>
      *
      * @param result The {@link EventResult} detailing the escape effect as a percentage.
+     *
      * @return A {@link String} summarizing the escape effect.
      */
     private String eventEffectEscapePercent(EventResult result) {
@@ -735,16 +753,19 @@ public class EventEffectsManager {
 
         String colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
 
-        String context = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1 ?
-            "context.prisoner.plural" : "context.prisoner.singular");
+        String context = getFormattedTextAt(RESOURCE_BUNDLE,
+              targetCount != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
 
-        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1
-            ? "pluralizer.have"
-            : "pluralizer.has");
+        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1 ? "pluralizer.have" : "pluralizer.has");
 
         // We can reuse the same report as the ESCAPE effect, here too
-        return getFormattedTextAt(RESOURCE_BUNDLE, "ESCAPE.report",
-            targetCount, context, haveOrHas, colorOpen, CLOSING_SPAN_TAG);
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "ESCAPE.report",
+              targetCount,
+              context,
+              haveOrHas,
+              colorOpen,
+              CLOSING_SPAN_TAG);
     }
 
     /**
@@ -754,8 +775,8 @@ public class EventEffectsManager {
      * event's magnitude. The outcome is logged in the event report.</p>
      *
      * @param result The {@link EventResult} specifying the fatigue effect and its magnitude.
-     * @return A {@link String} summarizing the fatigue effect or an empty string if fatigue
-     * is disabled.
+     *
+     * @return A {@link String} summarizing the fatigue effect or an empty string if fatigue is disabled.
      */
     private String eventEffectFatigueOne(EventResult result) {
         boolean isUseFatigue = campaign.getCampaignOptions().isUseFatigue();
@@ -773,21 +794,29 @@ public class EventEffectsManager {
             return "";
         }
 
-        target.changeFatigue(magnitude);
+        boolean hasGlassJaw = target.getOptions().booleanOption(FLAW_GLASS_JAW);
+        target.changeFatigue(hasGlassJaw ? magnitude * 2 : magnitude);
 
-        String context = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0
-            ? "context.guard.singular"
-            : "context.prisoner.singular");
+        if (campaign.getCampaignOptions().isUseFatigue()) {
+            Fatigue.processFatigueActions(campaign, target);
+        }
 
-        String colorOpen = magnitude > 0
-            ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor())
-            : spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+        String context = getFormattedTextAt(RESOURCE_BUNDLE,
+              magnitude > 0 ? "context.guard.singular" : "context.prisoner.singular");
 
-        String direction = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0
-            ? "change.increased" : "change.decreased");
+        String colorOpen = magnitude > 0 ?
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()) :
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, "FATIGUE_ONE.report",
-            context, colorOpen, direction, CLOSING_SPAN_TAG, magnitude);
+        String direction = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0 ? "change.increased" : "change.decreased");
+
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "FATIGUE_ONE.report",
+              context,
+              colorOpen,
+              direction,
+              CLOSING_SPAN_TAG,
+              magnitude);
     }
 
     /**
@@ -797,8 +826,8 @@ public class EventEffectsManager {
      * prisoners, based on the event effect's magnitude.</p>
      *
      * @param result The {@link EventResult} specifying the fatigue effect and its magnitude.
-     * @return A {@link String} summarizing the collective fatigue effect or an empty string
-     * if fatigue is disabled.
+     *
+     * @return A {@link String} summarizing the collective fatigue effect or an empty string if fatigue is disabled.
      */
     private String eventEffectFatigueAll(EventResult result) {
         boolean isUseFatigue = campaign.getCampaignOptions().isUseFatigue();
@@ -817,29 +846,36 @@ public class EventEffectsManager {
         }
 
         for (Person target : targets) {
-            target.changeFatigue(magnitude);
+            boolean hasGlassJaw = target.getOptions().booleanOption(FLAW_GLASS_JAW);
+            target.changeFatigue(hasGlassJaw ? magnitude * 2 : magnitude);
+
+            if (campaign.getCampaignOptions().isUseFatigue()) {
+                Fatigue.processFatigueActions(campaign, target);
+            }
         }
 
         String context;
         if (isGuard) {
-            context = getFormattedTextAt(RESOURCE_BUNDLE, targets.size() != 1
-                ? "context.guard.plural"
-                : "context.guard.singular");
+            context = getFormattedTextAt(RESOURCE_BUNDLE,
+                  targets.size() != 1 ? "context.guard.plural" : "context.guard.singular");
         } else {
-            context = getFormattedTextAt(RESOURCE_BUNDLE, targets.size() != 1
-                ? "context.prisoner.plural"
-                : "context.prisoner.singular");
+            context = getFormattedTextAt(RESOURCE_BUNDLE,
+                  targets.size() != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
         }
 
-        String colorOpen = magnitude > 0
-            ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor())
-            : spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+        String colorOpen = magnitude > 0 ?
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()) :
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
 
-        String direction = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0
-            ? "change.increased" : "change.decreased");
+        String direction = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0 ? "change.increased" : "change.decreased");
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, "FATIGUE_ALL.report",
-            context, colorOpen, direction, CLOSING_SPAN_TAG, magnitude);
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "FATIGUE_ALL.report",
+              context,
+              colorOpen,
+              direction,
+              CLOSING_SPAN_TAG,
+              magnitude);
     }
 
     /**
@@ -849,8 +885,8 @@ public class EventEffectsManager {
      * active contract. The change is logged for reporting purposes.</p>
      *
      * @param result The {@link EventResult} specifying the support point effect and its magnitude.
-     * @return A {@link String} summarizing the support point adjustment or an empty string if
-     * StratCon is disabled.
+     *
+     * @return A {@link String} summarizing the support point adjustment or an empty string if StratCon is disabled.
      */
     private String eventEffectSupportPoint(EventResult result) {
         if (!campaign.getCampaignOptions().isUseStratCon()) {
@@ -878,19 +914,23 @@ public class EventEffectsManager {
         StratconCampaignState targetState = potentialTargets.get(target);
         targetState.changeSupportPoints(magnitude);
 
-        String context = getFormattedTextAt(RESOURCE_BUNDLE, magnitude != 0
-            ? "SUPPORT_POINT.plural"
-            : "SUPPORT_POINT.singular");
+        String context = getFormattedTextAt(RESOURCE_BUNDLE,
+              magnitude != 0 ? "SUPPORT_POINT.plural" : "SUPPORT_POINT.singular");
 
-        String colorOpen = magnitude > 0
-            ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor())
-            : spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+        String colorOpen = magnitude > 0 ?
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()) :
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
 
-        String direction = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0
-            ? "change.increased" : "change.decreased");
+        String direction = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0 ? "change.increased" : "change.decreased");
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, "SUPPORT_POINT.report",
-            context, target.getName(), colorOpen, direction, CLOSING_SPAN_TAG, magnitude);
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "SUPPORT_POINT.report",
+              context,
+              target.getName(),
+              colorOpen,
+              direction,
+              CLOSING_SPAN_TAG,
+              magnitude);
     }
 
     /**
@@ -901,8 +941,8 @@ public class EventEffectsManager {
      *
      * @param eventData The {@link PrisonerEventData} providing context for the unique operation.
      * @param result    The {@link EventResult} detailing the specific unique effect.
-     * @return A {@link String} summarizing the unique effect or an empty string for unsupported
-     * events.
+     *
+     * @return A {@link String} summarizing the unique effect or an empty string for unsupported events.
      */
     private String eventEffectUnique(PrisonerEventData eventData, EventResult result) {
         final PrisonerEvent event = eventData.prisonerEvent();
@@ -928,8 +968,8 @@ public class EventEffectsManager {
      * <p>If the morale level of an active contract is below the overwhelming threshold, it is
      * increased by one level. The effect is logged as part of the event report.</p>
      *
-     * @return A {@link String} summarizing the outcome of the morale adjustment, or an empty string
-     * if no contract qualifies for the effect.
+     * @return A {@link String} summarizing the outcome of the morale adjustment, or an empty string if no contract
+     *       qualifies for the effect.
      */
     private String eventEffectUniqueBartering() {
         List<AtBContract> potentialTargets = new ArrayList<>();
@@ -953,8 +993,7 @@ public class EventEffectsManager {
 
         String colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, "BARTERING.report",
-            colorOpen, CLOSING_SPAN_TAG);
+        return getFormattedTextAt(RESOURCE_BUNDLE, "BARTERING.report", colorOpen, CLOSING_SPAN_TAG);
     }
 
     /**
@@ -976,8 +1015,7 @@ public class EventEffectsManager {
         target.setPrimaryRole(campaign, DEPENDENT);
         target.setSecondaryRole(NONE);
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, "MISTAKE.report",
-            target.getFullTitle());
+        return getFormattedTextAt(RESOURCE_BUNDLE, "MISTAKE.report", target.getFullTitle());
     }
 
     /**
@@ -986,8 +1024,8 @@ public class EventEffectsManager {
      * <p>The prisoner is updated to match the employer's faction, and their "Clan Personnel" status
      * is adjusted accordingly. This event can represent undercover operations or defections.</p>
      *
-     * @return A {@link String} summarizing the faction change for the affected prisoner, or an
-     * empty string if no prisoner qualifies.
+     * @return A {@link String} summarizing the faction change for the affected prisoner, or an empty string if no
+     *       prisoner qualifies.
      */
     private String eventEffectUniqueUndercover() {
         Person targetCharacter = getRandomTarget(false);
@@ -1004,21 +1042,19 @@ public class EventEffectsManager {
         targetCharacter.setClanPersonnel(newFaction.isClan());
 
         // We can reuse the MISTAKE report here, too.
-        return getFormattedTextAt(RESOURCE_BUNDLE, "MISTAKE.report",
-            targetCharacter.getFullTitle());
+        return getFormattedTextAt(RESOURCE_BUNDLE, "MISTAKE.report", targetCharacter.getFullTitle());
     }
 
     /**
-     * Applies a unique poison effect to a subset of the active personnel in the campaign,
-     * adjusting their fatigue levels based on the magnitude of the event result.
-     * The effect targets a percentage of personnel determined by a skill value provided in the
-     * event result.
+     * Applies a unique poison effect to a subset of the active personnel in the campaign, adjusting their fatigue
+     * levels based on the magnitude of the event result. The effect targets a percentage of personnel determined by a
+     * skill value provided in the event result.
      *
-     * @param result The event result containing data about the poison effect, including its
-     *               magnitude and a factor influencing the percentage of targets affected.
-     * @return A formatted string summarizing the poison's effect, including a color-coded
-     *         representation of severity, or an empty string if fatigue effects are disabled
-     *         or there are no valid personnel to target.
+     * @param result The event result containing data about the poison effect, including its magnitude and a factor
+     *               influencing the percentage of targets affected.
+     *
+     * @return A formatted string summarizing the poison's effect, including a color-coded representation of severity,
+     *       or an empty string if fatigue effects are disabled or there are no valid personnel to target.
      */
     private String eventEffectUniquePoison(EventResult result) {
         if (!campaign.getCampaignOptions().isUseFatigue()) {
@@ -1039,31 +1075,33 @@ public class EventEffectsManager {
             Person target = getRandomItem(potentialTargets);
 
             int fatigueChange = d6(magnitude);
-            target.changeFatigue(fatigueChange);
+            boolean hasGlassJaw = target.getOptions().booleanOption(FLAW_GLASS_JAW);
+            target.changeFatigue(hasGlassJaw ? fatigueChange * 2 : fatigueChange);
+
+            if (campaign.getCampaignOptions().isUseFatigue()) {
+                Fatigue.processFatigueActions(campaign, target);
+            }
 
             potentialTargets.remove(target);
         }
 
-        String colorOpen = magnitude > 1
-            ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
-            : spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+        String colorOpen = magnitude > 1 ?
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()) :
+                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, "POISON.report",
-            colorOpen, CLOSING_SPAN_TAG);
+        return getFormattedTextAt(RESOURCE_BUNDLE, "POISON.report", colorOpen, CLOSING_SPAN_TAG);
     }
 
     /**
-     * Handles an event where abandoned personnel generate new prisoners while increasing the
-     * crime rating.
+     * Handles an event where abandoned personnel generate new prisoners while increasing the crime rating.
      *
      * <p>The magnitude determines the severity of the crime level increase and the number of new
-     * prisoners generated. These prisoners are added to the campaign with random details and
-     * assigned the "prisoner" status.</p>
+     * prisoners generated. These prisoners are added to the campaign with random details and assigned the "prisoner"
+     * status.</p>
      *
-     * @param result The {@link EventResult} specifying the magnitude of the crime and prisoner
-     *              generation.
-     * @return A {@link String} summarizing the increase in crime and the generation of new
-     * prisoners.
+     * @param result The {@link EventResult} specifying the magnitude of the crime and prisoner generation.
+     *
+     * @return A {@link String} summarizing the increase in crime and the generation of new prisoners.
      */
     private String eventEffectUniqueAbandonedToDie(EventResult result) {
         int magnitude = result.magnitude();
@@ -1092,27 +1130,32 @@ public class EventEffectsManager {
 
         for (int i = 0; i < prisonerCount; i++) {
             Person newPerson = campaign.newPerson(PersonnelRole.MEKWARRIOR,
-                NONE,
-                new DefaultFactionSelector(originOptions, targetFaction),
-                new DefaultPlanetSelector(originOptions, targetContract.getSystem().getPrimaryPlanet()),
-                Gender.RANDOMIZE);
+                  NONE,
+                  new DefaultFactionSelector(originOptions, targetFaction),
+                  new DefaultPlanetSelector(originOptions, targetContract.getSystem().getPrimaryPlanet()),
+                  Gender.RANDOMIZE);
             campaign.recruitPerson(newPerson, PrisonerStatus.PRISONER, true, false);
         }
 
         String colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
 
-        String context = getFormattedTextAt(RESOURCE_BUNDLE, prisonerCount != 1
-            ? "context.prisoner.plural"
-            : "context.prisoner.singular");
+        String context = getFormattedTextAt(RESOURCE_BUNDLE,
+              prisonerCount != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
 
-        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, prisonerCount != 1
-            ? "pluralizer.have"
-            : "pluralizer.has");
+        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE,
+              prisonerCount != 1 ? "pluralizer.have" : "pluralizer.has");
 
-        String crimeReport = getFormattedTextAt(RESOURCE_BUNDLE, "ABANDONED_TO_DIE.report.crime",
-            colorOpen, CLOSING_SPAN_TAG, crimeChange);
+        String crimeReport = getFormattedTextAt(RESOURCE_BUNDLE,
+              "ABANDONED_TO_DIE.report.crime",
+              colorOpen,
+              CLOSING_SPAN_TAG,
+              crimeChange);
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, "ABANDONED_TO_DIE.report.prisoners",
-            prisonerCount, context, haveOrHas, crimeReport);
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "ABANDONED_TO_DIE.report.prisoners",
+              prisonerCount,
+              context,
+              haveOrHas,
+              crimeReport);
     }
 }

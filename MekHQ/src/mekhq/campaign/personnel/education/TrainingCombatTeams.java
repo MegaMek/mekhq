@@ -28,6 +28,7 @@
 package mekhq.campaign.personnel.education;
 
 import static java.lang.Math.round;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -75,14 +76,6 @@ public class TrainingCombatTeams {
 
     private static final String BUNDLE_NAME = "mekhq.resources.Education";
     private static ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME, MekHQ.getMHQOptions().getLocale());
-
-    /**
-     * Represents the fatigue gained by combat team members during training.
-     *
-     * <p>This is currently set to 3 which, when factoring in fatigue recovery, will result in a
-     * gain of 2 Fatigue per week.</p>
-     */
-    private final static int FATIGUE_GAIN = 2;
 
     /**
      * Processes all training combat teams in the campaign.
@@ -167,7 +160,7 @@ public class TrainingCombatTeams {
      * @param educatorSkills a map of skills and their experience levels available for teaching
      */
     private static void performTraining(Campaign campaign, Force force, Person commander,
-                                        Map<String, Integer> educatorSkills) {
+          Map<String, Integer> educatorSkills) {
         for (UUID unitId : force.getAllUnits(true)) {
             Unit unit = campaign.getUnit(unitId);
 
@@ -177,8 +170,10 @@ public class TrainingCombatTeams {
 
             for (Person trainee : unit.getActiveCrew()) {
                 if (campaign.getCampaignOptions().isUseFatigue()) {
+                    int fatigueChangeRate = campaign.getCampaignOptions().getFatigueRate();
+                    boolean hasGlassJaw = trainee.getOptions().booleanOption(FLAW_GLASS_JAW);
 
-                    trainee.changeFatigue(FATIGUE_GAIN);
+                    trainee.changeFatigue(fatigueChangeRate * (hasGlassJaw ? 4 : 2));
                 }
 
                 if (commander.getUnit().getActiveCrew().contains(trainee)) {
@@ -235,7 +230,7 @@ public class TrainingCombatTeams {
      * @param skillsBeingTrained a list of eligible {@link Skill} objects for training
      */
     private static void processEducationTime(Campaign campaign, Person commander, Person trainee,
-                                             List<Skill> skillsBeingTrained) {
+          List<Skill> skillsBeingTrained) {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final String EDUCATION_STRING = "TRAINING_COMBAT_TEAM"; // Never change this
         final int WEEK_DURATION = 7; // days

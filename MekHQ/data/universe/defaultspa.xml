@@ -465,6 +465,14 @@
 
     <!-- Misc SPA -->
     <ability>
+        <lookupName>flaw_glass_jaw</lookupName>
+        <displayName>Glass Jaw (ATOW)</displayName>
+        <desc>All injuries suffered and fatigue gained is doubled</desc>
+        <xpCost>-300</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
         <lookupName>eagle_eyes</lookupName>
         <xpCost>100</xpCost>
         <weight>2</weight>

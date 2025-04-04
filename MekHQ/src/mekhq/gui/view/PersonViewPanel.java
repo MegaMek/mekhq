@@ -1644,7 +1644,8 @@ public class PersonViewPanel extends JScrollablePanel {
             firsty++;
         }
 
-        if ((campaign.getCampaignOptions().isUseToughness()) && (person.getToughness() > 0)) {
+        int totalToughness = person.getToughness();
+        if ((campaign.getCampaignOptions().isUseToughness()) && (totalToughness != 0)) {
             lblTough1.setName("lblTough1");
             lblTough1.setText(resourceMap.getString("lblTough1.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -1655,7 +1656,7 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlSkills.add(lblTough1, gridBagConstraints);
 
             lblTough2.setName("lblTough2");
-            lblTough2.setText("+" + person.getToughness());
+            lblTough2.setText((totalToughness >= 0 ? "+" : "") + totalToughness);
             lblTough1.setLabelFor(lblTough2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
