@@ -34,7 +34,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.ITechWorkPanel;

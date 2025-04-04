@@ -29,7 +29,7 @@ package mekhq.gui.stratcon;
 
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.scaleObjectiveTimeLimits;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
-import static mekhq.campaign.personnel.SkillType.S_LEADER;
+import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
 import static mekhq.campaign.stratcon.StratconRulesManager.BASE_LEADERSHIP_BUDGET;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType;

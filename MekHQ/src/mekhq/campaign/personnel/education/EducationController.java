@@ -29,8 +29,8 @@ package mekhq.campaign.personnel.education;
 
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.personnel.SkillType.EXP_REGULAR;
-import static mekhq.campaign.personnel.SkillType.EXP_VETERAN;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.PERSONALITY_QUIRK_CHANCE;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateAndApplyPersonalityQuirk;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;

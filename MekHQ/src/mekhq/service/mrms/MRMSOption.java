@@ -37,7 +37,7 @@ import org.w3c.dom.NodeList;
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 
 public class MRMSOption {

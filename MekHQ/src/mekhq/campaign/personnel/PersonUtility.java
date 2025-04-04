@@ -29,7 +29,7 @@ package mekhq.campaign.personnel;
 
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.d6;
-import static mekhq.campaign.personnel.SkillType.*;
+import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.personnel.enums.PersonnelRole.*;
 import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
 
@@ -46,6 +46,7 @@ import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
+import mekhq.campaign.personnel.skills.Skill;
 
 /**
  * Utility class that provides methods for managing and modifying the skills, loyalty, and advantages of personnel in
