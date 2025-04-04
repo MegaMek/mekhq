@@ -40,6 +40,21 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.Aero;
+import megamek.common.CriticalSlot;
+import megamek.common.Dropship;
+import megamek.common.Entity;
+import megamek.common.Jumpship;
+import megamek.common.Mek;
+import megamek.common.SimpleTechLevel;
+import megamek.common.SmallCraft;
+import megamek.common.TechAdvancement;
+import megamek.common.TechConstants;
+import megamek.common.Warship;
+import mekhq.utilities.MHQXMLUtility;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.skills.SkillType;
+
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */

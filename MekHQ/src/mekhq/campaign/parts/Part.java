@@ -446,9 +446,24 @@ public abstract class Part implements IPartWork, ITechnology {
                 SkillType.getExperienceLevelColor(getSkillMin()),
                 SkillType.getExperienceLevelName(getSkillMin()) + "+"));
         }
-        toReturn.append("</b><br/>")
-            .append(getDetails())
-            .append("<br/>");
+
+        String details = getDetails();
+
+        if (details != null && !details.isBlank()) {
+            toReturn.append("</b><br/>").append(getDetails()).append("<br/>");
+        }
+
+        if (this instanceof mekhq.campaign.parts.equipment.AmmoBin ammoBin) {
+            if (campaign.getQuartermaster() != null) {
+                toReturn.append("<br> <b>In Warehouse:</b> ")
+                      .append(campaign.getQuartermaster().getAmmoAvailable(ammoBin.getType()))
+                      .append(' ');
+            }
+        } else if (campaign.getWarehouse() != null) {
+            toReturn.append("<br> <b>In Warehouse:</b> ")
+                  .append(campaign.getWarehouse().getSparePartsCount(this))
+                  .append(' ');
+        }
 
         if (getSkillMin() <= SkillType.EXP_ELITE) {
             toReturn.append(getTimeLeft())

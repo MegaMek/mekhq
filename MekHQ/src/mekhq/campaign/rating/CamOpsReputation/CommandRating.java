@@ -27,6 +27,12 @@
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import static java.lang.Math.max;
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_PARALYSIS;
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_SENSE;
@@ -40,6 +46,14 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.SkillType;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 

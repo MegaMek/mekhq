@@ -33,6 +33,15 @@ import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_GENERAL;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.CHARACTER_CREATION_ONLY;
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.CHARACTER_FLAW;
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.COMBAT_ABILITY;
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.MANEUVERING_ABILITY;
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.UTILITY_ABILITY;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_GENERAL;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createSubTabs;
@@ -55,7 +64,6 @@ import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
-import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.contents.*;
 
@@ -316,12 +324,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // SPAs
         abilitiesTab = new AbilitiesTab();
 
-        JTabbedPane abilityContentTabs = createSubTabs(Map.of("combatAbilitiesTab",
-              abilitiesTab.createAbilitiesTab(AbilityCategory.COMBAT_ABILITY),
-              "maneuveringAbilitiesTab",
-              abilitiesTab.createAbilitiesTab(AbilityCategory.MANEUVERING_ABILITY),
-              "utilityAbilitiesTab",
-              abilitiesTab.createAbilitiesTab(AbilityCategory.UTILITY_ABILITY)));
+        JTabbedPane abilityContentTabs = createSubTabs(Map.of("0combatAbilitiesTab",
+              abilitiesTab.createAbilitiesTab(COMBAT_ABILITY),
+              "1maneuveringAbilitiesTab",
+              abilitiesTab.createAbilitiesTab(MANEUVERING_ABILITY),
+              "2utilityAbilitiesTab",
+              abilitiesTab.createAbilitiesTab(UTILITY_ABILITY),
+              "3characterFlawsTab",
+              abilitiesTab.createAbilitiesTab(CHARACTER_FLAW),
+              "4characterCreationOnlyTab",
+              abilitiesTab.createAbilitiesTab(CHARACTER_CREATION_ONLY)));
         // the loading of values from the campaign is built into the AbilitiesTab class so not called here.
 
         // Add Tabs
@@ -454,7 +466,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * @param isSaveAction determines if this action is saving options to a preset
      */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset, boolean isStartUp,
-                                               boolean isSaveAction) {
+          boolean isSaveAction) {
         CampaignOptions options = this.campaignOptions;
         RandomSkillPreferences presetRandomSkillPreferences = null;
         Map<String, SkillType> presetSkills = null;

@@ -53,6 +53,7 @@ import static mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement.isCo
 import static mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement.isFreedomDay;
 import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewYear;
 import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWinterHolidayMajorDay;
+import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenUsage;
@@ -160,6 +161,8 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.RandomDependents;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.RandomDeath;
@@ -2739,14 +2742,8 @@ public class Campaign implements ITechManager {
         return parts.getParts();
     }
 
-    private int getQuantity(Part p) {
-        if (p instanceof Armor) {
-            return ((Armor) p).getAmount();
-        }
-        if (p instanceof AmmoStorage) {
-            return ((AmmoStorage) p).getShots();
-        }
-        return (p.getUnit() != null) ? 1 : p.getQuantity();
+    private int getQuantity(Part part) {
+        return getWarehouse().getPartQuantity(part);
     }
 
     private PartInUse getPartInUse(Part part) {
@@ -3168,7 +3165,7 @@ public class Campaign implements ITechManager {
         }
 
         // sort based on available minutes (highest -> lowest)
-        techs.sort(Comparator.comparingInt(person -> person.getDailyAvailableTechTime(false)));
+        techs.sort(Comparator.comparingInt(person -> -person.getDailyAvailableTechTime(false)));
 
         // finally, sort based on rank (lowest -> highest)
         techs.sort((person1, person2) -> {
@@ -5077,12 +5074,13 @@ public class Campaign implements ITechManager {
      */
     private void processAnniversaries(Person person) {
         LocalDate birthday = person.getBirthday(getGameYear());
-        if ((person.getRank().isOfficer()) || (!getCampaignOptions().isAnnounceOfficersOnly())) {
-            if (birthday.isEqual(currentDay) && campaignOptions.isAnnounceBirthdays()) {
+        boolean isBirthday = birthday != null && birthday.equals(currentDay);
+
+        if ((person.getRank().isOfficer()) || (!campaignOptions.isAnnounceOfficersOnly())) {
+            if (isBirthday && campaignOptions.isAnnounceBirthdays()) {
                 addReport(String.format(resources.getString("anniversaryBirthday.text"),
                       person.getHyperlinkedFullTitle(),
-                      ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions()
-                                                                          .getFontColorPositiveHexColor()),
+                      spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                       person.getAge(getLocalDate()),
                       CLOSING_SPAN_TAG));
             }
@@ -5096,28 +5094,31 @@ public class Campaign implements ITechManager {
                           (campaignOptions.isAnnounceRecruitmentAnniversaries())) {
                     addReport(String.format(resources.getString("anniversaryRecruitment.text"),
                           person.getHyperlinkedFullTitle(),
-                          ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions()
-                                                                              .getFontColorPositiveHexColor()),
+                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                           yearsOfEmployment,
                           CLOSING_SPAN_TAG,
                           name));
                 }
             }
         } else if ((person.getAge(getLocalDate()) == 18) && (campaignOptions.isAnnounceChildBirthdays())) {
-            if (birthday.isEqual(currentDay)) {
+            if (isBirthday) {
                 addReport(String.format(resources.getString("anniversaryBirthday.text"),
                       person.getHyperlinkedFullTitle(),
-                      ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions()
-                                                                          .getFontColorPositiveHexColor()),
+                      spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                       person.getAge(getLocalDate()),
                       CLOSING_SPAN_TAG));
             }
         }
 
         if (campaignOptions.isShowLifeEventDialogComingOfAge()) {
-            if ((person.getAge(currentDay) == 16) && (birthday.isEqual(currentDay))) {
+            if ((person.getAge(currentDay) == 16) && (isBirthday)) {
                 new ComingOfAgeAnnouncement(this, person);
             }
+        }
+
+        if (campaignOptions.isUseAgeEffects() && isBirthday) {
+            // This is where we update all the aging modifiers for the character.
+            updateAllSkillAgeModifiers(currentDay, person);
         }
     }
 
@@ -5670,6 +5671,11 @@ public class Campaign implements ITechManager {
 
             if (EducationController.processNewDay(this, person, false)) {
                 Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+
+                if (academy == null) {
+                    logger.debug("Found null academy for {} skipping", person.getFullTitle());
+                    continue;
+                }
 
                 graduatingPersonnel.add(person.getId());
 

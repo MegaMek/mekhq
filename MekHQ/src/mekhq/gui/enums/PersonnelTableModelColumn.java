@@ -50,6 +50,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
@@ -472,7 +473,8 @@ public enum PersonnelTableModelColumn {
     }
     // endregion Boolean Comparison Methods
 
-    public String getCellValue(final Campaign campaign, final PersonnelMarket personnelMarket, final Person person, final boolean loadAssignmentFromMarket, final boolean groupByUnit) {
+    public String getCellValue(final Campaign campaign, final PersonnelMarket personnelMarket, final Person person,
+          final boolean loadAssignmentFromMarket, final boolean groupByUnit) {
         PersonnelOptions options = person.getOptions();
         String sign;
 
@@ -537,7 +539,7 @@ public enum PersonnelTableModelColumn {
                 return GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());
             case SKILL_LEVEL:
                 return "<html>" +
-                             SkillType.getColoredExperienceLevelName(person.getSkillLevel(campaign, false)) +
+                             SkillType.getColoredExperienceLevelName(person.getExperienceLevel(campaign, false)) +
                              "</html>";
             case PERSONNEL_ROLE:
                 return person.getRoleDesc();

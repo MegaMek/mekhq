@@ -27,20 +27,26 @@
  */
 package mekhq.campaign.unit;
 
-import megamek.common.Entity;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
+import megamek.common.Entity;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import org.junit.jupiter.api.Test;
 
 public class UnitPersonTest {
     @Test
@@ -190,6 +196,7 @@ public class UnitPersonTest {
         Person mockTech = mock(Person.class);
         when(mockTech.getId()).thenReturn(id);
         when(mockCampaign.getPerson(eq(id))).thenReturn(mockTech);
+        when(mockTech.getUnit()).thenReturn(null);
 
         // Set the tech
         unit.setTech(mockTech);
@@ -239,6 +246,7 @@ public class UnitPersonTest {
         Person mockDriver = mock(Person.class);
         when(mockDriver.getId()).thenReturn(id);
         when(mockCampaign.getPerson(eq(id))).thenReturn(mockDriver);
+        when(mockDriver.getUnit()).thenReturn(unit);
 
         // This person is NOT a driver (yet)
         assertFalse(unit.isDriver(mockDriver));
@@ -297,6 +305,7 @@ public class UnitPersonTest {
         Person mockGunner = mock(Person.class);
         when(mockGunner.getId()).thenReturn(id);
         when(mockCampaign.getPerson(eq(id))).thenReturn(mockGunner);
+        when(mockGunner.getUnit()).thenReturn(unit);
 
         // This person is NOT a gunner (yet)
         assertFalse(unit.isGunner(mockGunner));
@@ -355,6 +364,7 @@ public class UnitPersonTest {
         Person mockVesselCrew = mock(Person.class);
         when(mockVesselCrew.getId()).thenReturn(id);
         when(mockCampaign.getPerson(eq(id))).thenReturn(mockVesselCrew);
+        when(mockVesselCrew.getUnit()).thenReturn(unit);
 
         // Add the vessel crew
         unit.addVesselCrew(mockVesselCrew);
@@ -402,6 +412,7 @@ public class UnitPersonTest {
         Person mockTechOfficer = mock(Person.class);
         when(mockTechOfficer.getId()).thenReturn(id);
         when(mockCampaign.getPerson(eq(id))).thenReturn(mockTechOfficer);
+         when(mockTechOfficer.getUnit()).thenReturn(unit);
 
         // This person is NOT a tech officer (yet)
         assertFalse(unit.isTechOfficer(mockTechOfficer));
@@ -459,6 +470,7 @@ public class UnitPersonTest {
         Person mockNavigator = mock(Person.class);
         when(mockNavigator.getId()).thenReturn(id);
         when(mockCampaign.getPerson(eq(id))).thenReturn(mockNavigator);
+        when(mockNavigator.getUnit()).thenReturn(unit);
 
         // This person is NOT a navigator (yet)
         assertFalse(unit.isNavigator(mockNavigator));

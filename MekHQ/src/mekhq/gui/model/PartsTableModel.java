@@ -27,15 +27,21 @@
  */
 package mekhq.gui.model;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.awt.Component;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
+
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.parts.Part;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import java.awt.*;
-import java.util.ArrayList;
-
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import mekhq.campaign.parts.PartInUse;
+import mekhq.campaign.work.IAcquisitionWork;
 
 /**
  * A table model for displaying parts
@@ -44,19 +50,51 @@ public class PartsTableModel extends DataTableModel {
     private static final String RESOURCE_BUNDLE = "mekhq.resources." + PartsTableModel.class.getSimpleName();
 
     public final static int COL_QUANTITY = 0;
-    public final static int COL_NAME = 1;
-    public final static int COL_DETAIL = 2;
-    public final static int COL_TECH_BASE = 3;
-    public final static int COL_QUALITY = 4;
-    public final static int COL_STATUS = 5;
-    public final static int COL_REPAIR = 6;
-    public final static int COL_COST = 7;
-    public final static int COL_TOTAL_COST = 8;
-    public final static int COL_TON = 9;
-    public final static int N_COL = 10;
+    public final static int COL_COL_IN_USE = 1;
+    public final static int COL_NAME = 2;
+    public final static int COL_DETAIL = 3;
+    public final static int COL_TECH_BASE = 4;
+    public final static int COL_QUALITY = 5;
+    public final static int COL_STATUS = 6;
+    public final static int COL_REPAIR = 7;
+    public final static int COL_COST = 8;
+    public final static int COL_TOTAL_COST = 9;
+    public final static int COL_TON = 10;
+    public final static int N_COL = 11;
 
+    Map<Part, Integer> partsUseData = new HashMap<>();
+
+
+    /**
+     * Default constructor that initializes the table model with no predefined part data. Creates an empty data source
+     * for parts.
+     *
+     * <p><b>Usage:</b> This constructor was predominantly created for {@link mekhq.gui.dialog.MRMSDialog}, for most
+     * other use-cases you probably want the full constructor.</p>
+     */
     public PartsTableModel() {
+        new PartsTableModel(null);
+    }
+
+    /**
+     * Constructs a table model with a predefined set of parts in use. This constructor maps each part in the provided
+     * set to its respective usage count, storing this information for later access or manipulation.
+     *
+     * @param partsInUse a {@link Set} of {@link PartInUse} objects. Each object represents a part being used and
+     *                   contains metadata about the part and its usage count. If {@code null}, the table model is
+     *                   initialized with an empty data source.
+     */
+    public PartsTableModel(@Nullable Set<PartInUse> partsInUse) {
         data = new ArrayList<Part>();
+
+        if (partsInUse != null) {
+            for (PartInUse partInUse : partsInUse) {
+                IAcquisitionWork description = partInUse.getPartToBuy();
+                Part acquisitionPart = description.getAcquisitionPart();
+
+                partsUseData.put(acquisitionPart, partInUse.getUseCount());
+            }
+        }
     }
 
     @Override
@@ -76,6 +114,7 @@ public class PartsTableModel extends DataTableModel {
             case COL_COST -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_COST");
             case COL_TOTAL_COST -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_TOTAL_COST");
             case COL_QUANTITY -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_QUANTITY");
+            case COL_COL_IN_USE -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_IN_USE");
             case COL_QUALITY -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_QUALITY");
             case COL_TON -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_TON");
             case COL_STATUS -> getFormattedTextAt(RESOURCE_BUNDLE, "label.COL_STATUS");
@@ -109,6 +148,18 @@ public class PartsTableModel extends DataTableModel {
         }
         if (col == COL_QUANTITY) {
             return part.getQuantity();
+        }
+        if (col == COL_COL_IN_USE) {
+            int useCount = 0;
+
+            for (Part comparisonPart : partsUseData.keySet()) {
+                if (comparisonPart.isSamePartType(part)) {
+                    useCount = partsUseData.get(comparisonPart);
+                    break;
+                }
+            }
+
+            return useCount;
         }
         if (col == COL_QUALITY) {
             String appendum;
@@ -183,9 +234,8 @@ public class PartsTableModel extends DataTableModel {
 
     public class Renderer extends DefaultTableCellRenderer {
         @Override
-        public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus,
-                int row, int column) {
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+                                                       int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setOpaque(true);
             int actualCol = table.convertColumnIndexToModel(column);

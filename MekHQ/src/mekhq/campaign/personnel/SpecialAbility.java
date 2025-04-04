@@ -40,6 +40,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
+import mekhq.campaign.personnel.skills.Skills;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.Version;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;

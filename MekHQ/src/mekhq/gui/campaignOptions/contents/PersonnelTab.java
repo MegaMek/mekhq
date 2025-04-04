@@ -50,6 +50,7 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
@@ -407,7 +408,10 @@ public class PersonnelTab {
      * {@code PrisonerStatus.FREE} enumeration.
      *
      * @return a {@link DefaultComboBoxModel} containing the prisoner status options.
+     *
+     * @deprecated unused, no alternative necessary
      */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     private DefaultComboBoxModel<PrisonerStatus> getPrisonerStatusOptions() {
         final DefaultComboBoxModel<PrisonerStatus> prisonerStatusModel = new DefaultComboBoxModel<>(PrisonerStatus.values());
         // we don't want this as a standard use case for prisoners
@@ -668,7 +672,8 @@ public class PersonnelTab {
         lblAwardBonusStyle = new CampaignOptionsLabel("AwardBonusStyle");
         comboAwardBonusStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
+            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
+                                                          final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof AwardBonus) {
                     list.setToolTipText(((AwardBonus) value).getToolTipText());
@@ -1048,7 +1053,8 @@ public class PersonnelTab {
         lblPrisonerCaptureStyle = new CampaignOptionsLabel("PrisonerCaptureStyle");
         comboPrisonerCaptureStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
+            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
+                                                          final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PrisonerCaptureStyle) {
                     list.setToolTipText(wordWrap(((PrisonerCaptureStyle) value).getTooltip()));

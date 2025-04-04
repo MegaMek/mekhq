@@ -37,6 +37,17 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
 
+import megamek.common.Aero;
+import megamek.common.Compute;
+import megamek.common.CriticalSlot;
+import megamek.common.Dropship;
+import megamek.common.Entity;
+import megamek.common.EquipmentType;
+import megamek.common.IAero;
+import megamek.common.Jumpship;
+import megamek.common.LandAirMek;
+import megamek.common.TechAdvancement;
+
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */

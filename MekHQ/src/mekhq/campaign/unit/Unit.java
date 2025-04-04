@@ -53,8 +53,8 @@ import javax.swing.UIManager;
 import megamek.Version;
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.*;
 import megamek.common.CrewType;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.ArmorType;
@@ -86,6 +86,7 @@ import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.enums.CrewAssignmentState;
@@ -5576,22 +5577,33 @@ public class Unit implements ITechnology {
         ensurePersonIsRegistered(person);
         if (person.equals(tech)) {
             removeTech();
-        } else {
+        }
+
+        boolean wasCrew = false;
+
+        if (this.equals(person.getUnit())) {
+            wasCrew = true;
             person.setUnit(null);
-            drivers.remove(person);
-            gunners.remove(person);
-            vesselCrew.remove(person);
-            if (person.equals(navigator)) {
-                navigator = null;
-            }
+        }
+        wasCrew |= drivers.remove(person);
+        wasCrew |= gunners.remove(person);
+        wasCrew |= vesselCrew.remove(person);
+        if (person.equals(navigator)) {
+            wasCrew = true;
+            navigator = null;
+        }
 
-            if (person.equals(techOfficer)) {
-                techOfficer = null;
-            }
+        if (person.equals(techOfficer)) {
+            wasCrew = true;
+            techOfficer = null;
+        }
 
-            if (person.equals(engineer)) {
-                engineer = null;
-            }
+        if (person.equals(engineer)) {
+            wasCrew = true;
+            engineer = null;
+        }
+
+        if (wasCrew) {
             resetPilotAndEntity();
             MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
         }

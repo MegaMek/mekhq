@@ -27,6 +27,8 @@
  */
 package mekhq;
 
+import static mekhq.MHQConstants.CAMPAIGN_PRESET_DIRECTORY;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,6 +53,7 @@ import javax.swing.JOptionPane;
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
+import megamek.common.preference.PreferenceManager;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import megamek.utilities.xml.MMXMLUtility;
@@ -59,6 +62,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -96,19 +100,19 @@ public class CampaignPreset {
     private String description;
 
     // Startup
-    private LocalDate                date;
-    private Faction                  faction;
-    private Planet                   planet;
-    private RankSystem               rankSystem;
-    private int                      contractCount;
-    private boolean                  gm;
+    private LocalDate date;
+    private Faction faction;
+    private Planet planet;
+    private RankSystem rankSystem;
+    private int contractCount;
+    private boolean gm;
     private CompanyGenerationOptions companyGenerationOptions;
 
     // Continuous
-    private GameOptions                 gameOptions;
-    private CampaignOptions             campaignOptions;
-    private RandomSkillPreferences      randomSkillPreferences;
-    private Map<String, SkillType>      skills;
+    private GameOptions gameOptions;
+    private CampaignOptions campaignOptions;
+    private RandomSkillPreferences randomSkillPreferences;
+    private Map<String, SkillType> skills;
     private Map<String, SpecialAbility> specialAbilities;
     // endregion Variable Declarations
 
@@ -158,7 +162,13 @@ public class CampaignPreset {
               SpecialAbility.getSpecialAbilities());
     }
 
-    public CampaignPreset(final String title, final String description, final boolean userData, final @Nullable LocalDate date, final @Nullable Faction faction, final @Nullable Planet planet, final @Nullable RankSystem rankSystem, final int contractCount, final boolean gm, final @Nullable CompanyGenerationOptions companyGenerationOptions, final @Nullable GameOptions gameOptions, final @Nullable CampaignOptions campaignOptions, final @Nullable RandomSkillPreferences randomSkillPreferences, final Map<String, SkillType> skills, final Map<String, SpecialAbility> specialAbilities) {
+    public CampaignPreset(final String title, final String description, final boolean userData,
+                          final @Nullable LocalDate date, final @Nullable Faction faction,
+                          final @Nullable Planet planet, final @Nullable RankSystem rankSystem, final int contractCount,
+                          final boolean gm, final @Nullable CompanyGenerationOptions companyGenerationOptions,
+                          final @Nullable GameOptions gameOptions, final @Nullable CampaignOptions campaignOptions,
+                          final @Nullable RandomSkillPreferences randomSkillPreferences,
+                          final Map<String, SkillType> skills, final Map<String, SpecialAbility> specialAbilities) {
         this.userData = userData;
 
         setTitle(title);
@@ -308,11 +318,34 @@ public class CampaignPreset {
     // endregion Getters/Setters
 
     /**
-     * @return a list of all the campaign presets in the default and userdata folders
+     * Retrieves a combined list of all campaign presets from the default directory, the old user data directory, and
+     * the modern (user-difined) user data directory. The campaign presets are sourced, merged, and sorted in natural
+     * order before being returned.
+     *
+     * <p>The method performs the following steps:</p>
+     * <ul>
+     *   <li>Loads campaign presets from the default campaign presets directory.</li>
+     *   <li>Loads campaign presets from the old user-specific campaign presets directory.</li>
+     *   <li>Loads campaign presets from the modern user-specific campaign presets directory,
+     *       typically defined by the user's current preferences.</li>
+     *   <li>Combines all presets into a single list.</li>
+     *   <li>Sorts the combined list of campaign presets in natural order.</li>
+     * </ul>
+     *
+     * @return a {@link List} of all combined and sorted campaign presets found in the default and user data folders.
      */
     public static List<CampaignPreset> getCampaignPresets() {
+        // Main directory
         final List<CampaignPreset> presets = loadCampaignPresetsFromDirectory(new File(MHQConstants.CAMPAIGN_PRESET_DIRECTORY));
+
+        // Old user data directory
         presets.addAll(loadCampaignPresetsFromDirectory(new File(MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY)));
+
+        // Modern user data directory
+        String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
+        File presetUserDirectory = new File(userDirectory + '/' + CAMPAIGN_PRESET_DIRECTORY);
+        presets.addAll(loadCampaignPresetsFromDirectory(presetUserDirectory));
+
         final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
 
         presets.sort((p0, p1) -> naturalOrderComparator.compare(p0.toString(), p1.toString()));
@@ -475,8 +508,8 @@ public class CampaignPreset {
         final Element element = xmlDoc.getDocumentElement();
         element.normalize();
 
-        final String  versionString = element.getAttribute("version");
-        final Version version       = new Version(versionString);
+        final String versionString = element.getAttribute("version");
+        final Version version = new Version(versionString);
         return parseFromXML(element.getChildNodes(), version);
     }
 
@@ -571,7 +604,7 @@ public class CampaignPreset {
                     }
                     case "specialAbilities": {
                         final PersonnelOptions options = new PersonnelOptions();
-                        final NodeList         nl2     = wn.getChildNodes();
+                        final NodeList nl2 = wn.getChildNodes();
                         for (int y = 0; y < nl2.getLength(); y++) {
                             final Node wn2 = nl2.item(y);
                             if (wn2.getNodeType() != Node.ELEMENT_NODE) {

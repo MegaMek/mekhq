@@ -62,6 +62,7 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
@@ -161,12 +162,12 @@ public class CampaignOptions {
 
     // region Supplies and Acquisition Tab
     // Acquisition
-    private int     waitingPeriod;
-    private String  acquisitionSkill;
+    private int waitingPeriod;
+    private String acquisitionSkill;
     private ProcurementPersonnelPick acquisitionPersonnelCategory;
-    private int     clanAcquisitionPenalty;
-    private int     isAcquisitionPenalty;
-    private int     maxAcquisitions;
+    private int clanAcquisitionPenalty;
+    private int isAcquisitionPenalty;
+    private int maxAcquisitions;
 
     // autoLogistics
     private int autoLogisticsHeatSink;
@@ -221,6 +222,7 @@ public class CampaignOptions {
     private boolean useSupportEdge;
     private boolean useImplants;
     private boolean alternativeQualityAveraging;
+    private boolean useAgeEffects;
     private boolean useTransfers;
     private boolean useExtendedTOEForceName;
     private boolean personnelLogSkillGain;
@@ -559,12 +561,12 @@ public class CampaignOptions {
 
     // Contract Market
     private ContractMarketMethod contractMarketMethod;
-    private int                  contractSearchRadius;
-    private boolean              variableContractLength;
+    private int contractSearchRadius;
+    private boolean variableContractLength;
     private boolean useDynamicDifficulty;
-    private boolean              contractMarketReportRefresh;
-    private int                  contractMaxSalvagePercentage;
-    private int                  dropShipBonusPercentage;
+    private boolean contractMarketReportRefresh;
+    private int contractMaxSalvagePercentage;
+    private int dropShipBonusPercentage;
     // endregion Markets Tab
 
     // region RATs Tab
@@ -645,9 +647,9 @@ public class CampaignOptions {
         // Repair
         useEraMods = false;
         assignedTechFirst = false;
-        resetToFirstTech  = false;
+        resetToFirstTech = false;
         techsUseAdministration = false;
-        useQuirks         = false;
+        useQuirks = false;
         useAeroSystemHits = false;
         destroyByMargin = false;
         destroyMargin = 4;
@@ -683,12 +685,12 @@ public class CampaignOptions {
 
         // region Supplies and Acquisitions Tab
         // Acquisition
-        waitingPeriod               = 7;
-        acquisitionSkill            = S_TECH;
+        waitingPeriod = 7;
+        acquisitionSkill = S_TECH;
         acquisitionPersonnelCategory = SUPPORT;
-        clanAcquisitionPenalty      = 0;
-        isAcquisitionPenalty        = 0;
-        maxAcquisitions             = 0;
+        clanAcquisitionPenalty = 0;
+        isAcquisitionPenalty = 0;
+        maxAcquisitions = 0;
 
         // autoLogistics
         autoLogisticsHeatSink = 50;
@@ -762,6 +764,7 @@ public class CampaignOptions {
         setUseSupportEdge(false);
         setUseImplants(false);
         setAlternativeQualityAveraging(false);
+        setUseAgeEffects(false);
         setUseTransfers(true);
         setUseExtendedTOEForceName(false);
         setPersonnelLogSkillGain(false);
@@ -1565,6 +1568,14 @@ public class CampaignOptions {
 
     public void setAlternativeQualityAveraging(final boolean alternativeQualityAveraging) {
         this.alternativeQualityAveraging = alternativeQualityAveraging;
+    }
+
+    public boolean isUseAgeEffects() {
+        return useAgeEffects;
+    }
+
+    public void setUseAgeEffects(final boolean useAgeEffects) {
+        this.useAgeEffects = useAgeEffects;
     }
 
     public boolean isUseTransfers() {
@@ -4916,6 +4927,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSupportEdge", isUseSupportEdge());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useImplants", isUseImplants());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "alternativeQualityAveraging", isAlternativeQualityAveraging());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAgeEffects", isUseAgeEffects());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTransfers", isUseTransfers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useExtendedTOEForceName", isUseExtendedTOEForceName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelLogSkillGain", isPersonnelLogSkillGain());
@@ -5676,6 +5688,8 @@ public class CampaignOptions {
                     retVal.setUseImplants(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("alternativeQualityAveraging")) {
                     retVal.setAlternativeQualityAveraging(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useAgeEffects")) {
+                    retVal.setUseAgeEffects(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
                     retVal.setUseTransfers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useExtendedTOEForceName")) {
@@ -6044,8 +6058,8 @@ public class CampaignOptions {
                         final Node wn3 = nl2.item(i);
                         try {
                             retVal.getEnabledRandomDeathAgeGroups()
-                                  .put(AgeGroup.valueOf(wn3.getNodeName()),
-                                        Boolean.parseBoolean(wn3.getTextContent().trim()));
+                                  .put(AgeGroup.valueOf(wn3.getNodeName()), Boolean.parseBoolean(wn3.getTextContent()
+                                                                                                       .trim()));
                         } catch (Exception ignored) {
 
                         }

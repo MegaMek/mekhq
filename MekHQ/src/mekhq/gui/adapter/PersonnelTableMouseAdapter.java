@@ -39,9 +39,11 @@ import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_COST_LEG_TYPE_5
 import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5;
 import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_RECOVERY;
 import static mekhq.campaign.personnel.Person.*;
+import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.enums.education.EducationLevel.DOCTORATE;
 import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
@@ -486,6 +488,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 for (Person person : people) {
                     Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
 
+                    if (academy == null) {
+                        logger.debug("Found null academy for {} skipping", person.getFullTitle());
+                        continue;
+                    }
+
                     EducationStage educationStage = person.getEduEducationStage();
 
                     switch (educationStage) {
@@ -551,6 +558,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_DROP_OUT: {
                 for (Person person : people) {
                     Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+
+                    if (academy == null) {
+                        logger.debug("Found null academy for {} skipping", person.getFullTitle());
+                        continue;
+                    }
 
                     EducationStage educationStage = person.getEduEducationStage();
 
@@ -750,6 +762,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     for (Person person : people) {
                         if (person.getPrisonerStatus() != status) {
                             person.setPrisonerStatus(getCampaign(), status, true);
+
+                            if (status.isCurrentPrisoner()) {
+                                statusValidator(getCampaign(), person, true);
+                            }
+
+                            MekHQ.triggerEvent(new PersonStatusChangedEvent(person));
                         }
                     }
                 } catch (Exception e) {
@@ -758,17 +776,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_FREE: {
-                processPrisonerResolutionCommand(people, "confirmFree.format", "freeQ.text");
+                processPrisonerResolutionCommand(people, "confirmFree.format", "freeQ.text", false);
 
                 break;
             }
             case CMD_EXECUTE: {
-                processPrisonerResolutionCommand(people, "confirmExecute.format", "executeQ.text");
+                processPrisonerResolutionCommand(people, "confirmExecute.format", "executeQ.text", true);
 
                 break;
             }
             case CMD_JETTISON: {
-                processPrisonerResolutionCommand(people, "confirmJettison.format", "jettisonQ.text");
+                processPrisonerResolutionCommand(people, "confirmJettison.format", "jettisonQ.text", true);
 
                 break;
             }
@@ -1515,13 +1533,39 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     /**
-     * This method processes a prisoner resolution command.
-     *
-     * @param prisoners an array of Person objects representing the prisoners
-     * @param message   a String representing the message to display in the dialog
-     * @param title     a String representing the title of the dialog
+     * @deprecated use {@link #processPrisonerResolutionCommand(Person[], String, String, boolean)} instead.
      */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     private void processPrisonerResolutionCommand(Person[] prisoners, String message, String title) {
+        processPrisonerResolutionCommand(prisoners, message, title);
+    }
+
+    /**
+     * Processes a prisoner resolution command, allowing a user to confirm a specific action (e.g., releasing or
+     * executing prisoners) via a dialog box. If confirmed, this method removes the selected prisoners from the campaign
+     * and optionally triggers additional execution-specific logic.
+     *
+     * <p><b>Behavior:</b></p>
+     * <ul>
+     *   <li>Displays a confirmation dialog with a message and title for the given prisoners.</li>
+     *   <li>If the user confirms, the specified prisoners are removed from the campaign.</li>
+     *   <li>Handles single prisoners by showing their full title in the dialog, while grouping
+     *   multiple prisoners by count.</li>
+     *   <li>If the action involves execution, an additional execution-handling method is called,
+     *   which processes execution-specific logic.</li>
+     * </ul>
+     *
+     * @param prisoners   an array of {@link Person} objects representing the prisoners to process. If the array
+     *                    contains only one prisoner, their full title is displayed; otherwise, the count of prisoners
+     *                    is shown.
+     * @param message     a {@link String} key representing the resource for the dialog message. This resource key
+     *                    should be able to handle placeholders for details, such as prisoner count or name.
+     * @param title       a {@link String} key representing the resource for the dialog title.
+     * @param isExecution a {@code boolean} indicating whether the command is related to execution. If {@code true},
+     *                    additional logic is executed to handle executions.
+     */
+    private void processPrisonerResolutionCommand(Person[] prisoners, String message, String title,
+                                                  boolean isExecution) {
         String label;
 
         if (prisoners.length == 1) {
@@ -1540,7 +1584,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
         }
 
-        processAdHocExecution(getCampaign(), prisoners.length);
+        if (isExecution) {
+            processAdHocExecution(getCampaign(), prisoners.length);
+        }
     }
 
     private void loadGMToolsForPerson(Person person) {
@@ -1691,7 +1737,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         menu = new JMenu(resources.getString("changeStatus.text"));
-        for (final PersonnelStatus status : PersonnelStatus.getImplementedStatuses()) {
+        boolean areAllFree = Stream.of(selected).allMatch(p -> p.getPrisonerStatus().isFreeOrBondsman());
+        for (final PersonnelStatus status : PersonnelStatus.getImplementedStatuses(areAllFree, false)) {
             cbMenuItem = new JCheckBoxMenuItem(status.toString());
             cbMenuItem.setToolTipText(status.getToolTipText());
             cbMenuItem.setSelected(person.getStatus() == status);
@@ -1699,8 +1746,19 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
         }
-        popup.add(menu);
 
+        JMenu cbMenu = new JMenu(resources.getString("changeStatus.causesOfDeath.text"));
+        for (final PersonnelStatus status : PersonnelStatus.getCauseOfDeathStatuses(areAllFree)) {
+            cbMenuItem = new JCheckBoxMenuItem(status.toString());
+            cbMenuItem.setToolTipText(status.getToolTipText());
+            cbMenuItem.setSelected(person.getStatus() == status);
+            cbMenuItem.setActionCommand(makeCommand(CMD_CHANGE_STATUS, status.name()));
+            cbMenuItem.addActionListener(this);
+            cbMenu.add(cbMenuItem);
+        }
+
+        menu.add(cbMenu);
+        popup.add(menu);
 
         if (StaticChecks.areAllPrisoners(selected)) {
             if (getCampaign().getLocation().isOnPlanet()) {
@@ -2122,79 +2180,85 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             if ((oneSelected) && (StaticChecks.areAllStudents(selected))) {
                 Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
 
-                // this pile of if-statements just checks that the individual is eligible for
-                // re-enrollment
-                // has the person finished their education, but not yet returned to the unit?
-                if ((!person.getEduEducationStage().isJourneyToCampus()) &&
-                          (!person.getEduEducationStage().isEducation())) {
-                    // is the academy still standing?
-                    if ((campaign.getGameYear() < academy.getDestructionYear()) &&
-                              (campaign.getGameYear() < academy.getClosureYear())) {
-                        // if the academy is local, is the system still populated?
-                        if ((!academy.isLocal()) ||
-                                  (campaign.getCurrentSystem().getPopulation(campaign.getLocalDate()) > 0)) {
-                            // is the person still within the correct age band?
-                            if ((person.getAge(campaign.getLocalDate()) < academy.getAgeMax()) &&
-                                      (person.getAge(campaign.getLocalDate()) >= academy.getAgeMin())) {
-                                // has the person been edited at some point and is no longer qualified?
-                                if (academy.isQualified(person)) {
-                                    // here we check that the person will benefit from re-enrollment
-                                    int improvementPossible = 0;
+                if (academy == null) {
+                    logger.debug("Found null academy for {} skipping", person.getFullTitle());
+                } else {
+                    // this pile of if-statements just checks that the individual is eligible for
+                    // re-enrollment
+                    // has the person finished their education, but not yet returned to the unit?
+                    if ((!person.getEduEducationStage().isJourneyToCampus()) &&
+                              (!person.getEduEducationStage().isEducation())) {
+                        // is the academy still standing?
+                        if ((campaign.getGameYear() < academy.getDestructionYear()) &&
+                                  (campaign.getGameYear() < academy.getClosureYear())) {
+                            // if the academy is local, is the system still populated?
+                            if ((!academy.isLocal()) ||
+                                      (campaign.getCurrentSystem().getPopulation(campaign.getLocalDate()) > 0)) {
+                                // is the person still within the correct age band?
+                                if ((person.getAge(campaign.getLocalDate()) < academy.getAgeMax()) &&
+                                          (person.getAge(campaign.getLocalDate()) >= academy.getAgeMin())) {
+                                    // has the person been edited at some point and is no longer qualified?
+                                    if (academy.isQualified(person)) {
+                                        // here we check that the person will benefit from re-enrollment
+                                        int improvementPossible = 0;
 
-                                    String filteredFaction = academy.getFilteredFaction(campaign,
-                                          person,
-                                          List.of(person.getEduAcademyFaction()));
+                                        String filteredFaction = academy.getFilteredFaction(campaign,
+                                              person,
+                                              List.of(person.getEduAcademyFaction()));
 
-                                    if (filteredFaction != null) {
-                                        int educationLevel = academy.getEducationLevel(person);
+                                        if (filteredFaction != null) {
+                                            int educationLevel = academy.getEducationLevel(person);
 
-                                        String[] skills = academy.getCurriculums()
-                                                                .get(person.getEduCourseIndex())
-                                                                .split(",");
+                                            String[] skills = academy.getCurriculums()
+                                                                    .get(person.getEduCourseIndex())
+                                                                    .split(",");
 
-                                        skills = Arrays.stream(skills).map(String::trim).toArray(String[]::new);
+                                            skills = Arrays.stream(skills).map(String::trim).toArray(String[]::new);
 
-                                        for (String skill : skills) {
-                                            if (skill.equalsIgnoreCase("none")) {
-                                                continue;
+                                            for (String skill : skills) {
+                                                if (skill.equalsIgnoreCase("none")) {
+                                                    continue;
+                                                }
+
+                                                if (skill.equalsIgnoreCase("xp")) {
+                                                    if (EducationLevel.parseToInt(person.getEduHighestEducation()) <
+                                                              educationLevel) {
+                                                        improvementPossible++;
+                                                    }
+                                                } else {
+                                                    String skillParsed = skillParser(skill);
+
+                                                    if ((person.hasSkill(skillParsed)) &&
+                                                              (person.getSkill(skillParsed).getExperienceLevel() <
+                                                                     educationLevel)) {
+                                                        improvementPossible++;
+                                                    } else if (!person.hasSkill(skillParsed)) {
+                                                        improvementPossible++;
+                                                    }
+                                                }
                                             }
 
-                                            if (skill.equalsIgnoreCase("xp")) {
-                                                if (EducationLevel.parseToInt(person.getEduHighestEducation()) <
-                                                          educationLevel) {
-                                                    improvementPossible++;
-                                                }
+                                            JMenuItem reEnroll;
+
+                                            if (improvementPossible > 0) {
+                                                reEnroll = new JMenuItem(resources.getString("eduReEnroll.text"));
+                                                reEnroll.setToolTipText(resources.getString("eduReEnroll.toolTip"));
+                                                reEnroll.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_RE_ENROLLMENT,
+                                                      academy.getSet(),
+                                                      academy.getName(),
+                                                      String.valueOf(person.getEduCourseIndex()),
+                                                      person.getEduAcademySystem(),
+                                                      person.getEduAcademyFaction()));
+                                                reEnroll.addActionListener(this);
                                             } else {
-                                                String skillParsed = skillParser(skill);
-
-                                                if ((person.hasSkill(skillParsed)) &&
-                                                          (person.getSkill(skillParsed).getExperienceLevel() <
-                                                                 educationLevel)) {
-                                                    improvementPossible++;
-                                                } else if (!person.hasSkill(skillParsed)) {
-                                                    improvementPossible++;
-                                                }
+                                                reEnroll = new JMenuItem(resources.getString(
+                                                      "eduReEnrollImpossible.text"));
+                                                reEnroll.setToolTipText(resources.getString(
+                                                      "eduReEnrollImpossible.toolTip"));
                                             }
+
+                                            academyMenu.add(reEnroll);
                                         }
-
-                                        JMenuItem reEnroll;
-
-                                        if (improvementPossible > 0) {
-                                            reEnroll = new JMenuItem(resources.getString("eduReEnroll.text"));
-                                            reEnroll.setToolTipText(resources.getString("eduReEnroll.toolTip"));
-                                            reEnroll.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_RE_ENROLLMENT,
-                                                  academy.getSet(),
-                                                  academy.getName(),
-                                                  String.valueOf(person.getEduCourseIndex()),
-                                                  person.getEduAcademySystem(),
-                                                  person.getEduAcademyFaction()));
-                                            reEnroll.addActionListener(this);
-                                        } else {
-                                            reEnroll = new JMenuItem(resources.getString("eduReEnrollImpossible.text"));
-                                            reEnroll.setToolTipText(resources.getString("eduReEnrollImpossible.toolTip"));
-                                        }
-
-                                        academyMenu.add(reEnroll);
                                     }
                                 }
                             }
@@ -2252,16 +2316,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         continue;
                     }
                     // Intelligence cost changes should always take place before global changes
-                    cost = (int) round(spa.getCost() * intelligenceXpCostMultiplier);
+                    int baseCost = spa.getCost();
+                    cost = (int) round(baseCost > 0 ? baseCost * intelligenceXpCostMultiplier : baseCost);
                     cost = (int) round(cost * xpCostMultiplier);
 
-                    String costDesc;
-                    if (cost < 0) {
-                        costDesc = resources.getString("costNotPossible.text");
-                    } else {
-                        costDesc = String.format(resources.getString("costValue.format"), cost);
-                    }
-                    boolean available = (cost >= 0) && (person.getXP() >= cost);
+                    String costDesc = String.format(resources.getString("costValue.format"), cost);
+                    boolean available = person.getXP() >= cost;
                     if (spa.getName().equals(OptionsConstants.GUNNERY_WEAPON_SPECIALIST)) {
                         Unit u = person.getUnit();
                         if (null != u) {

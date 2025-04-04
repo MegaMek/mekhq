@@ -40,6 +40,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.skills.SkillType;
+import org.w3c.dom.Node;
 
 /**
  * Legacy part that represents standard ProtoMek jump jets.

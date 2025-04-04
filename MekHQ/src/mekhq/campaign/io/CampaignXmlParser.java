@@ -29,6 +29,7 @@ package mekhq.campaign.io;
 
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
@@ -443,6 +444,12 @@ public class CampaignXmlParser {
                       refundAllDeprecatedSkills);
                 skipAllDeprecationChecks = deprecationTool.isSkipAll();
                 refundAllDeprecatedSkills = deprecationTool.isRefundAll();
+            }
+
+            // Self-correct any invalid personnel statuses (handles <50.05 campaigns)
+            // Any characters with invalid statuses will have their status set to 'Active'
+            if (person.getPrisonerStatus().isCurrentPrisoner()) {
+                statusValidator(campaign, person, true);
             }
         }
 
@@ -1702,7 +1709,7 @@ public class CampaignXmlParser {
     }
 
     private static void processPartsInUseRequestedStockMapVal(Campaign retVal, Node wn,
-                                                              Map<String, Double> partsInUseRequestedStockMap) {
+          Map<String, Double> partsInUseRequestedStockMap) {
         NodeList wList = wn.getChildNodes();
 
         String key = null;
