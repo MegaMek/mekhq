@@ -42,7 +42,6 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.personalities.enums.Intelligence;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -241,6 +240,7 @@ public class Skill {
      * the character's Reputation. If unsure, use {@link #getFinalSkillValue(PersonnelOptions, int)} instead.</p>
      *
      * @param characterOptions The {@link PersonnelOptions} to consider for determining skill value modifiers.
+     *
      * @return The final skill value after applying progression rules and using a default reputation of zero.
      */
     public int getFinalSkillValue(PersonnelOptions characterOptions) {
@@ -259,8 +259,9 @@ public class Skill {
      * <p>Any reputation values are included as a modifier in the calculation.</p>
      *
      * @param characterOptions The {@link PersonnelOptions} to consider for determining skill value modifiers.
-     * @param reputation       A reputation value to apply as a modifier to the skill's final value.
-     *                          Positive values increase the skill value, while negative values decrease it.
+     * @param reputation       A reputation value to apply as a modifier to the skill's final value. Positive values
+     *                         increase the skill value, while negative values decrease it.
+     *
      * @return The final skill value after applying progression rules and clamping to the legal range.
      */
     public int getFinalSkillValue(PersonnelOptions characterOptions, int reputation) {
@@ -276,7 +277,8 @@ public class Skill {
      * Calculates the skill modifiers for the current skill type based on the character's SPAs.
      *
      * @param characterOptions The {@link PersonnelOptions} with the character's attributes and options.
-     * @param reputation The character's reputation
+     * @param reputation       The character's reputation
+     *
      * @return The calculated skill modifier for the current skill type.
      */
     private int getSPAModifiers(PersonnelOptions characterOptions, int reputation) {
@@ -365,14 +367,39 @@ public class Skill {
     }
 
     /**
-     * @deprecated Use {@link #toString(PersonnelOptions, int)} instead.
+     * Returns a string representation of the object using default parameters.
+     *
+     * <p>This method calls {@link #toString(PersonnelOptions, int)} with a default
+     * {@link PersonnelOptions} instance and a reputation value of {@code 0}.</p>
+     *
+     * <p><b>Usage:</b> Generally you want to use the above-cited method, and pass in the character's SPAs and
+     * Reputation. As those can have an effect on the skill's Target Number. If you don't care about SPAs and
+     * Reputation, though, this method is great shortcut.</p>
+     *
+     * @return A string representation of the object based on default options and reputation.
      */
     @Override
-    @Deprecated(since = "0.50.05", forRemoval = false)
     public String toString() {
         return toString(new PersonnelOptions(), 0);
     }
 
+    /**
+     * Returns a string representation of the object based on the given parameters.
+     *
+     * <ul>
+     *   <li>If {@link #isCountUp()} is {@code true}, the final skill value is prefixed with a plus sign (<code>+</code>).</li>
+     *   <li>Otherwise, the final skill value is suffixed with a plus sign (<code>+</code>).</li>
+     * </ul>
+     *
+     * @param options    The {@link PersonnelOptions} to use for calculating the final skill value.
+     * @param reputation The reputation value used in the calculation.
+     *
+     * @return A string representation of the calculated final skill value, formatted depending on the state of
+     *       {@link #isCountUp()}.
+     *
+     * @see #isCountUp()
+     * @see #getFinalSkillValue(PersonnelOptions, int)
+     */
     public String toString(PersonnelOptions options, int reputation) {
         if (isCountUp()) {
             return "+" + getFinalSkillValue(options, reputation);
