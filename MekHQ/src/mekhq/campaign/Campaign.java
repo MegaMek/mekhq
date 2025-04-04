@@ -4199,14 +4199,26 @@ public class Campaign implements ITechManager {
         addReport(report);
     }
 
+    /**
+     * Repairs a specified part from the warehouse by creating a clone of it, decrementing the quantity in stock,
+     * repairing the cloned part, and optionally adding the repaired part back to the warehouse inventory.
+     *
+     * <p>If the original part's quantity drops to zero or below, no event notification is triggered.
+     * Otherwise, an event is triggered to update the system about changes in the spare part's stock.</p>
+     *
+     * @param part The {@link Part} object to be repaired. Its quantity is decremented by one during this operation.
+     * @param tech The {@link Person} who is performing the repair.
+     *
+     * @return A new repaired {@link Part} cloned from the original.
+     */
     public Part fixWarehousePart(Part part, Person tech) {
         // get a new cloned part to work with and decrement original
         Part repairable = part.clone();
-        part.decrementQuantity();
+        part.changeQuantity(-1);
 
         fixPart(repairable, tech);
         if (!(repairable instanceof OmniPod)) {
-            getQuartermaster().addPart(repairable, 0);
+            getQuartermaster().addPart(repairable, 0, false);
         }
 
         // If there is at least one remaining unit of the part
@@ -5262,7 +5274,7 @@ public class Campaign implements ITechManager {
 
             // check to see if this part can now be combined with other spare parts
             if (part.isSpare() && (part.getQuantity() > 0)) {
-                getQuartermaster().addPart(part, 0);
+                getQuartermaster().addPart(part, 0, false);
             }
         }
 
@@ -9429,7 +9441,7 @@ public class Campaign implements ITechManager {
             int toBuy = findStockUpAmount(partInUse);
             while (toBuy > 0) {
                 IAcquisitionWork partToBuy = partInUse.getPartToBuy();
-                getQuartermaster().addPart((Part) partToBuy.getNewEquipment(), 0);
+                getQuartermaster().addPart((Part) partToBuy.getNewEquipment(), 0, true);
                 --toBuy;
             }
         }

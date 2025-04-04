@@ -92,11 +92,11 @@ public class StructuralIntegrity extends Part {
     public Money getStickerPrice() {
         if (null != unit && unit.getEntity() instanceof Aero) {
             if (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof SmallCraft) {
-                return Money.of(((Aero) unit.getEntity()).get0SI() * 100000);
+                return Money.of(((Aero) unit.getEntity()).getOSI() * 100000);
             } else if (unit.getEntity() instanceof ConvFighter) {
-                return Money.of(((Aero) unit.getEntity()).get0SI() * 4000);
+                return Money.of(((Aero) unit.getEntity()).getOSI() * 4000);
             } else {
-                return Money.of(((Aero) unit.getEntity()).get0SI() * 50000);
+                return Money.of(((Aero) unit.getEntity()).getOSI() * 50000);
             }
         }
         return Money.zero();
@@ -161,7 +161,7 @@ public class StructuralIntegrity extends Part {
         super.fix();
         pointsNeeded = 0;
         if (null != unit && unit.getEntity() instanceof Aero) {
-            ((Aero) unit.getEntity()).setSI(((Aero) unit.getEntity()).get0SI());
+            ((Aero) unit.getEntity()).setSI(((Aero) unit.getEntity()).getOSI());
         }
     }
 
@@ -194,7 +194,7 @@ public class StructuralIntegrity extends Part {
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if ((unit != null) && (unit.getEntity() instanceof Aero)) {
-            pointsNeeded = ((Aero) unit.getEntity()).get0SI() - ((Aero) unit.getEntity()).getSI();
+            pointsNeeded = ((Aero) unit.getEntity()).getOSI() - ((Aero) unit.getEntity()).getSI();
         }
     }
 
@@ -210,7 +210,7 @@ public class StructuralIntegrity extends Part {
 
     @Override
     public void updateConditionFromPart() {
-        ((Aero) unit.getEntity()).setSI(((Aero) unit.getEntity()).get0SI() - pointsNeeded);
+        ((Aero) unit.getEntity()).setSI(((Aero) unit.getEntity()).getOSI() - pointsNeeded);
     }
 
     @Override

@@ -32,6 +32,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 
@@ -72,6 +73,7 @@ import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.enums.BloodGroup;
 import mekhq.campaign.personnel.enums.ManeiDominiClass;
 import mekhq.campaign.personnel.enums.ManeiDominiRank;
 import mekhq.campaign.personnel.enums.ModifierValue;
@@ -139,6 +141,8 @@ public class Person {
     // endregion Name
 
     private Gender gender;
+    private BloodGroup bloodGroup;
+
     private Portrait portrait;
 
     private PersonnelRole primaryRole;
@@ -1378,6 +1382,25 @@ public class Person {
         return gender;
     }
 
+    public void setBloodGroup(final BloodGroup bloodGroup) {
+        this.bloodGroup = bloodGroup;
+    }
+
+    /**
+     * Retrieves the blood group of the person. If the blood group has not been set, it generates a random blood group
+     * using {@link BloodGroup#getRandomBloodGroup()}.
+     *
+     * @return The {@link BloodGroup} of the entity. If no blood group is previously assigned, a random one is generated
+     *       and returned.
+     */
+    public BloodGroup getBloodGroup() {
+        if (bloodGroup == null) {
+            bloodGroup = getRandomBloodGroup();
+        }
+
+        return bloodGroup;
+    }
+
     /**
      * Sets the date of birth (the date they are born) for the person.
      *
@@ -2216,6 +2239,7 @@ public class Person {
             }
             // Always save the person's gender, as it would otherwise get confusing fast
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gender", getGender().name());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bloodGroup", getBloodGroup().name());
             if (!getRankSystem().equals(campaign.getRankSystem())) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rankSystem", getRankSystem().getCode());
             }
@@ -2602,6 +2626,8 @@ public class Person {
                     person.hitsPrior = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
                     person.setGender(Gender.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("bloodGroup")) {
+                    person.setBloodGroup(BloodGroup.fromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
                     final RankSystem rankSystem = Ranks.getRankSystemFromCode(wn2.getTextContent().trim());
 
