@@ -1052,7 +1052,8 @@ public enum PersonnelTableModelColumn {
                  ADMINISTRATION,
                  NEGOTIATION,
                  SCROUNGE -> new BonusSorter();
-            case INJURIES, KILLS, XP, TOUGHNESS, CONNECTIONS, EDGE, SPA_COUNT, IMPLANT_COUNT, LOYALTY, INTELLIGENCE ->
+            case INJURIES, KILLS, XP, TOUGHNESS, CONNECTIONS, WEALTH, REPUTATION, UNLUCKY, EDGE, SPA_COUNT,
+                 IMPLANT_COUNT, LOYALTY, INTELLIGENCE ->
                   new IntegerStringSorter();
             case SALARY -> new FormattedNumberSorter();
             default -> new NaturalOrderComparator();
