@@ -67,6 +67,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
 import megamek.client.ui.swing.util.UIUtil;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
@@ -1375,53 +1376,37 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         person.setClanPersonnel(chkClan.isSelected());
 
         if (campaign.getCampaignOptions().isUseToughness()) {
-            try {
-                person.setToughness(Integer.parseInt(textToughness.getText()));
-            } catch (NumberFormatException ignored) {
-            }
+            int currentValue = person.getToughness();
+            person.setToughness(MathUtility.parseInt(textToughness.getText(), currentValue));
         }
 
-        try {
-            int newValue = Integer.parseInt(textConnections.getText());
+            int currentValue = person.getConnections();
+            int newValue = MathUtility.parseInt(textConnections.getText(), currentValue);
             person.setConnections(clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
-        } catch (NumberFormatException ignored) {
-        }
 
-        try {
-            int newValue = Integer.parseInt(textWealth.getText());
+            currentValue = person.getWealth();
+            newValue = MathUtility.parseInt(textWealth.getText(), currentValue);
             person.setWealth(clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH));
-        } catch (NumberFormatException ignored) {
-        }
 
-        try {
-            int newValue = Integer.parseInt(textReputation.getText());
+            currentValue = person.getReputation();
+            newValue = MathUtility.parseInt(textReputation.getText(), currentValue);
             person.setReputation(clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
-        } catch (NumberFormatException ignored) {
-        }
 
-        try {
-            int newValue = Integer.parseInt(textUnlucky.getText());
+            currentValue = person.getUnlucky();
+            newValue = MathUtility.parseInt(textUnlucky.getText(), currentValue);
             person.setUnlucky(clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
-        } catch (NumberFormatException ignored) {
-        }
 
         if (campaign.getCampaignOptions().isUseEducationModule()) {
             person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
         }
 
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-            try {
-                person.setLoyalty(Integer.parseInt(textLoyalty.getText()));
-            } catch (NumberFormatException ignored) {
-            }
+            currentValue = person.getLoyalty();
+            person.setLoyalty(MathUtility.parseInt(textLoyalty.getText(), currentValue));
         }
 
-        if (campaign.getCampaignOptions().isUseFatigue()) {
-            try {
-                person.setFatigue(Integer.parseInt(textFatigue.getText()));
-            } catch (NumberFormatException ignored) {
-            }
-        }
+        currentValue = person.getFatigue();
+        person.setFatigue(MathUtility.parseInt(textFatigue.getText(), currentValue));
 
         if (null == choiceOriginalUnit.getSelectedItem()) {
             person.setOriginalUnit(null);
