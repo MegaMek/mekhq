@@ -261,7 +261,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
             // This seems to be overwritten completely and immediately by refresh
             StringBuilder experienceString = new StringBuilder(64);
             experienceString.append("<html><b>")
-                  .append(SkillType.getColoredExperienceLevelName(getCampaign().getReputation().getAverageSkillLevel()))
+                  .append(mekhq.campaign.personnel.SkillType.getColoredExperienceLevelName(getCampaign().getReputation()
+                                                                                                 .getAverageSkillLevel()))
                   .append("</b></html>");
             lblExperience.setText(experienceString.toString());
         }
@@ -627,7 +628,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
             StringBuilder experienceString = new StringBuilder(64);
             experienceString.append("<html><b>")
-                  .append(SkillType.getColoredExperienceLevelName(campaign.getReputation().getAverageSkillLevel()))
+                  .append(mekhq.campaign.personnel.SkillType.getColoredExperienceLevelName(campaign.getReputation()
+                                                                                                 .getAverageSkillLevel()))
                   .append("</b></html>");
             lblExperience.setText(experienceString.toString());
         }
@@ -648,11 +650,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
             }
         }
 
-        if (campaignOptions.isUseFatigue()) {
-            try {
-                lblFacilityCapacities.setText(campaignSummary.getFacilityReport());
-            } catch (Exception ignored) {
-            }
+        try {
+            lblFacilityCapacities.setText(campaignSummary.getFacilityReport());
+        } catch (Exception ignored) {
         }
     }
 
