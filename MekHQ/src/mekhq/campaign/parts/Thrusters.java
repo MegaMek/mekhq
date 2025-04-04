@@ -44,6 +44,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.personnel.skills.SkillType;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)

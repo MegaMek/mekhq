@@ -66,6 +66,25 @@ import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
+import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
+import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_LOGISTICS;
+import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
+import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
+import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
+import static mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect.*;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent.*;
+import static mekhq.campaign.randomEvents.prisoners.enums.ResponseQuality.RESPONSE_NEUTRAL;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 /**
  * Unit test class for the {@link EventEffectsManager}.
  *

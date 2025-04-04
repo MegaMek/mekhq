@@ -122,6 +122,24 @@ MEKHQ VERSION HISTORY:
 + Fix #6510: Fixed NPE In Armor Repair
 + Fix #6515, #6516: Allow Dynamically Priced Parts to be Replaced in Repair Bay
 + PR #6542: Fixes Compatibility for AC Ammo in MHQ
++ PR #6509: Corrected Tech Sort Direction for Minutes Comparison 
++ PR #6513: Fixed Support Points Update in AtBContract 
++ PR #6519: Fixed Aero Heat Sink Appearing in Parts Store Multiplie Times 
++ PR #6520: Changed Campaign Preset Directory Paths To "Data"; Added Campaign Presets to the custom User Directory 
++ PR #6521: Prisoners will No Longer Be Executed when Security is Told to 'Free' Them 
++ PR #6523: Renamed "Personnel" Tab To "Barracks" 
++ Fix #6481: Personnel that are both the tech and crew for a unit will now be properly removed from both
++ PR #6525: Added Spare View Filter & "In Use" Column to Parts Table in Warehouse Tab
++ Fix 6178: [RFE] Add warehouse stock level when salvaging
++ PR #6529: Added Award Icons to the custom User Directory
++ PR #6530: Removed Redundant Fatigue Check in Facility Report Update 
++ PR #6531: Added Status Self-Validation; Prevented Assignment of Invalid Statuses to PoWs; Updated Status Change Menu 
++ PR #6532: Added null Protection for getAcademy 
++ PR #6533: Prisoners Stage Escapes when Transferred to Academies 
++ PR #6536: Deprecated Unused Method And Adjusted Formatting 
++ PR #6538: Added Character Flaws as a New SPA Category 
++ PR #6549: Improved Image Scaling Utility; Improved Portrait Display in Immersive Dialogs
++ PR #6550: Moved Skill Classes into a Discrete Package 
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times

@@ -261,8 +261,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
             // This seems to be overwritten completely and immediately by refresh
             StringBuilder experienceString = new StringBuilder(64);
             experienceString.append("<html><b>")
-                  .append(SkillType.getColoredExperienceLevelName(getCampaign().getReputation().getAverageSkillLevel()))
-                  .append("</b></html>");
+                .append(SkillType.getColoredExperienceLevelName(getCampaign().getReputation().getAverageSkillLevel()))
+                .append("</b></html>");
             lblExperience.setText(experienceString.toString());
         }
 
@@ -627,8 +627,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
             StringBuilder experienceString = new StringBuilder(64);
             experienceString.append("<html><b>")
-                  .append(SkillType.getColoredExperienceLevelName(campaign.getReputation().getAverageSkillLevel()))
-                  .append("</b></html>");
+                .append(SkillType.getColoredExperienceLevelName(campaign.getReputation().getAverageSkillLevel()))
+                .append("</b></html>");
             lblExperience.setText(experienceString.toString());
         }
 
