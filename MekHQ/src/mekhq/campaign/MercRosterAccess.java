@@ -45,6 +45,7 @@ import megamek.common.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -555,77 +556,79 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
 
         progressNote = "Uploading personnel data";
         determineProgress();
-        for (Person p : campaign.getPersonnel()) {
+        for (Person person : campaign.getPersonnel()) {
             int forceId = 0;
             // assign parent id from force hash
-            if (null != forceHash.get(p.getId())) {
-                forceId = forceHash.get(p.getId());
+            if (null != forceHash.get(person.getId())) {
+                forceId = forceHash.get(person.getId());
             }
             try {
                 preparedStatement = connect.prepareStatement("UPDATE " + table
                         + ".crew SET rank=?, lname=?, fname=?, callsign=?, status=?, parent=?, crewnumber=?, joiningdate=?, notes=?, bday=? WHERE uuid=?");
-                preparedStatement.setInt(1, p.getRankNumeric());
-                preparedStatement.setString(2, truncateString(p.getSurname(), 30));
-                preparedStatement.setString(3, truncateString(p.getGivenName(), 30));
-                preparedStatement.setString(4, truncateString(p.getCallsign(), 30));
-                preparedStatement.setString(5, p.getStatus().toString());
+                preparedStatement.setInt(1, person.getRankNumeric());
+                preparedStatement.setString(2, truncateString(person.getSurname(), 30));
+                preparedStatement.setString(3, truncateString(person.getGivenName(), 30));
+                preparedStatement.setString(4, truncateString(person.getCallsign(), 30));
+                preparedStatement.setString(5, person.getStatus().toString());
                 preparedStatement.setInt(6, forceId);
                 preparedStatement.setInt(7, 1);
                 // TODO: get joining date right
-                preparedStatement.setDate(8, Date.valueOf(p.getDateOfBirth()));
+                preparedStatement.setDate(8, Date.valueOf(person.getDateOfBirth()));
                 // TODO: combine personnel log with biography
-                preparedStatement.setString(9, p.getBiography());
-                preparedStatement.setDate(10, Date.valueOf(p.getDateOfBirth()));
-                preparedStatement.setString(11, p.getId().toString());
+                preparedStatement.setString(9, person.getBiography());
+                preparedStatement.setDate(10, Date.valueOf(person.getDateOfBirth()));
+                preparedStatement.setString(11, person.getId().toString());
                 if (preparedStatement.executeUpdate() < 1) {
                     // no prior record so insert
                     preparedStatement = connect.prepareStatement("INSERT INTO " + table
                             + ".crew (rank, lname, fname, callsign, status, parent, crewnumber, joiningdate, notes, bday, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                    preparedStatement.setInt(1, p.getRankNumeric());
-                    preparedStatement.setString(2, truncateString(p.getSurname(), 30));
-                    preparedStatement.setString(3, truncateString(p.getGivenName(), 30));
-                    preparedStatement.setString(4, truncateString(p.getCallsign(), 30));
-                    preparedStatement.setString(5, p.getStatus().toString());
+                    preparedStatement.setInt(1, person.getRankNumeric());
+                    preparedStatement.setString(2, truncateString(person.getSurname(), 30));
+                    preparedStatement.setString(3, truncateString(person.getGivenName(), 30));
+                    preparedStatement.setString(4, truncateString(person.getCallsign(), 30));
+                    preparedStatement.setString(5, person.getStatus().toString());
                     preparedStatement.setInt(6, forceId);
                     preparedStatement.setInt(7, 1);
-                    preparedStatement.setDate(8, Date.valueOf(p.getDateOfBirth()));
-                    preparedStatement.setString(9, p.getBiography());
-                    preparedStatement.setDate(10, Date.valueOf(p.getDateOfBirth()));
-                    preparedStatement.setString(11, p.getId().toString());
+                    preparedStatement.setDate(8, Date.valueOf(person.getDateOfBirth()));
+                    preparedStatement.setString(9, person.getBiography());
+                    preparedStatement.setDate(10, Date.valueOf(person.getDateOfBirth()));
+                    preparedStatement.setString(11, person.getId().toString());
                     preparedStatement.executeUpdate();
                 }
 
                 // retrieve the MercRoster id of this person
                 preparedStatement = connect.prepareStatement("SELECT id FROM " + table + ".crew WHERE uuid=?");
-                preparedStatement.setString(1, p.getId().toString());
+                preparedStatement.setString(1, person.getId().toString());
                 ResultSet rs = preparedStatement.executeQuery();
                 rs.next();
                 int id = rs.getInt("id");
                 rs.close();
                 // put id in a hash for equipment assignment
-                personHash.put(p.getId(), id);
+                personHash.put(person.getId(), id);
                 // assign the personnel position
                 preparedStatement = connect.prepareStatement(
                         "INSERT INTO " + table + ".personnelpositions (personneltype, person) VALUES (?, ?)");
-                preparedStatement.setInt(1, p.getPrimaryRole().ordinal());
+                preparedStatement.setInt(1, person.getPrimaryRole().ordinal());
                 preparedStatement.setInt(2, id);
                 preparedStatement.executeUpdate();
                 // write out skills to skills table
+                PersonnelOptions options = person.getOptions();
+                int reputation = person.getReputation();
                 for (int i = 0; i < SkillType.skillList.length; i++) {
-                    if (p.hasSkill(SkillType.skillList[i])) {
-                        Skill skill = p.getSkill(SkillType.skillList[i]);
+                    if (person.hasSkill(SkillType.skillList[i])) {
+                        Skill skill = person.getSkill(SkillType.skillList[i]);
                         preparedStatement = connect.prepareStatement(
                                 "INSERT INTO " + table + ".skills (person, skill, value) VALUES (?, ?, ?)");
                         preparedStatement.setInt(1, id);
                         preparedStatement.setInt(2, i + 1);
-                        preparedStatement.setInt(3, skill.getFinalSkillValue());
+                        preparedStatement.setInt(3, skill.getFinalSkillValue(options, reputation));
                         preparedStatement.executeUpdate();
                     }
                 }
                 // add kills
                 // FIXME: the only issue here is we get duplicate kills for crewed vehicles
                 // TODO: clean up the getWhatKilled string
-                for (Kill k : campaign.getKillsFor(p.getId())) {
+                for (Kill k : campaign.getKillsFor(person.getId())) {
                     preparedStatement = connect.prepareStatement(
                             "INSERT INTO " + table + ".kills (parent, type, killdate, equipment) VALUES (?, ?, ?, ?)");
                     preparedStatement.setInt(1, id);

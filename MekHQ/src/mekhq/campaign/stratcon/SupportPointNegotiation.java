@@ -44,6 +44,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.Skill;
 
 import java.util.*;
 
@@ -190,7 +191,7 @@ public class SupportPointNegotiation {
             Person admin = iterator.next();
             int rollResult = Compute.d6(2);
 
-            int adminSkill = admin.getSkill(S_ADMIN).getFinalSkillValue();
+            int adminSkill = admin.getSkill(S_ADMIN).getFinalSkillValue(admin.getOptions());
             if (rollResult >= adminSkill) {
                 negotiatedSupportPoints ++;
             }

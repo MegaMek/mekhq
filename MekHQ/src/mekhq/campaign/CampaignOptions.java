@@ -64,6 +64,7 @@ import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;

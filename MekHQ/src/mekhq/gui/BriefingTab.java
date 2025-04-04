@@ -39,15 +39,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.io.File;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.table.TableColumn;
@@ -58,6 +50,7 @@ import megamek.client.bot.princess.PrincessException;
 import megamek.client.generator.ReconfigurationParameters;
 import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.Game;
@@ -74,6 +67,7 @@ import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
@@ -87,6 +81,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.unit.Unit;
@@ -840,21 +835,104 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         List<Unit> chosen = new ArrayList<>();
+        List<Unit> undeployedUnits = new ArrayList<>();
         StringBuilder undeployed = new StringBuilder();
 
+        Map<Unit, Entity> unitEntityMap = new HashMap<>();
         for (UUID uid : uids) {
-            Unit u = getCampaign().getUnit(uid);
-            if ((null != u) && (null != u.getEntity())) {
-                if (null == u.checkDeployment()) {
-                    // Make sure the unit's entity and pilot are fully up to date!
-                    u.resetPilotAndEntity();
+            Unit unit = getCampaign().getUnit(uid);
 
-                    // Add and run
-                    chosen.add(u);
+            if (unit == null) {
+                logger.error("Skipping unit {} because it is null", uid);
+                continue;
+            }
 
-                } else {
-                    undeployed.append('\n').append(u.getName()).append(" (").append(u.checkDeployment()).append(')');
+            Entity entity = unit.getEntity();
+
+            if (entity == null) {
+                logger.error("Skipping unit {} because it's entity is null", uid);
+                continue;
+            }
+
+            String deploymentStatus = unit.checkDeployment();
+            if (deploymentStatus != null) {
+                undeployed.append('\n').append(unit.getName()).append(" (").append(unit.checkDeployment()).append(')');
+                undeployedUnits.add(unit);
+                continue;
+            }
+
+            unitEntityMap.put(unit, entity);
+        }
+
+        List<Unit> prospectiveCommanders = new ArrayList<>();
+
+        for (Unit unit : unitEntityMap.keySet()) {
+            int forceId = unit.getForceId();
+            Force force = getCampaign().getForce(forceId);
+
+            // This will occur if the unit doesn't have an associated force
+            if (force == null) {
+                logger.error("Skipping unit {} because it's force is null", unit.getName());
+                continue;
+            }
+
+            UUID forceCommanderId = force.getForceCommanderID();
+            Person unitCommander = unit.getCommander();
+
+            if (unitCommander == null) {
+                logger.error("Skipping unit {} because it's commander is null", unit.getName());
+                continue;
+            }
+
+            UUID unitCommanderId = unitCommander.getId();
+
+            if (Objects.equals(forceCommanderId, unitCommanderId)) {
+                prospectiveCommanders.add(unit);
+            }
+        }
+
+        Unit commandUnit = null;
+        if (prospectiveCommanders.isEmpty()) {
+            // If we don't have an empty map we can just grab someone at random
+            if (!unitEntityMap.isEmpty()) {
+                Entity entity = ObjectUtility.getRandomItem(unitEntityMap.values());
+                entity.setCommander(true);
+            }
+        } else {
+            Person overallCommander = null;
+            for (Unit unit : prospectiveCommanders) {
+                Person commander = unit.getCommander();
+
+                if (commander.outRanksUsingSkillTiebreaker(getCampaign(), overallCommander)) {
+                    overallCommander = commander;
+                    commandUnit = unit;
                 }
+            }
+
+            if (commandUnit != null) {
+                Entity entity = unitEntityMap.get(commandUnit);
+                entity.setCommander(true);
+            } else {
+                if (!unitEntityMap.isEmpty()) {
+                    commandUnit = ObjectUtility.getRandomItem(unitEntityMap.keySet());
+                }
+            }
+        }
+
+        for (Unit unit : unitEntityMap.keySet()) {
+            if (!undeployedUnits.contains(unit)) {
+                // Make sure the unit's entity and pilot are fully up to date!
+                unit.resetPilotAndEntity();
+
+                // Assign commander - we need to do this here because otherwise the above step will wipe it
+                Entity commandEntity = unitEntityMap.get(commandUnit);
+
+                if (commandEntity != null) {
+                    commandEntity.setCommander(true);
+                }
+
+                // Add and run
+                chosen.add(unit);
             }
         }
 

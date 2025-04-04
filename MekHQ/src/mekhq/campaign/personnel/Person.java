@@ -35,8 +35,6 @@ import static megamek.common.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
-import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -49,6 +47,7 @@ import java.util.stream.Stream;
 
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
@@ -121,6 +120,26 @@ public class Person {
     public static final Map<Integer, Money> MEKWARRIOR_AERO_RANSOM_VALUES;
     public static final Map<Integer, Money> OTHER_RANSOM_VALUES;
 
+    // Traits
+    public static final int TRAIT_MODIFICATION_COST = 100;
+
+    public static final String CONNECTIONS_LABEL = "CONNECTIONS";
+    public static final int MINIMUM_CONNECTIONS = 0;
+    public static final int MAXIMUM_CONNECTIONS = 10;
+
+    public static final String REPUTATION_LABEL = "REPUTATION";
+    public static final int MINIMUM_REPUTATION = -5;
+    public static final int MAXIMUM_REPUTATION = 5;
+
+    public static final String WEALTH_LABEL = "WEALTH";
+    public static final int MINIMUM_WEALTH = -1;
+    public static final int MAXIMUM_WEALTH = 10;
+
+    public static final String UNLUCKY_LABEL = "UNLUCKY";
+    public static final int MINIMUM_UNLUCKY = 0;
+    public static final int MAXIMUM_UNLUCKY = 5;
+
+
     private PersonAwardController awardController;
 
     // region Family Variables
@@ -176,6 +195,10 @@ public class Person {
     private Skills skills;
     private PersonnelOptions options;
     private int toughness;
+    private int connections;
+    private int wealth;
+    private int reputation;
+    private int unlucky;
 
     private PersonnelStatus status;
     private int xp;
@@ -400,6 +423,10 @@ public class Person {
         hits = 0;
         hitsPrior = 0;
         toughness = 0;
+        connections = 0;
+        wealth = 0;
+        reputation = 0;
+        unlucky = 0;
         dateOfDeath = null;
         recruitment = null;
         joinedCampaign = null;
@@ -2296,6 +2323,22 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "toughness", toughness);
             }
 
+            if (connections != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "connections", connections);
+            }
+
+            if (wealth != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wealth", wealth);
+            }
+
+            if (reputation != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reputation", reputation);
+            }
+
+            if (unlucky != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unlucky", unlucky);
+            }
+
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minutesLeft", minutesLeft);
 
             if (overtimeLeft > 0) {
@@ -2598,17 +2641,17 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase("secondaryRole")) {
                     person.setSecondaryRoleDirect(PersonnelRole.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("acquisitions")) {
-                    person.acquisitions = Integer.parseInt(wn2.getTextContent());
+                    person.acquisitions = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("primaryDesignator")) {
                     person.primaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("secondaryDesignator")) {
                     person.secondaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToWaitForHealing")) {
-                    person.daysToWaitForHealing = Integer.parseInt(wn2.getTextContent());
+                    person.daysToWaitForHealing = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("vocationalXPTimer")
                                  // <50.03 compatibility handler
                                  || wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
-                    person.vocationalXPTimer = Integer.parseInt(wn2.getTextContent());
+                    person.vocationalXPTimer = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
                     person.id = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("genealogy")) {
@@ -2620,15 +2663,15 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase(Portrait.XML_TAG)) {
                     person.setPortrait(Portrait.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase("xp")) {
-                    person.setXPDirect(Integer.parseInt(wn2.getTextContent().trim()));
+                    person.setXPDirect(MathUtility.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("totalXPEarnings")) {
-                    person.setTotalXPEarnings(Integer.parseInt(wn2.getTextContent().trim()));
+                    person.setTotalXPEarnings(MathUtility.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("nTasks")) {
-                    person.nTasks = Integer.parseInt(wn2.getTextContent());
+                    person.nTasks = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
-                    person.hits = Integer.parseInt(wn2.getTextContent());
+                    person.hits = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("hitsPrior")) {
-                    person.hitsPrior = Integer.parseInt(wn2.getTextContent());
+                    person.hitsPrior = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
                     person.setGender(Gender.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("bloodGroup")) {
@@ -2640,9 +2683,9 @@ public class Person {
                         person.setRankSystemDirect(rankSystem);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
-                    person.setRank(Integer.parseInt(wn2.getTextContent().trim()));
+                    person.setRank(MathUtility.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankLevel")) {
-                    person.setRankLevel(Integer.parseInt(wn2.getTextContent().trim()));
+                    person.setRankLevel(MathUtility.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiClass")) {
                     person.setManeiDominiClassDirect(ManeiDominiClass.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiRank")) {
@@ -2664,9 +2707,9 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase("totalEarnings")) {
                     person.totalEarnings = Money.fromXmlString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("minutesLeft")) {
-                    person.minutesLeft = Integer.parseInt(wn2.getTextContent());
+                    person.minutesLeft = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("overtimeLeft")) {
-                    person.overtimeLeft = Integer.parseInt(wn2.getTextContent());
+                    person.overtimeLeft = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
                     person.birthday = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("deathday")) {
@@ -2678,13 +2721,13 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastRankChangeDate")) {
                     person.lastRankChangeDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("autoAwardSupportPoints")) {
-                    person.setAutoAwardSupportPoints(Integer.parseInt(wn2.getTextContent().trim()));
+                    person.setAutoAwardSupportPoints(MathUtility.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("retirement")) {
                     person.setRetirement(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("loyalty")) {
-                    person.loyalty = Integer.parseInt(wn2.getTextContent());
+                    person.loyalty = MathUtility.parseInt(wn2.getTextContent(), 9);
                 } else if (wn2.getNodeName().equalsIgnoreCase("fatigue")) {
-                    person.fatigue = Integer.parseInt(wn2.getTextContent());
+                    person.fatigue = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("isRecoveringFromFatigue")) {
                     person.isRecoveringFromFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
@@ -2692,13 +2735,21 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
                     edge = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edgeAvailable")) {
-                    person.currentEdge = Integer.parseInt(wn2.getTextContent());
+                    person.currentEdge = MathUtility.parseInt(wn2.getTextContent(), 0);
                 } else if (wn2.getNodeName().equalsIgnoreCase("implants")) {
                     implants = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("toughness")) {
-                    person.toughness = Integer.parseInt(wn2.getTextContent());
+                    person.toughness = MathUtility.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("connections")) {
+                    person.connections = MathUtility.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("wealth")) {
+                    person.wealth = MathUtility.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("reputation")) {
+                    person.reputation = MathUtility.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("unlucky")) {
+                    person.unlucky = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("pilotHits")) {
-                    person.hits = Integer.parseInt(wn2.getTextContent());
+                    person.hits = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("skill")) {
                     Skill s = Skill.generateInstanceFromXML(wn2);
                     if ((s != null) && (s.getType() != null)) {
@@ -2796,17 +2847,17 @@ public class Person {
                           .filter(inj -> (null == inj.getStart()))
                           .forEach(inj -> inj.setStart(now.minusDays(inj.getOriginalTime() - inj.getTime())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitWeight")) {
-                    person.originalUnitWeight = Integer.parseInt(wn2.getTextContent());
+                    person.originalUnitWeight = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitTech")) {
-                    person.originalUnitTech = Integer.parseInt(wn2.getTextContent());
+                    person.originalUnitTech = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitId")) {
                     person.originalUnitId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduHighestEducation")) {
                     person.eduHighestEducation = EducationLevel.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduJourneyTime")) {
-                    person.eduJourneyTime = Integer.parseInt(wn2.getTextContent());
+                    person.eduJourneyTime = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravel")) {
-                    person.eduDaysOfTravel = Integer.parseInt(wn2.getTextContent());
+                    person.eduDaysOfTravel = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduTagAlongs")) {
                     if (wn2.getNodeName().equalsIgnoreCase("eduTagAlongs")) {
                         NodeList uuidNodes = wn2.getChildNodes();
@@ -2846,35 +2897,35 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyFaction")) {
                     person.eduAcademyFaction = String.valueOf(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduCourseIndex")) {
-                    person.eduCourseIndex = Integer.parseInt(wn2.getTextContent());
+                    person.eduCourseIndex = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduEducationStage")) {
                     person.eduEducationStage = EducationStage.parseFromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduEducationTime")) {
-                    person.eduEducationTime = Integer.parseInt(wn2.getTextContent());
+                    person.eduEducationTime = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("aggression")) {
                     person.aggression = Aggression.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("aggressionDescriptionIndex")) {
-                    person.aggressionDescriptionIndex = Integer.parseInt(wn2.getTextContent());
+                    person.aggressionDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("ambition")) {
                     person.ambition = Ambition.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("ambitionDescriptionIndex")) {
-                    person.ambitionDescriptionIndex = Integer.parseInt(wn2.getTextContent());
+                    person.ambitionDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("greed")) {
                     person.greed = Greed.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("greedDescriptionIndex")) {
-                    person.greedDescriptionIndex = Integer.parseInt(wn2.getTextContent());
+                    person.greedDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("social")) {
                     person.social = Social.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("socialDescriptionIndex")) {
-                    person.socialDescriptionIndex = Integer.parseInt(wn2.getTextContent());
+                    person.socialDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityQuirk")) {
                     person.personalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityQuirkDescriptionIndex")) {
-                    person.personalityQuirkDescriptionIndex = Integer.parseInt(wn2.getTextContent());
+                    person.personalityQuirkDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("intelligence")) {
                     person.intelligence = Intelligence.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("intelligenceDescriptionIndex")) {
-                    person.intelligenceDescriptionIndex = Integer.parseInt(wn2.getTextContent());
+                    person.intelligenceDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityDescription")) {
                     person.personalityDescription = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")) {
@@ -4116,7 +4167,7 @@ public class Person {
 
     // region edge
     public int getEdge() {
-        return getOptions().intOption(OptionsConstants.EDGE);
+        return getOptions().intOption(OptionsConstants.EDGE) - unlucky;
     }
 
     public void setEdge(final int edge) {
@@ -4657,28 +4708,33 @@ public class Person {
         }
 
         if (part.isRightTechType(SkillType.S_TECH_BA) && hasSkill(SkillType.S_TECH_BA)) {
-            if ((skill == null) || (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_BA).getFinalSkillValue())) {
+            if ((skill == null) ||
+                      (skill.getFinalSkillValue(options, reputation) >
+                             getSkill(SkillType.S_TECH_BA).getFinalSkillValue(options, reputation))) {
                 skill = getSkill(SkillType.S_TECH_BA);
             }
         }
 
         if (part.isRightTechType(SkillType.S_TECH_AERO) && hasSkill(SkillType.S_TECH_AERO)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue())) {
+                      (skill.getFinalSkillValue(options, reputation) >
+                             getSkill(SkillType.S_TECH_AERO).getFinalSkillValue(options, reputation))) {
                 skill = getSkill(SkillType.S_TECH_AERO);
             }
         }
 
         if (part.isRightTechType(SkillType.S_TECH_MECHANIC) && hasSkill(SkillType.S_TECH_MECHANIC)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue())) {
+                      (skill.getFinalSkillValue(options, reputation) >
+                             getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue(options, reputation))) {
                 skill = getSkill(SkillType.S_TECH_MECHANIC);
             }
         }
 
         if (part.isRightTechType(SkillType.S_TECH_VESSEL) && hasSkill(SkillType.S_TECH_VESSEL)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue())) {
+                      (skill.getFinalSkillValue(options, reputation) >
+                             getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue(options, reputation))) {
                 skill = getSkill(SkillType.S_TECH_VESSEL);
             }
         }
@@ -4694,21 +4750,25 @@ public class Person {
         }
 
         if (hasSkill(SkillType.S_TECH_BA)) {
-            if ((skill == null) || (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_BA).getFinalSkillValue())) {
+            if ((skill == null) ||
+                      (skill.getFinalSkillValue(options, reputation) >
+                             getSkill(SkillType.S_TECH_BA).getFinalSkillValue(options, reputation))) {
                 skill = getSkill(SkillType.S_TECH_BA);
             }
         }
 
         if (hasSkill(SkillType.S_TECH_MECHANIC)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue())) {
+                      (skill.getFinalSkillValue(options, reputation) >
+                             getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue(options, reputation))) {
                 skill = getSkill(SkillType.S_TECH_MECHANIC);
             }
         }
 
         if (hasSkill(SkillType.S_TECH_AERO)) {
             if ((skill == null) ||
-                      (skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue())) {
+                      (skill.getFinalSkillValue(options, reputation) >
+                             getSkill(SkillType.S_TECH_AERO).getFinalSkillValue(options, reputation))) {
                 skill = getSkill(SkillType.S_TECH_AERO);
             }
         }
@@ -4807,6 +4867,38 @@ public class Person {
 
     public void setToughness(final int toughness) {
         this.toughness = toughness;
+    }
+
+    public int getConnections() {
+        return connections;
+    }
+
+    public void setConnections(final int connections) {
+        this.connections = connections;
+    }
+
+    public int getWealth() {
+        return wealth;
+    }
+
+    public void setWealth(final int wealth) {
+        this.wealth = wealth;
+    }
+
+    public int getReputation() {
+        return reputation;
+    }
+
+    public void setReputation(final int reputation) {
+        this.reputation = reputation;
+    }
+
+    public int getUnlucky() {
+        return unlucky;
+    }
+
+    public void setUnlucky(final int unlucky) {
+        this.unlucky = unlucky;
     }
 
     public void resetSkillTypes() {

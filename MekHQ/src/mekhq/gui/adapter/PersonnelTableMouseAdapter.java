@@ -38,6 +38,7 @@ import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_COST_HAND_TYPE_
 import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_COST_LEG_TYPE_5;
 import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5;
 import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_RECOVERY;
+import static mekhq.campaign.personnel.Person.*;
 import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
@@ -179,7 +180,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      * @deprecated use {@code CMD_ADD_XP} instead
      */
     @Deprecated(since = "0.50.05", forRemoval = true)
-    private static final String CMD_ADD_1_XP = "XP_ADD_1";
     private static final String CMD_ADD_XP = "XP_ADD";
     private static final String CMD_EDIT_BIOGRAPHY = "BIOGRAPHY";
     private static final String CMD_EDIT_PORTRAIT = "PORTRAIT";
@@ -199,6 +199,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_ACQUIRE_ABILITY = "ABILITY";
     private static final String CMD_ACQUIRE_CUSTOM_CHOICE = "CUSTOM_CHOICE";
     private static final String CMD_IMPROVE = "IMPROVE";
+    private static final String CMD_BUY_TRAIT = "BUY_TRAIT";
     private static final String CMD_ADD_SPOUSE = "SPOUSE";
     private static final String CMD_REMOVE_SPOUSE = "REMOVE_SPOUSE";
     private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY";
@@ -589,10 +590,28 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       selectedPerson,
                       getCampaign().getLocalDate(),
                       selectedPerson.getSkill(type).getType().getName(),
-                      selectedPerson.getSkill(type).toString());
+                      selectedPerson.getSkill(type).toString(selectedPerson.getOptions(), selectedPerson.getReputation()));
                 getCampaign().addReport(String.format(resources.getString("improved.format"),
                       selectedPerson.getHyperlinkedName(),
                       type));
+
+                getCampaign().personUpdated(selectedPerson);
+                break;
+            }
+            case CMD_BUY_TRAIT: {
+                String type = data[1];
+                int cost = Integer.parseInt(data[2]);
+                int target = Integer.parseInt(data[3]);
+
+                switch (type) {
+                    case CONNECTIONS_LABEL -> selectedPerson.setConnections(target);
+                    case REPUTATION_LABEL -> selectedPerson.setReputation(target);
+                    case WEALTH_LABEL -> selectedPerson.setWealth(target);
+                    case UNLUCKY_LABEL -> selectedPerson.setUnlucky(target);
+                    default -> logger.error("Invalid trait type: {}", type);
+                }
+
+                selectedPerson.spendXP(cost);
 
                 getCampaign().personUpdated(selectedPerson);
                 break;
@@ -1385,7 +1404,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 for (final Person person : people) {
                     if (person.getOriginalUnitId() != null) {
                         person.setOriginalUnitId(null);
-                        person.setOriginalUnitTech(Person.TECH_IS1);
+                        person.setOriginalUnitTech(TECH_IS1);
                         person.setOriginalUnitWeight(EntityWeightClass.WEIGHT_ULTRA_LIGHT);
                     }
                 }
@@ -1419,7 +1438,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 Skill skill = person.getSkill(S_DOCTOR);
 
                 if (skill != null &&
-                          skill.getFinalSkillValue() >= REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5) {
+                          skill.getFinalSkillValue(person.getOptions()) >= REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5) {
                     suitableDoctors.add(person);
                 }
             }
@@ -2663,6 +2682,81 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             JMenuHelpers.addMenuIfNonEmpty(menu, currentMenu);
             JMenuHelpers.addMenuIfNonEmpty(menu, newMenu);
+
+            JMenu traitsMenu = new JMenu(resources.getString("spendOnTraits.text"));
+            double costMultiplier = getCampaignOptions().getXpCostMultiplier();
+            int traitCost = (int) round(TRAIT_MODIFICATION_COST * costMultiplier);
+
+            // Connections
+            int connections = person.getConnections();
+            int target = connections + 1;
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnConnections.text"), target, traitCost));
+            menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnConnections.tooltip"),
+                  ((target > 0 ? "+" : "-") + target))));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT, CONNECTIONS_LABEL,
+                  String.valueOf(traitCost), String.valueOf(target)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(target <= MAXIMUM_CONNECTIONS && person.getXP() >= traitCost);
+            traitsMenu.add(menuItem);
+
+            // Reputation
+            int reputation = person.getReputation();
+            target = reputation + 1;
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnReputation.text"), target,
+                  traitCost));
+            menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnReputation.tooltip"),
+                  (target == 0 ? 0 : (target > 0 ? "+" : "-") + target), target)));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT, REPUTATION_LABEL,
+                  String.valueOf(traitCost), String.valueOf(target)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(target <= MAXIMUM_REPUTATION && person.getXP() >= traitCost);
+            traitsMenu.add(menuItem);
+
+            target = reputation - 1;
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnReputation.text"), target,
+                  -traitCost));
+            menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnReputation.tooltip"),
+                  (target == 0 ? 0 : (target > 0 ? "+" : "-") + target), target)));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT, REPUTATION_LABEL,
+                  String.valueOf(-traitCost), String.valueOf(target)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(target >= MINIMUM_REPUTATION);
+            traitsMenu.add(menuItem);
+
+            // Wealth
+            int wealth = person.getWealth();
+            target = wealth + 1;
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnWealth.text"), target,
+                  traitCost));
+            menuItem.setToolTipText(resources.getString("spendOnWealth.tooltip"));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT, WEALTH_LABEL,
+                  String.valueOf(traitCost), String.valueOf(target)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(target <= MAXIMUM_WEALTH && person.getXP() >= traitCost);
+            traitsMenu.add(menuItem);
+
+            target = wealth - 1;
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnWealth.text"), target,
+                  -traitCost));
+            menuItem.setToolTipText(resources.getString("spendOnWealth.tooltip"));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT, WEALTH_LABEL,
+                  String.valueOf(-traitCost), String.valueOf(target)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(target >= MINIMUM_WEALTH);
+            traitsMenu.add(menuItem);
+
+            // Unlucky
+            int unlucky = person.getUnlucky();
+            target = unlucky + 1;
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnUnlucky.text"), target,
+                  -traitCost));
+            menuItem.setToolTipText(String.format(resources.getString("spendOnUnlucky.tooltip"), target));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT, UNLUCKY_LABEL,
+                  String.valueOf(-traitCost), String.valueOf(target)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(target <= MAXIMUM_UNLUCKY);
+            traitsMenu.add(menuItem);
+            menu.add(traitsMenu);
 
             // Edge Purchasing
             if (getCampaignOptions().isUseEdge()) {

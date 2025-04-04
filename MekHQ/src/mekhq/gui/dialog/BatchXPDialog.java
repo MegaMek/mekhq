@@ -55,6 +55,8 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
@@ -373,7 +375,7 @@ public final class BatchXPDialog extends JDialog {
                       person,
                       campaign.getLocalDate(),
                       person.getSkill(skillName).getType().getName(),
-                      person.getSkill(skillName).toString());
+                      person.getSkill(skillName).toString(person.getOptions(), person.getReputation()));
                 campaign.personUpdated(person);
             }
 

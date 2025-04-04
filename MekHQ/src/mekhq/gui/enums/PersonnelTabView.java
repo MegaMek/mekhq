@@ -27,9 +27,9 @@
  */
 package mekhq.gui.enums;
 
-import mekhq.MekHQ;
-
 import java.util.ResourceBundle;
+
+import mekhq.MekHQ;
 
 public enum PersonnelTabView {
     //region Enum Declarations
@@ -45,6 +45,7 @@ public enum PersonnelTabView {
     DATES("PersonnelTabView.DATES.text", "PersonnelTabView.DATES.toolTipText"),
     FLAGS("PersonnelTabView.FLAGS.text", "PersonnelTabView.FLAGS.toolTipText"),
     PERSONALITY("PersonnelTabView.PERSONALITY.text", "PersonnelTabView.PERSONALITY.toolTipText"),
+    TRAITS("PersonnelTabView.TRAITS.text", "PersonnelTabView.TRAITS.toolTipText"),
     OTHER("PersonnelTabView.OTHER.text", "PersonnelTabView.OTHER.toolTipText");
     //endregion Enum Declarations
 
@@ -115,6 +116,10 @@ public enum PersonnelTabView {
 
     public boolean isPersonality() {
         return this == PERSONALITY;
+    }
+
+    public boolean isTraits() {
+        return this == TRAITS;
     }
 
     public boolean isOther() {

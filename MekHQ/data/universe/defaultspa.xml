@@ -208,8 +208,7 @@
         <lookupName>gunnery_ballistic</lookupName>
         <xpCost>100</xpCost>
         <weight>1</weight>
-        <invalidAbilities>weapon_specialist</invalidAbilities>
-        <invalidAbilities>specialist</invalidAbilities>
+        <invalidAbilities>weapon_specialist::specialist</invalidAbilities>
         <skillPrereq>
             <skill>Gunnery/Mek::Green</skill>
             <skill>Gunnery/ProtoMek::Green</skill>
@@ -224,8 +223,7 @@
         <lookupName>gunnery_missile</lookupName>
         <xpCost>100</xpCost>
         <weight>1</weight>
-        <invalidAbilities>weapon_specialist</invalidAbilities>
-        <invalidAbilities>specialist</invalidAbilities>
+        <invalidAbilities>weapon_specialist::specialist</invalidAbilities>
         <skillPrereq>
             <skill>Gunnery/Mek::Green</skill>
             <skill>Gunnery/ProtoMek::Green</skill>
@@ -240,8 +238,7 @@
         <lookupName>gunnery_laser</lookupName>
         <xpCost>100</xpCost>
         <weight>1</weight>
-        <invalidAbilities>weapon_specialist</invalidAbilities>
-        <invalidAbilities>specialist</invalidAbilities>
+        <invalidAbilities>weapon_specialist::specialist</invalidAbilities>
         <skillPrereq>
             <skill>Gunnery/Mek::Green</skill>
             <skill>Gunnery/ProtoMek::Green</skill>
@@ -537,6 +534,48 @@
             <skill>Gunnery/Aircraft::Regular</skill>
             <skill>Gunnery/Vehicle::Regular</skill>
         </skillPrereq>
+    </ability>
+    <ability>
+        <lookupName>atow_combat_paralysis</lookupName>
+        <xpCost>-400</xpCost>
+        <weight>1</weight>
+        <desc>Unit Reputation is decreased by 1 if this character is the campaign commander.
+
+A pilot who has Combat Sense rolls three dice per initiative check, keeping the top two rolls.
+
+If individual initiative is enabled, this penalty applies only to the pilot's unit. Otherwise, the penalty is applied only if the pilot's unit is the force commander.
+        </desc>
+        <skillPrereq/>
+        <removeAbilities>atow_combat_sense</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>atow_combat_sense</lookupName>
+        <xpCost>400</xpCost>
+        <weight>1</weight>
+        <desc>Unit Reputation is increased by 1 if this character is the campaign commander.
+
+A pilot who has Combat Sense rolls three dice per initiative check, keeping the top two rolls.
+
+If individual initiative is enabled, this bonus applies only to the pilot's unit. Otherwise, the bonus is applied only if the pilot's unit is the force commander.
+        </desc>
+        <skillPrereq>
+            <skill>Gunnery/Mek::Veteran</skill>
+            <skill>Piloting/Aircraft::Veteran</skill>
+            <skill>Gunnery/Spacecraft::Veteran</skill>
+            <skill>Piloting/Spacecraft::Veteran</skill>
+            <skill>Piloting/Mek::Veteran</skill>
+            <skill>Piloting/VTOL::Veteran</skill>
+            <skill>Piloting/Naval::Veteran</skill>
+            <skill>Gunnery/BattleArmor::Veteran</skill>
+            <skill>Gunnery/Aerospace::Veteran</skill>
+            <skill>Piloting/Aerospace::Veteran</skill>
+            <skill>Gunnery/ProtoMek::Veteran</skill>
+            <skill>Anti-Mek::Veteran</skill>
+            <skill>Piloting/Ground Vehicle::Veteran</skill>
+            <skill>Gunnery/Aircraft::Veteran</skill>
+            <skill>Gunnery/Vehicle::Veteran</skill>
+        </skillPrereq>
+        <removeAbilities>atow_combat_paralysis</removeAbilities>
     </ability>
     <ability>
         <lookupName>tactical_genius</lookupName>

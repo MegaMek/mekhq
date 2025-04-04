@@ -273,7 +273,7 @@ public class TrainingCombatTeams {
                       spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                       CLOSING_SPAN_TAG,
                       targetSkill.getType().getName(),
-                      targetSkill.getFinalSkillValue()));
+                      targetSkill.getFinalSkillValue(trainee.getOptions())));
             }
         }
     }

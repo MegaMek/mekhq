@@ -44,6 +44,9 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.skills.SkillType;
+import org.w3c.dom.Node;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)

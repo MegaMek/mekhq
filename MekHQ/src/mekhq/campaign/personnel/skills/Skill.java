@@ -30,13 +30,18 @@ package mekhq.campaign.personnel.skills;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static mekhq.campaign.personnel.skills.SkillType.S_NEG;
+import static mekhq.campaign.personnel.skills.SkillType.S_PROTOCOLS;
+import static mekhq.campaign.personnel.skills.SkillType.S_STREETWISE;
 
 import java.io.PrintWriter;
+import java.util.Objects;
 
 import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.randomEvents.personalities.enums.Intelligence;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -218,20 +223,73 @@ public class Skill {
     }
 
     /**
-     * Calculates the final skill value based on the progression type, the current level, and any applicable bonuses,
-     * while ensuring the value stays within the legal bounds for the skill type.
-     *
-     * <p>For "count up" progression types, the final skill value is capped at the maximum allowed value. For "count
-     * down" progression types, the final skill value is capped at the minimum allowed value.</p>
-     *
-     * @return the final skill value after applying progression rules and limiting it to the legal range.
+     * @deprecated use {@link #getFinalSkillValue(PersonnelOptions, int)} instead.
      */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public int getFinalSkillValue() {
+        return getFinalSkillValue(new PersonnelOptions(), 0);
+    }
+
+    /**
+     * Calculates the final skill value for the character based on the default reputation modifier (zero).
+     *
+     * <p>This is a convenience method that delegates to {@link #getFinalSkillValue(PersonnelOptions, int)}
+     * with a default reputation value of {@code 0}.</p>
+     *
+     * <p><b>Usage:</b> This method is for when we know, 100%, that the targeted {@link Skill} is not affected by
+     * the character's Reputation. If unsure, use {@link #getFinalSkillValue(PersonnelOptions, int)} instead.</p>
+     *
+     * @param characterOptions The {@link PersonnelOptions} to consider for determining skill value modifiers.
+     *
+     * @return The final skill value after applying progression rules and using a default reputation of zero.
+     */
+    public int getFinalSkillValue(PersonnelOptions characterOptions) {
+        return getFinalSkillValue(characterOptions, 0);
+    }
+
+    /**
+     * Calculates the final skill value based on the skill's progression type, current level, any applicable bonuses,
+     * and a reputation modifier, while ensuring the value remains within the legal bounds for the skill type.
+     *
+     * <p>The calculation follows these rules based on the progression type:</p>
+     * <ul>
+     *   <li>For "count up" progression types, the final skill value is capped at a predefined maximum allowed value.</li>
+     *   <li>For "count down" progression types, the final skill value is capped at a predefined minimum allowed value.</li>
+     * </ul>
+     * <p>Any reputation values are included as a modifier in the calculation.</p>
+     *
+     * @param characterOptions The {@link PersonnelOptions} to consider for determining skill value modifiers.
+     * @param reputation       A reputation value to apply as a modifier to the skill's final value. Positive values
+     *                         increase the skill value, while negative values decrease it.
+     *
+     * @return The final skill value after applying progression rules and clamping to the legal range.
+     */
+    public int getFinalSkillValue(PersonnelOptions characterOptions, int reputation) {
+        int modifier = getSPAModifiers(characterOptions, reputation);
         if (isCountUp()) {
-            return min(COUNT_UP_MAX_VALUE, getSkillValue());
+            return min(COUNT_UP_MAX_VALUE, getSkillValue() + modifier);
         } else {
-            return max(COUNT_DOWN_MIN_VALUE, getSkillValue());
+            return max(COUNT_DOWN_MIN_VALUE, getSkillValue() - modifier);
         }
+    }
+
+    /**
+     * Calculates the skill modifiers for the current skill type based on the character's SPAs.
+     *
+     * @param characterOptions The {@link PersonnelOptions} with the character's attributes and options.
+     * @param reputation       The character's reputation
+     *
+     * @return The calculated skill modifier for the current skill type.
+     */
+    private int getSPAModifiers(PersonnelOptions characterOptions, int reputation) {
+        int modifier = 0;
+
+        String name = getType().getName();
+        if (Objects.equals(name, S_NEG) || Objects.equals(name, S_PROTOCOLS) || Objects.equals(name, S_STREETWISE)) {
+            modifier += reputation;
+        }
+
+        return modifier;
     }
 
     /**
@@ -308,12 +366,45 @@ public class Skill {
         return type.getExperienceLevel(getTotalSkillLevel());
     }
 
+    /**
+     * Returns a string representation of the object using default parameters.
+     *
+     * <p>This method calls {@link #toString(PersonnelOptions, int)} with a default
+     * {@link PersonnelOptions} instance and a reputation value of {@code 0}.</p>
+     *
+     * <p><b>Usage:</b> Generally you want to use the above-cited method, and pass in the character's SPAs and
+     * Reputation. As those can have an effect on the skill's Target Number. If you don't care about SPAs and
+     * Reputation, though, this method is great shortcut.</p>
+     *
+     * @return A string representation of the object based on default options and reputation.
+     */
     @Override
     public String toString() {
+        return toString(new PersonnelOptions(), 0);
+    }
+
+    /**
+     * Returns a string representation of the object based on the given parameters.
+     *
+     * <ul>
+     *   <li>If {@link #isCountUp()} is {@code true}, the final skill value is prefixed with a plus sign (<code>+</code>).</li>
+     *   <li>Otherwise, the final skill value is suffixed with a plus sign (<code>+</code>).</li>
+     * </ul>
+     *
+     * @param options    The {@link PersonnelOptions} to use for calculating the final skill value.
+     * @param reputation The reputation value used in the calculation.
+     *
+     * @return A string representation of the calculated final skill value, formatted depending on the state of
+     *       {@link #isCountUp()}.
+     *
+     * @see #isCountUp()
+     * @see #getFinalSkillValue(PersonnelOptions, int)
+     */
+    public String toString(PersonnelOptions options, int reputation) {
         if (isCountUp()) {
-            return "+" + getFinalSkillValue();
+            return "+" + getFinalSkillValue(options, reputation);
         } else {
-            return getFinalSkillValue() + "+";
+            return getFinalSkillValue(options, reputation) + "+";
         }
     }
 

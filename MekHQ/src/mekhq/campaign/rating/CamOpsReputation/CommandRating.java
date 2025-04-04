@@ -27,6 +27,9 @@
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
+import static java.lang.Math.max;
+import static megamek.common.options.OptionsConstants.ATOW_COMBAT_PARALYSIS;
+import static megamek.common.options.OptionsConstants.ATOW_COMBAT_SENSE;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
 
 import java.util.HashMap;
@@ -37,13 +40,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 
 public class CommandRating {
@@ -54,14 +51,16 @@ public class CommandRating {
      *
      * @param campaign  the campaign the commander belongs to
      * @param commander the commander to calculate the rating for
-     * @return a map containing the commander's rating in different areas:
-     *         - "leadership": the commander's leadership skill value
-     *         - "tactics": the commander's tactics skill value
-     *         - "strategy": the commander's strategy skill value
-     *         - "negotiation": the commander's negotiation skill value
-     *         - "traits": the commander's traits (not currently tracked, always 0)
-     *         - "personality": the value of the commander's personality
-     *         characteristics (or 0, if disabled)
+     *
+     * @return A map containing the commander's rating in different areas:
+     *       <ul>
+     *           <li>"leadership": the commander's leadership skill value</li>
+     *           <li>"tactics": the commander's tactics skill value</li>
+     *           <li>"strategy": the commander's strategy skill value</li>
+     *           <li>"negotiation": the commander's negotiation skill value</li>
+     *           <li>"traits": the commander's trait score (see CamOps pg34)</li>
+     *           <li>"personality": the value of the commander's personality characteristics (or 0, if disabled)</li>
+     *       </ul>
      */
     protected static Map<String, Integer> calculateCommanderRating(Campaign campaign, Person commander) {
         Map<String, Integer> commandRating = new HashMap<>();
@@ -71,36 +70,91 @@ public class CommandRating {
         commandRating.put("strategy", getSkillValue(commander, SkillType.S_STRATEGY));
         commandRating.put("negotiation", getSkillValue(commander, SkillType.S_NEG));
 
-        // ATOW traits are not currently tracked by mhq, but when they are, this is
-        // where we'd add that data
-        commandRating.put("traits", 0);
+        commandRating.put("traits", getATOWTraitValues(commander));
 
         int personalityValue = 0;
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
         if (campaignOptions.isUseRandomPersonalityReputation() && commander != null) {
             personalityValue = getPersonalityValue(campaignOptions.isUseRandomPersonalities(),
-                commander.getAggression(), commander.getAmbition(), commander.getGreed(),
-                commander.getSocial());
+                  commander.getAggression(),
+                  commander.getAmbition(),
+                  commander.getGreed(),
+                  commander.getSocial());
         }
         commandRating.put("personality", personalityValue);
 
-        commandRating.put("total", commandRating.values().stream().mapToInt(rating -> rating).sum());
+        // CamOps pg34 states any score less than 1 is treated as 1
+        commandRating.put("total", max(1, commandRating.values().stream().mapToInt(rating -> rating).sum()));
 
         logger.debug("Command Rating = {}",
-                commandRating.keySet().stream()
-                        .map(key -> key + ": " + commandRating.get(key) + '\n')
-                        .collect(Collectors.joining()));
+              commandRating.keySet()
+                    .stream()
+                    .map(key -> key + ": " + commandRating.get(key) + '\n')
+                    .collect(Collectors.joining()));
 
         return commandRating;
     }
 
     /**
-     * @return the final skill value for the given skill,
-     *         or 0 if the person does not have the skill
+     * Calculates the ATOW (A Time of War) trait values for the provided commander.
      *
+     * <p>The trait score is determined by summing various attribute scores, including connection levels,
+     * combat-related traits, wealth, and reputation. The score has a minimum value of 1 regardless of calculated
+     * modifiers.</p>
+     *
+     * <p>Trait scoring includes:
+     * <ul>
+     *   <li>Connections: Adds a score based on connection levels ranging from 1 to 10.</li>
+     *   <li>Combat Traits: Adds or subtracts points based on "Combat Sense" (+1) and "Combat Paralysis" (-1).</li>
+     *   <li>Wealth: Adds 1 point if the commander has sufficient wealth.</li>
+     *   <li>Reputation: Adds or subtracts scores based on positive and negative reputation levels.</li>
+     * </ul>
+     *
+     * @param commander The {@link Person} representing the commander whose trait values need to be calculated. Can be
+     *                  {@code null}, in which case the output is 0.
+     *
+     * @return The calculated trait score for the commander, with a minimum value of 1.
+     */
+    private static int getATOWTraitValues(Person commander) {
+        if (commander == null) {
+            return 0;
+        }
+
+        int traitScore = 0;
+        PersonnelOptions options = commander.getOptions();
+
+        // Connections
+        traitScore += commander.getConnections();
+
+        // Wealth
+        traitScore += commander.getWealth() >= 7 ? 1 : 0;
+
+        // Reputation
+        int reputation = commander.getReputation();
+        if (reputation < 0) {
+            traitScore -= 1;
+        } else if (reputation > 0) {
+            traitScore += 1;
+        }
+
+        // Combat-related traits
+        if (options.booleanOption(ATOW_COMBAT_SENSE)) {
+            traitScore += 1;
+        }
+
+        if (options.booleanOption(ATOW_COMBAT_PARALYSIS)) {
+            traitScore -= 1;
+        }
+
+        return traitScore;
+    }
+
+    /**
      * @param person the person
      * @param skill  the skill
+     *
+     * @return the final skill value for the given skill, or 0 if the person does not have the skill
      */
     private static int getSkillValue(Person person, String skill) {
         int skillValue = 0;

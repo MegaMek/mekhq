@@ -648,9 +648,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
             }
         }
 
-        try {
-            lblFacilityCapacities.setText(campaignSummary.getFacilityReport());
-        } catch (Exception ignored) {
+        if (campaignOptions.isUseFatigue()) {
+            try {
+                lblFacilityCapacities.setText(campaignSummary.getFacilityReport());
+            } catch (Exception ignored) {
+            }
         }
     }
 

@@ -40,6 +40,8 @@ import megamek.common.Tank;
 import megamek.common.VTOL;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 
@@ -136,15 +138,17 @@ public class CrewListModel extends AbstractListModel<Person> {
         public Component getListCellRendererComponent(JList<? extends Person> list, Person value,
                                                       int index, boolean isSelected, boolean cellHasFocus) {
             setOpaque(true);
-            Person p = getElementAt(index);
+            Person person = getElementAt(index);
             String gunSkill = SkillType.getGunnerySkillFor(unit.getEntity());
             String driveSkill = SkillType.getDrivingSkillFor(unit.getEntity());
-            String sb = "<html><font><b>" + p.getFullTitle() + "</b><br/>"
-                    + CrewRole.getCrewRole(p, unit).getDisplayName()
+            PersonnelOptions options = person.getOptions();
+            int reputation = person.getReputation();
+            String sb = "<html><font><b>" + person.getFullTitle() + "</b><br/>"
+                    + CrewRole.getCrewRole(person, unit).getDisplayName()
                     + " ("
-                    + (p.hasSkill(gunSkill) ? p.getSkill(gunSkill).getFinalSkillValue() : "-")
-                    + "/"
-                    + (p.hasSkill(driveSkill) ? p.getSkill(driveSkill).getFinalSkillValue() : "-")
+                    + (person.hasSkill(gunSkill) ? person.getSkill(gunSkill).getFinalSkillValue(options, reputation) : "-")
+                    + '/'
+                    + (person.hasSkill(driveSkill) ? person.getSkill(driveSkill).getFinalSkillValue(options, reputation) : "-")
                     + ")</font></html>";
             setHtmlText(sb);
             if (isSelected) {
@@ -152,7 +156,7 @@ public class CrewListModel extends AbstractListModel<Person> {
             } else {
                 unhighlightBorder();
             }
-            setImage(p.getPortrait().getImage(54));
+            setImage(person.getPortrait().getImage(54));
             return this;
         }
     }

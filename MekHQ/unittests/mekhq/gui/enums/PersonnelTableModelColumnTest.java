@@ -27,18 +27,28 @@
  */
 package mekhq.gui.enums;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+
+import java.util.ResourceBundle;
+import javax.swing.SortOrder;
+import javax.swing.SwingConstants;
+
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.gui.sorter.*;
+import mekhq.gui.sorter.BonusSorter;
+import mekhq.gui.sorter.DateStringComparator;
+import mekhq.gui.sorter.FormattedNumberSorter;
+import mekhq.gui.sorter.IntegerStringSorter;
+import mekhq.gui.sorter.LevelSorter;
+import mekhq.gui.sorter.PersonRankStringSorter;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import javax.swing.*;
-import java.util.ResourceBundle;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 
 public class PersonnelTableModelColumnTest {
     //region Variable Declarations
@@ -886,6 +896,10 @@ public class PersonnelTableModelColumnTest {
                 case KILLS:
                 case XP:
                 case TOUGHNESS:
+                case CONNECTIONS:
+                case WEALTH:
+                case REPUTATION:
+                case UNLUCKY:
                 case EDGE:
                 case SPA_COUNT:
                 case IMPLANT_COUNT:

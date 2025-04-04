@@ -52,6 +52,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
@@ -731,15 +732,15 @@ public class SkillType {
                     };
                     //End <50.01 compatibility handler
                 } else if (wn2.getNodeName().equalsIgnoreCase("target")) {
-                    skillType.target = Integer.parseInt(wn2.getTextContent());
+                    skillType.target = MathUtility.parseInt(wn2.getTextContent(), skillType.target);
                 } else if (wn2.getNodeName().equalsIgnoreCase("greenLvl")) {
-                    skillType.greenLvl = Integer.parseInt(wn2.getTextContent());
+                    skillType.greenLvl = MathUtility.parseInt(wn2.getTextContent(), skillType.greenLvl);
                 } else if (wn2.getNodeName().equalsIgnoreCase("regLvl")) {
-                    skillType.regLvl = Integer.parseInt(wn2.getTextContent());
+                    skillType.regLvl = MathUtility.parseInt(wn2.getTextContent(), skillType.regLvl);
                 } else if (wn2.getNodeName().equalsIgnoreCase("vetLvl")) {
-                    skillType.vetLvl = Integer.parseInt(wn2.getTextContent());
+                    skillType.vetLvl = MathUtility.parseInt(wn2.getTextContent(), skillType.vetLvl);
                 } else if (wn2.getNodeName().equalsIgnoreCase("eliteLvl")) {
-                    skillType.eliteLvl = Integer.parseInt(wn2.getTextContent());
+                    skillType.eliteLvl = MathUtility.parseInt(wn2.getTextContent(), skillType.eliteLvl);
                 } else if (wn2.getNodeName().equalsIgnoreCase("countUp")) {
                     skillType.countUp = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("subType")) {
@@ -751,7 +752,7 @@ public class SkillType {
                 } else if (wn2.getNodeName().equalsIgnoreCase("costs")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
-                        skillType.costs[i] = Integer.parseInt(values[i]);
+                        skillType.costs[i] = MathUtility.parseInt(values[i], skillType.costs[i]);
                     }
                 }
             }
@@ -779,15 +780,15 @@ public class SkillType {
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     skillType.name = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("target")) {
-                    skillType.target = Integer.parseInt(wn2.getTextContent());
+                    skillType.target = MathUtility.parseInt(wn2.getTextContent(), skillType.target);
                 } else if (wn2.getNodeName().equalsIgnoreCase("greenLvl")) {
-                    skillType.greenLvl = Integer.parseInt(wn2.getTextContent());
+                    skillType.greenLvl = MathUtility.parseInt(wn2.getTextContent(), skillType.greenLvl);
                 } else if (wn2.getNodeName().equalsIgnoreCase("regLvl")) {
-                    skillType.regLvl = Integer.parseInt(wn2.getTextContent());
+                    skillType.regLvl = MathUtility.parseInt(wn2.getTextContent(), skillType.regLvl);
                 } else if (wn2.getNodeName().equalsIgnoreCase("vetLvl")) {
-                    skillType.vetLvl = Integer.parseInt(wn2.getTextContent());
+                    skillType.vetLvl = MathUtility.parseInt(wn2.getTextContent(), skillType.vetLvl);
                 } else if (wn2.getNodeName().equalsIgnoreCase("eliteLvl")) {
-                    skillType.eliteLvl = Integer.parseInt(wn2.getTextContent());
+                    skillType.eliteLvl = MathUtility.parseInt(wn2.getTextContent(), skillType.eliteLvl);
                 } else if (wn2.getNodeName().equalsIgnoreCase("countUp")) {
                     skillType.countUp = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("subType")) {
@@ -799,13 +800,9 @@ public class SkillType {
                 } else if (wn2.getNodeName().equalsIgnoreCase("costs")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
-                        skillType.costs[i] = Integer.parseInt(values[i]);
+                        skillType.costs[i] = MathUtility.parseInt(values[i], skillType.costs[i]);
                     }
                 }
-            }
-
-            if ("Gunnery/Protomek".equals(skillType.getName())) { // Renamed in 0.49.12
-                skillType.name = "Gunnery/ProtoMek";
             }
 
             // <50.05 compatibility handler
