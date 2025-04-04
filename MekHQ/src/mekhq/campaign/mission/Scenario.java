@@ -64,6 +64,8 @@ import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -82,6 +84,7 @@ public class Scenario implements IPlayerSettings {
     public static final int T_ATMOSPHERE = 1;
     public static final int T_SPACE = 2;
     private static final String[] typeNames = { "Ground", "Low Atmosphere", "Space" };
+    private static final Logger log = LogManager.getLogger(Scenario.class);
     private int boardType = T_GROUND;
 
     private String name;
@@ -1090,10 +1093,17 @@ public class Scenario implements IPlayerSettings {
                 } else if (wn2.getNodeName().equalsIgnoreCase("botForceStub")) {
                     String name = MHQXMLUtility.unEscape(wn2.getAttributes().getNamedItem("name").getTextContent());
                     List<String> stub = getEntityStub(wn2);
-                    int team = Integer.parseInt(MHQXMLUtility.unEscape(wn2.getAttributes()
-                                                                             .getNamedItem("team")
-                                                                             .getTextContent()));
-                    retVal.botForcesStubs.add(new BotForceStub(name, stub, team));
+                    int teamValue = 1;
+                    Node team = wn2.getAttributes().getNamedItem("team");
+                    if (team != null) {
+                        teamValue = Integer.parseInt(MHQXMLUtility.unEscape(team.getTextContent()));
+                    } else {
+                        // Campaigns <50.05 won't have 'team' recorded, so we need to use a fallback value.
+                        // The value is equal to 'Allied' which means the scenario will inherit the pre-change behavior
+                        logger.info("Scenario {} predates Blind Drop changes. Using fallback team of 1.",
+                              retVal.getName());
+                    }
+                    retVal.botForcesStubs.add(new BotForceStub(name, stub, teamValue));
                 } else if (wn2.getNodeName().equalsIgnoreCase("botForce")) {
                     BotForce bf = new BotForce();
                     try {

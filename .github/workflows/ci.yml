@@ -2,7 +2,7 @@ name: MekHQ CI with Gradle
 
 on:
   pull_request:
-    branches: [master]
+    branches: [ master ]
 
 env:
   GRADLE_OPTS: "-Dscan.link.VCS=${{ github.event.pull_request.html_url }}"
@@ -19,9 +19,9 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        java-distribution: [temurin]
-        java-version: [17]
+        os: [ ubuntu-latest ]
+        java-distribution: [ temurin ]
+        java-version: [ 17 ]
       fail-fast: false
 
     steps:
@@ -91,9 +91,9 @@ jobs:
         run: |
           echo ${{ github.sha }} >> mekhq/MekHQ/mhq-revision.txt
 
-      - name: Build with Gradle
+      - name: Test All
         working-directory: mekhq
-        run: ./gradlew build  -x checkstyleMain -x checkstyleTest --stacktrace --scan
+        run: ./gradlew testAll  --stacktrace --scan
 
       - name: Upload Test Logs on Failure
         uses: actions/upload-artifact@v4
@@ -101,6 +101,10 @@ jobs:
         with:
           name: cd-failure-logs
           path: ./mekhq/MekHQ/build/reports/
+
+      - name: Build with Gradle
+        working-directory: mekhq
+        run: ./gradlew build -x test
 
       - name: CodeCov.io Coverage Report
         uses: codecov/codecov-action@v5

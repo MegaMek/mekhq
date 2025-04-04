@@ -74,34 +74,34 @@ public class PartsStoreDialog extends JDialog {
 
     // region Variable Declarations
     // parts filter groups
-    private static final int SG_ALL      = 0;
-    private static final int SG_ARMOR    = 1;
-    private static final int SG_SYSTEM   = 2;
-    private static final int SG_EQUIP    = 3;
-    private static final int SG_LOC      = 4;
-    private static final int SG_WEAP     = 5;
-    private static final int SG_AMMO     = 6;
-    private static final int SG_MISC     = 7;
-    private static final int SG_ENGINE   = 8;
-    private static final int SG_GYRO     = 9;
-    private static final int SG_ACT      = 10;
-    private static final int SG_COCKPIT  = 11;
-    private static final int SG_BA_SUIT  = 12;
+    private static final int SG_ALL = 0;
+    private static final int SG_ARMOR = 1;
+    private static final int SG_SYSTEM = 2;
+    private static final int SG_EQUIP = 3;
+    private static final int SG_LOC = 4;
+    private static final int SG_WEAP = 5;
+    private static final int SG_AMMO = 6;
+    private static final int SG_MISC = 7;
+    private static final int SG_ENGINE = 8;
+    private static final int SG_GYRO = 9;
+    private static final int SG_ACT = 10;
+    private static final int SG_COCKPIT = 11;
+    private static final int SG_BA_SUIT = 12;
     private static final int SG_OMNI_POD = 13;
-    private static final int SG_NUM      = 14;
+    private static final int SG_NUM = 14;
 
-    private Campaign                        campaign;
-    private CampaignGUI                     campaignGUI;
-    private PartsTableModel                 partsModel;
+    private Campaign campaign;
+    private CampaignGUI campaignGUI;
+    private PartsTableModel partsModel;
     private TableRowSorter<PartsTableModel> partsSorter;
-    private boolean                         addToCampaign;
-    private Part                            selectedPart;
-    private Person                          logisticsPerson;
+    private boolean addToCampaign;
+    private Part selectedPart;
+    private Person logisticsPerson;
 
-    private JTable            partsTable;
-    private JTextField        txtFilter;
+    private JTable partsTable;
+    private JTextField txtFilter;
     private JComboBox<String> choiceParts;
-    private JCheckBox         hideImpossible;
+    private JCheckBox hideImpossible;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsStoreDialog",
           MekHQ.getMHQOptions().getLocale());
@@ -112,12 +112,13 @@ public class PartsStoreDialog extends JDialog {
         this(gui.getFrame(), modal, gui, gui.getCampaign(), true);
     }
 
-    public PartsStoreDialog(final JFrame frame, final boolean modal, final CampaignGUI gui, final Campaign campaign, final boolean add) {
+    public PartsStoreDialog(final JFrame frame, final boolean modal, final CampaignGUI gui, final Campaign campaign,
+                            final boolean add) {
         super(frame, modal);
-        this.campaignGUI   = gui;
-        this.campaign      = campaign;
+        this.campaignGUI = gui;
+        this.campaign = campaign;
         this.addToCampaign = add;
-        partsModel         = new PartsTableModel(campaign.getPartsStore().getInventory());
+        partsModel = new PartsTableModel(campaign.getPartsStore().getInventory());
         initComponents();
         filterParts();
         setLocationRelativeTo(frame);
@@ -150,9 +151,9 @@ public class PartsStoreDialog extends JDialog {
         scrollPartsTable.setViewportView(partsTable);
         getContentPane().add(scrollPartsTable, BorderLayout.CENTER);
 
-        GridBagConstraints           c               = new GridBagConstraints();
-        JPanel                       panFilter       = new JPanel();
-        JLabel                       lblPartsChoice  = new JLabel(resourceMap.getString("lblPartsChoice.text"));
+        GridBagConstraints c = new GridBagConstraints();
+        JPanel panFilter = new JPanel();
+        JLabel lblPartsChoice = new JLabel(resourceMap.getString("lblPartsChoice.text"));
         DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < SG_NUM; i++) {
             partsGroupModel.addElement(getPartsGroupName(i));
@@ -162,20 +163,20 @@ public class PartsStoreDialog extends JDialog {
         choiceParts.setSelectedIndex(0);
         choiceParts.addActionListener(evt -> filterParts());
         panFilter.setLayout(new GridBagLayout());
-        c.gridx   = 0;
-        c.gridy   = 0;
+        c.gridx = 0;
+        c.gridy = 0;
         c.weightx = 0.0;
-        c.anchor  = GridBagConstraints.WEST;
-        c.insets  = new Insets(5, 5, 5, 5);
+        c.anchor = GridBagConstraints.WEST;
+        c.insets = new Insets(5, 5, 5, 5);
         panFilter.add(lblPartsChoice, c);
-        c.gridx   = 1;
+        c.gridx = 1;
         c.weightx = 1.0;
         panFilter.add(choiceParts, c);
 
         JLabel lblFilter = new JLabel(resourceMap.getString("lblFilter.text"));
         lblFilter.setName("lblFilter");
-        c.gridx   = 0;
-        c.gridy   = 1;
+        c.gridx = 0;
+        c.gridy = 1;
         c.weightx = 0.0;
         panFilter.add(lblFilter, c);
         txtFilter = new JTextField();
@@ -199,8 +200,8 @@ public class PartsStoreDialog extends JDialog {
                 filterParts();
             }
         });
-        c.gridx   = 1;
-        c.gridy   = 1;
+        c.gridx = 1;
+        c.gridy = 1;
         c.weightx = 1.0;
         panFilter.add(txtFilter, c);
 
@@ -212,7 +213,7 @@ public class PartsStoreDialog extends JDialog {
 
         getContentPane().add(panFilter, BorderLayout.PAGE_START);
 
-        JPanel  panButtons = new JPanel();
+        JPanel panButtons = new JPanel();
         JButton btnAdd;
         JButton btnClose;
         if (addToCampaign) {
@@ -248,7 +249,7 @@ public class PartsStoreDialog extends JDialog {
                     int[] selectedRow = partsTable.getSelectedRows();
                     for (int i : selectedRow) {
                         PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
-                        int       quantity  = 1;
+                        int quantity = 1;
                         PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(),
                               true,
                               "How Many " + partProxy.getName() + '?',
@@ -395,7 +396,7 @@ public class PartsStoreDialog extends JDialog {
             @Override
             public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
                 PartsTableModel partsModel = entry.getModel();
-                Part            part       = partsModel.getPartAt(entry.getIdentifier());
+                Part part = partsModel.getPartAt(entry.getIdentifier());
 
                 if (hideImpossible.isSelected()) {
                     int target = partsModel.getPartProxyAt(entry.getIdentifier())
@@ -408,20 +409,20 @@ public class PartsStoreDialog extends JDialog {
                 } // This MUST NOT be an else if
 
                 if (!txtFilter.getText().isBlank() &&
-                    !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase()) &&
-                    !part.getDetails().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
+                          !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase()) &&
+                          !part.getDetails().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
                     return false;
                 } else if (((part.getTechBase() == Part.T_CLAN) || part.isClan()) &&
-                           !campaign.getCampaignOptions().isAllowClanPurchases()) {
+                                 !campaign.getCampaignOptions().isAllowClanPurchases()) {
                     return false;
                 } else if ((part.getTechBase() == Part.T_IS) &&
-                           !campaign.getCampaignOptions().isAllowISPurchases()
-                           // Hack to allow Clan access to SL tech but not post-Exodus tech
-                           // until 3050.
-                           &&
-                           !(campaign.useClanTechBase() &&
-                             (part.getIntroductionDate() > 2787) &&
-                             (part.getIntroductionDate() < 3050))) {
+                                 !campaign.getCampaignOptions().isAllowISPurchases()
+                                 // Hack to allow Clan access to SL tech but not post-Exodus tech
+                                 // until 3050.
+                                 &&
+                                 !(campaign.useClanTechBase() &&
+                                         (part.getIntroductionDate() > 2787) &&
+                                         (part.getIntroductionDate() < 3050))) {
                     return false;
                 } else if (!campaign.isLegal(part)) {
                     return false;
@@ -433,41 +434,41 @@ public class PartsStoreDialog extends JDialog {
                     return part instanceof Armor; // ProtoMekAmor and BaArmor are derived from Armor
                 } else if (nGroup == SG_SYSTEM) {
                     return (part instanceof MekLifeSupport) ||
-                           (part instanceof MekSensor) ||
-                           (part instanceof LandingGear) ||
-                           (part instanceof Avionics) ||
-                           (part instanceof FireControlSystem) ||
-                           (part instanceof AeroSensor) ||
-                           (part instanceof KfBoom) ||
-                           (part instanceof DropshipDockingCollar) ||
-                           (part instanceof JumpshipDockingCollar) ||
-                           (part instanceof BayDoor) ||
-                           (part instanceof Cubicle) ||
-                           (part instanceof GravDeck) ||
-                           (part instanceof VeeSensor) ||
-                           (part instanceof VeeStabilizer) ||
-                           (part instanceof ProtoMekSensor);
+                                 (part instanceof MekSensor) ||
+                                 (part instanceof LandingGear) ||
+                                 (part instanceof Avionics) ||
+                                 (part instanceof FireControlSystem) ||
+                                 (part instanceof AeroSensor) ||
+                                 (part instanceof KfBoom) ||
+                                 (part instanceof DropshipDockingCollar) ||
+                                 (part instanceof JumpshipDockingCollar) ||
+                                 (part instanceof BayDoor) ||
+                                 (part instanceof Cubicle) ||
+                                 (part instanceof GravDeck) ||
+                                 (part instanceof VeeSensor) ||
+                                 (part instanceof VeeStabilizer) ||
+                                 (part instanceof ProtoMekSensor);
                 } else if (nGroup == SG_EQUIP) {
                     return (part instanceof EquipmentPart) || (part instanceof ProtoMekJumpJet);
                 } else if (nGroup == SG_LOC) {
                     return (part instanceof MekLocation) ||
-                           (part instanceof TankLocation) ||
-                           (part instanceof ProtoMekLocation);
+                                 (part instanceof TankLocation) ||
+                                 (part instanceof ProtoMekLocation);
                 } else if (nGroup == SG_WEAP) {
                     return (part instanceof EquipmentPart) && (((EquipmentPart) part).getType() instanceof WeaponType);
                 } else if (nGroup == SG_AMMO) {
                     return part instanceof AmmoStorage;
                 } else if (nGroup == SG_MISC) {
                     return ((part instanceof EquipmentPart) && (((EquipmentPart) part).getType() instanceof MiscType) ||
-                            (part instanceof ProtoMekJumpJet));
+                                  (part instanceof ProtoMekJumpJet));
                 } else if (nGroup == SG_ENGINE) {
                     return part instanceof EnginePart;
                 } else if (nGroup == SG_GYRO) {
                     return part instanceof MekGyro;
                 } else if (nGroup == SG_ACT) {
                     return ((part instanceof MekActuator) ||
-                            (part instanceof ProtoMekArmActuator) ||
-                            (part instanceof ProtoMekLegActuator));
+                                  (part instanceof ProtoMekArmActuator) ||
+                                  (part instanceof ProtoMekLegActuator));
                 } else if (nGroup == SG_COCKPIT) {
                     return part instanceof MekCockpit;
                 } else if (nGroup == SG_BA_SUIT) {
@@ -482,12 +483,21 @@ public class PartsStoreDialog extends JDialog {
         partsSorter.setRowFilter(partsTypeFilter);
     }
 
+    /**
+     * Adds a part to the campaign, either by purchasing it or directly adding it to the quartermaster's inventory.
+     *
+     * @param purchase determines if the part should be purchased or directly added. If {@code true}, the part will be
+     *                 added to the shopping list. If {@code false}, the part will be cloned and added directly to the
+     *                 inventory.
+     * @param part     the {@link Part} to be added.
+     * @param quantity the number of parts to add.
+     */
     private void addPart(boolean purchase, Part part, int quantity) {
         if (purchase) {
             campaign.getShoppingList().addShoppingItem(part.getAcquisitionWork(), quantity, campaign);
         } else {
             while (quantity > 0) {
-                campaign.getQuartermaster().addPart(part.clone(), 0);
+                campaign.getQuartermaster().addPart(part.clone(), 0, true);
                 quantity--;
             }
         }
@@ -536,27 +546,27 @@ public class PartsStoreDialog extends JDialog {
      * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
      */
     public class PartsTableModel extends AbstractTableModel {
-        protected String[]             columnNames;
+        protected String[] columnNames;
         protected ArrayList<PartProxy> data;
 
-        public final static int COL_NAME      = 0;
-        public final static int COL_DETAIL    = 1;
+        public final static int COL_NAME = 0;
+        public final static int COL_DETAIL = 1;
         public final static int COL_TECH_BASE = 2;
-        public final static int COL_COST      = 3;
-        public final static int COL_TON       = 4;
-        public final static int COL_TARGET    = 5;
-        public final static int COL_SUPPLY    = 6;
-        public final static int COL_TRANSIT   = 7;
-        public final static int COL_QUEUE     = 8;
-        public final static int N_COL         = 9;
+        public final static int COL_COST = 3;
+        public final static int COL_TON = 4;
+        public final static int COL_TARGET = 5;
+        public final static int COL_SUPPLY = 6;
+        public final static int COL_TRANSIT = 7;
+        public final static int COL_QUEUE = 8;
+        public final static int N_COL = 9;
 
         /**
          * Provides a lazy view to a {@link TargetRoll} for use in a UI (e.g. sorting in a table).
          */
         public static class TargetProxy implements Comparable<TargetProxy> {
             private TargetRoll target;
-            private String     details;
-            private String     description;
+            private String details;
+            private String description;
 
             /**
              * Creates a new proxy object for a {@link TargetRoll}.
@@ -606,8 +616,8 @@ public class PartsStoreDialog extends JDialog {
                 if (null == details) {
                     details = target.getValueAsString();
                     if (target.getValue() != TargetRoll.IMPOSSIBLE &&
-                        target.getValue() != TargetRoll.AUTOMATIC_SUCCESS &&
-                        target.getValue() != TargetRoll.AUTOMATIC_FAIL) {
+                              target.getValue() != TargetRoll.AUTOMATIC_SUCCESS &&
+                              target.getValue() != TargetRoll.AUTOMATIC_FAIL) {
                         details += "+";
                     }
                 }
@@ -649,14 +659,14 @@ public class PartsStoreDialog extends JDialog {
          * Provides a container for a value formatted for display and the value itself for sorting.
          */
         public static class FormattedValue<T extends Comparable<T>> implements Comparable<FormattedValue<T>> {
-            private T      value;
+            private T value;
             private String formatted;
 
             /**
              * Creates a wrapper around a value and a formatted string representing the value.
              */
             public FormattedValue(T v, String f) {
-                value     = v;
+                value = v;
                 formatted = f;
             }
 
@@ -697,11 +707,11 @@ public class PartsStoreDialog extends JDialog {
          * Provides a lazy view to a {@link Part} for use in a UI (e.g. sorting in a table).
          */
         public class PartProxy {
-            private Part                    part;
-            private String                  details;
-            private TargetProxy             targetProxy;
-            private FormattedValue<Money>   cost;
-            private PartInventory           inventories;
+            private Part part;
+            private String details;
+            private TargetProxy targetProxy;
+            private FormattedValue<Money> cost;
+            private PartInventory inventories;
             private FormattedValue<Integer> ordered;
             private FormattedValue<Integer> supply;
             private FormattedValue<Integer> transit;
@@ -721,9 +731,9 @@ public class PartsStoreDialog extends JDialog {
             public void updateTargetAndInventories() {
                 targetProxy = null;
                 inventories = null;
-                ordered     = null;
-                supply      = null;
-                transit     = null;
+                ordered = null;
+                supply = null;
+                transit = null;
             }
 
             /**
@@ -994,7 +1004,8 @@ public class PartsStoreDialog extends JDialog {
 
         public class Renderer extends DefaultTableCellRenderer {
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                           boolean hasFocus, int row, int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setOpaque(true);
                 int actualCol = table.convertColumnIndexToModel(column);
