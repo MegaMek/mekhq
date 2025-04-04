@@ -53,8 +53,8 @@ import javax.swing.UIManager;
 import megamek.Version;
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.CrewType;
 import megamek.common.*;
+import megamek.common.CrewType;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.ArmorType;
@@ -86,7 +86,6 @@ import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.enums.CrewAssignmentState;
@@ -444,7 +443,7 @@ public class Unit implements ITechnology {
      */
     @Deprecated(since = "0.50.04", forRemoval = true)
     private void fixTransportedUnitReferences(AbstractTransportedUnitsSummary currentTransportedUnits,
-                                              Set<Unit> newTransportedUnits) {
+          Set<Unit> newTransportedUnits) {
         currentTransportedUnits.replaceTransportedUnits(newTransportedUnits);
     }
 
@@ -576,7 +575,7 @@ public class Unit implements ITechnology {
      * @see CampaignTransportType
      */
     public void setTransportAssignment(CampaignTransportType campaignTransportType,
-                                       @Nullable ITransportAssignment assignment) {
+          @Nullable ITransportAssignment assignment) {
         if (campaignTransportType.isShipTransport()) {
             if (assignment.getClass().isAssignableFrom(campaignTransportType.getTransportAssignmentType())) {
                 setTransportShipAssignment((TransportShipAssignment) assignment);
@@ -2368,7 +2367,7 @@ public class Unit implements ITechnology {
      * @see CampaignTransportType
      */
     public double getCurrentTransportCapacity(CampaignTransportType campaignTransportType,
-                                              TransporterType transporterType) {
+          TransporterType transporterType) {
         return getTransportedUnitsSummary(campaignTransportType).getCurrentTransportCapacity(transporterType);
     }
 
@@ -2494,7 +2493,7 @@ public class Unit implements ITechnology {
      */
     @Deprecated(since = "0.50.04", forRemoval = true)
     public @Nullable Unit loadTacticalTransport(Unit transportedUnit, @Nullable Transporter transportedLocation,
-                                                TransporterType transporterType) {
+          TransporterType transporterType) {
         return getTacticalTransportedUnitsSummary().loadTransport(transportedLocation,
               transporterType,
               transportedUnit);
@@ -2515,7 +2514,7 @@ public class Unit implements ITechnology {
      * @see TransporterType#TANK_TRAILER_HITCH
      */
     public @Nullable Unit towTrailer(Unit transportedUnit, @Nullable Transporter transportedLocation,
-                                     TransporterType transporterType) {
+          TransporterType transporterType) {
         return ((TowTransportedUnitsSummary) getTransportedUnitsSummary(CampaignTransportType.TOW_TRANSPORT)).towTrailer(
               transportedUnit,
               transportedLocation,
@@ -4703,7 +4702,9 @@ public class Unit implements ITechnology {
         if (getCampaign().getCampaignOptions().isUseTactics()) {
             // Tactics command bonus. This should actually reflect the unit's commander
             if (null != commander && commander.hasSkill(SkillType.S_TACTICS)) {
-                entity.getCrew().setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue(commander.getOptions()));
+                entity.getCrew()
+                      .setCommandBonus(commander.getSkill(SkillType.S_TACTICS)
+                                             .getFinalSkillValue(commander.getOptions()));
             }
         }
 
@@ -5134,7 +5135,8 @@ public class Unit implements ITechnology {
         if (person.hasSkill(driveType)) {
             piloting = person.getSkill(driveType).getFinalSkillValue(options);
         }
-        if (person.hasSkill(SkillType.S_ARTILLERY) && person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options) < artillery) {
+        if (person.hasSkill(SkillType.S_ARTILLERY) &&
+                  person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options) < artillery) {
             artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options);
         }
         entity.getCrew().setPiloting(Math.min(max(piloting, 0), 8), slot);
@@ -5896,10 +5898,11 @@ public class Unit implements ITechnology {
                 addVesselCrew(assignedEngineer);
             } else if (activationTech != null && activationTech.isTechLargeVessel()) {
                 addVesselCrew(activationTech);
-            } else {
+            } else if (!isGM) {
                 // In this case there is nothing to be done, we cant activate this unit.
                 return;
             }
+
             resetEngineer();
         } else {
             tech = activationTech;
