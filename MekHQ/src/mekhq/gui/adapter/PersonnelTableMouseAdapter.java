@@ -2274,16 +2274,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         continue;
                     }
                     // Intelligence cost changes should always take place before global changes
-                    cost = (int) round(spa.getCost() * intelligenceXpCostMultiplier);
+                    int baseCost = spa.getCost();
+                    cost = (int) round(baseCost > 0 ? baseCost * intelligenceXpCostMultiplier : baseCost);
                     cost = (int) round(cost * xpCostMultiplier);
 
-                    String costDesc;
-                    if (cost < 0) {
-                        costDesc = resources.getString("costNotPossible.text");
-                    } else {
-                        costDesc = String.format(resources.getString("costValue.format"), cost);
-                    }
-                    boolean available = (cost >= 0) && (person.getXP() >= cost);
+                    String costDesc = String.format(resources.getString("costValue.format"), cost);
+                    boolean available = person.getXP() >= cost;
                     if (spa.getName().equals(OptionsConstants.GUNNERY_WEAPON_SPECIALIST)) {
                         Unit u = person.getUnit();
                         if (null != u) {
