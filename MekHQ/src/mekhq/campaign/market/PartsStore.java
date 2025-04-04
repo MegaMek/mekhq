@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import megamek.common.*;
 import megamek.common.equipment.ArmorType;
@@ -257,17 +256,14 @@ public class PartsStore {
         }
         // lets throw aero heat sinks in here as well
         AeroHeatSink hs = new AeroHeatSink(0, Aero.HEAT_SINGLE, false, c);
-        parts.add(hs);
         parts.add(new OmniPod(hs, c));
         parts.add(new AeroHeatSink(0, Aero.HEAT_SINGLE, true, c));
 
         hs = new AeroHeatSink(0, Aero.HEAT_DOUBLE, false, c);
-        parts.add(hs);
         parts.add(new OmniPod(hs, c));
         parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE, true, c));
 
         hs = new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, false, c);
-        parts.add(hs);
         parts.add(new OmniPod(hs, c));
         parts.add(new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, true, c));
     }

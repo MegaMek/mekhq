@@ -27,6 +27,8 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.CHARACTER_CREATION_ONLY;
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.CHARACTER_FLAW;
 import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.COMBAT_ABILITY;
 import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.MANEUVERING_ABILITY;
 import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.UTILITY_ABILITY;
@@ -44,7 +46,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -84,6 +85,8 @@ public class AbilitiesTab {
     private JPanel combatTab;
     private JPanel maneuveringTab;
     private JPanel utilityTab;
+    private JPanel characterFlawsTab;
+    private JPanel characterCreationOnlyTab;
 
     /**
      * Constructor for the {@code AbilitiesTab} class. Initializes the tab by creating containers for ability categories
@@ -104,6 +107,8 @@ public class AbilitiesTab {
         combatTab = new JPanel();
         maneuveringTab = new JPanel();
         utilityTab = new JPanel();
+        characterFlawsTab = new JPanel();
+        characterCreationOnlyTab = new JPanel();
         buildAllAbilityInfo(SpecialAbility.getSpecialAbilities());
     }
 
@@ -157,9 +162,11 @@ public class AbilitiesTab {
      * Refreshes and updates all tabs related to abilities by clearing their contents and reloading the data.
      */
     private void refreshAll() {
-        refreshTabContents(combatTab, AbilityCategory.COMBAT_ABILITY);
-        refreshTabContents(maneuveringTab, AbilityCategory.MANEUVERING_ABILITY);
-        refreshTabContents(utilityTab, AbilityCategory.UTILITY_ABILITY);
+        refreshTabContents(combatTab, COMBAT_ABILITY);
+        refreshTabContents(maneuveringTab, MANEUVERING_ABILITY);
+        refreshTabContents(utilityTab, UTILITY_ABILITY);
+        refreshTabContents(characterFlawsTab, CHARACTER_FLAW);
+        refreshTabContents(characterCreationOnlyTab, CHARACTER_CREATION_ONLY);
     }
 
     /**
@@ -213,22 +220,44 @@ public class AbilitiesTab {
      * @return The {@code AbilityCategory} for the specified ability.
      */
     private AbilityCategory getCategory(SpecialAbility ability) {
+        int cost = ability.getCost();
+        // is the ability classified as Character Creation only?
+        boolean isCharacterCreationOnly = cost == -1;
+
+        if (isCharacterCreationOnly) {
+            return CHARACTER_CREATION_ONLY;
+        }
+
+        // Is the ability classified as a Flaw?
+        boolean isFlaw = cost < 0;
+
+        if (isFlaw) {
+            return CHARACTER_FLAW;
+        }
+
         for (SkillPerquisite skillPerquisite : ability.getPrereqSkills()) {
             // Is the ability classified as a Combat Ability?
-            boolean isCombatAbility = Stream.of("Gunnery", "Artillery", "Small Arms")
-                                            .anyMatch(word -> Pattern.compile("\\b" + word)
-                                                                    .matcher(skillPerquisite.toString())
-                                                                    .find());
+            boolean isCombatAbility = false;
+            for (String word : new String[] { "Gunnery", "Artillery", "Small Arms" }) {
+                if (Pattern.compile("\\b" + word).matcher(skillPerquisite.toString()).find()) {
+                    isCombatAbility = true;
+                    break; // Exit loop early since a match is found
+                }
+            }
 
             if (isCombatAbility) {
                 return COMBAT_ABILITY;
             }
 
             // Is the ability classified as a Maneuvering Ability?
-            boolean isManeuveringAbility = Stream.of("Piloting", "Anti-Mek")
-                                                 .anyMatch(word -> Pattern.compile("\\b" + word)
-                                                                         .matcher(skillPerquisite.toString())
-                                                                         .find());
+            boolean isManeuveringAbility = false;
+            for (String word : new String[] { "Piloting", "Anti-Mek" }) {
+                if (Pattern.compile("\\b" + word).matcher(skillPerquisite.toString()).find()) {
+                    isManeuveringAbility = true;
+                    break;
+                }
+            }
+
 
             if (isManeuveringAbility) {
                 return MANEUVERING_ABILITY;
@@ -256,6 +285,10 @@ public class AbilitiesTab {
                   getImageDirectory() + "logo_clan_hells_horses.png");
             case UTILITY_ABILITY -> new CampaignOptionsHeaderPanel("UtilityAbilitiesTab",
                   getImageDirectory() + "logo_circinus_federation.png");
+            case CHARACTER_FLAW ->
+                  new CampaignOptionsHeaderPanel("CharacterFlawsTab", getImageDirectory() + "logo_word_of_blake.png");
+            case CHARACTER_CREATION_ONLY -> new CampaignOptionsHeaderPanel("CharacterCreationOnlyTab",
+                  getImageDirectory() + "logo_tortuga_dominions.png");
         };
 
         // Contents
@@ -329,6 +362,14 @@ public class AbilitiesTab {
             case UTILITY_ABILITY -> {
                 utilityTab = parentPanel;
                 yield utilityTab;
+            }
+            case CHARACTER_FLAW -> {
+                characterFlawsTab = parentPanel;
+                yield characterFlawsTab;
+            }
+            case CHARACTER_CREATION_ONLY -> {
+                characterCreationOnlyTab = parentPanel;
+                yield characterCreationOnlyTab;
             }
         };
     }

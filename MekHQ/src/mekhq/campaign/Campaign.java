@@ -2739,14 +2739,8 @@ public class Campaign implements ITechManager {
         return parts.getParts();
     }
 
-    private int getQuantity(Part p) {
-        if (p instanceof Armor) {
-            return ((Armor) p).getAmount();
-        }
-        if (p instanceof AmmoStorage) {
-            return ((AmmoStorage) p).getShots();
-        }
-        return (p.getUnit() != null) ? 1 : p.getQuantity();
+    private int getQuantity(Part part) {
+        return getWarehouse().getPartQuantity(part);
     }
 
     private PartInUse getPartInUse(Part part) {
@@ -3168,7 +3162,7 @@ public class Campaign implements ITechManager {
         }
 
         // sort based on available minutes (highest -> lowest)
-        techs.sort(Comparator.comparingInt(person -> person.getDailyAvailableTechTime(false)));
+        techs.sort(Comparator.comparingInt(person -> -person.getDailyAvailableTechTime(false)));
 
         // finally, sort based on rank (lowest -> highest)
         techs.sort((person1, person2) -> {
@@ -5674,6 +5668,11 @@ public class Campaign implements ITechManager {
 
             if (EducationController.processNewDay(this, person, false)) {
                 Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+
+                if (academy == null) {
+                    logger.debug("Found null academy for {} skipping", person.getFullTitle());
+                    continue;
+                }
 
                 graduatingPersonnel.add(person.getId());
 
