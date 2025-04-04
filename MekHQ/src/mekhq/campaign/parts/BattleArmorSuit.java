@@ -31,9 +31,6 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -46,6 +43,8 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Battle Armor suits are crazy - you can't crit the equipment in them, so

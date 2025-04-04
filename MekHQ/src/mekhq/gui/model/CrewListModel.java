@@ -27,6 +27,14 @@
  */
 package mekhq.gui.model;
 
+import java.awt.Component;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import javax.swing.AbstractListModel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
+
 import megamek.common.Aero;
 import megamek.common.Tank;
 import megamek.common.VTOL;
@@ -34,12 +42,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 
 /**
  * Model for a list that displays a unit's crew with their role.

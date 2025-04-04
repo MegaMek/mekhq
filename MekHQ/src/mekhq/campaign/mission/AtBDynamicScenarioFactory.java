@@ -27,8 +27,35 @@
  */
 package mekhq.campaign.mission;
 
+import static java.lang.Math.max;
+import static java.lang.Math.round;
+import static megamek.client.ratgenerator.MissionRole.*;
+import static megamek.codeUtilities.MathUtility.clamp;
+import static megamek.common.Compute.d6;
+import static megamek.common.Compute.randomInt;
+import static megamek.common.UnitType.*;
+import static megamek.common.planetaryconditions.Wind.TORNADO_F4;
+import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
+import static mekhq.campaign.mission.Scenario.T_GROUND;
+import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
+import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
+import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
+import static mekhq.campaign.universe.IUnitGenerator.unitTypeSupportsWeightClass;
+import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
+
+import java.io.File;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import megamek.client.bot.princess.CardinalEdge;
-import megamek.client.generator.*;
+import megamek.client.generator.RandomGenderGenerator;
+import megamek.client.generator.RandomNameGenerator;
+import megamek.client.generator.RandomUnitGenerator;
+import megamek.client.generator.ReconfigurationParameters;
+import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.ModifiedConstantSkillGenerator;
 import megamek.client.ratgenerator.MissionRole;
@@ -64,37 +91,25 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.stratcon.*;
+import mekhq.campaign.stratcon.StratconBiomeManifest;
+import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratcon.StratconContractInitializer;
+import mekhq.campaign.stratcon.StratconFacility;
 import mekhq.campaign.stratcon.StratconFacility.FacilityType;
+import mekhq.campaign.stratcon.StratconScenario;
+import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.*;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
+import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.IUnitGenerator;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.UnitGeneratorParameters;
 import mekhq.campaign.universe.enums.EraFlag;
 import mekhq.campaign.universe.enums.HonorRating;
 import mekhq.campaign.universe.fameAndInfamy.BatchallFactions;
-
-import java.io.File;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static java.lang.Math.max;
-import static java.lang.Math.round;
-import static megamek.client.ratgenerator.MissionRole.*;
-import static megamek.codeUtilities.MathUtility.clamp;
-import static megamek.common.Compute.d6;
-import static megamek.common.Compute.randomInt;
-import static megamek.common.UnitType.*;
-import static megamek.common.planetaryconditions.Wind.TORNADO_F4;
-import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
-import static mekhq.campaign.mission.Scenario.T_GROUND;
-import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
-import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
-import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
-import static mekhq.campaign.universe.IUnitGenerator.unitTypeSupportsWeightClass;
-import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 /**
  * This class handles the creation and substantive manipulation of

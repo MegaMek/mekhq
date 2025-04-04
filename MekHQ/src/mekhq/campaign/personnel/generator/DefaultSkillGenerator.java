@@ -40,6 +40,7 @@ import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.SkillType;
 
 public class DefaultSkillGenerator extends AbstractSkillGenerator {
     //region Constructors

@@ -32,8 +32,9 @@ import static java.lang.Math.abs;
 import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 import static megamek.common.enums.SkillLevel.REGULAR;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 
 import java.io.PrintWriter;

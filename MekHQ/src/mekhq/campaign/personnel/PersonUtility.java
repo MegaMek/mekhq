@@ -32,6 +32,7 @@ import static megamek.common.Compute.d6;
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.personnel.enums.PersonnelRole.*;
 import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
+import static mekhq.campaign.personnel.skills.SkillType.*;
 
 import java.util.ArrayList;
 import java.util.Collections;

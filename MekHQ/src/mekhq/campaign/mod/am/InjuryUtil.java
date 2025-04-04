@@ -27,8 +27,13 @@
  */
 package mekhq.campaign.mod.am;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.IntUnaryOperator;
@@ -37,7 +42,8 @@ import megamek.common.Aero;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.Mek;
-import mekhq.campaign.*;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.GameEffect;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.BodyLocation;
@@ -48,6 +54,8 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 
 /**

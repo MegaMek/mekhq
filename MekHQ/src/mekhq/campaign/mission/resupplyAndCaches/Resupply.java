@@ -27,27 +27,6 @@
  */
 package mekhq.campaign.mission.resupplyAndCaches;
 
-import megamek.common.Entity;
-import megamek.common.Mek;
-import megamek.logging.MMLogger;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.market.procurement.Procurement;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.parts.*;
-import mekhq.campaign.parts.enums.PartQuality;
-import mekhq.campaign.parts.equipment.*;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Faction;
-
-import java.time.LocalDate;
-import java.util.*;
-
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -59,6 +38,39 @@ import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.market.procurement.Procurement.getFactionTechCode;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import megamek.common.Entity;
+import megamek.common.Mek;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.market.procurement.Procurement;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
+import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.HeatSink;
+import mekhq.campaign.parts.equipment.JumpJet;
+import mekhq.campaign.parts.equipment.MASC;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
 
 /**
  * The {@code Resupply} class manages the resupply process during a campaign.

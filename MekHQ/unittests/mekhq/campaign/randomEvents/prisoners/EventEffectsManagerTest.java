@@ -27,6 +27,33 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
+import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
+import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_LOGISTICS;
+import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
+import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
+import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
+import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
+import static mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect.*;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent.BARTERING;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent.BREAKOUT;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent.MISTAKE;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent.POISON;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent.UNDERCOVER;
+import static mekhq.campaign.randomEvents.prisoners.enums.ResponseQuality.RESPONSE_NEUTRAL;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
