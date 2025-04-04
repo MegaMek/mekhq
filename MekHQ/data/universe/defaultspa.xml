@@ -728,12 +728,12 @@
     </ability>
     <ability>
         <lookupName>small_pilot</lookupName>
-        <xpCost>50</xpCost>
+        <xpCost>-1</xpCost>
         <weight>1</weight>
     </ability>
     <ability>
         <lookupName>clan_pilot_training</lookupName>
-        <xpCost>0</xpCost>
+        <xpCost>-1</xpCost>
         <weight>0</weight>
     </ability>
 

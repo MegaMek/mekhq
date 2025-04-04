@@ -256,6 +256,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String LAYERED_FORCE_ICON_BATTLEMEK_CENTER_FILENAME = "BattleMek (Center).png";
     public static final String CUSTOM_MEKFILES_DIRECTORY_PATH = "data/mekfiles/customs/";
     public static final String AWARDS_DIRECTORY_PATH = "data/universe/awards/";
+    public static final String AWARDS_IMAGE_DIRECTORY_PATH = "data/images/awards";
     public static final String ACADEMY_DIRECTORY_PATH = "data/universe/academies/";
     public static final String RATINFO_DIR = "data/universe/ratdata/";
     public static final String ERAS_FILE_PATH = "data/universe/eras.xml";
@@ -263,11 +264,11 @@ public final class MHQConstants extends SuiteConstants {
     public static final String FINANCIAL_INSTITUTIONS_FILE_PATH = "data/universe/financialInstitutions.xml";
     public static final String RANDOM_DEATH_CAUSES_FILE_PATH = "data/universe/randomDeathCauses.xml";
     public static final String RANKS_FILE_PATH = "data/universe/ranks.xml";
-    public static final String CAMPAIGN_PRESET_DIRECTORY = "mmconf/campaignPresets/";
+    public static final String CAMPAIGN_PRESET_DIRECTORY = "data/campaignPresets/";
     public static final String USER_FINANCIAL_INSTITUTIONS_FILE_PATH = "userdata/data/universe/financialInstitutions.xml";
     public static final String USER_RANDOM_DEATH_CAUSES_FILE_PATH = "userdata/data/universe/randomDeathCauses.xml";
     public static final String USER_RANKS_FILE_PATH = "userdata/data/universe/ranks.xml";
-    public static final String USER_CAMPAIGN_PRESET_DIRECTORY = "userdata/mmconf/campaignPresets/";
+    public static final String USER_CAMPAIGN_PRESET_DIRECTORY = "userdata/data/campaignPresets/";
     public static final String STRATCON_MUL_FILES_DIRECTORY = "data/scenariotemplates/fixedmuls/";
     public static final String PLANETARY_SYSTEM_DIRECTORY_PATH = "data/universe/planetary_systems";
     public static final String FORCE_ICON_PATH = "data/images/force";
