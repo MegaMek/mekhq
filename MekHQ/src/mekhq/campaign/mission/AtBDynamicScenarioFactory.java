@@ -41,7 +41,7 @@ import static mekhq.campaign.mission.Scenario.T_GROUND;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX;
-import static mekhq.campaign.personnel.SkillType.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
 import static mekhq.campaign.universe.IUnitGenerator.unitTypeSupportsWeightClass;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
