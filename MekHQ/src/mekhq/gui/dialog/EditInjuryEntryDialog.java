@@ -64,21 +64,21 @@ public class EditInjuryEntryDialog extends JDialog {
 
     private Injury injury;
 
-    private JButton                       btnClose;
-    private JButton                       btnOK;
-    private JTextArea                     txtDays;
+    private JButton btnClose;
+    private JButton btnOK;
+    private JTextArea txtDays;
     private JComboBox<BodyLocationChoice> ddLocation;
-    private JComboBox<InjuryTypeChoice>   ddType;
-    private JTextArea                     txtFluff;
-    private JTextArea                     txtHits;
-    private JComboBox<String>             ddPermanent;
-    private JComboBox<String>             ddWorkedOn;
-    private JComboBox<String>             ddExtended;
-    private JPanel                        panBtn;
-    private JPanel                        panMain;
+    private JComboBox<InjuryTypeChoice> ddType;
+    private JTextArea txtFluff;
+    private JTextArea txtHits;
+    private JComboBox<String> ddPermanent;
+    private JComboBox<String> ddWorkedOn;
+    private JComboBox<String> ddExtended;
+    private JPanel panBtn;
+    private JPanel panMain;
 
-    private BodyLocationChoice[]                      locations;
-    private InjuryTypeChoice[]                        types;
+    private BodyLocationChoice[] locations;
+    private InjuryTypeChoice[] types;
     private FilterableComboBoxModel<InjuryTypeChoice> ddTypeModel;
 
     public EditInjuryEntryDialog(final JFrame frame, final boolean modal, final Injury injury) {
@@ -109,7 +109,7 @@ public class EditInjuryEntryDialog extends JDialog {
 
         types = InjuryType.getAllTypes().stream().map(InjuryTypeChoice::new).toArray(InjuryTypeChoice[]::new);
 
-        ddType      = new JComboBox<>(types);
+        ddType = new JComboBox<>(types);
         ddTypeModel = new FilterableComboBoxModel<>(ddType.getModel());
         ddTypeModel.setFilter(it -> {
             BodyLocation loc = ((BodyLocationChoice) Objects.requireNonNull(ddLocation.getSelectedItem())).loc;
@@ -124,17 +124,17 @@ public class EditInjuryEntryDialog extends JDialog {
             }
         }
 
-        txtDays  = new JTextArea();
+        txtDays = new JTextArea();
         txtFluff = new JTextArea();
-        txtHits  = new JTextArea();
+        txtHits = new JTextArea();
         String[] tf = { "True", "False" };
         ddPermanent = new JComboBox<>(tf);
-        ddWorkedOn  = new JComboBox<>(tf);
-        ddExtended  = new JComboBox<>(tf);
-        btnOK       = new JButton();
-        btnClose    = new JButton();
-        panBtn      = new JPanel();
-        panMain     = new JPanel();
+        ddWorkedOn = new JComboBox<>(tf);
+        ddExtended = new JComboBox<>(tf);
+        btnOK = new JButton();
+        btnClose = new JButton();
+        panBtn = new JPanel();
+        panMain = new JPanel();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditInjuryEntryDialog",
               MekHQ.getMHQOptions().getLocale());
@@ -154,14 +154,14 @@ public class EditInjuryEntryDialog extends JDialog {
               BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         txtDays.setPreferredSize(new Dimension(250, 75));
         txtDays.setMinimumSize(new Dimension(250, 75));
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 0;
-        gridBagConstraints.gridy   = 0;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill    = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(txtDays, gridBagConstraints);
 
         ddLocation.setName("ddLocation");
@@ -173,21 +173,21 @@ public class EditInjuryEntryDialog extends JDialog {
         ddLocation.addActionListener(evt -> {
             ddTypeModel.updateFilter();
 
-            BodyLocation loc  = ((BodyLocationChoice) Objects.requireNonNull(ddLocation.getSelectedItem())).loc;
-            InjuryType   type = ((InjuryTypeChoice) Objects.requireNonNull(ddType.getSelectedItem())).type;
+            BodyLocation loc = ((BodyLocationChoice) Objects.requireNonNull(ddLocation.getSelectedItem())).loc;
+            InjuryType type = ((InjuryTypeChoice) Objects.requireNonNull(ddType.getSelectedItem())).type;
             if (!type.isValidInLocation(loc)) {
                 ddType.setSelectedItem(ddTypeModel.getElementAt(0));
             }
         });
 
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 1;
-        gridBagConstraints.gridy   = 0;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill    = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(ddLocation, gridBagConstraints);
 
         ddType.setName("ddType");
@@ -196,14 +196,14 @@ public class EditInjuryEntryDialog extends JDialog {
               BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         ddType.setPreferredSize(new Dimension(250, 75));
         ddType.setMinimumSize(new Dimension(250, 75));
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 2;
-        gridBagConstraints.gridy   = 0;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill    = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(ddType, gridBagConstraints);
 
         txtFluff.setText(injury.getFluff());
@@ -215,14 +215,14 @@ public class EditInjuryEntryDialog extends JDialog {
               BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         txtFluff.setPreferredSize(new Dimension(250, 75));
         txtFluff.setMinimumSize(new Dimension(250, 75));
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 3;
-        gridBagConstraints.gridy   = 0;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill    = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(txtFluff, gridBagConstraints);
 
         txtHits.setText(Integer.toString(injury.getHits()));
@@ -234,14 +234,14 @@ public class EditInjuryEntryDialog extends JDialog {
               BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         txtHits.setPreferredSize(new Dimension(250, 75));
         txtHits.setMinimumSize(new Dimension(250, 75));
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 0;
-        gridBagConstraints.gridy   = 1;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill    = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(txtHits, gridBagConstraints);
 
         ddPermanent.setSelectedIndex(injury.isPermanent() ? 0 : 1);
@@ -251,14 +251,14 @@ public class EditInjuryEntryDialog extends JDialog {
               BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         ddPermanent.setPreferredSize(new Dimension(250, 75));
         ddPermanent.setMinimumSize(new Dimension(250, 75));
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 1;
-        gridBagConstraints.gridy   = 1;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill    = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(ddPermanent, gridBagConstraints);
 
         ddWorkedOn.setSelectedIndex(injury.isWorkedOn() ? 0 : 1);
@@ -268,14 +268,14 @@ public class EditInjuryEntryDialog extends JDialog {
               BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         ddWorkedOn.setPreferredSize(new Dimension(250, 75));
         ddWorkedOn.setMinimumSize(new Dimension(250, 75));
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 2;
-        gridBagConstraints.gridy   = 1;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill    = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(ddWorkedOn, gridBagConstraints);
 
         ddExtended.setSelectedIndex(injury.getExtended() ? 0 : 1);
@@ -285,14 +285,14 @@ public class EditInjuryEntryDialog extends JDialog {
               BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         ddExtended.setPreferredSize(new Dimension(250, 75));
         ddExtended.setMinimumSize(new Dimension(250, 75));
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 3;
-        gridBagConstraints.gridy   = 1;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill    = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(ddExtended, gridBagConstraints);
 
         btnOK.setText(resourceMap.getString("btnOkay.text"));
@@ -328,16 +328,20 @@ public class EditInjuryEntryDialog extends JDialog {
     }
 
     private void btnOKActionPerformed(ActionEvent evt) {
-        injury.setTime(Integer.parseInt(txtDays.getText()));
-        injury.setHits(Integer.parseInt(txtHits.getText()));
-        injury.setFluff(txtFluff.getText());
-        injury.setLocation(((BodyLocationChoice) Objects.requireNonNull(ddLocation.getSelectedItem())).loc);
-        injury.setType(((InjuryTypeChoice) Objects.requireNonNull(ddType.getSelectedItem())).type);
-        injury.setPermanent(ddPermanent.getSelectedIndex() == 0);
-        injury.setWorkedOn(ddWorkedOn.getSelectedIndex() == 0);
-        injury.setExtended(ddExtended.getSelectedIndex() == 0);
-        injury.setUUID(UUID.randomUUID());
-        this.setVisible(false);
+        try {
+            injury.setTime(Integer.parseInt(txtDays.getText()));
+            injury.setHits(Integer.parseInt(txtHits.getText()));
+            injury.setFluff(txtFluff.getText());
+            injury.setLocation(((BodyLocationChoice) Objects.requireNonNull(ddLocation.getSelectedItem())).loc);
+            injury.setType(((InjuryTypeChoice) Objects.requireNonNull(ddType.getSelectedItem())).type);
+            injury.setPermanent(ddPermanent.getSelectedIndex() == 0);
+            injury.setWorkedOn(ddWorkedOn.getSelectedIndex() == 0);
+            injury.setExtended(ddExtended.getSelectedIndex() == 0);
+            injury.setUUID(UUID.randomUUID());
+            this.dispose();
+        } catch (Exception ex) {
+            logger.info("Failed to update injury entry", ex);
+        }
     }
 
     private void btnCloseActionPerformed(ActionEvent evt) {
