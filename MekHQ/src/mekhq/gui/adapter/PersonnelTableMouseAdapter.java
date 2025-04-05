@@ -2818,14 +2818,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       attribute.getLabel(),
                       current,
                       target,
-                      -traitCost));
+                      0));
                 menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnAttributes.tooltip"))));
                 menuItem.setActionCommand(makeCommand(CMD_CHANGE_ATTRIBUTE,
                       String.valueOf(attribute),
-                      String.valueOf(-attributeCost),
+                      String.valueOf(0),
                       String.valueOf(false))); // Is this action improving the attribute?
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(target >= MINIMUM_ATTRIBUTE_SCORE);
+                menuItem.setEnabled(target >= MINIMUM_ATTRIBUTE_SCORE && getCampaign().isGM());
                 attributesMenuReduce.add(menuItem);
             }
             attributesMenu.add(attributesMenuIncrease);
