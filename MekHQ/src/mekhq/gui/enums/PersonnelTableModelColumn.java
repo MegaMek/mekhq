@@ -52,6 +52,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
@@ -144,7 +145,14 @@ public enum PersonnelTableModelColumn {
     AMBITION("PersonnelTableModelColumn.AMBITION.text"),
     GREED("PersonnelTableModelColumn.GREED.text"),
     SOCIAL("PersonnelTableModelColumn.SOCIAL.text"),
-    REASONING("PersonnelTableModelColumn.REASONING.text");
+    REASONING("PersonnelTableModelColumn.REASONING.text"),
+    STRENGTH("PersonnelTableModelColumn.STRENGTH.text"),
+    BODY("PersonnelTableModelColumn.BODY.text"),
+    REFLEXES("PersonnelTableModelColumn.REFLEXES.text"),
+    DEXTERITY("PersonnelTableModelColumn.DEXTERITY.text"),
+    INTELLIGENCE("PersonnelTableModelColumn.INTELLIGENCE.text"),
+    WILLPOWER("PersonnelTableModelColumn.WILLPOWER.text"),
+    CHARISMA("PersonnelTableModelColumn.CHARISMA.text");
 
     // endregion Enum Declarations
 
@@ -464,6 +472,8 @@ public enum PersonnelTableModelColumn {
     }
 
     /**
+     * When this is removed {@link #isATOWIntelligence()} should be renamed to just 'isIntelligence()'
+     *
      * @deprecated replaced by {@link #isReasoning()}
      */
     @Deprecated(since = "0.50.05", forRemoval = true)
@@ -474,6 +484,45 @@ public enum PersonnelTableModelColumn {
     public boolean isReasoning() {
         return this == REASONING;
     }
+
+    public boolean isStrength() {
+        return this == STRENGTH;
+    }
+
+    public boolean isBody() {
+        return this == BODY;
+    }
+
+    public boolean isReflexes() {
+        return this == REFLEXES;
+    }
+
+    public boolean isDexterity() {
+        return this == DEXTERITY;
+    }
+
+    public boolean isATOWIntelligence() {
+        return this == INTELLIGENCE;
+    }
+
+    public boolean isWillpower() {
+        return this == WILLPOWER;
+    }
+
+    public boolean isCharisma() {
+        return this == CHARISMA;
+    }
+
+    public boolean isATOWAttribute() {
+        return isStrength() ||
+                     isBody() ||
+                     isReflexes() ||
+                     isDexterity() ||
+                     isATOWIntelligence() ||
+                     isWillpower() ||
+                     isCharisma();
+    }
+
 
     public boolean isPersonality() {
         return isAggression() || isAmbition() || isGreed() || isSocial() || isReasoning();
@@ -846,6 +895,20 @@ public enum PersonnelTableModelColumn {
                 Reasoning reasoning = person.getReasoning();
 
                 return String.valueOf(reasoning.ordinal());
+            case STRENGTH:
+                return String.valueOf(person.getAttributeScore(SkillAttribute.STRENGTH));
+            case BODY:
+                return String.valueOf(person.getAttributeScore(SkillAttribute.BODY));
+            case REFLEXES:
+                return String.valueOf(person.getAttributeScore(SkillAttribute.REFLEXES));
+            case DEXTERITY:
+                return String.valueOf(person.getAttributeScore(SkillAttribute.DEXTERITY));
+            case INTELLIGENCE:
+                return String.valueOf(person.getAttributeScore(SkillAttribute.INTELLIGENCE));
+            case WILLPOWER:
+                return String.valueOf(person.getAttributeScore(SkillAttribute.WILLPOWER));
+            case CHARISMA:
+                return String.valueOf(person.getAttributeScore(SkillAttribute.CHARISMA));
             default:
                 return "UNIMPLEMENTED";
         }
@@ -1027,6 +1090,19 @@ public enum PersonnelTableModelColumn {
                 case EDGE -> campaign.getCampaignOptions().isUseEdge();
                 default -> false;
             };
+            case ATTRIBUTES -> switch (this) {
+                case RANK,
+                     FIRST_NAME,
+                     LAST_NAME,
+                     STRENGTH,
+                     BODY,
+                     REFLEXES,
+                     DEXTERITY,
+                     INTELLIGENCE,
+                     WILLPOWER,
+                     CHARISMA -> true;
+                default -> false;
+            };
             case OTHER -> switch (this) {
                 case RANK, FIRST_NAME, LAST_NAME -> true;
                 case TOUGHNESS -> campaign.getCampaignOptions().isUseToughness();
@@ -1081,7 +1157,13 @@ public enum PersonnelTableModelColumn {
                  SPA_COUNT,
                  IMPLANT_COUNT,
                  LOYALTY,
-                 REASONING -> new IntegerStringSorter();
+                 REASONING,
+                 STRENGTH,
+                 BODY,
+                 REFLEXES,
+                 DEXTERITY,
+                 INTELLIGENCE,
+                 WILLPOWER -> new IntegerStringSorter();
             case SALARY -> new FormattedNumberSorter();
             default -> new NaturalOrderComparator();
         };
