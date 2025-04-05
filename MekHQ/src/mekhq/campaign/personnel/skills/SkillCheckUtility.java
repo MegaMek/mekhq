@@ -87,7 +87,7 @@ public class SkillCheckUtility {
      * target number and an optional use of edge.</p>
      *
      * <p><b>Usage:</b> This constructor gives you a lot of control over what information you need, but for most
-     * use-cases you can get away with using the lazy method: {@link #performQuickSkillCheck(Person, String)}.</p>
+     * use-cases you can get away with using the lazy method: {@link #performQuickSkillCheck(Person, String, int)}.</p>
      *
      * @param person       the {@link Person} performing the skill check
      * @param skillName    the name of the skill being used
