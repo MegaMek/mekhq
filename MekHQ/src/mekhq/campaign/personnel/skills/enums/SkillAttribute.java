@@ -83,6 +83,14 @@ public enum SkillAttribute {
 
     final private static String RESOURCE_BUNDLE = "mekhq.resources." + SkillAttribute.class.getSimpleName();
 
+    /**
+     * Checks if the current instance is {@link #NONE}.
+     *
+     * @return {@code true} if the current instance is {@code NONE}, {@code false} otherwise.
+     */
+    public boolean isNone() {
+        return this == NONE;
+    }
 
     /**
      * Retrieves the label associated with this {@link SkillAttribute}.

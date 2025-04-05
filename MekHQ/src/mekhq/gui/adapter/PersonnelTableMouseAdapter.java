@@ -44,6 +44,8 @@ import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.enums.education.EducationLevel.DOCTORATE;
+import static mekhq.campaign.personnel.skills.Attributes.ATTRIBUTE_IMPROVEMENT_COST;
+import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
@@ -121,6 +123,7 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
@@ -179,6 +182,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      * @deprecated use {@code CMD_ADD_XP} instead
      */
     @Deprecated(since = "0.50.05", forRemoval = true)
+    private static final String CMD_ADD_1_XP = "XP_ADD_1";
     private static final String CMD_ADD_XP = "XP_ADD";
     private static final String CMD_EDIT_BIOGRAPHY = "BIOGRAPHY";
     private static final String CMD_EDIT_PORTRAIT = "PORTRAIT";
@@ -199,6 +203,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_ACQUIRE_CUSTOM_CHOICE = "CUSTOM_CHOICE";
     private static final String CMD_IMPROVE = "IMPROVE";
     private static final String CMD_BUY_TRAIT = "BUY_TRAIT";
+    private static final String CMD_CHANGE_ATTRIBUTE = "CHANGE_ATTRIBUTE";
+    private static final String CMD_SET_ATTRIBUTE = "SET_ATTRIBUTE";
     private static final String CMD_ADD_SPOUSE = "SPOUSE";
     private static final String CMD_REMOVE_SPOUSE = "REMOVE_SPOUSE";
     private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY";
@@ -330,8 +336,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_RANK: {
                 List<Person> promotedPersonnel = new ArrayList<>();
                 try {
-                    final int rank = Integer.parseInt(data[1]);
-                    final int level = (data.length > 2) ? Integer.parseInt(data[2]) : 0;
+                    final int rank = MathUtility.parseInt(data[1]);
+                    final int level = (data.length > 2) ? MathUtility.parseInt(data[2]) : 0;
                     for (final Person person : people) {
                         person.changeRank(getCampaign(), rank, level, true);
 
@@ -580,7 +586,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_IMPROVE: {
                 String type = data[1];
-                int cost = Integer.parseInt(data[2]);
+                int cost = MathUtility.parseInt(data[2]);
                 int oldExpLevel = selectedPerson.getExperienceLevel(getCampaign(), false);
                 selectedPerson.improveSkill(type);
                 selectedPerson.spendXP(cost);
@@ -600,8 +606,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_BUY_TRAIT: {
                 String type = data[1];
-                int cost = Integer.parseInt(data[2]);
-                int target = Integer.parseInt(data[3]);
+                int cost = MathUtility.parseInt(data[2]);
+                int target = MathUtility.parseInt(data[3]);
 
                 switch (type) {
                     case CONNECTIONS_LABEL -> selectedPerson.setConnections(target);
@@ -616,9 +622,44 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 getCampaign().personUpdated(selectedPerson);
                 break;
             }
+            case CMD_CHANGE_ATTRIBUTE: {
+                SkillAttribute attribute = SkillAttribute.fromString(data[1]);
+
+                selectedPerson.changeAttributeScore(attribute, 1);
+
+                int cost = MathUtility.parseInt(data[2]);
+                selectedPerson.spendXP(cost);
+
+                getCampaign().personUpdated(selectedPerson);
+                break;
+            }
+            case CMD_SET_ATTRIBUTE: {
+                SkillAttribute attribute = SkillAttribute.fromString(data[1]);
+
+                PopupValueChoiceDialog choiceDialog = new PopupValueChoiceDialog(getFrame(),
+                      true,
+                      resources.getString("spendOnAttributes.score"),
+                      selectedPerson.getAttributeScore(attribute),
+                      0);
+                choiceDialog.setVisible(true);
+
+                int choice = choiceDialog.getValue();
+                if (choice <= 0) {
+                    // <0 indicates Cancellation
+                    return;
+                }
+
+                for (Person person : people) {
+                    person.setAttributeScore(attribute, choice);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    getCampaign().personUpdated(person);
+                }
+
+                break;
+            }
             case CMD_ACQUIRE_ABILITY: {
                 String selected = data[1];
-                int cost = Integer.parseInt(data[2]);
+                int cost = MathUtility.parseInt(data[2]);
                 selectedPerson.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, selected, true);
                 selectedPerson.spendXP(cost);
                 final String displayName = SpecialAbility.getDisplayName(selected);
@@ -631,7 +672,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ACQUIRE_WEAPON_SPECIALIST: {
                 String selected = data[1];
-                int cost = Integer.parseInt(data[2]);
+                int cost = MathUtility.parseInt(data[2]);
                 selectedPerson.getOptions()
                       .acquireAbility(PersonnelOptions.LVL3_ADVANTAGES,
                             OptionsConstants.GUNNERY_WEAPON_SPECIALIST,
@@ -649,7 +690,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ACQUIRE_SANDBLASTER: {
                 String selected = data[1];
-                int cost = Integer.parseInt(data[2]);
+                int cost = MathUtility.parseInt(data[2]);
                 selectedPerson.getOptions()
                       .acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, OptionsConstants.GUNNERY_SANDBLASTER, selected);
                 selectedPerson.spendXP(cost);
@@ -665,7 +706,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ACQUIRE_SPECIALIST: {
                 String selected = data[1];
-                int cost = Integer.parseInt(data[2]);
+                int cost = MathUtility.parseInt(data[2]);
                 selectedPerson.getOptions()
                       .acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, OptionsConstants.GUNNERY_SPECIALIST, selected);
                 selectedPerson.spendXP(cost);
@@ -681,7 +722,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ACQUIRE_RANGEMASTER: {
                 String selected = data[1];
-                int cost = Integer.parseInt(data[2]);
+                int cost = MathUtility.parseInt(data[2]);
                 selectedPerson.getOptions()
                       .acquireAbility(PersonnelOptions.LVL3_ADVANTAGES,
                             OptionsConstants.GUNNERY_RANGE_MASTER,
@@ -699,7 +740,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ACQUIRE_ENVSPEC: {
                 String selected = data[1];
-                int cost = Integer.parseInt(data[2]);
+                int cost = MathUtility.parseInt(data[2]);
                 selectedPerson.getOptions()
                       .acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, OptionsConstants.MISC_ENV_SPECIALIST, selected);
                 selectedPerson.spendXP(cost);
@@ -715,7 +756,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ACQUIRE_HUMANTRO: {
                 String selected = data[1];
-                int cost = Integer.parseInt(data[2]);
+                int cost = MathUtility.parseInt(data[2]);
                 selectedPerson.getOptions()
                       .acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, OptionsConstants.MISC_HUMAN_TRO, selected);
                 selectedPerson.spendXP(cost);
@@ -731,7 +772,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ACQUIRE_CUSTOM_CHOICE: {
                 String selected = data[1];
-                int cost = Integer.parseInt(data[2]);
+                int cost = MathUtility.parseInt(data[2]);
                 String ability = data[3];
                 selectedPerson.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, ability, selected);
                 selectedPerson.spendXP(cost);
@@ -1515,7 +1556,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       person,
                       data[1],
                       data[2],
-                      Integer.parseInt(data[3]),
+                      MathUtility.parseInt(data[3]),
                       data[4],
                       data[5],
                       isReEnrollment);
@@ -2766,6 +2807,32 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             traitsMenu.add(menuItem);
             menu.add(traitsMenu);
 
+            JMenu attributesMenuIncrease = new JMenu(resources.getString("spendOnAttributes.increase"));
+            int attributeCost = (int) round(ATTRIBUTE_IMPROVEMENT_COST * costMultiplier);
+
+            for (SkillAttribute attribute : SkillAttribute.values()) {
+                if (attribute.isNone()) {
+                    continue;
+                }
+
+                int current = person.getAttributeScore(attribute);
+                // Improve
+                target = current + 1;
+                menuItem = new JMenuItem(String.format(resources.getString("spendOnAttributes.format"),
+                      attribute.getLabel(),
+                      current,
+                      target,
+                      traitCost));
+                menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnAttributes.tooltip"))));
+                menuItem.setActionCommand(makeCommand(CMD_CHANGE_ATTRIBUTE,
+                      String.valueOf(attribute),
+                      String.valueOf(attributeCost)));
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(target <= MAXIMUM_ATTRIBUTE_SCORE && person.getXP() >= attributeCost);
+                attributesMenuIncrease.add(menuItem);
+            }
+            menu.add(attributesMenuIncrease);
+
             // Edge Purchasing
             if (getCampaignOptions().isUseEdge()) {
                 JMenu edgeMenu = new JMenu(resources.getString("edge.text"));
@@ -3563,6 +3630,23 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setActionCommand(CMD_GENERATE_ROLEPLAY_SKILLS);
             menuItem.addActionListener(this);
             menu.add(menuItem);
+
+            JMenu attributesMenu = new JMenu(resources.getString("spendOnAttributes.set"));
+
+            for (SkillAttribute attribute : SkillAttribute.values()) {
+                if (attribute.isNone()) {
+                    continue;
+                }
+
+                // Set
+                menuItem = new JMenuItem(attribute.getLabel());
+                menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnAttributes.tooltip"))));
+                menuItem.setActionCommand(makeCommand(CMD_SET_ATTRIBUTE, String.valueOf(attribute)));
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(getCampaign().isGM());
+                attributesMenu.add(menuItem);
+            }
+            menu.add(attributesMenu);
 
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }
