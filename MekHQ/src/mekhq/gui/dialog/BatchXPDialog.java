@@ -30,7 +30,6 @@ package mekhq.gui.dialog;
 import static java.lang.Math.round;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -60,7 +59,6 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
-import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public final class BatchXPDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(BatchXPDialog.class);
@@ -159,25 +157,7 @@ public final class BatchXPDialog extends JDialog {
     }
 
     private TableCellRenderer getRenderer() {
-        return new Renderer();
-    }
-
-    private class Renderer extends MekHqTableCellRenderer {
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-              boolean hasFocus, int row, int column) {
-            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            final int modelRow = table.convertRowIndexToModel(row);
-            final PersonnelTableModelColumn personnelColumn = batchXPColumns.get(column);
-            Person person = personnelModel.getPerson(modelRow);
-            String displayText = personnelColumn.getDisplayText(campaign, person);
-            if (displayText != null) {
-                setText(displayText);
-            }
-
-            return this;
-        }
+        return personnelModel.new Renderer();
     }
 
     private JComponent getButtonPanel() {
