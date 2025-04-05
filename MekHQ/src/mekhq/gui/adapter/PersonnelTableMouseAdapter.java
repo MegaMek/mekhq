@@ -183,6 +183,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      * @deprecated use {@code CMD_ADD_XP} instead
      */
     @Deprecated(since = "0.50.05", forRemoval = true)
+    private static final String CMD_ADD_1_XP = "XP_ADD_1";
     private static final String CMD_ADD_XP = "XP_ADD";
     private static final String CMD_EDIT_BIOGRAPHY = "BIOGRAPHY";
     private static final String CMD_EDIT_PORTRAIT = "PORTRAIT";
@@ -2785,6 +2786,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menu.add(traitsMenu);
 
             JMenu attributesMenu = new JMenu(resources.getString("spendOnAttributes.text"));
+            JMenu attributesMenuIncrease = new JMenu(resources.getString("spendOnAttributes.increase"));
+            JMenu attributesMenuReduce = new JMenu(resources.getString("spendOnAttributes.decrease"));
             int attributeCost = (int) round(ATTRIBUTE_IMPROVEMENT_COST * costMultiplier);
 
             for (SkillAttribute attribute : SkillAttribute.values()) {
@@ -2807,7 +2810,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       String.valueOf(true))); // Is this action improving the attribute?
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(target <= MAXIMUM_ATTRIBUTE_SCORE && person.getXP() >= attributeCost);
-                attributesMenu.add(menuItem);
+                attributesMenuIncrease.add(menuItem);
 
                 // Decrease
                 target = current - 1;
@@ -2823,8 +2826,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       String.valueOf(false))); // Is this action improving the attribute?
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(target >= MINIMUM_ATTRIBUTE_SCORE);
-                attributesMenu.add(menuItem);
+                attributesMenuReduce.add(menuItem);
             }
+            attributesMenu.add(attributesMenuIncrease);
+            attributesMenu.add(attributesMenuReduce);
+            menu.add(attributesMenu);
 
             // Edge Purchasing
             if (getCampaignOptions().isUseEdge()) {
