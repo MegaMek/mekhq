@@ -38,15 +38,17 @@ import megamek.logging.MMLogger;
  * <p>It is used to categorize results such as skill checks into predefined ranges and retrieve associated values or
  * labels for those results.</p>
  *
- * <p>Each enum constant represents a performance level and is associated with:
+ * <p>Each enum constant represents a performance level and is associated with:</p>
  * <ul>
  *     <li>A lower bound (inclusive),</li>
  *     <li>An upper bound (inclusive),</li>
  *     <li>A margin of success value.</li>
+ * </ul>
  *
  * <p>For example, {@link #SPECTACULAR} represents a margin of success in the range of 7 to {@link Integer#MAX_VALUE},
  * while {@link #DISASTROUS} represents a margin of success in the range of {@link Integer#MIN_VALUE} to -7.</p>
  *
+ * @author Illiani
  * @since 0.50.5
  */
 public enum MarginOfSuccess {
@@ -74,6 +76,7 @@ public enum MarginOfSuccess {
      * @param upperBound the upper inclusive bound for this margin of success
      * @param margin     the margin value associated with this range
      *
+     * @author Illiani
      * @since 0.50.5
      */
     MarginOfSuccess(int lowerBound, int upperBound, int margin) {
@@ -92,6 +95,7 @@ public enum MarginOfSuccess {
      *
      * @return the margin value associated with the given {@link MarginOfSuccess}
      *
+     * @author Illiani
      * @since 0.50.5
      */
     public static int getMarginValue(MarginOfSuccess marginOfSuccess) {
@@ -109,6 +113,7 @@ public enum MarginOfSuccess {
      * @return the margin (calculated as {@code roll - lowerBound}) corresponding to the matching
      *       {@link MarginOfSuccess} range, or the margin for {@link #DISASTROUS} if no matching range is found
      *
+     * @author Illiani
      * @since 0.50.5
      */
     public static int getMarginOfSuccess(int roll) {
@@ -133,6 +138,7 @@ public enum MarginOfSuccess {
      *
      * @return the localized string representing the given margin of success
      *
+     * @author Illiani
      * @since 0.50.5
      */
     public static String getMarginOfSuccessString(int marginOfSuccess) {
