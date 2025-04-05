@@ -1163,7 +1163,8 @@ public enum PersonnelTableModelColumn {
                  REFLEXES,
                  DEXTERITY,
                  INTELLIGENCE,
-                 WILLPOWER -> new IntegerStringSorter();
+                 WILLPOWER,
+                 CHARISMA -> new IntegerStringSorter();
             case SALARY -> new FormattedNumberSorter();
             default -> new NaturalOrderComparator();
         };
