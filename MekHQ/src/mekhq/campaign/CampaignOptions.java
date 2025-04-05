@@ -1957,7 +1957,7 @@ public class CampaignOptions {
     }
 
     /**
-     * @deprecated replaced by {@link #setUseReasoningXpMultiplier()}
+     * @deprecated replaced by {@link #setUseReasoningXpMultiplier(boolean)}
      */
     @Deprecated(since = "0.50.5", forRemoval = true)
     public void setUseIntelligenceXpMultiplier(final boolean useIntelligenceXpMultiplier) {
