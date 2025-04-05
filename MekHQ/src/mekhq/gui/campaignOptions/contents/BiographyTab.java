@@ -118,7 +118,7 @@ public class BiographyTab {
     private JPanel pnlRandomBackgrounds;
     private JCheckBox chkUseRandomPersonalities;
     private JCheckBox chkUseRandomPersonalityReputation;
-    private JCheckBox chkUseIntelligenceXpMultiplier;
+    private JCheckBox chkUseReasoningXpMultiplier;
     private JCheckBox chkUseSimulatedRelationships;
     private JPanel pnlRandomOriginOptions;
     private JCheckBox chkRandomizeOrigin;
@@ -329,7 +329,7 @@ public class BiographyTab {
         pnlRandomBackgrounds = new JPanel();
         chkUseRandomPersonalities = new JCheckBox();
         chkUseRandomPersonalityReputation = new JCheckBox();
-        chkUseIntelligenceXpMultiplier = new JCheckBox();
+        chkUseReasoningXpMultiplier = new JCheckBox();
         chkUseSimulatedRelationships = new JCheckBox();
 
         pnlRandomOriginOptions = new JPanel();
@@ -587,7 +587,7 @@ public class BiographyTab {
      * <p>
      * <li>Random personalities for characters.</li>
      * <li>Random personality reputation.</li>
-     * <li>Intelligence XP multipliers.</li>
+     * <li>Reasoning XP multipliers.</li>
      * <li>Simulated relationships.</li>
      * </p>
      *
@@ -597,7 +597,7 @@ public class BiographyTab {
         // Contents
         chkUseRandomPersonalities = new CampaignOptionsCheckBox("UseRandomPersonalities");
         chkUseRandomPersonalityReputation = new CampaignOptionsCheckBox("UseRandomPersonalityReputation");
-        chkUseIntelligenceXpMultiplier = new CampaignOptionsCheckBox("UseIntelligenceXpMultiplier");
+        chkUseReasoningXpMultiplier = new CampaignOptionsCheckBox("UseReasoningXpMultiplier");
         chkUseSimulatedRelationships = new CampaignOptionsCheckBox("UseSimulatedRelationships");
 
         // Layout the Panels
@@ -613,7 +613,7 @@ public class BiographyTab {
         panel.add(chkUseRandomPersonalityReputation, layout);
 
         layout.gridy++;
-        panel.add(chkUseIntelligenceXpMultiplier, layout);
+        panel.add(chkUseReasoningXpMultiplier, layout);
 
         layout.gridy++;
         panel.add(chkUseSimulatedRelationships, layout);
@@ -649,7 +649,7 @@ public class BiographyTab {
         comboSpecifiedSystem.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
-                                                          final boolean isSelected, final boolean cellHasFocus) {
+                  final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PlanetarySystem) {
                     setText(((PlanetarySystem) value).getName(generalTab.getDate()));
@@ -674,7 +674,7 @@ public class BiographyTab {
         comboSpecifiedPlanet.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
-                                                          final boolean isSelected, final boolean cellHasFocus) {
+                  final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof Planet) {
                     setText(((Planet) value).getName(generalTab.getDate()));
@@ -1352,8 +1352,7 @@ public class BiographyTab {
      * @param presetRankSystem          Optional rank system, or `null` to use the default system.
      */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
-                                              @Nullable RandomOriginOptions presetRandomOriginOptions,
-                                              @Nullable RankSystem presetRankSystem) {
+          @Nullable RandomOriginOptions presetRandomOriginOptions, @Nullable RankSystem presetRankSystem) {
         CampaignOptions options = presetCampaignOptions;
         if (options == null) {
             options = this.campaignOptions;
@@ -1386,7 +1385,7 @@ public class BiographyTab {
         // Backgrounds
         chkUseRandomPersonalities.setSelected(options.isUseRandomPersonalities());
         chkUseRandomPersonalityReputation.setSelected(options.isUseRandomPersonalityReputation());
-        chkUseIntelligenceXpMultiplier.setSelected(options.isUseIntelligenceXpMultiplier());
+        chkUseReasoningXpMultiplier.setSelected(options.isUseReasoningXpMultiplier());
         chkUseSimulatedRelationships.setSelected(options.isUseSimulatedRelationships());
         chkRandomizeOrigin.setSelected(originOptions.isRandomizeOrigin());
         chkRandomizeDependentsOrigin.setSelected(originOptions.isRandomizeDependentOrigin());
@@ -1488,7 +1487,7 @@ public class BiographyTab {
         // Backgrounds
         options.setUseRandomPersonalities(chkUseRandomPersonalities.isSelected());
         options.setUseRandomPersonalityReputation(chkUseRandomPersonalityReputation.isSelected());
-        options.setUseIntelligenceXpMultiplier(chkUseIntelligenceXpMultiplier.isSelected());
+        options.setUseReasoningXpMultiplier(chkUseReasoningXpMultiplier.isSelected());
         options.setUseSimulatedRelationships(chkUseSimulatedRelationships.isSelected());
 
         originOptions.setRandomizeOrigin(chkRandomizeOrigin.isSelected());
