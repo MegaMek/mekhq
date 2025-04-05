@@ -30,18 +30,22 @@ package mekhq.campaign.personnel.skills;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.d6;
-import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
-import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
 import static mekhq.campaign.personnel.skills.Skill.COUNT_DOWN_MIN_VALUE;
 import static mekhq.campaign.personnel.skills.Skill.COUNT_UP_MAX_VALUE;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
+import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.DISASTROUS;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessString;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginValue;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.util.List;
 
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
@@ -51,19 +55,25 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
  * associated skill type. It determines if the skill check succeeds or fails by rolling dice and calculates the
  * resulting margin of success and corresponding text description.
  *
+ * @author Illiani
  * @since 0.50.5
  */
 public class SkillCheckUtility {
+    private static final MMLogger logger = MMLogger.create(SkillCheckUtility.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources." + SkillCheckUtility.class.getSimpleName();
+
     /**
      * The target number for an untrained skill check with one linked attribute.
      */
-    private static final int UNTRAINED_TARGET_NUMBER_ONE_LINKED_ATTRIBUTE = 12; // ATOW pg 43
+    protected static final int UNTRAINED_TARGET_NUMBER_ONE_LINKED_ATTRIBUTE = 12; // ATOW pg 43
 
     /**
      * The target number for an untrained skill check with two linked attributes.
      */
-    private static final int UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES = 18; // ATOW pg 43
+    protected static final int UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES = 18; // ATOW pg 43
 
+    private Person person;
+    private String skillName;
     private int marginOfSuccess;
     private String resultsText;
     private int targetNumber;
@@ -83,25 +93,19 @@ public class SkillCheckUtility {
      * @param skillName the name of the skill being used
      * @param useEdge   whether the person should use edge for a re-roll if the first attempt fails
      *
+     * @author Illiani
      * @since 0.50.5
      */
     public SkillCheckUtility(final Person person, final String skillName, final boolean useEdge) {
-        targetNumber = determineTargetNumber(person, skillName);
-        roll = d6(2);
-        int availableEdge = person.getCurrentEdge();
+        this.person = person;
+        this.skillName = skillName;
 
-        if (roll >= targetNumber || !useEdge || availableEdge < 1) {
-            marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(roll);
-            resultsText = getMarginOfSuccessString(marginOfSuccess);
+        if (isPersonNull()) {
             return;
         }
 
-        person.changeCurrentEdge(-1);
-        usedEdge = true;
-
-        roll = d6(2);
-        marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(roll);
-        resultsText = getMarginOfSuccessString(marginOfSuccess);
+        targetNumber = determineTargetNumber(person, skillName);
+        performCheck(useEdge);
     }
 
     /**
@@ -118,11 +122,102 @@ public class SkillCheckUtility {
      *
      * @return {@code true} if the skill check is successful, {@code false} otherwise
      *
+     * @author Illiani
      * @since 0.50.5
      */
-    public boolean performQuickSkillCheck(final Person person, final String skillName) {
+    public static boolean performQuickSkillCheck(final Person person, final String skillName) {
         SkillCheckUtility skillCheck = new SkillCheckUtility(person, skillName, false);
         return skillCheck.isSuccess();
+    }
+
+    /**
+     * Checks if the {@code person} object is {@code null} and handles the null case by auto-failing the check with
+     * obviously wrong results.
+     *
+     * <p>If the {@code person} is {@code null}, the method logs a debug message, sets a {@code DISASTROUS} failure
+     * margin, and assigns out-of-range values to the {@code targetNumber} and {@code roll} to make the issue easily
+     * identifiable.</p>
+     *
+     * @return {@code true} if the {@code person} is {@code null}, {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.5
+     */
+    private boolean isPersonNull() {
+        if (person == null) {
+            logger.debug("Null person passed into SkillCheckUtility." +
+                               " Auto-failing check with bogus results so the bug stands out.");
+
+            marginOfSuccess = getMarginValue(DISASTROUS);
+            resultsText = generateResultsText();
+            targetNumber = Integer.MAX_VALUE;
+            roll = Integer.MIN_VALUE;
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Generates a formatted results text that provides details about the outcome of a skill check.
+     *
+     * <p>This method creates a descriptive summary of the skill check results, including the person's title, name,
+     * gender-based pronoun, skill name, roll, target number, margin of success, and edge usage (if any). The text is
+     * color-coded based on the margin of success to visually indicate the outcome:</p>
+     *
+     * <ul>
+     *   <li><b>Neutral Margin:</b> Warning color (e.g., yellow).</li>
+     *   <li><b>Failure:</b> Negative color (e.g., red).</li>
+     *   <li><b>Success:</b> Positive color (e.g., green).</li>
+     * </ul>
+     *
+     * <p>If edge is used for a reroll, the results will also include a note about the reroll action.</p>
+     *
+     * <p>If the skill name is {@code null}, this method returns a localized error message related to skill name resolution,
+     * indicating that an error occurred during the skill check results generation.</p>
+     *
+     * @return a formatted string representing the results of the skill check. This string includes structured
+     *       information about the person, the skill, numerical results, edge usage, or an error message if the skill
+     *       name is {@code null}.
+     *
+     * @author Illiani
+     * @since 0.50.5
+     */
+    private String generateResultsText() {
+        if (skillName == null) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.error");
+        }
+
+        String fullTitle = person.getHyperlinkedFullTitle();
+        String firstName = person.getFirstName();
+        String genderedReferenced = HIS_HER_THEIR.getDescriptor(person.getGender());
+        String marginOfSuccessText = getMarginOfSuccessString(marginOfSuccess);
+
+        String colorOpen;
+        int neutralMarginValue = getMarginValue(BARELY_MADE_IT);
+        if (marginOfSuccess == neutralMarginValue) {
+            colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor());
+        } else if (marginOfSuccess < neutralMarginValue) {
+            colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
+        } else {
+            colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+        }
+
+        String edgeUseText = !usedEdge ? "" : getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.rerolled", firstName);
+
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "skillCheck.results",
+              fullTitle,
+              colorOpen,
+              skillName,
+              colorOpen,
+              CLOSING_SPAN_TAG,
+              genderedReferenced,
+              skillName,
+              roll,
+              targetNumber,
+              marginOfSuccessText,
+              edgeUseText);
     }
 
     /**
@@ -136,6 +231,7 @@ public class SkillCheckUtility {
      *
      * @return the margin of success
      *
+     * @author Illiani
      * @since 0.50.5
      */
     public int getMarginOfSuccess() {
@@ -153,6 +249,7 @@ public class SkillCheckUtility {
      *
      * @return {@code true} if the skill check succeeded, {@code false} otherwise
      *
+     * @author Illiani
      * @since 0.50.5
      */
     public boolean isSuccess() {
@@ -167,6 +264,7 @@ public class SkillCheckUtility {
      *
      * @return the results text for the skill check
      *
+     * @author Illiani
      * @since 0.50.5
      */
     public String getResultsText() {
@@ -181,12 +279,12 @@ public class SkillCheckUtility {
      *
      * @return the target number for the skill check
      *
+     * @author Illiani
      * @since 0.50.5
      */
     public int getTargetNumber() {
         return targetNumber;
     }
-
 
     /**
      * Gets the roll result for the skill check.
@@ -195,12 +293,12 @@ public class SkillCheckUtility {
      *
      * @return the roll result for the skill check
      *
+     * @author Illiani
      * @since 0.50.5
      */
     public int getRoll() {
         return roll;
     }
-
 
     /**
      * Checks whether edge was used during the skill check.
@@ -210,6 +308,7 @@ public class SkillCheckUtility {
      *
      * @return {@code true} if edge was used during the skill check, {@code false} otherwise
      *
+     * @author Illiani
      * @since 0.50.5
      */
     public boolean isUsedEdge() {
@@ -228,24 +327,25 @@ public class SkillCheckUtility {
      *
      * @return the target number for the skill check
      *
+     * @author Illiani
      * @since 0.50.5
      */
-    private static int determineTargetNumber(Person person, String skillName) {
+    static int determineTargetNumber(Person person, String skillName) {
         final SkillType skillType = SkillType.getType(skillName);
         final Attributes characterAttributes = person.getATOWAttributes();
 
-        boolean isUntrained = person.hasSkill(skillName);
+        boolean isUntrained = !person.hasSkill(skillName);
         int linkedAttributeCount = skillType.getLinkedAttributeCount();
 
         int targetNumber;
         int attributeModifier;
 
         if (isUntrained) {
-            targetNumber = switch (linkedAttributeCount) {
-                case 1 -> UNTRAINED_TARGET_NUMBER_ONE_LINKED_ATTRIBUTE;
-                case 2 -> UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES;
-                default -> 0;
-            };
+            if (linkedAttributeCount > 1) {
+                targetNumber = UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES;
+            } else {
+                targetNumber = UNTRAINED_TARGET_NUMBER_ONE_LINKED_ATTRIBUTE;
+            }
 
             attributeModifier = getTotalAttributeScoreForSkill(characterAttributes, skillType);
         } else {
@@ -254,13 +354,83 @@ public class SkillCheckUtility {
             attributeModifier = getTotalAttributeModifier(characterAttributes, skillType);
         }
 
+        targetNumber -= attributeModifier;
         if (skillType.isCountUp()) {
-            targetNumber += attributeModifier;
             return min(targetNumber, COUNT_UP_MAX_VALUE);
         } else {
-            targetNumber -= attributeModifier;
             return max(targetNumber, COUNT_DOWN_MIN_VALUE);
         }
+    }
+
+    /**
+     * Performs a skill check for a given person, determining success or failure based on dice rolls and optionally
+     * modifying the results by using edge points for a re-roll.
+     *
+     * <p>This method initiates a die roll to compare against a pre-determined target number. If the initial roll
+     * succeeds, the results are calculated and stored. If the initial roll fails and edge usage is allowed and
+     * available, the method consumes one edge point from the person and performs a re-roll. The final results include
+     * the margin of success and accompanying descriptive result text, both of which are stored internally.
+     *
+     * @param useEdge whether the person should use an edge point to perform a re-roll if the initial roll fails. If
+     *                {@code true}, edge use will be attempted, subject to availability.
+     *
+     * @author Illiani
+     * @since 0.50.5
+     */
+    void performCheck(boolean useEdge) {
+        roll = d6(2);
+        if (performInitialRoll(useEdge)) {
+            return;
+        }
+
+        roll = d6(2);
+        rollWithEdge();
+    }
+
+    /**
+     * Handles the logic for the initial dice roll in the skill check, determining whether the roll succeeds or if edge
+     * usage is necessary.
+     *
+     * <p>This method evaluates the result of the first roll against the target number and determines if further
+     * action (re-roll with edge) is needed. If the roll meets or exceeds the target number, or if edge usage is
+     * disallowed or unavailable, the results are finalized based on the initial roll.
+     *
+     * @param useEdge whether the person is allowed to use edge for a re-roll if the initial roll fails.
+     *
+     * @return {@code true} if the skill check is resolved (initial roll succeeds or no edge usage is possible);
+     *       {@code false} if further action (re-roll using edge) is required.
+     *
+     * @author Illiani
+     * @since 0.50.5
+     */
+    boolean performInitialRoll(boolean useEdge) {
+        int availableEdge = person.getCurrentEdge();
+
+        if (roll >= targetNumber || !useEdge || availableEdge < 1) {
+            marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(roll);
+            resultsText = generateResultsText();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Performs the re-roll logic for a skill check when edge is used, decrementing the person's edge points and
+     * calculating the results based on the new roll.
+     *
+     * <p>This method is invoked only when the initial roll fails, and edge usage is allowed and available. It
+     * handles decrementing the person's edge points by 1, marks that edge was used in the operation, and calculates the
+     * new margin of success and results text based on the re-roll.
+     *
+     * @author Illiani
+     * @since 0.50.5
+     */
+    private void rollWithEdge() {
+        person.changeCurrentEdge(-1);
+        usedEdge = true;
+
+        marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(roll);
+        resultsText = generateResultsText();
     }
 
     /**
@@ -274,6 +444,7 @@ public class SkillCheckUtility {
      *
      * @return the total attribute modifier for the skill check
      *
+     * @author Illiani
      * @since 0.50.5
      */
     public static int getTotalAttributeModifier(final Attributes characterAttributes, final SkillType skillType) {
@@ -281,6 +452,10 @@ public class SkillCheckUtility {
 
         int totalModifier = 0;
         for (SkillAttribute attribute : linkedAttributes) {
+            if (attribute == SkillAttribute.NONE) {
+                continue;
+            }
+
             int attributeScore = characterAttributes.getAttribute(attribute);
             totalModifier += getIndividualAttributeModifier(attributeScore);
         }
@@ -298,18 +473,20 @@ public class SkillCheckUtility {
      *
      * @return the attribute modifier for the given score
      *
+     * @author Illiani
      * @since 0.50.5
      */
     public static int getIndividualAttributeModifier(int attributeScore) {
-        int actualScore = clamp(attributeScore, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-        return switch (actualScore) {
+        int actualScore = max(attributeScore, 0);
+
+        return switch (actualScore) { // ATOW pg 41
             case 0 -> -4;
             case 1 -> -2;
             case 2, 3 -> -1;
             case 4, 5, 6 -> 0;
             case 7, 8, 9 -> 1;
             case 10 -> 2;
-            default -> min(5, (int) floor((double) actualScore / 3)); // ATOW pg 41
+            default -> min(5, (int) floor((double) actualScore / 3));
         };
     }
 
@@ -323,6 +500,7 @@ public class SkillCheckUtility {
      *
      * @return the total raw attribute score for the given skill type
      *
+     * @author Illiani
      * @since 0.50.5
      */
     public static int getTotalAttributeScoreForSkill(final Attributes characterAttributes, final SkillType skillType) {
@@ -330,6 +508,10 @@ public class SkillCheckUtility {
 
         int totalScore = 0;
         for (SkillAttribute attribute : linkedAttributes) {
+            if (attribute == SkillAttribute.NONE) {
+                continue;
+            }
+
             totalScore += characterAttributes.getAttribute(attribute);
         }
         return totalScore;

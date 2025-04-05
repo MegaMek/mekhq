@@ -1,0 +1,533 @@
+/*
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ */
+package mekhq.campaign.personnel.skills;
+
+import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_TARGET_NUMBER_ONE_LINKED_ATTRIBUTE;
+import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES;
+import static mekhq.campaign.personnel.skills.SkillCheckUtility.getIndividualAttributeModifier;
+import static mekhq.campaign.personnel.skills.SkillCheckUtility.getTotalAttributeModifier;
+import static mekhq.campaign.personnel.skills.SkillCheckUtility.performQuickSkillCheck;
+import static mekhq.campaign.personnel.skills.SkillType.S_GUN_MEK;
+import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.DISASTROUS;
+import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessString;
+import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginValue;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.DEXTERITY;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.REFLEXES;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+
+/**
+ * The {@link SkillCheckUtilityTest} class is a test suite designed to validate the behavior and functionality of the
+ * {@link SkillCheckUtility} class. It contains unit tests and parameterized tests to ensure proper handling of various
+ * edge cases and scenarios in skill check calculations, attribute modifiers, and target number determination.
+ *
+ * <p>Methods in this class include tests for scenarios involving:</p>
+ * <ul>
+ *     <li>Null checks for person objects in skill checks.</li>
+ *     <li>Calculations of total attribute modifiers with different numbers of linked attributes.</li>
+ *     <li>Computation of individual attribute modifiers based on attribute scores.</li>
+ *     <li>Verification of total attribute scores for skills, given a range of linked attribute configurations.</li>
+ *     <li>Determination of target numbers for skill checks, considering trained and untrained skills, single and
+ *     multiple attributes, invalid attributes, edge cases, and negative modifiers.</li>
+ * </ul>
+ *
+ * @author Illiani
+ * @since 0.50.5
+ */
+class SkillCheckUtilityTest {
+    @Test
+    void testIsPersonNull_EdgeDisallowed() {
+        SkillCheckUtility checkUtility = new SkillCheckUtility(null, S_GUN_MEK, false);
+
+        int expectedMarginOfSuccess = getMarginValue(DISASTROUS);
+        assertEquals(expectedMarginOfSuccess, checkUtility.getMarginOfSuccess());
+
+        String expectedResultsText = getMarginOfSuccessString(expectedMarginOfSuccess);
+        assertEquals(expectedResultsText, checkUtility.getResultsText());
+
+        int expectedTargetNumber = Integer.MAX_VALUE;
+        assertEquals(expectedTargetNumber, checkUtility.getTargetNumber());
+
+        int expectedRoll = Integer.MIN_VALUE;
+        assertEquals(expectedRoll, checkUtility.getRoll());
+    }
+
+    @Test
+    void testIsPersonNull_EdgeAllowed() {
+        SkillCheckUtility checkUtility = new SkillCheckUtility(null, S_GUN_MEK, true);
+
+        int expectedMarginOfSuccess = getMarginValue(DISASTROUS);
+        assertEquals(expectedMarginOfSuccess, checkUtility.getMarginOfSuccess());
+
+        String expectedResultsText = getMarginOfSuccessString(expectedMarginOfSuccess);
+        assertEquals(expectedResultsText, checkUtility.getResultsText());
+
+        int expectedTargetNumber = Integer.MAX_VALUE;
+        assertEquals(expectedTargetNumber, checkUtility.getTargetNumber());
+
+        int expectedRoll = Integer.MIN_VALUE;
+        assertEquals(expectedRoll, checkUtility.getRoll());
+    }
+
+    @Test
+    void testIsPersonNull_PerformQuickSkillCheck() {
+        boolean results = performQuickSkillCheck(null, S_GUN_MEK);
+        assertFalse(results);
+    }
+
+    @Test
+    void testGetTotalAttributeModifier_SingleLinkedAttribute() {
+        // Setup
+        SkillType testSkillType = new SkillType();
+        testSkillType.setFirstAttribute(REFLEXES);
+        testSkillType.setSecondAttribute(NONE);
+
+        Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              7,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE);
+
+        // Act
+        int totalModifier = SkillCheckUtility.getTotalAttributeModifier(attributes, testSkillType);
+
+        // Assert
+        assertEquals(1, totalModifier);
+    }
+
+    @Test
+    void testGetTotalAttributeModifier_TwoLinkedAttributes() {
+        // Setup
+        SkillType testSkillType = new SkillType();
+        testSkillType.setFirstAttribute(REFLEXES);
+        testSkillType.setSecondAttribute(DEXTERITY);
+
+        Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              7,
+              8,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE);
+
+        // Act
+        int totalModifier = SkillCheckUtility.getTotalAttributeModifier(attributes, testSkillType);
+
+        // Assert
+        assertEquals(2, totalModifier);
+    }
+
+    @Test
+    void testGetTotalAttributeModifier_NoLinkedAttributes() {
+        // Setup
+        SkillType testSkillType = new SkillType();
+        testSkillType.setFirstAttribute(NONE);
+        testSkillType.setSecondAttribute(NONE);
+
+        Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE);
+
+        // Act
+        int totalModifier = SkillCheckUtility.getTotalAttributeModifier(attributes, testSkillType);
+
+        // Assert
+        assertEquals(0, totalModifier);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = { "-10, -4", // Attribute score is below minimum, testing max()
+                         "0, -4",   // Minimum normal attribute score
+                         "1, -2",   // Attribute score of 1
+                         "2, -1",   // Attribute score of 2
+                         "3, -1",   // Attribute score of 3
+                         "4, 0",    // Attribute score of 4
+                         "5, 0",    // Attribute score of 5
+                         "6, 0",    // Attribute score of 6
+                         "7, 1",    // Attribute score of 7
+                         "8, 1",    // Attribute score of 8
+                         "9, 1",    // Attribute score of 9
+                         "10, 2",   // Maximum normal attribute score
+                         "99, 5"    // High attribute score
+    })
+    void testGetIndividualAttributeModifier(int attributeScore, int expectedModifier) {
+        assertEquals(expectedModifier,
+              getIndividualAttributeModifier(attributeScore),
+              "Attribute Score: " + attributeScore);
+    }
+
+    @Test
+    void testGetTotalAttributeScoreForSkill_SingleLinkedAttribute() {
+        // Setup
+        SkillType testSkillType = new SkillType();
+        testSkillType.setFirstAttribute(REFLEXES);
+        testSkillType.setSecondAttribute(NONE);
+
+        Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              7,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE);
+
+        // Act
+        int totalScore = SkillCheckUtility.getTotalAttributeScoreForSkill(attributes, testSkillType);
+
+        // Assert
+        assertEquals(7, totalScore);
+    }
+
+    @Test
+    void testGetTotalAttributeScoreForSkill_TwoLinkedAttributes() {
+        // Setup
+        SkillType testSkillType = new SkillType();
+        testSkillType.setFirstAttribute(REFLEXES);
+        testSkillType.setSecondAttribute(DEXTERITY);
+
+        Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              6,
+              8,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE);
+
+        // Act
+        int totalScore = SkillCheckUtility.getTotalAttributeScoreForSkill(attributes, testSkillType);
+
+        // Assert
+        assertEquals(14, totalScore);
+    }
+
+    @Test
+    void testGetTotalAttributeScoreForSkill_NoLinkedAttributes() {
+        // Setup
+        SkillType testSkillType = new SkillType();
+        testSkillType.setFirstAttribute(NONE);
+        testSkillType.setSecondAttribute(NONE);
+
+        Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              7,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE);
+
+        // Act
+        int totalScore = SkillCheckUtility.getTotalAttributeScoreForSkill(attributes, testSkillType);
+
+        // Assert
+        assertEquals(0, totalScore);
+    }
+
+    @Test
+    void testGetTotalAttributeScoreForSkill_SingleLinkedAttribute_None() {
+        // Setup
+        SkillType testSkillType = new SkillType();
+        testSkillType.setFirstAttribute(NONE);
+        testSkillType.setSecondAttribute(REFLEXES);
+
+        Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              7,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE);
+
+        // Act
+        int totalScore = SkillCheckUtility.getTotalAttributeScoreForSkill(attributes, testSkillType);
+
+        // Assert
+        assertEquals(7, totalScore);
+    }
+
+    @Test
+    void testDetermineTargetNumber_UntrainedWithOneLinkedAttribute() {
+        // Setup
+        Campaign mockCampaign = mock(Campaign.class);
+        Person person = new Person(mockCampaign);
+
+        try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {
+            SkillType testSkillType = new SkillType();
+            testSkillType.setSecondAttribute(NONE);
+
+            mockSkillType.when(() -> SkillType.getType(S_GUN_MEK)).thenReturn(testSkillType);
+
+            // Act
+            int targetNumber = SkillCheckUtility.determineTargetNumber(person, S_GUN_MEK);
+
+            // Assert
+            int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_ONE_LINKED_ATTRIBUTE -
+                                             person.getAttributeScore(REFLEXES);
+            assertEquals(expectedTargetNumber, targetNumber);
+        }
+    }
+
+    @Test
+    void testDetermineTargetNumber_UntrainedWithTwoLinkedAttributes() {
+        // Setup
+        Campaign mockCampaign = mock(Campaign.class);
+        Person person = new Person(mockCampaign);
+
+        try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {
+            SkillType testSkillType = new SkillType();
+
+            mockSkillType.when(() -> SkillType.getType(S_GUN_MEK)).thenReturn(testSkillType);
+
+            // Act
+            int targetNumber = SkillCheckUtility.determineTargetNumber(person, S_GUN_MEK);
+
+            // Assert
+            int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES -
+                                             person.getAttributeScore(REFLEXES) -
+                                             person.getAttributeScore(DEXTERITY);
+            assertEquals(expectedTargetNumber, targetNumber);
+        }
+    }
+
+    @Test
+    void testDetermineTargetNumber_TrainedWithOneLinkedAttribute() {
+        for (int attributeScore = MINIMUM_ATTRIBUTE_SCORE; attributeScore < MAXIMUM_ATTRIBUTE_SCORE; attributeScore++) {
+            // Setup
+            SkillType testSkillType = new SkillType();
+            testSkillType.setSecondAttribute(NONE);
+
+            Skill skill = new Skill(testSkillType, 0, 0);
+
+            Attributes characterAttributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
+                  DEFAULT_ATTRIBUTE_SCORE,
+                  attributeScore,
+                  DEFAULT_ATTRIBUTE_SCORE,
+                  DEFAULT_ATTRIBUTE_SCORE,
+                  DEFAULT_ATTRIBUTE_SCORE,
+                  DEFAULT_ATTRIBUTE_SCORE);
+
+            Person mockPerson = mock(Person.class);
+            when(mockPerson.hasSkill(S_GUN_MEK)).thenReturn(true);
+            when(mockPerson.getSkill(S_GUN_MEK)).thenReturn(skill);
+            when(mockPerson.getATOWAttributes()).thenReturn(characterAttributes);
+            when(mockPerson.getOptions()).thenReturn(new PersonnelOptions());
+            when(mockPerson.getReputation()).thenReturn(0);
+
+            try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {
+                mockSkillType.when(() -> SkillType.getType(S_GUN_MEK)).thenReturn(testSkillType);
+
+                // Act
+                int targetNumber = SkillCheckUtility.determineTargetNumber(mockPerson, S_GUN_MEK);
+
+                // Assert
+                int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), 0);
+                int attributeAdjustment = getTotalAttributeModifier(characterAttributes, testSkillType);
+                assertEquals(skillTargetNumber - attributeAdjustment,
+                      targetNumber,
+                      "Attribute Score: " + attributeScore);
+            }
+        }
+    }
+
+    @Test
+    void testDetermineTargetNumber_TrainedWithOneLinkedAttribute_AboveNormalAttributeScore() {
+        // Setup
+        SkillType testSkillType = new SkillType();
+        testSkillType.setSecondAttribute(NONE);
+
+        Skill skill = new Skill(testSkillType, 0, 0);
+
+        Attributes characterAttributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              300,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE,
+              DEFAULT_ATTRIBUTE_SCORE);
+
+        Person mockPerson = mock(Person.class);
+        when(mockPerson.hasSkill(S_GUN_MEK)).thenReturn(true);
+        when(mockPerson.getSkill(S_GUN_MEK)).thenReturn(skill);
+        when(mockPerson.getATOWAttributes()).thenReturn(characterAttributes);
+        when(mockPerson.getOptions()).thenReturn(new PersonnelOptions());
+        when(mockPerson.getReputation()).thenReturn(0);
+
+        try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {
+            mockSkillType.when(() -> SkillType.getType(S_GUN_MEK)).thenReturn(testSkillType);
+
+            // Act
+            int targetNumber = SkillCheckUtility.determineTargetNumber(mockPerson, S_GUN_MEK);
+
+            // Assert
+            int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), 0);
+            int attributeAdjustment = getTotalAttributeModifier(characterAttributes, testSkillType);
+            assertEquals(skillTargetNumber - attributeAdjustment, targetNumber, "Attribute Score: " + 300);
+        }
+    }
+
+    @Test
+    void testDetermineTargetNumber_TrainedWithTwoLinkedAttributes() {
+        for (int attributeScore = MINIMUM_ATTRIBUTE_SCORE; attributeScore < MAXIMUM_ATTRIBUTE_SCORE; attributeScore++) {
+            // Setup
+            SkillType testSkillType = new SkillType();
+
+            Skill skill = new Skill(testSkillType, 0, 0);
+
+            Attributes characterAttributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
+                  DEFAULT_ATTRIBUTE_SCORE,
+                  attributeScore,
+                  attributeScore,
+                  DEFAULT_ATTRIBUTE_SCORE,
+                  DEFAULT_ATTRIBUTE_SCORE,
+                  DEFAULT_ATTRIBUTE_SCORE);
+
+            Person mockPerson = mock(Person.class);
+            when(mockPerson.hasSkill(S_GUN_MEK)).thenReturn(true);
+            when(mockPerson.getSkill(S_GUN_MEK)).thenReturn(skill);
+            when(mockPerson.getATOWAttributes()).thenReturn(characterAttributes);
+            when(mockPerson.getOptions()).thenReturn(new PersonnelOptions());
+            when(mockPerson.getReputation()).thenReturn(0);
+
+            try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {
+                mockSkillType.when(() -> SkillType.getType(S_GUN_MEK)).thenReturn(testSkillType);
+
+                // Act
+                int targetNumber = SkillCheckUtility.determineTargetNumber(mockPerson, S_GUN_MEK);
+
+                // Assert
+                int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), 0);
+                int attributeAdjustment = getTotalAttributeModifier(characterAttributes, testSkillType);
+                assertEquals(skillTargetNumber - attributeAdjustment,
+                      targetNumber,
+                      "Attribute Score: " + attributeScore);
+            }
+        }
+    }
+
+    @Test
+    void testDetermineTargetNumber_InvalidAttributes() {
+        // Setup
+        Campaign mockCampaign = mock(Campaign.class);
+        Person person = new Person(mockCampaign);
+
+        Attributes invalidAttributes = new Attributes(-5, -5, -5, -5, -5, -5, -5); // Invalid attribute scores
+        person.setATOWAttributes(invalidAttributes);
+
+        SkillType testSkillType = new SkillType();
+        testSkillType.setFirstAttribute(REFLEXES);
+        testSkillType.setSecondAttribute(DEXTERITY);
+
+        try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {
+            mockSkillType.when(() -> SkillType.getType(S_GUN_MEK)).thenReturn(testSkillType);
+
+            // Act
+            int targetNumber = SkillCheckUtility.determineTargetNumber(person, S_GUN_MEK);
+
+            // Assert
+            int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES -
+                                             SkillCheckUtility.getTotalAttributeScoreForSkill(invalidAttributes,
+                                                   testSkillType);
+            assertEquals(expectedTargetNumber, targetNumber);
+        }
+    }
+
+    @Test
+    void testDetermineTargetNumber_EdgeCaseSkillType() {
+        // Setup
+        Campaign mockCampaign = mock(Campaign.class);
+        Person person = new Person(mockCampaign);
+
+        // Using default attributes.
+        SkillType edgeCaseSkillType = new SkillType();
+        edgeCaseSkillType.setFirstAttribute(NONE); // No attributes linked
+        edgeCaseSkillType.setSecondAttribute(NONE);
+        person.setATOWAttributes(new Attributes());
+
+        try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {
+            mockSkillType.when(() -> SkillType.getType(S_GUN_MEK)).thenReturn(edgeCaseSkillType);
+
+            // Act
+            int targetNumber = SkillCheckUtility.determineTargetNumber(person, S_GUN_MEK);
+
+            // Assert
+            assertEquals(UNTRAINED_TARGET_NUMBER_ONE_LINKED_ATTRIBUTE, targetNumber);
+        }
+    }
+
+    @Test
+    void testDetermineTargetNumber_NegativeAttributeModifier() {
+        // Setup
+        Campaign mockCampaign = mock(Campaign.class);
+        Person person = new Person(mockCampaign);
+
+        Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE, DEFAULT_ATTRIBUTE_SCORE, 3,
+              // A valid negative modifier attribute
+              2,
+              // A valid negative modifier attribute
+              DEFAULT_ATTRIBUTE_SCORE, DEFAULT_ATTRIBUTE_SCORE, DEFAULT_ATTRIBUTE_SCORE);
+
+        person.setATOWAttributes(attributes);
+
+        SkillType testSkillType = new SkillType();
+        testSkillType.setFirstAttribute(DEXTERITY);
+        testSkillType.setSecondAttribute(REFLEXES);
+
+        try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {
+            mockSkillType.when(() -> SkillType.getType(S_GUN_MEK)).thenReturn(testSkillType);
+
+            // Act
+            int targetNumber = SkillCheckUtility.determineTargetNumber(person, S_GUN_MEK);
+
+            // Assert
+            int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES -
+                                             SkillCheckUtility.getTotalAttributeScoreForSkill(attributes,
+                                                   testSkillType);
+            assertEquals(expectedTargetNumber, targetNumber);
+        }
+    }
+}

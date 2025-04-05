@@ -113,6 +113,37 @@ public class Attributes {
         charisma = DEFAULT_ATTRIBUTE_SCORE;
     }
 
+    /**
+     * Constructs a new {@code Attributes} object with the specified attribute values.
+     *
+     * @param strength     the {@link SkillAttribute#STRENGTH} value of the character, representing physical power.
+     * @param body         the {@link SkillAttribute#BODY} value of the character, representing endurance and physical
+     *                     resilience.
+     * @param reflexes     the {@link SkillAttribute#REFLEXES} value of the character, representing reaction speed and
+     *                     agility.
+     * @param dexterity    the {@link SkillAttribute#DEXTERITY} value of the character, representing skillfulness and
+     *                     precision.
+     * @param intelligence the {@link SkillAttribute#INTELLIGENCE} value of the character, representing cognitive
+     *                     ability and reasoning.
+     * @param willpower    the {@link SkillAttribute#WILLPOWER} value of the character, representing mental strength and
+     *                     determination.
+     * @param charisma     the {@link SkillAttribute#CHARISMA} value of the character, representing persuasiveness and
+     *                     social skills.
+     *
+     * @author Illiani
+     * @since 0.50.5
+     */
+    public Attributes(int strength, int body, int reflexes, int dexterity, int intelligence, int willpower,
+          int charisma) {
+        this.strength = strength;
+        this.body = body;
+        this.reflexes = reflexes;
+        this.dexterity = dexterity;
+        this.intelligence = intelligence;
+        this.willpower = willpower;
+        this.charisma = charisma;
+    }
+
     // Getters and Setters
 
     /**

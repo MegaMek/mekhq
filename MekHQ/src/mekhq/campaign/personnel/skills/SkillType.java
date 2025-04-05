@@ -316,6 +316,12 @@ public class SkillType {
 
     /** Creates new SkillType */
     public SkillType() {
+        name = "MISSING_NAME";
+        target = 7;
+        countUp = false;
+        subType = COMBAT_GUNNERY;
+        firstAttribute = REFLEXES;
+        secondAttribute = DEXTERITY;
         greenLvl = 1;
         regLvl = 3;
         vetLvl = 4;
@@ -429,6 +435,42 @@ public class SkillType {
 
     public void setEliteLevel(int l) {
         eliteLvl = l;
+    }
+
+    /**
+     * Sets the first {@link SkillAttribute} associated with the skill type.
+     *
+     * <p>If {@code firstAttribute} is {@code null}, no action is taken, and the current value of the first attribute
+     * remains unchanged.
+     *
+     * @param firstAttribute the {@link SkillAttribute} to be used as the second attribute. If {@code null}, the
+     *                       existing value is preserved.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public void setFirstAttribute(SkillAttribute firstAttribute) {
+        if (secondAttribute != null) {
+            this.firstAttribute = firstAttribute;
+        }
+    }
+
+    /**
+     * Sets the second {@link SkillAttribute} associated with the skill type.
+     *
+     * <p>If {@code secondAttribute} is {@code null}, no action is taken, and the current value of the second
+     * attribute remains unchanged.
+     *
+     * @param secondAttribute the {@link SkillAttribute} to be used as the second attribute. If {@code null}, the
+     *                        existing value is preserved.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public void setSecondAttribute(SkillAttribute secondAttribute) {
+        if (secondAttribute != null) {
+            this.secondAttribute = secondAttribute;
+        }
     }
 
     public int getCost(int lvl) {
