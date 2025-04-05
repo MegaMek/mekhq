@@ -77,7 +77,7 @@ import org.mockito.Mockito;
 class SkillCheckUtilityTest {
     @Test
     void testIsPersonNull_EdgeDisallowed() {
-        SkillCheckUtility checkUtility = new SkillCheckUtility(null, S_GUN_MEK, false);
+        SkillCheckUtility checkUtility = new SkillCheckUtility(null, S_GUN_MEK, 0, false);
 
         int expectedMarginOfSuccess = getMarginValue(DISASTROUS);
         assertEquals(expectedMarginOfSuccess, checkUtility.getMarginOfSuccess());
@@ -95,7 +95,7 @@ class SkillCheckUtilityTest {
 
     @Test
     void testIsPersonNull_EdgeAllowed() {
-        SkillCheckUtility checkUtility = new SkillCheckUtility(null, S_GUN_MEK, true);
+        SkillCheckUtility checkUtility = new SkillCheckUtility(null, S_GUN_MEK, 0, true);
 
         int expectedMarginOfSuccess = getMarginValue(DISASTROUS);
         assertEquals(expectedMarginOfSuccess, checkUtility.getMarginOfSuccess());
@@ -113,7 +113,7 @@ class SkillCheckUtilityTest {
 
     @Test
     void testIsPersonNull_PerformQuickSkillCheck() {
-        boolean results = performQuickSkillCheck(null, S_GUN_MEK);
+        boolean results = performQuickSkillCheck(null, S_GUN_MEK, 0);
         assertFalse(results);
     }
 
@@ -305,7 +305,7 @@ class SkillCheckUtilityTest {
             mockSkillType.when(() -> SkillType.getType(S_GUN_MEK)).thenReturn(testSkillType);
 
             // Act
-            int targetNumber = SkillCheckUtility.determineTargetNumber(person, S_GUN_MEK);
+            int targetNumber = SkillCheckUtility.determineTargetNumber(person, S_GUN_MEK, 0);
 
             // Assert
             int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_ONE_LINKED_ATTRIBUTE -
@@ -326,7 +326,7 @@ class SkillCheckUtilityTest {
             mockSkillType.when(() -> SkillType.getType(S_GUN_MEK)).thenReturn(testSkillType);
 
             // Act
-            int targetNumber = SkillCheckUtility.determineTargetNumber(person, S_GUN_MEK);
+            int targetNumber = SkillCheckUtility.determineTargetNumber(person, S_GUN_MEK, 0);
 
             // Assert
             int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES -
@@ -364,7 +364,7 @@ class SkillCheckUtilityTest {
                 mockSkillType.when(() -> SkillType.getType(S_GUN_MEK)).thenReturn(testSkillType);
 
                 // Act
-                int targetNumber = SkillCheckUtility.determineTargetNumber(mockPerson, S_GUN_MEK);
+                int targetNumber = SkillCheckUtility.determineTargetNumber(mockPerson, S_GUN_MEK, 0);
 
                 // Assert
                 int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), 0);
@@ -403,7 +403,7 @@ class SkillCheckUtilityTest {
             mockSkillType.when(() -> SkillType.getType(S_GUN_MEK)).thenReturn(testSkillType);
 
             // Act
-            int targetNumber = SkillCheckUtility.determineTargetNumber(mockPerson, S_GUN_MEK);
+            int targetNumber = SkillCheckUtility.determineTargetNumber(mockPerson, S_GUN_MEK, 0);
 
             // Assert
             int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), 0);
@@ -439,7 +439,7 @@ class SkillCheckUtilityTest {
                 mockSkillType.when(() -> SkillType.getType(S_GUN_MEK)).thenReturn(testSkillType);
 
                 // Act
-                int targetNumber = SkillCheckUtility.determineTargetNumber(mockPerson, S_GUN_MEK);
+                int targetNumber = SkillCheckUtility.determineTargetNumber(mockPerson, S_GUN_MEK, 0);
 
                 // Assert
                 int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), 0);
@@ -468,7 +468,7 @@ class SkillCheckUtilityTest {
             mockSkillType.when(() -> SkillType.getType(S_GUN_MEK)).thenReturn(testSkillType);
 
             // Act
-            int targetNumber = SkillCheckUtility.determineTargetNumber(person, S_GUN_MEK);
+            int targetNumber = SkillCheckUtility.determineTargetNumber(person, S_GUN_MEK, 0);
 
             // Assert
             int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES -
@@ -494,7 +494,7 @@ class SkillCheckUtilityTest {
             mockSkillType.when(() -> SkillType.getType(S_GUN_MEK)).thenReturn(edgeCaseSkillType);
 
             // Act
-            int targetNumber = SkillCheckUtility.determineTargetNumber(person, S_GUN_MEK);
+            int targetNumber = SkillCheckUtility.determineTargetNumber(person, S_GUN_MEK, 0);
 
             // Assert
             assertEquals(UNTRAINED_TARGET_NUMBER_ONE_LINKED_ATTRIBUTE, targetNumber);
@@ -523,7 +523,7 @@ class SkillCheckUtilityTest {
             mockSkillType.when(() -> SkillType.getType(S_GUN_MEK)).thenReturn(testSkillType);
 
             // Act
-            int targetNumber = SkillCheckUtility.determineTargetNumber(person, S_GUN_MEK);
+            int targetNumber = SkillCheckUtility.determineTargetNumber(person, S_GUN_MEK, 0);
 
             // Assert
             int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES -

@@ -72,8 +72,8 @@ public class SkillCheckUtility {
      */
     protected static final int UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES = 18; // ATOW pg 43
 
-    private Person person;
-    private String skillName;
+    private final Person person;
+    private final String skillName;
     private int marginOfSuccess;
     private String resultsText;
     private int targetNumber;
@@ -89,14 +89,18 @@ public class SkillCheckUtility {
      * <p><b>Usage:</b> This constructor gives you a lot of control over what information you need, but for most
      * use-cases you can get away with using the lazy method: {@link #performQuickSkillCheck(Person, String)}.</p>
      *
-     * @param person    the {@link Person} performing the skill check
-     * @param skillName the name of the skill being used
-     * @param useEdge   whether the person should use edge for a re-roll if the first attempt fails
+     * @param person       the {@link Person} performing the skill check
+     * @param skillName    the name of the skill being used
+     * @param miscModifier any special modifiers, as an {@link Integer}. These values are subtracted from the target
+     *                     number, if the associated skill is classified as 'count up', otherwise they are added to the
+     *                     target number. This means negative values are bonuses, positive values are penalties.
+     * @param useEdge      whether the person should use edge for a re-roll if the first attempt fails
      *
      * @author Illiani
      * @since 0.50.5
      */
-    public SkillCheckUtility(final Person person, final String skillName, final boolean useEdge) {
+    public SkillCheckUtility(final Person person, final String skillName, final int miscModifier,
+          final boolean useEdge) {
         this.person = person;
         this.skillName = skillName;
 
@@ -104,7 +108,7 @@ public class SkillCheckUtility {
             return;
         }
 
-        targetNumber = determineTargetNumber(person, skillName);
+        targetNumber = determineTargetNumber(person, skillName, miscModifier);
         performCheck(useEdge);
     }
 
@@ -117,16 +121,19 @@ public class SkillCheckUtility {
      * <p><b>Usage:</b> This is a nice, quick lazy method for performing a skill check. For most use-cases across
      * MekHQ this is the method you want to use. If you need more control use the class constructor, instead.</p>
      *
-     * @param person    the {@link Person} performing the skill check
-     * @param skillName the name of the skill being checked
+     * @param person       the {@link Person} performing the skill check
+     * @param skillName    the name of the skill being checked
+     * @param miscModifier any special modifiers, as an {@link Integer}. These values are subtracted from the target
+     *                     number, if the associated skill is classified as 'count up', otherwise they are added to the
+     *                     target number. This means negative values are bonuses, positive values are penalties.
      *
      * @return {@code true} if the skill check is successful, {@code false} otherwise
      *
      * @author Illiani
      * @since 0.50.5
      */
-    public static boolean performQuickSkillCheck(final Person person, final String skillName) {
-        SkillCheckUtility skillCheck = new SkillCheckUtility(person, skillName, false);
+    public static boolean performQuickSkillCheck(final Person person, final String skillName, final int miscModifier) {
+        SkillCheckUtility skillCheck = new SkillCheckUtility(person, skillName, miscModifier, false);
         return skillCheck.isSuccess();
     }
 
@@ -322,15 +329,18 @@ public class SkillCheckUtility {
      * <p>If the person is untrained, the target number is based on constants for untrained rolls and the number of
      * linked attributes. Otherwise, it is based on the final skill value and attribute modifiers.</p>
      *
-     * @param person    the {@link Person} performing the skill check
-     * @param skillName the name of the skill being used
+     * @param person       the {@link Person} performing the skill check
+     * @param skillName    the name of the skill being used
+     * @param miscModifier any special modifiers, as an {@link Integer}. These values are subtracted from the target
+     *                     number, if the associated skill is classified as 'count up', otherwise they are added to the
+     *                     target number. This means negative values are bonuses, positive values are penalties.
      *
      * @return the target number for the skill check
      *
      * @author Illiani
      * @since 0.50.5
      */
-    static int determineTargetNumber(Person person, String skillName) {
+    static int determineTargetNumber(Person person, String skillName, int miscModifier) {
         final SkillType skillType = SkillType.getType(skillName);
         final Attributes characterAttributes = person.getATOWAttributes();
 
@@ -356,8 +366,10 @@ public class SkillCheckUtility {
 
         targetNumber -= attributeModifier;
         if (skillType.isCountUp()) {
+            targetNumber -= miscModifier;
             return min(targetNumber, COUNT_UP_MAX_VALUE);
         } else {
+            targetNumber += miscModifier;
             return max(targetNumber, COUNT_DOWN_MIN_VALUE);
         }
     }
