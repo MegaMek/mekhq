@@ -1066,13 +1066,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_BUY_EDGE: {
                 int baseCost = getCampaignOptions().getEdgeCost();
                 final double xpCostMultiplier = getCampaignOptions().getXpCostMultiplier();
-                final boolean isUseIntelligenceMultiplier = getCampaignOptions().isUseIntelligenceXpMultiplier();
+                final boolean isUseReasoningMultiplier = getCampaignOptions().isUseReasoningXpMultiplier();
                 for (Person person : people) {
-                    double intelligenceXpCostMultiplier = person.getIntelligenceXpCostMultiplier(
-                          isUseIntelligenceMultiplier);
+                    double reasoningXpCostMultiplier = person.getReasoningXpCostMultiplier(isUseReasoningMultiplier);
 
-                    // Intelligence cost changes should always take place before global changes
-                    int cost = (int) round(baseCost * intelligenceXpCostMultiplier);
+                    // Reasoning cost changes should always take place before global changes
+                    int cost = (int) round(baseCost * reasoningXpCostMultiplier);
                     cost = (int) round(cost * xpCostMultiplier);
 
                     selectedPerson.spendXP(cost);
@@ -2314,9 +2313,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         // region Spend XP Menu
         if (oneSelected && person.getStatus().isActive()) {
-            final boolean isUseIntelligenceMultiplier = getCampaignOptions().isUseIntelligenceXpMultiplier();
-            final double intelligenceXpCostMultiplier = person.getIntelligenceXpCostMultiplier(
-                  isUseIntelligenceMultiplier);
+            final boolean isUseReasoningMultiplier = getCampaignOptions().isUseReasoningXpMultiplier();
+            final double reasoningXpCostMultiplier = person.getReasoningXpCostMultiplier(isUseReasoningMultiplier);
             final double xpCostMultiplier = getCampaignOptions().getXpCostMultiplier();
 
             menu = new JMenu(resources.getString("spendXP.text"));
@@ -2334,9 +2332,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (!spa.isEligible(person)) {
                         continue;
                     }
-                    // Intelligence cost changes should always take place before global changes
+                    // Reasoning cost changes should always take place before global changes
                     int baseCost = spa.getCost();
-                    cost = (int) round(baseCost > 0 ? baseCost * intelligenceXpCostMultiplier : baseCost);
+                    cost = (int) round(baseCost > 0 ? baseCost * reasoningXpCostMultiplier : baseCost);
                     cost = (int) round(cost * xpCostMultiplier);
 
                     String costDesc = String.format(resources.getString("costValue.format"), cost);
@@ -2680,7 +2678,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             for (int i = 0; i < SkillType.getSkillList().length; i++) {
                 String type = SkillType.getSkillList()[i];
 
-                int cost = person.getCostToImprove(type, isUseIntelligenceMultiplier);
+                int cost = person.getCostToImprove(type, isUseReasoningMultiplier);
                 cost = (int) round(cost * xpCostMultiplier);
 
                 if (cost >= 0) {
@@ -2832,8 +2830,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             if (getCampaignOptions().isUseEdge()) {
                 JMenu edgeMenu = new JMenu(resources.getString("edge.text"));
 
-                // Intelligence cost changes should always take place before global changes
-                int cost = (int) round(getCampaignOptions().getEdgeCost() * intelligenceXpCostMultiplier);
+                // Reasoning cost changes should always take place before global changes
+                int cost = (int) round(getCampaignOptions().getEdgeCost() * reasoningXpCostMultiplier);
                 cost = (int) round(cost * xpCostMultiplier);
 
                 if ((cost >= 0) && (person.getXP() >= cost)) {

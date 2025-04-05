@@ -62,7 +62,7 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
-import mekhq.campaign.randomEvents.personalities.enums.Intelligence;
+import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -89,7 +89,7 @@ public class EducationController {
      * @return true if the person is eligible for enrollment, false otherwise
      */
     public static boolean makeEnrollmentCheck(Campaign campaign, Person person, String academySet,
-                                              String academyNameInSet) {
+          String academyNameInSet) {
         ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME, MekHQ.getMHQOptions().getLocale());
 
         Academy academy = findAcademyInSet(academySet, academyNameInSet);
@@ -116,10 +116,10 @@ public class EducationController {
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
-        // Calculate the roll based on Intelligence if necessary
+        // Calculate the roll based on Reasoning if necessary
         int roll = d6(2);
         if (campaignOptions.isUseRandomPersonalities()) {
-            roll += (person.getIntelligence().getIntelligenceScore() / 4);
+            roll += (person.getReasoning().getReasoningScore() / 4);
         }
 
         // Calculate target number based on base target number and faculty skill
@@ -178,8 +178,7 @@ public class EducationController {
      * @param isReEnrollment   Whether the person is being re-enrolled.
      */
     public static void performEducationPreEnrollmentActions(Campaign campaign, Person person, String academySet,
-                                                            String academyNameInSet, int courseIndex, String campus,
-                                                            String faction, boolean isReEnrollment) {
+          String academyNameInSet, int courseIndex, String campus, String faction, boolean isReEnrollment) {
         ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME, MekHQ.getMHQOptions().getLocale());
 
         Academy academy = findAcademyInSet(academySet, academyNameInSet);
@@ -248,7 +247,7 @@ public class EducationController {
      * @param courseIndex The index of the course being taken.
      */
     public static void enrollPerson(Campaign campaign, Person person, Academy academy, String campus, String faction,
-                                    Integer courseIndex) {
+          Integer courseIndex) {
         // change status will wipe the academic information, so must always precede the
         // setters
         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.STUDENT);
@@ -586,7 +585,7 @@ public class EducationController {
      * @return The remaining days of education for the person.
      */
     private static boolean ongoingEducation(Campaign campaign, Person person, Academy academy, boolean ageBypass,
-                                            ResourceBundle resources) {
+          ResourceBundle resources) {
         int daysOfEducation = person.getEduEducationTime();
 
         if (academy.isPrepSchool()) {
@@ -648,7 +647,7 @@ public class EducationController {
      * @return true, if the person successfully graduates, otherwise, false
      */
     private static boolean graduationPicker(Campaign campaign, Person person, Academy academy,
-                                            ResourceBundle resources) {
+          ResourceBundle resources) {
         if (academy.isPrepSchool()) {
             graduateChild(campaign, person, academy, resources);
             return true;
@@ -743,7 +742,7 @@ public class EducationController {
      * @param resources The resource bundle used for localized strings.
      */
     private static void processNewWeekChecks(Campaign campaign, Academy academy, Person person,
-                                             ResourceBundle resources) {
+          ResourceBundle resources) {
         if (!academy.isHomeSchool()) {
             // has the system been depopulated? Nominally similar to destruction, but here
             // we use actual system data, so it's more dynamic.
@@ -780,7 +779,7 @@ public class EducationController {
      * @param resources The resource bundle used for localized strings.
      */
     private static void processNewYearChecks(Campaign campaign, Academy academy, Person person,
-                                             ResourceBundle resources) {
+          ResourceBundle resources) {
         if (academy.isHomeSchool()) {
             return;
         }
@@ -808,7 +807,7 @@ public class EducationController {
      * @param resources the resource bundle for getting localized strings
      */
     private static void checkForTrainingAccidents(Campaign campaign, Academy academy, Person person,
-                                                  ResourceBundle resources) {
+          ResourceBundle resources) {
         if (academy.isMilitary()) {
             int militaryDiceSize = campaign.getCampaignOptions().getMilitaryAcademyAccidents();
             int roll;
@@ -860,7 +859,7 @@ public class EducationController {
      * @param resources the ResourceBundle for localized strings
      */
     private static void processTrainingInjury(Campaign campaign, Academy academy, Person person,
-                                              ResourceBundle resources) {
+          ResourceBundle resources) {
         int roll = d6(3);
 
         String resultString = String.format(resources.getString("eventTrainingAccidentWounded.text"),
@@ -890,7 +889,7 @@ public class EducationController {
      * @return true if the person should drop out, false otherwise.
      */
     private static boolean checkForDropout(Campaign campaign, Academy academy, Person person,
-                                           ResourceBundle resources) {
+          ResourceBundle resources) {
         int roll;
         int diceSize;
 
@@ -1012,7 +1011,7 @@ public class EducationController {
      * @return true if a faction conflict is found and resolved, false otherwise
      */
     private static boolean checkForAcademyFactionConflict(Campaign campaign, Academy academy, Person person,
-                                                          ResourceBundle resources) {
+          ResourceBundle resources) {
         if (academy.isFactionConflict(campaign, person)) {
             String reportMessage = String.format(resources.getString("eventWarExpelled.text"),
                   person.getHyperlinkedFullTitle(),
@@ -1037,7 +1036,7 @@ public class EducationController {
      * @param resources the resource bundle for localization.
      */
     private static void checkForAcademyClosure(Campaign campaign, Academy academy, Person person,
-                                               ResourceBundle resources) {
+          ResourceBundle resources) {
         if (campaign.getLocalDate().getYear() >= academy.getClosureYear()) {
             String reportMessage = String.format(resources.getString("eventClosure.text"),
                   person.getHyperlinkedFullTitle(),
@@ -1060,7 +1059,7 @@ public class EducationController {
      * @return true if the academy has been destroyed, false otherwise
      */
     private static boolean checkForAcademyDestruction(Campaign campaign, Academy academy, Person person,
-                                                      ResourceBundle resources) {
+          ResourceBundle resources) {
         // we assume that if the system's population has been depleted, the academy has
         // been destroyed too.
         if ((campaign.getLocalDate().getYear() >= academy.getDestructionYear()) ||
@@ -1139,7 +1138,7 @@ public class EducationController {
         }
 
         if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
-            graduationRoll += person.getIntelligence().getIntelligenceScore();
+            graduationRoll += person.getReasoning().getReasoningScore();
         }
 
         // qualification failed
@@ -1364,7 +1363,7 @@ public class EducationController {
      * @param resources the resource bundle containing localized strings
      */
     private static void reportMastersOrDoctorateGain(Campaign campaign, Person person, Academy academy, int education,
-                                                     ResourceBundle resources) {
+          ResourceBundle resources) {
         EducationLevel educationLevel = EducationLevel.fromString(String.valueOf(education));
 
         String qualification = academy.getQualifications().get(person.getEduCourseIndex());
@@ -1407,7 +1406,7 @@ public class EducationController {
      * @param qualification  The qualification just completed
      */
     private static void generatePostGradGraduationReport(Campaign campaign, String personName, String graduationText,
-                                                         String qualification, ResourceBundle resources) {
+          String qualification, ResourceBundle resources) {
         campaign.addReport(String.format(resources.getString("graduatedPostGradReport.text"),
               personName,
               spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
@@ -1435,7 +1434,7 @@ public class EducationController {
         }
 
         if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
-            graduationRoll += person.getIntelligence().ordinal() - 12;
+            graduationRoll += person.getReasoning().ordinal() - 12;
         }
 
         // We don't process the granularity of graduation events for very young children.
@@ -1511,7 +1510,7 @@ public class EducationController {
      * @param resources  the resource bundle for retrieving localized messages
      */
     private static void processGraduation(Campaign campaign, Person person, Academy academy, Integer bonusCount,
-                                          ResourceBundle resources) {
+          ResourceBundle resources) {
         improveSkills(campaign, person, academy, true);
 
         addFacultyXp(campaign, person, academy, bonusCount);
@@ -1671,7 +1670,7 @@ public class EducationController {
      * @param resources  The resource bundle used for getting localized strings
      */
     private static void addBonus(Campaign campaign, Person person, Academy academy, int bonusCount,
-                                 ResourceBundle resources) {
+          ResourceBundle resources) {
         List<String> curriculum = Arrays.asList(academy.getCurriculums().get(person.getEduCourseIndex()).split(","));
 
         curriculum = curriculum.stream().map(String::trim).toList();
@@ -1955,21 +1954,21 @@ public class EducationController {
     }
 
     /**
-     * Sets the initial education level for a person based on their age, experience level, intelligence, a random
-     * pass/fail system, and their primary role. Additionally, assigns a pre-nominal ("Dr") for individuals who achieve
-     * a doctorate-level education.
+     * Sets the initial education level for a person based on their age, experience level, reasoning, a random pass/fail
+     * system, and their primary role. Additionally, assigns a pre-nominal ("Dr") for individuals who achieve a
+     * doctorate-level education.
      *
      * <p>The method applies the following rules:</p>
      * <ul>
      *   <li>Persons younger than 16 are automatically assigned the "Early Childhood" education level.</li>
-     *   <li>For individuals aged 16 or older, a pass/fail rate (based on intelligence and default thresholds)
+     *   <li>For individuals aged 16 or older, a pass/fail rate (based on reasoning and default thresholds)
      *   determines whether they flunk or succeed at further education.</li>
      *   <li>The assigned education level depends on their experience level and whether they have a combat or non-combat role.</li>
      *   <li>If the person's education reaches the doctorate level, they are granted the pre-nominal "Dr".</li>
      * </ul>
      *
      * <p>The pass rate is influenced by the campaign's settings. When using random personalities, the person's
-     * intelligence modifies the base pass rate (defaulting to average intelligence if personalities are disabled).</p>
+     * reasoning modifies the base pass rate (defaulting to average reasoning if personalities are disabled).</p>
      *
      * @param campaign the campaign context, used to retrieve the current date, options, and calculate the person's
      *                 experience.
@@ -1991,11 +1990,11 @@ public class EducationController {
         final boolean isCombatRole = person.getPrimaryRole().isCombat();
 
         // We base passRate on US averages
-        int passRate = 60 - (Intelligence.values().length / 2);
-        final int intelligenceModifier = campaign.getCampaignOptions().isUseRandomPersonalities() ?
-                                               person.getIntelligence().getIntelligenceScore() :
-                                               Intelligence.values().length / 2;
-        passRate += intelligenceModifier;
+        int passRate = 60 - (Reasoning.values().length / 2);
+        final int reasoningModifier = campaign.getCampaignOptions().isUseRandomPersonalities() ?
+                                            person.getReasoning().getReasoningScore() :
+                                            Reasoning.values().length / 2;
+        passRate += reasoningModifier;
 
         final boolean flunked = Compute.randomInt(100) <= passRate;
 
@@ -2018,8 +2017,8 @@ public class EducationController {
     }
 
     /**
-     * Determines the education level for individuals in combat roles based on their experience level,
-     * intelligence-based pass/fail rate, and whether they flunked previously.
+     * Determines the education level for individuals in combat roles based on their experience level, reasoning-based
+     * pass/fail rate, and whether they flunked previously.
      *
      * <p>The following rules are applied:</p>
      * <ul>
@@ -2033,12 +2032,12 @@ public class EducationController {
      *
      * @param experienceLevel the person's experience level (e.g., below regular, regular, or higher).
      * @param flunked         whether the person initially flunked based on the pass rate.
-     * @param passRate        the calculated pass rate based on default thresholds and intelligence modifiers.
+     * @param passRate        the calculated pass rate based on default thresholds and reasoning modifiers.
      *
      * @return the appropriate {@link EducationLevel} based on the person's experience level and final success status.
      */
     private static EducationLevel getCombatEducationLevel(final int experienceLevel, boolean flunked,
-                                                          final int passRate) {
+          final int passRate) {
         if (experienceLevel < EXP_REGULAR) {
             // Second-chance roll for High School
             if (flunked) {
@@ -2052,7 +2051,7 @@ public class EducationController {
 
     /**
      * Determines the education level for individuals in non-combat roles based on their experience level,
-     * intelligence-based pass/fail rate, and whether they flunked previously.
+     * reasoning-based pass/fail rate, and whether they flunked previously.
      *
      * <p>The following rules are applied:</p>
      * <ul>
@@ -2072,12 +2071,12 @@ public class EducationController {
      *
      * @param experienceLevel the person's experience level (e.g., below regular, regular, veteran, or higher).
      * @param flunked         whether the person initially flunked based on the pass rate.
-     * @param passRate        the calculated pass rate based on default thresholds and intelligence modifiers.
+     * @param passRate        the calculated pass rate based on default thresholds and reasoning modifiers.
      *
      * @return the appropriate {@link EducationLevel} based on the person's experience level and final success status.
      */
     private static EducationLevel getNonCombatEducationLevel(final int experienceLevel, boolean flunked,
-                                                             final int passRate) {
+          final int passRate) {
         if (experienceLevel < EXP_REGULAR) {
             // Second-chance roll for High School
             if (flunked) {

@@ -30,11 +30,6 @@ package mekhq.gui.dialog;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.codeUtilities.MathUtility.clamp;
-import static mekhq.campaign.personnel.skills.Aging.getAgeModifier;
-import static mekhq.campaign.personnel.skills.Aging.getMilestone;
-import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
-import static mekhq.campaign.personnel.skills.Skill.getCountDownMaxValue;
-import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
 import static mekhq.campaign.personnel.Person.MAXIMUM_CONNECTIONS;
 import static mekhq.campaign.personnel.Person.MAXIMUM_REPUTATION;
 import static mekhq.campaign.personnel.Person.MAXIMUM_UNLUCKY;
@@ -43,6 +38,9 @@ import static mekhq.campaign.personnel.Person.MINIMUM_CONNECTIONS;
 import static mekhq.campaign.personnel.Person.MINIMUM_REPUTATION;
 import static mekhq.campaign.personnel.Person.MINIMUM_UNLUCKY;
 import static mekhq.campaign.personnel.Person.MINIMUM_WEALTH;
+import static mekhq.campaign.personnel.skills.Aging.getAgeModifier;
+import static mekhq.campaign.personnel.skills.Aging.getMilestone;
+import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.skills.Skill.getCountDownMaxValue;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.personalityQuirksSortedAlphabetically;
@@ -88,22 +86,18 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
-import mekhq.campaign.randomEvents.personalities.enums.Intelligence;
 import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
+import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -186,7 +180,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private MMComboBox<Greed> comboGreed;
     private MMComboBox<Social> comboSocial;
     private MMComboBox<PersonalityQuirk> comboPersonalityQuirk;
-    private MMComboBox<Intelligence> comboIntelligence;
+    private MMComboBox<Reasoning> comboReasoning;
 
     private final Campaign campaign;
 
@@ -434,7 +428,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         choiceFaction.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
-                                                          final boolean isSelected, final boolean cellHasFocus) {
+                  final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof Faction faction) {
                     setText(String.format("%s [%s]",
@@ -486,7 +480,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         choiceSystem.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
-                                                          final boolean isSelected, final boolean cellHasFocus) {
+                  final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PlanetarySystem system) {
                     setText(system.getName(campaign.getLocalDate()));
@@ -541,7 +535,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         choicePlanet.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
-                                                          final boolean isSelected, final boolean cellHasFocus) {
+                  final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof Planet planet) {
                     setText(planet.getName(campaign.getLocalDate()));
@@ -907,7 +901,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         choiceOriginalUnit.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
-                                                          boolean cellHasFocus) {
+                  boolean cellHasFocus) {
                 if (null == value) {
                     setText("None");
                 } else {
@@ -1088,25 +1082,25 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             panDemog.add(comboPersonalityQuirk, gridBagConstraints);
 
-            JLabel labelIntelligence = new JLabel();
-            labelIntelligence.setText("Intelligence:");
-            labelIntelligence.setName("labelIntelligence");
+            JLabel labelReasoning = new JLabel();
+            labelReasoning.setText("Reasoning:");
+            labelReasoning.setName("labelReasoning");
 
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            panDemog.add(labelIntelligence, gridBagConstraints);
+            panDemog.add(labelReasoning, gridBagConstraints);
 
-            comboIntelligence = new MMComboBox<>("comboIntelligence", Intelligence.values());
-            comboIntelligence.setSelectedItem(person.getIntelligence());
+            comboReasoning = new MMComboBox<>("comboReasoning", Reasoning.values());
+            comboReasoning.setSelectedItem(person.getReasoning());
 
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y++;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            panDemog.add(comboIntelligence, gridBagConstraints);
+            panDemog.add(comboReasoning, gridBagConstraints);
 
             y++;
         }
@@ -1344,7 +1338,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     private void updatePlanetsComboBoxModel(DefaultComboBoxModel<Planet> planetsModel,
-                                            PlanetarySystem planetarySystem) {
+          PlanetarySystem planetarySystem) {
         planetsModel.removeAllElements();
         if (planetarySystem != null) {
             planetsModel.addElement(planetarySystem.getPrimaryPlanet());
@@ -1397,21 +1391,21 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             person.setToughness(MathUtility.parseInt(textToughness.getText(), currentValue));
         }
 
-            int currentValue = person.getConnections();
-            int newValue = MathUtility.parseInt(textConnections.getText(), currentValue);
-            person.setConnections(clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
+        int currentValue = person.getConnections();
+        int newValue = MathUtility.parseInt(textConnections.getText(), currentValue);
+        person.setConnections(clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
 
-            currentValue = person.getWealth();
-            newValue = MathUtility.parseInt(textWealth.getText(), currentValue);
-            person.setWealth(clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH));
+        currentValue = person.getWealth();
+        newValue = MathUtility.parseInt(textWealth.getText(), currentValue);
+        person.setWealth(clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH));
 
-            currentValue = person.getReputation();
-            newValue = MathUtility.parseInt(textReputation.getText(), currentValue);
-            person.setReputation(clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
+        currentValue = person.getReputation();
+        newValue = MathUtility.parseInt(textReputation.getText(), currentValue);
+        person.setReputation(clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
 
-            currentValue = person.getUnlucky();
-            newValue = MathUtility.parseInt(textUnlucky.getText(), currentValue);
-            person.setUnlucky(clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
+        currentValue = person.getUnlucky();
+        newValue = MathUtility.parseInt(textUnlucky.getText(), currentValue);
+        person.setUnlucky(clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
 
         if (campaign.getCampaignOptions().isUseEducationModule()) {
             person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
@@ -1441,7 +1435,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             person.setGreed(comboGreed.getSelectedItem());
             person.setSocial(comboSocial.getSelectedItem());
             person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
-            person.setIntelligence(comboIntelligence.getSelectedItem());
+            person.setReasoning(comboReasoning.getSelectedItem());
             PersonalityController.writePersonalityDescription(person);
         }
 

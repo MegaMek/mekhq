@@ -34,7 +34,7 @@ import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HE_SHE_THEY;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HIM_HER_THEM;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
-import static mekhq.campaign.randomEvents.personalities.enums.Intelligence.*;
+import static mekhq.campaign.randomEvents.personalities.enums.Reasoning.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,13 +46,13 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
-import mekhq.campaign.randomEvents.personalities.enums.Intelligence;
 import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
+import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 
 /**
  * This class is responsible for generating and managing personalities for characters. It assigns traits such as
- * aggression, ambition, greed, social behavior, intelligence, and personality quirks to a person, and generates a
+ * aggression, ambition, greed, social behavior, reasoning, and personality quirks to a person, and generates a
  * descriptive personality summary.
  *
  * <p>Additionally, this class includes methods for handling fallback personality logic, generating
@@ -76,12 +76,12 @@ public class PersonalityController {
      * </ul>
      */
     public enum PersonalityTraitType {
-        AGGRESSION, AMBITION, GREED, SOCIAL, INTELLIGENCE, PERSONALITY_QUIRK;
+        AGGRESSION, AMBITION, GREED, SOCIAL, REASONING, PERSONALITY_QUIRK;
     }
 
     /**
      * Generates a personality for the given person by assigning various personality characteristics such as aggression,
-     * ambition, greed, social behavior, intelligence, and optional quirks.
+     * ambition, greed, social behavior, reasoning, and optional quirks.
      *
      * <p>The method ensures that each personality characteristic is generated with a specified
      * probability (1 in 6 by default). If no characteristic is assigned, a fallback mechanism generates at least one
@@ -132,8 +132,8 @@ public class PersonalityController {
             person.setPersonalityQuirk(PersonalityQuirk.NONE);
         }
 
-        // INTELLIGENCE
-        person.setIntelligence(generateIntelligence(randomInt(8346)));
+        // REASONING
+        person.setReasoning(generateReasoning(randomInt(8346)));
 
         // finally, write the description
         writePersonalityDescription(person);
@@ -150,7 +150,7 @@ public class PersonalityController {
      * Generates an expansive "big" personality for a major character, Ronin, or hero.
      *
      * <p>This method creates a detailed set of personality traits for the given person,
-     * selecting and assigning a combination of major traits, a quirk, and intelligence. It ensures the generated
+     * selecting and assigning a combination of major traits, a quirk, and reasoning. It ensures the generated
      * personality reflects a high degree of uniqueness and depth.</p>
      *
      * <p>The method proceeds as follows:
@@ -158,7 +158,7 @@ public class PersonalityController {
      *     <li>Randomly selects up to four major traits (Aggression, Ambition, Greed, Social).</li>
      *     <li>Assigns the selected traits to the person's corresponding personality attributes.</li>
      *     <li>Generates and applies a unique personality quirk to the person.</li>
-     *     <li>Generates an intelligence score using the maximum of two random values.</li>
+     *     <li>Generates a reasoning score using the maximum of two random values.</li>
      *     <li>Writes a personality description based on the generated traits and attributes.</li>
      * </ul>
      *
@@ -225,10 +225,10 @@ public class PersonalityController {
         // PERSONALITY QUIRK
         generateAndApplyPersonalityQuirk(person);
 
-        // INTELLIGENCE
-        int firstIntelligence = randomInt(8346);
-        int secondIntelligence = randomInt(8346);
-        person.setIntelligence(generateIntelligence(max(firstIntelligence, secondIntelligence)));
+        // REASONING
+        int firstReasoning = randomInt(8346);
+        int secondReasoning = randomInt(8346);
+        person.setReasoning(generateReasoning(max(firstReasoning, secondReasoning)));
 
         // finally, write the description
         writePersonalityDescription(person);
@@ -324,14 +324,12 @@ public class PersonalityController {
               person.getSocial(),
               person.getSocialDescriptionIndex());
 
-        // Intelligence and personality quirk are handled differently to general personality traits.
-        // INTELLIGENCE
-        Intelligence intelligence = person.getIntelligence();
-        String intelligenceDescription = "";
-        if (!intelligence.isAverageType()) {
-            intelligenceDescription = intelligence.getDescription(person.getIntelligenceDescriptionIndex(),
-                  gender,
-                  givenName);
+        // Reasoning and personality quirk are handled differently to general personality traits.
+        // REASONING
+        Reasoning reasoning = person.getReasoning();
+        String reasoningDescription = "";
+        if (!reasoning.isAverageType()) {
+            reasoningDescription = reasoning.getDescription(person.getReasoningDescriptionIndex(), gender, givenName);
         }
 
         // PERSONALITY QUIRK
@@ -369,11 +367,11 @@ public class PersonalityController {
             }
         }
 
-        if (!intelligenceDescription.isBlank()) {
+        if (!reasoningDescription.isBlank()) {
             if (!personalityDescription.toString().isBlank()) {
-                personalityDescription.append("<p>").append(intelligenceDescription).append("</p>");
+                personalityDescription.append("<p>").append(reasoningDescription).append("</p>");
             } else {
-                personalityDescription.append(intelligenceDescription);
+                personalityDescription.append(reasoningDescription);
             }
         }
 
@@ -389,9 +387,9 @@ public class PersonalityController {
     }
 
     /**
-     * Retrieves the descriptions of all personality traits (other than Intelligence and Quirks) for the given person.
-     * This method processes various personality traits such as aggression, ambition, greed, and social behavior,
-     * generating descriptions based on the specified indices, gender, and given name of the person.
+     * Retrieves the descriptions of all personality traits (other than Reasoning and Quirks) for the given person. This
+     * method processes various personality traits such as aggression, ambition, greed, and social behavior, generating
+     * descriptions based on the specified indices, gender, and given name of the person.
      *
      * <p>Descriptions for traits that are not assigned or are empty will be excluded from the
      * returned list. This ensures only meaningful and applicable descriptions are included.
@@ -416,10 +414,8 @@ public class PersonalityController {
      *       the given person; traits without meaningful descriptions are excluded
      */
     private static List<String> getTraitDescriptions(Gender gender, String givenName, Aggression aggression,
-                                                     int aggressionDescriptionIndex, Ambition ambition,
-                                                     int ambitionDescriptionIndex, Greed greed,
-                                                     int greedDescriptionIndex, Social social,
-                                                     int socialDescriptionIndex) {
+          int aggressionDescriptionIndex, Ambition ambition, int ambitionDescriptionIndex, Greed greed,
+          int greedDescriptionIndex, Social social, int socialDescriptionIndex) {
         List<String> traitDescriptions = new ArrayList<>();
 
         // AGGRESSION
@@ -461,18 +457,24 @@ public class PersonalityController {
         return traitDescriptions;
     }
 
+
     /**
-     * Generates an Intelligence enum value for a person based on a randomly rolled value. Each intelligence level is
-     * mapped to a specific range of values, with lower rolls producing less intelligent results and higher rolls
-     * producing more intelligent results.
+     * @deprecated replaced by {@link #getReasoning()}
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+
+
+    /**
+     * Generates an {@link Reasoning} enum value for a person based on a randomly rolled value. Each reasoning
+     * level is mapped to a specific range of values, with lower rolls producing less intelligent results and higher
+     * rolls producing more intelligent results.
      *
-     * @param roll the random roll value used to determine the Intelligence enum value
+     * @param roll the random roll value used to determine the {@link Reasoning} enum value
      *
-     * @return the Intelligence enum value corresponding to the rolled range
+     * @return the {@link Reasoning} enum value corresponding to the rolled range
      *
      * @throws IllegalStateException if the roll exceeds the expected value range
-     */
-    private static Intelligence generateIntelligence(int roll) {
+     */ private static Reasoning generateReasoning(int roll) {
         if (roll < 1) {
             return BRAIN_DEAD;
         } else if (roll < 2) {
@@ -525,7 +527,7 @@ public class PersonalityController {
             return GENIUS;
         } else {
             throw new IllegalStateException(
-                  "Unexpected value in mekhq/campaign/personnel/randomEvents/PersonalityController.java/generateIntelligence: " +
+                  "Unexpected value in mekhq/campaign/personnel/randomEvents/PersonalityController.java/generateReasoning: " +
                         roll);
         }
     }
@@ -549,7 +551,7 @@ public class PersonalityController {
      *       are not enabled
      */
     public static int getPersonalityValue(final boolean isUseRandomPersonalities, final Aggression aggression,
-                                          final Ambition ambition, final Greed greed, final Social social) {
+          final Ambition ambition, final Greed greed, final Social social) {
         if (!isUseRandomPersonalities) {
             return 0;
         }

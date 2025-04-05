@@ -51,8 +51,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.skills.Skill;
@@ -363,7 +361,7 @@ public final class BatchXPDialog extends JDialog {
 
                 Person person = personnelModel.getPerson(personnelTable.convertRowIndexToModel(i));
 
-                int cost = person.getCostToImprove(skillName, campaignOptions.isUseIntelligenceXpMultiplier());
+                int cost = person.getCostToImprove(skillName, campaignOptions.isUseReasoningXpMultiplier());
                 double costMultiplier = campaignOptions.getXpCostMultiplier();
 
                 cost = (int) round(cost * costMultiplier);
@@ -427,7 +425,7 @@ public final class BatchXPDialog extends JDialog {
                 final CampaignOptions campaignOptions = campaign.getCampaignOptions();
                 final double xpCostMultiplier = campaignOptions.getXpCostMultiplier();
                 Skill skill = person.getSkill(skillName);
-                int cost = person.getCostToImprove(skillName, campaignOptions.isUseIntelligenceXpMultiplier());
+                int cost = person.getCostToImprove(skillName, campaignOptions.isUseReasoningXpMultiplier());
                 cost = (int) round(cost * xpCostMultiplier);
 
                 if (null == skill) {
