@@ -32,7 +32,6 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.enums.Gender;
-import megamek.logging.MMLogger;
 import mekhq.campaign.randomEvents.personalities.PersonalityController.PronounData;
 
 /**
@@ -243,16 +242,7 @@ public enum Reasoning {
         } catch (Exception ignored) {
         }
 
-        try {
-            return Reasoning.values()[MathUtility.parseInt(text)];
-        } catch (Exception ignored) {
-        }
-
-
-        MMLogger logger = MMLogger.create(Reasoning.class);
-        logger.error("Unknown Reasoning ordinal: {} - returning {}.", text, AVERAGE);
-
-        return AVERAGE;
+        return Reasoning.values()[MathUtility.parseInt(text, AVERAGE.level)];
     }
 
     @Override
