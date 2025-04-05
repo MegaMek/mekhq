@@ -335,7 +335,15 @@ public class SkillType {
         target = t;
     }
 
+    /**
+     * @deprecated replaced by {@link #isCountUp()}
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public boolean countUp() {
+        return countUp;
+    }
+
+    public boolean isCountUp() {
         return countUp;
     }
 
@@ -361,6 +369,21 @@ public class SkillType {
 
     public SkillAttribute getSecondAttribute() {
         return secondAttribute;
+    }
+
+    /**
+     * Calculates the number of linked attributes.
+     *
+     * <p>This method checks the primary and secondary attributes to determine how many are valid (i.e., not {@code
+     * null} and not {@code NONE}). It returns the total count of linked attributes.</p>
+     *
+     * @return the number of linked attributes, which can be 0, 1, or 2 depending on the validity of the attributes.
+     */
+    public int getLinkedAttributeCount() {
+        int count = 0;
+        count += (firstAttribute != null && firstAttribute != NONE) ? 1 : 0;
+        count += (secondAttribute != null && secondAttribute != NONE) ? 1 : 0;
+        return count;
     }
 
     public int getLevelFromExperience(int expLvl) {
@@ -690,7 +713,7 @@ public class SkillType {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "skillType");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "target", target);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "countUp", countUp);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isCountUp", countUp);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "subType", subType.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "firstAttribute", firstAttribute.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "secondAttribute", secondAttribute.toString());
@@ -741,7 +764,7 @@ public class SkillType {
                     skillType.vetLvl = MathUtility.parseInt(wn2.getTextContent(), skillType.vetLvl);
                 } else if (wn2.getNodeName().equalsIgnoreCase("eliteLvl")) {
                     skillType.eliteLvl = MathUtility.parseInt(wn2.getTextContent(), skillType.eliteLvl);
-                } else if (wn2.getNodeName().equalsIgnoreCase("countUp")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("isCountUp")) {
                     skillType.countUp = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("subType")) {
                     skillType.subType = SkillSubType.fromString(wn2.getTextContent().trim());
@@ -789,7 +812,7 @@ public class SkillType {
                     skillType.vetLvl = MathUtility.parseInt(wn2.getTextContent(), skillType.vetLvl);
                 } else if (wn2.getNodeName().equalsIgnoreCase("eliteLvl")) {
                     skillType.eliteLvl = MathUtility.parseInt(wn2.getTextContent(), skillType.eliteLvl);
-                } else if (wn2.getNodeName().equalsIgnoreCase("countUp")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("isCountUp")) {
                     skillType.countUp = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("subType")) {
                     skillType.subType = SkillSubType.fromString(wn2.getTextContent().trim());

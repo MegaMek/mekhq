@@ -1741,7 +1741,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
               skillType.getFirstAttribute(),
               skillType.getSecondAttribute());
 
-        if (skillType.countUp()) {
+        if (skillType.isCountUp()) {
             int target = min(getCountUpMaxValue(), skillType.getTarget() + level + bonus + ageModifier);
             skillValues.get(type).setText("+" + target);
         } else {
