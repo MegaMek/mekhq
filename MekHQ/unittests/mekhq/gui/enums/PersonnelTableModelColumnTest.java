@@ -902,6 +902,13 @@ public class PersonnelTableModelColumnTest {
                 case IMPLANT_COUNT:
                 case LOYALTY:
                 case REASONING:
+                case STRENGTH:
+                case BODY:
+                case REFLEXES:
+                case DEXTERITY:
+                case INTELLIGENCE:
+                case WILLPOWER:
+                case CHARISMA:
                     assertInstanceOf(IntegerStringSorter.class, personnelTableModelColumn.getComparator(mockCampaign));
                     break;
                 case SALARY:
