@@ -146,7 +146,8 @@ MEKHQ VERSION HISTORY:
 + PR #6539: Added "Glass Jaw" SPA
 + PR #6505: Refactored Advanced Medical Edit Injury Dialog To Improve Error Handling
 + PR #6540: Added AToW Wealth, Connections, Unlucky*, and Reputation Traits; Combat Sense, and Combat Paralysis SPAs; Integrated These Into CamOps Reputation 
-+ PR #6552: Added ATOW Attribute Tracking and Utility Methods 
++ PR #6552: Added ATOW Attribute Tracking and Utility Methods
++ PR #6551: Fixed Inability to GM Activate Self-Crewed Units (such as DropShips)
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
