@@ -46,7 +46,6 @@ import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.enums.education.EducationLevel.DOCTORATE;
 import static mekhq.campaign.personnel.skills.Attributes.ATTRIBUTE_IMPROVEMENT_COST;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
-import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
@@ -205,6 +204,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_IMPROVE = "IMPROVE";
     private static final String CMD_BUY_TRAIT = "BUY_TRAIT";
     private static final String CMD_CHANGE_ATTRIBUTE = "CHANGE_ATTRIBUTE";
+    private static final String CMD_SET_ATTRIBUTE = "SET_ATTRIBUTE";
     private static final String CMD_ADD_SPOUSE = "SPOUSE";
     private static final String CMD_REMOVE_SPOUSE = "REMOVE_SPOUSE";
     private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY";
@@ -623,16 +623,38 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_CHANGE_ATTRIBUTE: {
-                boolean isImprovement = Boolean.parseBoolean(data[3]);
-
                 SkillAttribute attribute = SkillAttribute.fromString(data[1]);
 
-                selectedPerson.changeAttributeScore(attribute, isImprovement ? 1 : -1);
+                selectedPerson.changeAttributeScore(attribute, 1);
 
                 int cost = MathUtility.parseInt(data[2]);
                 selectedPerson.spendXP(cost);
 
                 getCampaign().personUpdated(selectedPerson);
+                break;
+            }
+            case CMD_SET_ATTRIBUTE: {
+                SkillAttribute attribute = SkillAttribute.fromString(data[1]);
+
+                PopupValueChoiceDialog choiceDialog = new PopupValueChoiceDialog(getFrame(),
+                      true,
+                      resources.getString("spendOnAttributes.score"),
+                      selectedPerson.getAttributeScore(attribute),
+                      0);
+                choiceDialog.setVisible(true);
+
+                int choice = choiceDialog.getValue();
+                if (choice <= 0) {
+                    // <0 indicates Cancellation
+                    return;
+                }
+
+                for (Person person : people) {
+                    person.setAttributeScore(attribute, choice);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    getCampaign().personUpdated(person);
+                }
+
                 break;
             }
             case CMD_ACQUIRE_ABILITY: {
@@ -2785,9 +2807,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             traitsMenu.add(menuItem);
             menu.add(traitsMenu);
 
-            JMenu attributesMenu = new JMenu(resources.getString("spendOnAttributes.text"));
             JMenu attributesMenuIncrease = new JMenu(resources.getString("spendOnAttributes.increase"));
-            JMenu attributesMenuReduce = new JMenu(resources.getString("spendOnAttributes.decrease"));
             int attributeCost = (int) round(ATTRIBUTE_IMPROVEMENT_COST * costMultiplier);
 
             for (SkillAttribute attribute : SkillAttribute.values()) {
@@ -2806,31 +2826,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnAttributes.tooltip"))));
                 menuItem.setActionCommand(makeCommand(CMD_CHANGE_ATTRIBUTE,
                       String.valueOf(attribute),
-                      String.valueOf(attributeCost),
-                      String.valueOf(true))); // Is this action improving the attribute?
+                      String.valueOf(attributeCost)));
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(target <= MAXIMUM_ATTRIBUTE_SCORE && person.getXP() >= attributeCost);
                 attributesMenuIncrease.add(menuItem);
-
-                // Decrease
-                target = current - 1;
-                menuItem = new JMenuItem(String.format(resources.getString("spendOnAttributes.format"),
-                      attribute.getLabel(),
-                      current,
-                      target,
-                      0));
-                menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnAttributes.tooltip"))));
-                menuItem.setActionCommand(makeCommand(CMD_CHANGE_ATTRIBUTE,
-                      String.valueOf(attribute),
-                      String.valueOf(0),
-                      String.valueOf(false))); // Is this action improving the attribute?
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(target >= MINIMUM_ATTRIBUTE_SCORE && getCampaign().isGM());
-                attributesMenuReduce.add(menuItem);
             }
-            attributesMenu.add(attributesMenuIncrease);
-            attributesMenu.add(attributesMenuReduce);
-            menu.add(attributesMenu);
+            menu.add(attributesMenuIncrease);
 
             // Edge Purchasing
             if (getCampaignOptions().isUseEdge()) {
@@ -3629,6 +3630,23 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setActionCommand(CMD_GENERATE_ROLEPLAY_SKILLS);
             menuItem.addActionListener(this);
             menu.add(menuItem);
+
+            JMenu attributesMenu = new JMenu(resources.getString("spendOnAttributes.set"));
+
+            for (SkillAttribute attribute : SkillAttribute.values()) {
+                if (attribute.isNone()) {
+                    continue;
+                }
+
+                // Set
+                menuItem = new JMenuItem(attribute.getLabel());
+                menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnAttributes.tooltip"))));
+                menuItem.setActionCommand(makeCommand(CMD_SET_ATTRIBUTE, String.valueOf(attribute)));
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(getCampaign().isGM());
+                attributesMenu.add(menuItem);
+            }
+            menu.add(attributesMenu);
 
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }

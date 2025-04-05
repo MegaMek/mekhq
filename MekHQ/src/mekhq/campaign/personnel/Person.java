@@ -2969,8 +2969,8 @@ public class Person {
                 } else if ((nodeName.equalsIgnoreCase("reasoning")) || (nodeName.equalsIgnoreCase("intelligence"))) {
                     person.reasoning = Reasoning.fromString(wn2.getTextContent());
                     // 'intelligenceDescriptionIndex' is a <50.05 compatibility handler
-                } else if ((nodeName.equalsIgnoreCase("reasoningDescriptionIndex")) || (nodeName.equalsIgnoreCase(
-                      "intelligenceDescriptionIndex"))) {
+                } else if ((nodeName.equalsIgnoreCase("reasoningDescriptionIndex")) ||
+                                 (nodeName.equalsIgnoreCase("intelligenceDescriptionIndex"))) {
                     person.reasoningDescriptionIndex = MathUtility.parseInt(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("personalityDescription")) {
                     person.personalityDescription = wn2.getTextContent();
@@ -4955,6 +4955,38 @@ public class Person {
      */
     public Attributes getATOWAttributes() {
         return atowAttributes;
+    }
+
+    /**
+     * Updates the score of a specific attribute to a new value.
+     *
+     * <p>This method modifies the score of an attribute specified by the {@link SkillAttribute} parameter. If the
+     * provided attribute is {@code NONE}, no changes will be made. If the attribute is {@code null}, the method logs an
+     * error and exits without making changes.</p>
+     *
+     * @param attribute the {@link SkillAttribute} to update. Must not be {@code null}.
+     * @param newScore  the new score to set for the specified attribute.
+     *
+     * @since 0.50.5
+     */
+    public void setAttributeScore(final SkillAttribute attribute, final int newScore) {
+        if (attribute == null) {
+            logger.error("(setAttributeScore) SkillAttribute is null.");
+            return;
+        }
+
+        switch (attribute) {
+            case NONE -> {
+            }
+            case STRENGTH -> atowAttributes.setStrength(newScore);
+            case BODY -> atowAttributes.setBody(newScore);
+            case REFLEXES -> atowAttributes.setReflexes(newScore);
+            case DEXTERITY -> atowAttributes.setDexterity(newScore);
+            case INTELLIGENCE -> atowAttributes.setIntelligence(newScore);
+            case WILLPOWER -> atowAttributes.setWillpower(newScore);
+            case CHARISMA -> atowAttributes.setCharisma(newScore);
+        }
+        ;
     }
 
     /**
