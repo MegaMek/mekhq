@@ -39,7 +39,6 @@ import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_COST_LEG_TYPE_5
 import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5;
 import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_RECOVERY;
 import static mekhq.campaign.personnel.Person.*;
-import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
@@ -280,7 +279,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     public static void connect(CampaignGUI gui, JTable personnelTable, PersonnelTableModel personnelModel,
-                               JSplitPane splitPersonnel) {
+          JSplitPane splitPersonnel) {
         new PersonnelTableMouseAdapter(gui, personnelTable, personnelModel) {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -590,7 +589,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       selectedPerson,
                       getCampaign().getLocalDate(),
                       selectedPerson.getSkill(type).getType().getName(),
-                      selectedPerson.getSkill(type).toString(selectedPerson.getOptions(), selectedPerson.getReputation()));
+                      selectedPerson.getSkill(type)
+                            .toString(selectedPerson.getOptions(), selectedPerson.getReputation()));
                 getCampaign().addReport(String.format(resources.getString("improved.format"),
                       selectedPerson.getHyperlinkedName(),
                       type));
@@ -1048,13 +1048,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_BUY_EDGE: {
                 int baseCost = getCampaignOptions().getEdgeCost();
                 final double xpCostMultiplier = getCampaignOptions().getXpCostMultiplier();
-                final boolean isUseIntelligenceMultiplier = getCampaignOptions().isUseIntelligenceXpMultiplier();
+                final boolean isUseReasoningMultiplier = getCampaignOptions().isUseReasoningXpMultiplier();
                 for (Person person : people) {
-                    double intelligenceXpCostMultiplier = person.getIntelligenceXpCostMultiplier(
-                          isUseIntelligenceMultiplier);
+                    double reasoningXpCostMultiplier = person.getReasoningXpCostMultiplier(isUseReasoningMultiplier);
 
-                    // Intelligence cost changes should always take place before global changes
-                    int cost = (int) round(baseCost * intelligenceXpCostMultiplier);
+                    // Reasoning cost changes should always take place before global changes
+                    int cost = (int) round(baseCost * reasoningXpCostMultiplier);
                     cost = (int) round(cost * xpCostMultiplier);
 
                     selectedPerson.spendXP(cost);
@@ -1438,7 +1437,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 Skill skill = person.getSkill(S_DOCTOR);
 
                 if (skill != null &&
-                          skill.getFinalSkillValue(person.getOptions()) >= REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5) {
+                          skill.getFinalSkillValue(person.getOptions()) >=
+                                REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5) {
                     suitableDoctors.add(person);
                 }
             }
@@ -1565,7 +1565,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      *                    additional logic is executed to handle executions.
      */
     private void processPrisonerResolutionCommand(Person[] prisoners, String message, String title,
-                                                  boolean isExecution) {
+          boolean isExecution) {
         String label;
 
         if (prisoners.length == 1) {
@@ -2295,9 +2295,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         // region Spend XP Menu
         if (oneSelected && person.getStatus().isActive()) {
-            final boolean isUseIntelligenceMultiplier = getCampaignOptions().isUseIntelligenceXpMultiplier();
-            final double intelligenceXpCostMultiplier = person.getIntelligenceXpCostMultiplier(
-                  isUseIntelligenceMultiplier);
+            final boolean isUseReasoningMultiplier = getCampaignOptions().isUseReasoningXpMultiplier();
+            final double reasoningXpCostMultiplier = person.getReasoningXpCostMultiplier(isUseReasoningMultiplier);
             final double xpCostMultiplier = getCampaignOptions().getXpCostMultiplier();
 
             menu = new JMenu(resources.getString("spendXP.text"));
@@ -2315,9 +2314,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (!spa.isEligible(person)) {
                         continue;
                     }
-                    // Intelligence cost changes should always take place before global changes
+                    // Reasoning cost changes should always take place before global changes
                     int baseCost = spa.getCost();
-                    cost = (int) round(baseCost > 0 ? baseCost * intelligenceXpCostMultiplier : baseCost);
+                    cost = (int) round(baseCost > 0 ? baseCost * reasoningXpCostMultiplier : baseCost);
                     cost = (int) round(cost * xpCostMultiplier);
 
                     String costDesc = String.format(resources.getString("costValue.format"), cost);
@@ -2661,7 +2660,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             for (int i = 0; i < SkillType.getSkillList().length; i++) {
                 String type = SkillType.getSkillList()[i];
 
-                int cost = person.getCostToImprove(type, isUseIntelligenceMultiplier);
+                int cost = person.getCostToImprove(type, isUseReasoningMultiplier);
                 cost = (int) round(cost * xpCostMultiplier);
 
                 if (cost >= 0) {
@@ -2693,8 +2692,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem = new JMenuItem(String.format(resources.getString("spendOnConnections.text"), target, traitCost));
             menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnConnections.tooltip"),
                   ((target > 0 ? "+" : "-") + target))));
-            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT, CONNECTIONS_LABEL,
-                  String.valueOf(traitCost), String.valueOf(target)));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
+                  CONNECTIONS_LABEL,
+                  String.valueOf(traitCost),
+                  String.valueOf(target)));
             menuItem.addActionListener(this);
             menuItem.setEnabled(target <= MAXIMUM_CONNECTIONS && person.getXP() >= traitCost);
             traitsMenu.add(menuItem);
@@ -2702,23 +2703,27 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             // Reputation
             int reputation = person.getReputation();
             target = reputation + 1;
-            menuItem = new JMenuItem(String.format(resources.getString("spendOnReputation.text"), target,
-                  traitCost));
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnReputation.text"), target, traitCost));
             menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnReputation.tooltip"),
-                  (target == 0 ? 0 : (target > 0 ? "+" : "-") + target), target)));
-            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT, REPUTATION_LABEL,
-                  String.valueOf(traitCost), String.valueOf(target)));
+                  (target == 0 ? 0 : (target > 0 ? "+" : "-") + target),
+                  target)));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
+                  REPUTATION_LABEL,
+                  String.valueOf(traitCost),
+                  String.valueOf(target)));
             menuItem.addActionListener(this);
             menuItem.setEnabled(target <= MAXIMUM_REPUTATION && person.getXP() >= traitCost);
             traitsMenu.add(menuItem);
 
             target = reputation - 1;
-            menuItem = new JMenuItem(String.format(resources.getString("spendOnReputation.text"), target,
-                  -traitCost));
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnReputation.text"), target, -traitCost));
             menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnReputation.tooltip"),
-                  (target == 0 ? 0 : (target > 0 ? "+" : "-") + target), target)));
-            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT, REPUTATION_LABEL,
-                  String.valueOf(-traitCost), String.valueOf(target)));
+                  (target == 0 ? 0 : (target > 0 ? "+" : "-") + target),
+                  target)));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
+                  REPUTATION_LABEL,
+                  String.valueOf(-traitCost),
+                  String.valueOf(target)));
             menuItem.addActionListener(this);
             menuItem.setEnabled(target >= MINIMUM_REPUTATION);
             traitsMenu.add(menuItem);
@@ -2726,21 +2731,23 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             // Wealth
             int wealth = person.getWealth();
             target = wealth + 1;
-            menuItem = new JMenuItem(String.format(resources.getString("spendOnWealth.text"), target,
-                  traitCost));
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnWealth.text"), target, traitCost));
             menuItem.setToolTipText(resources.getString("spendOnWealth.tooltip"));
-            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT, WEALTH_LABEL,
-                  String.valueOf(traitCost), String.valueOf(target)));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
+                  WEALTH_LABEL,
+                  String.valueOf(traitCost),
+                  String.valueOf(target)));
             menuItem.addActionListener(this);
             menuItem.setEnabled(target <= MAXIMUM_WEALTH && person.getXP() >= traitCost);
             traitsMenu.add(menuItem);
 
             target = wealth - 1;
-            menuItem = new JMenuItem(String.format(resources.getString("spendOnWealth.text"), target,
-                  -traitCost));
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnWealth.text"), target, -traitCost));
             menuItem.setToolTipText(resources.getString("spendOnWealth.tooltip"));
-            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT, WEALTH_LABEL,
-                  String.valueOf(-traitCost), String.valueOf(target)));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
+                  WEALTH_LABEL,
+                  String.valueOf(-traitCost),
+                  String.valueOf(target)));
             menuItem.addActionListener(this);
             menuItem.setEnabled(target >= MINIMUM_WEALTH);
             traitsMenu.add(menuItem);
@@ -2748,11 +2755,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             // Unlucky
             int unlucky = person.getUnlucky();
             target = unlucky + 1;
-            menuItem = new JMenuItem(String.format(resources.getString("spendOnUnlucky.text"), target,
-                  -traitCost));
+            menuItem = new JMenuItem(String.format(resources.getString("spendOnUnlucky.text"), target, -traitCost));
             menuItem.setToolTipText(String.format(resources.getString("spendOnUnlucky.tooltip"), target));
-            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT, UNLUCKY_LABEL,
-                  String.valueOf(-traitCost), String.valueOf(target)));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
+                  UNLUCKY_LABEL,
+                  String.valueOf(-traitCost),
+                  String.valueOf(target)));
             menuItem.addActionListener(this);
             menuItem.setEnabled(target <= MAXIMUM_UNLUCKY);
             traitsMenu.add(menuItem);
@@ -2762,8 +2770,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             if (getCampaignOptions().isUseEdge()) {
                 JMenu edgeMenu = new JMenu(resources.getString("edge.text"));
 
-                // Intelligence cost changes should always take place before global changes
-                int cost = (int) round(getCampaignOptions().getEdgeCost() * intelligenceXpCostMultiplier);
+                // Reasoning cost changes should always take place before global changes
+                int cost = (int) round(getCampaignOptions().getEdgeCost() * reasoningXpCostMultiplier);
                 cost = (int) round(cost * xpCostMultiplier);
 
                 if ((cost >= 0) && (person.getXP() >= cost)) {
@@ -3573,7 +3581,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      * @param civilianMenu the civilian menu object
      */
     private void buildEducationMenusSingleton(Campaign campaign, Person person, Academy academy, JMenu militaryMenu,
-                                              JMenu civilianMenu) {
+          JMenu civilianMenu) {
         boolean showIneligibleAcademies = campaign.getCampaignOptions().isEnableShowIneligibleAcademies();
         if (campaign.getCampaignOptions().isEnableOverrideRequirements()) {
             JMenu academyOption = new JMenu(academy.getName());
@@ -3766,7 +3774,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      * @param civilianMenu the civilian menu object
      */
     private void buildEducationMenusMassEnroll(Campaign campaign, List<Person> personnel, Academy academy,
-                                               JMenu militaryMenu, JMenu civilianMenu) {
+          JMenu militaryMenu, JMenu civilianMenu) {
         if (campaign.getCampaignOptions().isEnableOverrideRequirements()) {
             JMenu academyOption = new JMenu(academy.getName());
 
@@ -3957,7 +3965,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      * @param option       the option to be added to the appropriate JMenu
      */
     private static void educationJMenuItemAdder(Academy academy, JMenu militaryMenu, JMenu civilianMenu,
-                                                JMenuItem option) {
+          JMenuItem option) {
         if (academy.isMilitary()) {
             militaryMenu.add(option);
         } else {
@@ -3966,7 +3974,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     private void buildEducationSubMenus(Campaign campaign, Academy academy, List<Person> personnel, JMenu academyOption,
-                                        String campus, String faction) {
+          String campus, String faction) {
         JMenuItem courses;
         int courseCount = academy.getQualifications().size();
 

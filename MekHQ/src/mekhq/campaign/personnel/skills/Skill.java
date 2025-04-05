@@ -37,12 +37,13 @@ import static mekhq.campaign.personnel.skills.SkillType.S_STREETWISE;
 import java.io.PrintWriter;
 import java.util.Objects;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.randomEvents.personalities.enums.Intelligence;
+import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -342,7 +343,7 @@ public class Skill {
      * the cost for the next valid level if it exists.</p>
      *
      * <p><b>Usage:</b> For most use cases you probably want to call {@code getCostToImprove(String)} from a
-     * {@link Person} object, as that will factor in things like {@link Intelligence}.</p>
+     * {@link Person} object, as that will factor in things like {@link Reasoning}.</p>
      *
      * @return the cost to improve the skill, or 0 if no valid level with a positive cost is found.
      */
@@ -433,11 +434,11 @@ public class Skill {
                     String text = wn2.getTextContent();
                     retVal.type = SkillType.getType(text);
                 } else if (wn2.getNodeName().equalsIgnoreCase("level")) {
-                    retVal.level = Integer.parseInt(wn2.getTextContent());
+                    retVal.level = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bonus")) {
-                    retVal.bonus = Integer.parseInt(wn2.getTextContent());
+                    retVal.bonus = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("agingModifier")) {
-                    retVal.agingModifier = Integer.parseInt(wn2.getTextContent());
+                    retVal.agingModifier = MathUtility.parseInt(wn2.getTextContent());
                 }
             }
         } catch (Exception ex) {

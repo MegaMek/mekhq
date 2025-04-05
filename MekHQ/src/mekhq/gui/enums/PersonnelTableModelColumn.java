@@ -50,13 +50,12 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
-import mekhq.campaign.randomEvents.personalities.enums.Intelligence;
+import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
@@ -145,7 +144,7 @@ public enum PersonnelTableModelColumn {
     AMBITION("PersonnelTableModelColumn.AMBITION.text"),
     GREED("PersonnelTableModelColumn.GREED.text"),
     SOCIAL("PersonnelTableModelColumn.SOCIAL.text"),
-    INTELLIGENCE("PersonnelTableModelColumn.INTELLIGENCE.text");
+    REASONING("PersonnelTableModelColumn.REASONING.text");
 
     // endregion Enum Declarations
 
@@ -464,12 +463,20 @@ public enum PersonnelTableModelColumn {
         return this == SOCIAL;
     }
 
+    /**
+     * @deprecated replaced by {@link #isReasoning()}
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public boolean isIntelligence() {
-        return this == INTELLIGENCE;
+        return isReasoning();
+    }
+
+    public boolean isReasoning() {
+        return this == REASONING;
     }
 
     public boolean isPersonality() {
-        return isAggression() || isAmbition() || isGreed() || isSocial() || isIntelligence();
+        return isAggression() || isAmbition() || isGreed() || isSocial() || isReasoning();
     }
     // endregion Boolean Comparison Methods
 
@@ -619,7 +626,8 @@ public enum PersonnelTableModelColumn {
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_MEK) ?
-                                    Integer.toString(person.getSkill(SkillType.S_PILOT_MEK).getFinalSkillValue(options)) :
+                                    Integer.toString(person.getSkill(SkillType.S_PILOT_MEK)
+                                                           .getFinalSkillValue(options)) :
                                     "-");
             case GROUND_VEHICLE:
                 return (person.hasSkill(SkillType.S_GUN_VEE) ?
@@ -627,7 +635,8 @@ public enum PersonnelTableModelColumn {
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_GVEE) ?
-                                    Integer.toString(person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue(options)) :
+                                    Integer.toString(person.getSkill(SkillType.S_PILOT_GVEE)
+                                                           .getFinalSkillValue(options)) :
                                     "-");
             case NAVAL_VEHICLE:
                 return (person.hasSkill(SkillType.S_GUN_VEE) ?
@@ -635,7 +644,8 @@ public enum PersonnelTableModelColumn {
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_NVEE) ?
-                                    Integer.toString(person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue(options)) :
+                                    Integer.toString(person.getSkill(SkillType.S_PILOT_NVEE)
+                                                           .getFinalSkillValue(options)) :
                                     "-");
             case VTOL:
                 return (person.hasSkill(SkillType.S_GUN_VEE) ?
@@ -643,7 +653,8 @@ public enum PersonnelTableModelColumn {
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_VTOL) ?
-                                    Integer.toString(person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue(options)) :
+                                    Integer.toString(person.getSkill(SkillType.S_PILOT_VTOL)
+                                                           .getFinalSkillValue(options)) :
                                     "-");
             case AEROSPACE:
                 return (person.hasSkill(SkillType.S_GUN_AERO) ?
@@ -651,7 +662,8 @@ public enum PersonnelTableModelColumn {
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_AERO) ?
-                                    Integer.toString(person.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue(options)) :
+                                    Integer.toString(person.getSkill(SkillType.S_PILOT_AERO)
+                                                           .getFinalSkillValue(options)) :
                                     "-");
             case CONVENTIONAL_AIRCRAFT:
                 return (person.hasSkill(SkillType.S_GUN_JET) ?
@@ -659,7 +671,8 @@ public enum PersonnelTableModelColumn {
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_JET) ?
-                                    Integer.toString(person.getSkill(SkillType.S_PILOT_JET).getFinalSkillValue(options)) :
+                                    Integer.toString(person.getSkill(SkillType.S_PILOT_JET)
+                                                           .getFinalSkillValue(options)) :
                                     "-");
             case VESSEL:
                 return (person.hasSkill(SkillType.S_GUN_SPACE) ?
@@ -667,7 +680,8 @@ public enum PersonnelTableModelColumn {
                               "-") +
                              '/' +
                              (person.hasSkill(SkillType.S_PILOT_SPACE) ?
-                                    Integer.toString(person.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue(options)) :
+                                    Integer.toString(person.getSkill(SkillType.S_PILOT_SPACE)
+                                                           .getFinalSkillValue(options)) :
                                     "-");
             case BATTLE_ARMOUR:
                 return person.hasSkill(SkillType.S_GUN_BA) ?
@@ -727,7 +741,8 @@ public enum PersonnelTableModelColumn {
                              "-";
             case NEGOTIATION:
                 return person.hasSkill(SkillType.S_NEG) ?
-                             Integer.toString(person.getSkill(SkillType.S_NEG).getFinalSkillValue(options, person.getReputation())) :
+                             Integer.toString(person.getSkill(SkillType.S_NEG)
+                                                    .getFinalSkillValue(options, person.getReputation())) :
                              "-";
             case SCROUNGE:
                 return person.hasSkill(SkillType.S_SCROUNGE) ?
@@ -827,10 +842,10 @@ public enum PersonnelTableModelColumn {
                 sign = social.isTraitPositive() ? "+" : "-";
 
                 return social + " (" + (social.isTraitMajor() ? sign + sign : sign) + ')';
-            case INTELLIGENCE:
-                Intelligence intelligence = person.getIntelligence();
+            case REASONING:
+                Reasoning reasoning = person.getReasoning();
 
-                return String.valueOf(intelligence.ordinal());
+                return String.valueOf(reasoning.ordinal());
             default:
                 return "UNIMPLEMENTED";
         }
@@ -1003,7 +1018,7 @@ public enum PersonnelTableModelColumn {
             };
             case PERSONALITY -> switch (this) {
                 case RANK, FIRST_NAME, LAST_NAME -> true;
-                case AGGRESSION, AMBITION, GREED, SOCIAL, INTELLIGENCE ->
+                case AGGRESSION, AMBITION, GREED, SOCIAL, REASONING ->
                       campaign.getCampaignOptions().isUseRandomPersonalities();
                 default -> false;
             };
@@ -1054,9 +1069,19 @@ public enum PersonnelTableModelColumn {
                  ADMINISTRATION,
                  NEGOTIATION,
                  SCROUNGE -> new BonusSorter();
-            case INJURIES, KILLS, XP, TOUGHNESS, CONNECTIONS, WEALTH, REPUTATION, UNLUCKY, EDGE, SPA_COUNT,
-                 IMPLANT_COUNT, LOYALTY, INTELLIGENCE ->
-                  new IntegerStringSorter();
+            case INJURIES,
+                 KILLS,
+                 XP,
+                 TOUGHNESS,
+                 CONNECTIONS,
+                 WEALTH,
+                 REPUTATION,
+                 UNLUCKY,
+                 EDGE,
+                 SPA_COUNT,
+                 IMPLANT_COUNT,
+                 LOYALTY,
+                 REASONING -> new IntegerStringSorter();
             case SALARY -> new FormattedNumberSorter();
             default -> new NaturalOrderComparator();
         };
