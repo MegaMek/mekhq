@@ -39,9 +39,7 @@ planet:
     event:
       - date: '2514-06-12'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 59428.0
         socioIndustrial: B-D-A-D-A
       - date: '2520-01-01'
@@ -171,9 +169,7 @@ planet:
         population: 184376993.0
       - date: '3081-08-14'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 184635301.0
       - date: '3100-01-01'
@@ -192,9 +188,7 @@ planet:
         population: 186789541.0
       - date: '3145-02-25'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 187425706.0
   - name: Tan
     type: DWARF_TERRESTRIAL

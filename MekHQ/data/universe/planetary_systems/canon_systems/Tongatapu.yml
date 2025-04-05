@@ -32,9 +32,7 @@ planet:
     event:
       - date: '2241-01-09'
         faction:
-          source: canon
-          value:
-            - MCM
+          - MCM
         population: 64347.0
         socioIndustrial: D-D-C-D-C
       - date: '2250-01-01'
@@ -45,7 +43,7 @@ planet:
         population: 1570947.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -226,9 +224,7 @@ planet:
         population: 829389853.0
       - date: '3079-01-05'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 834381151.0
       - date: '3090-01-01'
@@ -249,15 +245,11 @@ planet:
         population: 908404999.0
       - date: '3145-02-07'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 914054606.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: Manihera's Wheel
     type: TERRESTRIAL
     orbitalDist: 0.07

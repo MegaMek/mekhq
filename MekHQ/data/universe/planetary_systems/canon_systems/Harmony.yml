@@ -111,9 +111,7 @@ planet:
     event:
       - date: '2247-11-22'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
         population: 49506.0
         socioIndustrial: D-D-C-D-D
       - date: '2250-01-01'
@@ -124,7 +122,7 @@ planet:
         population: 684040.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -315,16 +313,12 @@ planet:
         population: 623988676.0
       - date: '3078-05-01'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
       - date: '3080-01-01'
         population: 632785954.0
       - date: '3086-02-01'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
       - date: '3090-01-01'
         population: 642092401.0
       - date: '3100-01-01'
@@ -347,12 +341,7 @@ planet:
         population: 701437794.0
       - date: '3148-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Morrison's Belt

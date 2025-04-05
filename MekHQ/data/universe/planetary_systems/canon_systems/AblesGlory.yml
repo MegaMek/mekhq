@@ -83,9 +83,7 @@ planet:
     event:
       - date: '3130-12-03'
         faction:
-          source: canon
-          value:
-            - RIM
+          - RIM
         population: 50000.0
         socioIndustrial: D-D-A-D-C
       - date: '3140-01-01'
@@ -94,11 +92,6 @@ planet:
         hpg: X
       - date: '3145-01-01'
         population: 131568.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - TiC
   - name: Canto's Glory
     type: ICE_GIANT
     orbitalDist: 7.28

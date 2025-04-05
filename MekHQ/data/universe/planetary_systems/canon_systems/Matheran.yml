@@ -46,9 +46,7 @@ planet:
     event:
       - date: '2241-10-06'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
         population: 54680.0
         socioIndustrial: D-D-B-D-C
       - date: '2250-01-01'
@@ -59,7 +57,7 @@ planet:
         population: 1408900.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -226,20 +224,14 @@ planet:
         population: 823709712.0
       - date: '3014-06-09'
         faction:
-          source: canon
-          value:
-            - FWL
-            - FWLR
+          - FWL
+          - FWLR
       - date: '3014-10-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 822881899.0
       - date: '3030-01-01'
@@ -258,16 +250,12 @@ planet:
         population: 854862912.0
       - date: '3079-08-20'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
       - date: '3080-01-01'
         population: 863627135.0
       - date: '3086-12-31'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
       - date: '3090-01-01'
         population: 865356118.0
       - date: '3100-01-01'
@@ -283,11 +271,6 @@ planet:
         population: 887617688.0
       - date: '3145-01-01'
         population: 892602291.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Loy's Frontier
     type: ICE_GIANT
     orbitalDist: 0.8

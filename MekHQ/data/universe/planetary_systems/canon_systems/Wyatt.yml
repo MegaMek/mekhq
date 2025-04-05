@@ -34,9 +34,7 @@ planet:
     event:
       - date: '2271-08-26'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 49467.0
         socioIndustrial: D-C-C-D-D
       - date: '2280-01-01'
@@ -55,9 +53,7 @@ planet:
         population: 63294096.0
       - date: '2350-07-05'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 107052504.0
       - date: '2360-01-01'
         population: 168273390.0
@@ -93,9 +89,7 @@ planet:
         population: 1777389114.0
       - date: '2500-10-28'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 1858778459.0
       - date: '2510-01-01'
         population: 1923849612.0
@@ -155,23 +149,17 @@ planet:
         population: 2704827624.0
       - date: '2767-09-10'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 2700495259.0
       - date: '2779-11-27'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 2667006964.0
       - date: '2786-08-23'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2790-01-01'
         population: 2629741491.0
       - date: '2800-01-01'
@@ -192,15 +180,11 @@ planet:
         population: 2483835234.0
       - date: '2868-06-24'
         faction:
-          source: canon
-          value:
-            - LA
-            - FWL
+          - LA
+          - FWL
       - date: '2868-07-15'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2870-01-01'
         population: 2466748595.0
       - date: '2880-01-01'
@@ -237,22 +221,22 @@ planet:
         population: 1838585362.0
       - date: '3028-01-01'
         socioIndustrial: C-C-C-B-D
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1814675092.0
       - date: '3040-01-01'
         population: 1833096181.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial: C-C-C-A-C
       - date: '3050-01-01'
         population: 1858010774.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -261,27 +245,19 @@ planet:
         population: 1897062124.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3078-01-12'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3078-01-20'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1923423054.0
       - date: '3081-01-11'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1954054489.0
       - date: '3097-01-01'
@@ -298,16 +274,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 2118072420.0
       - date: '3145-09-02'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 2130819056.0
   - name: Childers's Redoubt
     type: TERRESTRIAL

@@ -45,9 +45,7 @@ planet:
     event:
       - date: '2236-07-04'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 61233.0
         socioIndustrial: D-D-D-D-F
       - date: '2240-01-01'
@@ -76,9 +74,7 @@ planet:
         population: 64585427.0
       - date: '2355-10-25'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2360-01-01'
         population: 81461971.0
       - date: '2370-01-01'
@@ -223,14 +219,10 @@ planet:
         population: 242154292.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 232379035.0
       - date: '3030-01-01'
@@ -247,9 +239,7 @@ planet:
         population: 242006393.0
       - date: '3079-07-02'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
       - date: '3080-01-01'
         population: 246057228.0
       - date: '3090-01-01'
@@ -268,11 +258,6 @@ planet:
         population: 255843042.0
       - date: '3145-01-01'
         population: 256560407.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Woollahra
     type: GIANT_TERRESTRIAL
     orbitalDist: 1.28
@@ -354,9 +339,7 @@ planet:
     event:
       - date: '2236-09-17'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 50465.0
         socioIndustrial: D-C-B-D-F
       - date: '2240-01-01'
@@ -385,9 +368,7 @@ planet:
         population: 377113.0
       - date: '2355-11-03'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2360-01-01'
         population: 409054.0
       - date: '2370-01-01'
@@ -534,14 +515,10 @@ planet:
         population: 637769.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 632396.0
       - date: '3025-01-01'
@@ -561,9 +538,7 @@ planet:
         population: 708152810.0
       - date: '3079-02-14'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
       - date: '3080-01-01'
         population: 715556029.0
       - date: '3090-01-01'
@@ -586,11 +561,6 @@ planet:
         population: 754654405.0
       - date: '3145-01-01'
         population: 760563726.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Bythsea's Meridian
     type: GIANT_TERRESTRIAL
     orbitalDist: 2.24

@@ -37,9 +37,7 @@ planet:
     event:
       - date: '2607-08-10'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 46546.0
         socioIndustrial: C-F-A-D-C
       - date: '2608-01-01'
@@ -157,9 +155,7 @@ planet:
         population: 1023064569.0
       - date: '3079-05-23'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
       - date: '3080-01-01'
         population: 1029427273.0
       - date: '3090-05-23'
@@ -177,11 +173,6 @@ planet:
         population: 1101422583.0
       - date: '3145-01-01'
         population: 1105173794.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: K0G-2
     type: ICE_GIANT
     orbitalDist: 0.42

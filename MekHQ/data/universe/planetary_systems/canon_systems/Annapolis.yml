@@ -92,18 +92,14 @@ planet:
     event:
       - date: '2235-09-18'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 33485.0
         socioIndustrial: C-D-B-C-D
       - date: '2240-01-01'
         population: 72495.0
       - date: '2242-10-15'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 293037.0
       - date: '2260-01-01'
@@ -118,14 +114,12 @@ planet:
         population: 32345148.0
       - date: '2305-04-05'
         faction:
-          source: canon
-          value:
-            - AG
+          - AG
       - date: '2310-01-01'
         population: 59487271.0
-      - date: '2319-09-09'
+      - date: '2319-11-15'
         faction:
-          source: canon
+          source: 'Handbook: House Kurita'
           value:
             - DC
       - date: '2320-01-01'

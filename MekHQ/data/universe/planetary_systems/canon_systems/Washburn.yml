@@ -102,9 +102,7 @@ planet:
     event:
       - date: '2241-04-30'
         faction:
-          source: canon
-          value:
-            - MCM
+          - MCM
         population: 60527.0
         socioIndustrial: D-F-B-F-F
       - date: '2250-01-01'
@@ -115,7 +113,7 @@ planet:
         population: 1689225.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -301,9 +299,7 @@ planet:
         population: 1235290473.0
       - date: '3079-09-15'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 1242227505.0
       - date: '3090-01-01'
@@ -326,9 +322,7 @@ planet:
         population: 1271129841.0
       - date: '3145-10-12'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 1280571091.0
   - name: Mars
     type: TERRESTRIAL

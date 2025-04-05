@@ -76,9 +76,7 @@ planet:
     event:
       - date: '2550-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 47769.0
         socioIndustrial: C-D-C-D-C
       - date: '2560-01-01'
@@ -87,15 +85,11 @@ planet:
         population: 2656744.0
       - date: '2578-01-09'
         faction:
-          source: canon
-          value:
-            - FWL
-            - MOC
+          - FWL
+          - MOC
       - date: '2578-01-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2580-01-01'
         population: 9187583.0
       - date: '2590-01-01'
@@ -218,9 +212,7 @@ planet:
         population: 200221079.0
       - date: '3081-05-16'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 202071612.0
       - date: '3100-01-01'
@@ -241,12 +233,7 @@ planet:
         population: 218814021.0
       - date: '3148-09-01'
         faction:
-          source: canon
-          value:
-            - MOC
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - MOC
   - name: Gambatesa

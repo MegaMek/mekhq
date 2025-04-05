@@ -40,16 +40,12 @@ planet:
     event:
       - date: '2341-01-04'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 51076.0
         socioIndustrial: D-D-B-C-C
       - date: '2346-10-20'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2350-01-01'
         population: 205600.0
       - date: '2360-01-01'
@@ -196,36 +192,32 @@ planet:
         population: 479441061.0
       - date: '3026-01-01'
         socioIndustrial: D-C-C-D-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 481219146.0
       - date: '3040-01-01'
         population: 484987333.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial: C-C-B-C-B
       - date: '3050-01-01'
         population: 490498770.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3057-12-01'
         faction:
-          source: canon
-          value:
-            - ARDC
+          - ARDC
       - date: '3060-01-01'
         population: 496420213.0
       - date: '3067-04-24'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3070-01-01'
         population: 501961173.0
       - date: '3080-01-01'
@@ -248,15 +240,11 @@ planet:
         population: 560216195.0
       - date: '3145-06-17'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 565280898.0
       - date: '3152-05-13'
         faction:
-          source: canon
-          value:
-            - NTamP
+          - NTamP
   - name: Jacobs
     type: ICE_GIANT
     orbitalDist: 0.42

@@ -111,9 +111,7 @@ planet:
     event:
       - date: '2600-12-28'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 45999.0
         socioIndustrial: C-D-C-D-D
       - date: '2602-01-01'
@@ -224,15 +222,11 @@ planet:
         population: 362297565.0
       - date: '3059-07-27'
         faction:
-          source: canon
-          value:
-            - DC
-            - CSJ
+          - DC
+          - CSJ
       - date: '3059-08-13'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3060-01-01'
         population: 367368664.0
       - date: '3070-01-01'

@@ -47,9 +47,7 @@ planet:
     event:
       - date: '2745-12-10'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 60700.0
         socioIndustrial: C-F-C-D-F
       - date: '2747-01-22'
@@ -128,9 +126,7 @@ planet:
         population: 79835676.0
       - date: '3081-08-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 80428651.0
       - date: '3100-01-01'
@@ -149,15 +145,8 @@ planet:
         population: 81318250.0
       - date: '3145-11-25'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
         population: 81627848.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: New Malvern
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.7

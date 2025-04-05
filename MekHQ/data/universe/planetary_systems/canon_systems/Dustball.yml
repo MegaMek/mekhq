@@ -154,9 +154,7 @@ planet:
     event:
       - date: '2665-04-10'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 46944.0
         socioIndustrial: C-D-B-D-F
       - date: '2670-01-01'
@@ -245,15 +243,15 @@ planet:
         population: 805221041.0
       - date: '3027-01-01'
         socioIndustrial: F-D-D-D-F
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 808947194.0
       - date: '3040-01-01'
         population: 817649403.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3042-01-01'
         socioIndustrial:
           source: canon
@@ -262,9 +260,7 @@ planet:
         population: 824216833.0
       - date: '3057-12-01'
         faction:
-          source: canon
-          value:
-            - ARDC
+          - ARDC
       - date: '3060-01-01'
         population: 829259921.0
       - date: '3067-01-01'
@@ -273,9 +269,7 @@ planet:
           value: 833000000.0
       - date: '3067-04-24'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3070-01-01'
         population: 834500750.0
       - date: '3080-01-01'
@@ -292,10 +286,8 @@ planet:
         population: 849317973.0
       - date: '3130-05-29'
         faction:
-          source: canon
-          value:
-            - CJF
-            - LA
+          - CJF
+          - LA
         population: 849148126.0
       - date: '3132-08-07'
         hpg:
@@ -303,18 +295,14 @@ planet:
           value: X
       - date: '3135-03-24'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3140-01-01'
         population: 852722048.0
       - date: '3145-01-01'
         population: 855968556.0
       - date: '3151-08-13'
         faction:
-          source: canon
-          value:
-            - MalC
+          - MalC
   - name: Hestenes's Hold
     type: ICE_GIANT
     orbitalDist: 17.0

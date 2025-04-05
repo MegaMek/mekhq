@@ -115,9 +115,7 @@ planet:
     event:
       - date: '2170-04-08'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 41243.0
         socioIndustrial: F-D-A-F-F
       - date: '2180-01-01'
@@ -134,9 +132,7 @@ planet:
         population: 7727686.0
       - date: '2235-04-14'
         faction:
-          source: canon
-          value:
-            - TamP
+          - TamP
       - date: '2240-01-01'
         population: 13579215.0
       - date: '2250-01-01'
@@ -161,9 +157,9 @@ planet:
         population: 235820159.0
       - date: '2340-01-01'
         population: 274726643.0
-      - date: '2341-12-15'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -315,17 +311,17 @@ planet:
         population: 840010071.0
       - date: '3020-01-01'
         population: 834301750.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 833487612.0
       - date: '3032-01-01'
         socioIndustrial: B-B-B-B-D
       - date: '3040-01-01'
         population: 841359335.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial:
           source: canon
@@ -334,20 +330,20 @@ planet:
         population: 851686788.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
         population: 864212631.0
       - date: '3063-05-07'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FC
             - LA
       - date: '3063-05-25'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - LA
       - date: '3070-01-01'
@@ -366,9 +362,7 @@ planet:
         population: 933759434.0
       - date: '3130-11-05'
         faction:
-          source: canon
-          value:
-            - CW
+          - CW
         population: 949199350.0
       - date: '3132-08-07'
         hpg:
@@ -376,17 +370,13 @@ planet:
           value: X
       - date: '3140-05-11'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 963351971.0
       - date: '3145-01-01'
         population: 972450174.0
       - date: '3152-01-16'
         faction:
-          source: canon
-          value:
-            - NTamP
+          - NTamP
   - name: Brierley
     type: DWARF_TERRESTRIAL
     orbitalDist: 1.92

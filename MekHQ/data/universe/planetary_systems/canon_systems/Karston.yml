@@ -97,9 +97,7 @@ planet:
     event:
       - date: '2648-07-27'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 45309.0
         socioIndustrial: C-C-A-D-D
       - date: '2650-01-01'
@@ -164,9 +162,7 @@ planet:
         population: 489604556.0
       - date: '2900-03-14'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 483597565.0
       - date: '2904-01-01'
         socioIndustrial: C-D-B-F-B
@@ -196,14 +192,12 @@ planet:
         population: 355257228.0
       - date: '3025-06-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3030-01-01'
         population: 353138871.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-01-01'
@@ -214,7 +208,7 @@ planet:
         population: 360885733.0
       - date: '3051-12-16'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3060-01-01'
@@ -241,9 +235,7 @@ planet:
         population: 389732802.0
       - date: '3145-03-14'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 389966712.0
   - name: Shively
     type: ICE_GIANT

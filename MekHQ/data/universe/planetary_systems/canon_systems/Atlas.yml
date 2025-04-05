@@ -69,9 +69,7 @@ planet:
     event:
       - date: '2304-06-22'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 42961.0
         socioIndustrial: D-D-C-D-D
       - date: '2310-01-01'
@@ -88,9 +86,7 @@ planet:
         population: 29316392.0
       - date: '2367-12-18'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2370-01-01'
         population: 57319819.0
       - date: '2380-01-01'
@@ -138,9 +134,7 @@ planet:
         population: 2401892895.0
       - date: '2571-05-21'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2580-01-01'
         population: 2469627150.0
       - date: '2590-01-01'
@@ -196,9 +190,7 @@ planet:
         population: 2962687511.0
       - date: '2821-03-07'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2830-01-01'
         population: 2978653008.0
       - date: '2840-01-01'
@@ -245,15 +237,15 @@ planet:
         population: 2494284781.0
       - date: '3028-01-01'
         socioIndustrial: B-C-D-B-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 2469729033.0
       - date: '3040-01-01'
         population: 2491060296.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3047-01-01'
         socioIndustrial: A-B-C-A-C
       - date: '3050-01-01'
@@ -262,7 +254,7 @@ planet:
         population: 2528707851.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -287,15 +279,8 @@ planet:
         population: 2736578566.0
       - date: '3145-04-11'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 2744251723.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FS
   - name: Kronos Belt
     type: ASTEROID_BELT
     orbitalDist: 2.24

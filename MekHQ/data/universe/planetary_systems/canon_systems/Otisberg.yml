@@ -105,9 +105,7 @@ planet:
     event:
       - date: '2608-12-04'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 55714.0
         socioIndustrial: C-D-C-C-B
       - date: '2610-01-01'
@@ -152,9 +150,7 @@ planet:
         population: 614132759.0
       - date: '2779-02-02'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 612289538.0
       - date: '2790-01-01'
@@ -223,9 +219,7 @@ planet:
           value: C-C-C-C-A
       - date: '3048-03-30'
         faction:
-          source: canon
-          value:
-            - RIM
+          - RIM
       - date: '3050-01-01'
         population: 611461060.0
       - date: '3060-01-01'
@@ -249,11 +243,6 @@ planet:
         socioIndustrial: C-C-C-C-A
       - date: '3145-01-01'
         population: 642554266.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - TiC
   - name: Worfield
     type: TERRESTRIAL
     orbitalDist: 3.08

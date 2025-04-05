@@ -77,9 +77,7 @@ planet:
     event:
       - date: '2802-09-20'
         faction:
-          source: canon
-          value:
-            - CIH
+          - CIH
         population: 10628.0
         socioIndustrial: B-C-A-C-D
       - date: '2803-08-17'
@@ -92,9 +90,7 @@ planet:
         population: 160488.0
       - date: '2821-05-28'
         faction:
-          source: canon
-          value:
-            - CIH
+          - CIH
       - date: '2830-01-01'
         population: 446191.0
       - date: '2840-01-01'
@@ -151,31 +147,21 @@ planet:
         population: 11046297.0
       - date: '3072-10-08'
         faction:
-          source: canon
-          value:
-            - CIH
+          - CIH
       - date: '3073-03-01'
         faction:
-          source: canon
-          value:
-            - CGS
+          - CGS
       - date: '3075-07-28'
         faction:
-          source: canon
-          value:
-            - CGS
+          - CGS
       - date: '3079-02-12'
         faction:
-          source: canon
-          value:
-            - CSA
+          - CSA
       - date: '3080-01-01'
         population: 11217727.0
       - date: '3085-10-10'
         faction:
-          source: canon
-          value:
-            - CCC
+          - CCC
       - date: '3090-01-01'
         population: 11316878.0
       - date: '3100-01-01'

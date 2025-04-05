@@ -118,18 +118,14 @@ planet:
     event:
       - date: '2264-04-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 48750.0
         socioIndustrial: D-D-B-D-F
       - date: '2270-01-01'
         population: 111994.0
       - date: '2280-02-02'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 385210.0
       - date: '2290-01-01'
         population: 1126217.0
@@ -292,31 +288,21 @@ planet:
         population: 989349530.0
       - date: '3014-04-15'
         faction:
-          source: canon
-          value:
-            - FWL
-            - FWLR
+          - FWL
+          - FWLR
       - date: '3014-05-07'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-02-03'
         faction:
-          source: canon
-          value:
-            - FWLR
-            - FWL
+          - FWLR
+          - FWL
       - date: '3015-02-06'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 988323554.0
       - date: '3030-01-01'
@@ -339,9 +325,7 @@ planet:
         population: 1017035539.0
       - date: '3079-06-06'
         faction:
-          source: canon
-          value:
-            - TP
+          - TP
       - date: '3080-01-01'
         population: 1027873455.0
       - date: '3090-01-01'
@@ -356,9 +340,7 @@ planet:
         socioIndustrial: A-B-A-D-D
       - date: '3130-07-13'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
         population: 1037996135.0
       - date: '3132-08-07'
         hpg:
@@ -368,11 +350,6 @@ planet:
         population: 1036543957.0
       - date: '3145-01-01'
         population: 1038203755.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Emris V
     type: GIANT_TERRESTRIAL
     orbitalDist: 2.8

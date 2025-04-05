@@ -119,9 +119,7 @@ planet:
     event:
       - date: '2319-08-27'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 51280.0
         socioIndustrial: D-D-B-D-F
       - date: '2320-01-01'
@@ -136,9 +134,7 @@ planet:
         population: 12824365.0
       - date: '2367-03-04'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2370-01-01'
         population: 30050490.0
       - date: '2380-01-01'
@@ -231,9 +227,7 @@ planet:
         population: 2728311084.0
       - date: '2767-08-31'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 2703981656.0
       - date: '2771-09-17'
@@ -242,9 +236,7 @@ planet:
           value: X
       - date: '2779-12-23'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-02-04'
         hpg:
           source: canon
@@ -252,9 +244,7 @@ planet:
         population: 2683292938.0
       - date: '2790-10-13'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 2661429042.0
       - date: '2800-01-01'
         population: 2674347288.0
@@ -308,17 +298,10 @@ planet:
         population: 1896317531.0
       - date: '3030-10-29'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
         population: 1881668692.0
       - date: '3040-01-01'
         population: 1898490288.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: B-B-B-B-D
       - date: '3050-01-01'
@@ -327,34 +310,26 @@ planet:
         population: 1938974035.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
         population: 1954157169.0
       - date: '3072-02-01'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3077-05-21'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3077-05-26'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1968277874.0
       - date: '3081-11-12'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1984087251.0
       - date: '3100-01-01'
@@ -373,16 +348,12 @@ planet:
           value: X
       - date: '3135-07-10'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '3140-01-01'
         population: 2107619233.0
       - date: '3145-10-05'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 2126248130.0
   - name: Wendigo
     type: DWARF_TERRESTRIAL

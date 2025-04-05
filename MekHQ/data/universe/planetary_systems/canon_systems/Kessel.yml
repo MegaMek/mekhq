@@ -98,9 +98,7 @@ planet:
     event:
       - date: '2146-10-29'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 44723.0
         socioIndustrial: D-C-C-C-D
       - date: '2150-01-01'
@@ -125,9 +123,7 @@ planet:
         population: 84368304.0
       - date: '2242-04-18'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 126023171.0
       - date: '2260-01-01'
@@ -144,18 +140,16 @@ planet:
         population: 647298303.0
       - date: '2319-03-19'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2320-01-01'
         population: 766587941.0
       - date: '2330-01-01'
         population: 887572796.0
       - date: '2340-01-01'
         population: 1012802931.0
-      - date: '2341-07-31'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -272,9 +266,7 @@ planet:
         population: 2883896864.0
       - date: '2866-12-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2870-01-01'
         population: 2842427650.0
       - date: '2880-01-01'
@@ -329,24 +321,18 @@ planet:
         population: 2045956633.0
       - date: '3069-05-12'
         faction:
-          source: canon
-          value:
-            - DC
-            - WOB
+          - DC
+          - WOB
       - date: '3069-05-26'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3070-01-01'
         population: 2001209891.0
       - date: '3080-01-01'
         population: 2018090854.0
       - date: '3081-05-29'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 2030235798.0
       - date: '3095-01-01'
@@ -365,16 +351,12 @@ planet:
           value: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 2170921958.0
       - date: '3145-11-06'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 2191424837.0
   - name: Ēostre's Frontier
     type: TERRESTRIAL
@@ -398,9 +380,7 @@ planet:
     event:
       - date: '2146-12-04'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 62270.0
         socioIndustrial: D-F-C-D-F
       - date: '2150-01-01'
@@ -427,9 +407,7 @@ planet:
         population: 57752336.0
       - date: '2242-09-04'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 84468240.0
       - date: '2260-01-01'
@@ -446,18 +424,16 @@ planet:
         population: 366074639.0
       - date: '2319-03-21'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2320-01-01'
         population: 427586314.0
       - date: '2330-01-01'
         population: 486982757.0
       - date: '2340-01-01'
         population: 548989163.0
-      - date: '2341-10-21'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -574,9 +550,7 @@ planet:
         population: 1023015402.0
       - date: '2866-12-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2870-01-01'
         population: 984954037.0
       - date: '2880-01-01'
@@ -629,24 +603,18 @@ planet:
         population: 871596572.0
       - date: '3069-05-12'
         faction:
-          source: canon
-          value:
-            - DC
-            - WOB
+          - DC
+          - WOB
       - date: '3069-05-26'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3070-01-01'
         population: 881060830.0
       - date: '3080-01-01'
         population: 887604863.0
       - date: '3081-01-15'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 889559743.0
       - date: '3095-01-01'
@@ -661,16 +629,12 @@ planet:
         population: 893661144.0
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 899578814.0
       - date: '3145-01-28'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 902642588.0
   - name: Aje
     type: TERRESTRIAL

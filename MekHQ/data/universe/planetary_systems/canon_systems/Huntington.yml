@@ -75,9 +75,7 @@ planet:
     event:
       - date: '2721-06-19'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 44174.0
         socioIndustrial: C-D-B-D-C
       - date: '2725-11-05'
@@ -158,9 +156,7 @@ planet:
         population: 68326025.0
       - date: '3079-07-01'
         faction:
-          source: canon
-          value:
-            - MH
+          - MH
       - date: '3080-01-01'
         population: 68682246.0
       - date: '3090-01-01'
@@ -183,12 +179,7 @@ planet:
         population: 70209999.0
       - date: '3150-08-15'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Krieger

@@ -97,9 +97,7 @@ planet:
     event:
       - date: '2167-06-07'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 53479.0
         socioIndustrial: D-C-D-C-D
       - date: '2170-01-01'
@@ -120,9 +118,7 @@ planet:
         population: 59417983.0
       - date: '2242-07-21'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 103057872.0
       - date: '2260-01-01'
@@ -145,9 +141,9 @@ planet:
         population: 1472961327.0
       - date: '2340-01-01'
         population: 1775171906.0
-      - date: '2341-04-13'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -200,9 +196,7 @@ planet:
         population: 5409000374.0
       - date: '2571-11-16'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2580-01-01'
         population: 5421900330.0
       - date: '2590-01-01'
@@ -268,14 +262,10 @@ planet:
         population: 4945066369.0
       - date: '2821-08-08'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2825-09-06'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 4965417756.0
       - date: '2840-01-01'
@@ -288,9 +278,7 @@ planet:
         population: 5100374862.0
       - date: '2864-09-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2870-01-01'
         population: 5040352794.0
       - date: '2880-01-01'
@@ -340,13 +328,13 @@ planet:
         population: 1083328220.0
       - date: '3052-04-01'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CGB
             - DC
       - date: '3052-04-22'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CGB
       - date: '3060-01-01'
@@ -361,9 +349,7 @@ planet:
         population: 589507561.0
       - date: '3103-03-13'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
       - date: '3110-01-01'
         population: 589153962.0
       - date: '3120-01-01'

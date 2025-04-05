@@ -34,9 +34,7 @@ planet:
     event:
       - date: '2517-07-17'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 44673.0
         socioIndustrial: B-D-C-D-B
       - date: '2520-01-01'
@@ -169,9 +167,7 @@ planet:
         population: 220340515.0
       - date: '3081-02-23'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 224118324.0
       - date: '3100-01-01'
@@ -192,9 +188,7 @@ planet:
         population: 246453700.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: Peña's Harbour
     type: TERRESTRIAL
     orbitalDist: 0.9

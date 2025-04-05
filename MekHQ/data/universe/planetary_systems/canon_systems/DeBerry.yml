@@ -63,9 +63,7 @@ planet:
     event:
       - date: '2360-02-26'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 51260.0
         socioIndustrial: D-D-C-D-B
       - date: '2370-01-01'
@@ -212,15 +210,15 @@ planet:
         population: 228163657.0
       - date: '3028-01-01'
         socioIndustrial: C-B-C-B-B
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 227400148.0
       - date: '3040-01-01'
         population: 230145388.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3049-01-01'
         socioIndustrial: B-B-C-A-A
       - date: '3050-01-01'
@@ -229,7 +227,7 @@ planet:
         population: 236113172.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -252,9 +250,7 @@ planet:
         population: 266216858.0
       - date: '3145-07-17'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 268516196.0
   - name: Kennedy's Frontier
     type: ICE_GIANT

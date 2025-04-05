@@ -38,9 +38,7 @@ planet:
     event:
       - date: '2259-01-08'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 37997.0
         socioIndustrial: D-D-B-C-D
       - date: '2260-01-01'
@@ -49,9 +47,7 @@ planet:
         population: 161340.0
       - date: '2280-06-27'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 500151.0
       - date: '2290-01-01'
         population: 1342141.0
@@ -210,14 +206,10 @@ planet:
         population: 830448076.0
       - date: '3014-11-08'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 827369798.0
       - date: '3030-01-01'
@@ -236,9 +228,7 @@ planet:
         population: 891771360.0
       - date: '3081-04-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 908331842.0
       - date: '3100-01-01'
@@ -251,9 +241,7 @@ planet:
         population: 951661855.0
       - date: '3130-11-06'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
         population: 957580487.0
       - date: '3132-08-07'
         hpg: X
@@ -261,11 +249,6 @@ planet:
         population: 965078820.0
       - date: '3145-01-01'
         population: 970110301.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Naung's Gulf
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.21

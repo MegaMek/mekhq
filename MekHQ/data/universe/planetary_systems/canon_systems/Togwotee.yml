@@ -99,9 +99,7 @@ planet:
     event:
       - date: '2263-01-09'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 49171.0
         socioIndustrial: C-D-B-D-F
       - date: '2270-01-01'
@@ -120,9 +118,7 @@ planet:
         population: 23607453.0
       - date: '2332-08-12'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2340-01-01'
         population: 38940578.0
       - date: '2350-01-01'
@@ -250,9 +246,7 @@ planet:
         socioIndustrial: C-D-D-D-F
       - date: '2900-05-13'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1054848537.0
       - date: '2910-01-01'
         population: 1044606249.0
@@ -292,29 +286,21 @@ planet:
         population: 931173581.0
       - date: '3068-03-10'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3070-07-25'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 940814233.0
       - date: '3080-01-01'
         population: 949699583.0
       - date: '3081-03-10'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 963859662.0
       - date: '3100-08-21'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 975300575.0
       - date: '3104-01-01'
         socioIndustrial: C-D-B-C-F
@@ -330,9 +316,7 @@ planet:
         population: 1032301140.0
       - date: '3145-07-01'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 1040176517.0
   - name: OP-5
     type: TERRESTRIAL

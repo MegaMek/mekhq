@@ -110,9 +110,7 @@ planet:
     event:
       - date: '2270-07-30'
         faction:
-          source: canon
-          value:
-            - CH
+          - CH
         population: 58974.0
         socioIndustrial: D-D-C-C-D
       - date: '2280-01-01'
@@ -123,9 +121,7 @@ planet:
         population: 2442079.0
       - date: '2310-01-16'
         faction:
-          source: canon
-          value:
-            - CCom
+          - CCom
         population: 6100998.0
       - date: '2320-01-01'
         population: 13357080.0
@@ -139,7 +135,7 @@ planet:
         population: 117648341.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -254,9 +250,7 @@ planet:
         socioIndustrial: C-B-C-C-D
       - date: '2864-11-13'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2870-01-01'
         population: 1544996449.0
       - date: '2880-01-01'
@@ -267,9 +261,7 @@ planet:
         socioIndustrial: C-C-D-D-F
       - date: '2900-07-19'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 1427991119.0
       - date: '2910-01-01'
         population: 1389326337.0
@@ -295,6 +287,11 @@ planet:
         population: 1177368568.0
       - date: '3020-01-01'
         population: 1167111148.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1166488341.0
       - date: '3037-01-01'
@@ -302,18 +299,13 @@ planet:
       - date: '3040-09-04'
         population: 1175975267.0
         socioIndustrial: B-A-C-B-C
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 1182697466.0
       - date: '3060-01-01'
         population: 1191243617.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -338,11 +330,6 @@ planet:
         population: 1263389031.0
       - date: '3145-01-01'
         population: 1272009353.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - CC
   - name: Macuiltonaleque
     type: TERRESTRIAL
     orbitalDist: 4.2

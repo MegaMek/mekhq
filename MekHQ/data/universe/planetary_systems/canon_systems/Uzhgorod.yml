@@ -55,9 +55,7 @@ planet:
     event:
       - date: '2268-06-02'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 43926.0
         socioIndustrial: D-D-C-D-F
       - date: '2270-01-01'
@@ -80,9 +78,7 @@ planet:
         population: 39852664.0
       - date: '2360-04-14'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 59104989.0
       - date: '2370-01-01'
         population: 82797344.0
@@ -228,22 +224,22 @@ planet:
         population: 676019049.0
       - date: '3028-01-01'
         socioIndustrial: C-D-C-C-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 680328561.0
       - date: '3040-01-01'
         population: 687509646.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial: C-D-C-C-D
       - date: '3050-01-01'
         population: 694697056.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -272,9 +268,7 @@ planet:
         population: 736180887.0
       - date: '3145-05-13'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 739871009.0
   - name: Vitaliev's Planet
     type: TERRESTRIAL

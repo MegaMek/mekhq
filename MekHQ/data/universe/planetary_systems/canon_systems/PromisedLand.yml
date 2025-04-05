@@ -119,9 +119,7 @@ planet:
     event:
       - date: '2360-05-10'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 69861.0
         socioIndustrial: D-D-A-C-C
       - date: '2370-01-01'
@@ -212,9 +210,7 @@ planet:
         population: 648293260.0
       - date: '2750-05-29'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 642632025.0
       - date: '2760-01-01'
         population: 636449103.0
@@ -250,9 +246,7 @@ planet:
         socioIndustrial: C-C-C-C-C
       - date: '2900-10-02'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 613187827.0
       - date: '2910-01-01'
         population: 613033708.0
@@ -297,9 +291,7 @@ planet:
         socioIndustrial: B-B-A-B-C
       - date: '3079-01-28'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
       - date: '3080-01-01'
         population: 581320510.0
       - date: '3090-01-01'
@@ -314,9 +306,7 @@ planet:
         population: 585872540.0
       - date: '3130-05-09'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 594964808.0
       - date: '3132-08-07'
         hpg:
@@ -326,15 +316,8 @@ planet:
         population: 605407786.0
       - date: '3145-08-10'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
         population: 609904420.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Quilter's Rift
     type: TERRESTRIAL
     orbitalDist: 0.8

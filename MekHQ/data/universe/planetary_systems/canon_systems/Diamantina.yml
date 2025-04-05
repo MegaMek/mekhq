@@ -34,9 +34,7 @@ planet:
     event:
       - date: '2486-12-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 47292.0
         socioIndustrial: C-D-B-D-F
       - date: '2490-01-01'
@@ -173,9 +171,7 @@ planet:
         population: 393765836.0
       - date: '3079-04-09'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
       - date: '3080-01-01'
         population: 395739595.0
       - date: '3090-01-01'
@@ -194,11 +190,6 @@ planet:
         population: 407547059.0
       - date: '3145-01-01'
         population: 408199656.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Reduto de Odom
     type: TERRESTRIAL
     orbitalDist: 0.14

@@ -105,9 +105,7 @@ planet:
     event:
       - date: '2179-05-09'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 48769.0
         socioIndustrial: D-D-C-D-D
       - date: '2180-01-01'
@@ -128,9 +126,7 @@ planet:
         population: 11943115.0
       - date: '2250-08-17'
         faction:
-          source: canon
-          value:
-            - SIS
+          - SIS
         population: 21136589.0
       - date: '2260-01-01'
         population: 35010406.0
@@ -156,7 +152,7 @@ planet:
         population: 504219996.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -344,9 +340,7 @@ planet:
         population: 1144684674.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
   - name: St. Albert
     type: DWARF_TERRESTRIAL
     orbitalDist: 1.0

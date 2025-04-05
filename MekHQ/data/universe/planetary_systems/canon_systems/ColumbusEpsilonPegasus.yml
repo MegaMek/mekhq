@@ -120,32 +120,21 @@ planet:
     event:
       - date: '2549-05-12'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
         population: 1742.0
         socioIndustrial: B-X-X-X-X
       - date: '2765-03-09'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '3023-09-29'
         faction:
-          source: canon
-          value:
-            - CS
+          - CS
         hpg: A
         population: 1346.0
         socioIndustrial: B-X-X-X-X
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: N5
     type: DWARF_TERRESTRIAL
     orbitalDist: 2.8

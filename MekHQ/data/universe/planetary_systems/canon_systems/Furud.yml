@@ -32,9 +32,7 @@ planet:
     event:
       - date: '2250-08-22'
         faction:
-          source: canon
-          value:
-            - SIS
+          - SIS
         population: 49694.0
         socioIndustrial: D-C-C-D-B
       - date: '2260-01-01'
@@ -63,7 +61,7 @@ planet:
         population: 71165265.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -185,9 +183,7 @@ planet:
         population: 496619768.0
       - date: '2900-01-16'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 497586917.0
       - date: '2910-01-01'
         population: 497310397.0
@@ -217,9 +213,7 @@ planet:
         population: 491146215.0
       - date: '3025-08-29'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3030-01-01'
         population: 493744850.0
       - date: '3033-01-01'
@@ -239,9 +233,7 @@ planet:
         population: 524066658.0
       - date: '3081-07-27'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 527009664.0
       - date: '3094-01-01'
@@ -254,9 +246,7 @@ planet:
         population: 546109162.0
       - date: '3130-07-02'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
         population: 556473130.0
       - date: '3132-08-07'
         hpg: X

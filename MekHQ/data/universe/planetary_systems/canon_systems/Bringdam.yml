@@ -38,9 +38,7 @@ planet:
     event:
       - date: '2636-03-23'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 54755.0
         socioIndustrial: C-D-B-D-C
       - date: '2640-01-01'
@@ -82,43 +80,26 @@ planet:
       - date: '2800-01-01'
         population: 43546163.0
       - date: '2814-02-28'
-        socioIndustrial: D-D-C-D-B
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
+        socioIndustrial: D-D-C-D-B
       - date: '2965-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
       - date: '3025-01-25'
         faction:
-          source: assumption
-          value:
-            - ARC
-            - ARD
+          - ARC
+          - ARD
       - date: '3025-03-01'
         faction:
-          source: assumption
-          value:
-            - ARC
+          - ARC
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
         population: 92081090.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Hann's Belt
     type: ASTEROID_BELT
     orbitalDist: 0.49

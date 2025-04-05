@@ -36,9 +36,7 @@ planet:
     event:
       - date: '2194-08-10'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 46941.0
         socioIndustrial: D-D-A-D-D
       - date: '2200-01-01'
@@ -55,9 +53,7 @@ planet:
         population: 3166213.0
       - date: '2250-10-29'
         faction:
-          source: canon
-          value:
-            - SIS
+          - SIS
         population: 5956538.0
       - date: '2260-01-01'
         population: 10435861.0
@@ -85,7 +81,7 @@ planet:
         population: 210889064.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -234,53 +230,35 @@ planet:
         population: 422023517.0
       - date: '3030-10-17'
         faction:
-          source: canon
-          value:
-            - DA
-            - CC
+          - DA
+          - CC
       - date: '3030-10-27'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3031-03-14'
         faction:
-          source: canon
-          value:
-            - CC
-            - DA
+          - CC
+          - DA
       - date: '3031-03-18'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3032-09-26'
         faction:
-          source: canon
-          value:
-            - FWL
-            - DA
+          - FWL
+          - DA
       - date: '3032-09-30'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3033-05-12'
         faction:
-          source: canon
-          value:
-            - FWL
-            - DA
+          - FWL
+          - DA
       - date: '3033-05-16'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3034-12-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3035-01-01'
         socioIndustrial: B-D-C-D-C
       - date: '3040-01-01'
@@ -315,9 +293,7 @@ planet:
         population: 478885266.0
       - date: '3152-01-06'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
   - name: Khalil
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.49

@@ -65,9 +65,7 @@ planet:
     event:
       - date: '2472-06-17'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 57051.0
         socioIndustrial: C-D-C-D-D
       - date: '2475-01-01'
@@ -137,9 +135,7 @@ planet:
         population: 400224.0
       - date: '2779-10-15'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 233796.0
       - date: '2790-01-01'
@@ -162,17 +158,13 @@ planet:
         population: 4615.0
       - date: '2868-08-28'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '3087-04-05'
         faction:
-          source: canon
-          value:
-            - RT
+          - RT
         population: 50000.0
         socioIndustrial: D-D-C-D-C
       - date: '3090-01-01'
@@ -191,11 +183,6 @@ planet:
         population: 273151.0
       - date: '3145-01-01'
         population: 294425.0
-      - date: '2108-12-05'
-        name: Edirne
-      - date: '3130-01-01'
-        name: Brank
-        message: Edirne renamed to Brank
   - name: Volos
     type: TERRESTRIAL
     orbitalDist: 0.7

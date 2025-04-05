@@ -64,18 +64,14 @@ planet:
     event:
       - date: '2260-12-17'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 50264.0
         socioIndustrial: D-D-A-D-F
       - date: '2270-01-01'
         population: 170084.0
       - date: '2280-03-24'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 490829.0
       - date: '2290-01-01'
         population: 1241857.0
@@ -252,9 +248,7 @@ planet:
         population: 412491299.0
       - date: '3081-09-17'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 412738868.0
       - date: '3100-01-01'
@@ -271,9 +265,7 @@ planet:
         population: 433033509.0
       - date: '3145-05-25'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 437035799.0
   - name: West Lincoln
     type: TERRESTRIAL

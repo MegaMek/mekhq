@@ -56,7 +56,7 @@ planet:
     event:
       - date: '3049-04-21'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
         hpg: A
@@ -64,7 +64,7 @@ planet:
         socioIndustrial: A-X-X-X-X
       - date: '3050-08-01'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CSV
         hpg: A
@@ -72,9 +72,7 @@ planet:
         socioIndustrial: A-X-X-X-X
       - date: '3065-08-25'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

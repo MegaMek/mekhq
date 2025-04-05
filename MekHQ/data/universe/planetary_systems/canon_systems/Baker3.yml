@@ -97,9 +97,7 @@ planet:
     event:
       - date: '2528-08-05'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 55123.0
         socioIndustrial: C-C-A-D-C
       - date: '2530-01-01'
@@ -211,29 +209,29 @@ planet:
         population: 398587529.0
       - date: '3020-01-01'
         population: 395647411.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-09-07'
         population: 395276308.0
         socioIndustrial: C-C-B-D-C
       - date: '3040-01-01'
         population: 399208978.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: B-C-A-C-B
       - date: '3050-01-01'
         population: 403664882.0
       - date: '3050-08-03'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
             - FC
       - date: '3050-08-12'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CJF
       - date: '3060-01-01'
@@ -262,9 +260,7 @@ planet:
         population: 418964015.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Baker 4
     type: TERRESTRIAL
     orbitalDist: 1.6

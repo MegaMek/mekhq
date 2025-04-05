@@ -98,9 +98,7 @@ planet:
     event:
       - date: '2270-09-01'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 61381.0
         socioIndustrial: F-D-B-D-D
       - date: '2280-01-01'
@@ -113,14 +111,10 @@ planet:
         population: 8620368.0
       - date: '2315-09-13'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2317-09-04'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2320-01-01'
         population: 19751096.0
       - date: '2330-01-01'
@@ -223,23 +217,17 @@ planet:
         population: 2270478304.0
       - date: '2767-09-01'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 2250909848.0
       - date: '2779-12-23'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 2239832882.0
       - date: '2790-04-16'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 2246502866.0
       - date: '2800-01-01'
         population: 2254106507.0
@@ -249,9 +237,7 @@ planet:
         population: 2244681812.0
       - date: '2821-04-06'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2830-01-01'
         population: 2225950475.0
       - date: '2840-01-01'
@@ -298,24 +284,24 @@ planet:
         population: 2091489143.0
       - date: '3026-01-01'
         socioIndustrial: C-C-D-D-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 2104030615.0
       - date: '3035-01-01'
         socioIndustrial: C-C-D-C-C
       - date: '3040-01-01'
         population: 2131348431.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: B-C-C-B-C
       - date: '3050-01-01'
         population: 2157510144.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -324,21 +310,15 @@ planet:
         population: 2206163084.0
       - date: '3075-05-17'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3078-03-06'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '3080-01-01'
         population: 2238609347.0
       - date: '3081-08-24'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 2274260275.0
       - date: '3093-01-01'
@@ -359,19 +339,9 @@ planet:
         population: 2402848349.0
       - date: '3150-11-11'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - CJF
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - CJF
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - IND
   - name: Hassler
     type: ICE_GIANT
     orbitalDist: 0.4

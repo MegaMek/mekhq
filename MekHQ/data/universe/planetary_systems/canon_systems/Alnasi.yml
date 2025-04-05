@@ -103,9 +103,7 @@ planet:
     event:
       - date: '2319-02-07'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 54028.0
         socioIndustrial: D-D-C-D-B
       - date: '2320-01-01'
@@ -120,9 +118,7 @@ planet:
         population: 7698301.0
       - date: '2365-02-20'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2370-01-01'
         population: 16792124.0
       - date: '2380-01-01'
@@ -224,14 +220,10 @@ planet:
         population: 1302806074.0
       - date: '2821-02-08'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2822-07-03'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 1312996390.0
       - date: '2840-01-01'
@@ -282,15 +274,11 @@ planet:
         population: 892189995.0
       - date: '3039-04-15'
         faction:
-          source: canon
-          value:
-            - DC
-            - LA
+          - DC
+          - FC
       - date: '3039-05-12'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3040-01-01'
         population: 897738757.0
       - date: '3048-01-01'
@@ -305,9 +293,7 @@ planet:
         population: 928136775.0
       - date: '3081-03-20'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 938402639.0
       - date: '3100-01-01'
@@ -322,16 +308,12 @@ planet:
         population: 985135415.0
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 995633392.0
       - date: '3145-12-05'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 1000824170.0
   - name: Speth's World
     type: TERRESTRIAL

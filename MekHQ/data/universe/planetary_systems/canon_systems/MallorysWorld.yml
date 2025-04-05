@@ -168,9 +168,7 @@ planet:
     event:
       - date: '2168-11-23'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 68053.0
         socioIndustrial: D-D-B-D-C
       - date: '2170-01-01'
@@ -191,9 +189,7 @@ planet:
         population: 7938530.0
       - date: '2242-06-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 11850738.0
       - date: '2260-01-01'
@@ -218,9 +214,7 @@ planet:
         population: 102009368.0
       - date: '2360-02-16'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 113907182.0
       - date: '2370-01-01'
         population: 125135591.0
@@ -272,9 +266,7 @@ planet:
         population: 206728381.0
       - date: '2596-09-28'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2600-01-01'
         population: 205392778.0
       - date: '2610-01-01'
@@ -317,23 +309,17 @@ planet:
         population: 194756322.0
       - date: '2767-12-27'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 194400271.0
       - date: '2779-11-07'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 193911597.0
       - date: '2786-03-29'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2790-01-01'
         population: 194321574.0
       - date: '2800-01-01'
@@ -344,14 +330,10 @@ planet:
         population: 201203007.0
       - date: '2821-06-05'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2822-09-02'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 204734575.0
       - date: '2840-01-01'
@@ -364,9 +346,7 @@ planet:
         population: 215188499.0
       - date: '2864-05-18'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2870-01-01'
         population: 221077735.0
       - date: '2880-01-01'
@@ -403,18 +383,16 @@ planet:
         population: 197021800.0
       - date: '3025-03-12'
         faction:
-          source: canon
+          - FS
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
           value:
-            - FS
+            - FC
       - date: '3030-01-01'
         population: 199260773.0
       - date: '3040-01-01'
         population: 202272214.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial:
           source: canon
@@ -433,7 +411,7 @@ planet:
           value: 209435200.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -442,9 +420,7 @@ planet:
         population: 211032971.0
       - date: '3081-07-19'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 213111261.0
       - date: '3100-01-01'
@@ -463,25 +439,16 @@ planet:
           value: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-03-09'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 229433765.0
       - date: '3145-01-01'
         population: 231461692.0
       - date: '3149-06-04'
         faction:
-          source: canon
-          value:
-            - DC
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - DC
   - name: Hemere

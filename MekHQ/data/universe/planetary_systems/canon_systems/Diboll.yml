@@ -41,9 +41,7 @@ planet:
     event:
       - date: '2545-05-17'
         faction:
-          source: canon
-          value:
-            - OA
+          - OA
         population: 47133.0
         socioIndustrial: C-D-B-D-C
       - date: '2550-01-01'
@@ -61,9 +59,7 @@ planet:
         population: 96974514.0
       - date: '2596-09-22'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2600-01-01'
         population: 188453592.0
       - date: '2610-01-01'
@@ -100,9 +96,7 @@ planet:
         population: 1138643795.0
       - date: '2750-09-24'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 1139062061.0
       - date: '2760-01-01'
         population: 1139524749.0
@@ -162,17 +156,17 @@ planet:
         population: 940929696.0
       - date: '3020-01-01'
         population: 934918157.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 930573391.0
       - date: '3032-01-01'
         socioIndustrial: C-B-B-D-C
       - date: '3040-01-01'
         population: 938141646.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: B-B-A-C-B
       - date: '3050-01-01'
@@ -181,7 +175,7 @@ planet:
         population: 951367997.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -206,9 +200,7 @@ planet:
         population: 1039817968.0
       - date: '3145-06-24'
         faction:
-          source: canon
-          value:
-            - RA
+          - RA
         population: 1041899685.0
   - name: Smyth
     type: ICE_GIANT

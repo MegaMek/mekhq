@@ -178,9 +178,7 @@ planet:
     event:
       - date: '2241-10-28'
         faction:
-          source: canon
-          value:
-            - MCM
+          - MCM
         population: 49834.0
         socioIndustrial: D-D-C-D-B
       - date: '2250-01-01'
@@ -191,7 +189,7 @@ planet:
         population: 1798182.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -380,16 +378,12 @@ planet:
         population: 1981435399.0
       - date: '3079-02-23'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 2013796066.0
       - date: '3085-03-03'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 2047913625.0
       - date: '3100-12-08'
@@ -407,28 +401,17 @@ planet:
           value: X
       - date: '3135-05-01'
         faction:
-          source: canon
-          value:
-            - SA
+          - SA
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3139-07-26'
         faction:
-          source: canon
-          value:
-            - AA
+          - AA
       - date: '3140-01-01'
         population: 2226924601.0
       - date: '3145-01-01'
         population: 2241670912.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Geat
     type: GIANT_TERRESTRIAL
     orbitalDist: 9.0

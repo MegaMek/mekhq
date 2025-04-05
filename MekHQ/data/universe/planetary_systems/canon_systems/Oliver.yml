@@ -78,9 +78,7 @@ planet:
     event:
       - date: '2225-09-26'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 44295.0
         socioIndustrial: F-D-C-D-F
       - date: '2230-01-01'
@@ -105,14 +103,10 @@ planet:
         population: 104118006.0
       - date: '2315-03-19'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2319-04-26'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2320-01-01'
         population: 162474036.0
       - date: '2330-01-01'
@@ -212,24 +206,18 @@ planet:
         population: 3119792050.0
       - date: '2767-07-16'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 3129000000.0
       - date: '2770-01-01'
         population: 3100588018.0
       - date: '2779-05-10'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2780-01-01'
         population: 3096052157.0
       - date: '2790-05-03'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 3072780040.0
       - date: '2800-01-01'
         population: 3052775336.0
@@ -239,9 +227,7 @@ planet:
         population: 3063451249.0
       - date: '2821-02-09'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 3053806861.0
       - date: '2840-01-01'
@@ -295,64 +281,43 @@ planet:
         socioIndustrial: B-B-C-B-C
       - date: '3030-08-31'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 2244253749.0
       - date: '3033-11-21'
         faction:
-          source: canon
-          value:
-            - FWL
-            - FC
+          - FWL
+          - FC
       - date: '3033-11-28'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
       - date: '3040-01-01'
         population: 2095436022.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial: B-B-C-B-D
       - date: '3050-01-01'
         population: 1958030047.0
       - date: '3057-10-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3060-01-01'
         population: 1796746404.0
       - date: '3070-01-01'
         population: 1678686303.0
       - date: '3072-04-26'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3079-03-01'
         faction:
-          source: canon
-          value:
-            - WOB
-            - Stone
+          - WOB
+          - Stone
       - date: '3079-03-10'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 1692508123.0
       - date: '3081-06-12'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1710886274.0
       - date: '3100-01-01'
@@ -371,12 +336,7 @@ planet:
         population: 1818499163.0
       - date: '3150-03-25'
         faction:
-          source: canon
-          value:
-            - CWE
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - CWE
   - name: Epona

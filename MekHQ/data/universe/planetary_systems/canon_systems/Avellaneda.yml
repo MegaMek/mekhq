@@ -41,9 +41,7 @@ planet:
     event:
       - date: '2241-12-10'
         faction:
-          source: canon
-          value:
-            - MCM
+          - MCM
         population: 53737.0
         socioIndustrial: D-D-C-D-F
       - date: '2250-01-01'
@@ -54,7 +52,7 @@ planet:
         population: 1655740.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -234,16 +232,12 @@ planet:
         population: 1176476459.0
       - date: '3079-08-05'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 1186875139.0
       - date: '3082-04-10'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-09-30'
         population: 1192108896.0
         socioIndustrial: A-A-C-A-D
@@ -259,33 +253,17 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3137-08-01'
         faction:
-          source: canon
-          value:
-            - MiC
+          - MiC
       - date: '3139-07-01'
         faction:
-          source: canon
-          value:
-            - CP
+          - CP
       - date: '3140-01-01'
         population: 1228168358.0
       - date: '3145-01-01'
         population: 1236053842.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - CP
   - name: Bera
     type: ICE_GIANT
     orbitalDist: 0.42

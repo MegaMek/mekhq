@@ -34,9 +34,7 @@ planet:
     event:
       - date: '2172-08-11'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 43925.0
         socioIndustrial: D-D-A-D-F
       - date: '2180-01-01'
@@ -53,9 +51,7 @@ planet:
         population: 755392.0
       - date: '2235-05-28'
         faction:
-          source: canon
-          value:
-            - TamP
+          - TamP
       - date: '2240-01-01'
         population: 1046737.0
       - date: '2250-01-01'
@@ -80,9 +76,9 @@ planet:
         population: 6219204.0
       - date: '2340-01-01'
         population: 6950673.0
-      - date: '2341-04-09'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -231,22 +227,22 @@ planet:
         population: 14378359.0
       - date: '3028-01-01'
         socioIndustrial: B-C-A-C-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 14274777.0
       - date: '3040-01-01'
         population: 14458669.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: B-C-A-C-D
       - date: '3050-01-01'
         population: 14618592.0
       - date: '3051-11-12'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CSV
             - CJF
@@ -254,14 +250,10 @@ planet:
         population: 14725698.0
       - date: '3062-04-29'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3069-10-04'
         faction:
-          source: canon
-          value:
-            - CW
+          - CW
       - date: '3070-01-01'
         population: 14809874.0
       - date: '3080-01-01'
@@ -282,17 +274,13 @@ planet:
         hpg: X
       - date: '3140-05-28'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 16351083.0
       - date: '3145-01-01'
         population: 16452775.0
       - date: '3151-11-15'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
   - name: Turberville's World
     type: ICE_GIANT
     orbitalDist: 0.35

@@ -52,9 +52,7 @@ planet:
     event:
       - date: '2348-11-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 52212.0
         socioIndustrial: D-D-B-D-B
       - date: '2350-01-01'
@@ -222,9 +220,7 @@ planet:
         population: 215223825.0
       - date: '3081-03-02'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 217256467.0
       - date: '3100-01-01'
@@ -245,9 +241,7 @@ planet:
         population: 227756832.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
   - name: Mert
     type: GIANT_TERRESTRIAL
     orbitalDist: 1.6

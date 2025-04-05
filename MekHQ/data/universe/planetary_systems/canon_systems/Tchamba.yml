@@ -61,9 +61,7 @@ planet:
     event:
       - date: '2719-03-05'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         hpg: B
         population: 39723.0
         socioIndustrial: C-D-C-D-D
@@ -147,9 +145,7 @@ planet:
         population: 172018116.0
       - date: '3081-05-02'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 173434464.0
       - date: '3100-01-01'
@@ -168,9 +164,7 @@ planet:
         population: 175212548.0
       - date: '3145-12-05'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 175844450.0
   - name: Démence de Vivier
     type: TERRESTRIAL

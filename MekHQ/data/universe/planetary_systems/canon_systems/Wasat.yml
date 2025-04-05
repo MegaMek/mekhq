@@ -31,9 +31,7 @@ planet:
     event:
       - date: '2265-06-14'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 53022.0
         socioIndustrial: D-D-C-D-F
       - date: '2270-01-01'
@@ -44,9 +42,7 @@ planet:
         population: 1503887.0
       - date: '2300-01-19'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 4165235.0
       - date: '2310-01-01'
         population: 9928046.0
@@ -58,9 +54,7 @@ planet:
         population: 68693234.0
       - date: '2341-02-02'
         faction:
-          source: canon
-          value:
-            - TH
+          - TH
       - date: '2350-01-01'
         population: 109967293.0
       - date: '2360-01-01'
@@ -153,23 +147,17 @@ planet:
         population: 1972569689.0
       - date: '2767-07-20'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2770-01-01'
         population: 1942077813.0
       - date: '2779-07-23'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2780-01-01'
         population: 1844608024.0
       - date: '2790-11-25'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1758021407.0
       - date: '2800-01-01'
         population: 1717485450.0
@@ -179,9 +167,7 @@ planet:
         population: 1578782463.0
       - date: '2821-12-16'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2830-01-01'
         population: 1516275811.0
       - date: '2840-01-01'
@@ -206,9 +192,7 @@ planet:
         population: 1151282480.0
       - date: '2920-12-29'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 1165784004.0
       - date: '2930-01-01'
         population: 1182484855.0
@@ -230,80 +214,61 @@ planet:
         population: 999772396.0
       - date: '3020-01-01'
         population: 933524271.0
-      - date: '3029-10-12'
+      - date: '3029-03-03'
         faction:
-          source: canon
+          source: NAIS 4th SW Atlas Volume 2, p. 16–17
           value:
             - TFR
       - date: '3030-01-01'
         population: 921431965.0
-      - date: '3032-10-23'
+      - date: '3031-09-15'
         faction:
-          source: canon
+          source: 20 Year Update, p. 12
           value:
-            - FS
+            - FC
+      - date: '3031-09-15'
+        faction:
+          source: 20 Year Update, p. 12
+          value:
+            - FC
       - date: '3033-01-01'
         socioIndustrial: C-D-C-D-C
       - date: '3033-10-04'
         faction:
-          source: canon
-          value:
-            - FWL
-            - FC
-      - date: '3033-10-26'
-        faction:
-          source: canon
-          value:
-            - FS
+          - FWL
+          - FC
       - date: '3040-01-01'
         population: 927069878.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3047-01-01'
         socioIndustrial: D-D-C-D-D
       - date: '3050-01-01'
         population: 931251093.0
       - date: '3057-10-01'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3060-01-01'
         population: 938918746.0
       - date: '3070-01-01'
         population: 949019118.0
       - date: '3071-01-12'
         faction:
-          source: canon
-          value:
-            - FWL
-            - WOB
+          - FWL
+          - WOB
       - date: '3071-01-28'
         faction:
-          source: canon
-          value:
-            - WOB
+          - WOB
       - date: '3077-01-10'
         faction:
-          source: canon
-          value:
-            - Stone
-            - WOB
+          - Stone
+          - WOB
       - date: '3077-01-15'
         faction:
-          source: canon
-          value:
-            - Stone
+          - Stone
       - date: '3080-01-01'
         population: 962398825.0
       - date: '3081-04-03'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 976943620.0
       - date: '3100-01-01'
@@ -320,33 +285,22 @@ planet:
         hpg: X
       - date: '3135-05-01'
         faction:
-          source: canon
-          value:
-            - SA
+          - SA
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3139-02-15'
         faction:
-          source: canon
-          value:
-            - AA
+          - AA
       - date: '3140-01-01'
         population: 998874299.0
       - date: '3145-01-01'
         population: 999873672.0
       - date: '3149-02-01'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - ROS
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Saskatchewan
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.42

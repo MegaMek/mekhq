@@ -126,9 +126,7 @@ planet:
     event:
       - date: '2166-02-02'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 40193.0
         socioIndustrial: D-C-B-D-D
       - date: '2170-01-01'
@@ -151,9 +149,7 @@ planet:
         population: 1833428.0
       - date: '2242-10-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 2512541.0
       - date: '2260-01-01'
@@ -180,9 +176,7 @@ planet:
         population: 16345696.0
       - date: '2370-06-16'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 17633634.0
       - date: '2380-01-01'
         population: 18831490.0
@@ -273,18 +267,14 @@ planet:
         population: 35742815.0
       - date: '2787-05-01'
         faction:
-          source: canon
-          value:
-            - FS
-            - DC
+          - FS
+          - DC
       - date: '2790-01-01'
         population: 35856985.0
       - date: '2792-09-10'
         faction:
-          source: canon
-          value:
-            - FS
-            - DC
+          - FS
+          - DC
       - date: '2800-01-01'
         population: 35716311.0
       - date: '2810-01-01'
@@ -293,9 +283,7 @@ planet:
         population: 35398062.0
       - date: '2821-12-11'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 35208050.0
       - date: '2840-01-01'
@@ -342,20 +330,21 @@ planet:
         population: 33441914.0
       - date: '3022-06-01'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '3025-01-01'
         population:
           source: canon
           value: 33000000.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 65865471.0
       - date: '3030-12-31'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3033-01-01'
         socioIndustrial: D-D-C-D-C
       - date: '3040-01-01'
@@ -380,9 +369,7 @@ planet:
         population: 4218585099.0
       - date: '3096-11-06'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '3100-01-01'
         population: 4230413690.0
       - date: '3110-01-01'
@@ -401,9 +388,7 @@ planet:
         population: 4404821724.0
       - date: '3145-01-28'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 4420707660.0
   - name: Galtor IV
     type: DWARF_TERRESTRIAL

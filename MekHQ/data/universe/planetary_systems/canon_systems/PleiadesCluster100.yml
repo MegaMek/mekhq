@@ -60,9 +60,7 @@ planet:
     event:
       - date: '2330-08-27'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
         population: 56188.0
         socioIndustrial: D-D-A-D-D
       - date: '2340-01-01'
@@ -119,22 +117,16 @@ planet:
         population: 2558891730.0
       - date: '2580-02-11'
         faction:
-          source: canon
-          value:
-            - SL
-            - TC
+          - SL
+          - TC
       - date: '2580-03-01'
         faction:
-          source: canon
-          value:
-            - SL
+          - SL
       - date: '2590-01-01'
         population: 2621439290.0
       - date: '2596-09-22'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2600-01-01'
         population: 2668727467.0
       - date: '2605-01-01'
@@ -233,15 +225,15 @@ planet:
         population: 2036810408.0
       - date: '3028-01-01'
         socioIndustrial: B-C-B-B-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 2042284321.0
       - date: '3040-01-01'
         population: 2069628136.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: A-B-A-A-C
       - date: '3050-01-01'
@@ -250,22 +242,20 @@ planet:
         population: 2111648552.0
       - date: '3067-01-10'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
             - TC
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
         population: 2133510930.0
       - date: '3074-06-01'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
       - date: '3080-01-01'
         population: 2138637506.0
       - date: '3090-01-01'
