@@ -27,6 +27,9 @@
  */
 package mekhq.campaign.personnel.skills.enums;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
 
 /**
@@ -78,6 +81,117 @@ public enum SkillAttribute {
 
     public static int NO_SKILL_ATTRIBUTE = -1;
 
+    final private static String RESOURCE_BUNDLE = "mekhq.resources." + SkillAttribute.class.getSimpleName();
+
+
+    /**
+     * Retrieves the label associated with this {@link SkillAttribute}.
+     *
+     * <p>The label is determined by looking up a resource bundle key associated with the enum's name in the format
+     * <code>{name}.label</code>.</p>
+     *
+     * @return The localized label for this {@link SkillAttribute}.
+     *
+     * @see #getLabel(SkillAttribute)
+     * @since 0.50.05
+     */
+    public String getLabel() {
+        final String RESOURCE_KEY = name() + ".label";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+    }
+
+    /**
+     * Retrieves the label associated with the given {@link SkillAttribute}.
+     *
+     * <p>The label is determined by looking up a resource bundle key associated with the attribute's name in the
+     * format <code>{name}.label</code>.</p>
+     *
+     * @param attribute The {@link SkillAttribute} whose label is to be retrieved.
+     *
+     * @return The localized label for the provided {@link SkillAttribute}.
+     *
+     * @see #getLabel()
+     * @since 0.50.05
+     */
+    public static String getLabel(SkillAttribute attribute) {
+        final String RESOURCE_KEY = attribute.name() + ".label";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+    }
+
+    /**
+     * Retrieves the short name associated with this {@link SkillAttribute}.
+     *
+     * <p>The short name is determined by looking up a resource bundle key associated with the enum's name in the
+     * format <code>{name}.shortName</code>.</p>
+     *
+     * @return The localized short name for this {@link SkillAttribute}.
+     *
+     * @see #getShortName(SkillAttribute)
+     * @since 0.50.05
+     */
+    public String getShortName() {
+        final String RESOURCE_KEY = name() + ".shortName";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+    }
+
+    /**
+     * Retrieves the short name associated with the given {@link SkillAttribute}.
+     *
+     * <p>The short name is determined by looking up a resource bundle key associated with the attribute's name in
+     * the format <code>{name}.shortName</code>.</p>
+     *
+     * @param attribute The {@link SkillAttribute} whose short name is to be retrieved.
+     *
+     * @return The localized short name for the provided {@link SkillAttribute}.
+     *
+     * @see #getShortName()
+     * @since 0.50.05
+     */
+    public static String getShortName(SkillAttribute attribute) {
+        final String RESOURCE_KEY = attribute.name() + ".shortName";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+    }
+
+    /**
+     * Retrieves the description associated with this {@link SkillAttribute}.
+     *
+     * <p>The description is determined by looking up a resource bundle key associated with the enum's name in the
+     * format <code>{name}.description</code>.</p>
+     *
+     * @return The localized description for this {@link SkillAttribute}.
+     *
+     * @see #getDescription(SkillAttribute)
+     * @since 0.50.05
+     */
+    public String getDescription() {
+        final String RESOURCE_KEY = name() + ".description";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+    }
+
+    /**
+     * Retrieves the description associated with the given {@link SkillAttribute}.
+     *
+     * <p>The description is determined by looking up a resource bundle key associated with the attribute's name in
+     * the format <code>{name}.description</code>.</p>
+     *
+     * @param attribute The {@link SkillAttribute} whose description is to be retrieved.
+     *
+     * @return The localized description for the provided {@link SkillAttribute}.
+     *
+     * @see #getDescription()
+     * @since 0.50.05
+     */
+    public static String getDescription(SkillAttribute attribute) {
+        final String RESOURCE_KEY = attribute.name() + ".description";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+    }
+
     /**
      * Converts a string or integer input to its corresponding {@link SkillAttribute}.
      *
@@ -105,9 +219,7 @@ public enum SkillAttribute {
 
         try {
             // Attempt to parse as an integer and use as ordinal.
-            // We're using Integer.parseInt() here and not MathUtility.parseInt as we want to have a log in the event
-            // parsing fails, rather than just silently failing.
-            return SkillAttribute.values()[Integer.parseInt(text)];
+            return SkillAttribute.values()[MathUtility.parseInt(text)];
         } catch (Exception ignored) {
         }
 

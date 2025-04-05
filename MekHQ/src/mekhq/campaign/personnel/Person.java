@@ -90,9 +90,11 @@ import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
@@ -199,6 +201,7 @@ public class Person {
     private int wealth;
     private int reputation;
     private int unlucky;
+    private Attributes atowAttributes;
 
     private PersonnelStatus status;
     private int xp;
@@ -427,6 +430,7 @@ public class Person {
         wealth = 0;
         reputation = 0;
         unlucky = 0;
+        atowAttributes = new Attributes();
         dateOfDeath = null;
         recruitment = null;
         joinedCampaign = null;
@@ -2371,6 +2375,10 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unlucky", unlucky);
             }
 
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "atowAttributes");
+            atowAttributes.writeAttributesToXML(pw, indent);
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "atowAttributes");
+
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minutesLeft", minutesLeft);
 
             if (overtimeLeft > 0) {
@@ -2781,6 +2789,8 @@ public class Person {
                     person.reputation = MathUtility.parseInt(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("unlucky")) {
                     person.unlucky = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("atowAttributes")) {
+                    person.atowAttributes = new Attributes().generateAttributesFromXML(wn2);
                 } else if (nodeName.equalsIgnoreCase("pilotHits")) {
                     person.hits = MathUtility.parseInt(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("skill")) {
@@ -3529,18 +3539,18 @@ public class Person {
                              SkillType.EXP_NONE;
             case MECHANIC:
                 if (isTechsHaveAdministration) {
-                    if (hasSkill(SkillType.S_TECH_MECHANIC) && hasSkill(SkillType.S_ADMIN)) {
+                    if (hasSkill(SkillType.S_TECH_MECHANIC) && hasSkill(S_ADMIN)) {
                         if (isAlternativeQualityAveraging) {
                             int rawScore = (int) Math.floor((getSkill(SkillType.S_TECH_MECHANIC).getLevel() +
-                                                                   getSkill(SkillType.S_ADMIN).getLevel()) / 2.0);
+                                                                   getSkill(S_ADMIN).getLevel()) / 2.0);
                             if (getSkill(SkillType.S_TECH_MECHANIC).getType().getExperienceLevel(rawScore) ==
-                                      getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore)) {
+                                      getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
                                 return getSkill(SkillType.S_TECH_MECHANIC).getType().getExperienceLevel(rawScore);
                             }
                         }
 
                         return (int) Math.floor((getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() +
-                                                       getSkill(SkillType.S_ADMIN).getExperienceLevel()) / 2.0);
+                                                       getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
                     } else {
                         return SkillType.EXP_NONE;
                     }
@@ -3615,18 +3625,18 @@ public class Person {
                              SkillType.EXP_NONE;
             case VESSEL_CREW:
                 if (isTechsHaveAdministration) {
-                    if (hasSkill(SkillType.S_TECH_VESSEL) && hasSkill(SkillType.S_ADMIN)) {
+                    if (hasSkill(SkillType.S_TECH_VESSEL) && hasSkill(S_ADMIN)) {
                         if (isAlternativeQualityAveraging) {
                             int rawScore = (int) Math.floor((getSkill(SkillType.S_TECH_VESSEL).getLevel() +
-                                                                   getSkill(SkillType.S_ADMIN).getLevel()) / 2.0);
+                                                                   getSkill(S_ADMIN).getLevel()) / 2.0);
                             if (getSkill(SkillType.S_TECH_VESSEL).getType().getExperienceLevel(rawScore) ==
-                                      getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore)) {
+                                      getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
                                 return getSkill(SkillType.S_TECH_VESSEL).getType().getExperienceLevel(rawScore);
                             }
                         }
 
                         return (int) Math.floor((getSkill(SkillType.S_TECH_VESSEL).getExperienceLevel() +
-                                                       getSkill(SkillType.S_ADMIN).getExperienceLevel()) / 2.0);
+                                                       getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
                     } else {
                         return SkillType.EXP_NONE;
                     }
@@ -3639,18 +3649,18 @@ public class Person {
                 return hasSkill(SkillType.S_NAV) ? getSkill(SkillType.S_NAV).getExperienceLevel() : SkillType.EXP_NONE;
             case MEK_TECH:
                 if (isTechsHaveAdministration) {
-                    if (hasSkill(SkillType.S_TECH_MEK) && hasSkill(SkillType.S_ADMIN)) {
+                    if (hasSkill(SkillType.S_TECH_MEK) && hasSkill(S_ADMIN)) {
                         if (isAlternativeQualityAveraging) {
                             int rawScore = (int) Math.floor((getSkill(SkillType.S_TECH_MEK).getLevel() +
-                                                                   getSkill(SkillType.S_ADMIN).getLevel()) / 2.0);
+                                                                   getSkill(S_ADMIN).getLevel()) / 2.0);
                             if (getSkill(SkillType.S_TECH_MEK).getType().getExperienceLevel(rawScore) ==
-                                      getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore)) {
+                                      getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
                                 return getSkill(SkillType.S_TECH_MEK).getType().getExperienceLevel(rawScore);
                             }
                         }
 
                         return (int) Math.floor((getSkill(SkillType.S_TECH_MEK).getExperienceLevel() +
-                                                       getSkill(SkillType.S_ADMIN).getExperienceLevel()) / 2.0);
+                                                       getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
                     } else {
                         return SkillType.EXP_NONE;
                     }
@@ -3661,18 +3671,18 @@ public class Person {
                 }
             case AERO_TEK:
                 if (isTechsHaveAdministration) {
-                    if (hasSkill(SkillType.S_TECH_AERO) && hasSkill(SkillType.S_ADMIN)) {
+                    if (hasSkill(SkillType.S_TECH_AERO) && hasSkill(S_ADMIN)) {
                         if (isAlternativeQualityAveraging) {
                             int rawScore = (int) Math.floor((getSkill(SkillType.S_TECH_AERO).getLevel() +
-                                                                   getSkill(SkillType.S_ADMIN).getLevel()) / 2.0);
+                                                                   getSkill(S_ADMIN).getLevel()) / 2.0);
                             if (getSkill(SkillType.S_TECH_AERO).getType().getExperienceLevel(rawScore) ==
-                                      getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore)) {
+                                      getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
                                 return getSkill(SkillType.S_TECH_AERO).getType().getExperienceLevel(rawScore);
                             }
                         }
 
                         return (int) Math.floor((getSkill(SkillType.S_TECH_AERO).getExperienceLevel() +
-                                                       getSkill(SkillType.S_ADMIN).getExperienceLevel()) / 2.0);
+                                                       getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
                     } else {
                         return SkillType.EXP_NONE;
                     }
@@ -3683,18 +3693,18 @@ public class Person {
                 }
             case BA_TECH:
                 if (isTechsHaveAdministration) {
-                    if (hasSkill(SkillType.S_TECH_BA) && hasSkill(SkillType.S_ADMIN)) {
+                    if (hasSkill(SkillType.S_TECH_BA) && hasSkill(S_ADMIN)) {
                         if (isAlternativeQualityAveraging) {
                             int rawScore = (int) Math.floor((getSkill(SkillType.S_TECH_BA).getLevel() +
-                                                                   getSkill(SkillType.S_ADMIN).getLevel()) / 2.0);
+                                                                   getSkill(S_ADMIN).getLevel()) / 2.0);
                             if (getSkill(SkillType.S_TECH_BA).getType().getExperienceLevel(rawScore) ==
-                                      getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore)) {
+                                      getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
                                 return getSkill(SkillType.S_TECH_BA).getType().getExperienceLevel(rawScore);
                             }
                         }
 
                         return (int) Math.floor((getSkill(SkillType.S_TECH_BA).getExperienceLevel() +
-                                                       getSkill(SkillType.S_ADMIN).getExperienceLevel()) / 2.0);
+                                                       getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
                     } else {
                         return SkillType.EXP_NONE;
                     }
@@ -3709,18 +3719,18 @@ public class Person {
                              SkillType.EXP_NONE;
             case DOCTOR:
                 if (isDoctorsHaveAdministration) {
-                    if (hasSkill(SkillType.S_DOCTOR) && hasSkill(SkillType.S_ADMIN)) {
+                    if (hasSkill(SkillType.S_DOCTOR) && hasSkill(S_ADMIN)) {
                         if (isAlternativeQualityAveraging) {
                             int rawScore = (int) Math.floor((getSkill(SkillType.S_DOCTOR).getLevel() +
-                                                                   getSkill(SkillType.S_ADMIN).getLevel()) / 2.0);
+                                                                   getSkill(S_ADMIN).getLevel()) / 2.0);
                             if (getSkill(SkillType.S_DOCTOR).getType().getExperienceLevel(rawScore) ==
-                                      getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore)) {
+                                      getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
                                 return getSkill(SkillType.S_DOCTOR).getType().getExperienceLevel(rawScore);
                             }
                         }
 
                         return (int) Math.floor((getSkill(SkillType.S_DOCTOR).getExperienceLevel() +
-                                                       getSkill(SkillType.S_ADMIN).getExperienceLevel()) / 2.0);
+                                                       getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
                     } else {
                         return SkillType.EXP_NONE;
                     }
@@ -4651,7 +4661,7 @@ public class Person {
 
         double administrationMultiplier = 1.0 - (TECH_ADMINISTRATION_MULTIPLIER * REGULAR_EXPERIENCE_LEVEL);
 
-        Skill administration = skills.getSkill(SkillType.S_ADMIN);
+        Skill administration = skills.getSkill(S_ADMIN);
         int experienceLevel = SkillLevel.NONE.getExperienceLevel();
 
         if (administration != null) {
@@ -4699,7 +4709,7 @@ public class Person {
 
         double administrationMultiplier = 1.0 - (DOCTOR_ADMINISTRATION_MULTIPLIER * REGULAR_EXPERIENCE_LEVEL);
 
-        Skill administration = skills.getSkill(SkillType.S_ADMIN);
+        Skill administration = skills.getSkill(S_ADMIN);
         int experienceLevel = SkillLevel.NONE.getExperienceLevel();
 
         if (administration != null) {
@@ -4931,6 +4941,99 @@ public class Person {
 
     public void setUnlucky(final int unlucky) {
         this.unlucky = unlucky;
+    }
+
+    /**
+     * Retrieves the character's {@link Attributes} object containing the character's attribute scores.
+     *
+     * <p><b>Usage:</b> In most cases you'll want to use {@link #getAttributeScore(SkillAttribute)} instead, as that
+     * will allow you to jump straight to the exact score you need.</p>
+     *
+     * @return the character's {@link Attributes} object.
+     *
+     * @since 0.50.5
+     */
+    public Attributes getATOWAttributes() {
+        return atowAttributes;
+    }
+
+    /**
+     * Retrieves the score of a specified attribute.
+     *
+     * <p>The method maps the provided {@link SkillAttribute} to its corresponding attribute in
+     * the {@link Attributes} object and returns its value. If the {@link SkillAttribute} is {@code NONE}, the method
+     * returns a score of 0. If the {@code attribute} is {@code null}, an error is logged, and the method returns a
+     * score of 0.</p>
+     *
+     * @param attribute the {@link SkillAttribute} to retrieve the score for.
+     *
+     * @return the score of the specified attribute, or 0 if the attribute is {@code NONE} or {@code null}.
+     *
+     * @since 0.50.5
+     */
+    public int getAttributeScore(final SkillAttribute attribute) {
+        if (attribute == null) {
+            logger.error("(getAttributeScore) SkillAttribute is null.");
+            return 0;
+        }
+
+        return switch (attribute) {
+            case NONE -> 0;
+            case STRENGTH -> atowAttributes.getStrength();
+            case BODY -> atowAttributes.getBody();
+            case REFLEXES -> atowAttributes.getReflexes();
+            case DEXTERITY -> atowAttributes.getDexterity();
+            case INTELLIGENCE -> atowAttributes.getIntelligence();
+            case WILLPOWER -> atowAttributes.getWillpower();
+            case CHARISMA -> atowAttributes.getCharisma();
+        };
+    }
+
+    /**
+     * Sets the character's {@link Attributes} object which contains their ATOW Attribute scores.
+     *
+     * <p><b>Usage:</b> This completely wipes the character's attribute scores and is likely not the method you're
+     * looking for. Consider{@link #changeAttributeScore(SkillAttribute, int)} if you just want to increment or
+     * decrement a specific attribute by a certain value.</p>
+     *
+     * @param atowAttributes the {@link Attributes} object to set.
+     *
+     * @since 0.50.5
+     */
+    public void setATOWAttributes(final Attributes atowAttributes) {
+        this.atowAttributes = atowAttributes;
+    }
+
+    /**
+     * Modifies the score of a specified attribute by applying a delta value.
+     *
+     * <p>This method maps the provided {@link SkillAttribute} to its corresponding attribute in the
+     * {@link Attributes} object and adjusts its value by the specified delta. If the {@code attribute} is {@code NONE},
+     * the method does nothing. If {@code attribute} is {@code null}, an error is logged, and the method returns without
+     * performing any operation.</p>
+     *
+     * @param attribute the {@link SkillAttribute} to modify the score for.
+     * @param delta     the value to add to (or subtract from) the current score of the specified attribute.
+     *
+     * @since 0.50.5
+     */
+    public void changeAttributeScore(final SkillAttribute attribute, final int delta) {
+        if (attribute == null) {
+            logger.error("(changeAttributeScore) SkillAttribute is null.");
+            return;
+        }
+
+        switch (attribute) {
+            case NONE -> {
+            }
+            case STRENGTH -> atowAttributes.changeStrength(delta);
+            case BODY -> atowAttributes.changeBody(delta);
+            case REFLEXES -> atowAttributes.changeReflexes(delta);
+            case DEXTERITY -> atowAttributes.changeDexterity(delta);
+            case INTELLIGENCE -> atowAttributes.changeIntelligence(delta);
+            case WILLPOWER -> atowAttributes.changeWillpower(delta);
+            case CHARISMA -> atowAttributes.changeCharisma(delta);
+        }
     }
 
     public void resetSkillTypes() {
