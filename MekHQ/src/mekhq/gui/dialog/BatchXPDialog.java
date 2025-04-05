@@ -30,6 +30,7 @@ package mekhq.gui.dialog;
 import static java.lang.Math.round;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -39,6 +40,7 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -137,7 +139,7 @@ public final class BatchXPDialog extends JDialog {
             }
 
             tableColumn.setPreferredWidth(column.getWidth());
-            tableColumn.setCellRenderer(new MekHqTableCellRenderer());
+            tableColumn.setCellRenderer(getRenderer());
             columnModel.setColumnVisible(tableColumn, true);
 
             personnelSorter.setComparator(column.ordinal(), column.getComparator(campaign));
@@ -154,6 +156,28 @@ public final class BatchXPDialog extends JDialog {
         final JScrollPane pane = new JScrollPaneWithSpeed(personnelTable);
         pane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         return pane;
+    }
+
+    private TableCellRenderer getRenderer() {
+        return new Renderer();
+    }
+
+    private class Renderer extends MekHqTableCellRenderer {
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+              boolean hasFocus, int row, int column) {
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            final int modelRow = table.convertRowIndexToModel(row);
+            final PersonnelTableModelColumn personnelColumn = batchXPColumns.get(column);
+            Person person = personnelModel.getPerson(modelRow);
+            String displayText = personnelColumn.getDisplayText(campaign, person);
+            if (displayText != null) {
+                setText(displayText);
+            }
+
+            return this;
+        }
     }
 
     private JComponent getButtonPanel() {
