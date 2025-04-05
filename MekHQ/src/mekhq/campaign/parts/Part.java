@@ -450,19 +450,27 @@ public abstract class Part implements IPartWork, ITechnology {
         String details = getDetails();
 
         if (details != null && !details.isBlank()) {
-            toReturn.append("</b><br/>").append(getDetails()).append("<br/>");
+            toReturn.append("</b><br>").append(getDetails()).append("<br>");
         }
 
-        if (this instanceof mekhq.campaign.parts.equipment.AmmoBin ammoBin) {
-            if (campaign.getQuartermaster() != null) {
-                toReturn.append("<br> <b>In Warehouse:</b> ")
-                      .append(campaign.getQuartermaster().getAmmoAvailable(ammoBin.getType()))
-                      .append(' ');
+        if (this.isSalvaging()) {
+            int inStock = 0;
+            if (this instanceof mekhq.campaign.parts.equipment.AmmoBin ammoBin) {
+                if (campaign.getQuartermaster() != null) {
+                    inStock = campaign.getQuartermaster().getAmmoAvailable(ammoBin.getType());
+                }
+            } else if (campaign.getWarehouse() != null) {
+                inStock = campaign.getWarehouse().getSparePartsCount(this);
             }
-        } else if (campaign.getWarehouse() != null) {
-            toReturn.append("<br> <b>In Warehouse:</b> ")
-                  .append(campaign.getWarehouse().getSparePartsCount(this))
-                  .append(' ');
+            String inStockText = inStock == 0 ?
+                ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
+                    .getFontColorNegativeHexColor(), "None in stock") :
+               ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
+                    .getFontColorPositiveHexColor(), String.valueOf(inStock) + " in stock");
+
+            toReturn.append(inStockText).append("<br>");
+        } else {
+            toReturn.append("<br>");
         }
 
         if (getSkillMin() <= SkillType.EXP_ELITE) {
