@@ -37,11 +37,11 @@ import static mekhq.campaign.personnel.skills.SkillCheckUtility.getTotalAttribut
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.performQuickSkillCheck;
 import static mekhq.campaign.personnel.skills.SkillType.S_GUN_MEK;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.DISASTROUS;
-import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessString;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginValue;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.DEXTERITY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.REFLEXES;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
@@ -82,7 +82,8 @@ class SkillCheckUtilityTest {
         int expectedMarginOfSuccess = getMarginValue(DISASTROUS);
         assertEquals(expectedMarginOfSuccess, checkUtility.getMarginOfSuccess());
 
-        String expectedResultsText = getMarginOfSuccessString(expectedMarginOfSuccess);
+        String RESOURCE_BUNDLE = "mekhq.resources." + SkillCheckUtility.class.getSimpleName();
+        String expectedResultsText = getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.nullPerson");
         assertEquals(expectedResultsText, checkUtility.getResultsText());
 
         int expectedTargetNumber = Integer.MAX_VALUE;
@@ -99,7 +100,8 @@ class SkillCheckUtilityTest {
         int expectedMarginOfSuccess = getMarginValue(DISASTROUS);
         assertEquals(expectedMarginOfSuccess, checkUtility.getMarginOfSuccess());
 
-        String expectedResultsText = getMarginOfSuccessString(expectedMarginOfSuccess);
+        String RESOURCE_BUNDLE = "mekhq.resources." + SkillCheckUtility.class.getSimpleName();
+        String expectedResultsText = getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.nullPerson");
         assertEquals(expectedResultsText, checkUtility.getResultsText());
 
         int expectedTargetNumber = Integer.MAX_VALUE;

@@ -149,7 +149,7 @@ public class SkillCheckUtility {
                                " Auto-failing check with bogus results so the bug stands out.");
 
             marginOfSuccess = getMarginValue(DISASTROUS);
-            resultsText = generateResultsText();
+            resultsText = getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.nullPerson");
             targetNumber = Integer.MAX_VALUE;
             roll = Integer.MIN_VALUE;
             return true;
@@ -185,7 +185,7 @@ public class SkillCheckUtility {
      */
     private String generateResultsText() {
         if (skillName == null) {
-            return getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.error");
+            return getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.nullSkillName");
         }
 
         String fullTitle = person.getHyperlinkedFullTitle();
