@@ -48,6 +48,7 @@ import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGround
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosphere;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
@@ -1564,11 +1565,21 @@ public class StratconRulesManager {
      */
     private static void increaseFatigue(int forceID, Campaign campaign) {
         for (UUID unit : campaign.getForce(forceID).getAllUnits(false)) {
+            int fatigueChangeRate = campaign.getCampaignOptions().getFatigueRate();
             for (Person person : campaign.getUnit(unit).getCrew()) {
-                int fatigueChangeRate = campaign.getCampaignOptions().getFatigueRate();
-                boolean hasGlassJaw = person.getOptions().booleanOption(FLAW_GLASS_JAW);
+                int fatigueChange = fatigueChangeRate;
 
-                person.changeFatigue(hasGlassJaw ? fatigueChangeRate * 2 : fatigueChangeRate);
+                boolean hasGlassJaw = person.getOptions().booleanOption(FLAW_GLASS_JAW);
+                boolean hasToughness = person.getOptions().booleanOption(ATOW_TOUGHNESS);
+                boolean hasGlassJawAndToughness = hasGlassJaw && hasToughness;
+
+                if (hasGlassJaw && !hasGlassJawAndToughness) {
+                    fatigueChange = fatigueChangeRate * 2;
+                } else if (hasToughness && !hasGlassJawAndToughness) {
+                    fatigueChange = (int) round(fatigueChangeRate * 0.5);
+                }
+
+                person.changeFatigue(fatigueChange);
 
                 if (campaign.getCampaignOptions().isUseFatigue()) {
                     Fatigue.processFatigueActions(campaign, person);

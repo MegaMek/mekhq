@@ -30,10 +30,12 @@ package mekhq.campaign.randomEvents.prisoners;
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static mekhq.campaign.force.ForceType.SECURITY;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
@@ -60,10 +62,10 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
@@ -786,7 +788,7 @@ public class EventEffectsManager {
         }
 
         final boolean isGuard = result.isGuard();
-        final int magnitude = result.magnitude();
+        int magnitude = result.magnitude();
 
         Person target = getRandomTarget(isGuard);
 
@@ -795,7 +797,16 @@ public class EventEffectsManager {
         }
 
         boolean hasGlassJaw = target.getOptions().booleanOption(FLAW_GLASS_JAW);
-        target.changeFatigue(hasGlassJaw ? magnitude * 2 : magnitude);
+        boolean hasToughness = target.getOptions().booleanOption(ATOW_TOUGHNESS);
+        boolean hasGlassJawAndToughness = hasGlassJaw && hasToughness;
+
+        if (hasGlassJaw && !hasGlassJawAndToughness) {
+            magnitude = magnitude * 2;
+        } else if (hasToughness && !hasGlassJawAndToughness) {
+            magnitude = (int) round(magnitude * 0.5);
+        }
+
+        target.changeFatigue(magnitude);
 
         if (campaign.getCampaignOptions().isUseFatigue()) {
             Fatigue.processFatigueActions(campaign, target);
@@ -847,7 +858,18 @@ public class EventEffectsManager {
 
         for (Person target : targets) {
             boolean hasGlassJaw = target.getOptions().booleanOption(FLAW_GLASS_JAW);
-            target.changeFatigue(hasGlassJaw ? magnitude * 2 : magnitude);
+            boolean hasToughness = target.getOptions().booleanOption(ATOW_TOUGHNESS);
+            boolean hasGlassJawAndToughness = hasGlassJaw && hasToughness;
+
+            int fatigueGain = magnitude;
+
+            if (hasGlassJaw && !hasGlassJawAndToughness) {
+                fatigueGain = magnitude * 2;
+            } else if (hasToughness && !hasGlassJawAndToughness) {
+                fatigueGain = (int) round(magnitude * 0.5);
+            }
+
+            target.changeFatigue(fatigueGain);
 
             if (campaign.getCampaignOptions().isUseFatigue()) {
                 Fatigue.processFatigueActions(campaign, target);
@@ -1074,9 +1096,19 @@ public class EventEffectsManager {
         for (int i = 0; i < targetCount; i++) {
             Person target = getRandomItem(potentialTargets);
 
-            int fatigueChange = d6(magnitude);
+            int fatigueGain = d6(magnitude);
+
             boolean hasGlassJaw = target.getOptions().booleanOption(FLAW_GLASS_JAW);
-            target.changeFatigue(hasGlassJaw ? fatigueChange * 2 : fatigueChange);
+            boolean hasToughness = target.getOptions().booleanOption(ATOW_TOUGHNESS);
+            boolean hasGlassJawAndToughness = hasGlassJaw && hasToughness;
+
+            if (hasGlassJaw && !hasGlassJawAndToughness) {
+                fatigueGain = magnitude * 2;
+            } else if (hasToughness && !hasGlassJawAndToughness) {
+                fatigueGain = (int) round(magnitude * 0.5);
+            }
+
+            target.changeFatigue(fatigueGain);
 
             if (campaign.getCampaignOptions().isUseFatigue()) {
                 Fatigue.processFatigueActions(campaign, target);

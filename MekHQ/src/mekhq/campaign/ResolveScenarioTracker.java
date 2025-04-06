@@ -28,8 +28,10 @@
  */
 package mekhq.campaign;
 
+import static java.lang.Math.ceil;
 import static mekhq.campaign.mission.Scenario.T_SPACE;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 
 import java.io.File;
@@ -841,7 +843,7 @@ public class ResolveScenarioTracker {
             currentHits = 6;
         }
         int newHits = Math.max(0, currentHits - existingHits);
-        casualties = (int) Math.ceil(Compute.getFullCrewSize(en) * (newHits / 6.0));
+        casualties = (int) ceil(Compute.getFullCrewSize(en) * (newHits / 6.0));
         // Now reduce the casualties if some "hits" were caused by ejection
         casualties = Math.max(0, casualties - rescuedCrew);
 
@@ -1079,7 +1081,7 @@ public class ResolveScenarioTracker {
                     currentHits = entity.getCrew().getHits();
                 }
                 int newHits = Math.max(0, currentHits - existingHits);
-                casualties = (int) Math.ceil(Compute.getFullCrewSize(entity) * (newHits / 6.0));
+                casualties = (int) ceil(Compute.getFullCrewSize(entity) * (newHits / 6.0));
             }
 
             for (Person person : crew) {
@@ -1547,17 +1549,25 @@ public class ResolveScenarioTracker {
                 int statusHits = status.getHits();
                 int priorHits = person.getHits();
                 int newHits = statusHits - priorHits;
-                int extraHits = 0;
+                int adjustedHits = 0;
 
                 boolean hasGlassJaw = person.getOptions().booleanOption(FLAW_GLASS_JAW);
+                boolean hasToughness = person.getOptions().booleanOption(ATOW_TOUGHNESS);
+                boolean hasGlassJawAndToughness = hasGlassJaw && hasToughness;
 
-                if (hasGlassJaw) {
-                    extraHits = newHits;
+                if (hasGlassJaw && !hasGlassJawAndToughness) {
+                    adjustedHits = newHits * 2;
+                } else if (hasToughness && !hasGlassJawAndToughness) {
+                    adjustedHits = (int) ceil(newHits * 0.75);
                 }
 
                 if (campaign.getCampaignOptions().isUseInjuryFatigue()) {
                     int fatigueRate = campaign.getCampaignOptions().getFatigueRate();
-                    int fatigueIncrease = (hasGlassJaw ? fatigueRate * 2 : fatigueRate) * (newHits + extraHits);
+                    int fatigueIncrease = newHits * fatigueRate;
+
+                    if ((hasGlassJaw || hasToughness) && !hasGlassJawAndToughness) {
+                        fatigueIncrease = adjustedHits;
+                    }
 
                     person.changeFatigue(fatigueIncrease);
 
@@ -1565,7 +1575,7 @@ public class ResolveScenarioTracker {
                 }
 
                 person.setHitsPrior(priorHits);
-                person.setHits(statusHits + extraHits);
+                person.setHits(statusHits + adjustedHits);
             }
 
             if (status.wasDeployed()) {
@@ -1595,9 +1605,18 @@ public class ResolveScenarioTracker {
 
             if (!status.isDead()) {
                 int fatigueChangeRate = campaign.getCampaignOptions().getFatigueRate();
-                boolean hasGlassJaw = person.getOptions().booleanOption(FLAW_GLASS_JAW);
 
-                person.changeFatigue(hasGlassJaw ? fatigueChangeRate * 2 : fatigueChangeRate);
+                boolean hasGlassJaw = person.getOptions().booleanOption(FLAW_GLASS_JAW);
+                boolean hasToughness = person.getOptions().booleanOption(ATOW_TOUGHNESS);
+                boolean hasGlassJawAndToughness = hasGlassJaw && hasToughness;
+
+                if (hasGlassJaw && !hasGlassJawAndToughness) {
+                    fatigueChangeRate = fatigueChangeRate * 2;
+                } else if (hasToughness && !hasGlassJawAndToughness) {
+                    fatigueChangeRate = (int) ceil(fatigueChangeRate * 0.75);
+                }
+
+                person.changeFatigue(fatigueChangeRate);
 
                 if (campaign.getCampaignOptions().isUseFatigue()) {
                     Fatigue.processFatigueActions(campaign, person);
