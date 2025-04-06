@@ -149,6 +149,12 @@ MEKHQ VERSION HISTORY:
 + PR #6552: Added ATOW Attribute Tracking and Utility Methods
 + PR #6551: Fixed Inability to GM Activate Self-Crewed Units (such as DropShips)
 + PR #6553: Rebranded "Intelligence" as "Reasoning" to Avoid Confusion with ATOW Intelligence Attribute
++ Fix #6548: Fixed Age Soerting in Personnel Table
++ PR #6554: Added the Ability to Purchase ATOW Attribute Improvements; Added the GM Ability to Mass Set Attributes
++ PR #6555: Added ATOW Attribute Columns to Personnel Table
++ PR #6557: Improved Display for in stock parts while salvaging
++ PR #6558: Show engine tonnage in parts-in-use table
++ PR #6562: Fixed Campaign Portrait Fallback; Updated Immersive Dialog Visuals
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
