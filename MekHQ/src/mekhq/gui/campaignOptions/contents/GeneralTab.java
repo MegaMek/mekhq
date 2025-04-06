@@ -102,6 +102,7 @@ public class GeneralTab {
     private MMComboBox<UnitRatingMethod> unitRatingMethodCombo;
     private JLabel lblManualUnitRatingModifier;
     private JSpinner manualUnitRatingModifier;
+    private JCheckBox chkResetCriminalRecord;
     private JCheckBox chkClampReputationPayMultiplier;
     private JCheckBox chkReduceReputationPerformanceModifier;
     private JCheckBox chkReputationPerformanceModifierCutOff;
@@ -198,6 +199,7 @@ public class GeneralTab {
               resources.getString("lblReputation.tooltip")));
         lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
         manualUnitRatingModifier = new CampaignOptionsSpinner("ManualUnitRatingModifier", 0, -1000, 1000, 1);
+        chkResetCriminalRecord = new CampaignOptionsCheckBox("ResetCriminalRecord");
         chkClampReputationPayMultiplier = new CampaignOptionsCheckBox("ClampReputationPayMultiplier");
         chkReduceReputationPerformanceModifier = new CampaignOptionsCheckBox("ReduceReputationPerformanceModifier");
         chkReputationPerformanceModifierCutOff = new CampaignOptionsCheckBox("ReputationPerformanceModifierCutOff");
@@ -273,6 +275,8 @@ public class GeneralTab {
         panel.add(manualUnitRatingModifier, layout);
         layout.gridy++;
         layout.gridwidth = 3;
+        panel.add(chkResetCriminalRecord, layout);
+        layout.gridy++;
         panel.add(chkClampReputationPayMultiplier, layout);
         layout.gridy++;
         panel.add(chkReduceReputationPerformanceModifier, layout);
@@ -366,6 +370,7 @@ public class GeneralTab {
         lblManualUnitRatingModifier = new JLabel();
         manualUnitRatingModifier = new JSpinner();
 
+        chkResetCriminalRecord = new JCheckBox();
         chkClampReputationPayMultiplier = new JCheckBox();
         chkReduceReputationPerformanceModifier = new JCheckBox();
         chkReputationPerformanceModifierCutOff = new JCheckBox();
@@ -546,7 +551,7 @@ public class GeneralTab {
      *                              the campaign's default faction is used.
      */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
-                                              @Nullable LocalDate presetDate, @Nullable Faction presetFaction) {
+          @Nullable LocalDate presetDate, @Nullable Faction presetFaction) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -587,7 +592,7 @@ public class GeneralTab {
      * @param isSaveAction          A boolean indicating if this is a save action.
      */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions, boolean isStartUp,
-                                               boolean isSaveAction) {
+          boolean isSaveAction) {
         // First, we apply any updates to the campaign
         if (!isSaveAction) {
             campaign.setName(txtName.getText());
@@ -622,6 +627,13 @@ public class GeneralTab {
 
         options.setUnitRatingMethod(unitRatingMethodCombo.getSelectedItem());
         options.setManualUnitRatingModifier((int) manualUnitRatingModifier.getValue());
+
+        if (chkResetCriminalRecord.isSelected()) {
+            campaign.setDateOfLastCrime(null);
+            campaign.setCrimeRating(0);
+            campaign.setCrimePirateModifier(0);
+        }
+
         options.setClampReputationPayMultiplier(chkClampReputationPayMultiplier.isSelected());
         options.setReduceReputationPerformanceModifier(chkReduceReputationPerformanceModifier.isSelected());
         options.setReputationPerformanceModifierCutOff(chkReputationPerformanceModifierCutOff.isSelected());
