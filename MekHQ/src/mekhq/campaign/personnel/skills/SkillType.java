@@ -320,20 +320,22 @@ public class SkillType {
      * Default constructor for the {@code SkillType} class.
      *
      * <p>Initializes a default skill type with placeholder values, primarily for testing or fallback purposes.</p>
+     *
+     * <p><b>Usage:</b> Generally you don't want to be calling this, outside of loading from xml or in Unit Tests.
+     * Instead, you want to use the full constructor.</p>
      */
     public SkillType() {
-        new SkillType("MISSING_NAME",
-              7,
-              false,
-              COMBAT_GUNNERY,
-              REFLEXES,
-              DEXTERITY,
-              1,
-              3,
-              4,
-              5,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL });
+        this.name = "MISSING_NAME";
+        this.target = 7;
+        this.countUp = false;
+        this.subType = COMBAT_GUNNERY;
+        this.firstAttribute = REFLEXES;
+        this.secondAttribute = DEXTERITY;
+        this.greenLvl = 1;
+        this.regLvl = 3;
+        this.vetLvl = 4;
+        this.eliteLvl = 5;
+        this.costs = new Integer[11];
     }
 
     /**
@@ -375,10 +377,10 @@ public class SkillType {
      *
      *                        <p>For example:</p>
      *                        <pre>
-     *                                                                                                                                                                  Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                                                                  SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                                                                         SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                                                                  </pre>
+     *                                                                                                                                                                                                                                                              Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                                                                                                                                              SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                                                                                                                                                     SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                                                                                                                                              </pre>
      *
      * @author Illiani
      * @since 0.50.05
