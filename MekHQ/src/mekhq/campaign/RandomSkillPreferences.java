@@ -52,6 +52,7 @@ public class RandomSkillPreferences {
     private int overallRecruitBonus;
     Map<PersonnelRole, Integer> recruitmentBonuses;
     private boolean randomizeSkill;
+    private boolean randomizeAttributes;
     private boolean useClanBonuses;
     private int antiMekProb;
     private int[] specialAbilityBonus;
@@ -68,7 +69,7 @@ public class RandomSkillPreferences {
         overallRecruitBonus = 0;
         recruitmentBonuses = new HashMap<>();
         randomizeSkill = true;
-        useClanBonuses = true;
+        randomizeAttributes = false;
         antiMekProb = 10;
         combatSmallArmsBonus = -3;
         supportSmallArmsBonus = -10;
@@ -165,18 +166,34 @@ public class RandomSkillPreferences {
         }
     }
 
-    public void setRandomizeSkill(boolean b) {
-        this.randomizeSkill = b;
-    }
-
     public boolean randomizeSkill() {
         return randomizeSkill;
     }
 
+    public void setRandomizeSkill(boolean b) {
+        this.randomizeSkill = b;
+    }
+
+    public boolean isRandomizeAttributes() {
+        return randomizeAttributes;
+    }
+
+    public void setRandomizeAttributes(boolean isRandomizeAttributes) {
+        this.randomizeAttributes = isRandomizeAttributes;
+    }
+
+    /**
+     * @deprecated not in use.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public void setUseClanBonuses(boolean b) {
         this.useClanBonuses = b;
     }
 
+    /**
+     * @deprecated not in use.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public boolean useClanBonuses() {
         return useClanBonuses;
     }
@@ -269,7 +286,7 @@ public class RandomSkillPreferences {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandSkillsModifier", commandSkillsModifier);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "roleplaySkillsModifier", roleplaySkillsModifier);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeSkill", randomizeSkill);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanBonuses", useClanBonuses);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeAttributes", randomizeAttributes);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "antiMekProb", antiMekProb);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "combatSmallArmsBonus", combatSmallArmsBonus);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "supportSmallArmsBonus", supportSmallArmsBonus);
@@ -303,8 +320,8 @@ public class RandomSkillPreferences {
                     retVal.overallRecruitBonus = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomizeSkill")) {
                     retVal.randomizeSkill = wn2.getTextContent().equalsIgnoreCase("true");
-                } else if (wn2.getNodeName().equalsIgnoreCase("useClanBonuses")) {
-                    retVal.useClanBonuses = wn2.getTextContent().equalsIgnoreCase("true");
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomizeAttributes")) {
+                    retVal.randomizeAttributes = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("antiMekProb")) {
                     retVal.antiMekProb = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("combatSmallArmsBonus")) {

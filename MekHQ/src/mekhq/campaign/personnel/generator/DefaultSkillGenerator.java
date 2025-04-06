@@ -27,6 +27,9 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import static megamek.common.Compute.d6;
+import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
 
@@ -39,9 +42,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 public class DefaultSkillGenerator extends AbstractSkillGenerator {
     //region Constructors
@@ -150,6 +154,49 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             String selSkill = possibleSkills.get(Compute.randomInt(possibleSkills.size()));
             int secondLvl = Utilities.generateExpLevel(rskillPrefs.getSecondSkillBonus());
             addSkill(person, selSkill, secondLvl, rskillPrefs.randomizeSkill(), 0);
+        }
+    }
+
+    @Override
+    public void generateAttributes(Person person) {
+        RandomSkillPreferences skillPreferences = getSkillPreferences();
+        boolean extraRandomAttributes = skillPreferences.isRandomizeAttributes();
+
+        PersonnelRole profession = person.getPrimaryRole();
+        Phenotype phenotype = person.getPhenotype();
+        for (SkillAttribute attribute : SkillAttribute.values()) {
+            if (attribute.isNone()) {
+                continue;
+            }
+
+            // Profession && Phenotype adjustments
+            int attributeModifier = profession.getAttributeModifier(attribute);
+            attributeModifier += phenotype.getAttributeModifier(attribute);
+            person.changeAttributeScore(attribute, attributeModifier);
+
+            // Basic Attribute randomization
+            int roll = d6();
+
+            if (roll == 1) {
+                person.changeAttributeScore(attribute, -1);
+            } else if (roll == 6) {
+                person.changeAttributeScore(attribute, 1);
+            }
+
+            // Extra Attribute randomness
+            if (extraRandomAttributes) {
+                roll = d6();
+
+                if (roll == 1) {
+                    do {
+                        person.changeAttributeScore(attribute, -1);
+                    } while ((d6() == 1) && (person.getAttributeScore(attribute) > MINIMUM_ATTRIBUTE_SCORE));
+                } else if (roll == 6) {
+                    do {
+                        person.changeAttributeScore(attribute, 1);
+                    } while ((d6() == 1) && (person.getAttributeScore(attribute) < MAXIMUM_ATTRIBUTE_SCORE));
+                }
+            }
         }
     }
 }

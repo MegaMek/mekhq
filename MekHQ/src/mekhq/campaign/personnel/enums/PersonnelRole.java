@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 /**
  * The PersonnelRole enum represents various roles a person can have. Each role is associated with a name, an optional
@@ -57,7 +58,16 @@ public enum PersonnelRole {
     AEROSPACE_PILOT("PersonnelRole.AEROSPACE_PILOT.text", KeyEvent.VK_A),
     CONVENTIONAL_AIRCRAFT_PILOT("PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT.text", KeyEvent.VK_C),
     PROTOMEK_PILOT("PersonnelRole.PROTOMEK_PILOT.text", KeyEvent.VK_P),
-    BATTLE_ARMOUR("PersonnelRole.BATTLE_ARMOUR.text", "PersonnelRole.BATTLE_ARMOUR.clan.text", KeyEvent.VK_B),
+    BATTLE_ARMOUR("PersonnelRole.BATTLE_ARMOUR.text",
+          "PersonnelRole.BATTLE_ARMOUR.clan.text",
+          KeyEvent.VK_B,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0),
     SOLDIER("PersonnelRole.SOLDIER.text", KeyEvent.VK_S),
     VESSEL_PILOT("PersonnelRole.VESSEL_PILOT.text", KeyEvent.VK_I),
     VESSEL_GUNNER("PersonnelRole.VESSEL_GUNNER.text", KeyEvent.VK_U),
@@ -82,6 +92,13 @@ public enum PersonnelRole {
     private final String name;
     private final String clanName;
     private final int mnemonic; // Unused: J, K, Q, X, Z
+    private final int strength;
+    private final int body;
+    private final int dexterity;
+    private final int reflexes;
+    private final int intelligence;
+    private final int willpower;
+    private final int charisma;
     // endregion Variable Declarations
 
     // region Constructors
@@ -93,7 +110,7 @@ public enum PersonnelRole {
      * @param mnemonic the mnemonic of the personnel role
      */
     PersonnelRole(final String name, final int mnemonic) {
-        this(name, null, mnemonic);
+        this(name, null, mnemonic, 0, 0, 0, 0, 0, 0, 0);
     }
 
     /**
@@ -104,12 +121,21 @@ public enum PersonnelRole {
      * @param clanName the clan name of the role can be {@code null}.
      * @param mnemonic the mnemonic associated with the role.
      */
-    PersonnelRole(final String name, @Nullable final String clanName, final int mnemonic) {
+    PersonnelRole(final String name, @Nullable final String clanName, final int mnemonic, final int strength,
+          final int body, final int reflexes, final int dexterity, final int intelligence, final int willpower,
+          final int charisma) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
               MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.clanName = (clanName == null) ? this.name : resources.getString(clanName);
         this.mnemonic = mnemonic;
+        this.strength = strength;
+        this.body = body;
+        this.reflexes = reflexes;
+        this.dexterity = dexterity;
+        this.intelligence = intelligence;
+        this.willpower = willpower;
+        this.charisma = charisma;
     }
     // endregion Constructors
 
@@ -120,6 +146,43 @@ public enum PersonnelRole {
 
     public int getMnemonic() {
         return mnemonic;
+    }
+
+    /**
+     * Retrieves the corresponding modifier value for the given {@link SkillAttribute}.
+     *
+     * <p>This method determines the modifier by matching the input {@link SkillAttribute}
+     * to its associated property within the class. The mapping is as follows:</p>
+     * <ul>
+     *     <li>{@link SkillAttribute#NONE}: Returns {@code 0} as no modification is applicable.</li>
+     *     <li>{@link SkillAttribute#STRENGTH}: Returns the value of the {@code strength} modifier.</li>
+     *     <li>{@link SkillAttribute#BODY}: Returns the value of the {@code body} modifier.</li>
+     *     <li>{@link SkillAttribute#REFLEXES}: Returns the value of the {@code reflexes} modifier.</li>
+     *     <li>{@link SkillAttribute#DEXTERITY}: Returns the value of the {@code dexterity} modifier.</li>
+     *     <li>{@link SkillAttribute#INTELLIGENCE}: Returns the value of the {@code intelligence} modifier.</li>
+     *     <li>{@link SkillAttribute#WILLPOWER}: Returns the value of the {@code willpower} modifier.</li>
+     *     <li>{@link SkillAttribute#CHARISMA}: Returns the value of the {@code charisma} modifier.</li>
+     * </ul>
+     *
+     * @param attribute The {@link SkillAttribute} for which the modifier value is requested. Must not be {@code null}.
+     *
+     * @return The integer value of the modifier corresponding to the given {@link SkillAttribute}.
+     */
+    public int getAttributeModifier(final SkillAttribute attribute) {
+        if (attribute == null) {
+            return 0;
+        }
+
+        return switch (attribute) {
+            case NONE -> 0;
+            case STRENGTH -> strength;
+            case BODY -> body;
+            case REFLEXES -> reflexes;
+            case DEXTERITY -> dexterity;
+            case INTELLIGENCE -> intelligence;
+            case WILLPOWER -> willpower;
+            case CHARISMA -> charisma;
+        };
     }
     // endregion Getters
 
