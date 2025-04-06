@@ -170,25 +170,33 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         // Connections
         if (d6() == 6) {
-            person.changeConnections(1);
+            person.setConnections(1);
+        } else {
+            person.setConnections(0);
         }
 
         // Reputation
         int roll = d6();
         if (roll == 6 || roll == 1) {
-            person.changeReputation(roll == 6 ? 1 : -1);
+            person.setReputation(roll == 6 ? 1 : -1);
+        } else {
+            person.setReputation(0);
         }
 
         // Wealth
         roll = d6();
         if (roll == 6 || roll == 1) {
-            person.changeWealth(roll == 6 ? 1 : -1);
+            person.setWealth(roll == 6 ? 1 : -1);
+        } else {
+            person.setWealth(0);
         }
 
         // Unlucky
         roll = randomInt(20);
         if (roll == 0) {
-            person.changeUnlucky(1);
+            person.setUnlucky(1);
+        } else {
+            person.setUnlucky(0);
         }
     }
 }
