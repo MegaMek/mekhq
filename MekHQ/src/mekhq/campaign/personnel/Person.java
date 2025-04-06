@@ -4208,7 +4208,28 @@ public class Person {
     // endregion Personnel Options
 
     // region edge
+
+    /**
+     * Retrieves the edge value for the current person.
+     *
+     * <p><b>Usage:</b> This method gets the character's raw Edge score. Generally you likely want to use
+     * {@link #getAdjustedEdge()} instead, as that includes adjustments for the character's {@code unlucky} trait.</p>
+     *
+     * @return The edge value defined in the person's options.
+     */
     public int getEdge() {
+        return getOptions().intOption(OptionsConstants.EDGE);
+    }
+
+    /**
+     * Retrieves the adjusted edge value for the current person.
+     *
+     * <p>The adjusted Edge value is calculated by subtracting the person's level of bad luck (unlucky)
+     * from their base Edge value.</p>
+     *
+     * @return The adjusted edge value after accounting for the person's level of bad luck.
+     */
+    public int getAdjustedEdge() {
         return getOptions().intOption(OptionsConstants.EDGE) - unlucky;
     }
 
@@ -4229,7 +4250,7 @@ public class Person {
      * Resets support personnel edge points to the purchased level. Used for weekly refresh.
      */
     public void resetCurrentEdge() {
-        setCurrentEdge(getEdge());
+        setCurrentEdge(getAdjustedEdge());
     }
 
     /**

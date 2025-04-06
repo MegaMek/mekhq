@@ -4829,19 +4829,19 @@ public class Unit implements ITechnology {
                 if (getCampaign().getCampaignOptions().isUseEdge()) {
                     double sumEdge = 0;
                     for (Person p : drivers) {
-                        sumEdge += p.getEdge();
+                        sumEdge += p.getAdjustedEdge();
                     }
                     // Again, don't count infantrymen twice
                     if (!entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
                         for (Person p : gunners) {
-                            sumEdge += p.getEdge();
+                            sumEdge += p.getAdjustedEdge();
                         }
                     }
                     // Average the edge values of pilots and gunners. The Spacecraft Engineer
                     // (vessel crewmembers)
                     // handle edge solely through MHQ as noncombat personnel, so aren't considered
                     // here
-                    int edge = (int) Math.round(sumEdge / crewSize);
+                    int edge = max(0, (int) Math.round(sumEdge / crewSize));
                     IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
                     edgeOption.setValue((Integer) edge);
                 }
@@ -5228,7 +5228,7 @@ public class Unit implements ITechnology {
                         }
                         sumEdgeUsed = engineer.getEdgeUsed();
                     }
-                    sumEdge += p.getEdge();
+                    sumEdge += p.getAdjustedEdge();
 
                     if (p.hasSkill(SkillType.S_TECH_VESSEL)) {
                         sumSkill += p.getSkill(SkillType.S_TECH_VESSEL).getLevel();
@@ -5262,7 +5262,7 @@ public class Unit implements ITechnology {
                     }
                     engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill / nCrew, sumBonus / nCrew);
                     engineer.setEdgeUsed(sumEdgeUsed);
-                    engineer.setCurrentEdge((sumEdge - sumEdgeUsed) / nCrew);
+                    engineer.setCurrentEdge(max(0, (sumEdge - sumEdgeUsed) / nCrew));
                     engineer.setUnit(this);
                 } else {
                     engineer = null;
