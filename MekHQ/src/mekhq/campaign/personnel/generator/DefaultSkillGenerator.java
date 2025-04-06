@@ -174,27 +174,24 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             attributeModifier += phenotype.getAttributeModifier(attribute);
             person.changeAttributeScore(attribute, attributeModifier);
 
-            // Basic Attribute randomization
+            // Attribute randomization
             int roll = d6();
 
             if (roll == 1) {
                 person.changeAttributeScore(attribute, -1);
+
+                if (extraRandomAttributes) {
+                    while ((d6() == 1) && (person.getAttributeScore(attribute) > MINIMUM_ATTRIBUTE_SCORE)) {
+                        person.changeAttributeScore(attribute, -1);
+                    }
+                }
             } else if (roll == 6) {
                 person.changeAttributeScore(attribute, 1);
-            }
 
-            // Extra Attribute randomness
-            if (extraRandomAttributes) {
-                roll = d6();
-
-                if (roll == 1) {
-                    do {
-                        person.changeAttributeScore(attribute, -1);
-                    } while ((d6() == 1) && (person.getAttributeScore(attribute) > MINIMUM_ATTRIBUTE_SCORE));
-                } else if (roll == 6) {
-                    do {
+                if (extraRandomAttributes) {
+                    while ((d6() == 6) && (person.getAttributeScore(attribute) < MAXIMUM_ATTRIBUTE_SCORE)) {
                         person.changeAttributeScore(attribute, 1);
-                    } while ((d6() == 1) && (person.getAttributeScore(attribute) < MAXIMUM_ATTRIBUTE_SCORE));
+                    }
                 }
             }
         }
