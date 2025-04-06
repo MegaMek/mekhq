@@ -375,10 +375,10 @@ public class SkillType {
      *
      *                        <p>For example:</p>
      *                        <pre>
-     *                                                                                             Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                             SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                    SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                             </pre>
+     *                                                                                                                                                                  Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                                                  SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                                                         SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                                                  </pre>
      *
      * @author Illiani
      * @since 0.50.05
@@ -900,6 +900,12 @@ public class SkillType {
                     skillType.secondAttribute = SkillAttribute.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("costs")) {
                     String[] values = wn2.getTextContent().split(",");
+                    if (skillType.costs == null) {
+                        skillType.costs = new Integer[11];
+                        // Fill with default values, this protects us from NPEs
+                        Arrays.fill(skillType.costs, DISABLED_SKILL_LEVEL);
+                    }
+
                     for (int i = 0; i < values.length; i++) {
                         skillType.costs[i] = MathUtility.parseInt(values[i], skillType.costs[i]);
                     }
