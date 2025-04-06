@@ -322,7 +322,18 @@ public class SkillType {
      * <p>Initializes a default skill type with placeholder values, primarily for testing or fallback purposes.</p>
      */
     public SkillType() {
-        new SkillType("MISSING_NAME", 7, false, COMBAT_GUNNERY, REFLEXES, DEXTERITY, 1, 3, 4, 5, new ArrayList<>());
+        new SkillType("MISSING_NAME",
+              7,
+              false,
+              COMBAT_GUNNERY,
+              REFLEXES,
+              DEXTERITY,
+              1,
+              3,
+              4,
+              5,
+              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL });
     }
 
     /**
@@ -330,39 +341,51 @@ public class SkillType {
      *
      * <p>If certain parameters are {@code null}, default values will be used.</p>
      *
-     * <p>The {@code costs} parameter is validated to ensure that it has exactly 11 entries (corresponding to skill
-     * levels 0 through 10 inclusive). If the provided list has fewer than 11 entries, additional entries with a value
-     * of {@link #DISABLED_SKILL_LEVEL} will be appended until the size reaches 11. If an error occurs when setting the
-     * {@code costs}, it will be logged, and the {@code costs} array will not be set.</p>
+     * <p>The {@code costs} parameter is validated to ensure it contains exactly 11 entries,
+     * corresponding to skill levels 0 through 10 inclusive. If the provided array is {@code null} or has fewer than 11
+     * elements, a new array will be created with missing entries filled with {@link #DISABLED_SKILL_LEVEL}. If the
+     * array has more than 11 entries, it will be trimmed to size. Additionally, the input array is copied to prevent
+     * accidental external changes to the internal state of the instance.</p>
      *
      * @param name            The name of the skill type. <b>Cannot</b> be {@code null}.
-     * @param target          The target value of the skill used for achievement or comparison purposes. If
-     *                        {@code null}, the default value is {@code 7}.
+     * @param target          The target value representing a threshold or goal for the skill. If {@code null}, the
+     *                        default value is {@code 7}.
      * @param isCountUp       {@code true} if the skill counts up toward a goal, {@code false} otherwise. If
      *                        {@code null}, the default value is {@code false}.
-     * @param subType         The {@code SkillSubType} category of the skill. <b>Cannot</b> be {@code null}.
-     * @param firstAttribute  The first associated skill attribute. <b>Cannot</b> be {@code null}.
-     * @param secondAttribute The second associated skill attribute. If {@code null}, the default value is
-     *                        {@code NONE}.
-     * @param greenLvl        The value representing the green skill level. If {@code null}, the default value is
-     *                        {@code 1}.
-     * @param regLvl          The value representing the regular skill level. If {@code null}, the default value is
-     *                        {@code 3}.
-     * @param vetLvl          The value representing the veteran skill level. If {@code null}, the default value is
-     *                        {@code 4}.
-     * @param eliteLvl        The value representing the elite skill level. If {@code null}, the default value is
-     *                        {@code 5}.
-     * @param costs           A {@code List<Integer>} representing costs associated with the skill's progression. The
-     *                        list should ideally contain exactly 11 values, one for each skill level (0-10, inclusive).
-     *                        If fewer than 11 values are provided, additional entries with the value
-     *                        {@link #DISABLED_SKILL_LEVEL} will be  added until the size is 11.
+     * @param subType         The {@link SkillSubType} category of the skill. This indicates the broader classification
+     *                        of the skill (e.g., combat-related, role-playing).
+     *                        <b>Cannot</b> be {@code null}.
+     * @param firstAttribute  The primary {@link SkillAttribute} associated with the skill, influencing its calculation
+     *                        or behavior. <b>Cannot</b> be {@code null}.
+     * @param secondAttribute The secondary {@link SkillAttribute} associated with the skill. If {@code null}, the
+     *                        default value is {@link SkillAttribute#NONE}.
+     * @param greenLvl        The value representing the skill's "Green" proficiency level. If {@code null}, the default
+     *                        value is {@code 1}.
+     * @param regLvl          The value representing the skill's "Regular" proficiency level. If {@code null}, the
+     *                        default value is {@code 3}.
+     * @param vetLvl          The value representing the skill's "Veteran" proficiency level. If {@code null}, the
+     *                        default value is {@code 4}.
+     * @param eliteLvl        The value representing the skill's "Elite" proficiency level. If {@code null}, the default
+     *                        value is {@code 5}.
+     * @param costs           An {@code Integer[]} array representing the skill's progression costs for each level from
+     *                        0 to 10 inclusive. If the array is {@code null} or its length is not exactly 11, a new
+     *                        array is created with default values. Missing entries are filled with
+     *                        {@link #DISABLED_SKILL_LEVEL}, and extra entries beyond the 11th are ignored. A clean copy
+     *                        of the array is always used to ensure the integrity of the internal state.
+     *
+     *                        <p>For example:</p>
+     *                        <pre>
+     *                                                                                             Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                             SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                    SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                             </pre>
      *
      * @author Illiani
      * @since 0.50.05
      */
     public SkillType(String name, @Nullable Integer target, @Nullable Boolean isCountUp, SkillSubType subType,
           SkillAttribute firstAttribute, @Nullable SkillAttribute secondAttribute, @Nullable Integer greenLvl,
-          @Nullable Integer regLvl, @Nullable Integer vetLvl, @Nullable Integer eliteLvl, List<Integer> costs) {
+          @Nullable Integer regLvl, @Nullable Integer vetLvl, @Nullable Integer eliteLvl, Integer[] costs) {
         this.name = name;
         this.target = target == null ? 7 : target;
         this.countUp = isCountUp != null && isCountUp;
@@ -376,19 +399,21 @@ public class SkillType {
 
         // This validates the length of costs to ensure that valid entries exist for all possible skill levels (0-10,
         // inclusive)
-        int costsLength = costs.size();
-        if (costsLength != 11) {
-            while (costsLength < 11) {
-                costs.add(DISABLED_SKILL_LEVEL);
-                costsLength++;
-            }
-        }
+        if (costs == null || costs.length != 11) {
+            logger.warn(
+                  "The costs array is null or does not have exactly 11 entries. Filling missing levels with default values.");
+            Integer[] validCosts = new Integer[11];
+            Arrays.fill(validCosts, DISABLED_SKILL_LEVEL);
 
-        try {
-            this.costs = costs.toArray(new Integer[11]);
-        } catch (Exception e) {
-            logger.error("Error setting costs for skill type: {}. Array has {} entries." +
-                               "  Skipping setting of costs.", name, costsLength);
+            // If costs is not null, copy in existing elements
+            if (costs != null) {
+                System.arraycopy(costs, 0, validCosts, 0, Math.min(costs.length, 11));
+            }
+
+            this.costs = validCosts;
+        } else {
+            // Ensure a clean copy of the given array so we can't accidentally make dirty edits.
+            this.costs = Arrays.copyOf(costs, 11);
         }
     }
 
@@ -1098,7 +1123,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
+              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createGunneryMek() {
@@ -1112,7 +1137,8 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
+              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createPilotingAero() {
@@ -1126,7 +1152,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
+              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createGunneryAero() {
@@ -1140,7 +1166,8 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
+              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createPilotingJet() {
@@ -1154,7 +1181,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
+              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createGunneryJet() {
@@ -1168,7 +1195,8 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
+              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createPilotingSpace() {
@@ -1182,7 +1210,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
+              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createGunnerySpace() {
@@ -1196,7 +1224,8 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
+              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createPilotingGroundVee() {
@@ -1210,7 +1239,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
+              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createPilotingNavalVee() {
@@ -1224,7 +1253,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
+              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createPilotingVTOL() {
@@ -1238,7 +1267,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
+              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createGunneryVehicle() {
@@ -1252,7 +1281,8 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
+              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createArtillery() {
@@ -1266,7 +1296,8 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
+              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createGunneryBA() {
@@ -1280,7 +1311,8 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
+              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createGunneryProto() {
@@ -1294,7 +1326,8 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
+              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createSmallArms() {
@@ -1308,7 +1341,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
+              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createAntiMek() {
@@ -1325,7 +1358,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(12, 6, 6, 6, 6, 6, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
+              new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createTechMek() {
@@ -1340,17 +1373,8 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(12,
-                    6,
-                    0,
-                    6,
-                    6,
-                    6,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL));
+              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createTechMechanic() {
@@ -1365,17 +1389,8 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(12,
-                    6,
-                    0,
-                    6,
-                    6,
-                    6,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL));
+              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createTechAero() {
@@ -1390,17 +1405,8 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(12,
-                    6,
-                    0,
-                    6,
-                    6,
-                    6,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL));
+              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createTechBA() {
@@ -1415,17 +1421,8 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(12,
-                    6,
-                    0,
-                    6,
-                    6,
-                    6,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL));
+              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createTechVessel() {
@@ -1440,17 +1437,8 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(12,
-                    6,
-                    0,
-                    6,
-                    6,
-                    6,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL));
+              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createAstech() {
@@ -1465,17 +1453,9 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(12,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL));
+              new Integer[] { 12, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createDoctor() {
@@ -1490,17 +1470,8 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(16,
-                    8,
-                    0,
-                    8,
-                    8,
-                    8,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL));
+              new Integer[] { 16, 8, 0, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createMedTech() {
@@ -1514,17 +1485,9 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(16,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL));
+              new Integer[] { 16, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createNav() {
@@ -1539,7 +1502,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
+              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createTactics() {
@@ -1553,7 +1516,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6));
+              new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 });
     }
 
     public static SkillType createStrategy() {
@@ -1567,7 +1530,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6));
+              new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 });
     }
 
     public static SkillType createAdmin() {
@@ -1581,17 +1544,8 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(8,
-                    4,
-                    0,
-                    4,
-                    4,
-                    4,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL,
-                    DISABLED_SKILL_LEVEL));
+              new Integer[] { 8, 4, 0, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL });
     }
 
     public static SkillType createLeadership() {
@@ -1605,7 +1559,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6));
+              new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 });
     }
 
     public static SkillType createNegotiation() {
@@ -1619,7 +1573,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4));
+              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 });
     }
 
     public static SkillType createScrounge() {
@@ -1634,7 +1588,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4));
+              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 });
     }
 
     public static SkillType createAcrobatics() {
@@ -1648,7 +1602,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createActing() {
@@ -1662,7 +1616,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createAnimalHandling() {
@@ -1676,7 +1630,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createAppraisal() {
@@ -1690,7 +1644,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createArchery() {
@@ -1704,7 +1658,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createArtDancing() {
@@ -1718,7 +1672,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createArtDrawing() {
@@ -1732,7 +1686,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createArtPainting() {
@@ -1746,7 +1700,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createArtWriting() {
@@ -1760,7 +1714,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createClimbing() {
@@ -1774,7 +1728,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createCommunications() {
@@ -1788,7 +1742,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createComputers() {
@@ -1802,7 +1756,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createCryptography() {
@@ -1816,7 +1770,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createDemolitions() {
@@ -1830,7 +1784,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createDisguise() {
@@ -1844,7 +1798,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createEscapeArtist() {
@@ -1858,7 +1812,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createForgery() {
@@ -1872,7 +1826,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createInterestHistory() {
@@ -1886,7 +1840,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createInterestLiterature() {
@@ -1900,7 +1854,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createInterestHoloGames() {
@@ -1914,7 +1868,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createInterestSports() {
@@ -1928,7 +1882,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createInterrogation() {
@@ -1942,7 +1896,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createInvestigation() {
@@ -1956,7 +1910,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createLanguages() {
@@ -1970,7 +1924,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createMartialArts() {
@@ -1984,7 +1938,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createPerception() {
@@ -1998,7 +1952,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createSleightOfHand() {
@@ -2014,7 +1968,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createProtocols() {
@@ -2028,7 +1982,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createScienceBiology() {
@@ -2042,7 +1996,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createScienceChemistry() {
@@ -2056,7 +2010,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createScienceMathematics() {
@@ -2070,7 +2024,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createSciencePhysics() {
@@ -2084,7 +2038,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createSecuritySystemsElectronic() {
@@ -2098,7 +2052,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createSecuritySystemsMechanical() {
@@ -2112,7 +2066,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createSensorOperations() {
@@ -2126,7 +2080,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createStealth() {
@@ -2140,7 +2094,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createStreetwise() {
@@ -2154,7 +2108,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createSurvival() {
@@ -2168,7 +2122,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createTracking() {
@@ -2182,7 +2136,7 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 
     public static SkillType createTraining() {
@@ -2196,6 +2150,6 @@ public class SkillType {
               null,
               null,
               null,
-              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 });
     }
 }
