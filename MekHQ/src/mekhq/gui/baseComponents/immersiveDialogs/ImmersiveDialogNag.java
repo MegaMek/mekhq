@@ -113,7 +113,7 @@ public class ImmersiveDialogNag {
      *                       messages from the resource bundle.
      */
     public ImmersiveDialogNag(final Campaign campaign, final @Nullable AdministratorSpecialization specialization,
-                              final String nagConstant, final String messageKey) {
+          final String nagConstant, final String messageKey) {
         ImmersiveDialogCore dialog = constructDialog(campaign, specialization, messageKey);
         processDialogChoice(dialog.getDialogChoice(), nagConstant);
     }
@@ -135,7 +135,7 @@ public class ImmersiveDialogNag {
      *       button labels.
      */
     protected ImmersiveDialogCore constructDialog(Campaign campaign, AdministratorSpecialization specialization,
-                                                  String messageKey) {
+          String messageKey) {
         return new ImmersiveDialogCore(campaign,
               getSpeaker(campaign, specialization),
               null,
@@ -145,7 +145,7 @@ public class ImmersiveDialogNag {
               null,
               true,
               null,
-              campaign.getCampaignFactionIcon(),
+              null,
               true);
     }
 

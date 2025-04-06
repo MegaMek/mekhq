@@ -33,6 +33,7 @@ import static java.lang.Math.min;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
+import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -42,17 +43,21 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.icons.Portrait;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -82,7 +87,7 @@ public class ImmersiveDialogCore extends JDialog {
     private int CENTER_WIDTH = scaleForGUI(400);
 
     private final int PADDING = scaleForGUI(5);
-    protected final int IMAGE_WIDTH = 250; // This is scaled to GUI by 'scaleImageIconToWidth'
+    protected static final int IMAGE_WIDTH = scaleForGUI(200);
 
     private JPanel northPanel;
     private JPanel southPanel;
@@ -600,7 +605,7 @@ public class ImmersiveDialogCore extends JDialog {
         JPanel speakerBox = new JPanel();
         speakerBox.setLayout(new BoxLayout(speakerBox, BoxLayout.Y_AXIS));
         speakerBox.setAlignmentX(Component.CENTER_ALIGNMENT);
-        speakerBox.setMaximumSize(scaleForGUI(IMAGE_WIDTH, MAX_VALUE));
+        speakerBox.setMaximumSize(new Dimension(IMAGE_WIDTH, scaleForGUI(MAX_VALUE)));
 
         // Get speaker details
         String speakerName = campaign.getName();
@@ -704,7 +709,24 @@ public class ImmersiveDialogCore extends JDialog {
             return campaign.getCampaignFactionIcon();
         }
 
-        return speaker.getPortrait().getImageIcon();
+        Portrait portrait = speaker.getPortrait();
+
+        if (portrait == null || Objects.equals(portrait.getFilename(), DEFAULT_PORTRAIT_FILENAME)) {
+            return campaign.getCampaignFactionIcon();
+        }
+
+        // The following sorcery is due to the compressed manner in which personnel portraits are stored.
+        // We need to manipulate the original base image, otherwise it looks grainy and terrible.
+        ImageObserver observer = (img, infoFlags, x, y, width, height) -> true;
+
+        Image baseImage = portrait.getBaseImage();
+        int baseImageHeight = baseImage.getHeight(observer);
+        int baseImageWidth = baseImage.getWidth(observer);
+        int targetWidth = Math.max(1, IMAGE_WIDTH);
+
+        int height = (int) Math.ceil((double) targetWidth * baseImageHeight / baseImageWidth);
+
+        return new ImageIcon(baseImage.getScaledInstance(targetWidth, height, Image.SCALE_SMOOTH));
     }
 
     /**
