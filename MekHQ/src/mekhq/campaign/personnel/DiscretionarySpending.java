@@ -246,7 +246,7 @@ public class DiscretionarySpending {
             return "";
         }
 
-        person.setWealth(wealth - 1);
+        person.changeWealth(-1);
         person.setHasPerformedExtremeExpenditure(true);
 
         int totalSpending = getExpenditure(person.getAttributeScore(WILLPOWER), wealth);
