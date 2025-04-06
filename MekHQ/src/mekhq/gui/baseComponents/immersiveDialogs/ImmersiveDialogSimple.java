@@ -80,9 +80,8 @@ public class ImmersiveDialogSimple extends ImmersiveDialogCore {
      *                              buttons are stacked vertically; otherwise, they are arranged side-by-side.
      */
     public ImmersiveDialogSimple(Campaign campaign, @Nullable Person leftSpeaker, @Nullable Person rightSpeaker,
-                                 String centerMessage, @Nullable List<String> buttonLabels,
-                                 @Nullable String outOfCharacterMessage, @Nullable ImageIcon imageIcon,
-                                 boolean useVerticalLayout) {
+          String centerMessage, @Nullable List<String> buttonLabels, @Nullable String outOfCharacterMessage,
+          @Nullable ImageIcon imageIcon, boolean useVerticalLayout) {
         super(campaign,
               leftSpeaker,
               rightSpeaker,
@@ -92,7 +91,7 @@ public class ImmersiveDialogSimple extends ImmersiveDialogCore {
               null,
               useVerticalLayout,
               null,
-              imageIcon == null ? campaign.getCampaignFactionIcon() : imageIcon,
+              imageIcon,
               true);
     }
 

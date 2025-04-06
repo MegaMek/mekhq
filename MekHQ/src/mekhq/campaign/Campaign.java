@@ -161,8 +161,6 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.RandomDependents;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.RandomDeath;
@@ -1930,8 +1928,8 @@ public class Campaign implements ITechManager {
      * @return A new {@link Person}.
      */
     public Person newPerson(final PersonnelRole primaryRole, final PersonnelRole secondaryRole,
-                            final AbstractFactionSelector factionSelector, final AbstractPlanetSelector planetSelector,
-                            final Gender gender) {
+          final AbstractFactionSelector factionSelector, final AbstractPlanetSelector planetSelector,
+          final Gender gender) {
         return newPerson(primaryRole, secondaryRole, getPersonnelGenerator(factionSelector, planetSelector), gender);
     }
 
@@ -1958,7 +1956,7 @@ public class Campaign implements ITechManager {
      * @return A new {@link Person} configured using {@code personnelGenerator}.
      */
     public Person newPerson(final PersonnelRole primaryRole, final PersonnelRole secondaryRole,
-                            final AbstractPersonnelGenerator personnelGenerator, final Gender gender) {
+          final AbstractPersonnelGenerator personnelGenerator, final Gender gender) {
         final Person person = personnelGenerator.generate(this, primaryRole, secondaryRole, gender);
 
         // Assign a random portrait after we generate a new person
@@ -2320,17 +2318,20 @@ public class Campaign implements ITechManager {
                     switch (person.getPrimaryRole()) {
                         case GROUND_VEHICLE_DRIVER:
                             bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE) ?
-                                                     person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue(options) :
+                                                     person.getSkill(SkillType.S_PILOT_GVEE)
+                                                           .getFinalSkillValue(options) :
                                                      TargetRoll.AUTOMATIC_FAIL;
                             break;
                         case NAVAL_VEHICLE_DRIVER:
                             bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE) ?
-                                                     person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue(options) :
+                                                     person.getSkill(SkillType.S_PILOT_NVEE)
+                                                           .getFinalSkillValue(options) :
                                                      TargetRoll.AUTOMATIC_FAIL;
                             break;
                         case VTOL_PILOT:
                             bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL) ?
-                                                     person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue(options) :
+                                                     person.getSkill(SkillType.S_PILOT_VTOL)
+                                                           .getFinalSkillValue(options) :
                                                      TargetRoll.AUTOMATIC_FAIL;
                             break;
                         default:
@@ -2371,7 +2372,8 @@ public class Campaign implements ITechManager {
                         case VESSEL_NAVIGATOR:
                             bloodnameTarget += 2 *
                                                      (person.hasSkill(SkillType.S_NAV) ?
-                                                            person.getSkill(SkillType.S_NAV).getFinalSkillValue(options) :
+                                                            person.getSkill(SkillType.S_NAV)
+                                                                  .getFinalSkillValue(options) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
                         default:
@@ -2654,7 +2656,7 @@ public class Campaign implements ITechManager {
      * @return An {@link AbstractPersonnelGenerator} to use when creating new personnel.
      */
     public AbstractPersonnelGenerator getPersonnelGenerator(final AbstractFactionSelector factionSelector,
-                                                            final AbstractPlanetSelector planetSelector) {
+          final AbstractPlanetSelector planetSelector) {
         final DefaultPersonnelGenerator generator = new DefaultPersonnelGenerator(factionSelector, planetSelector);
         generator.setNameGenerator(RandomNameGenerator.getInstance());
         generator.setSkillPreferences(getRandomSkillPreferences());
@@ -2829,7 +2831,7 @@ public class Campaign implements ITechManager {
      * @param ignoreSparesUnderQuality spares with a quality lower than this threshold are excluded from counting.
      */
     private void updatePartInUseData(PartInUse partInUse, Part incomingPart, boolean ignoreMothballedUnits,
-                                     PartQuality ignoreSparesUnderQuality) {
+          PartQuality ignoreSparesUnderQuality) {
         Unit unit = incomingPart.getUnit();
         if (unit != null) {
             // Ignore conventional infantry
@@ -2875,7 +2877,7 @@ public class Campaign implements ITechManager {
      * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
      */
     public void updatePartInUse(PartInUse partInUse, boolean ignoreMothballedUnits,
-                                PartQuality ignoreSparesUnderQuality) {
+          PartQuality ignoreSparesUnderQuality) {
         partInUse.setUseCount(0);
         partInUse.setStoreCount(0);
         partInUse.setTransferCount(0);
@@ -2932,7 +2934,7 @@ public class Campaign implements ITechManager {
      */
 
     public Set<PartInUse> getPartsInUse(boolean ignoreMothballedUnits, boolean isResupply,
-                                        PartQuality ignoreSparesUnderQuality) {
+          PartQuality ignoreSparesUnderQuality) {
         // java.util.Set doesn't supply a get(Object) method, so we have to use a
         // java.util.Map
         Map<PartInUse, PartInUse> inUse = new HashMap<>();
@@ -3290,7 +3292,8 @@ public class Campaign implements ITechManager {
         if (getPatientsFor(doctor) > 25) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, doctor.getFullName() + " already has 25 patients.");
         }
-        TargetRoll target = new TargetRoll(skill.getFinalSkillValue(doctor.getOptions()), skill.getSkillLevel().toString());
+        TargetRoll target = new TargetRoll(skill.getFinalSkillValue(doctor.getOptions()),
+              skill.getSkillLevel().toString());
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             return target;
         }
@@ -3789,7 +3792,7 @@ public class Campaign implements ITechManager {
      * @return The result of the rolls.
      */
     public PartAcquisitionResult findContactForAcquisition(IAcquisitionWork acquisition, Person person,
-                                                           PlanetarySystem system) {
+          PlanetarySystem system) {
         TargetRoll target = getTargetForAcquisition(acquisition, person);
 
         String impossibleSentencePrefix = person == null ?
@@ -3900,7 +3903,7 @@ public class Campaign implements ITechManager {
      *         successful.
      */
     private boolean acquireEquipment(IAcquisitionWork acquisition, Person person, PlanetarySystem system,
-                                     int transitDays) {
+          int transitDays) {
         boolean found = false;
         String report = "";
 
@@ -6322,7 +6325,7 @@ public class Campaign implements ITechManager {
      * @param individualPayouts Map of Person to the Money they're owed
      */
     public void payPersonnel(TransactionType type, Money quantity, String description,
-                             Map<Person, Money> individualPayouts) {
+          Map<Person, Money> individualPayouts) {
         getFinances().debit(type,
               getLocalDate(),
               quantity,
@@ -7456,7 +7459,7 @@ public class Campaign implements ITechManager {
      *       an impossible/automatic result under specific circumstances.
      */
     public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition, final @Nullable Person person,
-                                              final boolean checkDaysToWait) {
+          final boolean checkDaysToWait) {
         if (getCampaignOptions().getAcquisitionSkill().equals(S_AUTO)) {
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "Automatic Success");
         }
@@ -7489,7 +7492,8 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "It is extinct!");
         }
 
-        TargetRoll target = new TargetRoll(skill.getFinalSkillValue(person.getOptions()), skill.getSkillLevel().toString());
+        TargetRoll target = new TargetRoll(skill.getFinalSkillValue(person.getOptions()),
+              skill.getSkillLevel().toString());
         target.append(acquisition.getAllAcquisitionMods());
 
         if (getCampaignOptions().isUseAtB() && getCampaignOptions().isRestrictPartsByMission()) {
@@ -8712,7 +8716,7 @@ public class Campaign implements ITechManager {
      * @return units that have that transport type
      */
     public Set<Unit> getTransportsByType(CampaignTransportType campaignTransportType, TransporterType transporterType,
-                                         double unitSize) {
+          double unitSize) {
         return Objects.requireNonNull(getCampaignTransporterMap(campaignTransportType))
                      .getTransportsByType(transporterType, unitSize);
     }
@@ -9540,7 +9544,7 @@ public class Campaign implements ITechManager {
         if (campaignIcon.getFilename() == null) {
             icon = getFactionLogo(this, getFaction().getShortName(), true);
         } else {
-            icon = new ImageIcon(campaignIcon.getFilename());
+            icon = campaignIcon.getImageIcon();
         }
         return icon;
     }
