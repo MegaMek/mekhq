@@ -91,6 +91,9 @@ public class PrisonerEventManager {
     private final int RESPONSE_TARGET_NUMBER = 7;
 
     public static final int DEFAULT_TEMPORARY_CAPACITY = 100;
+    // The temporary prisoner capacity should never go below 0.
+    // But the security forces should be able to guard some prisoners in all cases
+    public static final int MINIMUM_TEMPORARY_CAPACITY = 25;
     public static final double TEMPORARY_CAPACITY_DEGRADE_RATE = 0.1;
 
     // These values are based on CamOps. CamOps states a squad of CI or one squad of BA can
