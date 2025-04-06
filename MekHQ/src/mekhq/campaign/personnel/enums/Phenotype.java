@@ -209,7 +209,8 @@ public enum Phenotype {
      * the current instance (as returned by {@code name()}) and uses it to fetch the formatted text from the resource
      * bundle.</p>
      *
-     * @return A formatted label string corresponding to the key "<component name>.label" from the resource bundle.
+     * @return A formatted label string corresponding to the key "{@code Component Name}.label" from the resource
+     *       bundle.
      *
      * @author Illiani
      * @since 0.50.05
@@ -225,7 +226,8 @@ public enum Phenotype {
      * the current instance (as returned by {@code name()}) and uses it to fetch the formatted text from the resource
      * bundle.</p>
      *
-     * @return A formatted tooltip string corresponding to the key "<component name>.tooltip" from the resource bundle.
+     * @return A formatted tooltip string corresponding to the key "{@code Component Name}.tooltip" from the resource
+     *       bundle.
      *
      * @author Illiani
      * @since 0.50.05
