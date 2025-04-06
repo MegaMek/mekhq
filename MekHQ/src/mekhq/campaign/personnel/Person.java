@@ -975,11 +975,11 @@ public class Person {
         if (isClanPersonnel()) {
             bgPrefix = getPhenotype().getShortName() + ' ';
         }
-        return bgPrefix + getPrimaryRole().getName(isClanPersonnel());
+        return bgPrefix + getPrimaryRole().getLabel(isClanPersonnel());
     }
 
     public String getSecondaryRoleDesc() {
-        return getSecondaryRole().getName(isClanPersonnel());
+        return getSecondaryRole().getLabel(isClanPersonnel());
     }
 
     public boolean canPerformRole(LocalDate today, final PersonnelRole role, final boolean primary) {
@@ -2677,10 +2677,10 @@ public class Person {
                 } else if (nodeName.equalsIgnoreCase("biography")) {
                     person.biography = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("primaryRole")) {
-                    final PersonnelRole primaryRole = PersonnelRole.parseFromString(wn2.getTextContent().trim());
+                    final PersonnelRole primaryRole = PersonnelRole.fromString(wn2.getTextContent().trim());
                     person.setPrimaryRoleDirect(primaryRole);
                 } else if (nodeName.equalsIgnoreCase("secondaryRole")) {
-                    person.setSecondaryRoleDirect(PersonnelRole.parseFromString(wn2.getTextContent().trim()));
+                    person.setSecondaryRoleDirect(PersonnelRole.fromString(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("acquisitions")) {
                     person.acquisitions = MathUtility.parseInt(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("primaryDesignator")) {

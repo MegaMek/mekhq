@@ -92,7 +92,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.divorce.RandomDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -750,7 +749,7 @@ public class CampaignGUI extends JPanel {
         JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text"));
         menuHire.setMnemonic(KeyEvent.VK_H);
         for (PersonnelRole role : PersonnelRole.getPrimaryRoles()) {
-            JMenuItem miHire = new JMenuItem(role.getName(getCampaign().getFaction().isClan()));
+            JMenuItem miHire = new JMenuItem(role.getLabel(getCampaign().getFaction().isClan()));
             if (role.getMnemonic() != KeyEvent.VK_UNDEFINED) {
                 miHire.setMnemonic(role.getMnemonic());
                 miHire.setAccelerator(KeyStroke.getKeyStroke(role.getMnemonic(), InputEvent.ALT_DOWN_MASK));

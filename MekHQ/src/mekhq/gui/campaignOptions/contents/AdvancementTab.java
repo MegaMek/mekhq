@@ -1034,7 +1034,7 @@ public class AdvancementTab {
             layout.gridx = currentColumn * 2;
             layout.gridy = currentRow;
 
-            lblRecruitmentBonusCombat[i] = new JLabel(roles.get(i).getName(false));
+            lblRecruitmentBonusCombat[i] = new JLabel(roles.get(i).getLabel(false));
             spnRecruitmentBonusCombat[i] = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
 
             panel.add(lblRecruitmentBonusCombat[i], layout);
@@ -1076,7 +1076,7 @@ public class AdvancementTab {
             layout.gridx = currentColumn * 2;
             layout.gridy = currentRow;
 
-            lblRecruitmentBonusSupport[i] = new JLabel(roles.get(i).getName(false));
+            lblRecruitmentBonusSupport[i] = new JLabel(roles.get(i).getLabel(false));
             spnRecruitmentBonusSupport[i] = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
 
             panel.add(lblRecruitmentBonusSupport[i], layout);

@@ -51,7 +51,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MarketNewPersonnelEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.rating.IUnitRating;
@@ -115,9 +114,9 @@ public class PersonnelMarket {
     }
 
     /**
-     * Generates new personnel for the current day, adding them to the campaign's personnel market if applicable.
-     * The method handles removing outdated personnel, checking hiring hall and capital conditions,
-     * and updating the personnel pool.
+     * Generates new personnel for the current day, adding them to the campaign's personnel market if applicable. The
+     * method handles removing outdated personnel, checking hiring hall and capital conditions, and updating the
+     * personnel pool.
      * <p>
      * The process includes:
      * <ul>
@@ -129,8 +128,8 @@ public class PersonnelMarket {
      *     <li>Optionally generating a personnel market report, if this is enabled in campaign options.</li>
      * </ul>
      *
-     * @param campaign The {@link Campaign} related to the current gameplay context. Used to
-     *                determine the campaign's current planetary system, date, settings, factions, and more.
+     * @param campaign The {@link Campaign} related to the current gameplay context. Used to determine the campaign's
+     *                 current planetary system, date, settings, factions, and more.
      */
     public void generatePersonnelForDay(Campaign campaign) {
         PlanetarySystem location = campaign.getLocation().getCurrentSystem();
@@ -140,8 +139,9 @@ public class PersonnelMarket {
         boolean isOnPlanet = campaign.getLocation().isOnPlanet();
         boolean useCapitalsHiringHallsOnly = campaign.getCampaignOptions().isUsePersonnelHireHiringHallOnly();
         boolean isHiringHall = location.isHiringHall(today);
-        boolean isCapital = location.getFactionSet(today).stream()
-            .anyMatch(faction -> location.equals(faction.getStartingPlanet(campaign, today)));
+        boolean isCapital = location.getFactionSet(today)
+                                  .stream()
+                                  .anyMatch(faction -> location.equals(faction.getStartingPlanet(campaign, today)));
 
         // Remove existing personnel for the day
         if (!personnel.isEmpty()) {
@@ -181,9 +181,9 @@ public class PersonnelMarket {
     /**
      * Generates and adds a report to the campaign about new personnel added to the personnel market.
      * <p>
-     * If the corresponding option is enabled in the campaign settings, this function produces a detailed,
-     * user-facing report about the most notable individual in the new personnel pool. The report includes
-     * their experience level, primary role, and name.
+     * If the corresponding option is enabled in the campaign settings, this function produces a detailed, user-facing
+     * report about the most notable individual in the new personnel pool. The report includes their experience level,
+     * primary role, and name.
      * <p>
      * The generated report is in HTML format and provides easy access to the personnel market interface.
      *
@@ -208,13 +208,13 @@ public class PersonnelMarket {
             }
 
             report.append("<b>")
-                .append(SkillType.getColoredExperienceLevelName(experienceLevel))
-                .append(' ')
-                .append(person.getPrimaryRole())
-                .append("</b>")
-                .append(" named ")
-                .append(person.getFullName())
-                .append(" is available.");
+                  .append(SkillType.getColoredExperienceLevelName(experienceLevel))
+                  .append(' ')
+                  .append(person.getPrimaryRole())
+                  .append("</b>")
+                  .append(" named ")
+                  .append(person.getFullName())
+                  .append(" is available.");
         }
 
         campaign.addReport(report.toString());
@@ -280,6 +280,7 @@ public class PersonnelMarket {
      * Get the Entity associated with a recruit, if any
      *
      * @param p The recruit
+     *
      * @return The Entity associated with the recruit, or null if there is none
      */
     public Entity getAttachedEntity(Person p) {
@@ -290,6 +291,7 @@ public class PersonnelMarket {
      * Get the Entity associated with a recruit, if any
      *
      * @param pid The id of the recruit
+     *
      * @return The Entity associated with the recruit, or null if there is none
      */
     public Entity getAttachedEntity(UUID pid) {
@@ -337,8 +339,12 @@ public class PersonnelMarket {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "paidRecruitType", getPaidRecruitRole().name());
 
         for (UUID id : attachedEntities.keySet()) {
-            MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent, "entity", "id", id,
-                    attachedEntities.get(id).getShortNameRaw());
+            MHQXMLUtility.writeSimpleXMLAttributedTag(pw,
+                  indent,
+                  "entity",
+                  "id",
+                  id,
+                  attachedEntities.get(id).getShortNameRaw());
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "personnelMarket");
     }
@@ -376,8 +382,12 @@ public class PersonnelMarket {
                     try {
                         en = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
                     } catch (EntityLoadingException ex) {
-                        logger.error("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": "
-                                + ex.getMessage(), ex);
+                        logger.error("Unable to load entity: " +
+                                           ms.getSourceFile() +
+                                           ": " +
+                                           ms.getEntryName() +
+                                           ": " +
+                                           ex.getMessage(), ex);
                     }
                     if (null != en) {
                         retVal.attachedEntities.put(id, en);
@@ -385,7 +395,7 @@ public class PersonnelMarket {
                 } else if (wn2.getNodeName().equalsIgnoreCase("paidRecruitment")) {
                     retVal.paidRecruitment = true;
                 } else if (wn2.getNodeName().equalsIgnoreCase("paidRecruitType")) {
-                    retVal.setPaidRecruitRole(PersonnelRole.parseFromString(wn2.getTextContent().trim()));
+                    retVal.setPaidRecruitRole(PersonnelRole.fromString(wn2.getTextContent().trim()));
                 } else if (null != retVal.method) {
                     retVal.method.loadFieldsFromXml(wn2);
                 } else {
@@ -467,8 +477,8 @@ public class PersonnelMarket {
         int sc = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
         int cf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
         int asf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACEFIGHTER);
-        int vee = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, true)
-                + hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK);
+        int vee = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, true) +
+                        hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK);
         int inf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY);
         int ba = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
         int proto = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK);
@@ -531,11 +541,12 @@ public class PersonnelMarket {
     public TargetRoll getShipSearchTarget(Campaign campaign, boolean jumpship) {
         TargetRoll target = new TargetRoll(jumpship ? 12 : 10, "Base");
         Person adminLog = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_ADMIN);
-        int adminLogExp = (adminLog == null) ? SkillType.EXP_ULTRA_GREEN
-                : adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+        int adminLogExp = (adminLog == null) ?
+                                SkillType.EXP_ULTRA_GREEN :
+                                adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
         for (Person p : campaign.getAdmins()) {
-            if ((p.getPrimaryRole().isAdministratorLogistics() || p.getSecondaryRole().isAdministratorLogistics())
-                    && p.getSkill(SkillType.S_ADMIN).getExperienceLevel() > adminLogExp) {
+            if ((p.getPrimaryRole().isAdministratorLogistics() || p.getSecondaryRole().isAdministratorLogistics()) &&
+                      p.getSkill(SkillType.S_ADMIN).getExperienceLevel() > adminLogExp) {
                 adminLogExp = p.getSkill(SkillType.S_ADMIN).getExperienceLevel();
             }
         }
