@@ -27,6 +27,7 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
+import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
@@ -178,7 +179,8 @@ public class PrisonerEventManager {
         int newCapacity = 0;
 
         if (temporaryCapacityModifier != DEFAULT_TEMPORARY_CAPACITY) {
-            int degreeOfChange = (int) round(temporaryCapacityModifier * TEMPORARY_CAPACITY_DEGRADE_RATE);
+        	int differendInTemporaryCapacity = abs(DEFAULT_TEMPORARY_CAPACITY-temporaryCapacityModifier);
+            int degreeOfChange = (int) min(1,round(differendInTemporaryCapacity * TEMPORARY_CAPACITY_DEGRADE_RATE));
 
             if (temporaryCapacityModifier < DEFAULT_TEMPORARY_CAPACITY) {
                 temporaryCapacityModifier += degreeOfChange;
