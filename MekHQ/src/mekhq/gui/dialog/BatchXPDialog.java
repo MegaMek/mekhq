@@ -39,6 +39,7 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -58,7 +59,6 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
-import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public final class BatchXPDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(BatchXPDialog.class);
@@ -137,7 +137,7 @@ public final class BatchXPDialog extends JDialog {
             }
 
             tableColumn.setPreferredWidth(column.getWidth());
-            tableColumn.setCellRenderer(new MekHqTableCellRenderer());
+            tableColumn.setCellRenderer(getRenderer());
             columnModel.setColumnVisible(tableColumn, true);
 
             personnelSorter.setComparator(column.ordinal(), column.getComparator(campaign));
@@ -154,6 +154,10 @@ public final class BatchXPDialog extends JDialog {
         final JScrollPane pane = new JScrollPaneWithSpeed(personnelTable);
         pane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         return pane;
+    }
+
+    private TableCellRenderer getRenderer() {
+        return personnelModel.new Renderer();
     }
 
     private JComponent getButtonPanel() {

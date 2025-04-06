@@ -536,8 +536,7 @@ public enum PersonnelTableModelColumn {
                 return person.getPostNominal();
             case CALLSIGN:
                 return person.getCallsign();
-            case AGE:
-                return String.valueOf(person.getAge(campaign.getLocalDate()));
+            case AGE: //Age's cell value must return birthday to allow sorting
             case BIRTHDAY:
                 return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getDateOfBirth());
             case PERSONNEL_STATUS:
