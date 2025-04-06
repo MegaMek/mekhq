@@ -65,25 +65,28 @@ public class UnitGeneratorParameters {
      * Thorough deep clone of this generator parameters object.
      */
     @Override
-    public UnitGeneratorParameters clone() throws CloneNotSupportedException {
-        UnitGeneratorParameters unitGeneratorParameters = (UnitGeneratorParameters) super.clone();
+    public UnitGeneratorParameters clone() {
+        try {
+            UnitGeneratorParameters unitGeneratorParameters = (UnitGeneratorParameters) super.clone();
+            unitGeneratorParameters.setFaction(faction);
+            unitGeneratorParameters.setUnitType(unitType);
+            unitGeneratorParameters.setWeightClass(weightClass);
+            unitGeneratorParameters.setYear(year);
+            unitGeneratorParameters.setQuality(quality);
+            unitGeneratorParameters.setFilter(filter);
 
-        unitGeneratorParameters.setFaction(faction);
-        unitGeneratorParameters.setUnitType(unitType);
-        unitGeneratorParameters.setWeightClass(weightClass);
-        unitGeneratorParameters.setYear(year);
-        unitGeneratorParameters.setQuality(quality);
-        unitGeneratorParameters.setFilter(filter);
+            Collection<EntityMovementMode> newModes = new ArrayList<>(movementModes);
 
-        Collection<EntityMovementMode> newModes = new ArrayList<>(movementModes);
+            unitGeneratorParameters.setMovementModes(newModes);
 
-        unitGeneratorParameters.setMovementModes(newModes);
+            for (MissionRole missionRole : missionRoles) {
+                unitGeneratorParameters.addMissionRole(missionRole);
+            }
 
-        for (MissionRole missionRole : missionRoles) {
-            unitGeneratorParameters.addMissionRole(missionRole);
+            return unitGeneratorParameters;
+        } catch (CloneNotSupportedException e) {
+            return null;
         }
-
-        return unitGeneratorParameters;
     }
 
     /**
