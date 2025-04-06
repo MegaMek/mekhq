@@ -43,7 +43,6 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -114,6 +113,7 @@ public class AdvancementTab {
 
     //start Skill Randomization Tab
     private JCheckBox chkExtraRandomness;
+    private JCheckBox chkRandomizeTraits;
 
     private JPanel pnlPhenotype;
     private JLabel[] phenotypeLabels;
@@ -520,6 +520,7 @@ public class AdvancementTab {
      */
     private void initializeSkillRandomizationTab() {
         chkExtraRandomness = new JCheckBox();
+        chkRandomizeTraits = new JCheckBox();
 
         pnlPhenotype = new JPanel();
         phenotypeLabels = new JLabel[] {}; // This will be initialized properly later
@@ -604,6 +605,7 @@ public class AdvancementTab {
 
         // Contents
         chkExtraRandomness = new CampaignOptionsCheckBox("ExtraRandomness");
+        chkRandomizeTraits = new CampaignOptionsCheckBox("RandomizeTraits");
 
         pnlPhenotype = createPhenotypePanel();
         pnlRandomAbilities = createAbilityPanel();
@@ -620,6 +622,9 @@ public class AdvancementTab {
         layout.gridy++;
         layout.gridwidth = 1;
         panel.add(chkExtraRandomness, layout);
+
+        layout.gridy++;
+        panel.add(chkRandomizeTraits, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -1100,7 +1105,7 @@ public class AdvancementTab {
      *                                     {@code null}, values are loaded from the current skill preferences.
      */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
-                                              @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
+          @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -1132,6 +1137,7 @@ public class AdvancementTab {
 
         //start Skill Randomization Tab
         chkExtraRandomness.setSelected(skillPreferences.randomizeSkill());
+        chkRandomizeTraits.setSelected(skillPreferences.isRandomizeTraits());
         final int[] phenotypeProbabilities = options.getPhenotypeProbabilities();
         for (int i = 0; i < phenotypeSpinners.length; i++) {
             phenotypeSpinners[i].setValue(phenotypeProbabilities[i]);
@@ -1184,7 +1190,7 @@ public class AdvancementTab {
      *                                     {@code null}, values are applied to the current skill preferences.
      */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions,
-                                               @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
+          @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -1216,6 +1222,7 @@ public class AdvancementTab {
 
         //start Skill Randomization Tab
         skillPreferences.setRandomizeSkill(chkExtraRandomness.isSelected());
+        skillPreferences.setRandomizeTraits(chkRandomizeTraits.isSelected());
         for (int i = 0; i < phenotypeSpinners.length; i++) {
             options.setPhenotypeProbability(i, (int) phenotypeSpinners[i].getValue());
         }

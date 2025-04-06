@@ -4916,7 +4916,20 @@ public class Person {
     }
 
     public void setConnections(final int connections) {
-        this.connections = connections;
+        this.connections = clamp(connections, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+    }
+
+    /**
+     * Adjusts the person's Connections score by the specified amount.
+     *
+     * <p>The change in connections can be positive or negative, depending on the provided delta value.</p>
+     *
+     * @param delta The amount by which to adjust the number of connections. A positive value increases the connections,
+     *              while a negative value decreases them.
+     */
+    public void changeConnections(final int delta) {
+        int newValue = connections + delta;
+        connections = clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
     public int getWealth() {
@@ -4924,7 +4937,20 @@ public class Person {
     }
 
     public void setWealth(final int wealth) {
-        this.wealth = wealth;
+        this.wealth = clamp(wealth, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+    }
+
+    /**
+     * Adjusts the person's wealth by the specified amount.
+     *
+     * <p>The change in wealth can be positive or negative, depending on the provided delta value.</p>
+     *
+     * @param delta The amount by which to adjust the wealth. A positive value increases the wealth, while a negative
+     *              value decreases it.
+     */
+    public void changeWealth(final int delta) {
+        int newValue = wealth + delta;
+        wealth = clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH);
     }
 
     public int getReputation() {
@@ -4932,7 +4958,20 @@ public class Person {
     }
 
     public void setReputation(final int reputation) {
-        this.reputation = reputation;
+        this.reputation = clamp(reputation, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+    }
+
+    /**
+     * Adjusts the person's reputation by the specified amount.
+     *
+     * <p>The change in reputation can be positive or negative, depending on the provided delta value.</p>
+     *
+     * @param delta The amount by which to adjust the reputation. A positive value increases the reputation, while a
+     *              negative value decreases it.
+     */
+    public void changeReputation(final int delta) {
+        int newValue = reputation + delta;
+        reputation = clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
     public int getUnlucky() {
@@ -4940,7 +4979,12 @@ public class Person {
     }
 
     public void setUnlucky(final int unlucky) {
-        this.unlucky = unlucky;
+        this.unlucky = clamp(unlucky, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
+    }
+
+    public void changeUnlucky(final int delta) {
+        int newValue = unlucky + delta;
+        unlucky = clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
     }
 
     /**
