@@ -170,9 +170,9 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             }
 
             // Profession && Phenotype adjustments
-            int attributeModifier = profession.getAttributeModifier(attribute);
-            attributeModifier += phenotype.getAttributeModifier(attribute);
-            person.changeAttributeScore(attribute, attributeModifier);
+            int baseAttributeScore = profession.getAttributeModifier(attribute);
+            int attributeModifier = phenotype.getAttributeModifier(attribute);
+            person.setAttributeScore(attribute, baseAttributeScore + attributeModifier);
 
             // Attribute randomization
             int roll = d6();

@@ -47,103 +47,99 @@ public enum PersonnelRole {
     // region Enum Declarations
     /**
      * Individual roles with corresponding name texts and mnemonics.
-     *
-     * <p><b>Note:</b> The attribute score modifiers assume a default attribute score of 5. I opted to only include
-     * this information as modifiers, as it means if we ever change what the default score is, the ratios will remain
-     * correct.</p>
      */
     // I used an average of the modifiers from the MekWarrior, Hot Shot, and Grizzled Veteran ATOW Archetypes
-    MEKWARRIOR(true, KeyEvent.VK_M, -1, 0, 1, 1, -1, -1, -1),
+    MEKWARRIOR(true, KeyEvent.VK_M, 4, 5, 6, 6, 4, 4, 4),
 
     // I used an average of the modifiers from the MekWarrior, and Aerospace Pilot ATOW Archetypes
-    LAM_PILOT(true, KeyEvent.VK_UNDEFINED, -1, -1, 1, 1, -1, -1, -1),
+    LAM_PILOT(true, KeyEvent.VK_UNDEFINED, 4, 4, 6, 6, 4, 4, 41),
 
     // ATOW: Tanker Archetype
-    GROUND_VEHICLE_DRIVER(true, KeyEvent.VK_V, -1, 0, 0, +1, -1, -1, -1),
+    GROUND_VEHICLE_DRIVER(true, KeyEvent.VK_V, 4, 5, 5, 6, 4, 4, 4),
 
     // ATOW: Tanker Archetype
-    NAVAL_VEHICLE_DRIVER(true, KeyEvent.VK_N, -1, 0, 0, +1, -1, -1, -1),
+    NAVAL_VEHICLE_DRIVER(true, KeyEvent.VK_N, 4, 5, 5, 6, 4, 4, 4),
 
     // ATOW: Companion Chopper Pilot Archetype
-    VTOL_PILOT(true, KeyEvent.VK_UNDEFINED, -1, -1, 0, 0, -1, -1, -1),
+    VTOL_PILOT(true, KeyEvent.VK_UNDEFINED, 4, 4, 5, 5, 4, 4, 4),
 
     // ATOW: Tanker Archetype
-    VEHICLE_GUNNER(true, KeyEvent.VK_G, -1, 0, 0, +1, -1, -1, -1),
+    VEHICLE_GUNNER(true, KeyEvent.VK_G, 4, 5, 5, 6, 4, 4, 4),
 
     // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
     // Technician skill)
-    VEHICLE_CREW(true, KeyEvent.VK_UNDEFINED, 0, -1, 0, -2, 0, -1, -2),
+    VEHICLE_CREW(true, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
 
     // ATOW: Aerospace Pilot Archetype
-    AEROSPACE_PILOT(true, KeyEvent.VK_A, -3, -2, 0, 0, -1, -1, 0),
+    AEROSPACE_PILOT(true, KeyEvent.VK_A, 2, 3, 5, 5, 4, 4, 0),
 
     // ATOW: Aerospace Pilot Archetype
-    CONVENTIONAL_AIRCRAFT_PILOT(true, KeyEvent.VK_C, -3, -2, 0, 0, -1, -1, 0),
+    CONVENTIONAL_AIRCRAFT_PILOT(true, KeyEvent.VK_C, 2, 3, 5, 5, 4, 4, 0),
 
     // ATOW: Aerospace Pilot Archetype (most ProtoMek pilots are Aerospace Sibkbo washouts, so this made the most sense)
-    PROTOMEK_PILOT(true, KeyEvent.VK_P, -3, -2, 0, 0, -1, -1, 0),
+    PROTOMEK_PILOT(true, KeyEvent.VK_P, 2, 3, 5, 5, 4, 4, 0),
 
     // ATOW: Elemental Archetype
-    BATTLE_ARMOUR(true, true, KeyEvent.VK_B, +2, +1, -1, 0, -2, -1, -2),
+    BATTLE_ARMOUR(true, true, KeyEvent.VK_B, 7, 6, 4, 0, 3, 4, 3),
 
     // ATOW: Renegade Warrior Archetype
-    SOLDIER(true, KeyEvent.VK_S, 0, 0, -1, 0, -1, +1, -2),
+    SOLDIER(true, KeyEvent.VK_S, 5, 5, 4, 5, 4, 6, 3),
 
     // ATOW: Tanker Archetype
-    VESSEL_PILOT(true, KeyEvent.VK_I, -1, 0, 0, +1, -1, -1, -1),
+    VESSEL_PILOT(true, KeyEvent.VK_I, 4, 5, 5, 6, 4, 4, 4),
 
     // ATOW: Tanker Archetype
-    VESSEL_GUNNER(true, KeyEvent.VK_U, -1, 0, 0, +1, -1, -1, -1),
+    VESSEL_GUNNER(true, KeyEvent.VK_U, 4, 5, 5, 6, 4, 4, 4),
 
     // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
     // Technician skill)
-    VESSEL_CREW(true, KeyEvent.VK_W, 0, -1, 0, -2, 0, -1, -2),
+    VESSEL_CREW(true, KeyEvent.VK_W, 5, 4, 5, 3, 5, 4, 3),
 
     // ATOW: Battlefield Tech Archetype
-    VESSEL_NAVIGATOR(true, KeyEvent.VK_Y, 0, -1, 0, -2, 0, -1, -2),
+    VESSEL_NAVIGATOR(true, KeyEvent.VK_Y, 5, 4, 5, 3, 5, 4, 3),
 
     // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
     // Technician skill)
-    MEK_TECH(false, KeyEvent.VK_T, 0, -1, 0, -2, 0, -1, -2),
+    MEK_TECH(false, KeyEvent.VK_T, 5, 4, 5, 3, 5, 4, 3),
 
     // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
     // Technician skill)
-    MECHANIC(false, KeyEvent.VK_E, 0, -1, 0, -2, 0, -1, -2),
+    MECHANIC(false, KeyEvent.VK_E, 5, 4, 5, 3, 5, 4, 3),
 
     // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
     // Technician skill)
-    AERO_TEK(false, KeyEvent.VK_O, 0, -1, 0, -2, 0, -1, -2),
+    AERO_TEK(false, KeyEvent.VK_O, 5, 4, 5, 3, 5, 4, 3),
 
     // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
     // Technician skill)
-    BA_TECH(false, KeyEvent.VK_UNDEFINED, 0, -1, 0, -2, 0, -1, -2),
+    BA_TECH(false, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
 
     // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
     // Technician skill)
-    ASTECH(false, KeyEvent.VK_UNDEFINED, 0, -1, 0, -2, 0, -1, -2),
+    ASTECH(false, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
 
     // ATOW: Communications Specialist Archetype (this might seem like an odd choice, but the Attributes for this Archetype
     // work really well for this profession
-    DOCTOR(false, KeyEvent.VK_D, -2, -1, -1, 0, 1, -1, -1),
+    DOCTOR(false, KeyEvent.VK_D, 3, 4, 4, 5, 6, 4, 4),
 
     // ATOW: Communications Specialist Archetype (this might seem like an odd choice, but the Attributes for this Archetype
     // work really well for this profession
-    MEDIC(false, KeyEvent.VK_UNDEFINED, -2, -1, -1, 0, 1, -1, -1),
+    MEDIC(false, KeyEvent.VK_UNDEFINED, 3, 4, 4, 5, 6, 4, 4),
 
     // ATOW: Faceman Archetype
-    ADMINISTRATOR_COMMAND(false, KeyEvent.VK_UNDEFINED, -2, -2, -2, -1, 1, -2, 1),
+    ADMINISTRATOR_COMMAND(false, KeyEvent.VK_UNDEFINED, 3, 3, 3, 4, 6, 3, 5),
 
     // ATOW: Faceman Archetype
-    ADMINISTRATOR_LOGISTICS(false, KeyEvent.VK_L, -2, -2, -2, -1, 1, -2, 1),
+    ADMINISTRATOR_LOGISTICS(false, KeyEvent.VK_L, 3, 3, 3, 4, 6, 3, 5),
 
     // ATOW: Faceman Archetype
-    ADMINISTRATOR_TRANSPORT(false, KeyEvent.VK_R, -2, -2, -2, -1, 1, -2, 1),
+    ADMINISTRATOR_TRANSPORT(false, KeyEvent.VK_R, 3, 3, 3, 4, 6, 3, 5),
 
     // ATOW: Faceman Archetype
-    ADMINISTRATOR_HR(false, KeyEvent.VK_H, -2, -2, -2, -1, 1, -2, 1),
+    ADMINISTRATOR_HR(false, KeyEvent.VK_H, 3, 3, 3, 4, 6, 3, 5),
 
     // No archetype, but ATOW pg 35 states that the Attribute scores for an average person are 4
-    DEPENDENT(false, KeyEvent.VK_UNDEFINED, -1, -1, -1, -1, -1, -1, -1),
+    DEPENDENT(false, KeyEvent.VK_UNDEFINED, 4, 4, 4, 4, 4, 4, 4),
 
     // If we're generating a character without a Profession, we're just going to leave them with middle of the road
     // Attribute scores (5 in everything)
@@ -168,7 +164,7 @@ public enum PersonnelRole {
 
     // region Constructors
     PersonnelRole(final int mnemonic) {
-        this(false, false, mnemonic, 0, 0, 0, 0, 0, 0, 0);
+        this(false, false, mnemonic, 5, 5, 5, 5, 5, 5, 5);
     }
 
     PersonnelRole(final boolean isCombat, final int mnemonic, final int strength, final int body, final int dexterity,
