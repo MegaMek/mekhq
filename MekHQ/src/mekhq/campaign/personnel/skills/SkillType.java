@@ -48,6 +48,7 @@ import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColo
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -184,6 +185,7 @@ public class SkillType {
     public static Map<String, SkillType> lookupHash;
 
     public static final int SKILL_NONE = 0;
+    public static final int DISABLED_SKILL_LEVEL = -1;
 
     public static final int EXP_NONE = -1;
     public static final int EXP_ULTRA_GREEN = 0;
@@ -314,19 +316,80 @@ public class SkillType {
         return skillList;
     }
 
-    /** Creates new SkillType */
+    /**
+     * Default constructor for the {@code SkillType} class.
+     *
+     * <p>Initializes a default skill type with placeholder values, primarily for testing or fallback purposes.</p>
+     */
     public SkillType() {
-        name = "MISSING_NAME";
-        target = 7;
-        countUp = false;
-        subType = COMBAT_GUNNERY;
-        firstAttribute = REFLEXES;
-        secondAttribute = DEXTERITY;
-        greenLvl = 1;
-        regLvl = 3;
-        vetLvl = 4;
-        eliteLvl = 5;
-        costs = new Integer[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        new SkillType("MISSING_NAME", 7, false, COMBAT_GUNNERY, REFLEXES, DEXTERITY, 1, 3, 4, 5, new ArrayList<>());
+    }
+
+    /**
+     * Constructs a {@code SkillType} instance with the specified parameters.
+     *
+     * <p>If certain parameters are {@code null}, default values will be used.</p>
+     *
+     * <p>The {@code costs} parameter is validated to ensure that it has exactly 11 entries (corresponding to skill
+     * levels 0 through 10 inclusive). If the provided list has fewer than 11 entries, additional entries with a value
+     * of {@link #DISABLED_SKILL_LEVEL} will be appended until the size reaches 11. If an error occurs when setting the
+     * {@code costs}, it will be logged, and the {@code costs} array will not be set.</p>
+     *
+     * @param name            The name of the skill type. <b>Cannot</b> be {@code null}.
+     * @param target          The target value of the skill used for achievement or comparison purposes. If
+     *                        {@code null}, the default value is {@code 7}.
+     * @param isCountUp       {@code true} if the skill counts up toward a goal, {@code false} otherwise. If
+     *                        {@code null}, the default value is {@code false}.
+     * @param subType         The {@code SkillSubType} category of the skill. <b>Cannot</b> be {@code null}.
+     * @param firstAttribute  The first associated skill attribute. <b>Cannot</b> be {@code null}.
+     * @param secondAttribute The second associated skill attribute. If {@code null}, the default value is
+     *                        {@code NONE}.
+     * @param greenLvl        The value representing the green skill level. If {@code null}, the default value is
+     *                        {@code 1}.
+     * @param regLvl          The value representing the regular skill level. If {@code null}, the default value is
+     *                        {@code 3}.
+     * @param vetLvl          The value representing the veteran skill level. If {@code null}, the default value is
+     *                        {@code 4}.
+     * @param eliteLvl        The value representing the elite skill level. If {@code null}, the default value is
+     *                        {@code 5}.
+     * @param costs           A {@code List<Integer>} representing costs associated with the skill's progression. The
+     *                        list should ideally contain exactly 11 values, one for each skill level (0-10, inclusive).
+     *                        If fewer than 11 values are provided, additional entries with the value
+     *                        {@link #DISABLED_SKILL_LEVEL} will be  added until the size is 11.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public SkillType(String name, @Nullable Integer target, @Nullable Boolean isCountUp, SkillSubType subType,
+          SkillAttribute firstAttribute, @Nullable SkillAttribute secondAttribute, @Nullable Integer greenLvl,
+          @Nullable Integer regLvl, @Nullable Integer vetLvl, @Nullable Integer eliteLvl, List<Integer> costs) {
+        this.name = name;
+        this.target = target == null ? 7 : target;
+        this.countUp = isCountUp != null && isCountUp;
+        this.subType = subType;
+        this.firstAttribute = firstAttribute;
+        this.secondAttribute = secondAttribute == null ? NONE : secondAttribute;
+        this.greenLvl = greenLvl == null ? 1 : greenLvl;
+        this.regLvl = regLvl == null ? 3 : regLvl;
+        this.vetLvl = vetLvl == null ? 4 : vetLvl;
+        this.eliteLvl = eliteLvl == null ? 5 : eliteLvl;
+
+        // This validates the length of costs to ensure that valid entries exist for all possible skill levels (0-10,
+        // inclusive)
+        int costsLength = costs.size();
+        if (costsLength != 11) {
+            while (costsLength < 11) {
+                costs.add(DISABLED_SKILL_LEVEL);
+                costsLength++;
+            }
+        }
+
+        try {
+            this.costs = costs.toArray(new Integer[11]);
+        } catch (Exception e) {
+            logger.error("Error setting costs for skill type: {}. Array has {} entries." +
+                               "  Skipping setting of costs.", name, costsLength);
+        }
     }
 
     public String getName() {
@@ -449,10 +512,8 @@ public class SkillType {
      * @author Illiani
      * @since 0.50.05
      */
-    public void setFirstAttribute(SkillAttribute firstAttribute) {
-        if (secondAttribute != null) {
-            this.firstAttribute = firstAttribute;
-        }
+    public void setFirstAttribute(@Nullable SkillAttribute firstAttribute) {
+        this.firstAttribute = firstAttribute == null ? NONE : firstAttribute;
     }
 
     /**
@@ -467,15 +528,13 @@ public class SkillType {
      * @author Illiani
      * @since 0.50.05
      */
-    public void setSecondAttribute(SkillAttribute secondAttribute) {
-        if (secondAttribute != null) {
-            this.secondAttribute = secondAttribute;
-        }
+    public void setSecondAttribute(@Nullable SkillAttribute secondAttribute) {
+        this.secondAttribute = secondAttribute == null ? NONE : secondAttribute;
     }
 
     public int getCost(int lvl) {
         if ((lvl > 10) || (lvl < 0)) {
-            return -1;
+            return DISABLED_SKILL_LEVEL;
         } else {
             return costs[lvl];
         }
@@ -500,11 +559,11 @@ public class SkillType {
     }
 
     /**
-     * @return the maximum level of that skill (the last one not set to cost = -1, or 10)
+     * @return the maximum level of that skill (the last one not set to cost {@link #DISABLED_SKILL_LEVEL}, or 10)
      */
     public int getMaxLevel() {
         for (int lvl = 0; lvl < costs.length; ++lvl) {
-            if (costs[lvl] < 0) {
+            if (costs[lvl] == DISABLED_SKILL_LEVEL) {
                 return lvl - 1;
             }
         }
@@ -1029,967 +1088,1114 @@ public class SkillType {
 
 
     public static SkillType createPilotingMek() {
-        SkillType skill = new SkillType();
-        skill.name = S_PILOT_MEK;
-        skill.target = 8;
-        skill.greenLvl = 2;
-        skill.countUp = false;
-        skill.subType = COMBAT_PILOTING;
-        skill.firstAttribute = REFLEXES;
-        skill.secondAttribute = DEXTERITY;
-        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1 };
-
-        return skill;
+        return new SkillType(S_PILOT_MEK,
+              8,
+              false,
+              COMBAT_PILOTING,
+              REFLEXES,
+              DEXTERITY,
+              2,
+              null,
+              null,
+              null,
+              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createGunneryMek() {
-        SkillType skill = new SkillType();
-        skill.name = S_GUN_MEK;
-        skill.target = 7;
-        skill.greenLvl = 2;
-        skill.countUp = false;
-        skill.subType = COMBAT_GUNNERY;
-        skill.firstAttribute = REFLEXES;
-        skill.secondAttribute = DEXTERITY;
-        skill.costs = new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, -1, -1, -1 };
-
-        return skill;
+        return new SkillType(S_GUN_MEK,
+              7,
+              false,
+              COMBAT_GUNNERY,
+              REFLEXES,
+              DEXTERITY,
+              2,
+              null,
+              null,
+              null,
+              Arrays.asList(16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createPilotingAero() {
-        SkillType skill = new SkillType();
-        skill.name = S_PILOT_AERO;
-        skill.target = 8;
-        skill.greenLvl = 2;
-        skill.countUp = false;
-        skill.subType = COMBAT_PILOTING;
-        skill.firstAttribute = REFLEXES;
-        skill.secondAttribute = DEXTERITY;
-        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1 };
-
-        return skill;
+        return new SkillType(S_PILOT_AERO,
+              8,
+              false,
+              COMBAT_PILOTING,
+              REFLEXES,
+              DEXTERITY,
+              2,
+              null,
+              null,
+              null,
+              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createGunneryAero() {
-        SkillType skill = new SkillType();
-        skill.name = S_GUN_AERO;
-        skill.target = 7;
-        skill.greenLvl = 2;
-        skill.countUp = false;
-        skill.subType = COMBAT_GUNNERY;
-        skill.firstAttribute = REFLEXES;
-        skill.secondAttribute = DEXTERITY;
-        skill.costs = new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, -1, -1, -1 };
-
-        return skill;
+        return new SkillType(S_GUN_AERO,
+              7,
+              false,
+              COMBAT_GUNNERY,
+              REFLEXES,
+              DEXTERITY,
+              2,
+              null,
+              null,
+              null,
+              Arrays.asList(16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createPilotingJet() {
-        SkillType skill = new SkillType();
-        skill.name = S_PILOT_JET;
-        skill.target = 8;
-        skill.greenLvl = 2;
-        skill.countUp = false;
-        skill.subType = COMBAT_PILOTING;
-        skill.firstAttribute = REFLEXES;
-        skill.secondAttribute = DEXTERITY;
-        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1 };
-
-        return skill;
+        return new SkillType(S_PILOT_JET,
+              8,
+              false,
+              COMBAT_PILOTING,
+              REFLEXES,
+              DEXTERITY,
+              2,
+              null,
+              null,
+              null,
+              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createGunneryJet() {
-        SkillType skill = new SkillType();
-        skill.name = S_GUN_JET;
-        skill.target = 7;
-        skill.greenLvl = 2;
-        skill.countUp = false;
-        skill.subType = COMBAT_GUNNERY;
-        skill.firstAttribute = REFLEXES;
-        skill.secondAttribute = DEXTERITY;
-        skill.costs = new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, -1, -1, -1 };
-
-        return skill;
+        return new SkillType(S_GUN_JET,
+              7,
+              false,
+              COMBAT_GUNNERY,
+              REFLEXES,
+              DEXTERITY,
+              2,
+              null,
+              null,
+              null,
+              Arrays.asList(16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createPilotingSpace() {
-        SkillType skill = new SkillType();
-        skill.name = S_PILOT_SPACE;
-        skill.target = 8;
-        skill.greenLvl = 2;
-        skill.countUp = false;
-        skill.subType = COMBAT_PILOTING;
-        skill.firstAttribute = REFLEXES;
-        skill.secondAttribute = DEXTERITY;
-        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1 };
-
-        return skill;
+        return new SkillType(S_PILOT_SPACE,
+              8,
+              false,
+              COMBAT_PILOTING,
+              REFLEXES,
+              DEXTERITY,
+              2,
+              null,
+              null,
+              null,
+              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createGunnerySpace() {
-        SkillType skill = new SkillType();
-        skill.name = S_GUN_SPACE;
-        skill.target = 7;
-        skill.greenLvl = 2;
-        skill.countUp = false;
-        skill.subType = COMBAT_GUNNERY;
-        skill.firstAttribute = REFLEXES;
-        skill.secondAttribute = DEXTERITY;
-        skill.costs = new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, -1, -1, -1 };
-
-        return skill;
+        return new SkillType(S_GUN_SPACE,
+              7,
+              false,
+              COMBAT_GUNNERY,
+              REFLEXES,
+              DEXTERITY,
+              2,
+              null,
+              null,
+              null,
+              Arrays.asList(16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createPilotingGroundVee() {
-        SkillType skill = new SkillType();
-        skill.name = S_PILOT_GVEE;
-        skill.target = 8;
-        skill.greenLvl = 2;
-        skill.countUp = false;
-        skill.subType = COMBAT_PILOTING;
-        skill.firstAttribute = REFLEXES;
-        skill.secondAttribute = DEXTERITY;
-        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1 };
-
-        return skill;
+        return new SkillType(S_PILOT_GVEE,
+              8,
+              false,
+              COMBAT_PILOTING,
+              REFLEXES,
+              DEXTERITY,
+              2,
+              null,
+              null,
+              null,
+              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createPilotingNavalVee() {
-        SkillType skill = new SkillType();
-        skill.name = S_PILOT_NVEE;
-        skill.target = 8;
-        skill.greenLvl = 2;
-        skill.countUp = false;
-        skill.subType = COMBAT_PILOTING;
-        skill.firstAttribute = REFLEXES;
-        skill.secondAttribute = DEXTERITY;
-        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1 };
-
-        return skill;
+        return new SkillType(S_PILOT_NVEE,
+              8,
+              false,
+              COMBAT_PILOTING,
+              REFLEXES,
+              DEXTERITY,
+              2,
+              null,
+              null,
+              null,
+              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createPilotingVTOL() {
-        SkillType skill = new SkillType();
-        skill.name = S_PILOT_VTOL;
-        skill.target = 8;
-        skill.greenLvl = 2;
-        skill.countUp = false;
-        skill.subType = COMBAT_PILOTING;
-        skill.firstAttribute = REFLEXES;
-        skill.secondAttribute = DEXTERITY;
-        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1 };
-
-        return skill;
+        return new SkillType(S_PILOT_VTOL,
+              8,
+              false,
+              COMBAT_PILOTING,
+              REFLEXES,
+              DEXTERITY,
+              2,
+              null,
+              null,
+              null,
+              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createGunneryVehicle() {
-        SkillType skill = new SkillType();
-        skill.name = S_GUN_VEE;
-        skill.target = 7;
-        skill.greenLvl = 2;
-        skill.countUp = false;
-        skill.subType = COMBAT_GUNNERY;
-        skill.firstAttribute = REFLEXES;
-        skill.secondAttribute = DEXTERITY;
-        skill.costs = new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, -1, -1, -1 };
-
-        return skill;
+        return new SkillType(S_GUN_VEE,
+              7,
+              false,
+              COMBAT_GUNNERY,
+              REFLEXES,
+              DEXTERITY,
+              2,
+              null,
+              null,
+              null,
+              Arrays.asList(16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createArtillery() {
-        SkillType skill = new SkillType();
-        skill.name = S_ARTILLERY;
-        skill.target = 7;
-        skill.greenLvl = 2;
-        skill.countUp = false;
-        skill.subType = COMBAT_GUNNERY;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = WILLPOWER;
-        skill.costs = new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, -1, -1, -1 };
-
-        return skill;
+        return new SkillType(S_ARTILLERY,
+              7,
+              false,
+              COMBAT_GUNNERY,
+              INTELLIGENCE,
+              WILLPOWER,
+              2,
+              null,
+              null,
+              null,
+              Arrays.asList(16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createGunneryBA() {
-        SkillType skill = new SkillType();
-        skill.name = S_GUN_BA;
-        skill.target = 7;
-        skill.greenLvl = 2;
-        skill.countUp = false;
-        skill.subType = COMBAT_GUNNERY;
-        skill.firstAttribute = REFLEXES;
-        skill.secondAttribute = DEXTERITY;
-        skill.costs = new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, -1, -1, -1 };
-
-        return skill;
+        return new SkillType(S_GUN_BA,
+              7,
+              false,
+              COMBAT_GUNNERY,
+              REFLEXES,
+              DEXTERITY,
+              2,
+              null,
+              null,
+              null,
+              Arrays.asList(16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createGunneryProto() {
-        SkillType skill = new SkillType();
-        skill.name = S_GUN_PROTO;
-        skill.target = 7;
-        skill.greenLvl = 2;
-        skill.countUp = false;
-        skill.subType = COMBAT_GUNNERY;
-        skill.firstAttribute = REFLEXES;
-        skill.secondAttribute = DEXTERITY;
-        skill.costs = new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, -1, -1, -1 };
-
-        return skill;
+        return new SkillType(S_GUN_PROTO,
+              7,
+              false,
+              COMBAT_GUNNERY,
+              REFLEXES,
+              DEXTERITY,
+              2,
+              null,
+              null,
+              null,
+              Arrays.asList(16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createSmallArms() {
-        SkillType skill = new SkillType();
-        skill.name = S_SMALL_ARMS;
-        skill.target = 7;
-        skill.greenLvl = 2;
-        skill.countUp = false;
-        skill.subType = COMBAT_GUNNERY;
-        skill.firstAttribute = DEXTERITY;
-        skill.secondAttribute = NONE;
-        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1 };
-
-        return skill;
+        return new SkillType(S_SMALL_ARMS,
+              7,
+              false,
+              COMBAT_GUNNERY,
+              DEXTERITY,
+              NONE,
+              2,
+              null,
+              null,
+              null,
+              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createAntiMek() {
-        SkillType skill = new SkillType();
-        skill.name = S_ANTI_MEK;
-        skill.target = 8;
-        skill.greenLvl = 2;
-        skill.countUp = false;
-        // Anti-Mek is the 'piloting' skill of Conventional Infantry
-        skill.subType = COMBAT_PILOTING;
-        // Anti-Mek doesn't exist in ATOW so we use the linked attributes Demolitions
-        skill.firstAttribute = DEXTERITY;
-        skill.secondAttribute = INTELLIGENCE;
-        skill.costs = new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, -1, -1 };
-
-        return skill;
+        // Anti-Mek is the 'piloting' skill of Conventional Infantry so it has a subtype of 'COMBAT_PILOTING'.
+        // As Anti-Mek doesn't exist in ATOW so we use the linked attributes for Demolitions (and technically
+        // Climbing, though the linked attribute for Climbing is just Dexterity which is shared with Demolitions).
+        return new SkillType(S_ANTI_MEK,
+              8,
+              false,
+              COMBAT_PILOTING,
+              DEXTERITY,
+              INTELLIGENCE,
+              2,
+              null,
+              null,
+              null,
+              Arrays.asList(12, 6, 6, 6, 6, 6, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createTechMek() {
-        SkillType skill = new SkillType();
-        skill.name = S_TECH_MEK;
-        skill.target = 10;
-        skill.countUp = false;
-        skill.subType = SUPPORT;
-        // This corresponds to the ATOW skill 'Technician'
-        skill.firstAttribute = DEXTERITY;
-        skill.secondAttribute = INTELLIGENCE;
-        skill.costs = new Integer[] { 12, 6, 0, 6, 6, 6, -1, -1, -1, -1, -1 };
-
-        return skill;
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_MEK,
+              10,
+              false,
+              SUPPORT,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(12,
+                    6,
+                    0,
+                    6,
+                    6,
+                    6,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createTechMechanic() {
-        SkillType skill = new SkillType();
-        skill.name = S_TECH_MECHANIC;
-        skill.target = 10;
-        skill.countUp = false;
-        skill.subType = SUPPORT;
-        // This corresponds to the ATOW skill 'Technician'
-        skill.firstAttribute = DEXTERITY;
-        skill.secondAttribute = INTELLIGENCE;
-        skill.costs = new Integer[] { 12, 6, 0, 6, 6, 6, -1, -1, -1, -1, -1 };
-
-        return skill;
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_MECHANIC,
+              10,
+              false,
+              SUPPORT,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(12,
+                    6,
+                    0,
+                    6,
+                    6,
+                    6,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createTechAero() {
-        SkillType skill = new SkillType();
-        skill.name = S_TECH_AERO;
-        skill.target = 10;
-        skill.countUp = false;
-        skill.subType = SUPPORT;
-        // This corresponds to the ATOW skill 'Technician'
-        skill.firstAttribute = DEXTERITY;
-        skill.secondAttribute = INTELLIGENCE;
-        skill.costs = new Integer[] { 12, 6, 0, 6, 6, 6, -1, -1, -1, -1, -1 };
-
-        return skill;
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_AERO,
+              10,
+              false,
+              SUPPORT,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(12,
+                    6,
+                    0,
+                    6,
+                    6,
+                    6,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createTechBA() {
-        SkillType skill = new SkillType();
-        skill.name = S_TECH_BA;
-        skill.target = 10;
-        skill.countUp = false;
-        skill.subType = SUPPORT;
-        // This corresponds to the ATOW skill 'Technician'
-        skill.firstAttribute = DEXTERITY;
-        skill.secondAttribute = INTELLIGENCE;
-        skill.costs = new Integer[] { 12, 6, 0, 6, 6, 6, -1, -1, -1, -1, -1 };
-
-        return skill;
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_BA,
+              10,
+              false,
+              SUPPORT,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(12,
+                    6,
+                    0,
+                    6,
+                    6,
+                    6,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createTechVessel() {
-        SkillType skill = new SkillType();
-        skill.name = S_TECH_VESSEL;
-        skill.target = 10;
-        skill.countUp = false;
-        skill.subType = SUPPORT;
-        // This corresponds to the ATOW skill 'Technician'
-        skill.firstAttribute = DEXTERITY;
-        skill.secondAttribute = INTELLIGENCE;
-        skill.costs = new Integer[] { 12, 6, 0, 6, 6, 6, -1, -1, -1, -1, -1 };
-
-        return skill;
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_VESSEL,
+              10,
+              false,
+              SUPPORT,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(12,
+                    6,
+                    0,
+                    6,
+                    6,
+                    6,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createAstech() {
-        SkillType skill = new SkillType();
-        skill.name = S_ASTECH;
-        skill.target = 10;
-        skill.countUp = false;
-        skill.subType = SUPPORT;
         // This doesn't correspond to an ATOW skill, so we went with INTELLIGENCE as the tech equivalent of MedTech
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = NONE;
-        skill.costs = new Integer[] { 12, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-
-        return skill;
+        return new SkillType(S_ASTECH,
+              10,
+              false,
+              SUPPORT,
+              INTELLIGENCE,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(12,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createDoctor() {
-        SkillType skill = new SkillType();
-        skill.name = S_DOCTOR;
-        skill.target = 11;
-        skill.countUp = false;
-        skill.subType = SUPPORT;
         // This corresponds to the ATOW skill 'Surgery'
-        skill.firstAttribute = DEXTERITY;
-        skill.secondAttribute = INTELLIGENCE;
-        skill.costs = new Integer[] { 16, 8, 0, 8, 8, 8, -1, -1, -1, -1, -1 };
-
-        return skill;
+        return new SkillType(S_DOCTOR,
+              11,
+              false,
+              SUPPORT,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(16,
+                    8,
+                    0,
+                    8,
+                    8,
+                    8,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createMedTech() {
-        SkillType skill = new SkillType();
-        skill.name = S_MEDTECH;
-        skill.target = 11;
-        skill.countUp = false;
-        skill.subType = SUPPORT;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = NONE;
-        skill.costs = new Integer[] { 16, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-
-        return skill;
+        return new SkillType(S_MEDTECH,
+              11,
+              false,
+              SUPPORT,
+              INTELLIGENCE,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(16,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createNav() {
-        SkillType skill = new SkillType();
-        skill.name = S_NAV;
-        skill.target = 8;
-        skill.countUp = false;
-        skill.subType = SUPPORT;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = NONE;
-        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1 };
-
-        return skill;
+        // This skill corresponds to the ATOW skill Navigation
+        return new SkillType(S_NAV,
+              8,
+              false,
+              SUPPORT,
+              INTELLIGENCE,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createTactics() {
-        SkillType skill = new SkillType();
-        skill.name = S_TACTICS;
-        skill.target = 0;
-        skill.countUp = true;
-        skill.subType = SUPPORT_COMMAND;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = WILLPOWER;
-        skill.costs = new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 };
-
-        return skill;
+        return new SkillType(S_TACTICS,
+              0,
+              true,
+              SUPPORT_COMMAND,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6));
     }
 
     public static SkillType createStrategy() {
-        SkillType skill = new SkillType();
-        skill.name = S_STRATEGY;
-        skill.target = 0;
-        skill.countUp = true;
-        skill.subType = SUPPORT_COMMAND;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = WILLPOWER;
-        skill.costs = new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 };
-
-        return skill;
+        return new SkillType(S_STRATEGY,
+              0,
+              true,
+              SUPPORT_COMMAND,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6));
     }
 
     public static SkillType createAdmin() {
-        SkillType skill = new SkillType();
-        skill.name = S_ADMIN;
-        skill.target = 10;
-        skill.countUp = false;
-        skill.subType = SUPPORT;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = WILLPOWER;
-        skill.costs = new Integer[] { 8, 4, 0, 4, 4, 4, -1, -1, -1, -1, -1 };
-
-        return skill;
+        return new SkillType(S_ADMIN,
+              10,
+              false,
+              SUPPORT,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(8,
+                    4,
+                    0,
+                    4,
+                    4,
+                    4,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL,
+                    DISABLED_SKILL_LEVEL));
     }
 
     public static SkillType createLeadership() {
-        SkillType skill = new SkillType();
-        skill.name = S_LEADER;
-        skill.target = 0;
-        skill.countUp = true;
-        skill.subType = SUPPORT_COMMAND;
-        skill.firstAttribute = WILLPOWER;
-        skill.secondAttribute = CHARISMA;
-        skill.costs = new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 };
-
-        return skill;
+        return new SkillType(S_LEADER,
+              0,
+              true,
+              SUPPORT_COMMAND,
+              WILLPOWER,
+              CHARISMA,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6));
     }
 
     public static SkillType createNegotiation() {
-        SkillType skill = new SkillType();
-        skill.name = S_NEG;
-        skill.target = 10;
-        skill.countUp = false;
-        skill.subType = SUPPORT;
-        skill.firstAttribute = CHARISMA;
-        skill.secondAttribute = NONE;
-        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 };
-
-        return skill;
+        return new SkillType(S_NEG,
+              10,
+              false,
+              SUPPORT,
+              CHARISMA,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4));
     }
 
     public static SkillType createScrounge() {
-        SkillType skill = new SkillType();
-        skill.name = S_SCROUNGE;
-        skill.target = 10;
-        skill.countUp = false;
-        skill.subType = SUPPORT;
-        // This corresponds to the ATOW skill 'Negotiation'
-        skill.firstAttribute = CHARISMA;
-        skill.secondAttribute = NONE;
-        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 };
-
-        return skill;
+        // This skill doesn't exist in ATOW, so we copied the linked attributes from Negotiation
+        return new SkillType(S_SCROUNGE,
+              10,
+              false,
+              SUPPORT,
+              CHARISMA,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4));
     }
 
     public static SkillType createAcrobatics() {
-        SkillType skill = new SkillType();
-        skill.name = S_ACROBATICS;
-        skill.target = 7;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = REFLEXES;
-        skill.secondAttribute = NONE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_ACROBATICS,
+              7,
+              false,
+              ROLEPLAY_GENERAL,
+              REFLEXES,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createActing() {
-        SkillType skill = new SkillType();
-        skill.name = S_ACTING;
-        skill.target = 8;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = CHARISMA;
-        skill.secondAttribute = NONE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_ACTING,
+              8,
+              false,
+              ROLEPLAY_GENERAL,
+              CHARISMA,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createAnimalHandling() {
-        SkillType skill = new SkillType();
-        skill.name = S_ANIMAL_HANDLING;
-        skill.target = 8;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = WILLPOWER;
-        skill.secondAttribute = NONE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_ANIMAL_HANDLING,
+              8,
+              false,
+              ROLEPLAY_GENERAL,
+              WILLPOWER,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createAppraisal() {
-        SkillType skill = new SkillType();
-        skill.name = S_APPRAISAL;
-        skill.target = 8;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = NONE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_APPRAISAL,
+              8,
+              false,
+              ROLEPLAY_GENERAL,
+              INTELLIGENCE,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createArchery() {
-        SkillType skill = new SkillType();
-        skill.name = S_ARCHERY;
-        skill.target = 7;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = DEXTERITY;
-        skill.secondAttribute = NONE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_ARCHERY,
+              7,
+              false,
+              ROLEPLAY_GENERAL,
+              DEXTERITY,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createArtDancing() {
-        SkillType skill = new SkillType();
-        skill.name = S_ART_DANCING;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_ART;
-        skill.firstAttribute = DEXTERITY;
-        skill.secondAttribute = INTELLIGENCE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_ART_DANCING,
+              9,
+              false,
+              ROLEPLAY_ART,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createArtDrawing() {
-        SkillType skill = new SkillType();
-        skill.name = S_ART_DRAWING;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_ART;
-        skill.firstAttribute = DEXTERITY;
-        skill.secondAttribute = INTELLIGENCE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_ART_DANCING,
+              9,
+              false,
+              ROLEPLAY_ART,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createArtPainting() {
-        SkillType skill = new SkillType();
-        skill.name = S_ART_PAINTING;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_ART;
-        skill.firstAttribute = DEXTERITY;
-        skill.secondAttribute = INTELLIGENCE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_ART_DANCING,
+              9,
+              false,
+              ROLEPLAY_ART,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createArtWriting() {
-        SkillType skill = new SkillType();
-        skill.name = S_ART_WRITING;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_ART;
-        skill.firstAttribute = DEXTERITY;
-        skill.secondAttribute = INTELLIGENCE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_ART_DANCING,
+              9,
+              false,
+              ROLEPLAY_ART,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createClimbing() {
-        SkillType skill = new SkillType();
-        skill.name = S_CLIMBING;
-        skill.target = 7;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = DEXTERITY;
-        skill.secondAttribute = NONE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_CLIMBING,
+              7,
+              false,
+              ROLEPLAY_GENERAL,
+              DEXTERITY,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createCommunications() {
-        SkillType skill = new SkillType();
-        skill.name = S_COMMUNICATIONS;
-        skill.target = 7;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = NONE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_COMMUNICATIONS,
+              7,
+              false,
+              ROLEPLAY_GENERAL,
+              INTELLIGENCE,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createComputers() {
-        SkillType skill = new SkillType();
-        skill.name = S_COMPUTERS;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = NONE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_COMPUTERS,
+              9,
+              false,
+              ROLEPLAY_GENERAL,
+              INTELLIGENCE,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createCryptography() {
-        SkillType skill = new SkillType();
-        skill.name = S_CRYPTOGRAPHY;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = WILLPOWER;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_CRYPTOGRAPHY,
+              9,
+              false,
+              ROLEPLAY_GENERAL,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createDemolitions() {
-        SkillType skill = new SkillType();
-        skill.name = S_DEMOLITIONS;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = DEXTERITY;
-        skill.secondAttribute = INTELLIGENCE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_DEMOLITIONS,
+              9,
+              false,
+              ROLEPLAY_GENERAL,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createDisguise() {
-        SkillType skill = new SkillType();
-        skill.name = S_DISGUISE;
-        skill.target = 7;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = CHARISMA;
-        skill.secondAttribute = NONE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_DISGUISE,
+              7,
+              false,
+              ROLEPLAY_GENERAL,
+              CHARISMA,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createEscapeArtist() {
-        SkillType skill = new SkillType();
-        skill.name = S_ESCAPE_ARTIST;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = STRENGTH;
-        skill.secondAttribute = DEXTERITY;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_ESCAPE_ARTIST,
+              9,
+              false,
+              ROLEPLAY_GENERAL,
+              STRENGTH,
+              DEXTERITY,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createForgery() {
-        SkillType skill = new SkillType();
-        skill.name = S_FORGERY;
-        skill.target = 8;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = DEXTERITY;
-        skill.secondAttribute = INTELLIGENCE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_FORGERY,
+              8,
+              false,
+              ROLEPLAY_GENERAL,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createInterestHistory() {
-        SkillType skill = new SkillType();
-        skill.name = S_INTEREST_HISTORY;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_INTEREST;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = WILLPOWER;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_INTEREST_HISTORY,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createInterestLiterature() {
-        SkillType skill = new SkillType();
-        skill.name = S_INTEREST_LITERATURE;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_INTEREST;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = WILLPOWER;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_INTEREST_LITERATURE,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createInterestHoloGames() {
-        SkillType skill = new SkillType();
-        skill.name = S_INTEREST_HOLO_GAMES;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_INTEREST;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = WILLPOWER;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_INTEREST_HOLO_GAMES,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createInterestSports() {
-        SkillType skill = new SkillType();
-        skill.name = S_INTEREST_SPORTS;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_INTEREST;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = WILLPOWER;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_INTEREST_SPORTS,
+              9,
+              false,
+              ROLEPLAY_INTEREST,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createInterrogation() {
-        SkillType skill = new SkillType();
-        skill.name = S_INTERROGATION;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = WILLPOWER;
-        skill.secondAttribute = CHARISMA;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_INTERROGATION,
+              9,
+              false,
+              ROLEPLAY_GENERAL,
+              WILLPOWER,
+              CHARISMA,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createInvestigation() {
-        SkillType skill = new SkillType();
-        skill.name = S_INVESTIGATION;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = WILLPOWER;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_INVESTIGATION,
+              9,
+              false,
+              ROLEPLAY_GENERAL,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createLanguages() {
-        SkillType skill = new SkillType();
-        skill.name = S_LANGUAGES;
-        skill.target = 8;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = CHARISMA;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_LANGUAGES,
+              8,
+              false,
+              ROLEPLAY_GENERAL,
+              INTELLIGENCE,
+              CHARISMA,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createMartialArts() {
-        SkillType skill = new SkillType();
-        skill.name = S_MARTIAL_ARTS;
-        skill.target = 8;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = REFLEXES;
-        skill.secondAttribute = DEXTERITY;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_MARTIAL_ARTS,
+              8,
+              false,
+              ROLEPLAY_GENERAL,
+              REFLEXES,
+              DEXTERITY,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createPerception() {
-        SkillType skill = new SkillType();
-        skill.name = S_PERCEPTION;
-        skill.target = 7;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = NONE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_PERCEPTION,
+              7,
+              false,
+              ROLEPLAY_GENERAL,
+              INTELLIGENCE,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createSleightOfHand() {
         // We don't call this skill Prestidigitation because then we'll get 100 questions asking what
-        // 'Prestidigitation' is.
-        SkillType skill = new SkillType();
-        skill.name = S_SLEIGHT_OF_HAND;
-        skill.target = 8;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = REFLEXES;
-        skill.secondAttribute = DEXTERITY;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        // 'Prestidigitation' means.
+        return new SkillType(S_SLEIGHT_OF_HAND,
+              8,
+              false,
+              ROLEPLAY_GENERAL,
+              REFLEXES,
+              DEXTERITY,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createProtocols() {
-        SkillType skill = new SkillType();
-        skill.name = S_PROTOCOLS;
-        skill.target = 8;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = WILLPOWER;
-        skill.secondAttribute = CHARISMA;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_PROTOCOLS,
+              8,
+              false,
+              ROLEPLAY_GENERAL,
+              WILLPOWER,
+              CHARISMA,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createScienceBiology() {
-        SkillType skill = new SkillType();
-        skill.name = S_SCIENCE_BIOLOGY;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_SCIENCE;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = WILLPOWER;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_SCIENCE_BIOLOGY,
+              9,
+              false,
+              ROLEPLAY_SCIENCE,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createScienceChemistry() {
-        SkillType skill = new SkillType();
-        skill.name = S_SCIENCE_CHEMISTRY;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_SCIENCE;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = WILLPOWER;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_SCIENCE_CHEMISTRY,
+              9,
+              false,
+              ROLEPLAY_SCIENCE,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createScienceMathematics() {
-        SkillType skill = new SkillType();
-        skill.name = S_SCIENCE_MATHEMATICS;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_SCIENCE;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = WILLPOWER;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_SCIENCE_MATHEMATICS,
+              9,
+              false,
+              ROLEPLAY_SCIENCE,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createSciencePhysics() {
-        SkillType skill = new SkillType();
-        skill.name = S_SCIENCE_PHYSICS;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_SCIENCE;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = WILLPOWER;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_SCIENCE_PHYSICS,
+              9,
+              false,
+              ROLEPLAY_SCIENCE,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createSecuritySystemsElectronic() {
-        SkillType skill = new SkillType();
-        skill.name = S_SECURITY_SYSTEMS_ELECTRONIC;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_SECURITY;
-        skill.firstAttribute = DEXTERITY;
-        skill.secondAttribute = INTELLIGENCE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_SECURITY_SYSTEMS_ELECTRONIC,
+              9,
+              false,
+              ROLEPLAY_SECURITY,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createSecuritySystemsMechanical() {
-        SkillType skill = new SkillType();
-        skill.name = S_SCIENCE_SYSTEMS_MECHANICAL;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_SECURITY;
-        skill.firstAttribute = DEXTERITY;
-        skill.secondAttribute = INTELLIGENCE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_SCIENCE_SYSTEMS_MECHANICAL,
+              9,
+              false,
+              ROLEPLAY_SECURITY,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createSensorOperations() {
-        SkillType skill = new SkillType();
-        skill.name = S_SENSOR_OPERATIONS;
-        skill.target = 8;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = WILLPOWER;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_SENSOR_OPERATIONS,
+              8,
+              false,
+              ROLEPLAY_GENERAL,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createStealth() {
-        SkillType skill = new SkillType();
-        skill.name = S_STEALTH;
-        skill.target = 8;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = REFLEXES;
-        skill.secondAttribute = INTELLIGENCE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_STEALTH,
+              8,
+              false,
+              ROLEPLAY_GENERAL,
+              REFLEXES,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createStreetwise() {
-        SkillType skill = new SkillType();
-        skill.name = S_STREETWISE;
-        skill.target = 8;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = CHARISMA;
-        skill.secondAttribute = NONE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_STREETWISE,
+              8,
+              false,
+              ROLEPLAY_GENERAL,
+              CHARISMA,
+              NONE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createSurvival() {
-        SkillType skill = new SkillType();
-        skill.name = S_SURVIVAL;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = DEXTERITY;
-        skill.secondAttribute = INTELLIGENCE;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_SURVIVAL,
+              9,
+              false,
+              ROLEPLAY_GENERAL,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createTracking() {
-        SkillType skill = new SkillType();
-        skill.name = S_TRACKING;
-        skill.target = 8;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = WILLPOWER;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_TRACKING,
+              8,
+              false,
+              ROLEPLAY_GENERAL,
+              INTELLIGENCE,
+              WILLPOWER,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 
     public static SkillType createTraining() {
-        SkillType skill = new SkillType();
-        skill.name = S_TRAINING;
-        skill.target = 9;
-        skill.countUp = false;
-        skill.subType = ROLEPLAY_GENERAL;
-        skill.firstAttribute = INTELLIGENCE;
-        skill.secondAttribute = CHARISMA;
-        skill.costs = new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-
-        return skill;
+        return new SkillType(S_TRAINING,
+              9,
+              false,
+              ROLEPLAY_GENERAL,
+              INTELLIGENCE,
+              CHARISMA,
+              null,
+              null,
+              null,
+              null,
+              Arrays.asList(20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100));
     }
 }
