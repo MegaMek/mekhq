@@ -199,6 +199,7 @@ public class Person {
     private int toughness;
     private int connections;
     private int wealth;
+    private boolean hasPerformedExtremeExpenditure;
     private int reputation;
     private int unlucky;
     private Attributes atowAttributes;
@@ -428,6 +429,7 @@ public class Person {
         toughness = 0;
         connections = 0;
         wealth = 0;
+        hasPerformedExtremeExpenditure = false;
         reputation = 0;
         unlucky = 0;
         atowAttributes = new Attributes();
@@ -2367,6 +2369,10 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wealth", wealth);
             }
 
+            if (hasPerformedExtremeExpenditure) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasPerformedExtremeExpenditure", true);
+            }
+
             if (reputation != 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reputation", reputation);
             }
@@ -2785,6 +2791,8 @@ public class Person {
                     person.connections = MathUtility.parseInt(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("wealth")) {
                     person.wealth = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("hasPerformedExtremeExpenditure")) {
+                    person.hasPerformedExtremeExpenditure = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("reputation")) {
                     person.reputation = MathUtility.parseInt(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("unlucky")) {
@@ -4925,6 +4933,14 @@ public class Person {
 
     public void setWealth(final int wealth) {
         this.wealth = wealth;
+    }
+
+    public boolean isHasPerformedExtremeExpenditure() {
+        return hasPerformedExtremeExpenditure;
+    }
+
+    public void setHasPerformedExtremeExpenditure(final boolean hasPerformedExtremeExpenditure) {
+        this.hasPerformedExtremeExpenditure = hasPerformedExtremeExpenditure;
     }
 
     public int getReputation() {

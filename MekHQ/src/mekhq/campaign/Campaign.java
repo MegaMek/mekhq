@@ -46,6 +46,7 @@ import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performRe
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
+import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
@@ -4930,6 +4931,19 @@ public class Campaign implements ITechManager {
                         personnelWhoAdvancedInXP.add(person);
                     }
                 }
+
+                if (person.isCommander() &&
+                          campaignOptions.isAllowMonthlyReinvestment() &&
+                          !person.isHasPerformedExtremeExpenditure()) {
+                    String reportString = performDiscretionarySpending(person, finances, currentDay);
+                    if (reportString != null) {
+                        addReport(reportString);
+                    } else {
+                        logger.error("Unable to process discretionary spending for {}", person.getFullTitle());
+                    }
+                }
+
+                person.setHasPerformedExtremeExpenditure(false);
             }
 
             if (isCommandersDay && !faction.isClan() && (peopleWhoCelebrateCommandersDay < commanderDayTargetNumber)) {
