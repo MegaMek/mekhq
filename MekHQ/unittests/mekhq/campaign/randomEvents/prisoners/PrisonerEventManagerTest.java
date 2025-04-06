@@ -35,6 +35,7 @@ import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.TEMPORARY_CAPACITY_DEGRADE_RATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -85,6 +86,7 @@ public class PrisonerEventManagerTest {
 
         // Assert
         assertEquals(expectedValue, actualValue);
+        assertNotEquals(INITIAL_TEMPORARY_CAPACITY, actualValue);
     }
 
     @Test
@@ -109,6 +111,7 @@ public class PrisonerEventManagerTest {
 
         // Assert
         assertEquals(expectedValue, actualValue);
+        assertNotEquals(INITIAL_TEMPORARY_CAPACITY, actualValue);
     }
 
     @Test
@@ -136,6 +139,7 @@ public class PrisonerEventManagerTest {
 
         // Assert
         assertEquals(expectedValue, actualValue);
+        assertNotEquals(INITIAL_TEMPORARY_CAPACITY, actualValue);
     }
 
     @Test
@@ -160,6 +164,7 @@ public class PrisonerEventManagerTest {
 
         // Assert
         assertEquals(expectedValue, actualValue);
+        assertNotEquals(INITIAL_TEMPORARY_CAPACITY, actualValue);
     }
 
     @Test
