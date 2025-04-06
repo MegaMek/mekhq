@@ -180,7 +180,7 @@ public class PrisonerEventManager {
 
         if (temporaryCapacityModifier != DEFAULT_TEMPORARY_CAPACITY) {
         	int differendInTemporaryCapacity = abs(DEFAULT_TEMPORARY_CAPACITY-temporaryCapacityModifier);
-            int degreeOfChange = (int) min(1,round(differendInTemporaryCapacity * TEMPORARY_CAPACITY_DEGRADE_RATE));
+            int degreeOfChange = (int) max(1,round(differendInTemporaryCapacity * TEMPORARY_CAPACITY_DEGRADE_RATE));
 
             if (temporaryCapacityModifier < DEFAULT_TEMPORARY_CAPACITY) {
                 temporaryCapacityModifier += degreeOfChange;
