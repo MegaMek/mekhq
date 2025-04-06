@@ -35,19 +35,16 @@ import java.util.function.Predicate;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.client.ratgenerator.ModelRecord;
-import megamek.client.ratgenerator.UnitTable.Parameters;
+import megamek.client.ratgenerator.Parameters;
 import megamek.common.EntityMovementMode;
 import megamek.common.MekSummary;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 
 /**
- * Data structure that contains parameters relevant to unit generation via the
- * IUnitGenerator interface
- * and is capable of translating itself to
- * megamek.client.ratgenerator.parameters
+ * Data structure that contains parameters relevant to unit generation via the IUnitGenerator interface and is capable
+ * of translating itself to megamek.client.ratgenerator.parameters
  *
  * @author NickAragua
- *
  */
 public class UnitGeneratorParameters {
     private String faction;
@@ -68,33 +65,29 @@ public class UnitGeneratorParameters {
      * Thorough deep clone of this generator parameters object.
      */
     @Override
-    public UnitGeneratorParameters clone() {
-        UnitGeneratorParameters newParams = new UnitGeneratorParameters();
+    public UnitGeneratorParameters clone() throws CloneNotSupportedException {
+        UnitGeneratorParameters unitGeneratorParameters = (UnitGeneratorParameters) super.clone();
 
-        newParams.setFaction(faction);
-        newParams.setUnitType(unitType);
-        newParams.setWeightClass(weightClass);
-        newParams.setYear(year);
-        newParams.setQuality(quality);
-        newParams.setFilter(filter);
+        unitGeneratorParameters.setFaction(faction);
+        unitGeneratorParameters.setUnitType(unitType);
+        unitGeneratorParameters.setWeightClass(weightClass);
+        unitGeneratorParameters.setYear(year);
+        unitGeneratorParameters.setQuality(quality);
+        unitGeneratorParameters.setFilter(filter);
 
-        Collection<EntityMovementMode> newModes = new ArrayList<>();
-        for (EntityMovementMode movementMode : movementModes) {
-            newModes.add(movementMode);
-        }
+        Collection<EntityMovementMode> newModes = new ArrayList<>(movementModes);
 
-        newParams.setMovementModes(newModes);
+        unitGeneratorParameters.setMovementModes(newModes);
 
         for (MissionRole missionRole : missionRoles) {
-            newParams.addMissionRole(missionRole);
+            unitGeneratorParameters.addMissionRole(missionRole);
         }
 
-        return newParams;
+        return unitGeneratorParameters;
     }
 
     /**
-     * Translate the contents of this data structure into a
-     * megamek.client.ratgenerator.Parameters object
+     * Translate the contents of this data structure into a megamek.client.ratgenerator.Parameters object
      *
      * @return
      */
@@ -107,11 +100,16 @@ public class UnitGeneratorParameters {
             weightClasses.add(getWeightClass());
         }
 
-        Parameters params = new Parameters(fRec, getUnitType(), getYear(), rating, weightClasses,
-                ModelRecord.NETWORK_NONE,
-                getMovementModes(), getMissionRoles(), 2, fRec);
-
-        return params;
+        return new Parameters(fRec,
+              getUnitType(),
+              getYear(),
+              rating,
+              weightClasses,
+              ModelRecord.NETWORK_NONE,
+              getMovementModes(),
+              getMissionRoles(),
+              2,
+              fRec);
     }
 
     public String getFaction() {
@@ -174,6 +172,10 @@ public class UnitGeneratorParameters {
         this.missionRoles = missionRoles;
     }
 
+    /**
+     * @deprecated no indicated uses.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public void clearMissionRoles() {
         missionRoles.clear();
     }
