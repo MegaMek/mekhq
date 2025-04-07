@@ -27,6 +27,7 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
+import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
@@ -91,6 +92,9 @@ public class PrisonerEventManager {
     private final int RESPONSE_TARGET_NUMBER = 7;
 
     public static final int DEFAULT_TEMPORARY_CAPACITY = 100;
+    // The temporary prisoner capacity should never go below 0.
+    // But the security forces should be able to guard some prisoners in all cases
+    public static final int MINIMUM_TEMPORARY_CAPACITY = 25;
     public static final double TEMPORARY_CAPACITY_DEGRADE_RATE = 0.1;
 
     // These values are based on CamOps. CamOps states a squad of CI or one squad of BA can
@@ -175,7 +179,8 @@ public class PrisonerEventManager {
         int newCapacity = 0;
 
         if (temporaryCapacityModifier != DEFAULT_TEMPORARY_CAPACITY) {
-            int degreeOfChange = (int) round(temporaryCapacityModifier * TEMPORARY_CAPACITY_DEGRADE_RATE);
+        	double differendInTemporaryCapacity = (double) abs(DEFAULT_TEMPORARY_CAPACITY-temporaryCapacityModifier);
+            int degreeOfChange = max(1,(int) round(differendInTemporaryCapacity * TEMPORARY_CAPACITY_DEGRADE_RATE));
 
             if (temporaryCapacityModifier < DEFAULT_TEMPORARY_CAPACITY) {
                 temporaryCapacityModifier += degreeOfChange;
