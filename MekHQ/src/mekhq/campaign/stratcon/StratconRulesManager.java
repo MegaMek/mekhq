@@ -2412,8 +2412,14 @@ public class StratconRulesManager {
             }
         }
 
-        if (suitableForces.isEmpty() && !bypassRoleRestrictions) {
-            suitableForces = getAvailableForceIDs(campaign, contract, true);
+        if (suitableForces.isEmpty()) {
+            if (!bypassRoleRestrictions) {
+                logger.info("No suitable combat teams found for contract {}. Relaxing restrictions", contract.getId());
+                suitableForces = getAvailableForceIDs(campaign, contract, true);
+            } else {
+                logger.info("No suitable combat teams found for contract {} despite relaxed restrictions." +
+                                  " Scenario generation will likely be skipped.", contract.getId());
+            }
         }
 
         return suitableForces;
