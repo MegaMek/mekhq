@@ -38,14 +38,16 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 public class SkillCheckDialog {
     final String RESOURCE_BUNDLE = "mekhq.resources." + SkillCheckDialog.class.getSimpleName();
 
-    final String DIALOG_IMAGE_FILENAME = "data/images/misc/skill_check.png";
+    final String DIALOG_IMAGE_FILENAME_DEFAULT = "data/images/misc/skill_check_default.png";
+    final String DIALOG_IMAGE_FILENAME_PASS = "data/images/misc/skill_check_pass.png";
+    final String DIALOG_IMAGE_FILENAME_FAIL = "data/images/misc/skill_check_fail.png";
 
     final int DIALOG_CANCEL_INDEX = 0;
     final int DIALOG_USE_EDGE_INDEX = 2;
 
     private final Campaign campaign;
     private final Person character;
-    private final ImageIcon image;
+    boolean isSuccess = false;
     private List<String> skillNames = new ArrayList<>();
 
 
@@ -64,7 +66,6 @@ public class SkillCheckDialog {
     public SkillCheckDialog(Campaign campaign, Person character) {
         this.campaign = campaign;
         this.character = character;
-        this.image = new ImageIcon(DIALOG_IMAGE_FILENAME);
 
         // Initial Dialog
         ImmersiveDialogCore dialog = getInitialDialog();
@@ -102,7 +103,7 @@ public class SkillCheckDialog {
               null,
               false,
               getSupplementalPanel(),
-              image,
+              new ImageIcon(DIALOG_IMAGE_FILENAME_DEFAULT),
               true);
     }
 
@@ -122,6 +123,7 @@ public class SkillCheckDialog {
         String skillName = skillNames.get(selectedSkill);
         boolean useEdge = choiceIndex == DIALOG_USE_EDGE_INDEX;
         SkillCheckUtility utility = new SkillCheckUtility(character, skillName, selectedModifier, useEdge);
+        isSuccess = utility.isSuccess();
 
         return utility.getResultsText();
     }
@@ -136,7 +138,14 @@ public class SkillCheckDialog {
      * @since 0.50.05
      */
     private void showResultsDialog(String results) {
-        new ImmersiveDialogSimple(campaign, character, null, results, null, null, image, false);
+        new ImmersiveDialogSimple(campaign,
+              character,
+              null,
+              results,
+              null,
+              null,
+              new ImageIcon(isSuccess ? DIALOG_IMAGE_FILENAME_PASS : DIALOG_IMAGE_FILENAME_FAIL),
+              false);
     }
 
     /**

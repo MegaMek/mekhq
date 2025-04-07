@@ -348,15 +348,6 @@ public class ImmersiveDialogCore extends JDialog {
         // Create a JLabel for the image above the JEditorPane
         JLabel imageLabel = new JLabel();
         if (imageIcon != null) {
-            if (imageIcon.getIconWidth() > CENTER_WIDTH) {
-                imageIcon = scaleImageIcon(imageIcon, CENTER_WIDTH, true);
-            }
-
-            int heightLimit = max(1, CENTER_WIDTH / 3); // I went with 3 because that provided the best feel
-            if (imageIcon.getIconHeight() > heightLimit) {
-                imageIcon = scaleImageIcon(imageIcon, heightLimit, false);
-            }
-
             imageLabel.setIcon(imageIcon);
             imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         }
