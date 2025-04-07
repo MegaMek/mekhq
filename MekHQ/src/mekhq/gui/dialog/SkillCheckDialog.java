@@ -9,6 +9,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -16,7 +17,6 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ui.baseComponents.MMComboBox;
-import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillCheckUtility;
@@ -38,11 +38,14 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 public class SkillCheckDialog {
     final String RESOURCE_BUNDLE = "mekhq.resources." + SkillCheckDialog.class.getSimpleName();
 
+    final String DIALOG_IMAGE_FILENAME = "data/images/misc/skill_check.png";
+
     final int DIALOG_CANCEL_INDEX = 0;
     final int DIALOG_USE_EDGE_INDEX = 2;
 
     private final Campaign campaign;
     private final Person character;
+    private final ImageIcon image;
     private List<String> skillNames = new ArrayList<>();
 
 
@@ -61,6 +64,7 @@ public class SkillCheckDialog {
     public SkillCheckDialog(Campaign campaign, Person character) {
         this.campaign = campaign;
         this.character = character;
+        this.image = new ImageIcon(DIALOG_IMAGE_FILENAME);
 
         // Initial Dialog
         ImmersiveDialogCore dialog = getInitialDialog();
@@ -98,7 +102,7 @@ public class SkillCheckDialog {
               null,
               false,
               getSupplementalPanel(),
-              null,
+              image,
               true);
     }
 
@@ -116,8 +120,6 @@ public class SkillCheckDialog {
      */
     private String performSkillCheck(int selectedSkill, int selectedModifier, int choiceIndex) {
         String skillName = skillNames.get(selectedSkill);
-        MMLogger logger = MMLogger.create(SkillCheckDialog.class);
-        logger.info("Performing skill check for " + skillName + " with modifier " + selectedModifier);
         boolean useEdge = choiceIndex == DIALOG_USE_EDGE_INDEX;
         SkillCheckUtility utility = new SkillCheckUtility(character, skillName, selectedModifier, useEdge);
 
@@ -134,7 +136,7 @@ public class SkillCheckDialog {
      * @since 0.50.05
      */
     private void showResultsDialog(String results) {
-        new ImmersiveDialogSimple(campaign, character, null, results, null, null, null, false);
+        new ImmersiveDialogSimple(campaign, character, null, results, null, null, image, false);
     }
 
     /**
