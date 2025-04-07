@@ -92,7 +92,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.divorce.RandomDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -1394,7 +1393,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void hirePersonMarket() {
-        PersonnelMarketDialog pmd = new PersonnelMarketDialog(getFrame(), this, getCampaign());
+        PersonnelMarketDialog pmd = new PersonnelMarketDialog(null, this, getCampaign());
         pmd.setVisible(true);
     }
 
