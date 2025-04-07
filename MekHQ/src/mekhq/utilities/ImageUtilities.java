@@ -94,6 +94,57 @@ public class ImageUtilities {
         }
 
         // Create a new BufferedImage with the desired dimensions
+        BufferedImage scaledImage = getBufferedImage(icon.getImage(), width, height);
+
+        return new ImageIcon(scaledImage);
+    }
+
+    /**
+     * Scales an {@link Image} proportionally based on either the specified width or height.
+     *
+     * <p>This method preserves the aspect ratio of the original image while resizing. The size to scale
+     * is determined by the {@code size} parameter, and whether scaling is based on width or height is controlled by the
+     * {@code scaleByWidth} flag.</p>
+     *
+     * <p>If the provided {@link Image} is {@code null}, an empty {@link Image} will be returned, and
+     * an error will be logged.</p>
+     *
+     * @param image        The {@link Image} to be scaled. If {@code null}, an empty {@link Image} is returned.
+     * @param size         The target size to scale to, either width or height depending on the {@code scaleByWidth}
+     *                     flag. This value will be scaled for the GUI using {@link UIUtil#scaleForGUI(int)}.
+     * @param scaleByWidth A {@code boolean} flag to determine the scaling mode:
+     *                     <ul>
+     *                       <li>If {@code true}, scales the image by the given width, and calculates the height
+     *                           proportionally.</li>
+     *                       <li>If {@code false}, scales the image by the given height, and calculates the width
+     *                           proportionally.</li>
+     *                     </ul>
+     *
+     * @return A scaled {@link Image}, resized to the specified target dimension while maintaining the aspect ratio. If
+     *       the provided {@link Image} is {@code null}, returns an empty {@link Image}.
+     */
+    public static Image scaleImage(Image image, int size, boolean scaleByWidth) {
+        if (image == null) {
+            logger.error(new NullPointerException(),
+                  "Image is null in scaleImage(Image, int, boolean). Returning a placeholder image.");
+            return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        }
+
+        int width, height;
+
+        if (scaleByWidth) {
+            width = Math.max(1, UIUtil.scaleForGUI(size));
+            height = (int) Math.ceil((double) width * image.getHeight(null) / image.getWidth(null));
+        } else {
+            height = Math.max(1, UIUtil.scaleForGUI(size));
+            width = (int) Math.ceil((double) height * image.getWidth(null) / image.getHeight(null));
+        }
+
+        return getBufferedImage(image, width, height);
+    }
+
+    private static BufferedImage getBufferedImage(Image image, int width, int height) {
+        // Create a new BufferedImage with the desired dimensions
         BufferedImage scaledImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
         // Get the Graphics2D object and set rendering hints for quality
@@ -103,10 +154,9 @@ public class ImageUtilities {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         // Draw the scaled image with high-quality rendering
-        g2d.drawImage(icon.getImage(), 0, 0, width, height, null);
+        g2d.drawImage(image, 0, 0, width, height, null);
         g2d.dispose();
-
-        return new ImageIcon(scaledImage);
+        return scaledImage;
     }
 
     /**

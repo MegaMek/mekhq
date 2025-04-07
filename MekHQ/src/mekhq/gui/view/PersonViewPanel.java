@@ -34,6 +34,7 @@ import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 import static mekhq.utilities.ImageUtilities.addTintToImageIcon;
+import static mekhq.utilities.ImageUtilities.scaleImage;
 import static org.jfree.chart.ChartColor.DARK_BLUE;
 import static org.jfree.chart.ChartColor.DARK_RED;
 
@@ -94,8 +95,6 @@ import mekhq.gui.model.PersonnelKillLogModel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.WrapLayout;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
-
 /**
  * A custom panel that gets filled in with goodies from a Person record
  *
@@ -104,7 +103,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 public class PersonViewPanel extends JScrollablePanel {
     private static final MMLogger logger = MMLogger.create(PersonViewPanel.class);
 
-    private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 4;
+    private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 3;
 
     private final CampaignGUI gui;
 
@@ -408,13 +407,16 @@ public class PersonViewPanel extends JScrollablePanel {
                 int awardTierCount = getAwardTierCount(award, maximumTiers);
 
                 String ribbonFileName = award.getRibbonFileName(awardTierCount);
+                String directory = award.getSet() + "/ribbons/";
 
-                ribbon = (Image) MHQStaticDirectoryManager.getAwardIcons()
-                                       .getItem(award.getSet() + "/ribbons/", ribbonFileName);
+                ribbon = (Image) MHQStaticDirectoryManager.getAwardIcons().getItem(directory, ribbonFileName);
                 if (ribbon == null) {
+                    logger.warn("No ribbon icon found for award: {}", directory + ribbonFileName);
                     continue;
                 }
-                ribbon = ribbon.getScaledInstance(25, 8, Image.SCALE_DEFAULT);
+
+                ribbon = scaleImage(ribbon, 8, false);
+
                 ribbonLabel.setIcon(new ImageIcon(ribbon));
                 ribbonLabel.setToolTipText(award.getTooltip(campaign.getCampaignOptions(), person));
                 rowRibbonsBox.add(ribbonLabel, 0);
@@ -481,23 +483,15 @@ public class PersonViewPanel extends JScrollablePanel {
                 int awardTierCount = getAwardTierCount(award, maximumTiers);
 
                 String medalFileName = award.getMedalFileName(awardTierCount);
+                String directory = award.getSet() + "/medals/";
 
-                medal = (Image) MHQStaticDirectoryManager.getAwardIcons()
-                                      .getItem(award.getSet() + "/medals/", medalFileName);
+                medal = (Image) MHQStaticDirectoryManager.getAwardIcons().getItem(directory, medalFileName);
                 if (medal == null) {
+                    logger.warn("No medal icon found for award: {}", directory + medalFileName);
                     continue;
                 }
 
-                int width = medal.getWidth(null);
-                int height = medal.getHeight(null);
-
-                if (width == height) {
-                    medal = medal.getScaledInstance(40, 40, Image.SCALE_FAST);
-                } else if (width < height) {
-                    medal = medal.getScaledInstance(20, 40, Image.SCALE_FAST);
-                } else {
-                    medal = medal.getScaledInstance(40, 20, Image.SCALE_FAST);
-                }
+                medal = scaleImage(medal, 40, false);
 
                 medalLabel.setIcon(new ImageIcon(medal));
                 medalLabel.setToolTipText(award.getTooltip(campaign.getCampaignOptions(), person));
@@ -529,27 +523,19 @@ public class PersonViewPanel extends JScrollablePanel {
 
             Image misc;
             try {
-                int maximumTiers = award.getNumberOfMedalFiles();
+                int maximumTiers = award.getNumberOfMiscFiles();
                 int awardTierCount = getAwardTierCount(award, maximumTiers);
 
                 String miscFileName = award.getMiscFileName(awardTierCount);
+                String directory = award.getSet() + "/misc/";
 
-                misc = (Image) MHQStaticDirectoryManager.getAwardIcons()
-                                     .getItem(award.getSet() + "/misc/", miscFileName);
+                misc = (Image) MHQStaticDirectoryManager.getAwardIcons().getItem(directory, miscFileName);
                 if (misc == null) {
+                    logger.warn("No misc icon found for award: {}", directory + miscFileName);
                     continue;
                 }
 
-                int width = misc.getWidth(null);
-                int height = misc.getHeight(null);
-
-                if (width == height) {
-                    misc = misc.getScaledInstance(40, 40, Image.SCALE_FAST);
-                } else if (width < height) {
-                    misc = misc.getScaledInstance(20, 40, Image.SCALE_FAST);
-                } else {
-                    misc = misc.getScaledInstance(40, 20, Image.SCALE_FAST);
-                }
+                misc = scaleImage(misc, 40, false);
 
                 miscLabel.setIcon(new ImageIcon(misc));
                 miscLabel.setToolTipText(award.getTooltip(campaign.getCampaignOptions(), person));
