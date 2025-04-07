@@ -335,7 +335,8 @@ public class SkillType {
         this.regLvl = 3;
         this.vetLvl = 4;
         this.eliteLvl = 5;
-        this.costs = new Integer[11];
+        this.costs = new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                                     DISABLED_SKILL_LEVEL };
     }
 
     /**
@@ -377,10 +378,10 @@ public class SkillType {
      *
      *                        <p>For example:</p>
      *                        <pre>
-     *                                                                                                                                                                                                                                                              Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                                                                                                                                                              SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                                                                                                                                                                     SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                                                                                                                                                              </pre>
+     *                                                                                                                                                                                                                                                                                     Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                                                                                                                                                                     SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                                                                                                                                                                            SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                                                                                                                                                                     </pre>
      *
      * @author Illiani
      * @since 0.50.05
@@ -1684,7 +1685,7 @@ public class SkillType {
     }
 
     public static SkillType createArtDrawing() {
-        return new SkillType(S_ART_DANCING,
+        return new SkillType(S_ART_DRAWING,
               9,
               false,
               ROLEPLAY_ART,
@@ -1698,7 +1699,7 @@ public class SkillType {
     }
 
     public static SkillType createArtPainting() {
-        return new SkillType(S_ART_DANCING,
+        return new SkillType(S_ART_PAINTING,
               9,
               false,
               ROLEPLAY_ART,
@@ -1712,7 +1713,7 @@ public class SkillType {
     }
 
     public static SkillType createArtWriting() {
-        return new SkillType(S_ART_DANCING,
+        return new SkillType(S_ART_WRITING,
               9,
               false,
               ROLEPLAY_ART,
