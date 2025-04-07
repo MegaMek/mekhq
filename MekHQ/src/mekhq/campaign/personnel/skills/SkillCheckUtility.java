@@ -47,6 +47,7 @@ import java.util.List;
 
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
@@ -457,6 +458,7 @@ public class SkillCheckUtility {
      */
     private void rollWithEdge() {
         person.changeCurrentEdge(-1);
+        MekHQ.triggerEvent(new PersonChangedEvent(person));
         usedEdge = true;
 
         marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(roll - targetNumber);
