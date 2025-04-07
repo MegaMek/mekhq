@@ -157,7 +157,8 @@ MEKHQ VERSION HISTORY:
 + PR #6562: Fixed Campaign Portrait Fallback; Updated Immersive Dialog Visuals
 + PR #6560: Fix for negative temporary prisoner capacity
 + PR #6561: Added Dedicated Skill Check Utility Class
-+ PR #6576: Switched Autoresolve Localization to MekHQ from MegaMek 
++ PR #6576: Switched Autoresolve Localization to MekHQ from MegaMek
++ PR #6577: Corrected Art Skill Type Names
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
