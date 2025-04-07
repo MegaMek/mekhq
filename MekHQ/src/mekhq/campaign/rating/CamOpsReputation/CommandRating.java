@@ -32,6 +32,7 @@ import static megamek.common.options.OptionsConstants.ATOW_COMBAT_PARALYSIS;
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_SENSE;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -70,7 +71,11 @@ public class CommandRating {
         commandRating.put("strategy", getSkillValue(commander, SkillType.S_STRATEGY));
         commandRating.put("negotiation", getSkillValue(commander, SkillType.S_NEG));
 
-        commandRating.put("traits", getATOWTraitValues(commander));
+        commandRating.put("traits",
+              getATOWTraitValues(commander,
+                    campaign.getCampaignOptions().isUseAgeEffects(),
+                    campaign.isClanCampaign(),
+                    campaign.getLocalDate()));
 
         int personalityValue = 0;
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
@@ -116,7 +121,8 @@ public class CommandRating {
      *
      * @return The calculated trait score for the commander, with a minimum value of 1.
      */
-    private static int getATOWTraitValues(Person commander) {
+    private static int getATOWTraitValues(Person commander, boolean isUseAgingEffects, boolean isClanCampaign,
+          LocalDate today) {
         if (commander == null) {
             return 0;
         }
@@ -131,7 +137,7 @@ public class CommandRating {
         traitScore += commander.getWealth() >= 7 ? 1 : 0;
 
         // Reputation
-        int reputation = commander.getReputation();
+        int reputation = commander.getAdjustedReputation(isUseAgingEffects, isClanCampaign, today);
         if (reputation < 0) {
             traitScore -= 1;
         } else if (reputation > 0) {

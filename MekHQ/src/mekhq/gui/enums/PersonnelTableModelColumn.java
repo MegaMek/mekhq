@@ -29,6 +29,7 @@ package mekhq.gui.enums;
 
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -534,6 +535,10 @@ public enum PersonnelTableModelColumn {
         PersonnelOptions options = person.getOptions();
         String sign;
 
+        boolean isUseAgeEffects = campaign.getCampaignOptions().isUseAgeEffects();
+        boolean isClanCampaign = campaign.isClanCampaign();
+        LocalDate today = campaign.getLocalDate();
+
         switch (this) {
             case PERSON:
                 return "";
@@ -790,7 +795,10 @@ public enum PersonnelTableModelColumn {
             case NEGOTIATION:
                 return person.hasSkill(SkillType.S_NEG) ?
                              Integer.toString(person.getSkill(SkillType.S_NEG)
-                                                    .getFinalSkillValue(options, person.getReputation())) :
+                                                    .getFinalSkillValue(options,
+                                                          person.getAdjustedReputation(isUseAgeEffects,
+                                                                isClanCampaign,
+                                                                today))) :
                              "-";
             case SCROUNGE:
                 return person.hasSkill(SkillType.S_SCROUNGE) ?
@@ -852,7 +860,7 @@ public enum PersonnelTableModelColumn {
             case WEALTH:
                 return Integer.toString(person.getWealth());
             case REPUTATION:
-                return Integer.toString(person.getReputation());
+                return Integer.toString(person.getAdjustedReputation(isUseAgeEffects, isClanCampaign, today));
             case UNLUCKY:
                 return Integer.toString(person.getUnlucky());
             case FATIGUE:

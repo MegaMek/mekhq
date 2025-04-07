@@ -94,8 +94,6 @@ import mekhq.gui.model.PersonnelKillLogModel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.WrapLayout;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
-
 /**
  * A custom panel that gets filled in with goodies from a Person record
  *
@@ -1516,7 +1514,10 @@ public class PersonViewPanel extends JScrollablePanel {
                 } else {
                     lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), skillName));
                 }
-                lblValue = new JLabel(person.getSkill(skillName).toString(person.getOptions(), person.getReputation()));
+                int reputation = person.getAdjustedReputation(campaign.getCampaignOptions().isUseAgeEffects(),
+                      campaign.isClanCampaign(),
+                      campaign.getLocalDate());
+                lblValue = new JLabel(person.getSkill(skillName).toString(person.getOptions(), reputation));
                 lblName.setLabelFor(lblValue);
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = addition;
@@ -1728,7 +1729,11 @@ public class PersonViewPanel extends JScrollablePanel {
             firsty++;
         }
 
-        if (person.getReputation() != 0) {
+        int reputation = person.getAdjustedReputation(campaign.getCampaignOptions().isUseAgeEffects(),
+              campaign.isClanCampaign(),
+              campaign.getLocalDate());
+
+        if (reputation != 0) {
             lblReputation1.setName("lblReputation1");
             lblReputation1.setText(resourceMap.getString("lblReputation1.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -1739,7 +1744,7 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlSkills.add(lblReputation1, gridBagConstraints);
 
             lblReputation2.setName("lblReputation2");
-            lblReputation2.setText(person.getReputation() + "");
+            lblReputation2.setText(reputation + "");
             lblReputation1.setLabelFor(lblReputation2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;

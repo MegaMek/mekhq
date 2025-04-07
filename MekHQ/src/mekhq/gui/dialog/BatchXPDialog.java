@@ -377,7 +377,7 @@ public final class BatchXPDialog extends JDialog {
                       person,
                       campaign.getLocalDate(),
                       person.getSkill(skillName).getType().getName(),
-                      person.getSkill(skillName).toString(person.getOptions(), person.getReputation()));
+                      person.getSkill(skillName).toString());
                 campaign.personUpdated(person);
             }
 

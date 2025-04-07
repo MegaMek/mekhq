@@ -34,6 +34,7 @@ import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 
 import java.io.PrintWriter;
@@ -4927,8 +4928,39 @@ public class Person {
         this.wealth = wealth;
     }
 
+    /**
+     * Retrieves the raw reputation value of the character.
+     *
+     * <p>This method returns the unadjusted reputation value associated with the character.</p>
+     *
+     * <p><b>Usage:</b> If aging effects are enabled, you likely want to use
+     * {@link #getAdjustedReputation(boolean, LocalDate)} instead.</p>
+     *
+     * @return The raw reputation value.
+     */
     public int getReputation() {
         return reputation;
+    }
+
+    /**
+     * Calculates the adjusted reputation value for the character based on the current campaign type and date.
+     *
+     * <p>This method computes the character's reputation by applying age modifiers, taking into account whether
+     * the campaign is clan-specific and whether the character possesses a bloodname.</p>
+     *
+     * <p><b>Usage:</b> If aging effects are disabled you can get away with using {@link #getReputation()} as the
+     * end result will be identical.</p>
+     *
+     * @param isClanCampaign Indicates whether the current campaign is a clan campaign.
+     * @param today          The current date used to calculate the character's age.
+     *
+     * @return The adjusted reputation value considering age, clan status, and bloodname possession.
+     */
+    public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
+        return reputation +
+                     (isUseAgingEffects ?
+                            getReputationAgeModifier(getAge(today), isClanCampaign, !bloodname.isBlank()) :
+                            0);
     }
 
     public void setReputation(final int reputation) {
