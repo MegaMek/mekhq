@@ -798,7 +798,8 @@ public enum PersonnelTableModelColumn {
                                                     .getFinalSkillValue(options,
                                                           person.getAdjustedReputation(isUseAgeEffects,
                                                                 isClanCampaign,
-                                                                today))) :
+                                                                today,
+                                                                person.getRankLevel()))) :
                              "-";
             case SCROUNGE:
                 return person.hasSkill(SkillType.S_SCROUNGE) ?
@@ -860,7 +861,10 @@ public enum PersonnelTableModelColumn {
             case WEALTH:
                 return Integer.toString(person.getWealth());
             case REPUTATION:
-                return Integer.toString(person.getAdjustedReputation(isUseAgeEffects, isClanCampaign, today));
+                return Integer.toString(person.getAdjustedReputation(isUseAgeEffects,
+                      isClanCampaign,
+                      today,
+                      person.getRankLevel()));
             case UNLUCKY:
                 return Integer.toString(person.getUnlucky());
             case FATIGUE:

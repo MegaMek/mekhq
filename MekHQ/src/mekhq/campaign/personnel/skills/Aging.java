@@ -31,6 +31,9 @@ import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.skills.enums.AgingMilestone.CLAN_REPUTATION_MULTIPLIER;
 import static mekhq.campaign.personnel.skills.enums.AgingMilestone.NONE;
+import static mekhq.campaign.personnel.skills.enums.AgingMilestone.STAR_CAPTAIN_RANK_INDEX;
+import static mekhq.campaign.personnel.skills.enums.AgingMilestone.STAR_CAPTAIN_REPUTATION_MULTIPLIER;
+import static mekhq.campaign.personnel.skills.enums.AgingMilestone.STAR_COLONEL_REPUTATION_MULTIPLIER;
 import static mekhq.campaign.personnel.skills.enums.AgingMilestone.TWENTY_FIVE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NO_SKILL_ATTRIBUTE;
 
@@ -196,30 +199,47 @@ public class Aging {
     }
 
     /**
-     * Calculates the reputation age modifier for a character based on their age, clan affiliation, and bloodname
-     * status.
+     * Calculates the reputation age modifier for a character based on their age, clan affiliation, bloodname status,
+     * and military rank.
      *
      * <p>This method determines a character's reputation age modifier by evaluating their age against a predefined
-     * milestone, their clan affiliation, and whether they possess a bloodname. The reputation multiplier is adjusted
-     * accordingly and scaled by a clan-specific reputation multiplier.</p>
+     * aging milestone, their clan affiliation, their possession of a bloodname, and their rank in the clan hierarchy.
+     * If the character meets specific conditions, such as holding a high enough rank or possessing a bloodname, the
+     * reputation multiplier is adjusted. The final result is scaled by a clan-specific reputation multiplier.</p>
      *
      * @param characterAge The age of the character for which the reputation modifier is being calculated.
      * @param isClan       Indicates whether the character is part of a clan. If {@code false}, the method returns 0.
      * @param hasBloodname Indicates whether the character possesses a bloodname, which can decrease the reputation
-     *                     multiplier.
+     *                     multiplier under certain conditions.
+     * @param rankIndex    The rank index of the character, used to determine if they meet rank-specific milestone
+     *                     conditions for reputation adjustment.
      *
      * @return The calculated reputation age modifier. Returns 0 if the character is not a clan member.
      *
      * @author Illiani
      * @since 0.50.05
      */
-    public static int getReputationAgeModifier(int characterAge, boolean isClan, boolean hasBloodname) {
+    public static int getReputationAgeModifier(int characterAge, boolean isClan, boolean hasBloodname, int rankIndex) {
         if (!isClan) {
             return 0;
         }
 
         AgingMilestone milestone = getMilestone(characterAge);
-        int reputationMultiplier = milestone.getReputation() + (hasBloodname ? -1 : 0);
+
+        int reputationMultiplier = milestone.getReputation();
+        boolean hasHitRankTarget = false;
+
+        if (reputationMultiplier == STAR_CAPTAIN_REPUTATION_MULTIPLIER && rankIndex >= STAR_CAPTAIN_RANK_INDEX) {
+            hasHitRankTarget = true;
+        }
+
+        if (reputationMultiplier == STAR_COLONEL_REPUTATION_MULTIPLIER && rankIndex >= STAR_CAPTAIN_RANK_INDEX) {
+            hasHitRankTarget = true;
+        }
+
+        if (hasHitRankTarget || hasBloodname) {
+            reputationMultiplier--;
+        }
 
         return reputationMultiplier * CLAN_REPUTATION_MULTIPLIER;
     }

@@ -4943,23 +4943,31 @@ public class Person {
     }
 
     /**
-     * Calculates the adjusted reputation value for the character based on the current campaign type and date.
+     * Calculates the adjusted reputation value for the character based on aging effects, the current campaign type,
+     * date, and rank.
      *
-     * <p>This method computes the character's reputation by applying age modifiers, taking into account whether
-     * the campaign is clan-specific and whether the character possesses a bloodname.</p>
+     * <p>This method computes the character's reputation by applying age-based modifiers, which depend on factors such
+     * as
+     * whether aging effects are enabled, whether the campaign is clan-specific, the character's bloodname status, and
+     * their rank in the clan hierarchy. If aging effects are disabled, the reputation remains unchanged.</p>
      *
-     * <p><b>Usage:</b> If aging effects are disabled you can get away with using {@link #getReputation()} as the
-     * end result will be identical.</p>
+     * <p><b>Usage:</b> If aging effects are disabled, the result will be equivalent to the base reputation value
+     * provided by {@link #getReputation()}.</p>
      *
-     * @param isClanCampaign Indicates whether the current campaign is a clan campaign.
-     * @param today          The current date used to calculate the character's age.
+     * @param isUseAgingEffects Indicates whether aging effects should be applied to the reputation calculation.
+     * @param isClanCampaign    Indicates whether the current campaign is specific to a clan.
+     * @param today             The current date used to calculate the character's age.
+     * @param rankIndex         The rank index of the character, which can adjust the reputation modifier in clan-based
+     *                          campaigns.
      *
-     * @return The adjusted reputation value considering age, clan status, and bloodname possession.
+     * @return The adjusted reputation value, accounting for factors like age, clan campaign status, bloodname
+     *       possession, and rank. If aging effects are disabled, the base reputation value is returned.
      */
-    public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
+    public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
+          int rankIndex) {
         return reputation +
                      (isUseAgingEffects ?
-                            getReputationAgeModifier(getAge(today), isClanCampaign, !bloodname.isBlank()) :
+                            getReputationAgeModifier(getAge(today), isClanCampaign, !bloodname.isBlank(), rankIndex) :
                             0);
     }
 

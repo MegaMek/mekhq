@@ -36,17 +36,21 @@ public enum AgingMilestone {
     NONE(0, 25, 0, 0, 0, 0, 0, 0, 0, 0, false, false),
     TWENTY_FIVE(25, 31, 50, 50, 0, 50, 50, 50, 50, 0, false, false),
     THIRTY_ONE(31, 14, 50, 50, 0, 50, 50, 50, 0, 1, false, false),
-    FORTY_ONE(41, 51, 0, 0, -50, 0, 0, 0, 0, 0, false, false),
+    FORTY_ONE(41, 51, 0, 0, -50, 0, 0, 0, 0, 1, false, false),
     FIFTY_ONE(51, 61, 0, -100, 0, -100, 0, 0, -50, 2, false, false),
-    SIXTY_ONE(61, 71, -100, -100, -100, 0, 50, 0, -50, 0, true, false),
-    SEVENTY_ONE(71, 81, -100, -125, 0, -100, 0, -50, -75, 0, true, true),
-    EIGHTY_ONE(81, 91, -150, -150, -100, -100, -100, -50, -100, 0, true, true),
-    NINETY_ONE(91, 101, -150, -175, -150, -125, -150, -100, -100, 0, true, true),
-    ONE_HUNDRED_ONE(101, MAX_VALUE, -200, -200, -200, -150, -200, -100, -1500, 0, true, true);
+    SIXTY_ONE(61, 71, -100, -100, -100, 0, 50, 0, -50, 2, true, false),
+    SEVENTY_ONE(71, 81, -100, -125, 0, -100, 0, -50, -75, 2, true, true),
+    EIGHTY_ONE(81, 91, -150, -150, -100, -100, -100, -50, -100, 2, true, true),
+    NINETY_ONE(91, 101, -150, -175, -150, -125, -150, -100, -100, 2, true, true),
+    ONE_HUNDRED_ONE(101, MAX_VALUE, -200, -200, -200, -150, -200, -100, -1500, 2, true, true);
 
     private static final MMLogger logger = MMLogger.create(AgingMilestone.class);
 
     public static final int CLAN_REPUTATION_MULTIPLIER = 150;
+    public static final int STAR_CAPTAIN_RANK_INDEX = 34;
+    public static final int STAR_CAPTAIN_REPUTATION_MULTIPLIER = 1;
+    public static final int STAR_COLONEL_RANK_INDEX = 38;
+    public static final int STAR_COLONEL_REPUTATION_MULTIPLIER = 2;
 
     // Attributes
     private final int milestone;

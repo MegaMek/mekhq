@@ -1516,7 +1516,8 @@ public class PersonViewPanel extends JScrollablePanel {
                 }
                 int reputation = person.getAdjustedReputation(campaign.getCampaignOptions().isUseAgeEffects(),
                       campaign.isClanCampaign(),
-                      campaign.getLocalDate());
+                      campaign.getLocalDate(),
+                      person.getRankLevel());
                 lblValue = new JLabel(person.getSkill(skillName).toString(person.getOptions(), reputation));
                 lblName.setLabelFor(lblValue);
                 gridBagConstraints = new GridBagConstraints();
@@ -1731,7 +1732,8 @@ public class PersonViewPanel extends JScrollablePanel {
 
         int reputation = person.getAdjustedReputation(campaign.getCampaignOptions().isUseAgeEffects(),
               campaign.isClanCampaign(),
-              campaign.getLocalDate());
+              campaign.getLocalDate(),
+              person.getRankLevel());
 
         if (reputation != 0) {
             lblReputation1.setName("lblReputation1");

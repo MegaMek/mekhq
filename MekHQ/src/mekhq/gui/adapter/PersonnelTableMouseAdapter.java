@@ -2742,7 +2742,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             // Reputation
             int reputation = person.getAdjustedReputation(getCampaignOptions().isUseAgeEffects(),
                   getCampaign().isClanCampaign(),
-                  getCampaign().getLocalDate());
+                  getCampaign().getLocalDate(),
+                  person.getRankLevel());
             target = reputation + 1;
             menuItem = new JMenuItem(String.format(resources.getString("spendOnReputation.text"), target, traitCost));
             menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnReputation.tooltip"),

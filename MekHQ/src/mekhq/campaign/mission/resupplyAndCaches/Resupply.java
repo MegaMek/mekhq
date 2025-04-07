@@ -780,7 +780,8 @@ public class Resupply {
             if (skill != null) {
                 int reputation = negotiator.getAdjustedReputation(campaign.getCampaignOptions().isUseAgeEffects(),
                       campaign.isClanCampaign(),
-                      campaign.getLocalDate());
+                      campaign.getLocalDate(),
+                      negotiator.getRankLevel());
                 int skillLevel = skill.getFinalSkillValue(negotiator.getOptions(), reputation);
                 negotiatorSkill = skill.getType().getExperienceLevel(skillLevel);
             }

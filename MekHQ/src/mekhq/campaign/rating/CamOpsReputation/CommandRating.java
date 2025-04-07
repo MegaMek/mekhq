@@ -137,7 +137,10 @@ public class CommandRating {
         traitScore += commander.getWealth() >= 7 ? 1 : 0;
 
         // Reputation
-        int reputation = commander.getAdjustedReputation(isUseAgingEffects, isClanCampaign, today);
+        int reputation = commander.getAdjustedReputation(isUseAgingEffects,
+              isClanCampaign,
+              today,
+              commander.getRankLevel());
         if (reputation < 0) {
             traitScore -= 1;
         } else if (reputation > 0) {
