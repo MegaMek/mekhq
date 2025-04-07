@@ -122,6 +122,9 @@ public class ImageUtilities {
      *
      * @return A scaled {@link Image}, resized to the specified target dimension while maintaining the aspect ratio. If
      *       the provided {@link Image} is {@code null}, returns an empty {@link Image}.
+     *
+     * @author Illiani
+     * @since 0.50.05
      */
     public static Image scaleImage(Image image, int size, boolean scaleByWidth) {
         if (image == null) {
@@ -143,6 +146,18 @@ public class ImageUtilities {
         return getBufferedImage(image, width, height);
     }
 
+    /**
+     * Creates a high-quality, scaled {@link BufferedImage} with the specified dimensions.
+     *
+     * @param image  The source {@link Image} to be scaled. Must not be {@code null}.
+     * @param width  The target width for the scaled image.
+     * @param height The target height for the scaled image.
+     *
+     * @return A {@link BufferedImage} scaled to the specified dimensions with high-quality rendering.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
     private static BufferedImage getBufferedImage(Image image, int width, int height) {
         // Create a new BufferedImage with the desired dimensions
         BufferedImage scaledImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
