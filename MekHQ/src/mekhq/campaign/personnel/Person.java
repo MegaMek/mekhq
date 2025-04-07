@@ -4423,6 +4423,80 @@ public class Person {
         return isTech() && techUnits.stream().anyMatch(Unit::isMothballing);
     }
 
+    /**
+     * Determines whether this {@code Person} is considered "busy" based on their current status, unit assignment, and
+     * associated tasks.
+     *
+     * <p>This method checks:</p>
+     * <ol>
+     *     <li>If the personnel is active (i.e., has an active {@link PersonnelStatus}).</li>
+     *     <li>Special cases for units that are self-crewed, including activities such as
+     *         mothballing, refitting, or undergoing repairs, during which crew members are
+     *         considered busy.</li>
+     *     <li>If the personnel is a technician, by reviewing their current tech assignments,
+     *         such as units being mothballed, refitted, or repaired.</li>
+     *     <li>If the personnel has a unit assignment and whether that unit is currently deployed.</li>
+     * </li>
+     *
+     * @return {@code true} if the person is deemed busy due to one of the above conditions; {@code false} otherwise.
+     */
+    public boolean isBusy() {
+        // Personnel status
+        if (!status.isActive()) {
+            return false;
+        }
+
+        final boolean hasUnitAssignment = unit != null;
+        final Entity entity = hasUnitAssignment ? unit.getEntity() : null;
+        final boolean isSpecialCase = entity != null && unit.isSelfCrewed();
+
+        // Special case handlers (self crewed units have their tech teams formed as a composite of their crew, so all
+        // crew are considered to be busy during these states)
+        if (isSpecialCase) {
+            if (unit.isMothballing()) {
+                return true;
+            }
+
+            if (unit.isRefitting()) {
+                return true;
+            }
+
+            if (unit.isUnderRepair()) {
+                return true;
+            }
+        }
+
+        // Tech assignments
+        if (isTech()) {
+            for (Unit unit : techUnits) {
+                boolean isActiveTech = Objects.equals(unit.getRefit().getTech(), this);
+
+                if (unit.isMothballing() && isActiveTech) {
+                    return true;
+                }
+
+                if (unit.isRefitting() && isActiveTech) {
+                    return true;
+                }
+
+                if (unit.isUnderRepair()) {
+                    for (Part part : unit.getParts()) {
+                        if (Objects.equals(part.getTech(), this)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Unit assignments
+        if (hasUnitAssignment) {
+            return unit.isDeployed();
+        }
+
+        return false;
+    }
+
     public @Nullable Unit getUnit() {
         return unit;
     }
