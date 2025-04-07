@@ -2412,7 +2412,7 @@ public class StratconRulesManager {
             }
         }
 
-        if (suitableForces.isEmpty()) {
+        if (suitableForces.isEmpty() && !bypassRoleRestrictions) {
             suitableForces = getAvailableForceIDs(campaign, contract, true);
         }
 
