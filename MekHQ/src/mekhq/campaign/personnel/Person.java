@@ -4436,7 +4436,7 @@ public class Person {
      *     <li>If the personnel is a technician, by reviewing their current tech assignments,
      *         such as units being mothballed, refitted, or repaired.</li>
      *     <li>If the personnel has a unit assignment and whether that unit is currently deployed.</li>
-     * </li>
+     * </ol>
      *
      * @return {@code true} if the person is deemed busy due to one of the above conditions; {@code false} otherwise.
      */
