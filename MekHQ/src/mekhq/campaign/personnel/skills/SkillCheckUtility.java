@@ -36,6 +36,7 @@ import static mekhq.campaign.personnel.skills.Skill.COUNT_DOWN_MIN_VALUE;
 import static mekhq.campaign.personnel.skills.Skill.COUNT_UP_MAX_VALUE;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.DISASTROUS;
+import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessString;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -77,6 +78,7 @@ public class SkillCheckUtility {
     private int marginOfSuccess;
     private String resultsText;
     private int targetNumber;
+    boolean isCountUp;
     private int roll;
     private boolean usedEdge;
 
@@ -108,7 +110,9 @@ public class SkillCheckUtility {
             return;
         }
 
-        targetNumber = determineTargetNumber(person, skillName, miscModifier);
+        final SkillType skillType = SkillType.getType(skillName);
+        isCountUp = skillType.isCountUp();
+        targetNumber = determineTargetNumber(person, skillType, miscModifier);
         performCheck(useEdge);
     }
 
@@ -198,7 +202,6 @@ public class SkillCheckUtility {
         String fullTitle = person.getHyperlinkedFullTitle();
         String firstName = person.getFirstName();
         String genderedReferenced = HIS_HER_THEIR.getDescriptor(person.getGender());
-        String marginOfSuccessText = getMarginOfSuccessString(marginOfSuccess);
 
         String colorOpen;
         int neutralMarginValue = getMarginValue(BARELY_MADE_IT);
@@ -209,22 +212,29 @@ public class SkillCheckUtility {
         } else {
             colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
         }
-
-        String edgeUseText = !usedEdge ? "" : getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.rerolled", firstName);
-
-        return getFormattedTextAt(RESOURCE_BUNDLE,
+        String status = getFormattedTextAt(RESOURCE_BUNDLE,
+              "skillCheck.results." + (isSuccess() ? "success" : "failure"));
+        String mainMessage = getFormattedTextAt(RESOURCE_BUNDLE,
               "skillCheck.results",
               fullTitle,
               colorOpen,
-              skillName,
-              colorOpen,
+              status,
               CLOSING_SPAN_TAG,
               genderedReferenced,
               skillName,
               roll,
-              targetNumber,
-              marginOfSuccessText,
-              edgeUseText);
+              targetNumber);
+
+        String edgeUseText = !usedEdge ? "" : getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.rerolled", firstName);
+
+        if (!edgeUseText.isBlank()) {
+            mainMessage = mainMessage + "<p>" + edgeUseText + "</p>";
+        }
+
+        MarginOfSuccess marginOfSuccessObject = getMarginOfSuccessObjectFromMarginValue(marginOfSuccess);
+        String marginOfSuccessText = getMarginOfSuccessString(marginOfSuccessObject);
+
+        return mainMessage + "<p>" + marginOfSuccessText + "</p>";
     }
 
     /**
@@ -330,7 +340,7 @@ public class SkillCheckUtility {
      * linked attributes. Otherwise, it is based on the final skill value and attribute modifiers.</p>
      *
      * @param person       the {@link Person} performing the skill check
-     * @param skillName    the name of the skill being used
+     * @param skillType    the associated {@link SkillType} for the {@link Skill} being used.
      * @param miscModifier any special modifiers, as an {@link Integer}. These values are subtracted from the target
      *                     number, if the associated skill is classified as 'count up', otherwise they are added to the
      *                     target number. This means negative values are bonuses, positive values are penalties.
@@ -340,8 +350,8 @@ public class SkillCheckUtility {
      * @author Illiani
      * @since 0.50.5
      */
-    static int determineTargetNumber(Person person, String skillName, int miscModifier) {
-        final SkillType skillType = SkillType.getType(skillName);
+    public static int determineTargetNumber(Person person, SkillType skillType, int miscModifier) {
+        final String skillName = skillType.getName();
         final Attributes characterAttributes = person.getATOWAttributes();
 
         boolean isUntrained = !person.hasSkill(skillName);
@@ -419,7 +429,15 @@ public class SkillCheckUtility {
         int availableEdge = person.getCurrentEdge();
 
         if (roll >= targetNumber || !useEdge || availableEdge < 1) {
-            marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(roll);
+            int difference = isCountUp ? targetNumber - roll : roll - targetNumber;
+
+            logger.info("Initial roll for skill check {}: {} vs {}. Margin of success: {}.",
+                  skillName,
+                  roll,
+                  targetNumber,
+                  difference);
+
+            marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(difference);
             resultsText = generateResultsText();
             return true;
         }
@@ -441,7 +459,7 @@ public class SkillCheckUtility {
         person.changeCurrentEdge(-1);
         usedEdge = true;
 
-        marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(roll);
+        marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(roll - targetNumber);
         resultsText = generateResultsText();
     }
 

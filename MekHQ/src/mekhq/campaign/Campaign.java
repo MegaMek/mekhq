@@ -6407,7 +6407,8 @@ public class Campaign implements ITechManager {
     }
 
     public void setTemporaryPrisonerCapacity(int temporaryPrisonerCapacity) {
-        this.temporaryPrisonerCapacity = max(PrisonerEventManager.MINIMUM_TEMPORARY_CAPACITY, temporaryPrisonerCapacity);
+        this.temporaryPrisonerCapacity = max(PrisonerEventManager.MINIMUM_TEMPORARY_CAPACITY,
+              temporaryPrisonerCapacity);
     }
 
     public RandomEventLibraries getRandomEventLibraries() {
