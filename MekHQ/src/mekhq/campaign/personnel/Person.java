@@ -4934,7 +4934,7 @@ public class Person {
      * <p>This method returns the unadjusted reputation value associated with the character.</p>
      *
      * <p><b>Usage:</b> If aging effects are enabled, you likely want to use
-     * {@link #getAdjustedReputation(boolean, LocalDate)} instead.</p>
+     * {@link #getAdjustedReputation(boolean, boolean, LocalDate, int)}  instead.</p>
      *
      * @return The raw reputation value.
      */
@@ -4947,9 +4947,8 @@ public class Person {
      * date, and rank.
      *
      * <p>This method computes the character's reputation by applying age-based modifiers, which depend on factors such
-     * as
-     * whether aging effects are enabled, whether the campaign is clan-specific, the character's bloodname status, and
-     * their rank in the clan hierarchy. If aging effects are disabled, the reputation remains unchanged.</p>
+     * as whether aging effects are enabled, whether the campaign is clan-specific, the character's bloodname status,
+     * and their rank in the clan hierarchy. If aging effects are disabled, the reputation remains unchanged.</p>
      *
      * <p><b>Usage:</b> If aging effects are disabled, the result will be equivalent to the base reputation value
      * provided by {@link #getReputation()}.</p>
