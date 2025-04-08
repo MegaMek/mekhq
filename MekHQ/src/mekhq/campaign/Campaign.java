@@ -4325,6 +4325,7 @@ public class Campaign implements ITechManager {
                                  (partWork.getUnit().getEntity() instanceof Jumpship))) {
                     helpMod = 0;
                 }
+
                 if (partWork.getShorthandedMod() < helpMod) {
                     partWork.setShorthandedMod(helpMod);
                 }
@@ -4349,6 +4350,7 @@ public class Campaign implements ITechManager {
                     partWork.resetOvertime();
                     partWork.setTech(null);
                     partWork.cancelReservation();
+                    partWork.setShorthandedMod(0);
                 }
                 MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
                 addReport(report);
@@ -4448,6 +4450,7 @@ public class Campaign implements ITechManager {
         partWork.resetOvertime();
         partWork.setTech(null);
         partWork.cancelReservation();
+        partWork.setShorthandedMod(0);
         MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
         addReport(report);
         return report;
@@ -5266,6 +5269,10 @@ public class Campaign implements ITechManager {
                           tech.getHyperlinkedFullTitle(),
                           part.getName()));
                     part.setTech(null);
+                    part.resetTimeSpent();
+                    part.resetOvertime();
+                    part.cancelReservation();
+                    part.setShorthandedMod(0);
                 }
             } else {
                 JOptionPane.showMessageDialog(null,
@@ -6407,7 +6414,8 @@ public class Campaign implements ITechManager {
     }
 
     public void setTemporaryPrisonerCapacity(int temporaryPrisonerCapacity) {
-        this.temporaryPrisonerCapacity = max(PrisonerEventManager.MINIMUM_TEMPORARY_CAPACITY, temporaryPrisonerCapacity);
+        this.temporaryPrisonerCapacity = max(PrisonerEventManager.MINIMUM_TEMPORARY_CAPACITY,
+              temporaryPrisonerCapacity);
     }
 
     public RandomEventLibraries getRandomEventLibraries() {
