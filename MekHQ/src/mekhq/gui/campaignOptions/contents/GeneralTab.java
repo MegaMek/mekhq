@@ -29,8 +29,8 @@ package mekhq.gui.campaignOptions.contents;
 
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.common.options.OptionsConstants.ALLOWED_YEAR;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
-import static mekhq.utilities.ImageUtilities.scaleImageIcon;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -546,7 +546,7 @@ public class GeneralTab {
      *                              the campaign's default faction is used.
      */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
-                                              @Nullable LocalDate presetDate, @Nullable Faction presetFaction) {
+          @Nullable LocalDate presetDate, @Nullable Faction presetFaction) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -587,7 +587,7 @@ public class GeneralTab {
      * @param isSaveAction          A boolean indicating if this is a save action.
      */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions, boolean isStartUp,
-                                               boolean isSaveAction) {
+          boolean isSaveAction) {
         // First, we apply any updates to the campaign
         if (!isSaveAction) {
             campaign.setName(txtName.getText());
