@@ -1738,7 +1738,8 @@ public class Refit extends Part implements IAcquisitionWork {
         UnitUtil.compactCriticals(newEntity);
 
         String unitName = newEntity.getShortNameRaw();
-        String fileName = MHQXMLUtility.escapeWithSlashes(unitName);
+        // MHQXMLUtility.escape() doesn't include `/` or `\` so we need to include them explicitly.
+        String fileName = MHQXMLUtility.escape(unitName).replace("/", "_").replace("\\", "_");
         String sCustomsDir = String.join(File.separator, "data", "mekfiles", "customs"); // TODO : Remove inline file
         // path
         String sCustomsDirCampaign = sCustomsDir + File.separator + getCampaign().getName();
