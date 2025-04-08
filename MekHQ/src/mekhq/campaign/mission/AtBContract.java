@@ -55,6 +55,7 @@ import static mekhq.campaign.mission.enums.AtBMoraleLevel.ADVANCING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_A;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_ASTAR;
 import static mekhq.campaign.rating.IUnitRating.DRAGOON_B;
@@ -121,6 +122,7 @@ import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.randomEvents.MercenaryAuction;
 import mekhq.campaign.randomEvents.RoninOffer;
+import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractDefinition;
 import mekhq.campaign.stratcon.StratconContractInitializer;
@@ -657,6 +659,17 @@ public class AtBContract extends Contract {
         if (moraleLevel.isRouted()) {
             if (contractType.isGarrisonType() || contractType.isReliefDuty()) {
                 routEnd = today.plusMonths(max(1, d6() - 3)).minusDays(1);
+
+                PrisonerMissionEndEvent prisoners = new PrisonerMissionEndEvent(campaign, this);
+                if (campaign.getFriendlyPrisoners().isEmpty()) {
+                    prisoners.handlePrisoners(true, true);
+                }
+
+                if (campaign.getCurrentPrisoners().isEmpty()) {
+                    prisoners.handlePrisoners(true, false);
+                }
+
+                campaign.setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
             } else {
                 campaign.addReport("With the enemy routed, any remaining objectives have been" +
                                          " successfully completed. The contract will conclude tomorrow.");
