@@ -28,6 +28,7 @@
  */
 package mekhq.campaign.unit;
 
+import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static megamek.common.MiscType.F_CARGO;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
@@ -265,7 +266,11 @@ public class Unit implements ITechnology {
         } else if (!isPresent()) {
             return "In transit (" + getDaysToArrival() + " days)";
         } else if (isRefitting()) {
-            return "Refitting" + " (" + getRefit().getTimeLeft() + "m)";
+            int minutesInHour = 60;
+            int hoursInDay = 24;
+            int minutesInDay = hoursInDay * minutesInHour;
+            int days = (int) ceil((double) getRefit().getTimeLeft() / minutesInDay);
+            return "Refitting" + " (" + days + " days)";
         } else {
             return getCondition();
         }
@@ -5962,7 +5967,7 @@ public class Unit implements ITechnology {
         if (getEntity() instanceof Infantry) {
             return TECH_WORK_DAY;
         } else if ((getEntity() instanceof Dropship) || (getEntity() instanceof Jumpship)) {
-            return TECH_WORK_DAY * (int) Math.ceil(getEntity().getWeight() / 500.0);
+            return TECH_WORK_DAY * (int) ceil(getEntity().getWeight() / 500.0);
         } else if (isMothballed()) {
             return TECH_WORK_DAY;
         } else {
