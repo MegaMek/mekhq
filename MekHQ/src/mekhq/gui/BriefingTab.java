@@ -446,7 +446,10 @@ public final class BriefingTab extends CampaignGuiTab {
             prisoners.handlePrisoners(wasOverallSuccess, false);
         }
 
-        getCampaign().setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
+        // We only reset prisoner capacity if there are no active Missions
+        if (getCampaign().getActiveMissions(false).isEmpty()) {
+            getCampaign().setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
+        }
 
         // resolve turnover
         if ((getCampaign().getCampaignOptions().isUseRandomRetirement()) &&

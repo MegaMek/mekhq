@@ -175,18 +175,26 @@ public class PrisonerEventManager {
      */
     int degradeTemporaryCapacity() {
         int temporaryCapacityModifier = campaign.getTemporaryPrisonerCapacity();
+        int newCapacity = 0;
 
         if (temporaryCapacityModifier != DEFAULT_TEMPORARY_CAPACITY) {
-            if (temporaryCapacityModifier < DEFAULT_TEMPORARY_CAPACITY) {
-                temporaryCapacityModifier += TEMPORARY_CAPACITY_DEGRADE_RATE;
-            } else {
-                temporaryCapacityModifier -= TEMPORARY_CAPACITY_DEGRADE_RATE;
-            }
+            int degreeOfChange = TEMPORARY_CAPACITY_DEGRADE_RATE;
 
-            campaign.changeTemporaryPrisonerCapacity(temporaryCapacityModifier);
+            if (temporaryCapacityModifier < DEFAULT_TEMPORARY_CAPACITY) {
+                temporaryCapacityModifier += degreeOfChange;
+                newCapacity = min(DEFAULT_TEMPORARY_CAPACITY, temporaryCapacityModifier);
+
+                campaign.setTemporaryPrisonerCapacity(newCapacity);
+            } else {
+                temporaryCapacityModifier -= degreeOfChange;
+                newCapacity = max(DEFAULT_TEMPORARY_CAPACITY, temporaryCapacityModifier);
+
+                campaign.setTemporaryPrisonerCapacity(newCapacity);
+            }
         }
 
-        return campaign.getTemporaryPrisonerCapacity();
+        // This return is predominantly for unit testing
+        return newCapacity;
     }
 
     /**
