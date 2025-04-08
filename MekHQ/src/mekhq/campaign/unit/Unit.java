@@ -265,7 +265,7 @@ public class Unit implements ITechnology {
         } else if (!isPresent()) {
             return "In transit (" + getDaysToArrival() + " days)";
         } else if (isRefitting()) {
-            return "Refitting";
+            return "Refitting" + " (" + getRefit().getTimeLeft() + "m)";
         } else {
             return getCondition();
         }
