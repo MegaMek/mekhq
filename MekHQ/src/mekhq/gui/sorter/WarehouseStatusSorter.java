@@ -44,6 +44,9 @@ import megamek.logging.MMLogger;
  *
  * <p>Example List After Sorting:</p>
  * <pre>["Broken", "Damaged", "Functional", "In Transit (1 day)", "In Transit (5 days)", "Transit (101 days)"]</pre>
+ *
+ * @author Illiani
+ * @since 0.50.05
  */
 public class WarehouseStatusSorter implements Comparator<String> {
     private static final MMLogger logger = MMLogger.create(WarehouseStatusSorter.class);
@@ -69,6 +72,9 @@ public class WarehouseStatusSorter implements Comparator<String> {
      *
      * @return a negative integer, zero, or a positive integer as the first string is less than, equal to, or greater
      *       than the second string respectively
+     *
+     * @author Illiani
+     * @since 0.50.05
      */
     @Override
     public int compare(String firstString, String secondString) {
@@ -107,6 +113,9 @@ public class WarehouseStatusSorter implements Comparator<String> {
      * @param string the input string to search
      *
      * @return the numeric representation of "days", or {@link Integer#MAX_VALUE} if no match is found
+     *
+     * @author Illiani
+     * @since 0.50.05
      */
     private int extractDays(String string) {
         Matcher matcher = DAYS_PATTERN.matcher(string);
