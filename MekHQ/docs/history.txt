@@ -159,6 +159,9 @@ MEKHQ VERSION HISTORY:
 + PR #6561: Added Dedicated Skill Check Utility Class
 + PR #6576: Switched Autoresolve Localization to MekHQ from MegaMek
 + PR #6577: Corrected Art Skill Type Names
++ Fix #2359, #6085: Updated Refitting Status Display To Show Time Left
++ Fix #2968, #2996, #3758, #5332, #6469: Fixed Missing Part Resets when Failing or Cancelling Work Job
++ PR #6598: Fixed Refitting Units With Bays
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
