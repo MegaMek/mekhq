@@ -5038,7 +5038,7 @@ public class Unit implements ITechnology {
         // limits
         // and set it to true when we start up through MHQ
         entity.getCrew().setPiloting(Math.min(max(piloting, 0), 8), 0);
-        entity.getCrew().setGunnery(Math.min(max(gunnery, 0), 7), 0);
+        entity.getCrew().setGunnery(Math.min(max(gunnery, 0), 8), 0);
         entity.getCrew().setArtillery(Math.min(max(artillery, 0), 8), 0);
         if (entity instanceof SmallCraft || entity instanceof Jumpship) {
             // Use tacops crew hits calculations and current size versus maximum size
@@ -5099,9 +5099,9 @@ public class Unit implements ITechnology {
         }
         LAMPilot crew = (LAMPilot) entity.getCrew();
         crew.setPiloting(Math.min(max(pilotingMek, 0), 8));
-        crew.setGunnery(Math.min(max(gunneryMek, 0), 7));
+        crew.setGunnery(Math.min(max(gunneryMek, 0), 8));
         crew.setPilotingAero(Math.min(max(pilotingAero, 0), 8));
-        crew.setGunneryAero(Math.min(max(gunneryAero, 0), 7));
+        crew.setGunneryAero(Math.min(max(gunneryAero, 0), 8));
         entity.getCrew().setArtillery(Math.min(max(artillery, 0), 8), 0);
         entity.getCrew().setSize(1);
         entity.getCrew().setMissing(false, 0);
@@ -5140,12 +5140,12 @@ public class Unit implements ITechnology {
             artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options);
         }
         entity.getCrew().setPiloting(Math.min(max(piloting, 0), 8), slot);
-        entity.getCrew().setGunnery(Math.min(max(gunnery, 0), 7), slot);
+        entity.getCrew().setGunnery(Math.min(max(gunnery, 0), 8), slot);
         // also set RPG gunnery skills in case present in game options
-        entity.getCrew().setGunneryL(Math.min(max(gunnery, 0), 7), slot);
-        entity.getCrew().setGunneryM(Math.min(max(gunnery, 0), 7), slot);
-        entity.getCrew().setGunneryB(Math.min(max(gunnery, 0), 7), slot);
-        entity.getCrew().setArtillery(Math.min(max(artillery, 0), 7), slot);
+        entity.getCrew().setGunneryL(Math.min(max(gunnery, 0), 8), slot);
+        entity.getCrew().setGunneryM(Math.min(max(gunnery, 0), 8), slot);
+        entity.getCrew().setGunneryB(Math.min(max(gunnery, 0), 8), slot);
+        entity.getCrew().setArtillery(Math.min(max(artillery, 0), 8), slot);
         entity.getCrew().setToughness(person.getToughness(), slot);
 
         entity.getCrew().setExternalIdAsString(person.getId().toString(), slot);
