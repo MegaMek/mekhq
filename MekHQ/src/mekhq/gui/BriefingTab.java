@@ -438,16 +438,16 @@ public final class BriefingTab extends CampaignGuiTab {
         // Prisoners
         boolean wasOverallSuccess = cmd.getStatus() == SUCCESS || cmd.getStatus() == PARTIAL;
 
-        if (!getCampaign().getFriendlyPrisoners().isEmpty()) {
-            prisoners.handlePrisoners(wasOverallSuccess, true);
-        }
-
-        if (!getCampaign().getCurrentPrisoners().isEmpty()) {
-            prisoners.handlePrisoners(wasOverallSuccess, false);
-        }
-
-        // We only reset prisoner capacity if there are no active Missions
+        // We only resolve prisoners if there are no active Missions
         if (getCampaign().getActiveMissions(false).isEmpty()) {
+            if (!getCampaign().getFriendlyPrisoners().isEmpty()) {
+                prisoners.handlePrisoners(wasOverallSuccess, true);
+            }
+
+            if (!getCampaign().getCurrentPrisoners().isEmpty()) {
+                prisoners.handlePrisoners(wasOverallSuccess, false);
+            }
+
             getCampaign().setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
         }
 
