@@ -34,6 +34,7 @@ import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.UnitType.*;
+import static megamek.common.planetaryconditions.Atmosphere.THIN;
 import static megamek.common.planetaryconditions.Wind.TORNADO_F4;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.mission.AtBScenario.selectBotTeamCommanders;
@@ -69,6 +70,7 @@ import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.planetaryconditions.Atmosphere;
+import megamek.common.planetaryconditions.Wind;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
@@ -553,7 +555,8 @@ public class AtBDynamicScenarioFactory {
         boolean allowsTanks = true;
 
         if (campaign.getCampaignOptions().isUsePlanetaryModifiers()) {
-            if (scenario.getAtmosphere().isLighterThan(Atmosphere.THIN)) {
+            if (scenario.getAtmosphere().isLighterThan(THIN)) {
+                logger.info("Atmosphere is lighter than {}, setting low pressure flag and disallowing Tanks", THIN);
                 isLowPressure = true;
                 allowsTanks = false;
             } else {
@@ -562,30 +565,36 @@ public class AtBDynamicScenarioFactory {
                                                                                .getAtmosphere(currentDate);
 
                 switch (specific_atmosphere) {
-                    case TOXICPOISON:
-                    case TOXICCAUSTIC:
+                    case TOXICPOISON, TOXICCAUSTIC -> {
+                        logger.info("Atmosphere is {}, disallowing Tanks and Infantry", specific_atmosphere);
                         allowsConvInfantry = false;
                         allowsTanks = false;
-                        break;
-                    case TAINTEDPOISON:
-                    case TAINTEDCAUSTIC:
+                    }
+                    case TAINTEDPOISON, TAINTEDCAUSTIC -> {
+                        logger.info("Atmosphere is {}, setting tainted flag", specific_atmosphere);
                         isTainted = true;
-                        break;
-                    default:
-                        break;
+                    }
+                    default -> {
+                        // No action needed for the default case.
+                    }
                 }
             }
 
-            if (scenario.getGravity() <= 0.2) {
+            double gravity = scenario.getGravity();
+            if (gravity <= 0.2) {
+                logger.info("Gravity is {}, setting low gravity flag and disallowing tanks", gravity);
                 allowsTanks = false;
                 isLowGravity = true;
             }
         }
 
         if (campaign.getCampaignOptions().isUseWeatherConditions()) {
-            if (scenario.getWind().isTornadoF1ToF3() || scenario.getWind().isTornadoF4()) {
+            Wind wind = scenario.getWind();
+            if (wind.isTornadoF1ToF3() || wind.isTornadoF4()) {
+                logger.info("Tornado detected, disallowing Infantry");
                 allowsConvInfantry = false;
-                if (scenario.getWind().isTornadoF4()) {
+                if (wind.isTornadoF4()) {
+                    logger.info("F4 Tornado detected, disallowing Battle Armor and Tanks");
                     allowsTanks = false;
                     allowsBattleArmor = false;
                 }
@@ -991,8 +1000,7 @@ public class AtBDynamicScenarioFactory {
 
                         boolean allowConventionalAircraft = scenario.getTemplate().mapParameters.getMapLocation() !=
                                                                   MapLocation.Space &&
-                                                                  scenario.getAtmosphere()
-                                                                        .isDenserThan(Atmosphere.THIN);
+                                                                  scenario.getAtmosphere().isDenserThan(THIN);
 
                         if (fighterMultiplier > 0 && allowConventionalAircraft) {
                             baseFighterCount *= fighterMultiplier;
