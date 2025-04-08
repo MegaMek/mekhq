@@ -27,7 +27,6 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
-import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
@@ -95,7 +94,7 @@ public class PrisonerEventManager {
     // The temporary prisoner capacity should never go below 0.
     // But the security forces should be able to guard some prisoners in all cases
     public static final int MINIMUM_TEMPORARY_CAPACITY = 25;
-    public static final double TEMPORARY_CAPACITY_DEGRADE_RATE = 0.1;
+    public static final int TEMPORARY_CAPACITY_DEGRADE_RATE = 2;
 
     // These values are based on CamOps. CamOps states a squad of CI or one squad of BA can
     // handle 100 prisoners. As there are usually around 21 soldiers in a CI platoon and 5 BA
@@ -134,7 +133,7 @@ public class PrisonerEventManager {
 
         // we have this here, as we still want Temporary Capacity to degrade even if the MeKHQ
         // capture style isn't being used.
-        if (isFirstOfMonth) {
+        if (isMonday) {
             degradeTemporaryCapacity();
         }
 
@@ -176,26 +175,18 @@ public class PrisonerEventManager {
      */
     int degradeTemporaryCapacity() {
         int temporaryCapacityModifier = campaign.getTemporaryPrisonerCapacity();
-        int newCapacity = 0;
 
         if (temporaryCapacityModifier != DEFAULT_TEMPORARY_CAPACITY) {
-        	double differendInTemporaryCapacity = (double) abs(DEFAULT_TEMPORARY_CAPACITY-temporaryCapacityModifier);
-            int degreeOfChange = max(1,(int) round(differendInTemporaryCapacity * TEMPORARY_CAPACITY_DEGRADE_RATE));
-
             if (temporaryCapacityModifier < DEFAULT_TEMPORARY_CAPACITY) {
-                temporaryCapacityModifier += degreeOfChange;
-                newCapacity = min(DEFAULT_TEMPORARY_CAPACITY, temporaryCapacityModifier);
-
-                campaign.setTemporaryPrisonerCapacity(newCapacity);
+                temporaryCapacityModifier += TEMPORARY_CAPACITY_DEGRADE_RATE;
             } else {
-                temporaryCapacityModifier -= degreeOfChange;
-                newCapacity = max(DEFAULT_TEMPORARY_CAPACITY, temporaryCapacityModifier);
-
-                campaign.setTemporaryPrisonerCapacity(newCapacity);
+                temporaryCapacityModifier -= TEMPORARY_CAPACITY_DEGRADE_RATE;
             }
+
+            campaign.changeTemporaryPrisonerCapacity(temporaryCapacityModifier);
         }
 
-        return newCapacity;
+        return campaign.getTemporaryPrisonerCapacity();
     }
 
     /**
@@ -260,7 +251,8 @@ public class PrisonerEventManager {
      *         <li>The second element is {@code true} if a major event occurred, {@code false} otherwise.</li>
      *       </ul>
      */
-    List<Boolean> checkForPrisonerEvents(boolean isHeadless, int totalPrisoners, int prisonerCapacityUsage, int prisonerCapacity) {
+    List<Boolean> checkForPrisonerEvents(boolean isHeadless, int totalPrisoners, int prisonerCapacityUsage,
+          int prisonerCapacity) {
         // Calculate overflow as the percentage over prisonerCapacity
         double overflowPercentage = ((double) (prisonerCapacityUsage - prisonerCapacity) / prisonerCapacity) * 100;
 
@@ -468,9 +460,9 @@ public class PrisonerEventManager {
         boolean hasBackfired = backfireRoll == 1;
 
         if (hasBackfired) {
-            campaign.setTemporaryPrisonerCapacity(-(victims * 2));
+            campaign.changeTemporaryPrisonerCapacity(-(victims * 2));
         } else {
-            campaign.setTemporaryPrisonerCapacity(victims * 2);
+            campaign.changeTemporaryPrisonerCapacity(victims * 2);
         }
 
         // Was the crime noticed?
