@@ -4346,11 +4346,7 @@ public class Campaign implements ITechManager {
                     }
                 } else {
                     report += " cannot be finished because there was no time left after maintenance tasks.</b>";
-                    partWork.resetTimeSpent();
-                    partWork.resetOvertime();
-                    partWork.setTech(null);
-                    partWork.cancelReservation();
-                    partWork.setShorthandedMod(0);
+                    partWork.cancelAssignment(true);
                 }
                 MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
                 addReport(report);
@@ -4446,11 +4442,7 @@ public class Campaign implements ITechManager {
             report += " (" + xpGained + "XP gained) ";
         }
         report += wrongType;
-        partWork.resetTimeSpent();
-        partWork.resetOvertime();
-        partWork.setTech(null);
-        partWork.cancelReservation();
-        partWork.setShorthandedMod(0);
+        partWork.cancelAssignment(true);
         MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
         addReport(report);
         return report;
@@ -5268,9 +5260,7 @@ public class Campaign implements ITechManager {
                           "%s looks at %s, recalls his total lack of skill for working with such technology, then slowly puts the tools down before anybody gets hurt.",
                           tech.getHyperlinkedFullTitle(),
                           part.getName()));
-                    part.setTech(null);
-                    part.cancelReservation();
-                    part.setShorthandedMod(0);
+                    part.cancelAssignment(false);
                 }
             } else {
                 JOptionPane.showMessageDialog(null,

@@ -4464,7 +4464,7 @@ public class Person {
 
         for (final Part part : campaign.getWarehouse().getParts()) {
             if (equals(part.getTech())) {
-                part.cancelAssignment();
+                part.cancelAssignment(true);
             }
         }
 

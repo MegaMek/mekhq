@@ -5287,7 +5287,7 @@ public class Unit implements ITechnology {
             // cancel any scheduled tasks
             for (Part p : getParts()) {
                 if (p.isBeingWorkedOn()) {
-                    p.cancelAssignment();
+                    p.cancelAssignment(true);
                 }
             }
         }
@@ -5804,7 +5804,7 @@ public class Unit implements ITechnology {
 
         // clear any assigned tasks
         for (Part p : getParts()) {
-            p.cancelAssignment();
+            p.cancelAssignment(true);
         }
 
         if (!isGM) {
