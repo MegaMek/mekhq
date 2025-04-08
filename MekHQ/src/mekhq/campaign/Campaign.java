@@ -5269,8 +5269,6 @@ public class Campaign implements ITechManager {
                           tech.getHyperlinkedFullTitle(),
                           part.getName()));
                     part.setTech(null);
-                    part.resetTimeSpent();
-                    part.resetOvertime();
                     part.cancelReservation();
                     part.setShorthandedMod(0);
                 }
