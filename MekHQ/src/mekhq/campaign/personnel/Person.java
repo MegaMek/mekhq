@@ -5097,21 +5097,16 @@ public class Person {
         }
 
         boolean hasFreakishStrength = options.booleanOption(MUTATION_FREAKISH_STRENGTH);
-        boolean hasFreakishStrengthUnofficial = options.booleanOption(MUTATION_FREAKISH_STRENGTH_UNOFFICIAL);
         boolean hasExoticAppearance = options.booleanOption(MUTATION_EXOTIC_APPEARANCE);
         boolean hasFacialHair = options.booleanOption(MUTATION_FACIAL_HAIR);
         boolean hasSeriousDisfigurement = options.booleanOption(MUTATION_SERIOUS_DISFIGUREMENT);
         boolean isCatGirl = options.booleanOption(MUTATION_CAT_GIRL);
-        boolean isCatGirlUnofficial = options.booleanOption(MUTATION_CAT_GIRL_UNOFFICIAL);
 
         return switch (attribute) {
             case NONE -> 0;
             case STRENGTH -> {
                 int attributeScore = atowAttributes.getStrength();
                 if (hasFreakishStrength) {
-                    attributeScore += 2;
-                }
-                if (hasFreakishStrengthUnofficial) {
                     attributeScore += 2;
                 }
                 yield min(attributeScore, MAXIMUM_ATTRIBUTE_SCORE);
@@ -5123,9 +5118,6 @@ public class Person {
             case WILLPOWER -> atowAttributes.getWillpower();
             case CHARISMA -> {
                 int attributeScore = atowAttributes.getCharisma();
-                if (isCatGirlUnofficial) {
-                    attributeScore++;
-                }
                 if (hasExoticAppearance) {
                     attributeScore++;
                 }

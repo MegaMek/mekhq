@@ -311,9 +311,13 @@ public class Skill {
             }
         }
 
-        // Attractive and Unattractive
+        // Attractive, Unattractive, Freakish Strength
         if (type.hasAttribute(CHARISMA)) {
             if (characterOptions.booleanOption(FLAW_UNATTRACTIVE)) {
+                modifier += 2;
+            }
+
+            if (characterOptions.booleanOption(MUTATION_FREAKISH_STRENGTH)) {
                 modifier += 2;
             }
 
@@ -322,13 +326,21 @@ public class Skill {
             }
         }
 
-        // Poor Hearing, Good Hearing, Poor Vision, Good Vision, Sixth Sense
+        // Poor Hearing, Good Hearing, Poor Vision, Good Vision, Sixth Sense, Cat Girl
         if (Objects.equals(name, S_PERCEPTION)) {
             if (characterOptions.booleanOption(FLAW_POOR_HEARING)) {
                 modifier += 1;
             }
 
             if (characterOptions.booleanOption(ATOW_GOOD_HEARING)) {
+                modifier -= 1;
+            }
+
+            if (characterOptions.booleanOption(MUTATION_CAT_GIRL)) {
+                modifier -= 1;
+            }
+
+            if (characterOptions.booleanOption(MUTATION_CAT_GIRL_UNOFFICIAL)) {
                 modifier -= 1;
             }
 

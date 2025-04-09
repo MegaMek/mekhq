@@ -621,21 +621,13 @@ They also gain Fatigue based on the campaign options fatigue rate (default 1).]]
     <ability>
         <lookupName>mutation_freakish_strength</lookupName>
         <displayName>Freakish Strength (ATOW:Companion)</displayName>
-        <desc><![CDATA[Increases Strength Attribute by 2 (may not take it above 10). Unattractive requirement is due to inhumanly shaped bulk.]]></desc>
-        <xpCost>500</xpCost>
-        <weight>1</weight>
-        <skillPrereq/>
-        <prereqAbilities>flaw_unattractive</prereqAbilities>
-        <invalidAbilities>mutation_freakish_strength_unofficial</invalidAbilities>
-    </ability>
-    <ability>
-        <lookupName>mutation_freakish_strength_unofficial</lookupName>
-        <displayName>Freakish Strength (Unofficial)</displayName>
-        <desc><![CDATA[Increases Strength Attribute by 2 (may not take it above 10).]]></desc>
+        <desc><![CDATA[Increases Strength Attribute by 2 (may not take it above 10).
+
+Increases the target number of all Charisma-based skills by 2 due to inhumanly shaped bulk.]]></desc>
         <xpCost>300</xpCost>
         <weight>1</weight>
         <skillPrereq/>
-        <invalidAbilities>mutation_freakish_strength</invalidAbilities>
+        <invalidAbilities>flaw_unattractive</invalidAbilities>
     </ability>
     <ability>
         <lookupName>mutation_exceptional_immune_system</lookupName>
@@ -647,7 +639,7 @@ They also gain Fatigue based on the campaign options fatigue rate (default 1).]]
     </ability>
     <ability>
         <lookupName>mutation_exotic_appearance</lookupName>
-        <displayName>Exotic (Yet Pleasing) Appearance (ATOW:Companion)</displayName>
+        <displayName>Exotic Yet Pleasing Appearance (ATOW:Companion)</displayName>
         <desc><![CDATA[Increases Charisma Attribute by 1 (may not take it above 10).]]></desc>
         <xpCost>100</xpCost>
         <weight>1</weight>
@@ -672,18 +664,20 @@ They also gain Fatigue based on the campaign options fatigue rate (default 1).]]
     <ability>
         <lookupName>mutation_cat_girl</lookupName>
         <displayName>Functional Tail and Mobile Ears (ATOW:Companion)</displayName>
-        <desc><![CDATA[Decreases Charisma Attribute by 3 (may not take it below 1).]]></desc>
-        <xpCost>-400</xpCost>
+        <desc><![CDATA[Decreases Charisma Attribute by 3 (may not take it below 1).
+
+The Target Number of all Perception checks decreased by 1 due to improved hearing.]]></desc>
+        <xpCost>-300</xpCost>
         <weight>1</weight>
         <skillPrereq/>
-        <prereqAbilities>atow_good_hearing</prereqAbilities>
-        <invalidAbilities>mutation_cat_girl_unofficial</invalidAbilities>
     </ability>
     <ability>
         <lookupName>mutation_cat_girl_unofficial</lookupName>
         <displayName>Functional Tail and Mobile Ears (Unofficial)</displayName>
-        <desc><![CDATA[Increases Charisma Attribute by 1 (may not take it above 10).]]></desc>
-        <xpCost>100</xpCost>
+        <desc><![CDATA[Increases Charisma Attribute by 1 (may not take it above 10).
+
+The Target Number of all Perception checks decreased by 1 due to improved hearing.]]></desc>
+        <xpCost>200</xpCost>
         <weight>1</weight>
         <skillPrereq/>
         <invalidAbilities>mutation_cat_girl</invalidAbilities>
@@ -751,7 +745,7 @@ Mechanically, this offers few benefits; however, the character will be completel
         <displayName>Slow Learner (ATOW)</displayName>
         <desc><![CDATA[Increases the cost of purchasing and improving Skills by 20% (rounded normally).
 
-If XP adjustments from a high or low Reasoning are enabled, those adjustments are additive. So 20% increase from this SPA and a 5% decrease from Reasoning would equal a 15% increase.]]></desc>
+If XP adjustments from a high or low Reasoning are enabled, those adjustments are additive. So a 20% increase from this SPA and a 5% decrease from Reasoning would equal a 15% increase.]]></desc>
         <xpCost>-300</xpCost>
         <weight>1</weight>
         <skillPrereq/>
@@ -762,7 +756,7 @@ If XP adjustments from a high or low Reasoning are enabled, those adjustments ar
         <displayName>Fast Learner (ATOW)</displayName>
         <desc><![CDATA[Decreases the cost of purchasing and improving Skills by 20% (rounded normally).
 
-If XP adjustments from a high or low Reasoning are enabled, those adjustments are additive. So 20% decrease from this SPA and a 5% increase from Reasoning would equal a 15% decrease.]]></desc>
+If XP adjustments from a high or low Reasoning are enabled, those adjustments are additive. So a 20% decrease from this SPA and a 5% increase from Reasoning would equal a 15% decrease.]]></desc>
         <xpCost>300</xpCost>
         <weight>1</weight>
         <skillPrereq/>

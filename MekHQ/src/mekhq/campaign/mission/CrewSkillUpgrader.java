@@ -40,8 +40,10 @@ import megamek.common.Entity;
 import megamek.common.UnitType;
 import megamek.common.WeaponType;
 import megamek.common.equipment.WeaponMounted;
+import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 
@@ -66,8 +68,8 @@ public class CrewSkillUpgrader {
     /**
      * Constructor. Initializes updated SPA list, broken down by unit type.
      *
-     * @param upgradeIntensity how likely a pilot is to receive consideration for an
-     *                         SPA (&lt;0 means none, 3+ means every time)
+     * @param upgradeIntensity how likely a pilot is to receive consideration for an SPA (&lt;0 means none, 3+ means
+     *                         every time)
      */
     public CrewSkillUpgrader(int upgradeIntensity) {
         this.upgradeIntensity = upgradeIntensity;
@@ -148,6 +150,7 @@ public class CrewSkillUpgrader {
      * Upgrade an entity with a single SPA
      *
      * @param entity
+     *
      * @return the xp cost of the added SPA
      */
     private int addSingleSPA(Entity entity, double xpCap) {
@@ -196,7 +199,7 @@ public class CrewSkillUpgrader {
                             return 0;
                             // If we can't access the option, try a different one
                         } else if ((entity.getCrew().getOptions() == null) ||
-                                (entity.getCrew().getOptions(spa.getName()) == null)) {
+                                         (entity.getCrew().getOptions(spa.getName()) == null)) {
                             // Make sure to remove choices we can't use
                             choices.remove(spaIndex);
                             continue;
@@ -204,12 +207,25 @@ public class CrewSkillUpgrader {
 
                         // If the option has a name but isn't defined, try another one
                         try {
-                            entity.getCrew().getOptions().getOption(spa.getName()).setValue(true);
+                            IOption option = entity.getCrew().getOptions().getOption(spa.getName());
+                            if (option == null) {
+                                PersonnelOptions personnelOptions = new PersonnelOptions();
+                                option = personnelOptions.getOption(spa.getName());
+
+                                if (option == null) {
+                                    // This means it isn't a MekHQ only SPA, so we need to log an error and then
+                                    // remove it from the pile
+                                    logger.error("Attempted to assign SPA '{}' but SPA not found.", spa.getName());
+                                    choices.remove(spaIndex);
+                                } else {
+                                    // This means it's a MekHQ only SPA, so it should be removed from the pile
+                                    choices.remove(spaIndex);
+                                }
+                            }
+
                             return spa.getCost();
                         } catch (NullPointerException e) {
-                            logger.warn("Attempted to assign SPA '" + spa.getName() + "' but SPA not found.");
-                            // Make sure to remove choices we can't use
-                            choices.remove(spaIndex);
+                            logger.error("An error occurred while trying to assign a special ability to an entity.", e);
                             continue;
                         }
                 }
@@ -227,11 +243,11 @@ public class CrewSkillUpgrader {
     }
 
     /**
-     * Utility function that returns all the SPAs for the given unit type at or
-     * below the given cap
+     * Utility function that returns all the SPAs for the given unit type at or below the given cap
      *
      * @param unitType Unit type
      * @param xpCap    maximum xp cost
+     *
      * @return coalesced list
      */
     private List<SpecialAbility> coalescedSPAList(int unitType, double xpCap) {
@@ -247,11 +263,11 @@ public class CrewSkillUpgrader {
     }
 
     /**
-     * Contains "special" logic to ensure SPA is appropriate for the entity, beyond
-     * the simple unit type check.
+     * Contains "special" logic to ensure SPA is appropriate for the entity, beyond the simple unit type check.
      *
      * @param spa
      * @param entity
+     *
      * @return
      */
     private boolean extraEligibilityCheck(SpecialAbility spa, Entity entity) {
@@ -264,11 +280,11 @@ public class CrewSkillUpgrader {
     }
 
     /**
-     * Picks a random weapon specialization for a weapon that the entity has
-     * mounted,
-     * and returns the weapon's name so that a weapon specialist value may be set.
+     * Picks a random weapon specialization for a weapon that the entity has mounted, and returns the weapon's name so
+     * that a weapon specialist value may be set.
      *
      * @param entity The entity being manipulated
+     *
      * @return Weapon name
      */
     private String pickRandomWeapon(Entity entity, boolean clusterOnly) {
@@ -290,11 +306,11 @@ public class CrewSkillUpgrader {
     }
 
     /**
-     * Picks a random gunnery specialization for the given entity. Naturally
-     * weighted
-     * towards weapon categories contained in the entity.
+     * Picks a random gunnery specialization for the given entity. Naturally weighted towards weapon categories
+     * contained in the entity.
      *
      * @param entity The entity being examined.
+     *
      * @return Gunnery specialization name
      */
     private String pickRandomGunnerySpecialization(Entity entity) {
@@ -318,18 +334,23 @@ public class CrewSkillUpgrader {
     }
 
     private String pickRandomRangeMaster() {
-        return ObjectUtility.getRandomItem(
-                Arrays.asList(Crew.RANGEMASTER_MEDIUM, Crew.RANGEMASTER_LONG, Crew.RANGEMASTER_EXTREME));
+        return ObjectUtility.getRandomItem(Arrays.asList(Crew.RANGEMASTER_MEDIUM,
+              Crew.RANGEMASTER_LONG,
+              Crew.RANGEMASTER_EXTREME));
     }
 
     private String pickRandomHumanTRO() {
-        return ObjectUtility.getRandomItem(
-                Arrays.asList(Crew.HUMANTRO_MEK, Crew.HUMANTRO_AERO, Crew.HUMANTRO_VEE, Crew.HUMANTRO_BA));
+        return ObjectUtility.getRandomItem(Arrays.asList(Crew.HUMANTRO_MEK,
+              Crew.HUMANTRO_AERO,
+              Crew.HUMANTRO_VEE,
+              Crew.HUMANTRO_BA));
     }
 
     private String pickRandomEnvSpec() {
-        return ObjectUtility.getRandomItem(
-                Arrays.asList(Crew.ENVSPC_FOG, Crew.ENVSPC_LIGHT, Crew.ENVSPC_RAIN, Crew.ENVSPC_SNOW,
-                        Crew.ENVSPC_WIND));
+        return ObjectUtility.getRandomItem(Arrays.asList(Crew.ENVSPC_FOG,
+              Crew.ENVSPC_LIGHT,
+              Crew.ENVSPC_RAIN,
+              Crew.ENVSPC_SNOW,
+              Crew.ENVSPC_WIND));
     }
 }
