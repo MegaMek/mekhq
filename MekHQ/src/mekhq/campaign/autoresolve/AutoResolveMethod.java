@@ -27,7 +27,6 @@
  */
 package mekhq.campaign.autoresolve;
 
-import megamek.common.internationalization.Internationalization;
 import mekhq.utilities.MHQInternationalization;
 
 import java.util.Optional;
@@ -44,7 +43,7 @@ public enum AutoResolveMethod {
 
     AutoResolveMethod(final String name, final String toolTipText) {
         this.name = MHQInternationalization.getText(name);
-        this.toolTipText = Internationalization.getText(toolTipText);
+        this.toolTipText = MHQInternationalization.getText(toolTipText);
     }
 
     public String getToolTipText() {

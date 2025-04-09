@@ -27,9 +27,9 @@
  */
 package mekhq.gui.dialog;
 
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerDescription;
 import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerIcon;
-import static mekhq.utilities.ImageUtilities.scaleImageIcon;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

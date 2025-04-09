@@ -32,7 +32,7 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 
 import megamek.client.ui.dialogs.helpDialogs.AbstractHelpDialog;
-import megamek.common.internationalization.Internationalization;
+import mekhq.utilities.MHQInternationalization;
 
 public class AutoResolveBehaviorSettingsHelpDialog extends AbstractHelpDialog {
 
@@ -42,8 +42,8 @@ public class AutoResolveBehaviorSettingsHelpDialog extends AbstractHelpDialog {
      * @param frame  parent frame
      */
     public AutoResolveBehaviorSettingsHelpDialog(final JFrame frame) {
-        super(frame, Internationalization.getText("AutoResolveBehaviorSettingsDialog.title"),
-            Internationalization.getText("AutoResolveBehaviorSettingsDialog.autoResolveHelpPath"));
+        super(frame, MHQInternationalization.getText("AutoResolveBehaviorSettingsDialog.title"),
+              MHQInternationalization.getText("AutoResolveBehaviorSettingsDialog.autoResolveHelpPath"));
 
         setMinimumSize(new Dimension(400, 400));
         setModalExclusionType(ModalExclusionType.TOOLKIT_EXCLUDE);
