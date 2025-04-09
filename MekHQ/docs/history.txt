@@ -159,6 +159,9 @@ MEKHQ VERSION HISTORY:
 + PR #6561: Added Dedicated Skill Check Utility Class
 + PR #6576: Switched Autoresolve Localization to MekHQ from MegaMek
 + PR #6577: Corrected Art Skill Type Names
++ Fix #2359, #6085: Updated Refitting Status Display To Show Time Left
++ Fix #2968, #2996, #3758, #5332, #6469: Fixed Missing Part Resets when Failing or Cancelling Work Job
++ PR #6598: Fixed Refitting Units With Bays
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
@@ -529,6 +532,7 @@ MEKHQ VERSION HISTORY:
 + Fix #5932: Added check for injuries that are not permanent before going on leave
 + PR #5946: Implemented Linked Scenarios for Interceptions
 + Fix #5951: Fixed Cargo Capacity Calculation in For Cargo Items in Body
++ PR #6601: When restoring techs time, Large Vessel Crews should be considered techs.
 
 0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.

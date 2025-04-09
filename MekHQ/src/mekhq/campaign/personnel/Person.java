@@ -4464,7 +4464,7 @@ public class Person {
 
         for (final Part part : campaign.getWarehouse().getParts()) {
             if (equals(part.getTech())) {
-                part.cancelAssignment();
+                part.cancelAssignment(true);
             }
         }
 
@@ -4651,7 +4651,7 @@ public class Person {
         final double TECH_ADMINISTRATION_MULTIPLIER = 0.05;
         final int REGULAR_EXPERIENCE_LEVEL = REGULAR.getExperienceLevel();
 
-        if (!isTech()) {
+        if (!isTechExpanded()) {
             return 0;
         }
 

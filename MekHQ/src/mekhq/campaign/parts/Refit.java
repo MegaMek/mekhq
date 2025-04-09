@@ -792,8 +792,15 @@ public class Refit extends Part implements IAcquisitionWork {
          * number of doors. Any remaining are matched on size, and difference in number of doors is noted as moving
          * doors has to be accounted for in the time calculation.
          */
-        List<Bay> oldUnitBays = oldUnit.getEntity().getTransportBays().stream().filter(b -> !b.isQuarters()).toList();
-        List<Bay> newUnitBays = newEntity.getTransportBays().stream().filter(b -> !b.isQuarters()).toList();
+        List<Bay> oldUnitBays = new ArrayList<>(oldUnit.getEntity()
+                                                      .getTransportBays()
+                                                      .stream()
+                                                      .filter(b -> !b.isQuarters())
+                                                      .toList());
+        List<Bay> newUnitBays = new ArrayList<>(newEntity.getTransportBays()
+                                                      .stream()
+                                                      .filter(b -> !b.isQuarters())
+                                                      .toList());
 
         // If any bays keep the same size but have any doors added or removed, we need to note that separately since
         // removing a door from one bay and adding it to another requires time even if the number of parts hasn't
