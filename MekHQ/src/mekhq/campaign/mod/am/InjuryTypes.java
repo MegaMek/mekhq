@@ -128,9 +128,9 @@ public final class InjuryTypes {
         }
 
         @Override
-        public Injury newInjury(Campaign c, Person p, BodyLocation loc, int severity) {
-            Injury result = super.newInjury(c, p, loc, severity);
-            final int time = modifyInjuryTime(c, p, result.getOriginalTime());
+        public Injury newInjury(Campaign campaign, Person person, BodyLocation bodyLocation, int severity) {
+            Injury result = super.newInjury(campaign, person, bodyLocation, severity);
+            final int time = modifyInjuryTime(campaign, person, result.getOriginalTime());
             result.setOriginalTime(time);
             result.setTime(time);
             return result;

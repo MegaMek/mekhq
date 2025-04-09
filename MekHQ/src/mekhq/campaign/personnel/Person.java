@@ -29,11 +29,16 @@
 package mekhq.campaign.personnel;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.floor;
+import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
+import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 
 import java.io.PrintWriter;
@@ -1684,18 +1689,23 @@ public class Person {
     }
 
     /**
-     * Adjusts the current fatigue level by the specified amount.
+     * Adjusts the current fatigue level by the specified amount, applying an SPA fatigue multiplier where applicable.
      *
-     * <p>
-     * This method modifies the fatigue level by adding the value of {@code change} to the current fatigue. Positive
-     * values will increase the fatigue, while negative values will decrease it.
-     * </p>
+     * <p>This method modifies the fatigue level based on the given {@code delta} value. Positive values, which
+     * indicate an increase in fatigue, are scaled by the result of {@link #getFatigueMultiplier()} and rounded down
+     * using {@link Math#floor(double)} to ensure consistent results. Negative values, which indicate a reduction in
+     * fatigue, are applied directly without modification.</p>
      *
-     * @param change The amount to adjust the fatigue by. Positive values increase fatigue, and negative values decrease
-     *               it.
+     * @param delta The amount to adjust the fatigue by. Positive values represent fatigue gain and are scaled by the
+     *              fatigue multiplier, while negative values represent fatigue reduction and are applied as-is.
      */
-    public void changeFatigue(final int change) {
-        this.fatigue = this.fatigue + change;
+    public void changeFatigue(int delta) {
+        if (delta > 0) {
+            // Only fatigue gain is modified by SPAs, not reduction.
+            delta = (int) floor(delta * getFatigueMultiplier());
+        }
+
+        this.fatigue = this.fatigue + delta;
     }
 
     public boolean getIsRecoveringFromFatigue() {
@@ -1704,6 +1714,44 @@ public class Person {
 
     public void setIsRecoveringFromFatigue(final boolean isRecoveringFromFatigue) {
         this.isRecoveringFromFatigue = isRecoveringFromFatigue;
+    }
+
+    /**
+     * Calculates the fatigue multiplier for a character based on their traits and fitness options.
+     *
+     * <p>The method determines the fatigue multiplier by analyzing specific boolean options:
+     * <ul>
+     *     <li>{@code FLAW_GLASS_JAW}: If present, doubles the base multiplier.</li>
+     *     <li>{@code ATOW_FIT}: If present, decreases the multiplier by 1, unless {@code FLAW_UNFIT} is also set.</li>
+     *     <li>{@code FLAW_UNFIT}: If present, increases the multiplier by 1.</li>
+     * </ul>
+     *
+     * <p>If both {@code ATOW_FIT} and {@code FLAW_UNFIT} are set, they cancel each other out. Additionally, if the
+     * calculated multiplier equals 0, it is set to 0.5 to avoid zero fatigue.</p>
+     *
+     * @return the calculated fatigue multiplier
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    private double getFatigueMultiplier() {
+        boolean hasGlassJaw = options.booleanOption(FLAW_GLASS_JAW);
+        boolean hasFit = options.booleanOption(ATOW_FIT);
+        boolean hasUnfit = options.booleanOption(FLAW_UNFIT);
+        boolean modifyForFitness = !(hasFit && hasUnfit);
+
+        double fatigueMultiplier = (hasGlassJaw ? 2 : 1);
+
+        if (modifyForFitness) {
+            fatigueMultiplier += (hasUnfit ? 1 : 0);
+            fatigueMultiplier -= (hasFit ? 1 : 0);
+
+            if (fatigueMultiplier == 0) {
+                fatigueMultiplier = 0.5;
+            }
+        }
+
+        return fatigueMultiplier;
     }
     // region Turnover and Retention
 
@@ -3457,16 +3505,16 @@ public class Person {
                      * non-standard experience thresholds then fall back on lower precision averaging See Bug #140
                      */
                     if (isAlternativeQualityAveraging) {
-                        int rawScore = (int) Math.floor((getSkill(SkillType.S_GUN_MEK).getLevel() +
-                                                               getSkill(SkillType.S_PILOT_MEK).getLevel()) / 2.0);
+                        int rawScore = (int) floor((getSkill(SkillType.S_GUN_MEK).getLevel() +
+                                                          getSkill(SkillType.S_PILOT_MEK).getLevel()) / 2.0);
                         if (getSkill(SkillType.S_GUN_MEK).getType().getExperienceLevel(rawScore) ==
                                   getSkill(SkillType.S_PILOT_MEK).getType().getExperienceLevel(rawScore)) {
                             return getSkill(SkillType.S_GUN_MEK).getType().getExperienceLevel(rawScore);
                         }
                     }
 
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_MEK).getExperienceLevel() +
-                                                   getSkill(SkillType.S_PILOT_MEK).getExperienceLevel()) / 2.0);
+                    return (int) floor((getSkill(SkillType.S_GUN_MEK).getExperienceLevel() +
+                                              getSkill(SkillType.S_PILOT_MEK).getExperienceLevel()) / 2.0);
                 } else {
                     return SkillType.EXP_NONE;
                 }
@@ -3478,7 +3526,7 @@ public class Person {
                      * non-standard experience thresholds then fall back on lower precision averaging See Bug #140
                      */
                     if (isAlternativeQualityAveraging) {
-                        int rawScore = (int) Math.floor((Stream.of(SkillType.S_GUN_MEK,
+                        int rawScore = (int) floor((Stream.of(SkillType.S_GUN_MEK,
                               SkillType.S_PILOT_MEK,
                               SkillType.S_GUN_AERO,
                               SkillType.S_PILOT_AERO).mapToInt(s -> getSkill(s).getLevel()).sum()) / 4.0);
@@ -3497,10 +3545,10 @@ public class Person {
                         }
                     }
 
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_MEK).getExperienceLevel() +
-                                                   getSkill(SkillType.S_PILOT_MEK).getExperienceLevel() +
-                                                   getSkill(SkillType.S_GUN_AERO).getExperienceLevel() +
-                                                   getSkill(SkillType.S_PILOT_AERO).getExperienceLevel()) / 4.0);
+                    return (int) floor((getSkill(SkillType.S_GUN_MEK).getExperienceLevel() +
+                                              getSkill(SkillType.S_PILOT_MEK).getExperienceLevel() +
+                                              getSkill(SkillType.S_GUN_AERO).getExperienceLevel() +
+                                              getSkill(SkillType.S_PILOT_AERO).getExperienceLevel()) / 4.0);
                 } else {
                     return SkillType.EXP_NONE;
                 }
@@ -3541,16 +3589,16 @@ public class Person {
                 if (isTechsHaveAdministration) {
                     if (hasSkill(SkillType.S_TECH_MECHANIC) && hasSkill(S_ADMIN)) {
                         if (isAlternativeQualityAveraging) {
-                            int rawScore = (int) Math.floor((getSkill(SkillType.S_TECH_MECHANIC).getLevel() +
-                                                                   getSkill(S_ADMIN).getLevel()) / 2.0);
+                            int rawScore = (int) floor((getSkill(SkillType.S_TECH_MECHANIC).getLevel() +
+                                                              getSkill(S_ADMIN).getLevel()) / 2.0);
                             if (getSkill(SkillType.S_TECH_MECHANIC).getType().getExperienceLevel(rawScore) ==
                                       getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
                                 return getSkill(SkillType.S_TECH_MECHANIC).getType().getExperienceLevel(rawScore);
                             }
                         }
 
-                        return (int) Math.floor((getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() +
-                                                       getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
+                        return (int) floor((getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() +
+                                                  getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
                     } else {
                         return SkillType.EXP_NONE;
                     }
@@ -3562,32 +3610,32 @@ public class Person {
             case AEROSPACE_PILOT:
                 if (hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO)) {
                     if (isAlternativeQualityAveraging) {
-                        int rawScore = (int) Math.floor((getSkill(SkillType.S_GUN_AERO).getLevel() +
-                                                               getSkill(SkillType.S_PILOT_AERO).getLevel()) / 2.0);
+                        int rawScore = (int) floor((getSkill(SkillType.S_GUN_AERO).getLevel() +
+                                                          getSkill(SkillType.S_PILOT_AERO).getLevel()) / 2.0);
                         if (getSkill(SkillType.S_GUN_AERO).getType().getExperienceLevel(rawScore) ==
                                   getSkill(SkillType.S_PILOT_AERO).getType().getExperienceLevel(rawScore)) {
                             return getSkill(SkillType.S_GUN_AERO).getType().getExperienceLevel(rawScore);
                         }
                     }
 
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_AERO).getExperienceLevel() +
-                                                   getSkill(SkillType.S_PILOT_AERO).getExperienceLevel()) / 2.0);
+                    return (int) floor((getSkill(SkillType.S_GUN_AERO).getExperienceLevel() +
+                                              getSkill(SkillType.S_PILOT_AERO).getExperienceLevel()) / 2.0);
                 } else {
                     return SkillType.EXP_NONE;
                 }
             case CONVENTIONAL_AIRCRAFT_PILOT:
                 if (hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET)) {
                     if (isAlternativeQualityAveraging) {
-                        int rawScore = (int) Math.floor((getSkill(SkillType.S_GUN_JET).getLevel() +
-                                                               getSkill(SkillType.S_PILOT_JET).getLevel()) / 2.0);
+                        int rawScore = (int) floor((getSkill(SkillType.S_GUN_JET).getLevel() +
+                                                          getSkill(SkillType.S_PILOT_JET).getLevel()) / 2.0);
                         if (getSkill(SkillType.S_GUN_JET).getType().getExperienceLevel(rawScore) ==
                                   getSkill(SkillType.S_PILOT_JET).getType().getExperienceLevel(rawScore)) {
                             return getSkill(SkillType.S_GUN_JET).getType().getExperienceLevel(rawScore);
                         }
                     }
 
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_JET).getExperienceLevel() +
-                                                   getSkill(SkillType.S_PILOT_JET).getExperienceLevel()) / 2.0);
+                    return (int) floor((getSkill(SkillType.S_GUN_JET).getExperienceLevel() +
+                                              getSkill(SkillType.S_PILOT_JET).getExperienceLevel()) / 2.0);
                 } else {
                     return SkillType.EXP_NONE;
                 }
@@ -3598,16 +3646,16 @@ public class Person {
             case BATTLE_ARMOUR:
                 if (hasSkill(SkillType.S_GUN_BA) && hasSkill(SkillType.S_ANTI_MEK)) {
                     if (isAlternativeQualityAveraging) {
-                        int rawScore = (int) Math.floor((getSkill(SkillType.S_GUN_BA).getLevel() +
-                                                               getSkill(SkillType.S_ANTI_MEK).getLevel()) / 2.0);
+                        int rawScore = (int) floor((getSkill(SkillType.S_GUN_BA).getLevel() +
+                                                          getSkill(SkillType.S_ANTI_MEK).getLevel()) / 2.0);
                         if (getSkill(SkillType.S_GUN_BA).getType().getExperienceLevel(rawScore) ==
                                   getSkill(SkillType.S_ANTI_MEK).getType().getExperienceLevel(rawScore)) {
                             return getSkill(SkillType.S_GUN_BA).getType().getExperienceLevel(rawScore);
                         }
                     }
 
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_BA).getExperienceLevel() +
-                                                   getSkill(SkillType.S_ANTI_MEK).getExperienceLevel()) / 2.0);
+                    return (int) floor((getSkill(SkillType.S_GUN_BA).getExperienceLevel() +
+                                              getSkill(SkillType.S_ANTI_MEK).getExperienceLevel()) / 2.0);
                 } else {
                     return SkillType.EXP_NONE;
                 }
@@ -3627,16 +3675,16 @@ public class Person {
                 if (isTechsHaveAdministration) {
                     if (hasSkill(SkillType.S_TECH_VESSEL) && hasSkill(S_ADMIN)) {
                         if (isAlternativeQualityAveraging) {
-                            int rawScore = (int) Math.floor((getSkill(SkillType.S_TECH_VESSEL).getLevel() +
-                                                                   getSkill(S_ADMIN).getLevel()) / 2.0);
+                            int rawScore = (int) floor((getSkill(SkillType.S_TECH_VESSEL).getLevel() +
+                                                              getSkill(S_ADMIN).getLevel()) / 2.0);
                             if (getSkill(SkillType.S_TECH_VESSEL).getType().getExperienceLevel(rawScore) ==
                                       getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
                                 return getSkill(SkillType.S_TECH_VESSEL).getType().getExperienceLevel(rawScore);
                             }
                         }
 
-                        return (int) Math.floor((getSkill(SkillType.S_TECH_VESSEL).getExperienceLevel() +
-                                                       getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
+                        return (int) floor((getSkill(SkillType.S_TECH_VESSEL).getExperienceLevel() +
+                                                  getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
                     } else {
                         return SkillType.EXP_NONE;
                     }
@@ -3651,16 +3699,16 @@ public class Person {
                 if (isTechsHaveAdministration) {
                     if (hasSkill(SkillType.S_TECH_MEK) && hasSkill(S_ADMIN)) {
                         if (isAlternativeQualityAveraging) {
-                            int rawScore = (int) Math.floor((getSkill(SkillType.S_TECH_MEK).getLevel() +
-                                                                   getSkill(S_ADMIN).getLevel()) / 2.0);
+                            int rawScore = (int) floor((getSkill(SkillType.S_TECH_MEK).getLevel() +
+                                                              getSkill(S_ADMIN).getLevel()) / 2.0);
                             if (getSkill(SkillType.S_TECH_MEK).getType().getExperienceLevel(rawScore) ==
                                       getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
                                 return getSkill(SkillType.S_TECH_MEK).getType().getExperienceLevel(rawScore);
                             }
                         }
 
-                        return (int) Math.floor((getSkill(SkillType.S_TECH_MEK).getExperienceLevel() +
-                                                       getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
+                        return (int) floor((getSkill(SkillType.S_TECH_MEK).getExperienceLevel() +
+                                                  getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
                     } else {
                         return SkillType.EXP_NONE;
                     }
@@ -3673,16 +3721,16 @@ public class Person {
                 if (isTechsHaveAdministration) {
                     if (hasSkill(SkillType.S_TECH_AERO) && hasSkill(S_ADMIN)) {
                         if (isAlternativeQualityAveraging) {
-                            int rawScore = (int) Math.floor((getSkill(SkillType.S_TECH_AERO).getLevel() +
-                                                                   getSkill(S_ADMIN).getLevel()) / 2.0);
+                            int rawScore = (int) floor((getSkill(SkillType.S_TECH_AERO).getLevel() +
+                                                              getSkill(S_ADMIN).getLevel()) / 2.0);
                             if (getSkill(SkillType.S_TECH_AERO).getType().getExperienceLevel(rawScore) ==
                                       getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
                                 return getSkill(SkillType.S_TECH_AERO).getType().getExperienceLevel(rawScore);
                             }
                         }
 
-                        return (int) Math.floor((getSkill(SkillType.S_TECH_AERO).getExperienceLevel() +
-                                                       getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
+                        return (int) floor((getSkill(SkillType.S_TECH_AERO).getExperienceLevel() +
+                                                  getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
                     } else {
                         return SkillType.EXP_NONE;
                     }
@@ -3695,16 +3743,16 @@ public class Person {
                 if (isTechsHaveAdministration) {
                     if (hasSkill(SkillType.S_TECH_BA) && hasSkill(S_ADMIN)) {
                         if (isAlternativeQualityAveraging) {
-                            int rawScore = (int) Math.floor((getSkill(SkillType.S_TECH_BA).getLevel() +
-                                                                   getSkill(S_ADMIN).getLevel()) / 2.0);
+                            int rawScore = (int) floor((getSkill(SkillType.S_TECH_BA).getLevel() +
+                                                              getSkill(S_ADMIN).getLevel()) / 2.0);
                             if (getSkill(SkillType.S_TECH_BA).getType().getExperienceLevel(rawScore) ==
                                       getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
                                 return getSkill(SkillType.S_TECH_BA).getType().getExperienceLevel(rawScore);
                             }
                         }
 
-                        return (int) Math.floor((getSkill(SkillType.S_TECH_BA).getExperienceLevel() +
-                                                       getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
+                        return (int) floor((getSkill(SkillType.S_TECH_BA).getExperienceLevel() +
+                                                  getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
                     } else {
                         return SkillType.EXP_NONE;
                     }
@@ -3721,16 +3769,16 @@ public class Person {
                 if (isDoctorsHaveAdministration) {
                     if (hasSkill(SkillType.S_DOCTOR) && hasSkill(S_ADMIN)) {
                         if (isAlternativeQualityAveraging) {
-                            int rawScore = (int) Math.floor((getSkill(SkillType.S_DOCTOR).getLevel() +
-                                                                   getSkill(S_ADMIN).getLevel()) / 2.0);
+                            int rawScore = (int) floor((getSkill(SkillType.S_DOCTOR).getLevel() +
+                                                              getSkill(S_ADMIN).getLevel()) / 2.0);
                             if (getSkill(SkillType.S_DOCTOR).getType().getExperienceLevel(rawScore) ==
                                       getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
                                 return getSkill(SkillType.S_DOCTOR).getType().getExperienceLevel(rawScore);
                             }
                         }
 
-                        return (int) Math.floor((getSkill(SkillType.S_DOCTOR).getExperienceLevel() +
-                                                       getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
+                        return (int) floor((getSkill(SkillType.S_DOCTOR).getExperienceLevel() +
+                                                  getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
                     } else {
                         return SkillType.EXP_NONE;
                     }
@@ -4050,11 +4098,21 @@ public class Person {
      *       0 if the specified skill does not currently exist.
      */
     public int getCostToImprove(final String skillName, final boolean useReasoning) {
-        int cost = hasSkill(skillName) ?
-                         getSkill(skillName).getCostToImprove() :
-                         SkillType.getType(skillName).getCost(0);
+        final Skill skill = getSkill(skillName);
+        final SkillType skillType = SkillType.getType(skillName);
+        int cost = hasSkill(skillName) ? skill.getCostToImprove() : skillType.getCost(0);
 
         double multiplier = getReasoningXpCostMultiplier(useReasoning);
+
+        if (skillType.isAffectedByGremlinsOrTechEmpathy()) {
+            if (options.booleanOption(FLAW_GREMLINS)) {
+                multiplier += 0.1;
+            }
+
+            if (options.booleanOption(ATOW_TECH_EMPATHY)) {
+                multiplier -= 0.1;
+            }
+        }
 
         return (int) round(cost * multiplier);
     }
@@ -5009,15 +5067,42 @@ public class Person {
             return 0;
         }
 
+        boolean hasFreakishStrength = options.booleanOption(MUTATION_FREAKISH_STRENGTH);
+        boolean hasExoticAppearance = options.booleanOption(MUTATION_EXOTIC_APPEARANCE);
+        boolean hasFacialHair = options.booleanOption(MUTATION_FACIAL_HAIR);
+        boolean hasSeriousDisfigurement = options.booleanOption(MUTATION_SERIOUS_DISFIGUREMENT);
+        boolean isCatGirl = options.booleanOption(MUTATION_CAT_GIRL);
+
         return switch (attribute) {
             case NONE -> 0;
-            case STRENGTH -> atowAttributes.getStrength();
+            case STRENGTH -> {
+                int attributeScore = atowAttributes.getStrength();
+                if (hasFreakishStrength) {
+                    attributeScore += 2;
+                }
+                yield min(attributeScore, MAXIMUM_ATTRIBUTE_SCORE);
+            }
             case BODY -> atowAttributes.getBody();
             case REFLEXES -> atowAttributes.getReflexes();
             case DEXTERITY -> atowAttributes.getDexterity();
             case INTELLIGENCE -> atowAttributes.getIntelligence();
             case WILLPOWER -> atowAttributes.getWillpower();
-            case CHARISMA -> atowAttributes.getCharisma();
+            case CHARISMA -> {
+                int attributeScore = atowAttributes.getCharisma();
+                if (hasExoticAppearance) {
+                    attributeScore += 1;
+                }
+                if (hasFacialHair) {
+                    attributeScore -= 1;
+                }
+                if (hasSeriousDisfigurement) {
+                    attributeScore -= 3;
+                }
+                if (isCatGirl) {
+                    attributeScore -= 3;
+                }
+                yield clamp(attributeScore, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            }
         };
     }
 

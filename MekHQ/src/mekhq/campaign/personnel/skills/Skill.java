@@ -30,9 +30,14 @@ package mekhq.campaign.personnel.skills;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static mekhq.campaign.personnel.PersonnelOptions.*;
+import static mekhq.campaign.personnel.skills.SkillType.S_ACTING;
+import static mekhq.campaign.personnel.skills.SkillType.S_ANIMAL_HANDLING;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEG;
+import static mekhq.campaign.personnel.skills.SkillType.S_PERCEPTION;
 import static mekhq.campaign.personnel.skills.SkillType.S_PROTOCOLS;
 import static mekhq.campaign.personnel.skills.SkillType.S_STREETWISE;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
 
 import java.io.PrintWriter;
 import java.util.Objects;
@@ -285,9 +290,92 @@ public class Skill {
     private int getSPAModifiers(PersonnelOptions characterOptions, int reputation) {
         int modifier = 0;
 
-        String name = getType().getName();
+        String name = type.getName();
+        // Reputation and Alternate ID
         if (Objects.equals(name, S_NEG) || Objects.equals(name, S_PROTOCOLS) || Objects.equals(name, S_STREETWISE)) {
+            if (characterOptions.booleanOption(ATOW_ALTERNATE_ID) && reputation < 0) {
+                reputation = min(0, reputation + 2);
+            }
+
             modifier += reputation;
+        }
+
+        // Animal Empathy and Animal Antipathy
+        if (Objects.equals(name, S_ANIMAL_HANDLING)) {
+            if (characterOptions.booleanOption(FLAW_ANIMAL_ANTIPATHY)) {
+                modifier += 2;
+            }
+
+            if (characterOptions.booleanOption(ATOW_ANIMAL_EMPATHY)) {
+                modifier -= 2;
+            }
+        }
+
+        // Attractive and Unattractive
+        if (type.hasAttribute(CHARISMA)) {
+            if (characterOptions.booleanOption(FLAW_UNATTRACTIVE)) {
+                modifier += 2;
+            }
+
+            if (characterOptions.booleanOption(ATOW_ATTRACTIVE)) {
+                modifier -= 2;
+            }
+        }
+
+        // Poor Hearing, Good Hearing, Poor Vision, Good Vision, Sixth Sense
+        if (Objects.equals(name, S_PERCEPTION)) {
+            if (characterOptions.booleanOption(FLAW_POOR_HEARING)) {
+                modifier += 1;
+            }
+
+            if (characterOptions.booleanOption(ATOW_GOOD_HEARING)) {
+                modifier -= 1;
+            }
+
+            if (characterOptions.booleanOption(FLAW_POOR_VISION)) {
+                modifier += 1;
+            }
+
+            if (characterOptions.booleanOption(ATOW_GOOD_VISION)) {
+                modifier -= 1;
+            }
+
+            if (characterOptions.booleanOption(ATOW_SIXTH_SENSE)) {
+                modifier -= 3;
+            }
+        }
+
+        // Introvert, Gregarious
+        if (Objects.equals(name, S_ACTING) || Objects.equals(name, S_NEG)) {
+            if (characterOptions.booleanOption(FLAW_INTROVERT)) {
+                modifier += 1;
+            }
+
+            if (characterOptions.booleanOption(ATOW_GREGARIOUS)) {
+                modifier -= 1;
+            }
+        }
+
+        // Impatient, Patient
+        if (type.isAffectedByImpatientOrPatient()) {
+            if (characterOptions.booleanOption(FLAW_IMPATIENT)) {
+                modifier += 1;
+            }
+
+            if (characterOptions.booleanOption(ATOW_PATIENT)) {
+                modifier -= 1;
+            }
+        }
+
+        // Gremlins, Tech Empathy
+        if (type.isAffectedByGremlinsOrTechEmpathy()) {
+            if (characterOptions.booleanOption(FLAW_IMPATIENT)) {
+                modifier += 1;
+            }
+
+            if (characterOptions.booleanOption(ATOW_PATIENT)) {
+                modifier -= 1;
+            }
         }
 
         return modifier;
