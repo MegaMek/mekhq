@@ -367,6 +367,7 @@ MEKHQ VERSION HISTORY:
 + PR #6319: Added Early Exit for Objective Determination Self-Correction Loop
 + PR #6323: Added MekHQ New Player Guide
 + PR #6325: Updated New Player Guide PDF
++ Fix #6596: Added Off-Board Deployment Validation and Improved Generation Safety
 
 
 0.50.03 (2025-02-02 2030 UTC)
