@@ -4104,6 +4104,14 @@ public class Person {
 
         double multiplier = getReasoningXpCostMultiplier(useReasoning);
 
+        if (options.booleanOption(FLAW_SLOW_LEARNER)) {
+            multiplier += 0.2;
+        }
+
+        if (options.booleanOption(ATOW_FAST_LEARNER)) {
+            multiplier -= 0.2;
+        }
+
         if (skillType.isAffectedByGremlinsOrTechEmpathy()) {
             if (options.booleanOption(FLAW_GREMLINS)) {
                 multiplier += 0.1;

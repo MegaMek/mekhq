@@ -63,6 +63,8 @@ public class PersonnelOptions extends PilotOptions {
     public static final String TECH_FIXER = "tech_fixer";
     public static final String TECH_MAINTAINER = "tech_maintainer";
     public static final String FLAW_GLASS_JAW = "flaw_glass_jaw";
+    public static final String FLAW_SLOW_LEARNER = "flaw_slow_learner";
+    public static final String ATOW_FAST_LEARNER = "atow_fast_learner";
     public static final String ATOW_ALTERNATE_ID = "atow_alternate_id";
     public static final String FLAW_ANIMAL_ANTIPATHY = "flaw_animal_antipathy";
     public static final String ATOW_ANIMAL_EMPATHY = "atow_animal_empathy";
@@ -134,6 +136,8 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, TECH_FIXER, false);
         addOption(l3a, TECH_MAINTAINER, false);
         addOption(l3a, FLAW_GLASS_JAW, false);
+        addOption(l3a, FLAW_SLOW_LEARNER, false);
+        addOption(l3a, ATOW_FAST_LEARNER, false);
         addOption(l3a, ATOW_ALTERNATE_ID, false);
         addOption(l3a, FLAW_ANIMAL_ANTIPATHY, false);
         addOption(l3a, ATOW_ANIMAL_EMPATHY, false);
