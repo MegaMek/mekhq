@@ -66,6 +66,7 @@ import mekhq.gui.model.TechTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.TechSorter;
+import mekhq.gui.sorter.WarehouseStatusSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
@@ -197,6 +198,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         partsSorter = new TableRowSorter<>(partsModel);
         partsSorter.setComparator(PartsTableModel.COL_COST, new FormattedNumberSorter());
         partsSorter.setComparator(PartsTableModel.COL_DETAIL, new PartsDetailSorter());
+        partsSorter.setComparator(PartsTableModel.COL_STATUS, new WarehouseStatusSorter());
         partsSorter.setComparator(PartsTableModel.COL_TOTAL_COST, new FormattedNumberSorter());
         partsTable.setRowSorter(partsSorter);
         TableColumn column;
