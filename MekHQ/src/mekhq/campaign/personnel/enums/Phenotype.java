@@ -34,6 +34,7 @@ import java.util.List;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 /**
@@ -46,24 +47,24 @@ public enum Phenotype {
     /**
      * Individual external phenotypes.
      */
-    MEKWARRIOR(true, true, 0, 0, 1, 1, new ArrayList<>()),
-    ELEMENTAL(true, true, 2, 1, -1, 0, List.of("atow_toughness")),
-    AEROSPACE(true, true, -1, -1, +2, +2, List.of("flaw_glass_jaw")),
+    MEKWARRIOR(true, true, 0, 0, 1, 1, new Attributes(8, 8, 9, 9, 8, 8, 9), new ArrayList<>()),
+    ELEMENTAL(true, true, 2, 1, -1, 0, new Attributes(9, 9, 8, 7, 8, 9, 8), List.of("atow_toughness")),
+    AEROSPACE(true, true, -1, -1, +2, +2, new Attributes(7, 7, 9, 9, 9, 8, 8), List.of("flaw_glass_jaw")),
     // ATOW doesn't cover a vehicle phenotype, but as the linked attributes for vehicle skills are also reflexes and
-    // dexterity I copied the MekWarrior phenotype
-    VEHICLE(true, true, 0, 0, 1, 1, new ArrayList<>()),
+    // dexterity, I copied the MekWarrior phenotype
+    VEHICLE(true, true, 0, 0, 1, 1, new Attributes(8, 8, 9, 9, 8, 8, 9), new ArrayList<>()),
     // According to my research, ProtoMek pilots are normally just Aerospace washouts, so I'm assuming they'd have the
     // same phenotype modifiers.
-    PROTOMEK(true, true, -1, -1, +2, +2, List.of("flaw_glass_jaw")),
+    PROTOMEK(true, true, -1, -1, +2, +2, new Attributes(7, 7, 9, 9, 9, 8, 8), List.of("flaw_glass_jaw")),
     // Copying the MekWarrior phenotype, same reasons as above.
-    NAVAL(true, true, 0, 0, 1, 1, new ArrayList<>()),
+    NAVAL(true, true, 0, 0, 1, 1, new Attributes(8, 8, 9, 9, 8, 8, 9), new ArrayList<>()),
 
     /**
      * Individual internal phenotypes.
      */
     // Internal Phenotypes
-    NONE(false, false, 0, 0, 0, 0, new ArrayList<>()),
-    GENERAL(false, false, 0, 0, 0, 0, new ArrayList<>());
+    NONE(false, false, 0, 0, 0, 0, new Attributes(8, 8, 8, 8, 8, 8, 9), new ArrayList<>()),
+    GENERAL(false, false, 0, 0, 0, 0, new Attributes(8, 8, 8, 8, 8, 8, 9), new ArrayList<>());
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -76,27 +77,43 @@ public enum Phenotype {
     private final int body;
     private final int reflexes;
     private final int dexterity;
+    private final Attributes attributeCaps;
     private final List<String> bonusTraits;
     // endregion Variable Declarations
 
     // region Constructors
     Phenotype() {
-        this(false, false, 0, 0, 0, 0, new ArrayList<>());
+        this(false, false, 0, 0, 0, 0, new Attributes(8, 8, 8, 8, 8, 8, 9), new ArrayList<>());
     }
 
     Phenotype(final boolean isTrueborn, final boolean external, final int strength, final int body, final int reflexes,
-          final int dexterity, final List<String> bonusTraits) {
+          final int dexterity, final Attributes attributeCaps, final List<String> bonusTraits) {
         this.isTrueborn = isTrueborn;
         this.external = external;
         this.strength = strength;
         this.body = body;
         this.reflexes = reflexes;
         this.dexterity = dexterity;
+        this.attributeCaps = attributeCaps;
         this.bonusTraits = bonusTraits;
     }
     // endregion Constructors
 
     // region Getters
+
+    /**
+     * Retrieves the cap (maximum allowable score) for a specified {@link SkillAttribute}.
+     *
+     * @param attribute The {@link SkillAttribute} for which the cap is requested.
+     *
+     * @return The cap value for the specified skill attribute.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public int getAttributeCap(SkillAttribute attribute) {
+        return attributeCaps.getAttributeScore(attribute);
+    }
 
     /**
      * @deprecated use {@link #getLabel()} instead

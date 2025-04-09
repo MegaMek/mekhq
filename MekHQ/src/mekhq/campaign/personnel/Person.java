@@ -34,6 +34,8 @@ import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 
 import java.io.PrintWriter;
@@ -2671,7 +2673,7 @@ public class Person {
                 } else if (nodeName.equalsIgnoreCase("becomingBondsmanEndDate")) {
                     person.becomingBondsmanEndDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("phenotype")) {
-                    person.phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
+                    person.phenotype = Phenotype.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("bloodname")) {
                     person.bloodname = wn2.getTextContent();
                 } else if (nodeName.equalsIgnoreCase("biography")) {
@@ -4958,67 +4960,72 @@ public class Person {
     }
 
     /**
-     * Updates the score of a specific attribute to a new value.
+     * Updates the score for a specific skill attribute.
      *
-     * <p>This method modifies the score of an attribute specified by the {@link SkillAttribute} parameter. If the
-     * provided attribute is {@code NONE}, no changes will be made. If the attribute is {@code null}, the method logs an
-     * error and exits without making changes.</p>
+     * <p>This method sets the provided score for the given {@link SkillAttribute}. If the attribute is
+     * <code>null</code> or represents "NONE", the method logs a warning and exits without making any changes.</p>
      *
-     * @param attribute the {@link SkillAttribute} to update. Must not be {@code null}.
-     * @param newScore  the new score to set for the specified attribute.
+     * <p>The actual attribute score update is delegated to the underlying attribute handler.</p>
      *
-     * @since 0.50.5
+     * @param attribute The {@link SkillAttribute} to be updated. Must not be <code>null</code> or "NONE".
+     * @param newScore  The new score to assign to the specified skill attribute.
+     *
+     * @author Illiani
+     * @since 0.50.05
      */
     public void setAttributeScore(final SkillAttribute attribute, final int newScore) {
-        if (attribute == null) {
-            logger.error("(setAttributeScore) SkillAttribute is null.");
+        if (attribute == null || attribute == SkillAttribute.NONE) {
+            logger.warn("(setAttributeScore) SkillAttribute is null or NONE.");
             return;
         }
 
-        switch (attribute) {
-            case NONE -> {
-            }
-            case STRENGTH -> atowAttributes.setStrength(newScore);
-            case BODY -> atowAttributes.setBody(newScore);
-            case REFLEXES -> atowAttributes.setReflexes(newScore);
-            case DEXTERITY -> atowAttributes.setDexterity(newScore);
-            case INTELLIGENCE -> atowAttributes.setIntelligence(newScore);
-            case WILLPOWER -> atowAttributes.setWillpower(newScore);
-            case CHARISMA -> atowAttributes.setCharisma(newScore);
-        }
-        ;
+        atowAttributes.setAttributeScore(phenotype, options, attribute, newScore);
     }
 
     /**
      * Retrieves the score of a specified attribute.
      *
-     * <p>The method maps the provided {@link SkillAttribute} to its corresponding attribute in
-     * the {@link Attributes} object and returns its value. If the {@link SkillAttribute} is {@code NONE}, the method
-     * returns a score of 0. If the {@code attribute} is {@code null}, an error is logged, and the method returns a
-     * score of 0.</p>
-     *
      * @param attribute the {@link SkillAttribute} to retrieve the score for.
      *
-     * @return the score of the specified attribute, or 0 if the attribute is {@code NONE} or {@code null}.
+     * @return the score of the specified attribute, or {@link Attributes#DEFAULT_ATTRIBUTE_SCORE} if the attribute is
+     *       {@code NONE} or {@code null}.
      *
      * @since 0.50.5
      */
     public int getAttributeScore(final SkillAttribute attribute) {
-        if (attribute == null) {
-            logger.error("(getAttributeScore) SkillAttribute is null.");
-            return 0;
+        if (attribute == null || attribute.isNone()) {
+            logger.error("(getAttributeScore) SkillAttribute is null or NONE.");
+            return DEFAULT_ATTRIBUTE_SCORE;
         }
 
-        return switch (attribute) {
-            case NONE -> 0;
-            case STRENGTH -> atowAttributes.getStrength();
-            case BODY -> atowAttributes.getBody();
-            case REFLEXES -> atowAttributes.getReflexes();
-            case DEXTERITY -> atowAttributes.getDexterity();
-            case INTELLIGENCE -> atowAttributes.getIntelligence();
-            case WILLPOWER -> atowAttributes.getWillpower();
-            case CHARISMA -> atowAttributes.getCharisma();
-        };
+        return atowAttributes.getAttributeScore(attribute);
+    }
+
+    /**
+     * Retrieves the maximum allowed value (cap) for the specified {@link SkillAttribute}.
+     *
+     * <p>If the attribute is {@code null} or marked as {@link SkillAttribute#NONE}, a default maximum attribute score
+     * is returned, and a warning is logged.</p>
+     *
+     * <p>For valid attributes, this method delegates to
+     * {@link Attributes#getAttributeCap(Phenotype, PersonnelOptions, SkillAttribute)}.</p>
+     *
+     * @param attribute The {@link SkillAttribute} for which the maximum value is being retrieved. Must not be
+     *                  {@code null} or {@link SkillAttribute#NONE}.
+     *
+     * @return The maximum allowed value (cap) for the given attribute. Returns the default maximum value if the input
+     *       attribute is invalid.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public int getAttributeCap(final SkillAttribute attribute) {
+        if (attribute == null || attribute.isNone()) {
+            logger.warn("(getAttributeCap) SkillAttribute is null or NONE.");
+            return MAXIMUM_ATTRIBUTE_SCORE;
+        }
+
+        return atowAttributes.getAttributeCap(phenotype, options, attribute);
     }
 
     /**
@@ -5037,35 +5044,32 @@ public class Person {
     }
 
     /**
-     * Modifies the score of a specified attribute by applying a delta value.
+     * Modifies the score of a specified skill attribute by a given delta value.
      *
-     * <p>This method maps the provided {@link SkillAttribute} to its corresponding attribute in the
-     * {@link Attributes} object and adjusts its value by the specified delta. If the {@code attribute} is {@code NONE},
-     * the method does nothing. If {@code attribute} is {@code null}, an error is logged, and the method returns without
-     * performing any operation.</p>
+     * <p>This method adjusts the current score of the provided {@link SkillAttribute} by adding the specified delta
+     * to it. If the attribute is {@code null} or {@link SkillAttribute#NONE}, a warning is logged, and the method exits
+     * without making any changes.</p>
      *
-     * @param attribute the {@link SkillAttribute} to modify the score for.
-     * @param delta     the value to add to (or subtract from) the current score of the specified attribute.
+     * <p>The new score is computed as the sum of the current score and the delta, and it is passed
+     * to {@link Attributes#setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} to ensure is compiles
+     * with the character's minimum and maximum attribute score values.</p>
      *
-     * @since 0.50.5
+     * @param attribute The {@link SkillAttribute} whose score is to be modified. Must not be <code>null</code>.
+     * @param delta     The value to add to the current score of the specified skill attribute.
+     *
+     * @author Illiani
+     * @since 0.50.05
      */
     public void changeAttributeScore(final SkillAttribute attribute, final int delta) {
-        if (attribute == null) {
-            logger.error("(changeAttributeScore) SkillAttribute is null.");
+        if (attribute == null || attribute.isNone()) {
+            logger.warn("(changeAttributeScore) SkillAttribute is null or NONE.");
             return;
         }
 
-        switch (attribute) {
-            case NONE -> {
-            }
-            case STRENGTH -> atowAttributes.changeStrength(delta);
-            case BODY -> atowAttributes.changeBody(delta);
-            case REFLEXES -> atowAttributes.changeReflexes(delta);
-            case DEXTERITY -> atowAttributes.changeDexterity(delta);
-            case INTELLIGENCE -> atowAttributes.changeIntelligence(delta);
-            case WILLPOWER -> atowAttributes.changeWillpower(delta);
-            case CHARISMA -> atowAttributes.changeCharisma(delta);
-        }
+        int current = atowAttributes.getAttributeScore(attribute);
+        int newScore = current + delta;
+
+        setAttributeScore(attribute, newScore);
     }
 
     public void resetSkillTypes() {

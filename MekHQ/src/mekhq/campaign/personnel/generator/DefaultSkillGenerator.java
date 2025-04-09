@@ -28,7 +28,6 @@
 package mekhq.campaign.personnel.generator;
 
 import static megamek.common.Compute.d6;
-import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
@@ -189,7 +188,8 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
                 person.changeAttributeScore(attribute, 1);
 
                 if (extraRandomAttributes) {
-                    while ((d6() == 6) && (person.getAttributeScore(attribute) < MAXIMUM_ATTRIBUTE_SCORE)) {
+                    int attributeCap = person.getPhenotype().getAttributeCap(attribute);
+                    while ((d6() == 6) && (person.getAttributeScore(attribute) < attributeCap)) {
                         person.changeAttributeScore(attribute, 1);
                     }
                 }
