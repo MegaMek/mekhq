@@ -88,6 +88,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String ATOW_TECH_EMPATHY = "atow_tech_empathy";
     public static final String FLAW_TRANSIT_DISORIENTATION_SYNDROME = "flaw_transit_disorientation_syndrome";
     public static final String MUTATION_FREAKISH_STRENGTH = "mutation_freakish_strength";
+    public static final String MUTATION_FREAKISH_STRENGTH_UNOFFICIAL = "mutation_freakish_strength_unofficial";
     public static final String MUTATION_EXCEPTIONAL_IMMUNE_SYSTEM = "mutation_exceptional_immune_system";
     public static final String MUTATION_EXOTIC_APPEARANCE = "mutation_exotic_appearance";
     public static final String MUTATION_FACIAL_HAIR = "mutation_facial_hair";
@@ -163,6 +164,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, ATOW_TECH_EMPATHY, false);
         addOption(l3a, FLAW_TRANSIT_DISORIENTATION_SYNDROME, false);
         addOption(l3a, MUTATION_FREAKISH_STRENGTH, false);
+        addOption(l3a, MUTATION_FREAKISH_STRENGTH_UNOFFICIAL, false);
         addOption(l3a, MUTATION_EXCEPTIONAL_IMMUNE_SYSTEM, false);
         addOption(l3a, MUTATION_EXOTIC_APPEARANCE, false);
         addOption(l3a, MUTATION_FACIAL_HAIR, false);

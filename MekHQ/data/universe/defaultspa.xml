@@ -626,6 +626,16 @@ They also gain Fatigue based on the campaign options fatigue rate (default 1).]]
         <weight>1</weight>
         <skillPrereq/>
         <prereqAbilities>flaw_unattractive</prereqAbilities>
+        <invalidAbilities>mutation_freakish_strength_unofficial</invalidAbilities>
+    </ability>
+    <ability>
+        <lookupName>mutation_freakish_strength_unofficial</lookupName>
+        <displayName>Freakish Strength (Unofficial)</displayName>
+        <desc><![CDATA[Increases Strength Attribute by 2 (may not take it above 10).]]></desc>
+        <xpCost>300</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <invalidAbilities>mutation_freakish_strength</invalidAbilities>
     </ability>
     <ability>
         <lookupName>mutation_exceptional_immune_system</lookupName>
