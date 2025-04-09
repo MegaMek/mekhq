@@ -1563,7 +1563,7 @@ public class ResolveScenarioTracker {
                 }
 
                 if (campaign.getCampaignOptions().isUseInjuryFatigue()) {
-                    int fatigueIncrease = fatigueRate * (newHits + extraHits);
+                    int fatigueIncrease = fatigueRate * newHits;
 
                     person.changeFatigue(fatigueIncrease);
 

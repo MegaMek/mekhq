@@ -1717,38 +1717,59 @@ public class Person {
     }
 
     /**
-     * Calculates the fatigue multiplier for a character based on their traits and fitness options.
+     * Calculates the fatigue multiplier for a character based on their traits and fitness-related options.
      *
-     * <p>The method determines the fatigue multiplier by analyzing specific boolean options:
+     * <p>The calculation is influenced by the following conditions:</p>
      * <ul>
-     *     <li>{@code FLAW_GLASS_JAW}: If present, doubles the base multiplier.</li>
-     *     <li>{@code ATOW_FIT}: If present, decreases the multiplier by 1, unless {@code FLAW_UNFIT} is also set.</li>
-     *     <li>{@code FLAW_UNFIT}: If present, increases the multiplier by 1.</li>
+     *     <li><b>{@code FLAW_GLASS_JAW}</b>: If set, increases the multiplier by 1.</li>
+     *     <li><b>{@code ATOW_TOUGHNESS}</b>: If set, decreases the multiplier by 1.</li>
+     *     <li>Both {@code FLAW_GLASS_JAW} and {@code ATOW_TOUGHNESS} cannot modify the multiplier if both are
+     *     present, as they cancel each other out.</li>
+     *     <li><b>{@code ATOW_FIT}</b>: If set, decreases the multiplier by 1.</li>
+     *     <li><b>{@code FLAW_UNFIT}</b>: If set, increases the multiplier by 1.</li>
+     *     <li>Both {@code ATOW_FIT} and {@code FLAW_UNFIT}, when present simultaneously, cancel each other out and
+     *     do not affect the multiplier.</li>
      * </ul>
      *
-     * <p>If both {@code ATOW_FIT} and {@code FLAW_UNFIT} are set, they cancel each other out. Additionally, if the
-     * calculated multiplier equals 0, it is set to 0.5 to avoid zero fatigue.</p>
+     * <p>After calculating the initial multiplier, the following adjustments are applied:</p>
+     * <ul>
+     *     <li>If the resulting multiplier equals {@code 0}, it is set to {@code 0.5} to avoid zeroing Fatigue.</li>
+     *     <li>If the resulting multiplier is less than {@code 0}, it is set to a minimum value of {@code 0.25}.</li>
+     * </ul>
      *
-     * @return the calculated fatigue multiplier
+     * @return the calculated fatigue multiplier, adjusted based on the character's traits and options
      *
      * @author Illiani
      * @since 0.50.05
      */
     private double getFatigueMultiplier() {
+        double fatigueMultiplier = 1;
+
+        // Glass Jaw and Toughness
         boolean hasGlassJaw = options.booleanOption(FLAW_GLASS_JAW);
+        boolean hasToughness = options.booleanOption(ATOW_TOUGHNESS);
+        boolean modifyForGlassJawToughness = !(hasGlassJaw && hasToughness);
+
+        if (modifyForGlassJawToughness) {
+            fatigueMultiplier += (hasGlassJaw ? 1 : 0);
+            fatigueMultiplier -= (hasToughness ? 1 : 0);
+        }
+
+        // Fit and Unfit
         boolean hasFit = options.booleanOption(ATOW_FIT);
         boolean hasUnfit = options.booleanOption(FLAW_UNFIT);
         boolean modifyForFitness = !(hasFit && hasUnfit);
 
-        double fatigueMultiplier = (hasGlassJaw ? 2 : 1);
-
         if (modifyForFitness) {
             fatigueMultiplier += (hasUnfit ? 1 : 0);
             fatigueMultiplier -= (hasFit ? 1 : 0);
+        }
 
-            if (fatigueMultiplier == 0) {
-                fatigueMultiplier = 0.5;
-            }
+        // Conclusion
+        if (fatigueMultiplier == 0) {
+            fatigueMultiplier = 0.5;
+        } else if (fatigueMultiplier < 0) {
+            fatigueMultiplier = 0.25;
         }
 
         return fatigueMultiplier;
