@@ -4834,12 +4834,12 @@ public class Unit implements ITechnology {
                 if (getCampaign().getCampaignOptions().isUseEdge()) {
                     double sumEdge = 0;
                     for (Person p : drivers) {
-                        sumEdge += p.getEdge();
+                        sumEdge += p.getCurrentEdge();
                     }
                     // Again, don't count infantrymen twice
                     if (!entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
                         for (Person p : gunners) {
-                            sumEdge += p.getEdge();
+                            sumEdge += p.getCurrentEdge();
                         }
                     }
                     // Average the edge values of pilots and gunners. The Spacecraft Engineer
@@ -5233,7 +5233,7 @@ public class Unit implements ITechnology {
                         }
                         sumEdgeUsed = engineer.getEdgeUsed();
                     }
-                    sumEdge += p.getEdge();
+                    sumEdge += p.getAdjustedEdge();
 
                     if (p.hasSkill(SkillType.S_TECH_VESSEL)) {
                         sumSkill += p.getSkill(SkillType.S_TECH_VESSEL).getLevel();
@@ -5267,7 +5267,7 @@ public class Unit implements ITechnology {
                     }
                     engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill / nCrew, sumBonus / nCrew);
                     engineer.setEdgeUsed(sumEdgeUsed);
-                    engineer.setCurrentEdge((sumEdge - sumEdgeUsed) / nCrew);
+                    engineer.setCurrentEdge(max(0, (sumEdge - sumEdgeUsed) / nCrew));
                     engineer.setUnit(this);
                 } else {
                     engineer = null;
