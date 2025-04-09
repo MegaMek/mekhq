@@ -470,6 +470,66 @@
         <skillPrereq/>
     </ability>
     <ability>
+        <lookupName>exceptional_attribute_strength</lookupName>
+        <displayName>Exceptional Attribute - Strength (ATOW)</displayName>
+        <desc><![CDATA[Characters can only increase their Attributes up to a maximum determined by their Phenotype.
+
+This SPA increases that maximum by 1, but does not increase the Attribute itself.]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>exceptional_attribute_body</lookupName>
+        <displayName>Exceptional Attribute - Body (ATOW)</displayName>
+        <desc><![CDATA[Characters can only increase their Attributes up to a maximum determined by their Phenotype.
+
+This SPA increases that maximum by 1, but does not increase the Attribute itself.]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>exceptional_attribute_reflexes</lookupName>
+        <displayName>Exceptional Attribute - Reflexes (ATOW)</displayName>
+        <desc><![CDATA[Characters can only increase their Attributes up to a maximum determined by their Phenotype.
+
+This SPA increases that maximum by 1, but does not increase the Attribute itself.]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>exceptional_attribute_dexterity</lookupName>
+        <displayName>Exceptional Attribute - Dexterity (ATOW)</displayName>
+        <desc><![CDATA[Characters can only increase their Attributes up to a maximum determined by their Phenotype.
+
+This SPA increases that maximum by 1, but does not increase the Attribute itself.]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>exceptional_attribute_intelligence</lookupName>
+        <displayName>Exceptional Attribute - Intelligence (ATOW)</displayName>
+        <desc><![CDATA[Characters can only increase their Attributes up to a maximum determined by their Phenotype.
+
+This SPA increases that maximum by 1, but does not increase the Attribute itself.]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>exceptional_attribute_willpower</lookupName>
+        <displayName>Exceptional Attribute - Willpower (ATOW)</displayName>
+        <desc><![CDATA[Characters can only increase their Attributes up to a maximum determined by their Phenotype.
+
+This SPA increases that maximum by 1, but does not increase the Attribute itself.]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
         <lookupName>eagle_eyes</lookupName>
         <xpCost>100</xpCost>
         <weight>2</weight>
@@ -541,9 +601,9 @@
         <weight>1</weight>
         <desc>Unit Reputation is decreased by 1 if this character is the campaign commander.
 
-A pilot who has Combat Sense rolls three dice per initiative check, keeping the top two rolls.
+            A pilot who has Combat Sense rolls three dice per initiative check, keeping the top two rolls.
 
-If individual initiative is enabled, this penalty applies only to the pilot's unit. Otherwise, the penalty is applied only if the pilot's unit is the force commander.
+            If individual initiative is enabled, this penalty applies only to the pilot's unit. Otherwise, the penalty is applied only if the pilot's unit is the force commander.
         </desc>
         <skillPrereq/>
         <removeAbilities>atow_combat_sense</removeAbilities>
@@ -554,9 +614,9 @@ If individual initiative is enabled, this penalty applies only to the pilot's un
         <weight>1</weight>
         <desc>Unit Reputation is increased by 1 if this character is the campaign commander.
 
-A pilot who has Combat Sense rolls three dice per initiative check, keeping the top two rolls.
+            A pilot who has Combat Sense rolls three dice per initiative check, keeping the top two rolls.
 
-If individual initiative is enabled, this bonus applies only to the pilot's unit. Otherwise, the bonus is applied only if the pilot's unit is the force commander.
+            If individual initiative is enabled, this bonus applies only to the pilot's unit. Otherwise, the bonus is applied only if the pilot's unit is the force commander.
         </desc>
         <skillPrereq>
             <skill>Gunnery/Mek::Veteran</skill>

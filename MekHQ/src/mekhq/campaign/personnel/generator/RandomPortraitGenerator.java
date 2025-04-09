@@ -27,14 +27,19 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import megamek.common.Compute;
 import megamek.common.icons.Portrait;
 import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.personnel.Person;
-
-import java.io.File;
-import java.util.*;
 
 public class RandomPortraitGenerator {
     private static final MMLogger logger = MMLogger.create(RandomPortraitGenerator.class);
@@ -46,20 +51,20 @@ public class RandomPortraitGenerator {
     /**
      * This generates a unique Portrait based on the supplied {@link Person}
      *
-     * @param personnel a list of all personnel, from which existing portraits are
-     *                  determined
+     * @param personnel a list of all personnel, from which existing portraits are determined
      * @param p         the {@link Person} to generate a unique portrait for
+     *
      * @return the generated portrait
      */
-    public static Portrait generate(Collection<Person> personnel, Person p,
-            Boolean allowDuplicatePortraits) {
+    public static Portrait generate(Collection<Person> personnel, Person p, Boolean allowDuplicatePortraits) {
         // first create a list of existing portrait strings, so we can check for
         // duplicates - unless they are allowed in campaign options
         Set<String> existingPortraits = new HashSet<>();
         if (!allowDuplicatePortraits) {
             for (Person existingPerson : personnel) {
-                existingPortraits.add(existingPerson.getPortrait().getCategory() + ':'
-                    + existingPerson.getPortrait().getFilename());
+                existingPortraits.add(existingPerson.getPortrait().getCategory() +
+                                            ':' +
+                                            existingPerson.getPortrait().getFilename());
             }
         }
 
@@ -69,7 +74,7 @@ public class RandomPortraitGenerator {
         // and if none are found then /gender/rolegroup, then /gender/combat or
         // /gender/support, then in /gender.
         File genderFile = new File(p.getGender().isFemale() ? "Female" : "Male");
-        File searchFile = new File(genderFile, p.getPrimaryRole().getName(p.isClanPersonnel()));
+        File searchFile = new File(genderFile, p.getPrimaryRole().getLabel(p.isClanPersonnel()));
 
         possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchFile);
 
@@ -108,29 +113,30 @@ public class RandomPortraitGenerator {
             if (temp.length == 2) {
                 return new Portrait(temp[0], temp[1]);
             } else {
-                logger.error("Failed to generate portrait for " + p.getFullTitle() + ". "
-                        + chosenPortrait + " does not split into an array of length 2.");
+                logger.error("Failed to generate portrait for " +
+                                   p.getFullTitle() +
+                                   ". " +
+                                   chosenPortrait +
+                                   " does not split into an array of length 2.");
             }
         } else {
-            logger.warn("Failed to generate portrait for " + p.getFullTitle()
-                    + ". No possible portraits found.");
+            logger.warn("Failed to generate portrait for " + p.getFullTitle() + ". No possible portraits found.");
         }
 
         return new Portrait();
     }
 
     /**
-     * This is a helper method that determines what possible unassigned portraits
-     * can be generated
-     * based on the supplied subdirectory
+     * This is a helper method that determines what possible unassigned portraits can be generated based on the supplied
+     * subdirectory
      *
-     * @param existingPortraits the list of existing portraits that have already
-     *                          been assigned
+     * @param existingPortraits the list of existing portraits that have already been assigned
      * @param subdirectory      the subdirectory to search
+     *
      * @return a list of all possible unassigned random portraits
      */
     private static List<String> getPossibleRandomPortraits(final Set<String> existingPortraits,
-            final File subdirectory) {
+          final File subdirectory) {
         if (MHQStaticDirectoryManager.getPortraits() == null) {
             return new ArrayList<>();
         }

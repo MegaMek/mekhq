@@ -27,126 +27,128 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.logging.MMLogger;
-import mekhq.MekHQ;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
+
+import megamek.codeUtilities.MathUtility;
+import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.skills.Attributes;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 /**
- * The {@link Phenotype} Enum represents various phenotypes a Clan character can have.
- * Each {@link Phenotype} is associated with a name, short name, grouping name and a tooltip text.
- * Each {@link Phenotype} can be classified as either {@code external} or {@code internal}.
+ * The {@link Phenotype} Enum represents various phenotypes a Clan character can have. Each {@link Phenotype} is
+ * associated with a name, short name, grouping name and a tooltip text. Each {@link Phenotype} can be classified as
+ * either {@code external} or {@code internal}.
  */
 public enum Phenotype {
     // region Enum Declarations
     /**
      * Individual external phenotypes.
      */
-    MEKWARRIOR("Phenotype.MEKWARRIOR.text", "Trueborn.text",
-            "Phenotype.MEKWARRIOR.text", "Phenotype.MEKWARRIOR.toolTipText"),
-    ELEMENTAL("Phenotype.ELEMENTAL.text", "Trueborn.text",
-            "Phenotype.ELEMENTAL.text", "Phenotype.ELEMENTAL.toolTipText"),
-    AEROSPACE("Phenotype.AEROSPACE.text", "Trueborn.text",
-            "Phenotype.AEROSPACE.groupingNameText", "Phenotype.AEROSPACE.toolTipText"),
-    VEHICLE("Phenotype.VEHICLE.text", "Trueborn.text",
-            "Phenotype.VEHICLE.groupingNameText", "Phenotype.VEHICLE.toolTipText"),
-    PROTOMEK("Phenotype.PROTOMEK.text", "Trueborn.text",
-            "Phenotype.PROTOMEK.groupingNameText", "Phenotype.PROTOMEK.toolTipText"),
-    NAVAL("Phenotype.NAVAL.text", "Trueborn.text",
-            "Phenotype.NAVAL.groupingNameText", "Phenotype.NAVAL.toolTipText"),
+    MEKWARRIOR(true, true, 0, 0, 1, 1, new Attributes(8, 8, 9, 9, 8, 8, 9), new ArrayList<>()),
+    ELEMENTAL(true, true, 2, 1, -1, 0, new Attributes(9, 9, 8, 7, 8, 9, 8), List.of("atow_toughness")),
+    AEROSPACE(true, true, -1, -1, +2, +2, new Attributes(7, 7, 9, 9, 9, 8, 8), List.of("flaw_glass_jaw")),
+    // ATOW doesn't cover a vehicle phenotype, but as the linked attributes for vehicle skills are also reflexes and
+    // dexterity, I copied the MekWarrior phenotype
+    VEHICLE(true, true, 0, 0, 1, 1, new Attributes(8, 8, 9, 9, 8, 8, 9), new ArrayList<>()),
+    // According to my research, ProtoMek pilots are normally just Aerospace washouts, so I'm assuming they'd have the
+    // same phenotype modifiers.
+    PROTOMEK(true, true, -1, -1, +2, +2, new Attributes(7, 7, 9, 9, 9, 8, 8), List.of("flaw_glass_jaw")),
+    // Copying the MekWarrior phenotype, same reasons as above.
+    NAVAL(true, true, 0, 0, 1, 1, new Attributes(8, 8, 9, 9, 8, 8, 9), new ArrayList<>()),
 
     /**
      * Individual internal phenotypes.
      */
     // Internal Phenotypes
-    NONE("Phenotype.NONE.text", "Freeborn.text",
-            "Phenotype.NONE.text", "Phenotype.NONE.toolTipText", false),
-    GENERAL("Phenotype.GENERAL.text", "Trueborn.text",
-            "Phenotype.GENERAL.text", "Phenotype.GENERAL.toolTipText", false);
+    NONE(false, false, 0, 0, 0, 0, new Attributes(8, 8, 8, 8, 8, 8, 9), new ArrayList<>()),
+    GENERAL(false, false, 0, 0, 0, 0, new Attributes(8, 8, 8, 8, 8, 8, 9), new ArrayList<>());
     // endregion Enum Declarations
 
     // region Variable Declarations
-    private final String name;
-    private final String shortName;
-    private final String groupingName;
-    private final String toolTipText;
+    private static final MMLogger logger = MMLogger.create(Phenotype.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources." + Phenotype.class.getSimpleName();
+
+    private final boolean isTrueborn;
     private final boolean external;
+    private final int strength;
+    private final int body;
+    private final int reflexes;
+    private final int dexterity;
+    private final Attributes attributeCaps;
+    private final List<String> bonusTraits;
     // endregion Variable Declarations
 
     // region Constructors
-    /**
-     * Overloaded constructor to create an external {@link Phenotype}.
-     *
-     * @param name the name of the phenotype.
-     * @param shortName the short name for phenotype.
-     * @param groupingName the group the phenotype belongs to.
-     * @param toolTipText tooltip text for the phenotype.
-     */
-    Phenotype(final String name, final String shortName, final String groupingName,
-            final String toolTipText) {
-        this(name, shortName, groupingName, toolTipText, true);
+    Phenotype() {
+        this(false, false, 0, 0, 0, 0, new Attributes(8, 8, 8, 8, 8, 8, 9), new ArrayList<>());
     }
 
-    /**
-     * Overloaded constructor to create a {@link Phenotype}, either external or internal.
-     *
-     * @param name the name of the phenotype.
-     * @param shortName the short name for phenotype.
-     * @param groupingName the group the phenotype belongs to.
-     * @param toolTipText tooltip text for the phenotype.
-     * @param external a boolean denoting whether the phenotype is internal ({@code false}) or
-     *                external ({@code true}).
-     */
-    Phenotype(final String name, final String shortName, final String groupingName,
-            final String toolTipText, final boolean external) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
-        this.name = resources.getString(name);
-        this.shortName = resources.getString(shortName);
-        this.groupingName = resources.getString(groupingName);
-        this.toolTipText = resources.getString(toolTipText);
+    Phenotype(final boolean isTrueborn, final boolean external, final int strength, final int body, final int reflexes,
+          final int dexterity, final Attributes attributeCaps, final List<String> bonusTraits) {
+        this.isTrueborn = isTrueborn;
         this.external = external;
+        this.strength = strength;
+        this.body = body;
+        this.reflexes = reflexes;
+        this.dexterity = dexterity;
+        this.attributeCaps = attributeCaps;
+        this.bonusTraits = bonusTraits;
     }
     // endregion Constructors
 
     // region Getters
+
     /**
-     * Retrieves the name of the phenotype.
+     * Retrieves the cap (maximum allowable score) for a specified {@link SkillAttribute}.
      *
-     * @return a {@link String} representing the name of the phenotype.
+     * @param attribute The {@link SkillAttribute} for which the cap is requested.
+     *
+     * @return The cap value for the specified skill attribute.
+     *
+     * @author Illiani
+     * @since 0.50.05
      */
+    public int getAttributeCap(SkillAttribute attribute) {
+        return attributeCaps.getAttributeScore(attribute);
+    }
+
+    /**
+     * @deprecated use {@link #getLabel()} instead
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public String getName() {
-        return name;
+        return getLabel();
     }
 
     /**
-     * Retrieves the short name of the phenotype.
-     *
-     * @return a {@link String} representing the short name of the phenotype.
+     * @deprecated use {@link #getLabel()} instead
      */
-    public String getShortName() {
-        return shortName;
-    }
-
-    /**
-     * Retrieves the grouping name of the phenotype.
-     *
-     * @return a {@link String} representing the grouping name of the phenotype.
-     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public String getGroupingName() {
-        return groupingName;
+        return getLabel();
     }
 
     /**
-     * Retrieves the tooltip text associated with the phenotype.
-     *
-     * @return a {@link String} representing the tooltip text of the phenotype.
+     * @deprecated use {@link #getTooltip()} instead
      */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public String getToolTipText() {
-        return toolTipText;
+        return getTooltip();
+    }
+
+    /**
+     * Checks whether the phenotype is a Clan Trueborn phenotype.
+     *
+     * @return a boolean, {@code true} if the phenotype is Trueborn, otherwise {@code false}.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public boolean isTrueborn() {
+        return external;
     }
 
     /**
@@ -157,9 +159,103 @@ public enum Phenotype {
     public boolean isExternal() {
         return external;
     }
+
+    /**
+     * Retrieves the modifier value for a given skill attribute.
+     *
+     * <p>The method determines the corresponding modifier based on the
+     * specified {@link SkillAttribute}. The value is fetched from the associated field depending on the attribute:</p>
+     * <ul>
+     *     <li>For {@code STRENGTH}, the {@code strength} field is returned.</li>
+     *     <li>For {@code BODY}, the {@code body} field is returned.</li>
+     *     <li>For {@code REFLEXES}, the {@code reflexes} field is returned.</li>
+     *     <li>For {@code DEXTERITY}, the {@code dexterity} field is returned.</li>
+     *     <li>For {@code NONE}, {@code INTELLIGENCE}, {@code WILLPOWER}, and
+     *     {@code CHARISMA}, a default value of {@code 0} is returned.</li>
+     * </ul>
+     *
+     * @param attribute The skill attribute for which the modifier is requested.
+     *
+     * @return The modifier value associated with the provided attribute. If the attribute is {@code NONE},
+     *       {@code INTELLIGENCE}, {@code WILLPOWER}, or {@code CHARISMA}, the method returns {@code 0}.
+     *
+     * @throws NullPointerException If the {@code attribute} is {@code null}.
+     */
+    public int getAttributeModifier(final SkillAttribute attribute) {
+        return switch (attribute) {
+            case STRENGTH -> strength;
+            case BODY -> body;
+            case REFLEXES -> reflexes;
+            case DEXTERITY -> dexterity;
+            case NONE, INTELLIGENCE, WILLPOWER, CHARISMA -> 0;
+        };
+    }
+
+    /**
+     * Retrieves a list of bonus traits assigned to this phenotype.
+     *
+     * @return A list of bonus traits as strings.
+     */
+    public List<String> getBonusTraits() {
+        return bonusTraits;
+    }
+
+    /**
+     * Retrieves the short name of this phenotype based on its Clan status.
+     *
+     * <p>The method determines the appropriate key by appending the Clan status
+     * ("trueborn" or "freeborn") to the base key "shortName.". This key is then used to fetch the formatted text from
+     * the resource bundle.</p>
+     *
+     * @return A formatted short name string corresponding to the born type (e.g., "shortName.trueborn" or
+     *       "shortName.freeborn") from the resource bundle.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public String getShortName() {
+        String key = "shortName." + (isTrueborn ? "trueborn" : "freeborn");
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, key);
+    }
+
+    /**
+     * Retrieves the label for this phenotype.
+     *
+     * <p>The method constructs the key by appending ".label" to the name of
+     * the current instance (as returned by {@code name()}) and uses it to fetch the formatted text from the resource
+     * bundle.</p>
+     *
+     * @return A formatted label string corresponding to the key "{@code Component Name}.label" from the resource
+     *       bundle.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public String getLabel() {
+        return getFormattedTextAt(RESOURCE_BUNDLE, name() + ".label");
+    }
+
+    /**
+     * Retrieves the tooltip text for this phenotype.
+     *
+     * <p>The method constructs the key by appending ".tooltip" to the name of
+     * the current instance (as returned by {@code name()}) and uses it to fetch the formatted text from the resource
+     * bundle.</p>
+     *
+     * @return A formatted tooltip string corresponding to the key "{@code Component Name}.tooltip" from the resource
+     *       bundle.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public String getTooltip() {
+        return getFormattedTextAt(RESOURCE_BUNDLE, name() + ".tooltip");
+    }
     // endregion Getters
 
     // region Boolean Comparison Methods
+
     /**
      * Checks if the phenotype is MekWarrior.
      *
@@ -236,70 +332,122 @@ public enum Phenotype {
     /**
      * Retrieves a list of external phenotypes.
      *
-     * @return a {@link List} of {@link Phenotype} objects where {@code isExternal()} returns
-     * {@code true}.
+     * @return a {@link List} of {@link Phenotype} objects where {@code isExternal()} returns {@code true}.
      */
     public static List<Phenotype> getExternalPhenotypes() {
-        return Arrays.stream(values())
-                .filter(Phenotype::isExternal)
-                .collect(Collectors.toList());
+        List<Phenotype> externalPhenotypes = new ArrayList<>();
+
+        for (Phenotype phenotype : values()) {
+            if (phenotype.isExternal()) {
+                externalPhenotypes.add(phenotype);
+            }
+        }
+
+        return externalPhenotypes;
+    }
+
+    // region File I/O
+
+    /**
+     * @deprecated use {@link #fromString(String)} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public static Phenotype parseFromString(final String phenotype) {
+        return fromString(phenotype);
     }
 
     /**
-     * Parses a string representation of a {@link Phenotype} and returns the corresponding phenotype
-     * object.
-     * If the string cannot be parsed into a valid phenotype, returns {@code Phenotype.NONE}.
+     * Converts a string representation to a corresponding {@link Phenotype} value.
      *
-     * @param phenotype the string representation of the phenotype to parse
-     * @return the parsed phenotype
+     * <p>This method attempts to parse the input string and return the appropriate
+     * {@link Phenotype} instance using the following approaches:</p>
+     * <ol>
+     *     <li><b>By name:</b> Converts the input to uppercase, replaces spaces with underscores,
+     *         and tries to match it using {@link Phenotype#valueOf(String)}.</li>
+     *     <li><b>By label (short name):</b> Matches the input case-insensitively against
+     *         the short name of each {@link Phenotype}.</li>
+     *     <li><b>Legacy compatibility:</b> Matches certain input strings such as
+     *         {@code "MECHWARRIOR"} and {@code "PROTOMECH"} to their updated {@link Phenotype} equivalents.</li>
+     *     <li><b>By ordinal:</b> Parses the input as an integer and retrieves the
+     *         phenotype corresponding to the specified ordinal.</li>
+     * </ol>
+     *
+     * <p>If the input is {@code null} or none of the parsing approaches are successful,
+     * an error is logged, and the method defaults to returning {@link Phenotype#NONE}.</p>
+     *
+     * @param text The string representation to parse. Supported input formats include:
+     *             <ul>
+     *                 <li>The full name of the phenotype (case-insensitive, spaces allowed).</li>
+     *                 <li>The short name (label) of the phenotype (case-insensitive).</li>
+     *                 <li>Legacy names such as {@code "MECHWARRIOR"} or {@code "PROTOMECH"}.</li>
+     *                 <li>An ordinal value corresponding to the phenotype.</li>
+     *             </ul>
+     *
+     * @return The corresponding {@link Phenotype} instance for the given input, or {@link Phenotype#NONE} if the input
+     *       he input is invalid or {@code null}.
+     *
+     * @author Illiani
+     * @since 0.50.05
      */
-    // region File I/O
-    public static Phenotype parseFromString(final String phenotype) {
-        try {
-            return valueOf(phenotype);
-        } catch (Exception ignored) {}
-
-        try {
-            switch (Integer.parseInt(phenotype)) {
-                case 0:
-                    return NONE;
-                case 1:
-                    return MEKWARRIOR;
-                case 2:
-                    return ELEMENTAL;
-                case 3:
-                    return AEROSPACE;
-                case 4:
-                    return VEHICLE;
-                default:
-                    break;
-            }
-        } catch (Exception ignored) {}
-
-        // <50.1 compatibility
-        switch (phenotype) {
-            case "MECHWARRIOR" -> {
-                return MEKWARRIOR;
-            }
-            case "PROTOMECH" -> {
-                return PROTOMEK;
-            }
-            default -> {}
+    public static Phenotype fromString(String text) {
+        if (text == null || text.isBlank()) {
+            logger.error("Unable to parse text into a Phenotype. Returning NONE");
+            return NONE;
         }
 
-        MMLogger.create(Phenotype.class).error(
-                String.format("Unable to parse %s into a Phenotype. Returning NONE.", phenotype));
+        // Parse from name
+        try {
+            return Phenotype.valueOf(text.toUpperCase().replace(" ", "_"));
+        } catch (Exception ignored) {
+        }
+
+        // Parse from label
+        try {
+            for (Phenotype phenotype : Phenotype.values()) {
+                if (phenotype.getLabel().equalsIgnoreCase(text)) {
+                    return phenotype;
+                }
+            }
+        } catch (Exception ignored) {
+        }
+
+        // <50.1 compatibility
+        if (text.equalsIgnoreCase("MECHWARRIOR")) {
+            return MEKWARRIOR;
+        } else if (text.equalsIgnoreCase("PROTOMECH")) {
+            return PROTOMEK;
+        }
+
+        // Parse from ordinal
+        try {
+            return Phenotype.values()[MathUtility.parseInt(text, NONE.ordinal())];
+        } catch (Exception ignored) {
+        }
+
+        logger.error("Unable to parse {} into a Phenotype. Returning NONE", text);
         return NONE;
     }
     // endregion File I/O
 
     /**
-     * @return The string representation of a {@link Phenotype}.
-     *         If the phenotype is {@code None} or {@code General}, it returns short name.
-     *         Otherwise, it returns the short name followed by a space and group name.
+     * Returns a string representation of this phenotype.
+     *
+     * <p>The string is composed of the short name and, if the component is
+     * {@code trueborn}, the label is appended with a space separator. If the component is not {@code trueborn}, only
+     * the short name is included.
+     * </p>
+     *
+     * @return A string representation consisting of the short name and, if applicable, the label, formatted as:
+     *       <ul>
+     *           <li>{@code "<shortName> <label>"} if {@code trueborn} is {@code true}</li>
+     *           <li>{@code "<shortName>"} if {@code trueborn} is {@code false}</li>
+     *       </ul>
+     *
+     * @author Illiani
+     * @since 0.50.05
      */
     @Override
     public String toString() {
-        return (isNone() || isGeneral()) ? getShortName() : getShortName() + ' ' + getGroupingName();
+        return getShortName() + (isTrueborn ? ' ' + getLabel() : "");
     }
 }

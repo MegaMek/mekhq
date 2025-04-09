@@ -103,6 +103,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(getSkillPreferences());
         skillGenerator.generateSkills(campaign, person, expLvl);
+        skillGenerator.generateAttributes(person);
 
         // Limit skills by age for children and adolescents
         int age = person.getAge(campaign.getLocalDate());

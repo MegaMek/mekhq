@@ -65,7 +65,8 @@ public class StratconContractInitializer {
     /**
      * Initializes the campaign state given a contract, campaign and contract definition
      */
-    public static void initializeCampaignState(AtBContract contract, Campaign campaign, StratconContractDefinition contractDefinition) {
+    public static void initializeCampaignState(AtBContract contract, Campaign campaign,
+          StratconContractDefinition contractDefinition) {
         StratconCampaignState campaignState = new StratconCampaignState(contract);
         campaignState.setBriefingText(contractDefinition.getBriefing() +
                                             "<br/>" +
@@ -272,7 +273,7 @@ public class StratconContractInitializer {
             //
             //                    if (hiddenCache != null) {
             //                        logger.info(String.format("A secret cache has been spawned for contract %s",
-            //                            contract.getName()));
+            //                            contract.getLabel()));
             //                    }
             //                } else {
             //                    logger.error("'Chasing a Rumor' scenario failed to deserialize");
@@ -286,7 +287,8 @@ public class StratconContractInitializer {
     /**
      * Set up initial state of a track, dimensions are based on number of assigned lances.
      */
-    public static StratconTrackState initializeTrackState(int numLances, int scenarioOdds, int deploymentTime, int planetaryTemp) {
+    public static StratconTrackState initializeTrackState(int numLances, int scenarioOdds, int deploymentTime,
+          int planetaryTemp) {
         // to initialize a track,
         // 1. we set the # of required lances
         // 2. set the track size to a total of numlances * 28 hexes, a rectangle that is
@@ -350,7 +352,8 @@ public class StratconContractInitializer {
      * Avoids places with existing facilities and scenarios, capable of taking facility sub set and setting strategic
      * objective flag.
      */
-    private static void initializeTrackFacilities(StratconTrackState trackState, int numFacilities, ForceAlignment owner, boolean strategicObjective, List<String> modifiers) {
+    private static void initializeTrackFacilities(StratconTrackState trackState, int numFacilities,
+          ForceAlignment owner, boolean strategicObjective, List<String> modifiers) {
 
         int trackSize = trackState.getWidth() * trackState.getHeight();
 
@@ -424,7 +427,9 @@ public class StratconContractInitializer {
      * @param objectiveModifiers a list of optional {@link String} modifiers to apply to the generated scenarios; can be
      *                           {@code null} if no modifiers are required
      */
-    private static void initializeObjectiveScenarios(Campaign campaign, AtBContract contract, StratconTrackState trackState, int numScenarios, List<String> objectiveScenarios, List<String> objectiveModifiers) {
+    private static void initializeObjectiveScenarios(Campaign campaign, AtBContract contract,
+          StratconTrackState trackState, int numScenarios, List<String> objectiveScenarios,
+          List<String> objectiveModifiers) {
         // pick scenario from subset
         // place it on the map somewhere nothing else has been placed yet
         // if it's a facility scenario, place the facility
@@ -551,7 +556,8 @@ public class StratconContractInitializer {
      * @return a {@link StratconCoords} object representing the location of a suitable, unoccupied coordinate, or
      *       {@code null} if no valid coordinates are available
      */
-    public static @Nullable StratconCoords getUnoccupiedCoords(StratconTrackState trackState, boolean allowPlayerFacilities, boolean allowPlayerForces, boolean emphasizeStrategicTargets) {
+    public static @Nullable StratconCoords getUnoccupiedCoords(StratconTrackState trackState,
+          boolean allowPlayerFacilities, boolean allowPlayerForces, boolean emphasizeStrategicTargets) {
         final int trackHeight = trackState.getHeight();
         final int trackWidth = trackState.getWidth();
 
