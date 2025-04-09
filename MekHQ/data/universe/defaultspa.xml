@@ -464,7 +464,7 @@
     <ability>
         <lookupName>atow_alternate_id</lookupName>
         <displayName>Alternate ID (ATOW)</displayName>
-        <desc><![CDATA[A low Reputation trait infers a penalty to Negotiation, Streewise and Protocols skill checks. This SPA reduces that penalty by 2.
+        <desc><![CDATA[A low Reputation trait infers a penalty to Negotiation, Streetwise and Protocols skill checks. This SPA reduces that penalty by 2.
 
 While this SPA does exist in ATOW (and that's where you'll find its description), these effects are unique to MekHQ.]]></desc>
         <xpCost>200</xpCost>
