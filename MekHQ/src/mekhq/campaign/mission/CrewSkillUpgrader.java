@@ -40,7 +40,6 @@ import megamek.common.Entity;
 import megamek.common.UnitType;
 import megamek.common.WeaponType;
 import megamek.common.equipment.WeaponMounted;
-import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -207,25 +206,16 @@ public class CrewSkillUpgrader {
 
                         // If the option has a name but isn't defined, try another one
                         try {
-                            IOption option = entity.getCrew().getOptions().getOption(spa.getName());
-                            if (option == null) {
-                                PersonnelOptions personnelOptions = new PersonnelOptions();
-                                option = personnelOptions.getOption(spa.getName());
-
-                                if (option == null) {
-                                    // This means it isn't a MekHQ only SPA, so we need to log an error and then
-                                    // remove it from the pile
-                                    logger.error("Attempted to assign SPA '{}' but SPA not found.", spa.getName());
-                                    choices.remove(spaIndex);
-                                } else {
-                                    // This means it's a MekHQ only SPA, so it should be removed from the pile
-                                    choices.remove(spaIndex);
-                                }
-                            }
-
+                            entity.getCrew().getOptions().getOption(spa.getName()).setValue(true);
                             return spa.getCost();
                         } catch (NullPointerException e) {
-                            logger.error("An error occurred while trying to assign a special ability to an entity.", e);
+                            PersonnelOptions personnelOptions = new PersonnelOptions();
+                            // We don't want to show this warning if the SPA is a MekHQ-only SPA
+                            if (personnelOptions.getOption(spa.getName()) == null) {
+                                logger.warn("Attempted to assign SPA '{}' but SPA not found", spa.getName());
+                            }
+                            // Make sure to remove choices we can't use
+                            choices.remove(spaIndex);
                             continue;
                         }
                 }
