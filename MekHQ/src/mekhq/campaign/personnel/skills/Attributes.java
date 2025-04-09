@@ -33,6 +33,7 @@ import java.io.PrintWriter;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -117,7 +118,64 @@ public class Attributes {
         charisma = DEFAULT_ATTRIBUTE_SCORE;
     }
 
+    /**
+     * Constructs a new {@code Attributes} object with the specified attribute values.
+     *
+     * @param strength     the {@link SkillAttribute#STRENGTH} value of the character, representing physical power.
+     * @param body         the {@link SkillAttribute#BODY} value of the character, representing endurance and physical
+     *                     resilience.
+     * @param reflexes     the {@link SkillAttribute#REFLEXES} value of the character, representing reaction speed and
+     *                     agility.
+     * @param dexterity    the {@link SkillAttribute#DEXTERITY} value of the character, representing skillfulness and
+     *                     precision.
+     * @param intelligence the {@link SkillAttribute#INTELLIGENCE} value of the character, representing cognitive
+     *                     ability and reasoning.
+     * @param willpower    the {@link SkillAttribute#WILLPOWER} value of the character, representing mental strength and
+     *                     determination.
+     * @param charisma     the {@link SkillAttribute#CHARISMA} value of the character, representing persuasiveness and
+     *                     social skills.
+     *
+     * @author Illiani
+     * @since 0.50.5
+     */
+    public Attributes(int strength, int body, int reflexes, int dexterity, int intelligence, int willpower,
+          int charisma) {
+        this.strength = strength;
+        this.body = body;
+        this.reflexes = reflexes;
+        this.dexterity = dexterity;
+        this.intelligence = intelligence;
+        this.willpower = willpower;
+        this.charisma = charisma;
+    }
+
     // Getters and Setters
+
+    /**
+     * Retrieves the value of a specified attribute.
+     *
+     * <p>This method returns the score of the requested {@link SkillAttribute}.
+     * If the attribute does not match any of the defined attributes, the method returns {@code 0} as the default
+     * value.</p>
+     *
+     * @param attribute the {@link SkillAttribute} to retrieve the value for.
+     *
+     * @return the value of the specified attribute, or {@code 0} if the attribute is not valid or not recognized.
+     *
+     * @since 0.50.05
+     */
+    public int getAttribute(SkillAttribute attribute) {
+        return switch (attribute) {
+            case STRENGTH -> strength;
+            case BODY -> body;
+            case REFLEXES -> reflexes;
+            case DEXTERITY -> dexterity;
+            case INTELLIGENCE -> intelligence;
+            case WILLPOWER -> willpower;
+            case CHARISMA -> charisma;
+            default -> 0;
+        };
+    }
 
     /**
      * @return the current strength value.

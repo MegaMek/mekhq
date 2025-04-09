@@ -27,9 +27,9 @@
  */
 package mekhq.gui.dialog.resupplyAndCaches;
 
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.getEnemyFactionReference;
-import static mekhq.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.BorderLayout;

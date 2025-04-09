@@ -27,6 +27,7 @@
  */
 package mekhq.gui.stratcon;
 
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.scaleObjectiveTimeLimits;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
@@ -44,7 +45,6 @@ import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.REINFORCEME
 import static mekhq.campaign.utilities.CampaignTransportUtilities.getLeadershipDropdownVectorPair;
 import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerDescription;
 import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerIcon;
-import static mekhq.utilities.ImageUtilities.scaleImageIcon;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -143,7 +143,7 @@ public class StratconScenarioWizard extends JDialog {
      *                       </ul>
      */
     public void setCurrentScenario(StratconScenario scenario, StratconTrackState trackState,
-                                   StratconCampaignState campaignState, boolean isPrimaryForce) {
+          StratconCampaignState campaignState, boolean isPrimaryForce) {
         currentScenario = scenario;
         currentCampaignState = campaignState;
         currentTrackState = trackState;
@@ -481,7 +481,7 @@ public class StratconScenarioWizard extends JDialog {
      * Add an "available force list" to the given control
      */
     private JList<Force> addAvailableForceList(JPanel parent, GridBagConstraints gbc,
-                                               ScenarioForceTemplate forceTemplate) {
+          ScenarioForceTemplate forceTemplate) {
         JScrollPane forceListContainer = new JScrollPaneWithSpeed();
 
         ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign,
@@ -514,7 +514,7 @@ public class StratconScenarioWizard extends JDialog {
      * @return A JList of units that can be selected.
      */
     private JList<Unit> addIndividualUnitSelector(List<Unit> units, GridBagConstraints gridBagConstraints,
-                                                  int maxSelectionSize, boolean usesBV) {
+          int maxSelectionSize, boolean usesBV) {
         // Create the panel for the individual unit selector
         JPanel unitPanel = new JPanel();
         unitPanel.setLayout(new GridBagLayout());
@@ -949,7 +949,7 @@ public class StratconScenarioWizard extends JDialog {
      *                                  {@code false} otherwise.
      */
     private void btnCommitClicked(ActionEvent evt, @Nullable Integer reinforcementTargetNumber,
-                                  boolean isGMReinforcement) {
+          boolean isGMReinforcement) {
         if (parent != null) {
             parent.setCommitForces(true);
         }
@@ -1097,7 +1097,7 @@ public class StratconScenarioWizard extends JDialog {
      *                            selected items, {@code false}
      */
     private void availableUnitSelectorChanged(ListSelectionEvent event, JLabel selectionCountLabel,
-                                              JLabel unitStatusLabel, int maxSelectionSize, boolean usesBV) {
+          JLabel unitStatusLabel, int maxSelectionSize, boolean usesBV) {
         if (!(event.getSource() instanceof JList<?>)) {
             return;
         }
@@ -1166,7 +1166,7 @@ public class StratconScenarioWizard extends JDialog {
     }
 
     private void selectTransportedUnitsAndTransport(CampaignTransportType campaignTransportType, Unit unit,
-                                                    JList<Unit> changedList) {
+          JList<Unit> changedList) {
         if (campaignTransportType != null) {
             if (unit.hasTransportedUnits(campaignTransportType)) {
                 Set<Unit> potentialTransportedUnits = unit.getTransportedUnits(campaignTransportType);

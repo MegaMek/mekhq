@@ -66,12 +66,12 @@ import org.w3c.dom.NodeList;
  * <p>
  * target - this is the baseline target number for the skill when level and bonus are zero.
  * <p>
- * countUp - this is a boolean that defines whether this skill's target is a "roll greater than or equal to" (false) or
- * an rpg-style bonus to a roll (true)
+ * isCountUp - this is a boolean that defines whether this skill's target is a "roll greater than or equal to" (false)
+ * or an rpg-style bonus to a roll (true)
  * <p>
  * The actual target number for a skill is given by
  * <p>
- * countUp: target + lvl + bonus !countUp: target - level - bonus
+ * isCountUp: target + lvl + bonus !isCountUp: target - level - bonus
  * <p>
  * by clever manipulation of these values and skill costs in campaignOptions, players should be able to recreate any of
  * the rpg versions or their own homebrew system. The default setup will follow the core rule books (not aToW).
@@ -79,8 +79,8 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Skill {
-    private static int COUNT_UP_MAX_VALUE = 10;
-    private static int COUNT_DOWN_MIN_VALUE = 0;
+    public static int COUNT_UP_MAX_VALUE = 10;
+    public static int COUNT_DOWN_MIN_VALUE = 0;
 
     private static final MMLogger logger = MMLogger.create(Skill.class);
 
@@ -137,7 +137,7 @@ public class Skill {
      * @return {@code true} if the progression type is "count up", {@code false} otherwise.
      */
     private boolean isCountUp() {
-        return type.countUp();
+        return type.isCountUp();
     }
 
     /**

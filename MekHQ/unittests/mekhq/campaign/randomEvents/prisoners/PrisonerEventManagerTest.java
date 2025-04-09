@@ -27,6 +27,7 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
+import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
@@ -34,6 +35,7 @@ import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.TEMPORARY_CAPACITY_DEGRADE_RATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -78,11 +80,13 @@ public class PrisonerEventManagerTest {
         // Act
         int actualValue = eventManager.degradeTemporaryCapacity();
 
-        int degreeOfChange = (int) round(INITIAL_TEMPORARY_CAPACITY * TEMPORARY_CAPACITY_DEGRADE_RATE);
+        int differendInTemporaryCapacity = abs(DEFAULT_TEMPORARY_CAPACITY-INITIAL_TEMPORARY_CAPACITY);
+        int degreeOfChange = (int) max(1,round(differendInTemporaryCapacity * TEMPORARY_CAPACITY_DEGRADE_RATE));
         int expectedValue = max(DEFAULT_TEMPORARY_CAPACITY, INITIAL_TEMPORARY_CAPACITY - degreeOfChange);
 
         // Assert
         assertEquals(expectedValue, actualValue);
+        assertNotEquals(INITIAL_TEMPORARY_CAPACITY, actualValue);
     }
 
     @Test
@@ -107,6 +111,7 @@ public class PrisonerEventManagerTest {
 
         // Assert
         assertEquals(expectedValue, actualValue);
+        assertNotEquals(INITIAL_TEMPORARY_CAPACITY, actualValue);
     }
 
     @Test
@@ -128,11 +133,13 @@ public class PrisonerEventManagerTest {
         // Act
         int actualValue = eventManager.degradeTemporaryCapacity();
 
-        int degreeOfChange = (int) round(INITIAL_TEMPORARY_CAPACITY * TEMPORARY_CAPACITY_DEGRADE_RATE);
+        int differendInTemporaryCapacity = abs(DEFAULT_TEMPORARY_CAPACITY-INITIAL_TEMPORARY_CAPACITY);
+        int degreeOfChange = (int) max(1,round(differendInTemporaryCapacity * TEMPORARY_CAPACITY_DEGRADE_RATE));
         int expectedValue = min(DEFAULT_TEMPORARY_CAPACITY, INITIAL_TEMPORARY_CAPACITY + degreeOfChange);
 
         // Assert
         assertEquals(expectedValue, actualValue);
+        assertNotEquals(INITIAL_TEMPORARY_CAPACITY, actualValue);
     }
 
     @Test
@@ -157,6 +164,7 @@ public class PrisonerEventManagerTest {
 
         // Assert
         assertEquals(expectedValue, actualValue);
+        assertNotEquals(INITIAL_TEMPORARY_CAPACITY, actualValue);
     }
 
     @Test
