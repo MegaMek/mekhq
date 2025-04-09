@@ -28,6 +28,7 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
@@ -49,8 +50,8 @@ import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
@@ -195,6 +196,7 @@ public class PersonnelTab {
     private JPanel prisonerPanel;
     private JLabel lblPrisonerCaptureStyle;
     private MMComboBox<PrisonerCaptureStyle> comboPrisonerCaptureStyle;
+    private JCheckBox chkResetTemporaryPrisonerCapacity;
 
     private JPanel dependentsPanel;
     private JCheckBox chkUseRandomDependentAddition;
@@ -276,6 +278,7 @@ public class PersonnelTab {
         prisonerPanel = new JPanel();
         lblPrisonerCaptureStyle = new JLabel();
         comboPrisonerCaptureStyle = new MMComboBox<>("comboPrisonerCaptureStyle", PrisonerCaptureStyle.values());
+        chkResetTemporaryPrisonerCapacity = new JCheckBox();
 
         dependentsPanel = new JPanel();
         chkUseRandomDependentAddition = new JCheckBox();
@@ -673,7 +676,7 @@ public class PersonnelTab {
         comboAwardBonusStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
-                                                          final boolean isSelected, final boolean cellHasFocus) {
+                  final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof AwardBonus) {
                     list.setToolTipText(((AwardBonus) value).getToolTipText());
@@ -1054,7 +1057,7 @@ public class PersonnelTab {
         comboPrisonerCaptureStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
-                                                          final boolean isSelected, final boolean cellHasFocus) {
+                  final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PrisonerCaptureStyle) {
                     list.setToolTipText(wordWrap(((PrisonerCaptureStyle) value).getTooltip()));
@@ -1062,6 +1065,8 @@ public class PersonnelTab {
                 return this;
             }
         });
+
+        chkResetTemporaryPrisonerCapacity = new CampaignOptionsCheckBox("ResetTemporaryPrisonerCapacity");
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PrisonersPanel", true, "PrisonersPanel");
@@ -1073,6 +1078,11 @@ public class PersonnelTab {
         panel.add(lblPrisonerCaptureStyle, layout);
         layout.gridx++;
         panel.add(comboPrisonerCaptureStyle, layout);
+
+        layout.gridy++;
+        layout.gridx = 0;
+        layout.gridwidth = 2;
+        panel.add(chkResetTemporaryPrisonerCapacity, layout);
 
         return panel;
     }
@@ -1455,9 +1465,10 @@ public class PersonnelTab {
      * Applies the modified personnel tab settings to the repository's campaign options. If no preset
      * {@link CampaignOptions} is provided, the changes are applied to the current options.
      *
+     * @param campaign              the {@link Campaign} object, representing the current campaign state.
      * @param presetCampaignOptions optional custom {@link CampaignOptions} to apply changes to.
      */
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+    public void applyCampaignOptionsToCampaign(Campaign campaign, @Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -1534,6 +1545,9 @@ public class PersonnelTab {
 
         // Prisoners and Dependents
         options.setPrisonerCaptureStyle(comboPrisonerCaptureStyle.getSelectedItem());
+        if (chkResetTemporaryPrisonerCapacity.isSelected()) {
+            campaign.setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
+        }
         options.setUseRandomDependentAddition(chkUseRandomDependentAddition.isSelected());
         options.setUseRandomDependentRemoval(chkUseRandomDependentRemoval.isSelected());
 
