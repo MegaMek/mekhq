@@ -5274,14 +5274,102 @@ public class Person {
                      injuries.stream().anyMatch(injury -> (injury.getTime() > 0) || !injury.isPermanent());
     }
 
-    public int getPilotingInjuryMod() {
-        return Modifier.calcTotalModifier(injuries.stream().flatMap(injury -> injury.getModifiers().stream()),
-              ModifierValue.PILOTING);
+    /**
+     * Calculates the total injury modifier for the pilot, based on the character's injuries and ambidextrous trait (if
+     * present). This modifier can apply to either piloting or gunnery checks depending on the input parameter.
+     *
+     * <p>This method examines all injuries and their associated modifiers, distinguishing between left-side and
+     * right-side injuries if the character is ambidextrous, and the injury implies a missing body location. If the
+     * character is not ambidextrous, all modifiers are considered uniformly.</p>
+     *
+     * <p>The method performs the following steps:</p>
+     * <ul>
+     *    <li>If the character is ambidextrous and the injury implies a missing location:
+     *        <ul>
+     *            <li>Classifies injuries into left-side or right-side based on their body location.</li>
+     *            <li>Adds associated modifiers to separate lists for left-side and right-side injuries.</li>
+     *            <li>If injuries are only present on one side, the modifiers for the opposite side are removed.</li>
+     *        </ul>
+     *    </li>
+     *    <li>If the character is not ambidextrous or the injury does not imply a missing body location all modifiers
+     *    from all injuries are included without distinguishing between left and right sides.</li>
+     * </ul>
+     *
+     * <p>After processing the injuries, the method calculates the total injury modifier by summing up the relevant
+     * modifier values, taking into account whether the modifier applies to piloting or gunnery checks.</p>
+     *
+     * @param isPiloting A boolean value indicating whether the modifier calculation is for piloting checks
+     *                   ({@code true}) or gunnery checks ({@code false}).
+     *
+     * @return The total injury modifier calculated from the character's injuries, specific to piloting or gunnery.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public int getInjuryModifiers(boolean isPiloting) {
+        boolean isAmbidextrous = options.booleanOption(ATOW_AMBIDEXTROUS);
+
+        List<Modifier> leftSideModifiers = new ArrayList<>();
+        List<Modifier> rightSideModifiers = new ArrayList<>();
+
+        List<Modifier> allModifiers = new ArrayList<>();
+        for (Injury injury : injuries) {
+            boolean isLeftSide = false;
+            boolean isRightSide = false;
+            if (isAmbidextrous && injury.getType().impliesMissingLocation()) {
+                BodyLocation location = injury.getLocation();
+                if (location.isLimb()) {
+                    if (location == BodyLocation.LEFT_ARM || location == BodyLocation.LEFT_HAND) {
+                        isLeftSide = true;
+                    } else if (location == BodyLocation.RIGHT_ARM || location == BodyLocation.RIGHT_HAND) {
+                        isRightSide = true;
+                    }
+                }
+            }
+
+            for (Modifier modifier : injury.getModifiers()) {
+                if (isAmbidextrous) {
+                    if (isLeftSide) {
+                        leftSideModifiers.add(modifier);
+                    }
+
+                    if (isRightSide) {
+                        rightSideModifiers.add(modifier);
+                    }
+                }
+
+                allModifiers.add(modifier);
+            }
+        }
+
+        if (isAmbidextrous) {
+            if (leftSideModifiers.isEmpty() && !rightSideModifiers.isEmpty()) {
+                allModifiers.removeAll(rightSideModifiers);
+            }
+
+            if (rightSideModifiers.isEmpty() && !leftSideModifiers.isEmpty()) {
+                allModifiers.removeAll(leftSideModifiers);
+            }
+        }
+
+        return Modifier.calcTotalModifier(allModifiers.stream(),
+              isPiloting ? ModifierValue.PILOTING : ModifierValue.GUNNERY);
     }
 
+    /**
+     * @deprecated use {@link #getInjuryModifiers(boolean)} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public int getPilotingInjuryMod() {
+        return getInjuryModifiers(true);
+    }
+
+    /**
+     * @deprecated use {@link #getInjuryModifiers(boolean)} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public int getGunneryInjuryMod() {
-        return Modifier.calcTotalModifier(injuries.stream().flatMap(injury -> injury.getModifiers().stream()),
-              ModifierValue.GUNNERY);
+        return getInjuryModifiers(false);
     }
 
     public boolean hasInjuries(final boolean permanentCheck) {

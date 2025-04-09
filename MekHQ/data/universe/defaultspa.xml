@@ -492,8 +492,8 @@ While this SPA does exist in ATOW (and that's where you'll find its description)
     <ability>
         <lookupName>atow_ambidextrous</lookupName>
         <displayName>Ambidextrous (ATOW)</displayName>
-        <desc><![CDATA[No mechanical benefits.]]></desc>
-        <xpCost>0</xpCost>
+        <desc><![CDATA[Removes the penalties from a single missing arm or hand (Advanced Medical only).]]></desc>
+        <xpCost>200</xpCost>
         <weight>1</weight>
         <skillPrereq/>
         <removeAbilities>flaw_animal_antipathy</removeAbilities>
@@ -528,7 +528,7 @@ While this SPA does exist in ATOW (and that's where you'll find its description)
     <ability>
         <lookupName>atow_fit</lookupName>
         <displayName>Fit (ATOW)</displayName>
-        <desc><![CDATA[Halves all Fatigue gain (rounding down).]]></desc>
+        <desc><![CDATA[Half all Fatigue gained (rounding down).]]></desc>
         <xpCost>200</xpCost>
         <weight>1</weight>
         <skillPrereq/>
@@ -598,25 +598,38 @@ While this SPA does exist in ATOW (and that's where you'll find its description)
         <removeAbilities>atow_patient</removeAbilities>
     </ability>
     <ability>
+        <lookupName>atow_patient</lookupName>
+        <displayName>Patient (ATOW:Companion)</displayName>
+        <desc><![CDATA[The Target Number of Art/Any, Cryptography, Demolitions, Investigation, Protocols, Security Systems/Any, Strategy, Tactics and Training checks is decreased by 1.]]></desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>flaw_impatient</removeAbilities>
+    </ability>
+    <ability>
         <lookupName>flaw_transit_disorientation_syndrome</lookupName>
         <displayName>Transit Disorientation Syndrome (ATOW)</displayName>
-        <desc><![CDATA[Is violently ill following a hyperspace jump. No mechanical effects.]]></desc>
+        <desc><![CDATA[Is violently ill following a hyperspace jump.
+
+They increase the Target Number of Piloting and Gunnery checks by 1 for 48 hours following the jump (Advanced Medical only).
+
+They also gain Fatigue based on the campaign options fatigue rate (default 1).]]></desc>
         <xpCost>-100</xpCost>
         <weight>1</weight>
         <skillPrereq/>
     </ability>
     <ability>
         <lookupName>mutation_freakish_strength</lookupName>
-        <displayName>Freakish Strength (ATOW)</displayName>
+        <displayName>Freakish Strength (ATOW:Companion)</displayName>
         <desc><![CDATA[Increases Strength Attribute by 2 (may not take it above 10). Unattractive requirement is due to inhumanly shaped bulk.]]></desc>
-        <xpCost>100</xpCost>
+        <xpCost>500</xpCost>
         <weight>1</weight>
         <skillPrereq/>
         <prereqAbilities>flaw_unattractive</prereqAbilities>
     </ability>
     <ability>
         <lookupName>mutation_exceptional_immune_system</lookupName>
-        <displayName>Exceptional Immune System (ATOW)</displayName>
+        <displayName>Exceptional Immune System (ATOW:Companion)</displayName>
         <desc><![CDATA[Recover from injuries at twice the normal rate (Advanced Medical only).]]></desc>
         <xpCost>200</xpCost>
         <weight>1</weight>
@@ -624,7 +637,7 @@ While this SPA does exist in ATOW (and that's where you'll find its description)
     </ability>
     <ability>
         <lookupName>mutation_exotic_appearance</lookupName>
-        <displayName>Exotic (Yet Pleasing) Appearance (ATOW)</displayName>
+        <displayName>Exotic (Yet Pleasing) Appearance (ATOW:Companion)</displayName>
         <desc><![CDATA[Increases Charisma Attribute by 1 (may not take it above 10).]]></desc>
         <xpCost>100</xpCost>
         <weight>1</weight>
@@ -632,7 +645,7 @@ While this SPA does exist in ATOW (and that's where you'll find its description)
     </ability>
     <ability>
         <lookupName>mutation_facial_hair</lookupName>
-        <displayName>Extremely Excess Facial Hair (ATOW)</displayName>
+        <displayName>Extremely Excess Facial Hair (ATOW:Companion)</displayName>
         <desc><![CDATA[Decreases Charisma Attribute by 1 (may not take it below 1).]]></desc>
         <xpCost>-100</xpCost>
         <weight>1</weight>
@@ -640,29 +653,20 @@ While this SPA does exist in ATOW (and that's where you'll find its description)
     </ability>
     <ability>
         <lookupName>mutation_serious_disfigurement</lookupName>
-        <displayName>Serious Disfigurement (ATOW)</displayName>
+        <displayName>Serious Disfigurement (ATOW:Companion)</displayName>
         <desc><![CDATA[Decreases Charisma Attribute by 3 (may not take it below 1).]]></desc>
-        <xpCost>-200</xpCost>
+        <xpCost>-400</xpCost>
         <weight>1</weight>
         <skillPrereq/>
     </ability>
     <ability>
         <lookupName>mutation_cat_girl</lookupName>
-        <displayName>Functional Tail and Mobile Ears (ATOW)</displayName>
+        <displayName>Functional Tail and Mobile Ears (ATOW:Companion)</displayName>
         <desc><![CDATA[Decreases Charisma Attribute by 3 (may not take it below 1).]]></desc>
         <xpCost>-400</xpCost>
         <weight>1</weight>
         <skillPrereq/>
         <prereqAbilities>atow_good_hearing</prereqAbilities>
-    </ability>
-    <ability>
-        <lookupName>atow_patient</lookupName>
-        <displayName>Patient (ATOW)</displayName>
-        <desc><![CDATA[The Target Number of Art/Any, Cryptography, Demolitions, Investigation, Protocols, Security Systems/Any, Strategy, Tactics and Training checks is decreased by 1.]]></desc>
-        <xpCost>100</xpCost>
-        <weight>1</weight>
-        <skillPrereq/>
-        <removeAbilities>flaw_impatient</removeAbilities>
     </ability>
     <ability>
         <lookupName>flaw_gremlins</lookupName>
@@ -707,7 +711,7 @@ Mechanically, this offers few benefits; however, the character will be completel
     <ability>
         <lookupName>flaw_glass_jaw</lookupName>
         <displayName>Glass Jaw (ATOW)</displayName>
-        <desc>All injuries suffered and fatigue gained is doubled. Fatigue gain from sustaining injuries is not doubled.</desc>
+        <desc><![CDATA[All injuries suffered and fatigue gained is doubled. Fatigue gain from sustaining injuries is not doubled.]]></desc>
         <xpCost>-300</xpCost>
         <weight>1</weight>
         <skillPrereq/>
@@ -716,7 +720,7 @@ Mechanically, this offers few benefits; however, the character will be completel
     <ability>
         <lookupName>atow_toughness</lookupName>
         <displayName>Toughness (ATOW)</displayName>
-        <desc>All injuries suffered are reduced by 75% and Fatigue gain is halved. Fatigue gain from sustaining injuries is not halved.</desc>
+        <desc><![CDATA[All injuries suffered are reduced by 25% and Fatigue gain is halved. Fatigue gain from sustaining injuries is not halved.]]></desc>
         <xpCost>300</xpCost>
         <weight>1</weight>
         <skillPrereq/>
@@ -725,10 +729,9 @@ Mechanically, this offers few benefits; however, the character will be completel
     <ability>
         <lookupName>flaw_slow_learner</lookupName>
         <displayName>Slow Learner (ATOW)</displayName>
-        <desc>Increases the cost of purchasing and improving Skills by 20% (rounded normally).
+        <desc><![CDATA[Increases the cost of purchasing and improving Skills by 20% (rounded normally).
 
-If XP adjustments from a high or low Reasoning are enabled, those adjustments are additive. So 20% increase from this SPA and a 5% decrease from Reasoning would equal a 15% increase.
-        </desc>
+If XP adjustments from a high or low Reasoning are enabled, those adjustments are additive. So 20% increase from this SPA and a 5% decrease from Reasoning would equal a 15% increase.]]></desc>
         <xpCost>-300</xpCost>
         <weight>1</weight>
         <skillPrereq/>
@@ -737,10 +740,9 @@ If XP adjustments from a high or low Reasoning are enabled, those adjustments ar
     <ability>
         <lookupName>atow_fast_learner</lookupName>
         <displayName>Fast Learner (ATOW)</displayName>
-        <desc>Decreases the cost of purchasing and improving Skills by 20% (rounded normally).
+        <desc><![CDATA[Decreases the cost of purchasing and improving Skills by 20% (rounded normally).
 
-If XP adjustments from a high or low Reasoning are enabled, those adjustments are additive. So 20% decrease from this SPA and a 5% increase from Reasoning would equal a 15% decrease.
-        </desc>
+If XP adjustments from a high or low Reasoning are enabled, those adjustments are additive. So 20% decrease from this SPA and a 5% increase from Reasoning would equal a 15% decrease.]]></desc>
         <xpCost>300</xpCost>
         <weight>1</weight>
         <skillPrereq/>
