@@ -38,6 +38,8 @@ import megamek.client.ratgenerator.ModelRecord;
 import megamek.client.ratgenerator.Parameters;
 import megamek.common.EntityMovementMode;
 import megamek.common.MekSummary;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 
 /**
@@ -46,7 +48,9 @@ import mekhq.campaign.mission.AtBDynamicScenarioFactory;
  *
  * @author NickAragua
  */
-public class UnitGeneratorParameters {
+public class UnitGeneratorParameters implements Cloneable {
+    private static final MMLogger logger = MMLogger.create(UnitGeneratorParameters.class);
+
     private String faction;
     private int unitType;
     private int weightClass;
@@ -65,7 +69,7 @@ public class UnitGeneratorParameters {
      * Thorough deep clone of this generator parameters object.
      */
     @Override
-    public UnitGeneratorParameters clone() {
+    public @Nullable UnitGeneratorParameters clone() {
         try {
             UnitGeneratorParameters unitGeneratorParameters = (UnitGeneratorParameters) super.clone();
             unitGeneratorParameters.setFaction(faction);
@@ -79,12 +83,14 @@ public class UnitGeneratorParameters {
 
             unitGeneratorParameters.setMovementModes(newModes);
 
-            for (MissionRole missionRole : missionRoles) {
+            // We need a separate copy of the missionRoles collection to avoid concurrent modification
+            for (MissionRole missionRole : new ArrayList<>(missionRoles)) {
                 unitGeneratorParameters.addMissionRole(missionRole);
             }
 
             return unitGeneratorParameters;
         } catch (CloneNotSupportedException e) {
+            logger.error("Failed to clone UnitGeneratorParameters. State of the object: {}", this, e);
             return null;
         }
     }
@@ -193,5 +199,27 @@ public class UnitGeneratorParameters {
 
     public void setFilter(Predicate<MekSummary> filter) {
         this.filter = filter;
+    }
+
+    @Override
+    public String toString() {
+        return "UnitGeneratorParameters{" +
+                     "faction=" +
+                     faction +
+                     ", unitType=" +
+                     unitType +
+                     ", weightClass=" +
+                     weightClass +
+                     ", year=" +
+                     year +
+                     ", quality=" +
+                     quality +
+                     ", filter=" +
+                     filter +
+                     ", movementModes=" +
+                     movementModes +
+                     ", missionRoles=" +
+                     missionRoles +
+                     '}';
     }
 }
