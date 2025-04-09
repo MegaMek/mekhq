@@ -28,7 +28,10 @@
 package mekhq.campaign.personnel.skills;
 
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_FAST_LEARNER;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_SLOW_LEARNER;
 import static mekhq.campaign.personnel.skills.enums.AgingMilestone.CLAN_REPUTATION_MULTIPLIER;
 import static mekhq.campaign.personnel.skills.enums.AgingMilestone.NONE;
 import static mekhq.campaign.personnel.skills.enums.AgingMilestone.STAR_CAPTAIN_RANK_INDEX;
@@ -264,19 +267,25 @@ public class Aging {
                 // Glass Jaw
                 if (milestone.isGlassJaw()) {
                     boolean hasGlassJaw = options.booleanOption(FLAW_GLASS_JAW);
-                    if (!hasGlassJaw) {
-                        options.acquireAbility(LVL3_ADVANTAGES, FLAW_GLASS_JAW, true);
-                    }
+                    boolean hasToughness = options.booleanOption(ATOW_TOUGHNESS);
 
-                    boolean hasToughness = options.booleanOption("atow_toughness");
                     if (hasToughness) {
-                        person.getOptions().getOption("atow_toughness").setValue(false);
+                        person.getOptions().getOption(ATOW_TOUGHNESS).setValue(false);
+                    } else if (!hasGlassJaw) {
+                        options.acquireAbility(LVL3_ADVANTAGES, FLAW_GLASS_JAW, true);
                     }
                 }
 
                 // Slow Learner
                 if (milestone.isSlowLearner()) {
-                    // TODO this is where we'd give the character Slow Learner, once that's implemented.
+                    boolean hasSlowLearner = options.booleanOption(FLAW_SLOW_LEARNER);
+                    boolean hasFastLearner = options.booleanOption(ATOW_FAST_LEARNER);
+
+                    if (hasFastLearner) {
+                        person.getOptions().getOption(ATOW_FAST_LEARNER).setValue(false);
+                    } else if (!hasSlowLearner) {
+                        options.acquireAbility(LVL3_ADVANTAGES, FLAW_SLOW_LEARNER, true);
+                    }
                 }
 
                 break;
