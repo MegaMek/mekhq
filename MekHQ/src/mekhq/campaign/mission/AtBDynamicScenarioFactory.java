@@ -1248,9 +1248,6 @@ public class AtBDynamicScenarioFactory {
      * classified as artillery. If any entity in the force doesn't have an artillery weapon, the entire force is moved
      * on-board, as forces cannot be split between on-board and off-board deployments.</p>
      *
-     * @param forceTemplate     The {@link ScenarioForceTemplate} representing the current force's deployment
-     *                          configuration. If the force lacks artillery weapons, its off-board deployment setting
-     *                          will be disabled.
      * @param generatedEntities A list of {@link Entity} objects representing the units generated for the force. Each
      *                          entity and its weapon list will be checked for artillery capability.
      *
