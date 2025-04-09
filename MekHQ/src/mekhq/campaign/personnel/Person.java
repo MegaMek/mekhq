@@ -33,6 +33,8 @@ import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_FAST_LEARNER;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_SLOW_LEARNER;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 
@@ -4055,6 +4057,14 @@ public class Person {
                          SkillType.getType(skillName).getCost(0);
 
         double multiplier = getReasoningXpCostMultiplier(useReasoning);
+
+        if (options.booleanOption(FLAW_SLOW_LEARNER)) {
+            multiplier += 0.2;
+        }
+
+        if (options.booleanOption(ATOW_FAST_LEARNER)) {
+            multiplier -= 0.2;
+        }
 
         return (int) round(cost * multiplier);
     }

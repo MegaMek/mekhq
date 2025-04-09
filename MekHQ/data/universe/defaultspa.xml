@@ -470,6 +470,30 @@
         <skillPrereq/>
     </ability>
     <ability>
+        <lookupName>flaw_slow_learner</lookupName>
+        <displayName>Slow Learner (ATOW)</displayName>
+        <desc>Increases the cost of purchasing and improving Skills by 20% (rounded normally).
+
+If XP adjustments from a high or low Reasoning are enabled, those adjustments are additive. So 20% increase from this SPA and a 5% decrease from Reasoning would equal a 15% increase.
+        </desc>
+        <xpCost>-300</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>atow_fast_learner</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>atow_fast_learner</lookupName>
+        <displayName>Fast Learner (ATOW)</displayName>
+        <desc>Decreases the cost of purchasing and improving Skills by 20% (rounded normally).
+
+If XP adjustments from a high or low Reasoning are enabled, those adjustments are additive. So 20% decrease from this SPA and a 5% increase from Reasoning would equal a 15% decrease.
+        </desc>
+        <xpCost>300</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>flaw_slow_learner</removeAbilities>
+    </ability>
+    <ability>
         <lookupName>eagle_eyes</lookupName>
         <xpCost>100</xpCost>
         <weight>2</weight>
