@@ -667,6 +667,16 @@ They also gain Fatigue based on the campaign options fatigue rate (default 1).]]
         <weight>1</weight>
         <skillPrereq/>
         <prereqAbilities>atow_good_hearing</prereqAbilities>
+        <invalidAbilities>mutation_cat_girl_unofficial</invalidAbilities>
+    </ability>
+    <ability>
+        <lookupName>mutation_cat_girl_unofficial</lookupName>
+        <displayName>Functional Tail and Mobile Ears (Unofficial)</displayName>
+        <desc><![CDATA[Increases Charisma Attribute by 1 (may not take it above 10).]]></desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <invalidAbilities>mutation_cat_girl</invalidAbilities>
     </ability>
     <ability>
         <lookupName>flaw_gremlins</lookupName>

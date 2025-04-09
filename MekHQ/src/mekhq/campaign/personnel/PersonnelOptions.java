@@ -93,6 +93,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String MUTATION_FACIAL_HAIR = "mutation_facial_hair";
     public static final String MUTATION_SERIOUS_DISFIGUREMENT = "mutation_serious_disfigurement";
     public static final String MUTATION_CAT_GIRL = "mutation_cat_girl";
+    public static final String MUTATION_CAT_GIRL_UNOFFICIAL = "mutation_cat_girl_unofficial";
 
     @Override
     public void initialize() {
@@ -167,6 +168,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, MUTATION_FACIAL_HAIR, false);
         addOption(l3a, MUTATION_SERIOUS_DISFIGUREMENT, false);
         addOption(l3a, MUTATION_CAT_GIRL, false);
+        addOption(l3a, MUTATION_CAT_GIRL_UNOFFICIAL, false);
 
         addOption(edge, EDGE_MEDICAL, true);
         addOption(edge, EDGE_REPAIR_BREAK_PART, true);

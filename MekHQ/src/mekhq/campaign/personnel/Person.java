@@ -5101,6 +5101,7 @@ public class Person {
         boolean hasFacialHair = options.booleanOption(MUTATION_FACIAL_HAIR);
         boolean hasSeriousDisfigurement = options.booleanOption(MUTATION_SERIOUS_DISFIGUREMENT);
         boolean isCatGirl = options.booleanOption(MUTATION_CAT_GIRL);
+        boolean isCatGirlUnofficial = options.booleanOption(MUTATION_CAT_GIRL_UNOFFICIAL);
 
         return switch (attribute) {
             case NONE -> 0;
@@ -5118,11 +5119,14 @@ public class Person {
             case WILLPOWER -> atowAttributes.getWillpower();
             case CHARISMA -> {
                 int attributeScore = atowAttributes.getCharisma();
+                if (isCatGirlUnofficial) {
+                    attributeScore++;
+                }
                 if (hasExoticAppearance) {
-                    attributeScore += 1;
+                    attributeScore++;
                 }
                 if (hasFacialHair) {
-                    attributeScore -= 1;
+                    attributeScore--;
                 }
                 if (hasSeriousDisfigurement) {
                     attributeScore -= 3;
