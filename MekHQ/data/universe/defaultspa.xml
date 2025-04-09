@@ -707,10 +707,20 @@ Mechanically, this offers few benefits; however, the character will be completel
     <ability>
         <lookupName>flaw_glass_jaw</lookupName>
         <displayName>Glass Jaw (ATOW)</displayName>
-        <desc>All injuries suffered and fatigue gained is doubled</desc>
+        <desc>All injuries suffered and fatigue gained is doubled. Fatigue gain from sustaining injuries is not doubled.</desc>
         <xpCost>-300</xpCost>
         <weight>1</weight>
         <skillPrereq/>
+        <removeAbilities>atow_toughness</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>atow_toughness</lookupName>
+        <displayName>Toughness (ATOW)</displayName>
+        <desc>All injuries suffered are reduced by 75% and Fatigue gain is halved. Fatigue gain from sustaining injuries is not halved.</desc>
+        <xpCost>300</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>flaw_glass_jaw</removeAbilities>
     </ability>
     <ability>
         <lookupName>flaw_slow_learner</lookupName>
