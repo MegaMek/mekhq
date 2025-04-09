@@ -27,8 +27,8 @@
  */
 package mekhq.gui.campaignOptions;
 
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
-import static mekhq.utilities.ImageUtilities.scaleImageIcon;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -125,7 +125,7 @@ public class SelectPresetDialog extends JDialog {
         DefaultListCellRenderer listRenderer = new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
-                                                          boolean cellHasFocus) {
+                  boolean cellHasFocus) {
                 if (value instanceof CampaignPreset preset) {
                     setText(preset.getTitle());
                 }

@@ -45,7 +45,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * It makes use of some short names to make it easier to use since it is used in many places
  */
 public class MHQInternationalization {
-    private static String MISSING_RESOURCE_TAG = "!";
+    private static final String MISSING_RESOURCE_TAG = "!";
 
     private final String defaultBundle;
     private final ConcurrentHashMap<String, ResourceBundle> resourceBundles = new ConcurrentHashMap<>();

@@ -4326,6 +4326,7 @@ public class Campaign implements ITechManager {
                                  (partWork.getUnit().getEntity() instanceof Jumpship))) {
                     helpMod = 0;
                 }
+
                 if (partWork.getShorthandedMod() < helpMod) {
                     partWork.setShorthandedMod(helpMod);
                 }
@@ -4346,10 +4347,7 @@ public class Campaign implements ITechManager {
                     }
                 } else {
                     report += " cannot be finished because there was no time left after maintenance tasks.</b>";
-                    partWork.resetTimeSpent();
-                    partWork.resetOvertime();
-                    partWork.setTech(null);
-                    partWork.cancelReservation();
+                    partWork.cancelAssignment(true);
                 }
                 MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
                 addReport(report);
@@ -4445,10 +4443,7 @@ public class Campaign implements ITechManager {
             report += " (" + xpGained + "XP gained) ";
         }
         report += wrongType;
-        partWork.resetTimeSpent();
-        partWork.resetOvertime();
-        partWork.setTech(null);
-        partWork.cancelReservation();
+        partWork.cancelAssignment(true);
         MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
         addReport(report);
         return report;
@@ -5268,7 +5263,7 @@ public class Campaign implements ITechManager {
                           "%s looks at %s, recalls his total lack of skill for working with such technology, then slowly puts the tools down before anybody gets hurt.",
                           tech.getHyperlinkedFullTitle(),
                           part.getName()));
-                    part.setTech(null);
+                    part.cancelAssignment(false);
                 }
             } else {
                 JOptionPane.showMessageDialog(null,
@@ -6425,7 +6420,8 @@ public class Campaign implements ITechManager {
     }
 
     public void setTemporaryPrisonerCapacity(int temporaryPrisonerCapacity) {
-        this.temporaryPrisonerCapacity = temporaryPrisonerCapacity;
+        this.temporaryPrisonerCapacity = max(PrisonerEventManager.MINIMUM_TEMPORARY_CAPACITY,
+              temporaryPrisonerCapacity);
     }
 
     public RandomEventLibraries getRandomEventLibraries() {

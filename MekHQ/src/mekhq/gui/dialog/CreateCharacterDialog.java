@@ -1436,7 +1436,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         int level = (Integer) skillLvls.get(type).getModel().getValue();
         int bonus = (Integer) skillBonus.get(type).getModel().getValue();
 
-        if (skillType.countUp()) {
+        if (skillType.isCountUp()) {
             int target = min(getCountUpMaxValue(), skillType.getTarget() + level + bonus);
             skillValues.get(type).setText("+" + target);
         } else {

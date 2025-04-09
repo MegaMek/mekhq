@@ -31,9 +31,9 @@ import static java.awt.Color.BLACK;
 import static java.awt.Color.RED;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
+import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
-import static mekhq.utilities.ImageUtilities.addTintToImageIcon;
 import static org.jfree.chart.ChartColor.DARK_BLUE;
 import static org.jfree.chart.ChartColor.DARK_RED;
 
