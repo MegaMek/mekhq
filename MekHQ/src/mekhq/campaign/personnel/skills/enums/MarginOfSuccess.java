@@ -49,7 +49,7 @@ import megamek.logging.MMLogger;
  * while {@link #DISASTROUS} represents a margin of success in the range of {@link Integer#MIN_VALUE} to -7.</p>
  *
  * @author Illiani
- * @since 0.50.5
+ * @since 0.50.05
  */
 public enum MarginOfSuccess {
     SPECTACULAR(7, Integer.MAX_VALUE, 4),
@@ -77,7 +77,7 @@ public enum MarginOfSuccess {
      * @param margin     the margin value associated with this range
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
     MarginOfSuccess(int lowerBound, int upperBound, int margin) {
         this.lowerBound = lowerBound;
@@ -96,36 +96,85 @@ public enum MarginOfSuccess {
      * @return the margin value associated with the given {@link MarginOfSuccess}
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
     public static int getMarginValue(MarginOfSuccess marginOfSuccess) {
         return marginOfSuccess.margin;
     }
 
     /**
-     * Retrieves the margin of success for the specified roll value.
+     * Determines the margin of success as an integer based on the difference between the roll and the target.
      *
-     * <p>This method matches the provided roll value against the bounds of each {@link MarginOfSuccess} constant to
-     * determine the appropriate range and calculate the roll's margin.</p>
+     * <p>This method calculates the margin of success using the given difference and returns the associated
+     * margin as an integer. Internally, it utilizes {@link #getMarginOfSuccessObject(int)} to determine the relevant
+     * margin category.</p>
      *
-     * @param roll the roll value to evaluate
+     * @param differenceBetweenRollAndTarget The difference between the roll result and the target value.
      *
-     * @return the margin (calculated as {@code roll - lowerBound}) corresponding to the matching
-     *       {@link MarginOfSuccess} range, or the margin for {@link #DISASTROUS} if no matching range is found
+     * @return The margin of success as an integer.
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
-    public static int getMarginOfSuccess(int roll) {
-        for (MarginOfSuccess mos : MarginOfSuccess.values()) {
-            if (roll >= mos.lowerBound && roll <= mos.upperBound) {
-                return roll - mos.lowerBound;
+    public static int getMarginOfSuccess(int differenceBetweenRollAndTarget) {
+        return getMarginOfSuccessObject(differenceBetweenRollAndTarget).margin;
+    }
+
+    /**
+     * Determines the {@link MarginOfSuccess} category based on the difference between the roll and the target.
+     *
+     * <p>This method iterates through all possible {@link MarginOfSuccess} values and compares the provided
+     * difference to their defined bounds ({@code lowerBound} and {@code upperBound}). If a matching range is found, it
+     * returns the corresponding {@link MarginOfSuccess} object.</p>
+     *
+     * <p>If no matching category is found, an error message is logged, and the method returns the
+     * {@link MarginOfSuccess#DISASTROUS} category as a fallback.</p>
+     *
+     * @param differenceBetweenRollAndTarget The difference between the roll result and the target value.
+     *
+     * @return The {@link MarginOfSuccess} object that corresponds to the provided difference.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public static MarginOfSuccess getMarginOfSuccessObject(int differenceBetweenRollAndTarget) {
+        for (MarginOfSuccess margin : MarginOfSuccess.values()) {
+            if ((differenceBetweenRollAndTarget >= margin.lowerBound) &&
+                      (differenceBetweenRollAndTarget <= margin.upperBound)) {
+                return margin;
+            }
+        }
+        logger.error("No valid MarginOfSuccess found for roll: {}. Returning DISASTROUS",
+              differenceBetweenRollAndTarget);
+        return DISASTROUS;
+    }
+
+    /**
+     * Retrieves the {@link MarginOfSuccess} object corresponding to the specified margin value.
+     *
+     * <p>This method iterates through all possible {@link MarginOfSuccess} values and returns the one
+     * whose associated margin matches the provided {@code marginValue}.</p>
+     *
+     * <p>If no matching {@link MarginOfSuccess} is found, an error is logged, and the method
+     * defaults to returning {@link MarginOfSuccess#DISASTROUS}.</p>
+     *
+     * @param marginValue The integer margin value to look up.
+     *
+     * @return The {@link MarginOfSuccess} object corresponding to the given margin value, or
+     *       {@link MarginOfSuccess#DISASTROUS} if no match is found.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public static MarginOfSuccess getMarginOfSuccessObjectFromMarginValue(int marginValue) {
+        for (MarginOfSuccess marginOfSuccess : MarginOfSuccess.values()) {
+            if (marginOfSuccess.margin == marginValue) {
+                return marginOfSuccess;
             }
         }
 
-        logger.error("Unknown MarginOfSuccess value: {} - returning {}.", roll, DISASTROUS);
-
-        return DISASTROUS.margin;
+        logger.error("No valid MarginOfSuccess found for marginValue: {}. Returning DISASTROUS", marginValue);
+        return DISASTROUS;
     }
 
     /**
@@ -139,9 +188,9 @@ public enum MarginOfSuccess {
      * @return the localized string representing the given margin of success
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
-    public static String getMarginOfSuccessString(int marginOfSuccess) {
+    public static String getMarginOfSuccessString(MarginOfSuccess marginOfSuccess) {
         return getFormattedTextAt(RESOURCE_BUNDLE, marginOfSuccess + ".label");
     }
 }

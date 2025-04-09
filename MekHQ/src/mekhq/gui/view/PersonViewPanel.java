@@ -33,6 +33,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
+import static mekhq.campaign.personnel.skills.SkillType.RP_ONLY_TAG;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 import static org.jfree.chart.ChartColor.DARK_BLUE;
 import static org.jfree.chart.ChartColor.DARK_RED;
@@ -1508,9 +1509,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 }
                 if (type.isRoleplaySkill()) {
                     lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader.roleplay"),
-                          skillName.replaceAll(' ' +
-                                                     Pattern.quote(resourceMap.getString("format.itemHeader.roleplay" +
-                                                                                               ".removal")), "")));
+                          skillName.replaceAll(Pattern.quote(RP_ONLY_TAG), "")));
                 } else {
                     lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), skillName));
                 }
