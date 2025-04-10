@@ -78,7 +78,6 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -829,7 +828,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (scenario == null) {
             return;
         }
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
+        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(false);
         if (uids.isEmpty()) {
             return;
         }

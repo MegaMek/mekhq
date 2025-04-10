@@ -899,7 +899,7 @@ public class Scenario implements IPlayerSettings {
         if (!getStatus().isCurrent()) {
             return false;
         }
-        if (getForces(c).getAllUnits(true).isEmpty()) {
+        if (getForces(c).getAllUnits(false).isEmpty()) {
             return false;
         }
         if (!includesRequiredPersonnel(c)) {
