@@ -39,6 +39,11 @@ import megamek.logging.MMLogger;
  */
 public enum SkillSubType {
     /**
+     * Represents a default value, it normally means the SubType is missing, or hasn't been set.
+     */
+    NONE,
+
+    /**
      * Represents gunnery-related combat skills.
      */
     COMBAT_GUNNERY,

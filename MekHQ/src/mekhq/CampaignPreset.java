@@ -62,7 +62,6 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -163,12 +162,12 @@ public class CampaignPreset {
     }
 
     public CampaignPreset(final String title, final String description, final boolean userData,
-                          final @Nullable LocalDate date, final @Nullable Faction faction,
-                          final @Nullable Planet planet, final @Nullable RankSystem rankSystem, final int contractCount,
-                          final boolean gm, final @Nullable CompanyGenerationOptions companyGenerationOptions,
-                          final @Nullable GameOptions gameOptions, final @Nullable CampaignOptions campaignOptions,
-                          final @Nullable RandomSkillPreferences randomSkillPreferences,
-                          final Map<String, SkillType> skills, final Map<String, SpecialAbility> specialAbilities) {
+          final @Nullable LocalDate date, final @Nullable Faction faction, final @Nullable Planet planet,
+          final @Nullable RankSystem rankSystem, final int contractCount, final boolean gm,
+          final @Nullable CompanyGenerationOptions companyGenerationOptions, final @Nullable GameOptions gameOptions,
+          final @Nullable CampaignOptions campaignOptions,
+          final @Nullable RandomSkillPreferences randomSkillPreferences, final Map<String, SkillType> skills,
+          final Map<String, SpecialAbility> specialAbilities) {
         this.userData = userData;
 
         setTitle(title);
@@ -598,7 +597,7 @@ public class CampaignPreset {
                                 continue;
                             }
 
-                            SkillType.generateSeparateInstanceFromXML(wn2, preset.getSkills());
+                            SkillType.generateSeparateInstanceFromXML(wn2, preset.getSkills(), version);
                         }
                         break;
                     }
