@@ -43,7 +43,6 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -120,6 +119,8 @@ public class AdvancementTab {
     private JSpinner[] phenotypeSpinners;
 
     private JPanel pnlRandomAbilities;
+    private JLabel lblAbilityUltraGreen;
+    private JSpinner spnAbilityUltraGreen;
     private JLabel lblAbilityGreen;
     private JSpinner spnAbilityGreen;
     private JLabel lblAbilityReg;
@@ -128,6 +129,10 @@ public class AdvancementTab {
     private JSpinner spnAbilityVet;
     private JLabel lblAbilityElite;
     private JSpinner spnAbilityElite;
+    private JLabel lblAbilityHeroic;
+    private JSpinner spnAbilityHeroic;
+    private JLabel lblAbilityLegendary;
+    private JSpinner spnAbilityLegendary;
 
     private JPanel pnlSkillGroups;
 
@@ -142,6 +147,10 @@ public class AdvancementTab {
     private JSpinner spnCommandSkillsVet;
     private JLabel lblCommandSkillsElite;
     private JSpinner spnCommandSkillsElite;
+    private JLabel lblCommandSkillsHeroic;
+    private JSpinner spnCommandSkillsHeroic;
+    private JLabel lblCommandSkillsLegendary;
+    private JSpinner spnCommandSkillsLegendary;
 
     private JPanel pnlSmallArms;
     private JLabel lblCombatSA;
@@ -174,6 +183,10 @@ public class AdvancementTab {
     private JSpinner spnRoleplaySkillsVet;
     private JLabel lblRoleplaySkillsElite;
     private JSpinner spnRoleplaySkillsElite;
+    private JLabel lblRoleplaySkillsHeroic;
+    private JSpinner spnRoleplaySkillsHeroic;
+    private JLabel lblRoleplaySkillsLegendary;
+    private JSpinner spnRoleplaySkillsLegendary;
     //end Skill Randomization Tab
 
     //start Recruitment Bonus Tab
@@ -538,6 +551,10 @@ public class AdvancementTab {
         spnCommandSkillsVet = new JSpinner();
         lblCommandSkillsElite = new JLabel();
         spnCommandSkillsElite = new JSpinner();
+        lblCommandSkillsHeroic = new JLabel();
+        spnCommandSkillsHeroic = new JSpinner();
+        lblCommandSkillsLegendary = new JLabel();
+        spnCommandSkillsLegendary = new JSpinner();
 
         pnlSmallArms = new JPanel();
         lblCombatSA = new JLabel();
@@ -570,16 +587,26 @@ public class AdvancementTab {
         spnRoleplaySkillsVet = new JSpinner();
         lblRoleplaySkillsElite = new JLabel();
         spnRoleplaySkillsElite = new JSpinner();
+        lblRoleplaySkillsHeroic = new JLabel();
+        spnRoleplaySkillsHeroic = new JSpinner();
+        lblRoleplaySkillsLegendary = new JLabel();
+        spnRoleplaySkillsLegendary = new JSpinner();
 
         pnlRandomAbilities = new JPanel();
         lblAbilityGreen = new JLabel();
         spnAbilityGreen = new JSpinner();
+        lblAbilityUltraGreen = new JLabel();
+        spnAbilityUltraGreen = new JSpinner();
         lblAbilityReg = new JLabel();
         spnAbilityReg = new JSpinner();
         lblAbilityVet = new JLabel();
         spnAbilityVet = new JSpinner();
         lblAbilityElite = new JLabel();
         spnAbilityElite = new JSpinner();
+        lblAbilityHeroic = new JLabel();
+        spnAbilityHeroic = new JSpinner();
+        lblAbilityLegendary = new JLabel();
+        spnAbilityHeroic = new JSpinner();
 
         pnlRecruitmentBonusesCombat = new JPanel();
         lblRecruitmentBonusCombat = new JLabel[] {}; // This will be initialized properly later
@@ -680,8 +707,12 @@ public class AdvancementTab {
      */
     private JPanel createAbilityPanel() {
         // Contents
+        lblAbilityUltraGreen = new CampaignOptionsLabel("AbilityUltraGreen");
+        spnAbilityUltraGreen = new CampaignOptionsSpinner("AbilityUltraGreen", 0, -12, 12, 1);
+
         lblAbilityGreen = new CampaignOptionsLabel("AbilityGreen");
         spnAbilityGreen = new CampaignOptionsSpinner("AbilityGreen", 0, -12, 12, 1);
+
         lblAbilityReg = new CampaignOptionsLabel("AbilityRegular");
         spnAbilityReg = new CampaignOptionsSpinner("AbilityRegular", 0, -12, 12, 1);
 
@@ -691,29 +722,51 @@ public class AdvancementTab {
         lblAbilityElite = new CampaignOptionsLabel("AbilityElite");
         spnAbilityElite = new CampaignOptionsSpinner("AbilityElite", 0, -12, 12, 1);
 
+        lblAbilityHeroic = new CampaignOptionsLabel("AbilityHeroic");
+        spnAbilityHeroic = new CampaignOptionsSpinner("AbilityHeroic", 0, -12, 12, 1);
+
+        lblAbilityLegendary = new CampaignOptionsLabel("AbilityLegendary");
+        spnAbilityLegendary = new CampaignOptionsSpinner("AbilityLegendary", 0, -12, 12, 1);
+
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AbilityPanel", true, "AbilityPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
         layout.gridwidth = 1;
         layout.gridx = 0;
         layout.gridy = 0;
+        panel.add(lblAbilityUltraGreen, layout);
+        layout.gridx++;
+        panel.add(spnAbilityUltraGreen, layout);
+        layout.gridx++;
         panel.add(lblAbilityGreen, layout);
         layout.gridx++;
         panel.add(spnAbilityGreen, layout);
-        layout.gridx++;
-        panel.add(lblAbilityReg, layout);
-        layout.gridx++;
-        panel.add(spnAbilityReg, layout);
 
         layout.gridx = 0;
         layout.gridy++;
+        panel.add(lblAbilityReg, layout);
+        layout.gridx++;
+        panel.add(spnAbilityReg, layout);
+        layout.gridx++;
         panel.add(lblAbilityVet, layout);
         layout.gridx++;
         panel.add(spnAbilityVet, layout);
-        layout.gridx++;
+
+        layout.gridx = 0;
+        layout.gridy++;
         panel.add(lblAbilityElite, layout);
         layout.gridx++;
         panel.add(spnAbilityElite, layout);
+        layout.gridx++;
+        panel.add(lblAbilityHeroic, layout);
+        layout.gridx++;
+        panel.add(spnAbilityHeroic, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblAbilityLegendary, layout);
+        layout.gridx++;
+        panel.add(spnAbilityLegendary, layout);
 
         return panel;
     }
@@ -778,6 +831,12 @@ public class AdvancementTab {
         lblCommandSkillsElite = new CampaignOptionsLabel("CommandSkillsElite");
         spnCommandSkillsElite = new CampaignOptionsSpinner("CommandSkillsElite", 0, -12, 12, 1);
 
+        lblCommandSkillsHeroic = new CampaignOptionsLabel("CommandSkillsHeroic");
+        spnCommandSkillsHeroic = new CampaignOptionsSpinner("CommandSkillsHeroic", 0, -12, 12, 1);
+
+        lblCommandSkillsLegendary = new CampaignOptionsLabel("CommandSkillsLegendary");
+        spnCommandSkillsLegendary = new CampaignOptionsSpinner("CommandSkillsLegendary", 0, -12, 12, 1);
+
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("CommandSkillsPanel", true, "CommandSkillsPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -807,6 +866,16 @@ public class AdvancementTab {
         panel.add(lblCommandSkillsElite, layout);
         layout.gridx++;
         panel.add(spnCommandSkillsElite, layout);
+        layout.gridx++;
+        panel.add(lblCommandSkillsHeroic, layout);
+        layout.gridx++;
+        panel.add(spnCommandSkillsHeroic, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblCommandSkillsLegendary, layout);
+        layout.gridx++;
+        panel.add(spnCommandSkillsLegendary, layout);
 
         return panel;
     }
@@ -827,6 +896,12 @@ public class AdvancementTab {
 
         lblRoleplaySkillsElite = new CampaignOptionsLabel("RoleplaySkillsElite");
         spnRoleplaySkillsElite = new CampaignOptionsSpinner("RoleplaySkillsElite", 0, -12, 12, 1);
+
+        lblRoleplaySkillsHeroic = new CampaignOptionsLabel("RoleplaySkillsHeroic");
+        spnRoleplaySkillsHeroic = new CampaignOptionsSpinner("RoleplaySkillsHeroic", 0, -12, 12, 1);
+
+        lblRoleplaySkillsLegendary = new CampaignOptionsLabel("RoleplaySkillsLegendary");
+        spnRoleplaySkillsLegendary = new CampaignOptionsSpinner("RoleplaySkillsLegendary", 0, -12, 12, 1);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("RoleplaySkillsPanel", true, "RoleplaySkillsPanel");
@@ -857,6 +932,16 @@ public class AdvancementTab {
         panel.add(lblRoleplaySkillsElite, layout);
         layout.gridx++;
         panel.add(spnRoleplaySkillsElite, layout);
+        layout.gridx++;
+        panel.add(lblRoleplaySkillsHeroic, layout);
+        layout.gridx++;
+        panel.add(spnRoleplaySkillsHeroic, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblRoleplaySkillsLegendary, layout);
+        layout.gridx++;
+        panel.add(spnRoleplaySkillsLegendary, layout);
 
         return panel;
     }
@@ -1100,7 +1185,7 @@ public class AdvancementTab {
      *                                     {@code null}, values are loaded from the current skill preferences.
      */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
-                                              @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
+          @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -1136,20 +1221,43 @@ public class AdvancementTab {
         for (int i = 0; i < phenotypeSpinners.length; i++) {
             phenotypeSpinners[i].setValue(phenotypeProbabilities[i]);
         }
+
+        spnAbilityUltraGreen.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_ULTRA_GREEN));
         spnAbilityGreen.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_GREEN));
         spnAbilityReg.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_REGULAR));
         spnAbilityVet.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_VETERAN));
         spnAbilityElite.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_ELITE));
+        try {
+            spnAbilityHeroic.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_HEROIC));
+            spnAbilityLegendary.setValue(skillPreferences.getSpecialAbilityBonus(SkillType.EXP_LEGENDARY));
+        } catch (NullPointerException e) {
+            // This is expected for campaigns <50.05. In those cases, we're just going to use the default values.
+        }
+
         spnCommandSkillsUltraGreen.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_ULTRA_GREEN));
         spnCommandSkillsGreen.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_GREEN));
         spnCommandSkillsReg.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_REGULAR));
         spnCommandSkillsVet.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_VETERAN));
         spnCommandSkillsElite.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_ELITE));
+        try {
+            spnCommandSkillsHeroic.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_HEROIC));
+            spnCommandSkillsLegendary.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_LEGENDARY));
+        } catch (NullPointerException e) {
+            // This is expected for campaigns <50.05. In those cases, we're just going to use the default values.
+        }
+
         spnRoleplaySkillsUltraGreen.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_ULTRA_GREEN));
         spnRoleplaySkillsGreen.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_GREEN));
         spnRoleplaySkillsReg.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_REGULAR));
         spnRoleplaySkillsVet.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_VETERAN));
         spnRoleplaySkillsElite.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_ELITE));
+        try {
+            spnRoleplaySkillsHeroic.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_HEROIC));
+            spnRoleplaySkillsLegendary.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_LEGENDARY));
+        } catch (NullPointerException e) {
+            // This is expected for campaigns <50.05. In those cases, we're just going to use the default values.
+        }
+
         spnCombatSA.setValue(skillPreferences.getCombatSmallArmsBonus());
         spnSupportSA.setValue(skillPreferences.getSupportSmallArmsBonus());
         spnArtyProb.setValue(skillPreferences.getArtilleryProb());
@@ -1184,7 +1292,7 @@ public class AdvancementTab {
      *                                     {@code null}, values are applied to the current skill preferences.
      */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions,
-                                               @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
+          @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -1225,11 +1333,15 @@ public class AdvancementTab {
         skillPreferences.setArtilleryBonus((int) spnArtyBonus.getValue());
         skillPreferences.setSecondSkillProb((int) spnSecondProb.getValue());
         skillPreferences.setSecondSkillBonus((int) spnSecondBonus.getValue());
+
         skillPreferences.setCommandSkillsMod(SkillType.EXP_ULTRA_GREEN, (int) spnCommandSkillsUltraGreen.getValue());
         skillPreferences.setCommandSkillsMod(SkillType.EXP_GREEN, (int) spnCommandSkillsGreen.getValue());
         skillPreferences.setCommandSkillsMod(SkillType.EXP_REGULAR, (int) spnCommandSkillsReg.getValue());
         skillPreferences.setCommandSkillsMod(SkillType.EXP_VETERAN, (int) spnCommandSkillsVet.getValue());
         skillPreferences.setCommandSkillsMod(SkillType.EXP_ELITE, (int) spnCommandSkillsElite.getValue());
+        skillPreferences.setCommandSkillsMod(SkillType.EXP_HEROIC, (int) spnCommandSkillsHeroic.getValue());
+        skillPreferences.setCommandSkillsMod(SkillType.EXP_LEGENDARY, (int) spnCommandSkillsLegendary.getValue());
+
         skillPreferences.setRoleplaySkillsModifier(SkillType.EXP_ULTRA_GREEN,
               (int) spnRoleplaySkillsUltraGreen.getValue());
         skillPreferences.setRoleplaySkillsModifier(SkillType.EXP_GREEN, (int) spnRoleplaySkillsGreen.getValue());
@@ -1238,10 +1350,14 @@ public class AdvancementTab {
         skillPreferences.setRoleplaySkillsModifier(SkillType.EXP_ELITE, (int) spnRoleplaySkillsElite.getValue());
         skillPreferences.setCombatSmallArmsBonus((int) spnCombatSA.getValue());
         skillPreferences.setSupportSmallArmsBonus((int) spnSupportSA.getValue());
+
+        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_ULTRA_GREEN, (int) spnAbilityUltraGreen.getValue());
         skillPreferences.setSpecialAbilityBonus(SkillType.EXP_GREEN, (int) spnAbilityGreen.getValue());
         skillPreferences.setSpecialAbilityBonus(SkillType.EXP_REGULAR, (int) spnAbilityReg.getValue());
         skillPreferences.setSpecialAbilityBonus(SkillType.EXP_VETERAN, (int) spnAbilityVet.getValue());
         skillPreferences.setSpecialAbilityBonus(SkillType.EXP_ELITE, (int) spnAbilityElite.getValue());
+        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_HEROIC, (int) spnAbilityHeroic.getValue());
+        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_LEGENDARY, (int) spnAbilityLegendary.getValue());
 
         //start Recruitment Bonuses
         final List<PersonnelRole> supportRoles = PersonnelRole.getSupportRoles();
