@@ -27,6 +27,15 @@
  */
 package mekhq.campaign.market.unitMarket;
 
+import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.ResourceBundle;
+
 import megamek.Version;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.common.Compute;
@@ -43,13 +52,6 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.ResourceBundle;
-
 public abstract class AbstractUnitMarket {
     private static final MMLogger logger = MMLogger.create(AbstractUnitMarket.class);
 
@@ -58,7 +60,7 @@ public abstract class AbstractUnitMarket {
     private List<UnitMarketOffer> offers;
 
     protected final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
     // region Constructors
@@ -83,20 +85,18 @@ public abstract class AbstractUnitMarket {
     // endregion Getters/Setters
 
     // region Process New Day
+
     /**
-     * This is the primary method for processing the Unit Market. It is executed as
-     * part of
-     * {@link Campaign#newDay()}
+     * This is the primary method for processing the Unit Market. It is executed as part of {@link Campaign#newDay()}
      *
      * @param campaign the campaign to process the Unit Market new day using
      */
     public abstract void processNewDay(Campaign campaign);
 
     // region Generate Offers
+
     /**
-     * This is the primary Unit Market generation method, which is how the market
-     * specified
-     * generates unit offers
+     * This is the primary Unit Market generation method, which is how the market specified generates unit offers
      *
      * @param campaign the campaign to generate the unit offers for
      */
@@ -109,15 +109,13 @@ public abstract class AbstractUnitMarket {
      * @param number      the number of units to generate
      * @param market      the unit market type the unit is part of
      * @param unitType    the unit type to generate
-     * @param faction     the faction to add the offers for, or null. If null, that
-     *                    must be handled within
-     *                    this method before any generated offers may be added to
-     *                    the market.
+     * @param faction     the faction to add the offers for, or null. If null, that must be handled within this method
+     *                    before any generated offers may be added to the market.
      * @param quality     the quality of the unit to generate
      * @param priceTarget the target number used to determine the percent
      */
     public abstract void addOffers(Campaign campaign, int number, UnitMarketType market, int unitType,
-            @Nullable Faction faction, int quality, int priceTarget);
+          @Nullable Faction faction, int quality, int priceTarget);
 
     /**
      * @param campaign the campaign to use to generate the unit
@@ -125,16 +123,20 @@ public abstract class AbstractUnitMarket {
      * @param unitType the unit type to generate the unit with
      * @param faction  the faction to generate the unit from
      * @param quality  the quality to generate the unit at
-     * @param percent  the percentage of the original unit cost the unit will be
-     *                 offered at
-     * @return the name of the unit that has been added to the market, or null if
-     *         none were added
+     * @param percent  the percentage of the original unit cost the unit will be offered at
+     *
+     * @return the name of the unit that has been added to the market, or null if none were added
      */
-    public @Nullable String addSingleUnit(final Campaign campaign, final UnitMarketType market,
-            final int unitType, final Faction faction,
-            final int quality, final int percent) {
-        return addSingleUnit(campaign, market, unitType, faction, quality, new ArrayList<>(),
-                new ArrayList<>(), percent);
+    public @Nullable String addSingleUnit(final Campaign campaign, final UnitMarketType market, final int unitType,
+          final Faction faction, final int quality, final int percent) {
+        return addSingleUnit(campaign,
+              market,
+              unitType,
+              faction,
+              quality,
+              new ArrayList<>(),
+              new ArrayList<>(),
+              percent);
     }
 
     /**
@@ -145,19 +147,22 @@ public abstract class AbstractUnitMarket {
      * @param quality       the quality to generate the unit at
      * @param movementModes the movement modes to generate for
      * @param missionRoles  the mission roles to generate for
-     * @param percent       the percentage of the original unit cost the unit will
-     *                      be offered at
-     * @return the name of the unit that has been added to the market, or null if
-     *         none were added
+     * @param percent       the percentage of the original unit cost the unit will be offered at
+     *
+     * @return the name of the unit that has been added to the market, or null if none were added
      */
-    public @Nullable String addSingleUnit(final Campaign campaign, final UnitMarketType market,
-            final int unitType, final Faction faction,
-            final int quality,
-            final Collection<EntityMovementMode> movementModes,
-            final Collection<MissionRole> missionRoles,
-            final int percent) {
-        return addSingleUnit(campaign, market, unitType, faction,
-                generateWeight(campaign, unitType, faction), quality, movementModes, missionRoles, percent);
+    public @Nullable String addSingleUnit(final Campaign campaign, final UnitMarketType market, final int unitType,
+          final Faction faction, final int quality, final Collection<EntityMovementMode> movementModes,
+          final Collection<MissionRole> missionRoles, final int percent) {
+        return addSingleUnit(campaign,
+              market,
+              unitType,
+              faction,
+              generateWeight(campaign, unitType, faction),
+              quality,
+              movementModes,
+              missionRoles,
+              percent);
     }
 
     /**
@@ -169,22 +174,30 @@ public abstract class AbstractUnitMarket {
      * @param quality       the quality to generate the unit at
      * @param movementModes the movement modes to generate for
      * @param missionRoles  the mission roles to generate for
-     * @param percent       the percentage of the original unit cost the unit will
-     *                      be offered at
-     * @return the name of the unit that has been added to the market, or null if
-     *         none were added
+     * @param percent       the percentage of the original unit cost the unit will be offered at
+     *
+     * @return the name of the unit that has been added to the market, or null if none were added
      */
-    protected @Nullable String addSingleUnit(final Campaign campaign, final UnitMarketType market,
-            final int unitType, final Faction faction,
-            final int weight, final int quality,
-            final Collection<EntityMovementMode> movementModes,
-            final Collection<MissionRole> missionRoles,
-            final int percent) {
-        final MekSummary mekSummary = campaign.getUnitGenerator().generate(faction.getShortName(),
-                unitType, weight, campaign.getGameYear(), quality, movementModes, missionRoles,
-                ms -> (!campaign.getCampaignOptions().isLimitByYear() || (campaign.getGameYear() > ms.getYear()))
-                        && (!ms.isClan() || campaign.getCampaignOptions().isAllowClanPurchases())
-                        && (ms.isClan() || campaign.getCampaignOptions().isAllowISPurchases()));
+    protected @Nullable String addSingleUnit(final Campaign campaign, final UnitMarketType market, final int unitType,
+          final Faction faction, final int weight, final int quality,
+          final Collection<EntityMovementMode> movementModes, final Collection<MissionRole> missionRoles,
+          final int percent) {
+        final MekSummary mekSummary = campaign.getUnitGenerator()
+                                            .generate(faction.getShortName(),
+                                                  unitType,
+                                                  weight,
+                                                  campaign.getGameYear(),
+                                                  quality,
+                                                  movementModes,
+                                                  missionRoles,
+                                                  ms -> (!campaign.getCampaignOptions().isLimitByYear() ||
+                                                               (campaign.getGameYear() > ms.getYear())) &&
+                                                              (!ms.isClan() ||
+                                                                     campaign.getCampaignOptions()
+                                                                           .isAllowClanPurchases()) &&
+                                                              (ms.isClan() ||
+                                                                     campaign.getCampaignOptions()
+                                                                           .isAllowISPurchases()));
         return (mekSummary == null) ? null : addSingleUnit(campaign, market, unitType, mekSummary, percent);
     }
 
@@ -193,14 +206,12 @@ public abstract class AbstractUnitMarket {
      * @param market     the market type the unit is being offered in
      * @param unitType   the unit type of the generated unit
      * @param mekSummary the generated mek summary
-     * @param percent    the percentage of the original unit cost the unit will be
-     *                   offered at
+     * @param percent    the percentage of the original unit cost the unit will be offered at
+     *
      * @return the name of the unit that has been added to the market
      */
-    public String addSingleUnit(final Campaign campaign, final UnitMarketType market,
-            final int unitType, final MekSummary mekSummary,
-            final int percent) {
-        final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
+    public String addSingleUnit(final Campaign campaign, final UnitMarketType market, final int unitType,
+          final MekSummary mekSummary, final int percent) {
 
         Faction campaignFaction = campaign.getFaction();
         LocalDate currentDate = campaign.getLocalDate();
@@ -211,8 +222,7 @@ public abstract class AbstractUnitMarket {
             }
         }
 
-        getOffers().add(new UnitMarketOffer(market, unitType, mekSummary, percent,
-                generateTransitDuration(campaign)));
+        getOffers().add(new UnitMarketOffer(market, unitType, mekSummary, percent, generateTransitDuration(campaign)));
 
         return mekSummary.getName();
     }
@@ -221,18 +231,20 @@ public abstract class AbstractUnitMarket {
      * @param campaign the campaign to generate the unit weight based on
      * @param unitType the unit type to determine the format of weight to generate
      * @param faction  the faction to generate the weight for
+     *
      * @return the generated weight
      */
-    protected abstract int generateWeight(Campaign campaign, int unitType,
-            Faction faction);
+    protected abstract int generateWeight(Campaign campaign, int unitType, Faction faction);
 
     /**
      * @param campaign the campaign to use to generate the transit duration
+     *
      * @return the generated transit duration
      */
     protected int generateTransitDuration(final Campaign campaign) {
-        return campaign.getCampaignOptions().isInstantUnitMarketDelivery() ? 0
-                : campaign.calculatePartTransitTime(Compute.d6(2) - 2);
+        return campaign.getCampaignOptions().isInstantUnitMarketDelivery() ?
+                     0 :
+                     campaign.calculatePartTransitTime(Compute.d6(2) - 2);
     }
 
     /**
@@ -246,10 +258,9 @@ public abstract class AbstractUnitMarket {
     // endregion Generate Offers
 
     // region Offer Removal
+
     /**
-     * This is the primary Unit Market removal method, which is how the market
-     * specified
-     * removes unit offers
+     * This is the primary Unit Market removal method, which is how the market specified removes unit offers
      *
      * @param campaign the campaign to use in determining the offers to remove
      */
@@ -258,6 +269,7 @@ public abstract class AbstractUnitMarket {
     // endregion Process New Day
 
     // region File I/O
+
     /**
      * This writes the Unit Market to XML
      *
@@ -271,9 +283,8 @@ public abstract class AbstractUnitMarket {
     }
 
     /**
-     * This is meant to be overridden so that a market can have additional elements
-     * added to it,
-     * albeit with this called by super.writeBodyToXML(pw, indent) first.
+     * This is meant to be overridden so that a market can have additional elements added to it, albeit with this called
+     * by super.writeBodyToXML(pw, indent) first.
      *
      * @param pw     the PrintWriter to write to
      * @param indent the base indent level to write at
@@ -285,9 +296,8 @@ public abstract class AbstractUnitMarket {
     }
 
     /**
-     * This method fills the market based on the supplied XML node. The market is
-     * initialized as
-     * empty before this is called.
+     * This method fills the market based on the supplied XML node. The market is initialized as empty before this is
+     * called.
      *
      * @param wn       the node to fill the market from
      * @param campaign the campaign the market is being parsed as part of
@@ -309,9 +319,8 @@ public abstract class AbstractUnitMarket {
     }
 
     /**
-     * This is meant to be overridden so that a market can have additional elements
-     * added to it,
-     * albeit with this called by super.parseXMLNode(wn) first.
+     * This is meant to be overridden so that a market can have additional elements added to it, albeit with this called
+     * by super.parseXMLNode(wn) first.
      *
      * @param wn       the node to parse from XML
      * @param campaign the campaign the market is being parsed as part of

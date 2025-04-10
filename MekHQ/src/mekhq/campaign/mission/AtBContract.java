@@ -46,6 +46,7 @@ import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.parseFromInteger;
 import static megamek.common.enums.SkillLevel.parseFromString;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.force.FormationLevel.BATTALION;
@@ -1717,8 +1718,6 @@ public class AtBContract extends Contract {
      * </p>
      */
     public void clanTechSalvageOverride() {
-        final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
-
         if (getEnemy().isClan() && !getEmployerFaction().isClan()) {
             if (getStartDate().isBefore(BATTLE_OF_TUKAYYID)) {
                 setSalvageExchange(true);
