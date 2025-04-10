@@ -27,6 +27,9 @@
  */
 package mekhq.gui.menus;
 
+import java.util.stream.Stream;
+import javax.swing.JMenuItem;
+
 import megamek.codeUtilities.StringUtility;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
@@ -34,16 +37,13 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
 
-import javax.swing.*;
-import java.util.stream.Stream;
-
 /**
- * This is a standard menu that takes either a unit or multiple units, and
- * allows the user to
- * assign or remove a tech from them.
+ * This is a standard menu that takes either a unit or multiple units, and allows the user to assign or remove a tech
+ * from them.
  */
 public class AssignUnitToTechMenu extends JScrollableMenu {
     // region Constructors
+
     /**
      * @param campaign the campaign the unit is a part of
      * @param units    the units in question
@@ -69,9 +69,10 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
         // Initial Parsing Values
         final int maintenanceTime = Stream.of(units).mapToInt(Unit::getMaintenanceTime).sum();
         final String skillName = units[0].determineUnitTechSkillType();
-        final boolean assign = (maintenanceTime < Person.PRIMARY_ROLE_SUPPORT_TIME)
-                && !StringUtility.isNullOrBlank(skillName)
-                && Stream.of(units).allMatch(unit -> skillName.equalsIgnoreCase(unit.determineUnitTechSkillType()));
+        final boolean assign = (maintenanceTime < Person.PRIMARY_ROLE_SUPPORT_TIME) &&
+                                     !StringUtility.isNullOrBlank(skillName) &&
+                                     Stream.of(units)
+                                           .allMatch(unit -> skillName.equalsIgnoreCase(unit.determineUnitTechSkillType()));
 
         if (assign) {
             // Person Assignment Menus
@@ -82,56 +83,39 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
             final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
             final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
             final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu",
-                    SkillLevel.ULTRA_GREEN.toString());
+                  SkillLevel.ULTRA_GREEN.toString());
 
             // Boolean Parsing Values
-            final boolean allShareTech = Stream.of(units).allMatch(unit -> (units[0].getTech() == null)
-                    ? (unit.getTech() == null)
-                    : units[0].getTech().equals(unit.getTech()));
+            final boolean allShareTech = Stream.of(units)
+                                               .allMatch(unit -> (units[0].getTech() == null) ?
+                                                                       (unit.getTech() == null) :
+                                                                       units[0].getTech().equals(unit.getTech()));
 
             for (final Person tech : campaign.getTechs()) {
                 if (allShareTech && tech.equals(units[0].getTech())) {
                     continue;
                 }
 
-                if (tech.hasSkill(skillName)
-                        && ((tech.getMaintenanceTimeUsing() + maintenanceTime) <= Person.PRIMARY_ROLE_SUPPORT_TIME)) {
-                    final SkillLevel skillLevel = (tech.getSkillForWorkingOn(units[0]) == null)
-                            ? SkillLevel.NONE
-                            : tech.getSkillForWorkingOn(units[0]).getSkillLevel();
+                if (tech.hasSkill(skillName) &&
+                          ((tech.getMaintenanceTimeUsing() + maintenanceTime) <= Person.PRIMARY_ROLE_SUPPORT_TIME)) {
+                    final SkillLevel skillLevel = (tech.getSkillForWorkingOn(units[0]) == null) ?
+                                                        SkillLevel.NONE :
+                                                        tech.getSkillForWorkingOn(units[0]).getSkillLevel();
 
-                    final JScrollableMenu subMenu;
-                    switch (skillLevel) {
-                        case LEGENDARY:
-                            subMenu = legendaryMenu;
-                            break;
-                        case HEROIC:
-                            subMenu = heroicMenu;
-                            break;
-                        case ELITE:
-                            subMenu = eliteMenu;
-                            break;
-                        case VETERAN:
-                            subMenu = veteranMenu;
-                            break;
-                        case REGULAR:
-                            subMenu = regularMenu;
-                            break;
-                        case GREEN:
-                            subMenu = greenMenu;
-                            break;
-                        case ULTRA_GREEN:
-                            subMenu = ultraGreenMenu;
-                            break;
-                        default:
-                            subMenu = null;
-                            break;
-                    }
+                    final JScrollableMenu subMenu = switch (skillLevel) {
+                        case LEGENDARY -> legendaryMenu;
+                        case HEROIC -> heroicMenu;
+                        case ELITE -> eliteMenu;
+                        case VETERAN -> veteranMenu;
+                        case REGULAR -> regularMenu;
+                        case GREEN -> greenMenu;
+                        case ULTRA_GREEN -> ultraGreenMenu;
+                        default -> null;
+                    };
 
                     if (subMenu != null) {
-                        final JMenuItem miAssignTech = new JMenuItem(String.format(
-                                resources.getString("miAssignTech.text"), tech.getFullTitle(),
-                                tech.getMaintenanceTimeUsing()));
+                        final JMenuItem miAssignTech = new JMenuItem(String.format(resources.getString(
+                              "miAssignTech.text"), tech.getFullTitle(), tech.getMaintenanceTimeUsing()));
                         miAssignTech.setName("miAssignTech");
                         miAssignTech.addActionListener(evt -> {
                             for (final Unit unit : units) {
@@ -160,8 +144,8 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
         if (Stream.of(units).anyMatch(unit -> unit.getTech() != null)) {
             final JMenuItem miUnassignTech = new JMenuItem(resources.getString("miUnassignTech.text"));
             miUnassignTech.setName("miUnassignTech");
-            miUnassignTech
-                    .addActionListener(evt -> Stream.of(units).forEach(unit -> unit.remove(unit.getTech(), true)));
+            miUnassignTech.addActionListener(evt -> Stream.of(units)
+                                                          .forEach(unit -> unit.remove(unit.getTech(), true)));
             add(miUnassignTech);
         }
     }
