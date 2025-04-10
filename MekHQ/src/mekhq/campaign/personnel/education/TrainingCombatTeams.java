@@ -28,6 +28,7 @@
 package mekhq.campaign.personnel.education;
 
 import static java.lang.Math.round;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -170,8 +171,17 @@ public class TrainingCombatTeams {
 
             for (Person trainee : unit.getActiveCrew()) {
                 if (campaign.getCampaignOptions().isUseFatigue()) {
-                    int fatigueChangeRate = campaign.getCampaignOptions().getFatigueRate();
+                    int fatigueChangeRate = campaign.getCampaignOptions().getFatigueRate() * 2;
+
                     boolean hasGlassJaw = trainee.getOptions().booleanOption(FLAW_GLASS_JAW);
+                    boolean hasToughness = trainee.getOptions().booleanOption(ATOW_TOUGHNESS);
+                    boolean hasGlassJawAndToughness = hasGlassJaw && hasToughness;
+
+                    if (hasGlassJaw && !hasGlassJawAndToughness) {
+                        fatigueChangeRate = fatigueChangeRate * 2;
+                    } else if (hasToughness && !hasGlassJawAndToughness) {
+                        fatigueChangeRate = (int) round(fatigueChangeRate * 0.5);
+                    }
 
                     trainee.changeFatigue(fatigueChangeRate * (hasGlassJaw ? 4 : 2));
                 }

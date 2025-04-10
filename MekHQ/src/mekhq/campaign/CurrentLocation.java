@@ -30,6 +30,9 @@ package mekhq.campaign;
 
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.campaign.mod.am.InjuryTypes.TRANSIT_DISORIENTATION_SYNDROME;
+import static mekhq.campaign.personnel.BodyLocation.INTERNAL;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_TRANSIT_DISORIENTATION_SYNDROME;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.io.PrintWriter;
@@ -44,6 +47,8 @@ import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.TransitCompleteEvent;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
@@ -261,12 +266,12 @@ public class CurrentLocation {
             }
             if (isAtJumpPoint() && (rechargeTime >= neededRechargeTime)) {
                 // jump
-                if (campaign.getCampaignOptions().isPayForTransport()) {
+                final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                if (campaignOptions.isPayForTransport()) {
                     if (!campaign.getFinances()
                                .debit(TransactionType.TRANSPORTATION,
                                      campaign.getLocalDate(),
-                                     campaign.calculateCostPerJump(true,
-                                           campaign.getCampaignOptions().isEquipmentContractBase()),
+                                     campaign.calculateCostPerJump(true, campaignOptions.isEquipmentContractBase()),
                                      "Jump from " +
                                            currentSystem.getName(campaign.getLocalDate()) +
                                            " to " +
@@ -275,6 +280,22 @@ public class CurrentLocation {
                                                  MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
                                                  "'><b>You cannot afford to make the jump!</b></font>");
                         return;
+                    }
+
+                    if (campaignOptions.isUseAbilities()) {
+                        for (Person person : campaign.getPersonnelFilteringOutDeparted()) {
+                            if (person.getOptions().booleanOption(FLAW_TRANSIT_DISORIENTATION_SYNDROME)) {
+                                Injury injury = TRANSIT_DISORIENTATION_SYNDROME.newInjury(campaign,
+                                      person,
+                                      INTERNAL,
+                                      1);
+                                person.addInjury(injury);
+
+                                if (campaignOptions.isUseFatigue()) {
+                                    person.changeFatigue(campaignOptions.getFatigueRate());
+                                }
+                            }
+                        }
                     }
                 }
                 campaign.addReport("Jumping to " + jumpPath.get(1).getPrintableName(campaign.getLocalDate()));
