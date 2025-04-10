@@ -1962,8 +1962,6 @@ public class AtBDynamicScenarioFactory {
         params.setYear(campaign.getGameYear());
         params.setMissionRoles(rolesByType);
 
-        // Special handling for pre-Tukayyid, where Clan units shouldn't be appearing in non-Clan forces. Clan
-        // tech, at that time, would be closely guarded and not something we want OpFors to be generating with
         if (filterOutClanTech(campaign, isFactionClan(factionCode))) {
             params.setFilter(mekSummary -> !mekSummary.isClan() &&
                                                  (unitType == GUN_EMPLACEMENT || mekSummary.getWalkMp() >= 1));
@@ -1988,10 +1986,6 @@ public class AtBDynamicScenarioFactory {
         }
 
         return createEntityWithCrew(factionCode, skill, campaign, unitData);
-    }
-
-    private static boolean isBeforeBattleOfTukayyid(Campaign campaign) {
-        return campaign.getLocalDate().isBefore(BATTLE_OF_TUKAYYID);
     }
 
     /**
@@ -2055,8 +2049,6 @@ public class AtBDynamicScenarioFactory {
         if (campaign.getCampaignOptions().isOpForUsesVTOLs()) {
             params.getMovementModes().addAll(IUnitGenerator.MIXED_TANK_VTOL);
         } else {
-            // Special handling for pre-Tukayyid, where Clan units shouldn't be appearing in non-Clan forces. Clan
-            // tech, at that time, would be closely guarded and not something we want OpFors to be generating with
             if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
                 params.setFilter(mekSummary -> !mekSummary.isClan() && !mekSummary.getUnitType().equals("VTOL"));
             } else {
@@ -2083,8 +2075,50 @@ public class AtBDynamicScenarioFactory {
         return createEntityWithCrew(params.getFaction(), skill, campaign, unitData);
     }
 
+    /**
+     * Filters out Clan technology based on the campaign timeline and unit type.
+     *
+     * <p>Special handling for pre-Tukayyid, where Clan units shouldn't be appearing in non-Clan forces. Clan tech,
+     * at that time, would be closely guarded and not something we want OpFors to be generating with.</p>
+     *
+     * @param campaign The campaign object which contains timeline details.
+     * @param isClan   A boolean indicating whether the unit is Clan technology.
+     *
+     * @return {@code true} if the unit should be filtered out (not Clan and before the Battle of Tukayyid),
+     *       {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
     private static boolean filterOutClanTech(Campaign campaign, boolean isClan) {
-        return isBeforeBattleOfTukayyid(campaign) && !isClan;
+        boolean isBeforeTukayyid = campaign.getLocalDate().isBefore(BATTLE_OF_TUKAYYID);
+
+        return isBeforeTukayyid && !isClan;
+    }
+
+    /**
+     * Checks whether a given faction, identified by its name or identifier, belongs to the Clan faction group.
+     *
+     * <p>If the specified faction code cannot be parsed into a {@link Faction}, a warning is logged and {@code false}
+     * is returned.</p>
+     *
+     * @param params the name or identifier of the faction to check
+     *
+     * @return {@code true} if the specified faction exists and is classified as a Clan faction; {@code false} if the
+     *       faction does not exist or is not a Clan faction
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    private static boolean isFactionClan(String params) {
+        Faction faction = Factions.getInstance().getFaction(params);
+
+        if (faction == null) {
+            logger.warn("AtBDynamicScenarioFactory#isFactionClan) Faction {} does not exist.", params);
+            return false;
+        }
+
+        return faction.isClan();
     }
 
     /**
@@ -2404,8 +2438,6 @@ public class AtBDynamicScenarioFactory {
                 newParams.getMovementModes().add(EntityMovementMode.INF_LEG);
             }
 
-            // Special handling for pre-Tukayyid, where Clan units shouldn't be appearing in non-Clan forces. Clan
-            // tech, at that time, would be closely guarded and not something we want OpFors to be generating with
             if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
                 params.setFilter(mekSummary -> !mekSummary.isClan() &&
                                                      mekSummary.getTons() <=
@@ -2448,8 +2480,6 @@ public class AtBDynamicScenarioFactory {
         } else {
             newParams.getMovementModes().addAll(IUnitGenerator.ALL_INFANTRY_MODES);
 
-            // Special handling for pre-Tukayyid, where Clan units shouldn't be appearing in non-Clan forces. Clan
-            // tech, at that time, would be closely guarded and not something we want OpFors to be generating with
             if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
                 params.setFilter(mekSummary -> !mekSummary.isClan() && mekSummary.getTons() <= bayCapacity);
             } else {
@@ -2514,8 +2544,6 @@ public class AtBDynamicScenarioFactory {
             // Set the parameters to filter out types that are too heavy for the provided
             // bay space, or those that cannot use mechanized BA travel
             if (bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT) {
-                // Special handling for pre-Tukayyid, where Clan units shouldn't be appearing in non-Clan forces. Clan
-                // tech, at that time, would be closely guarded and not something we want OpFors to be generating with
                 if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
                     params.setFilter(mekSummary -> !mekSummary.isClan() && mekSummary.getTons() <= bayCapacity);
                 } else {
@@ -2531,8 +2559,6 @@ public class AtBDynamicScenarioFactory {
         // If generating for an internal bay fails, try again as mechanized if the flag is set
         if (unitData == null) {
             if (newParams != null && bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT && retryAsMechanized) {
-                // Special handling for pre-Tukayyid, where Clan units shouldn't be appearing in non-Clan forces. Clan
-                // tech, at that time, would be closely guarded and not something we want OpFors to be generating with
                 if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
                     params.setFilter(mekSummary -> !mekSummary.isClan());
                 } else {
@@ -2553,12 +2579,6 @@ public class AtBDynamicScenarioFactory {
         } else {
             return null;
         }
-    }
-
-    private static boolean isFactionClan(String params) {
-        Faction faction = Factions.getInstance().getFaction(params);
-        boolean isClan = faction != null && faction.isClan();
-        return isClan;
     }
 
     /**
