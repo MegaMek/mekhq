@@ -162,6 +162,7 @@ MEKHQ VERSION HISTORY:
 + Fix #2359, #6085: Updated Refitting Status Display To Show Time Left
 + Fix #2968, #2996, #3758, #5332, #6469: Fixed Missing Part Resets when Failing or Cancelling Work Job
 + PR #6598: Fixed Refitting Units With Bays
++ PR #6863: Fixed Princess Not Acting of Their Rounds
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
