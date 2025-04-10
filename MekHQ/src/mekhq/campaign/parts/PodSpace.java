@@ -51,8 +51,8 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.utilities.ReportingUtilities;
 
 /**
- * An abstraction of all the pod-mounted equipment within a single location of an omni unit. Used
- * to group them together as recipients of a single tech action.
+ * An abstraction of all the pod-mounted equipment within a single location of an omni unit. Used to group them together
+ * as recipients of a single tech action.
  *
  * @author Neoancient
  */
@@ -91,8 +91,10 @@ public class PodSpace implements IPartWork {
     }
 
     public List<Part> getPartList() {
-        return childPartIds.stream().map(id -> campaign.getWarehouse().getPart(id))
-                .filter(Objects::nonNull).collect(Collectors.toList());
+        return childPartIds.stream()
+                     .map(id -> campaign.getWarehouse().getPart(id))
+                     .filter(Objects::nonNull)
+                     .collect(Collectors.toList());
     }
 
     @Override
@@ -130,10 +132,11 @@ public class PodSpace implements IPartWork {
         shorthandedMod = 0;
         for (int pid : childPartIds) {
             final Part part = campaign.getWarehouse().getPart(pid);
-            if (part != null && !(part instanceof MissingPart)
-                    && !(part instanceof AmmoBin)
-                    && part.needsFixing()
-                    && !repairInPlace) {
+            if (part != null &&
+                      !(part instanceof MissingPart) &&
+                      !(part instanceof AmmoBin) &&
+                      part.needsFixing() &&
+                      !repairInPlace) {
                 part.remove(true);
                 MekHQ.triggerEvent(new PartChangedEvent(part));
             }
@@ -159,9 +162,9 @@ public class PodSpace implements IPartWork {
         if ((isSalvaging() && !childPartIds.isEmpty()) || location < 0) {
             for (int partId : childPartIds) {
                 // If all remaining parts are already missing, we don't need to keep salvaging
-                 if (!(campaign.getWarehouse().getPart(partId) instanceof MissingPart)) {
-                     return null;
-                 }
+                if (!(campaign.getWarehouse().getPart(partId) instanceof MissingPart)) {
+                    return null;
+                }
             }
         }
         // The part is only fixable if the location is not destroyed.
@@ -197,8 +200,9 @@ public class PodSpace implements IPartWork {
                         return null;
                     }
                 }
-                return "There are no replacement parts available for "
-                    + unit.getEntity().getLocationName(location) + '.';
+                return "There are no replacement parts available for " +
+                             unit.getEntity().getLocationName(location) +
+                             '.';
             }
         }
         return null;
@@ -207,8 +211,9 @@ public class PodSpace implements IPartWork {
     @Override
     public boolean needsFixing() {
         return childPartIds.stream()
-                .map(id -> campaign.getWarehouse().getPart(id)).filter(Objects::nonNull)
-                .anyMatch(p -> !(p instanceof AmmoBin) && p.needsFixing());
+                     .map(id -> campaign.getWarehouse().getPart(id))
+                     .filter(Objects::nonNull)
+                     .anyMatch(p -> !(p instanceof AmmoBin) && p.needsFixing());
     }
 
     @Override
@@ -253,12 +258,14 @@ public class PodSpace implements IPartWork {
     public String succeed() {
         if (isSalvaging()) {
             remove(true);
-            return ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorPositiveHexColor(), "<b> removed</b>") + ".";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
+                                                                             .getFontColorPositiveHexColor(),
+                  "<b> removed</b>") + ".";
         } else {
             fix();
-            return ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorPositiveHexColor(), "<b> fixed</b>") + ".";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
+                                                                             .getFontColorPositiveHexColor(),
+                  "<b> fixed</b>") + ".";
         }
     }
 
@@ -269,19 +276,19 @@ public class PodSpace implements IPartWork {
         boolean replacing = false;
         for (int id : childPartIds) {
             final Part part = campaign.getWarehouse().getPart(id);
-            if (part != null && (isSalvaging() ||
-                    (!(part instanceof AmmoBin) && part.needsFixing()))) {
+            if (part != null && (isSalvaging() || (!(part instanceof AmmoBin) && part.needsFixing()))) {
                 part.fail(rating);
                 replacing |= part instanceof MissingPart;
             }
         }
-        if (rating >= SkillType.EXP_ELITE && replacing) {
-                return ReportingUtilities.messageSurroundedBySpanWithColor(
-                        MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
-                        "<b> failed and part(s) destroyed</b>") + ".";
+        if (rating >= SkillType.EXP_LEGENDARY && replacing) {
+            return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
+                                                                             .getFontColorNegativeHexColor(),
+                  "<b> failed and part(s) destroyed</b>") + ".";
         } else {
-            return ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(),"<b> failed</b>") + ".";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
+                                                                             .getFontColorNegativeHexColor(),
+                  "<b> failed</b>") + ".";
         }
     }
 
@@ -306,9 +313,9 @@ public class PodSpace implements IPartWork {
         for (int id : childPartIds) {
             final Part part = campaign.getWarehouse().getPart(id);
             if (part != null) {
-                if ((isSalvaging() && !(part instanceof MissingPart))
-                        || (!isSalvaging() && (part instanceof MissingPart)
-                                || (!(part instanceof AmmoBin) && part.needsFixing()))) {
+                if ((isSalvaging() && !(part instanceof MissingPart)) ||
+                          (!isSalvaging() && (part instanceof MissingPart) ||
+                                 (!(part instanceof AmmoBin) && part.needsFixing()))) {
                     minSkill = Math.max(minSkill, part.getSkillMin());
                 }
             }
@@ -392,23 +399,22 @@ public class PodSpace implements IPartWork {
     public String getDesc() {
         StringBuilder toReturn = new StringBuilder();
         toReturn.append("<html><b>")
-            .append(isSalvaging() ? "Salvage  " : "Replace ")
-            .append(getPartName())
-            .append(" Equipment - ")
-            .append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                SkillType.getExperienceLevelColor(getSkillMin()),
-                SkillType.getExperienceLevelName(getSkillMin()) + "+"))
-            .append("</b><br/>")
-            .append(getDetails())
-            .append("<br/>");
+              .append(isSalvaging() ? "Salvage  " : "Replace ")
+              .append(getPartName())
+              .append(" Equipment - ")
+              .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(getSkillMin()),
+                    SkillType.getExperienceLevelName(getSkillMin()) + "+"))
+              .append("</b><br/>")
+              .append(getDetails())
+              .append("<br/>");
 
-        if (getSkillMin() <= SkillType.EXP_ELITE) {
+        if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
             toReturn.append(getTimeLeft())
-                .append(" minutes")
-                .append(getTech() != null ? " (scheduled)" : "")
-                .append(" <b>TN:</b> ")
-                .append(getAllMods(null).getValue() > -1 ? "+" : "")
-                .append(getAllMods(null).getValueAsString());
+                  .append(" minutes")
+                  .append(getTech() != null ? " (scheduled)" : "")
+                  .append(" <b>TN:</b> ")
+                  .append(getAllMods(null).getValue() > -1 ? "+" : "")
+                  .append(getAllMods(null).getValueAsString());
         }
         toReturn.append("</html>");
         return toReturn.toString();
@@ -457,8 +463,14 @@ public class PodSpace implements IPartWork {
         if (isSalvaging()) {
             return allParts + " parts remaining";
         } else {
-            return replacements + "/" + allParts + " available<br />"
-                    + inTransit + " in transit, " + onOrder + " on order";
+            return replacements +
+                         "/" +
+                         allParts +
+                         " available<br />" +
+                         inTransit +
+                         " in transit, " +
+                         onOrder +
+                         " on order";
         }
     }
 
@@ -495,14 +507,18 @@ public class PodSpace implements IPartWork {
 
     @Override
     public void reservePart() {
-        childPartIds.stream().map(id -> campaign.getWarehouse().getPart(id))
-            .filter(Objects::nonNull).forEach(Part::reservePart);
+        childPartIds.stream()
+              .map(id -> campaign.getWarehouse().getPart(id))
+              .filter(Objects::nonNull)
+              .forEach(Part::reservePart);
     }
 
     @Override
     public void cancelReservation() {
-        childPartIds.stream().map(id -> campaign.getWarehouse().getPart(id))
-            .filter(Objects::nonNull).forEach(Part::cancelReservation);
+        childPartIds.stream()
+              .map(id -> campaign.getWarehouse().getPart(id))
+              .filter(Objects::nonNull)
+              .forEach(Part::cancelReservation);
     }
 
     @Override
@@ -518,16 +534,18 @@ public class PodSpace implements IPartWork {
 
     /**
      * Sticker price is the value of the part according to the rulebooks
+     *
      * @return the part's sticker price
      */
     @Override
-    public Money getStickerPrice(){
+    public Money getStickerPrice() {
         return Money.of(0.0);
     }
 
     /**
-     * This is the value of the part that may be affected by characteristics and campaign options
-     * (Note: Pod Space, an abstraction, does not have value or price.
+     * This is the value of the part that may be affected by characteristics and campaign options (Note: Pod Space, an
+     * abstraction, does not have value or price.
+     *
      * @return the part's actual value
      */
     @Override
@@ -536,9 +554,9 @@ public class PodSpace implements IPartWork {
     }
 
     /**
-     * This is the value of the part that may be affected by characteristics and campaign options
-     * but which ignores damage
-     * (Note: Pod Space, an abstraction, does not have value or price.
+     * This is the value of the part that may be affected by characteristics and campaign options but which ignores
+     * damage (Note: Pod Space, an abstraction, does not have value or price.
+     *
      * @return the part's actual value
      */
     @Override
@@ -547,7 +565,7 @@ public class PodSpace implements IPartWork {
     }
 
     @Override
-    public boolean isPriceAdjustedForAmount(){
+    public boolean isPriceAdjustedForAmount() {
         return false;
     }
 }

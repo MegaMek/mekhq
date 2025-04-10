@@ -72,9 +72,9 @@ public class RandomSkillPreferences {
         antiMekProb = 10;
         combatSmallArmsBonus = -3;
         supportSmallArmsBonus = -10;
-        specialAbilityBonus = new int[] { -10, -10, -2, 0, 1 };
-        commandSkillsModifier = new int[] { -10, -10, -7, -4, -1 };
-        roleplaySkillsModifier = new int[] { -12, -11, -10, -9, -8 };
+        specialAbilityBonus = new int[] { -10, -10, -2, 0, 1, 1, 1 };
+        commandSkillsModifier = new int[] { -12, -11, -10, -9, -8, -8, -8 };
+        roleplaySkillsModifier = new int[] { -12, -11, -10, -9, -8, -8, -8 };
         artilleryProb = 10;
         artilleryBonus = -2;
         secondSkillProb = 0;

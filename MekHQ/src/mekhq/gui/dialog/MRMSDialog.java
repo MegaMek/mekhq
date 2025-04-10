@@ -84,27 +84,27 @@ public class MRMSDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(MRMSDialog.class);
 
     // region Variable Declarations
-    private final JFrame          frame;
-    private       CampaignGUI     campaignGUI;
-    private       CampaignOptions campaignOptions;
+    private final JFrame frame;
+    private CampaignGUI campaignGUI;
+    private CampaignOptions campaignOptions;
 
     private MRMSMode mode;
 
-    private Unit                           selectedUnit;
-    private UnitTableModel                 unitTableModel;
-    private JTable                         unitTable;
+    private Unit selectedUnit;
+    private UnitTableModel unitTableModel;
+    private JTable unitTable;
     private TableRowSorter<UnitTableModel> unitSorter;
-    private JPanel                         pnlUnits;
-    private JScrollPane                    scrollUnitList;
-    private JButton                        btnSelectNone;
-    private JButton                        btnSelectAssigned;
-    private JButton                        btnSelectUnassigned;
+    private JPanel pnlUnits;
+    private JScrollPane scrollUnitList;
+    private JButton btnSelectNone;
+    private JButton btnSelectAssigned;
+    private JButton btnSelectUnassigned;
 
     private PartsTableModel partsTableModel;
-    private JTable          partsTable;
-    private JPanel          pnlParts;
-    private JScrollPane     scrollPartsTable;
-    private JButton         btnSelectAllParts;
+    private JTable partsTable;
+    private JPanel pnlParts;
+    private JScrollPane scrollPartsTable;
+    private JButton btnSelectAllParts;
 
     private JCheckBox useRepairBox;
     private JCheckBox useSalvageBox;
@@ -118,7 +118,7 @@ public class MRMSDialog extends JDialog {
 
     private Map<PartRepairType, MRMSOptionControl> mrmsOptionControls = null;
 
-    private List<Unit> unitList          = null;
+    private List<Unit> unitList = null;
     private List<Part> completePartsList = null;
     private List<Part> filteredPartsList = null;
 
@@ -131,12 +131,13 @@ public class MRMSDialog extends JDialog {
         this(frame, modal, campaignGUI, null, mode);
     }
 
-    public MRMSDialog(final JFrame frame, final boolean modal, final CampaignGUI campaignGUI, final Unit selectedUnit, final MRMSMode mode) {
+    public MRMSDialog(final JFrame frame, final boolean modal, final CampaignGUI campaignGUI, final Unit selectedUnit,
+          final MRMSMode mode) {
         super(frame, modal);
-        this.frame        = frame;
-        this.campaignGUI  = campaignGUI;
+        this.frame = frame;
+        this.campaignGUI = campaignGUI;
         this.selectedUnit = selectedUnit;
-        this.mode         = mode;
+        this.mode = mode;
 
         campaignOptions = campaignGUI.getCampaign().getCampaignOptions();
 
@@ -150,8 +151,8 @@ public class MRMSDialog extends JDialog {
                 int unitCount = unitTable.getRowCount();
 
                 for (int i = 0; i < unitCount; i++) {
-                    int  rowIdx = unitTable.convertRowIndexToModel(i);
-                    Unit unit   = unitTableModel.getUnit(rowIdx);
+                    int rowIdx = unitTable.convertRowIndexToModel(i);
+                    Unit unit = unitTableModel.getUnit(rowIdx);
 
                     if (unit == null) {
                         continue;
@@ -192,8 +193,8 @@ public class MRMSDialog extends JDialog {
         int[] selectedRows = unitTable.getSelectedRows();
 
         for (int selectedRow : selectedRows) {
-            int  rowIdx = unitTable.convertRowIndexToModel(selectedRow);
-            Unit unit   = unitTableModel.getUnit(rowIdx);
+            int rowIdx = unitTable.convertRowIndexToModel(selectedRow);
+            Unit unit = unitTableModel.getUnit(rowIdx);
 
             if (unit == null) {
                 continue;
@@ -202,7 +203,7 @@ public class MRMSDialog extends JDialog {
             selectedUnitMap.put(unit.getId().toString(), unit);
         }
 
-        int activeCount   = 0;
+        int activeCount = 0;
         int inactiveCount = 0;
 
         unitList = new ArrayList<>();
@@ -230,8 +231,8 @@ public class MRMSDialog extends JDialog {
         int unitCount = unitTable.getRowCount();
 
         for (int i = 0; i < unitCount; i++) {
-            int  rowIdx = unitTable.convertRowIndexToModel(i);
-            Unit unit   = unitTableModel.getUnit(rowIdx);
+            int rowIdx = unitTable.convertRowIndexToModel(i);
+            Unit unit = unitTableModel.getUnit(rowIdx);
 
             if (!selectedUnitMap.containsKey(unit.getId().toString())) {
                 continue;
@@ -257,9 +258,9 @@ public class MRMSDialog extends JDialog {
 
             campaignGUI.getCampaign().getWarehouse().forEachSparePart(part -> {
                 if (!part.isBeingWorkedOn() &&
-                    part.needsFixing() &&
-                    !(part instanceof AmmoBin) &&
-                    (part.getSkillMin() <= SkillType.EXP_ELITE)) {
+                          part.needsFixing() &&
+                          !(part instanceof AmmoBin) &&
+                          (part.getSkillMin() <= SkillType.EXP_LEGENDARY)) {
                     completePartsList.add(part);
                 }
             });
@@ -315,12 +316,12 @@ public class MRMSDialog extends JDialog {
 
     private GridBagConstraints createBaseConstraints(int rowIdx) {
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx   = 0;
-        gridBagConstraints.gridy   = rowIdx;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = rowIdx;
         gridBagConstraints.weightx = 1;
         gridBagConstraints.weighty = 1;
-        gridBagConstraints.fill    = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
         return gridBagConstraints;
     }
@@ -356,9 +357,9 @@ public class MRMSDialog extends JDialog {
             column.setCellRenderer(unitTableModel.getRenderer(false));
 
             if ((i != UnitTableModel.COL_NAME) &&
-                (i != UnitTableModel.COL_TYPE) &&
-                (i != UnitTableModel.COL_STATUS) &&
-                (i != UnitTableModel.COL_RSTATUS)) {
+                      (i != UnitTableModel.COL_TYPE) &&
+                      (i != UnitTableModel.COL_STATUS) &&
+                      (i != UnitTableModel.COL_RSTATUS)) {
                 ((XTableColumnModel) unitTable.getColumnModel()).setColumnVisible(column, false);
             }
         }
@@ -371,12 +372,12 @@ public class MRMSDialog extends JDialog {
         scrollUnitList.setPreferredSize(new Dimension(350, 200));
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx   = 0;
-        gridBagConstraints.gridy   = 0;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill    = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
         pnlUnits.add(scrollUnitList, gridBagConstraints);
 
@@ -389,7 +390,7 @@ public class MRMSDialog extends JDialog {
               "PartsPanel.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         partsTableModel = new PartsTableModel();
-        partsTable      = new JTable(partsTableModel);
+        partsTable = new JTable(partsTableModel);
         partsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         partsTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         partsTable.setColumnModel(new XTableColumnModel());
@@ -406,9 +407,9 @@ public class MRMSDialog extends JDialog {
             column.setCellRenderer(partsTableModel.getRenderer());
 
             if ((i != PartsTableModel.COL_QUANTITY) &&
-                (i != PartsTableModel.COL_NAME) &&
-                (i != PartsTableModel.COL_DETAIL) &&
-                (i != PartsTableModel.COL_TECH_BASE)) {
+                      (i != PartsTableModel.COL_NAME) &&
+                      (i != PartsTableModel.COL_DETAIL) &&
+                      (i != PartsTableModel.COL_TECH_BASE)) {
                 ((XTableColumnModel) partsTable.getColumnModel()).setColumnVisible(column, false);
             }
         }
@@ -421,12 +422,12 @@ public class MRMSDialog extends JDialog {
         scrollPartsTable.setPreferredSize(new Dimension(350, 200));
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx   = 0;
-        gridBagConstraints.gridy   = 0;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill    = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlParts.add(scrollPartsTable, gridBagConstraints);
 
         return pnlParts;
@@ -444,19 +445,19 @@ public class MRMSDialog extends JDialog {
         useRepairBox = new JCheckBox(resources.getString("useRepairBox.text"));
         useRepairBox.setToolTipText(wordWrap(resources.getString("useRepairBox.toolTipText")));
         useRepairBox.setName("useRepairBox");
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 0;
-        gridBagConstraints.gridy   = gridRowIdx++;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = gridRowIdx++;
         gridBagConstraints.weightx = 1;
-        gridBagConstraints.fill    = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlOptions.add(useRepairBox, gridBagConstraints);
 
         useSalvageBox = new JCheckBox(resources.getString("useSalvageBox.text"));
         useSalvageBox.setToolTipText(wordWrap(resources.getString("useSalvageBox.toolTipText")));
         useSalvageBox.setName("useSalvageBox");
         gridBagConstraints.gridy = gridRowIdx++;
-        gridBagConstraints.fill  = GridBagConstraints.NONE;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         pnlOptions.add(useSalvageBox, gridBagConstraints);
 
         useExtraTimeBox = new JCheckBox(resources.getString("useExtraTimeBox.text"));
@@ -505,14 +506,14 @@ public class MRMSDialog extends JDialog {
         }
 
         JPanel pnlItems = new JPanel(new GridBagLayout());
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 0;
-        gridBagConstraints.gridy   = gridRowIdx++;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = gridRowIdx++;
         gridBagConstraints.weightx = 0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets  = new Insets(10, 0, 0, 0);
-        gridBagConstraints.anchor  = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill    = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(10, 0, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         pnlOptions.add(pnlItems, gridBagConstraints);
 
         gridRowIdx = 0;
@@ -521,11 +522,11 @@ public class MRMSDialog extends JDialog {
         itemLabel.setName("itemLabel");
         Font boldFont = new Font(itemLabel.getFont().getFontName(), Font.BOLD, itemLabel.getFont().getSize());
         itemLabel.setFont(boldFont);
-        gridBagConstraints        = new GridBagConstraints();
-        gridBagConstraints.gridx  = gridRowIdx++;
-        gridBagConstraints.gridy  = 0;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = gridRowIdx++;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-        gridBagConstraints.fill   = GridBagConstraints.NONE;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         pnlItems.add(itemLabel, gridBagConstraints);
 
@@ -646,7 +647,8 @@ public class MRMSDialog extends JDialog {
         return pnlOptions;
     }
 
-    private MRMSOptionControl createMRMSOptionControls(PartRepairType type, String text, String tooltipText, String activeBoxName, JPanel pnlItems, int rowIdx) {
+    private MRMSOptionControl createMRMSOptionControls(PartRepairType type, String text, String tooltipText,
+          String activeBoxName, JPanel pnlItems, int rowIdx) {
         MRMSOption mrmsOption = campaignOptions.getMRMSOptions()
                                       .stream()
                                       .filter(option -> option.getType() == type)
@@ -708,16 +710,17 @@ public class MRMSDialog extends JDialog {
         return mrmsOptionControl;
     }
 
-    private JSpinner createMRMSSkillBTHSpinner(int selectedValue, boolean enabled, JPanel pnlItems, int rowIdx, int columnIdx) {
+    private JSpinner createMRMSSkillBTHSpinner(int selectedValue, boolean enabled, JPanel pnlItems, int rowIdx,
+          int columnIdx) {
         JSpinner skillBTHSpn = new JSpinner(new SpinnerNumberModel(selectedValue, 1, 12, 1));
         ((DefaultEditor) skillBTHSpn.getEditor()).getTextField().setEditable(false);
         skillBTHSpn.setEnabled(enabled);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx  = columnIdx;
-        gridBagConstraints.gridy  = rowIdx;
+        gridBagConstraints.gridx = columnIdx;
+        gridBagConstraints.gridy = rowIdx;
         gridBagConstraints.insets = new Insets(0, 5, 0, 5);
-        gridBagConstraints.fill   = GridBagConstraints.NONE;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
 
         pnlItems.add(skillBTHSpn, gridBagConstraints);
@@ -725,16 +728,17 @@ public class MRMSDialog extends JDialog {
         return skillBTHSpn;
     }
 
-    private JSpinner createMRMSDailyTimeSpinner(int selectedValue, boolean enabled, JPanel pnlItems, int rowIdx, int columnIdx) {
+    private JSpinner createMRMSDailyTimeSpinner(int selectedValue, boolean enabled, JPanel pnlItems, int rowIdx,
+          int columnIdx) {
         JSpinner dailyTimeSpn = new JSpinner(new SpinnerNumberModel(selectedValue, 0, 480, 30));
         ((DefaultEditor) dailyTimeSpn.getEditor()).getTextField().setEditable(true);
         dailyTimeSpn.setEnabled(enabled);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx  = columnIdx;
-        gridBagConstraints.gridy  = rowIdx;
+        gridBagConstraints.gridx = columnIdx;
+        gridBagConstraints.gridy = rowIdx;
         gridBagConstraints.insets = new Insets(0, 5, 0, 5);
-        gridBagConstraints.fill   = GridBagConstraints.NONE;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
 
         pnlItems.add(dailyTimeSpn, gridBagConstraints);
@@ -742,29 +746,33 @@ public class MRMSDialog extends JDialog {
         return dailyTimeSpn;
     }
 
-    private JComboBox<String> createMRMSSkillCBox(int selectedValue, boolean enabled, JPanel pnlItems, int rowIdx, int columnIdx) {
+    private JComboBox<String> createMRMSSkillCBox(int selectedValue, boolean enabled, JPanel pnlItems, int rowIdx,
+          int columnIdx) {
         DefaultComboBoxModel<String> skillModel = new DefaultComboBoxModel<>();
         skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_ULTRA_GREEN));
         skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_GREEN));
         skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_REGULAR));
         skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_VETERAN));
         skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_ELITE));
+        skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_HEROIC));
+        skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_LEGENDARY));
         skillModel.setSelectedItem(SkillType.getExperienceLevelName(selectedValue));
         JComboBox<String> skillCBox = new JComboBox<>(skillModel);
         skillCBox.setEnabled(enabled);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx  = columnIdx;
-        gridBagConstraints.gridy  = rowIdx;
+        gridBagConstraints.gridx = columnIdx;
+        gridBagConstraints.gridy = rowIdx;
         gridBagConstraints.insets = new Insets(0, 5, 0, 5);
-        gridBagConstraints.fill   = GridBagConstraints.NONE;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
 
         pnlItems.add(skillCBox, gridBagConstraints);
 
         return skillCBox;
     }
 
-    private JCheckBox createMRMSOptionItemBox(String text, String toolTipText, String name, boolean selected, JPanel pnlItems, int rowIdx, int columnIdx) {
+    private JCheckBox createMRMSOptionItemBox(String text, String toolTipText, String name, boolean selected,
+          JPanel pnlItems, int rowIdx, int columnIdx) {
         JCheckBox optionItemBox = new JCheckBox();
         optionItemBox.setText(resources.getString(text));
         optionItemBox.setToolTipText(wordWrap(resources.getString(toolTipText)));
@@ -781,11 +789,11 @@ public class MRMSDialog extends JDialog {
         });
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx  = columnIdx;
-        gridBagConstraints.gridy  = rowIdx;
+        gridBagConstraints.gridx = columnIdx;
+        gridBagConstraints.gridy = rowIdx;
         gridBagConstraints.insets = new Insets(0, 0, 0, 5);
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill   = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 
         pnlItems.add(optionItemBox, gridBagConstraints);
 
@@ -801,13 +809,13 @@ public class MRMSDialog extends JDialog {
     private JPanel createUnitActionButtons() {
         JPanel pnlButtons = new JPanel();
 
-        int                btnIdx             = 0;
+        int btnIdx = 0;
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx     = btnIdx++;
-        gridBagConstraints.gridy     = 0;
+        gridBagConstraints.gridx = btnIdx++;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor    = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
 
         btnSelectNone = new JButton(resources.getString("btnSelectNone.text"));
         btnSelectNone.setToolTipText(wordWrap(resources.getString("btnSelectNone.toolTipText")));
@@ -860,8 +868,8 @@ public class MRMSDialog extends JDialog {
         int unitCount = unitTable.getRowCount();
 
         for (int i = 0; i < unitCount; i++) {
-            int  rowIdx = unitTable.convertRowIndexToModel(i);
-            Unit unit   = unitTableModel.getUnit(rowIdx);
+            int rowIdx = unitTable.convertRowIndexToModel(i);
+            Unit unit = unitTableModel.getUnit(rowIdx);
 
             if ((unit == null) || (unit.getActiveCrew() == null) || unit.getActiveCrew().isEmpty()) {
                 continue;
@@ -875,8 +883,8 @@ public class MRMSDialog extends JDialog {
         int unitCount = unitTable.getRowCount();
 
         for (int i = 0; i < unitCount; i++) {
-            int  rowIdx = unitTable.convertRowIndexToModel(i);
-            Unit unit   = unitTableModel.getUnit(rowIdx);
+            int rowIdx = unitTable.convertRowIndexToModel(i);
+            Unit unit = unitTableModel.getUnit(rowIdx);
 
             if (unit == null) {
                 continue;
@@ -891,13 +899,13 @@ public class MRMSDialog extends JDialog {
     private JPanel createPartsActionButtons() {
         JPanel pnlButtons = new JPanel();
 
-        int                btnIdx             = 0;
+        int btnIdx = 0;
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx     = btnIdx++;
-        gridBagConstraints.gridy     = 0;
+        gridBagConstraints.gridx = btnIdx++;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor    = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
 
         JButton btnDeselectParts = new JButton(resources.getString("btnDeselectParts.text"));
         btnDeselectParts.setToolTipText(wordWrap(resources.getString("btnDeselectParts.toolTipText")));
@@ -949,11 +957,11 @@ public class MRMSDialog extends JDialog {
         int btnIdx = 0;
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx     = btnIdx++;
-        gridBagConstraints.gridy     = 0;
+        gridBagConstraints.gridx = btnIdx++;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor    = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets    = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
 
         JButton btnStart = new JButton(resources.getString(getMode().isUnits() ?
                                                                  "btnStart.MRMS.text" :
@@ -1006,8 +1014,8 @@ public class MRMSDialog extends JDialog {
             List<Unit> units = new ArrayList<>();
 
             for (int selectedRow : selectedRows) {
-                int  rowIdx = unitTable.convertRowIndexToModel(selectedRow);
-                Unit unit   = unitTableModel.getUnit(rowIdx);
+                int rowIdx = unitTable.convertRowIndexToModel(selectedRow);
+                Unit unit = unitTableModel.getUnit(rowIdx);
 
                 if (unit == null) {
                     continue;
@@ -1056,8 +1064,8 @@ public class MRMSDialog extends JDialog {
             List<IPartWork> parts = new ArrayList<>();
 
             for (int selectedRow : selectedRows) {
-                int  rowIdx = partsTable.convertRowIndexToModel(selectedRow);
-                Part part   = partsTableModel.getPartAt(rowIdx);
+                int rowIdx = partsTable.convertRowIndexToModel(selectedRow);
+                Part part = partsTableModel.getPartAt(rowIdx);
 
                 if (part == null) {
                     continue;
@@ -1217,12 +1225,12 @@ public class MRMSDialog extends JDialog {
     }
 
     public static class MRMSOptionControl {
-        private JCheckBox         activeBox       = null;
-        private JComboBox<String> minSkillCBox    = null;
-        private JComboBox<String> maxSkillCBox    = null;
-        private JSpinner          minBTHSpn       = null;
-        private JSpinner          maxBTHSpn       = null;
-        private JSpinner          minDailyTimeSpn = null;
+        private JCheckBox activeBox = null;
+        private JComboBox<String> minSkillCBox = null;
+        private JComboBox<String> maxSkillCBox = null;
+        private JSpinner minBTHSpn = null;
+        private JSpinner maxBTHSpn = null;
+        private JSpinner minDailyTimeSpn = null;
 
         public JCheckBox getActiveBox() {
             return activeBox;
