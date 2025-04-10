@@ -37,6 +37,7 @@ import static megamek.common.UnitType.*;
 import static megamek.common.WeaponType.CLASS_ARTILLERY;
 import static megamek.common.planetaryconditions.Atmosphere.THIN;
 import static megamek.common.planetaryconditions.Wind.TORNADO_F4;
+import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.mission.AtBScenario.selectBotTeamCommanders;
 import static mekhq.campaign.mission.Scenario.T_GROUND;
@@ -1939,7 +1940,7 @@ public class AtBDynamicScenarioFactory {
     /**
      * Use the force generator system to randomly select a unit based on parameters
      *
-     * @param faction     The faction code to use for locating the correct RAT and assigning a crew name
+     * @param factionCode The faction code to use for locating the correct RAT and assigning a crew name
      * @param skill       The {@link SkillLevel} of the overall force.
      * @param quality     The equipment rating of the force.
      * @param unitType    The {@link UnitType} constant of the type of unit to generate.
@@ -1949,20 +1950,25 @@ public class AtBDynamicScenarioFactory {
      *
      * @return A randomly selected Entity from the parameters specified, with crew. May return null.
      */
-    public static @Nullable Entity getEntity(String faction, SkillLevel skill, int quality, int unitType,
+    public static @Nullable Entity getEntity(String factionCode, SkillLevel skill, int quality, int unitType,
           int weightClass, @Nullable Collection<MissionRole> rolesByType, Campaign campaign) {
         MekSummary unitData;
 
         // Set up random unit generation parameters
         UnitGeneratorParameters params = new UnitGeneratorParameters();
-        params.setFaction(faction);
+        params.setFaction(factionCode);
         params.setQuality(quality);
         params.setUnitType(unitType);
         params.setYear(campaign.getGameYear());
         params.setMissionRoles(rolesByType);
 
-        // This filter is to ensure we don't generate trailers or other units that cannot move
-        if (unitType != GUN_EMPLACEMENT) {
+        // Special handling for pre-Tukayyid, where Clan units shouldn't be appearing in non-Clan forces. Clan
+        // tech, at that time, would be closely guarded and not something we want OpFors to be generating with
+        if (filterOutClanTech(campaign, isFactionClan(factionCode))) {
+            params.setFilter(mekSummary -> !mekSummary.isClan() &&
+                                                 (unitType == GUN_EMPLACEMENT || mekSummary.getWalkMp() >= 1));
+        } else if (unitType != GUN_EMPLACEMENT) {
+            // This filter is to ensure we don't generate trailers or other units that cannot move
             params.setFilter(mekSummary -> mekSummary.getWalkMp() >= 1);
         }
 
@@ -1981,7 +1987,11 @@ public class AtBDynamicScenarioFactory {
             return null;
         }
 
-        return createEntityWithCrew(faction, skill, campaign, unitData);
+        return createEntityWithCrew(factionCode, skill, campaign, unitData);
+    }
+
+    private static boolean isBeforeBattleOfTukayyid(Campaign campaign) {
+        return campaign.getLocalDate().isBefore(BATTLE_OF_TUKAYYID);
     }
 
     /**
@@ -2045,8 +2055,15 @@ public class AtBDynamicScenarioFactory {
         if (campaign.getCampaignOptions().isOpForUsesVTOLs()) {
             params.getMovementModes().addAll(IUnitGenerator.MIXED_TANK_VTOL);
         } else {
-            params.setFilter(v -> !v.getUnitType().equals("VTOL"));
+            // Special handling for pre-Tukayyid, where Clan units shouldn't be appearing in non-Clan forces. Clan
+            // tech, at that time, would be closely guarded and not something we want OpFors to be generating with
+            if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
+                params.setFilter(mekSummary -> !mekSummary.isClan() && !mekSummary.getUnitType().equals("VTOL"));
+            } else {
+                params.setFilter(mekSummary -> !mekSummary.getUnitType().equals("VTOL"));
+            }
         }
+
         MekSummary unitData = campaign.getUnitGenerator().generate(params);
 
         if (unitData == null) {
@@ -2064,6 +2081,10 @@ public class AtBDynamicScenarioFactory {
         }
 
         return createEntityWithCrew(params.getFaction(), skill, campaign, unitData);
+    }
+
+    private static boolean filterOutClanTech(Campaign campaign, boolean isClan) {
+        return isBeforeBattleOfTukayyid(campaign) && !isClan;
     }
 
     /**
@@ -2382,7 +2403,17 @@ public class AtBDynamicScenarioFactory {
             } else {
                 newParams.getMovementModes().add(EntityMovementMode.INF_LEG);
             }
-            newParams.setFilter(inf -> inf.getTons() <= IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT);
+
+            // Special handling for pre-Tukayyid, where Clan units shouldn't be appearing in non-Clan forces. Clan
+            // tech, at that time, would be closely guarded and not something we want OpFors to be generating with
+            if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
+                params.setFilter(mekSummary -> !mekSummary.isClan() &&
+                                                     mekSummary.getTons() <=
+                                                           IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT);
+            } else {
+                params.setFilter(mekSummary -> mekSummary.getTons() <= IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT);
+            }
+
             unitData = campaign.getUnitGenerator().generate(newParams);
 
             if (unitData == null) {
@@ -2416,7 +2447,15 @@ public class AtBDynamicScenarioFactory {
 
         } else {
             newParams.getMovementModes().addAll(IUnitGenerator.ALL_INFANTRY_MODES);
-            newParams.setFilter(inf -> inf.getTons() <= bayCapacity);
+
+            // Special handling for pre-Tukayyid, where Clan units shouldn't be appearing in non-Clan forces. Clan
+            // tech, at that time, would be closely guarded and not something we want OpFors to be generating with
+            if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
+                params.setFilter(mekSummary -> !mekSummary.isClan() && mekSummary.getTons() <= bayCapacity);
+            } else {
+                params.setFilter(mekSummary -> mekSummary.getTons() <= bayCapacity);
+            }
+
             unitData = campaign.getUnitGenerator().generate(newParams);
 
             if (unitData == null) {
@@ -2475,7 +2514,13 @@ public class AtBDynamicScenarioFactory {
             // Set the parameters to filter out types that are too heavy for the provided
             // bay space, or those that cannot use mechanized BA travel
             if (bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT) {
-                newParams.setFilter(inf -> inf.getTons() <= bayCapacity);
+                // Special handling for pre-Tukayyid, where Clan units shouldn't be appearing in non-Clan forces. Clan
+                // tech, at that time, would be closely guarded and not something we want OpFors to be generating with
+                if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
+                    params.setFilter(mekSummary -> !mekSummary.isClan() && mekSummary.getTons() <= bayCapacity);
+                } else {
+                    params.setFilter(mekSummary -> mekSummary.getTons() <= bayCapacity);
+                }
             } else {
                 newParams.addMissionRole(MECHANIZED_BA);
             }
@@ -2486,7 +2531,14 @@ public class AtBDynamicScenarioFactory {
         // If generating for an internal bay fails, try again as mechanized if the flag is set
         if (unitData == null) {
             if (newParams != null && bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT && retryAsMechanized) {
-                newParams.setFilter(null);
+                // Special handling for pre-Tukayyid, where Clan units shouldn't be appearing in non-Clan forces. Clan
+                // tech, at that time, would be closely guarded and not something we want OpFors to be generating with
+                if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
+                    params.setFilter(mekSummary -> !mekSummary.isClan());
+                } else {
+                    newParams.setFilter(null);
+                }
+
                 newParams.addMissionRole((MECHANIZED_BA));
                 unitData = campaign.getUnitGenerator().generate(newParams);
             }
@@ -2501,6 +2553,12 @@ public class AtBDynamicScenarioFactory {
         } else {
             return null;
         }
+    }
+
+    private static boolean isFactionClan(String params) {
+        Faction faction = Factions.getInstance().getFaction(params);
+        boolean isClan = faction != null && faction.isClan();
+        return isClan;
     }
 
     /**
@@ -3719,11 +3777,15 @@ public class AtBDynamicScenarioFactory {
     private static void setBotForceParameters(BotForce generatedForce, ScenarioForceTemplate forceTemplate,
           ForceAlignment forceAlignment, AtBContract contract) {
         if (forceAlignment == ForceAlignment.Allied) {
-            generatedForce.setName(String.format("%s %s", contract.getAllyBotName(), forceTemplate.getForceName()));
+            generatedForce.setName(java.lang.String.format("%s %s",
+                  contract.getAllyBotName(),
+                  forceTemplate.getForceName()));
             generatedForce.setColour(contract.getAllyColour());
             generatedForce.setCamouflage(contract.getAllyCamouflage().clone());
         } else if (forceAlignment == ForceAlignment.Opposing) {
-            generatedForce.setName(String.format("%s %s", contract.getEnemyBotName(), forceTemplate.getForceName()));
+            generatedForce.setName(java.lang.String.format("%s %s",
+                  contract.getEnemyBotName(),
+                  forceTemplate.getForceName()));
             generatedForce.setColour(contract.getEnemyColour());
             generatedForce.setCamouflage(contract.getEnemyCamouflage().clone());
         } else {
