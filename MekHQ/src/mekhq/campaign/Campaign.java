@@ -178,6 +178,7 @@ import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
+import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.lifeEvents.ComingOfAgeAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement;
@@ -5117,6 +5118,12 @@ public class Campaign implements ITechManager {
         if (campaignOptions.isUseAgeEffects() && isBirthday) {
             // This is where we update all the aging modifiers for the character.
             updateAllSkillAgeModifiers(currentDay, person);
+        }
+
+        if (campaignOptions.isRewardComingOfAgeAbilities() && isBirthday && (person.getAge(currentDay) == 16)) {
+            SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
+            singleSpecialAbilityGenerator.rollSPA(this, person);
+            MekHQ.triggerEvent(new PersonChangedEvent(person));
         }
     }
 
