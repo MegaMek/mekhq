@@ -621,7 +621,8 @@ They also gain Fatigue based on the campaign options fatigue rate (default 1).]]
     <ability>
         <lookupName>mutation_freakish_strength</lookupName>
         <displayName>Freakish Strength (ATOW:Companion)</displayName>
-        <desc><![CDATA[Increases Strength Attribute by 2 (may not take it above 10).
+        <desc><![CDATA[Increases Strength Attribute by 2 and maximum Strength by 1. Neither increase may take this
+         Attribute above 10.
 
 Increases the target number of all Charisma-based skills by 2 due to inhumanly shaped bulk.]]></desc>
         <xpCost>300</xpCost>
