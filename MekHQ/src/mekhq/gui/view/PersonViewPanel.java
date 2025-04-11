@@ -35,8 +35,6 @@ import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
 import static mekhq.campaign.personnel.skills.SkillType.RP_ONLY_TAG;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
-import static mekhq.utilities.ImageUtilities.addTintToImageIcon;
-import static mekhq.utilities.ImageUtilities.scaleImage;
 import static org.jfree.chart.ChartColor.DARK_BLUE;
 import static org.jfree.chart.ChartColor.DARK_RED;
 
@@ -68,6 +66,7 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.logging.MMLogger;
+import megamek.utilities.ImageUtilities;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -417,7 +416,9 @@ public class PersonViewPanel extends JScrollablePanel {
                     continue;
                 }
 
-                ribbon = scaleImage(ribbon, 8, false);
+                ImageIcon ribbonAsImageIcon = new ImageIcon(ribbon);
+                ribbonAsImageIcon = ImageUtilities.scaleImageIcon(ribbonAsImageIcon, 8, false);
+                ribbon = ribbonAsImageIcon.getImage();
 
                 ribbonLabel.setIcon(new ImageIcon(ribbon));
                 ribbonLabel.setToolTipText(award.getTooltip(campaign.getCampaignOptions(), person));
@@ -493,7 +494,9 @@ public class PersonViewPanel extends JScrollablePanel {
                     continue;
                 }
 
-                medal = scaleImage(medal, 40, false);
+                ImageIcon medalAsImageIcon = new ImageIcon(medal);
+                medalAsImageIcon = ImageUtilities.scaleImageIcon(medalAsImageIcon, 40, false);
+                medal = medalAsImageIcon.getImage();
 
                 medalLabel.setIcon(new ImageIcon(medal));
                 medalLabel.setToolTipText(award.getTooltip(campaign.getCampaignOptions(), person));
@@ -537,7 +540,9 @@ public class PersonViewPanel extends JScrollablePanel {
                     continue;
                 }
 
-                misc = scaleImage(misc, 40, false);
+                ImageIcon miscAsImageIcon = new ImageIcon(misc);
+                miscAsImageIcon = ImageUtilities.scaleImageIcon(miscAsImageIcon, 40, false);
+                misc = miscAsImageIcon.getImage();
 
                 miscLabel.setIcon(new ImageIcon(misc));
                 miscLabel.setToolTipText(award.getTooltip(campaign.getCampaignOptions(), person));
