@@ -49,6 +49,7 @@ import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.enums.education.EducationLevel.DOCTORATE;
 import static mekhq.campaign.personnel.skills.Attributes.ATTRIBUTE_IMPROVEMENT_COST;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
@@ -148,6 +149,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(PersonnelTableMouseAdapter.class);
 
     // region Variable Declarations
+    private static final String CMD_SKILL_CHECK = "SKILL_CHECK";
     private static final String CMD_RANKSYSTEM = "RANKSYSTEM";
     private static final String CMD_RANK = "RANK";
     private static final String CMD_MANEI_DOMINI_RANK = "MD_RANK";
@@ -331,6 +333,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         String[] data = action.getActionCommand().split(SEPARATOR, -1);
 
         switch (data[0]) {
+            case CMD_SKILL_CHECK: {
+                for (final Person person : people) {
+                    new SkillCheckDialog(getCampaign(), person);
+                }
+                break;
+            }
             case CMD_RANKSYSTEM: {
                 final RankSystem rankSystem = Ranks.getRankSystemFromCode(data[1]);
                 final RankValidator rankValidator = new RankValidator();
@@ -646,11 +654,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       true,
                       resources.getString("spendOnAttributes.score"),
                       selectedPerson.getAttributeScore(attribute),
-                      0);
+                      MINIMUM_ATTRIBUTE_SCORE);
                 choiceDialog.setVisible(true);
 
                 int choice = choiceDialog.getValue();
-                if (choice <= 0) {
+                if (choice < 0) {
                     // <0 indicates Cancellation
                     return;
                 }
@@ -1702,6 +1710,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         Person[] selected = getSelectedPeople();
 
         // lets fill the pop up menu
+        menuItem = new JMenuItem(resources.getString("makeSkillCheck.text"));
+        menuItem.setActionCommand(makeCommand(CMD_SKILL_CHECK));
+        menuItem.addActionListener(this);
+        popup.add(menuItem);
+
         if (StaticChecks.areAllEligible(true, selected)) {
             menu = new JMenu(resources.getString("changeRank.text"));
             final Profession initialProfession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
