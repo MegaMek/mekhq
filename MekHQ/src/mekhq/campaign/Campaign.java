@@ -46,6 +46,7 @@ import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performRe
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
+import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
@@ -4325,6 +4326,7 @@ public class Campaign implements ITechManager {
                                  (partWork.getUnit().getEntity() instanceof Jumpship))) {
                     helpMod = 0;
                 }
+
                 if (partWork.getShorthandedMod() < helpMod) {
                     partWork.setShorthandedMod(helpMod);
                 }
@@ -4345,10 +4347,7 @@ public class Campaign implements ITechManager {
                     }
                 } else {
                     report += " cannot be finished because there was no time left after maintenance tasks.</b>";
-                    partWork.resetTimeSpent();
-                    partWork.resetOvertime();
-                    partWork.setTech(null);
-                    partWork.cancelReservation();
+                    partWork.cancelAssignment(true);
                 }
                 MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
                 addReport(report);
@@ -4444,10 +4443,7 @@ public class Campaign implements ITechManager {
             report += " (" + xpGained + "XP gained) ";
         }
         report += wrongType;
-        partWork.resetTimeSpent();
-        partWork.resetOvertime();
-        partWork.setTech(null);
-        partWork.cancelReservation();
+        partWork.cancelAssignment(true);
         MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
         addReport(report);
         return report;
@@ -4930,6 +4926,19 @@ public class Campaign implements ITechManager {
                         personnelWhoAdvancedInXP.add(person);
                     }
                 }
+
+                if (person.isCommander() &&
+                          campaignOptions.isAllowMonthlyReinvestment() &&
+                          !person.isHasPerformedExtremeExpenditure()) {
+                    String reportString = performDiscretionarySpending(person, finances, currentDay);
+                    if (reportString != null) {
+                        addReport(reportString);
+                    } else {
+                        logger.error("Unable to process discretionary spending for {}", person.getFullTitle());
+                    }
+                }
+
+                person.setHasPerformedExtremeExpenditure(false);
             }
 
             if (isCommandersDay && !faction.isClan() && (peopleWhoCelebrateCommandersDay < commanderDayTargetNumber)) {
@@ -5262,7 +5271,7 @@ public class Campaign implements ITechManager {
                           "%s looks at %s, recalls his total lack of skill for working with such technology, then slowly puts the tools down before anybody gets hurt.",
                           tech.getHyperlinkedFullTitle(),
                           part.getName()));
-                    part.setTech(null);
+                    part.cancelAssignment(false);
                 }
             } else {
                 JOptionPane.showMessageDialog(null,
@@ -6404,7 +6413,8 @@ public class Campaign implements ITechManager {
     }
 
     public void setTemporaryPrisonerCapacity(int temporaryPrisonerCapacity) {
-        this.temporaryPrisonerCapacity = max(PrisonerEventManager.MINIMUM_TEMPORARY_CAPACITY, temporaryPrisonerCapacity);
+        this.temporaryPrisonerCapacity = max(PrisonerEventManager.MINIMUM_TEMPORARY_CAPACITY,
+              temporaryPrisonerCapacity);
     }
 
     public RandomEventLibraries getRandomEventLibraries() {

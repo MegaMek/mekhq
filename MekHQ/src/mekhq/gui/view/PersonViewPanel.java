@@ -31,9 +31,9 @@ import static java.awt.Color.BLACK;
 import static java.awt.Color.RED;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
+import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
-import static mekhq.utilities.ImageUtilities.addTintToImageIcon;
 import static org.jfree.chart.ChartColor.DARK_BLUE;
 import static org.jfree.chart.ChartColor.DARK_RED;
 
@@ -93,8 +93,6 @@ import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.WrapLayout;
-
-import static megamek.client.ui.WrapLayout.wordWrap;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
@@ -1602,7 +1600,8 @@ public class PersonViewPanel extends JScrollablePanel {
             }
         }
 
-        if (campaign.getCampaignOptions().isUseEdge() && (person.getEdge() > 0)) {
+        int edge = person.getAdjustedEdge();
+        if (campaign.getCampaignOptions().isUseEdge() && (edge != 0)) {
             lblEdge1.setName("lblEdge1");
             lblEdge1.setText(resourceMap.getString("lblEdge1.text"));
             gridBagConstraints = new GridBagConstraints();

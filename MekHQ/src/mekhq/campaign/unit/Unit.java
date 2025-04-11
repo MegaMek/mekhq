@@ -28,6 +28,7 @@
  */
 package mekhq.campaign.unit;
 
+import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static megamek.common.MiscType.F_CARGO;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
@@ -265,7 +266,11 @@ public class Unit implements ITechnology {
         } else if (!isPresent()) {
             return "In transit (" + getDaysToArrival() + " days)";
         } else if (isRefitting()) {
-            return "Refitting";
+            int minutesInHour = 60;
+            int hoursInDay = 24;
+            int minutesInDay = hoursInDay * minutesInHour;
+            int days = (int) ceil((double) getRefit().getTimeLeft() / minutesInDay);
+            return "Refitting" + " (" + days + " days)";
         } else {
             return getCondition();
         }
@@ -4829,12 +4834,12 @@ public class Unit implements ITechnology {
                 if (getCampaign().getCampaignOptions().isUseEdge()) {
                     double sumEdge = 0;
                     for (Person p : drivers) {
-                        sumEdge += p.getEdge();
+                        sumEdge += p.getCurrentEdge();
                     }
                     // Again, don't count infantrymen twice
                     if (!entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
                         for (Person p : gunners) {
-                            sumEdge += p.getEdge();
+                            sumEdge += p.getCurrentEdge();
                         }
                     }
                     // Average the edge values of pilots and gunners. The Spacecraft Engineer
@@ -5228,7 +5233,7 @@ public class Unit implements ITechnology {
                         }
                         sumEdgeUsed = engineer.getEdgeUsed();
                     }
-                    sumEdge += p.getEdge();
+                    sumEdge += p.getAdjustedEdge();
 
                     if (p.hasSkill(SkillType.S_TECH_VESSEL)) {
                         sumSkill += p.getSkill(SkillType.S_TECH_VESSEL).getLevel();
@@ -5262,7 +5267,7 @@ public class Unit implements ITechnology {
                     }
                     engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill / nCrew, sumBonus / nCrew);
                     engineer.setEdgeUsed(sumEdgeUsed);
-                    engineer.setCurrentEdge((sumEdge - sumEdgeUsed) / nCrew);
+                    engineer.setCurrentEdge(max(0, (sumEdge - sumEdgeUsed) / nCrew));
                     engineer.setUnit(this);
                 } else {
                     engineer = null;
@@ -5287,7 +5292,7 @@ public class Unit implements ITechnology {
             // cancel any scheduled tasks
             for (Part p : getParts()) {
                 if (p.isBeingWorkedOn()) {
-                    p.cancelAssignment();
+                    p.cancelAssignment(true);
                 }
             }
         }
@@ -5804,7 +5809,7 @@ public class Unit implements ITechnology {
 
         // clear any assigned tasks
         for (Part p : getParts()) {
-            p.cancelAssignment();
+            p.cancelAssignment(true);
         }
 
         if (!isGM) {
@@ -5962,7 +5967,7 @@ public class Unit implements ITechnology {
         if (getEntity() instanceof Infantry) {
             return TECH_WORK_DAY;
         } else if ((getEntity() instanceof Dropship) || (getEntity() instanceof Jumpship)) {
-            return TECH_WORK_DAY * (int) Math.ceil(getEntity().getWeight() / 500.0);
+            return TECH_WORK_DAY * (int) ceil(getEntity().getWeight() / 500.0);
         } else if (isMothballed()) {
             return TECH_WORK_DAY;
         } else {

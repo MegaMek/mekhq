@@ -28,9 +28,9 @@
 package mekhq.gui.dialog.resupplyAndCaches;
 
 import static megamek.common.Compute.randomInt;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerDescription;
 import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerIcon;
-import static mekhq.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.BorderLayout;

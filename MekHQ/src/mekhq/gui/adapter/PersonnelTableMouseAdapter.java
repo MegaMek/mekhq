@@ -38,6 +38,9 @@ import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_COST_HAND_TYPE_
 import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_COST_LEG_TYPE_5;
 import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_MINIMUM_SKILL_REQUIRED_TYPES_3_4_5;
 import static mekhq.campaign.mod.am.InjuryTypes.REPLACEMENT_LIMB_RECOVERY;
+import static mekhq.campaign.personnel.DiscretionarySpending.getExpenditure;
+import static mekhq.campaign.personnel.DiscretionarySpending.getExpenditureExhaustedReportMessage;
+import static mekhq.campaign.personnel.DiscretionarySpending.performExtremeExpenditure;
 import static mekhq.campaign.personnel.Person.*;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
@@ -47,6 +50,7 @@ import static mekhq.campaign.personnel.enums.education.EducationLevel.DOCTORATE;
 import static mekhq.campaign.personnel.skills.Attributes.ATTRIBUTE_IMPROVEMENT_COST;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.S_DOCTOR;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 
@@ -189,6 +193,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_EDIT_HITS = "EDIT_HITS";
     private static final String CMD_EDIT = "EDIT";
     private static final String CMD_SACK = "SACK";
+    private static final String CMD_SPENDING_SPREE = "SPENDING_SPREE";
     private static final String CMD_REMOVE = "REMOVE";
     private static final String CMD_EDGE_TRIGGER = "EDGE";
     private static final String CMD_CHANGE_PRISONER_STATUS = "PRISONER_STATUS";
@@ -213,6 +218,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_PERSONALITY = "PERSONALITY";
     private static final String CMD_ADD_RANDOM_ABILITY = "ADD_RANDOM_ABILITY";
     private static final String CMD_GENERATE_ROLEPLAY_SKILLS = "GENERATE_ROLEPLAY_SKILLS";
+    private static final String CMD_GENERATE_ROLEPLAY_TRAITS = "GENERATE_ROLEPLAY_TRAITS";
 
     private static final String CMD_FREE = "FREE";
     private static final String CMD_EXECUTE = "EXECUTE";
@@ -1006,6 +1012,29 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
+            case CMD_SPENDING_SPREE: {
+                for (Person person : people) {
+                    if (person.getWealth() > MINIMUM_WEALTH) {
+                        if (person.isHasPerformedExtremeExpenditure()) {
+                            String report = getExpenditureExhaustedReportMessage(person.getHyperlinkedFullTitle());
+                            getCampaign().addReport(report);
+                            continue;
+                        }
+
+                        String report = performExtremeExpenditure(person,
+                              getCampaign().getFinances(),
+                              getCampaign().getLocalDate());
+                        getCampaign().addReport(report);
+
+                        if (!person.isFounder()) {
+                            person.performForcedDirectionLoyaltyChange(getCampaign(), false, true, true);
+                        }
+
+                        MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    }
+                }
+                break;
+            }
             case CMD_EDIT: {
                 for (Person person : people) {
                     CustomizePersonDialog npd = new CustomizePersonDialog(getFrame(), true, person, getCampaign());
@@ -1363,6 +1392,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPreferences);
                 for (Person person : people) {
                     skillGenerator.generateRoleplaySkills(person, person.getExperienceLevel(getCampaign(), false));
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
+            case CMD_GENERATE_ROLEPLAY_TRAITS: {
+                RandomSkillPreferences skillPreferences = getCampaign().getRandomSkillPreferences();
+                AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPreferences);
+                for (Person person : people) {
+                    skillGenerator.generateTraits(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -3272,6 +3310,20 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             popup.add(menuItem);
         }
 
+        if (oneSelected) {
+            int wealth = person.getWealth();
+            int willpower = person.getAttributeScore(WILLPOWER);
+            int spending = getExpenditure(willpower, wealth);
+            String spendingString = Money.of(spending).toAmountString();
+            menuItem = new JMenuItem(String.format(resources.getString("wealth.extreme.single"), spendingString));
+            menuItem.setEnabled(!person.isHasPerformedExtremeExpenditure());
+        } else {
+            menuItem = new JMenuItem(resources.getString("wealth.extreme.multiple"));
+        }
+        menuItem.setActionCommand(CMD_SPENDING_SPREE);
+        menuItem.addActionListener(this);
+        popup.add(menuItem);
+
         // region Flags Menu
         // This Menu contains the following flags, in the specified order:
         // 1) Clan Personnel
@@ -3630,6 +3682,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setActionCommand(CMD_GENERATE_ROLEPLAY_SKILLS);
             menuItem.addActionListener(this);
             menu.add(menuItem);
+
+            if (getCampaign().getRandomSkillPreferences().isRandomizeTraits()) {
+                menuItem = new JMenuItem(resources.getString("generateRoleplayTraits.text"));
+                menuItem.setActionCommand(CMD_GENERATE_ROLEPLAY_TRAITS);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+            }
 
             JMenu attributesMenu = new JMenu(resources.getString("spendOnAttributes.set"));
 

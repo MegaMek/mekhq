@@ -29,6 +29,7 @@ package mekhq.gui.dialog.resupplyAndCaches;
 
 import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
 import static megamek.common.Compute.randomInt;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.finances.enums.TransactionType.EQUIPMENT_PURCHASE;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.loadPlayerConvoys;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.makeDelivery;
@@ -42,7 +43,6 @@ import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getS
 import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.createPartsReport;
 import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.formatColumnData;
 import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.getEnemyFactionReference;
-import static mekhq.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.BorderLayout;
