@@ -6786,118 +6786,164 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Use an A* algorithm to find the best path between two planets For right now, we are just going to minimize the
-     * number of jumps, but we could extend this to take advantage of recharge information or other variables as well
-     * Based on <a href="http://www.policyalmanac.org/games/aStarTutorial.htm">Policy Almanac A Star Tutorial</a>
+     * Calculates the optimal jump path between two planetary systems using the A* algorithm.
      *
-     * @param start Starting System
-     * @param end   Ending System
+     * <p>This implementation minimizes a combination of jump counts and recharge times to find the most efficient
+     * route between systems. The algorithm uses a heuristic based on straight-line distance combined with actual path
+     * costs from the starting system.</p>
      *
-     * @return A {@link JumpPath} if found.
+     * <p>The algorithm will optionally avoid systems without population when the {@code
+     * isAvoidingEmptySystems} flag equals {@code true}.</p>
+     *
+     * <p>Implementation is based on:
+     * <a href="http://www.policyalmanac.org/games/aStarTutorial.htm">Policy Almanac A* Tutorial</a></p>
+     *
+     * @param start The starting planetary system
+     * @param end   The destination planetary system
+     *
+     * @return A {@link JumpPath} containing the sequence of systems to traverse, or {@code null} if no valid path
+     *       exists between the systems. If start and end are the same system, returns a path containing only that
+     *       system.
      */
     public @Nullable JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end) {
+        // Handle edge cases
         if (null == start) {
             return null;
         }
         if ((null == end) || start.getId().equals(end.getId())) {
-            JumpPath jpath = new JumpPath();
-            jpath.addSystem(start);
-            return jpath;
+            JumpPath jumpPath = new JumpPath();
+            jumpPath.addSystem(start);
+            return jumpPath;
         }
 
+        // Initialize A* algorithm variables
         String startKey = start.getId();
         String endKey = end.getId();
 
-        String current = startKey;
         Set<String> closed = new HashSet<>();
         Set<String> open = new HashSet<>();
-        boolean found = false;
-        int jumps = 0;
 
-        // we are going to through and set up some hashes that will make our
-        // work easier
-        // hash of parent key
         Map<String, String> parent = new HashMap<>();
-        // hash of H for each planet which will not change
-        Map<String, Double> scoreH = new HashMap<>();
-        // hash of G for each planet which might change
-        Map<String, Double> scoreG = new HashMap<>();
+        Map<String, Double> scoreH = new HashMap<>(); // Heuristic scores (estimated cost to goal)
+        Map<String, Double> scoreG = new HashMap<>(); // Path costs from start
 
-        for (String key : Systems.getInstance().getSystems().keySet()) {
-            PlanetarySystem system = Systems.getInstance().getSystems().get(key);
-            scoreH.put(key, end.getDistanceTo(system));
+        // Precompute heuristics
+        Systems systemsInstance = Systems.getInstance();
+        Map<String, PlanetarySystem> allSystems = systemsInstance.getSystems();
+
+        for (Entry<String, PlanetarySystem> entry : allSystems.entrySet()) {
+            scoreH.put(entry.getKey(), end.getDistanceTo(entry.getValue()));
         }
 
+        // Initialize starting node
+        String current = startKey;
         scoreG.put(current, 0.0);
         closed.add(current);
 
-        while (!found && jumps < 10000) {
-            jumps++;
-            double currentG = scoreG.get(current) +
-                                    Systems.getInstance().getSystemById(current).getRechargeTime(getLocalDate());
-
+        // A* search
+        final int MAX_JUMPS = 10000;
+        for (int jumps = 0; jumps < MAX_JUMPS; jumps++) {
+            // Get current node's information
+            PlanetarySystem currentSystem = systemsInstance.getSystemById(current);
+            double currentG = scoreG.get(current) + currentSystem.getRechargeTime(getLocalDate());
             final String localCurrent = current;
-            Systems.getInstance()
-                  .visitNearbySystems(Systems.getInstance().getSystemById(current), 30, planetarySystem -> {
-                      // Skip systems without population
-                      if (isAvoidingEmptySystems && planetarySystem.getPopulation(currentDay) <= 0) {
-                          return;
-                      }
 
-                      if (closed.contains(planetarySystem.getId())) {
-                          // Do nothing
-                      } else if (open.contains(planetarySystem.getId())) {
-                          // is the current G better than the existing G
-                          if (currentG < scoreG.get(planetarySystem.getId())) {
-                              // then change G and parent
-                              scoreG.put(planetarySystem.getId(), currentG);
-                              parent.put(planetarySystem.getId(), localCurrent);
-                          }
-                      } else {
-                          // put the current G for this one in memory
-                          scoreG.put(planetarySystem.getId(), currentG);
-                          // put the parent in memory
-                          parent.put(planetarySystem.getId(), localCurrent);
-                          open.add(planetarySystem.getId());
-                      }
-                  });
+            // Explore neighbors
+            systemsInstance.visitNearbySystems(currentSystem, 30, neighborSystem -> {
+                String neighborId = neighborSystem.getId();
 
-            String bestMatch = null;
-            double bestF = Double.POSITIVE_INFINITY;
-            for (String possible : open) {
-                // calculate F
-                double currentF = scoreG.get(possible) + scoreH.get(possible);
-                if (currentF < bestF) {
-                    bestMatch = possible;
-                    bestF = currentF;
+                // Skip systems without population if avoiding empty systems
+                if (isAvoidingEmptySystems && neighborSystem.getPopulation(currentDay) <= 0) {
+                    return;
                 }
+
+                if (closed.contains(neighborId)) {
+                    return; // Already evaluated
+                }
+
+                if (open.contains(neighborId)) {
+                    // Check if this path is better than the previously found one
+                    if (currentG < scoreG.get(neighborId)) {
+                        scoreG.put(neighborId, currentG);
+                        parent.put(neighborId, localCurrent);
+                    }
+                } else {
+                    // Discover a new node
+                    scoreG.put(neighborId, currentG);
+                    parent.put(neighborId, localCurrent);
+                    open.add(neighborId);
+                }
+            });
+
+            // Find the open node with the lowest f score
+            String bestMatch = findNodeWithLowestFScore(open, scoreG, scoreH);
+
+            if (bestMatch == null) {
+                break; // No path exists
             }
 
+            // Move to the best node
             current = bestMatch;
-            if (null == current) {
-                // We're done - probably failed to find anything
-                break;
-            }
-
             closed.add(current);
             open.remove(current);
+
+            // Check if we've reached the destination
             if (current.equals(endKey)) {
-                found = true;
+                return reconstructPath(current, parent, systemsInstance);
             }
         }
 
-        // now we just need to back up from the last current by parents until we
-        // hit null
+        // No path found or maximum jumps reached
+        return reconstructPath(current, parent, systemsInstance);
+    }
+
+    /**
+     * Finds the node in the open set with the lowest f-score (g + h).
+     *
+     * @param openSet The set of nodes to evaluate
+     * @param gScores Map of path costs from start
+     * @param hScores Map of heuristic distances to goal
+     *
+     * @return The node with the lowest f-score, or null if openSet is empty
+     */
+    private String findNodeWithLowestFScore(Set<String> openSet, Map<String, Double> gScores,
+          Map<String, Double> hScores) {
+        String bestMatch = null;
+        double bestF = Double.POSITIVE_INFINITY;
+
+        for (String candidate : openSet) {
+            double f = gScores.get(candidate) + hScores.get(candidate);
+            if (f < bestF) {
+                bestMatch = candidate;
+                bestF = f;
+            }
+        }
+
+        return bestMatch;
+    }
+
+    /**
+     * Reconstructs the path from the parent map.
+     *
+     * @param current         The final node in the path
+     * @param parent          Map of parent nodes
+     * @param systemsInstance The systems registry
+     *
+     * @return A JumpPath containing the sequence of systems
+     */
+    private JumpPath reconstructPath(String current, Map<String, String> parent, Systems systemsInstance) {
+        // Reconstruct path
         List<PlanetarySystem> path = new ArrayList<>();
         String nextKey = current;
-        while (null != nextKey) {
-            path.add(Systems.getInstance().getSystemById(nextKey));
+
+        while (nextKey != null) {
+            path.add(systemsInstance.getSystemById(nextKey));
             nextKey = parent.get(nextKey);
         }
 
-        // now reverse the direction
+        // Create the final path in the correct order (start to end)
         JumpPath finalPath = new JumpPath();
-        for (int i = (path.size() - 1); i >= 0; i--) {
+        for (int i = path.size() - 1; i >= 0; i--) {
             finalPath.addSystem(path.get(i));
         }
 
