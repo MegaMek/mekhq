@@ -6514,8 +6514,8 @@ public class Unit implements ITechnology {
                      "<b>Ammunition</b>: " +
                      getAmmoCost().toAmountAndSymbolString() +
                      "<br>" +
-                     "<b>Fuel</b>: " +
-                     getFuelCost().toAmountAndSymbolString() +
+                     "<b>Fuel</b>: ~" +
+                     getFuelCost(0).toAmountAndSymbolString() +
                      "<br>";
     }
 
@@ -6624,21 +6624,62 @@ public class Unit implements ITechnology {
         return ammoCost.multipliedBy(0.25);
     }
 
+    /**
+     * @deprecated use {@link #getFuelCost(int)} instead.
+     */
+    @Deprecated(since = "0.50.04", forRemoval = true)
     public Money getFuelCost() {
-        Money fuelCost = Money.zero();
+        return getFuelCost(0);
+    }
 
-        if ((entity instanceof Warship) || (entity instanceof SmallCraft)) {
-            fuelCost = fuelCost.plus(getTonsBurnDay(entity));
-        } else if (entity instanceof Jumpship) {
-            fuelCost = fuelCost.plus(getTonsBurnDay(entity));// * 3 * 15000;
-        } else if (entity instanceof ConvFighter) {
+    /**
+     * Calculates the monthly fuel cost for this unit, applying any available hydrogen production credits.
+     *
+     * <p>Different entity types have different fuel requirements:</p>
+     * <ul>
+     *   <li>Large Craft and Small Craft: Calculated based on tons burned per day</li>
+     *   <li>Conventional Fighters: Use fighter-specific fuel cost calculation</li>
+     *   <li>Aerospace Fighters: Based on fuel tonnage multiplied by a factor of 4</li>
+     *   <li>Vehicles and Mechs: Use vehicle-specific fuel cost calculation</li>
+     *   <li>Infantry: Use infantry-specific fuel cost calculation</li>
+     * </ul>
+     *
+     * <p>Hydrogen produced by fusion engines is credited against the unit's hydrogen usage, reducing the overall
+     * fuel cost.</p>
+     *
+     * @param hydrogenProduction The amount of hydrogen produced by fusion engines, which offsets hydrogen usage costs
+     *
+     * @return The calculated fuel cost as a Money object, always non-negative
+     */
+    public Money getFuelCost(int hydrogenProduction) {
+        final int FUEL_COST_PER_HYDROGEN = 15000;
+
+        Money fuelCost = Money.zero();
+        double hydrogenUsage = 0;
+
+        // Calculate base fuel costs by entity type
+        if (entity.isLargeCraft() || entity.isSmallCraft()) {
+            hydrogenUsage = getTonsBurnDay(entity);
+        } else if (entity.isConventionalFighter()) {
             fuelCost = fuelCost.plus(getFighterFuelCost(entity));
-        } else if (entity instanceof Aero) {
-            fuelCost = fuelCost.plus(((Aero) entity).getFuelTonnage() * 4.0 * 15000.0);
-        } else if ((entity instanceof Tank) || (entity instanceof Mek)) {
+        } else if (entity.isAerospaceFighter()) {
+            try {
+                hydrogenUsage = ((AeroSpaceFighter) entity).getFuelTonnage() * 4.0;
+            } catch (ClassCastException e) {
+                logger.error("{} was thought to be an AeroSpace Fighter, but actually it isn't." +
+                                   " This should be looked into.", getName());
+            }
+        } else if (entity.isVehicle() || entity.isMek()) {
             fuelCost = fuelCost.plus(getVehicleFuelCost(entity));
-        } else if (entity instanceof Infantry) {
+        } else if (entity.isInfantry()) {
             fuelCost = fuelCost.plus(getInfantryFuelCost(entity));
+        }
+
+        // Apply hydrogen production credit if there is any hydrogen usage
+        if (hydrogenUsage > 0) {
+            // Ensure hydrogen usage doesn't go negative after applying production credit
+            double actualHydrogenUsage = Math.max(0, hydrogenUsage - hydrogenProduction);
+            fuelCost = fuelCost.plus(Money.of(actualHydrogenUsage * FUEL_COST_PER_HYDROGEN));
         }
 
         return fuelCost;
