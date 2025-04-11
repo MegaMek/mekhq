@@ -1612,7 +1612,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
             lblEdge2.setName("lblEdge2");
             lblEdge1.setLabelFor(lblEdge2);
-            lblEdge2.setText(Integer.toString(edge));
+            lblEdge2.setText("" + person.getCurrentEdge() + '/' + person.getEdge());
             lblEdge2.setToolTipText(person.getEdgeTooltip());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
@@ -1623,27 +1623,6 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSkills.add(lblEdge2, gridBagConstraints);
-
-            if (campaign.getCampaignOptions().isUseSupportEdge() && person.hasSupportRole(true)) {
-                // Add the Edge Available field for support personnel only
-                lblEdgeAvail1.setName("lblEdgeAvail1");
-                lblEdgeAvail1.setText(resourceMap.getString("lblEdgeAvail1.text"));
-                gridBagConstraints = new GridBagConstraints();
-                gridBagConstraints.gridx = 2;
-                gridBagConstraints.gridy = firsty;
-                gridBagConstraints.fill = GridBagConstraints.NONE;
-                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-                pnlSkills.add(lblEdgeAvail1, gridBagConstraints);
-
-                lblEdgeAvail2.setName("lblEdgeAvail2");
-                lblEdgeAvail1.setLabelFor(lblEdgeAvail2);
-                lblEdgeAvail2.setText(Integer.toString(person.getCurrentEdge()));
-                gridBagConstraints.gridx = 3;
-                gridBagConstraints.gridwidth = 1;
-                gridBagConstraints.weightx = 1.0;
-                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-                pnlSkills.add(lblEdgeAvail2, gridBagConstraints);
-            }
             firsty++;
         }
 

@@ -4910,7 +4910,7 @@ public class Campaign implements ITechManager {
                     processWeeklyRelationshipEvents(person);
                 }
 
-                processWeeklyEdgeResets(person);
+                person.resetCurrentEdge();
 
                 if (!person.getStatus().isMIA()) {
                     processFatigueRecovery(this, person);
@@ -4999,14 +4999,11 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Process weekly Edge resets for a given person.
-     *
-     * @param person the person for whom weekly Edge resets will be processed
+     * @deprecated use {@link Person#resetCurrentEdge()} instead
      */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     private void processWeeklyEdgeResets(Person person) {
-        if ((person.hasSupportRole(true) || person.isEngineer())) {
-            person.resetCurrentEdge();
-        }
+        person.resetCurrentEdge();
     }
 
     /**

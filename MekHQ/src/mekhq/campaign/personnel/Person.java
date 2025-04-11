@@ -216,7 +216,7 @@ public class Person {
 
     // Supports edge usage by a ship's engineer composite crewman
     private int edgeUsedThisRound;
-    // To track how many edge points support personnel have left until next refresh
+    // To track how many edge points personnel have left until next refresh
     private int currentEdge;
 
     // phenotype and background
@@ -2417,10 +2417,7 @@ public class Person {
                       indent,
                       "edge",
                       getOptionList("::", PersonnelOptions.EDGE_ADVANTAGES));
-                // For support personnel, write an available edge value
-                if (hasSupportRole(true) || isEngineer()) {
-                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edgeAvailable", getCurrentEdge());
-                }
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edgeAvailable", getCurrentEdge());
             }
 
             if (countOptions(PersonnelOptions.MD_ADVANTAGES) > 0) {
@@ -4255,14 +4252,14 @@ public class Person {
     }
 
     /**
-     * Resets support personnel edge points to the purchased level. Used for weekly refresh.
+     * Resets edge points to the purchased level. Used for weekly refresh.
      */
     public void resetCurrentEdge() {
         setCurrentEdge(getAdjustedEdge());
     }
 
     /**
-     * Sets support personnel edge points to the value 'currentEdge'. Used for weekly refresh.
+     * Sets edge points to the value 'currentEdge'. Used for weekly refresh.
      *
      * @param currentEdge - integer used to track this person's edge points available for the current week
      */
@@ -5054,18 +5051,6 @@ public class Person {
     public void changeWealth(final int delta) {
         int newValue = wealth + delta;
         wealth = clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH);
-    }
-
-    /**
-     * Adjusts the person's wealth by the specified amount.
-     *
-     * <p>The change in wealth can be positive or negative, depending on the provided delta value.</p>
-     *
-     * @param delta The amount by which to adjust the wealth. A positive value increases the wealth, while a negative
-     *              value decreases it.
-     */
-    public void changeWealth(final int delta) {
-        this.wealth += delta;
     }
 
     public boolean isHasPerformedExtremeExpenditure() {
