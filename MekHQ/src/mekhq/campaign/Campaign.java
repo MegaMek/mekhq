@@ -328,6 +328,7 @@ public class Campaign implements ITechManager {
     private Finances finances;
 
     private CurrentLocation location;
+    private boolean isAvoidingEmptySystems;
 
     private final News news;
 
@@ -424,6 +425,7 @@ public class Campaign implements ITechManager {
         techFactionCode = ITechnology.F_MERC;
         CurrencyManager.getInstance().setCampaign(this);
         location = new CurrentLocation(Systems.getInstance().getSystems().get("Galatea"), 0);
+        isAvoidingEmptySystems = true;
         currentReport = new ArrayList<>();
         currentReportHTML = "";
         newReports = new ArrayList<>();
@@ -580,6 +582,14 @@ public class Campaign implements ITechManager {
 
     public PlanetarySystem getCurrentSystem() {
         return location.getCurrentSystem();
+    }
+
+    public boolean isAvoidingEmptySystems() {
+        return isAvoidingEmptySystems;
+    }
+
+    public void setIsAvoidingEmptySystems(boolean isAvoidingEmptySystems) {
+        this.isAvoidingEmptySystems = isAvoidingEmptySystems;
     }
 
     /**
@@ -6515,6 +6525,7 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "forces");
         finances.writeToXML(pw, indent);
         location.writeToXML(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isAvoidingEmptySystems", isAvoidingEmptySystems);
         shoppingList.writeToXML(pw, indent);
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "kills");
@@ -6813,8 +6824,10 @@ public class Campaign implements ITechManager {
         Map<String, Double> scoreG = new HashMap<>();
 
         for (String key : Systems.getInstance().getSystems().keySet()) {
-            scoreH.put(key, end.getDistanceTo(Systems.getInstance().getSystems().get(key)));
+            PlanetarySystem system = Systems.getInstance().getSystems().get(key);
+            scoreH.put(key, end.getDistanceTo(system));
         }
+
         scoreG.put(current, 0.0);
         closed.add(current);
 
@@ -6824,23 +6837,30 @@ public class Campaign implements ITechManager {
                                     Systems.getInstance().getSystemById(current).getRechargeTime(getLocalDate());
 
             final String localCurrent = current;
-            Systems.getInstance().visitNearbySystems(Systems.getInstance().getSystemById(current), 30, p -> {
-                if (closed.contains(p.getId())) {
-                } else if (open.contains(p.getId())) {
-                    // is the current G better than the existing G
-                    if (currentG < scoreG.get(p.getId())) {
-                        // then change G and parent
-                        scoreG.put(p.getId(), currentG);
-                        parent.put(p.getId(), localCurrent);
-                    }
-                } else {
-                    // put the current G for this one in memory
-                    scoreG.put(p.getId(), currentG);
-                    // put the parent in memory
-                    parent.put(p.getId(), localCurrent);
-                    open.add(p.getId());
-                }
-            });
+            Systems.getInstance()
+                  .visitNearbySystems(Systems.getInstance().getSystemById(current), 30, planetarySystem -> {
+                      // Skip systems without population
+                      if (isAvoidingEmptySystems && planetarySystem.getPopulation(currentDay) <= 0) {
+                          return;
+                      }
+
+                      if (closed.contains(planetarySystem.getId())) {
+                          // Do nothing
+                      } else if (open.contains(planetarySystem.getId())) {
+                          // is the current G better than the existing G
+                          if (currentG < scoreG.get(planetarySystem.getId())) {
+                              // then change G and parent
+                              scoreG.put(planetarySystem.getId(), currentG);
+                              parent.put(planetarySystem.getId(), localCurrent);
+                          }
+                      } else {
+                          // put the current G for this one in memory
+                          scoreG.put(planetarySystem.getId(), currentG);
+                          // put the parent in memory
+                          parent.put(planetarySystem.getId(), localCurrent);
+                          open.add(planetarySystem.getId());
+                      }
+                  });
 
             String bestMatch = null;
             double bestF = Double.POSITIVE_INFINITY;
@@ -6872,7 +6892,6 @@ public class Campaign implements ITechManager {
         String nextKey = current;
         while (null != nextKey) {
             path.add(Systems.getInstance().getSystemById(nextKey));
-            // MekHQApp.logMessage(nextKey);
             nextKey = parent.get(nextKey);
         }
 
