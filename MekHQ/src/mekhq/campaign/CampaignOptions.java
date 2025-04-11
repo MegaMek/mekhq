@@ -6030,7 +6030,7 @@ public class CampaignOptions {
                 } else if (nodeName.equalsIgnoreCase("logProcreation")) {
                     retVal.setLogProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("randomProcreationMethod")) {
-                    retVal.setRandomProcreationMethod(RandomProcreationMethod.valueOf(wn2.getTextContent().trim()));
+                    retVal.setRandomProcreationMethod(RandomProcreationMethod.fromString(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("useRelationshiplessRandomProcreation")) {
                     retVal.setUseRelationshiplessRandomProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("useRandomClanPersonnelProcreation")) {
