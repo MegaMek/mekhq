@@ -5053,18 +5053,6 @@ public class Person {
         wealth = clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH);
     }
 
-    /**
-     * Adjusts the person's wealth by the specified amount.
-     *
-     * <p>The change in wealth can be positive or negative, depending on the provided delta value.</p>
-     *
-     * @param delta The amount by which to adjust the wealth. A positive value increases the wealth, while a negative
-     *              value decreases it.
-     */
-    public void changeWealth(final int delta) {
-        this.wealth += delta;
-    }
-
     public boolean isHasPerformedExtremeExpenditure() {
         return hasPerformedExtremeExpenditure;
     }
