@@ -4410,32 +4410,31 @@ public class Person {
     }
 
     /**
-     * Calculates and retrieves the person's current daily available tech time. This does NOT account for any expended
-     * time, but it factors in administrative adjustments if specified.
+     * Calculates and retrieves the current daily available tech time for the person.
      *
-     * <p>The returned value is determined based on the person's role:</p>
+     * <p>This calculation does not account for any expended time but incorporates potential administrative
+     * adjustments if specified.</p>
+     *
+     * <p>The calculation follows these rules:</p>
      * <ul>
-     *   <li>If the primary role is a technician, the primary role's base support
-     *       time is used.</li>
-     *   <li>Otherwise, the secondary role's base support time is used.</li>
+     *   <li>If the person's primary role is a technician, the base support time is determined from the primary
+     *   role.</li>
+     *   <li>Otherwise, the base support time is taken from the secondary role.</li>
      * </ul>
      *
-     * <p>The base time is then adjusted by a multiplier if administrative adjustments
-     * are enabled (via the {@code isTechsUseAdministration} parameter). Maintenance
-     * time is also deducted from the result.</p>
+     * <p>If administrative adjustments are enabled (via the {@code isTechsUseAdministration} parameter),
+     * the support time is multiplied by an administrative adjustment multiplier.</p>
      *
-     * @param isTechsUseAdministration Determines whether administrative adjustments should be applied when calculating
-     *                                 the person's time.
+     * @param isTechsUseAdministration A boolean flag indicating whether administrative adjustments should be applied in
+     *                                 the calculation.
      *
-     * @return The person's current daily available tech time, after applying the multiplier for administrative
-     *       adjustments (if applicable) and deducting maintenance time.
+     * @return The adjusted daily available tech time for the person, after factoring in the appropriate role support
+     *       time, applying the administrative multiplier (if enabled), and deducting maintenance time.
      */
     public int getDailyAvailableTechTime(final boolean isTechsUseAdministration) {
         int baseTime = (getPrimaryRole().isTech() ? PRIMARY_ROLE_SUPPORT_TIME : SECONDARY_ROLE_SUPPORT_TIME);
 
-        // TODO maintenance time should only be deducted when we make a maintenance check
-        return (int) round(baseTime * calculateTechTimeMultiplier(isTechsUseAdministration)) -
-                     getMaintenanceTimeUsing();
+        return (int) round(baseTime * calculateTechTimeMultiplier(isTechsUseAdministration));
     }
 
     public int getMaintenanceTimeUsing() {
