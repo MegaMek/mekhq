@@ -27,26 +27,41 @@
  */
 package mekhq.campaign.unit;
 
-import megamek.common.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.UUID;
+import java.util.Vector;
+
+import megamek.common.Aero;
+import megamek.common.AeroSpaceFighter;
+import megamek.common.Dropship;
+import megamek.common.Entity;
+import megamek.common.EquipmentType;
+import megamek.common.Game;
+import megamek.common.Mek;
+import megamek.common.Transporter;
+import megamek.common.bays.ASFBay;
+import megamek.common.bays.Bay;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-import java.util.UUID;
-import java.util.Vector;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 public class UnitTransportTest {
 
     @BeforeAll
     static void before() {
         EquipmentType.initializeTypes();
-
-
     }
 
     @ParameterizedTest
@@ -59,7 +74,6 @@ public class UnitTransportTest {
         Unit transport = new Unit();
         when(mockCampaign.getGame()).thenReturn(mockGame);
         mockCampaign.importUnit(transport);
-
 
 
         // We start with empty transport bays
@@ -163,8 +177,8 @@ public class UnitTransportTest {
 
         // Create a fake entity to back the real transport Unit
         Dropship mockVengeance = mock(Dropship.class);
-        Unit transport = new Unit(mockVengeance,campaign);
-        ASFBay mockASFBay = new ASFBay(100, 1 ,0);
+        Unit transport = new Unit(mockVengeance, campaign);
+        ASFBay mockASFBay = new ASFBay(100, 1, 0);
 
         // Initialize bays
         Vector<Bay> bays = new Vector<>();
