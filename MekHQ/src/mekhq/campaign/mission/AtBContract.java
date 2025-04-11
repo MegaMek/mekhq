@@ -45,6 +45,7 @@ import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.parseFromInteger;
 import static megamek.common.enums.SkillLevel.parseFromString;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.force.FormationLevel.BATTALION;
@@ -64,7 +65,6 @@ import static mekhq.campaign.stratcon.StratconContractDefinition.getContractDefi
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FACTIONS;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
-import static mekhq.utilities.ImageUtilities.scaleImageIcon;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;

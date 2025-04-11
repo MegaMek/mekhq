@@ -34,8 +34,8 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
 import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.force.Force.FORCE_NONE;
-import static mekhq.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.BorderLayout;
@@ -56,6 +56,7 @@ import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 
+import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Portrait;
 import megamek.logging.MMLogger;
@@ -96,6 +97,8 @@ public class ImmersiveDialogCore extends JDialog {
 
     private JSpinner spinner;
     private int spinnerValue;
+    private MMComboBox<?> comboBox; // can be null
+    private int comboBoxChoiceIndex;
 
     private int dialogChoice = 0;
 
@@ -116,18 +119,61 @@ public class ImmersiveDialogCore extends JDialog {
         return dialogChoice;
     }
 
+    /**
+     * Sets the dialog choice for the current object.
+     *
+     * @param dialogChoice The integer value representing the dialog choice to set.
+     */
     public void setDialogChoice(int dialogChoice) {
         this.dialogChoice = dialogChoice;
     }
 
+    /**
+     * Retrieves the current value of the spinner.
+     *
+     * <p><b>Note:</b> will return 0 if the dialog does not contain a {@link JSpinner} in the supplemental panel.</p>
+     *
+     * @return The integer value of the spinner.
+     */
     public int getSpinnerValue() {
         return spinnerValue;
     }
 
+    /**
+     * Sets a new value for the spinner.
+     *
+     * <p><b>Note:</b> will return 0 if the dialog does not contain a {@link MMComboBox} in the supplemental panel.</p>
+     *
+     * @param spinnerValue The integer value to set for the spinner.
+     */
     public void setSpinnerValue(int spinnerValue) {
         this.spinnerValue = spinnerValue;
     }
 
+
+    /**
+     * Retrieves the current index of the combo box choice.
+     *
+     * @return The integer value representing the current selected index of the combo box.
+     */
+    public int getComboBoxChoiceIndex() {
+        return comboBoxChoiceIndex;
+    }
+
+    /**
+     * Sets a new index for the combo box choice.
+     *
+     * @param comboBoxChoiceIndex The integer value to set as the combo box's selected index.
+     */
+    public void setComboBoxChoiceIndex(int comboBoxChoiceIndex) {
+        this.comboBoxChoiceIndex = comboBoxChoiceIndex;
+    }
+
+    /**
+     * Retrieves the padding value defined in this object.
+     *
+     * @return The padding value as an integer.
+     */
     protected int getPADDING() {
         return PADDING;
     }
@@ -152,18 +198,17 @@ public class ImmersiveDialogCore extends JDialog {
      * @param centerWidth           An optional width for the center panel; uses the default value if {@code null}.
      * @param isVerticalLayout      A {@code boolean} determining the button layout: {@code true} for vertical stacking,
      *                              {@code false} for horizontal layout.
-     * @param spinnerPanel          An optional {@link JPanel} containing a spinner widget to be displayed in the center
-     *                              panel; use {@code null} if not applicable.
+     * @param supplementalPanel     An optional {@link JPanel} containing a {@link JSpinner} and/or a {@link MMComboBox}
+     *                              to be displayed in the center panel; use {@code null} if not applicable.
      */
     public ImmersiveDialogCore(Campaign campaign, @Nullable Person leftSpeaker, @Nullable Person rightSpeaker,
           String centerMessage, List<ButtonLabelTooltipPair> buttons, @Nullable String outOfCharacterMessage,
-          @Nullable Integer centerWidth, boolean isVerticalLayout, @Nullable JPanel spinnerPanel,
+          @Nullable Integer centerWidth, boolean isVerticalLayout, @Nullable JPanel supplementalPanel,
           @Nullable ImageIcon imageIcon, boolean isModal) {
         // Initialize
         this.campaign = campaign;
         this.leftSpeaker = leftSpeaker;
         this.rightSpeaker = rightSpeaker;
-        spinner = new JSpinner();
 
         CENTER_WIDTH = (centerWidth != null) ? centerWidth : CENTER_WIDTH;
 
@@ -193,7 +238,7 @@ public class ImmersiveDialogCore extends JDialog {
         }
 
         // Center box for the message
-        JPanel pnlCenter = createCenterBox(centerMessage, buttons, isVerticalLayout, spinnerPanel, imageIcon);
+        JPanel pnlCenter = createCenterBox(centerMessage, buttons, isVerticalLayout, supplementalPanel, imageIcon);
         constraints.gridx = gridx;
         constraints.gridy = 0;
         constraints.weightx = 2;
@@ -265,11 +310,11 @@ public class ImmersiveDialogCore extends JDialog {
      * @return A {@link JPanel} with the message displayed in the center and buttons at the bottom.
      */
     private JPanel createCenterBox(String centerMessage, List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout,
-          @Nullable JPanel spinnerPanel, @Nullable ImageIcon imageIcon) {
+          @Nullable JPanel supplementalPanel, @Nullable ImageIcon imageIcon) {
         northPanel = new JPanel(new BorderLayout());
 
         // Buttons panel
-        JPanel buttonPanel = populateButtonPanel(buttons, isVerticalLayout, spinnerPanel);
+        JPanel buttonPanel = populateButtonPanel(buttons, isVerticalLayout, supplementalPanel);
 
         // Create a JEditorPane for the center message
         JEditorPane editorPane = new JEditorPane();
@@ -303,15 +348,6 @@ public class ImmersiveDialogCore extends JDialog {
         // Create a JLabel for the image above the JEditorPane
         JLabel imageLabel = new JLabel();
         if (imageIcon != null) {
-            if (imageIcon.getIconWidth() > CENTER_WIDTH) {
-                imageIcon = scaleImageIcon(imageIcon, CENTER_WIDTH, true);
-            }
-
-            int heightLimit = max(1, CENTER_WIDTH / 3); // I went with 3 because that provided the best feel
-            if (imageIcon.getIconHeight() > heightLimit) {
-                imageIcon = scaleImageIcon(imageIcon, heightLimit, false);
-            }
-
             imageLabel.setIcon(imageIcon);
             imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         }
@@ -442,7 +478,7 @@ public class ImmersiveDialogCore extends JDialog {
      *                         {@code false} for horizontal arrangement.
      */
     protected JPanel populateButtonPanel(List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout,
-          @Nullable JPanel spinnerPanel) {
+          @Nullable JPanel supplementalPanel) {
         final int padding = getPADDING();
 
         // Main container panel to hold the spinner and button panel
@@ -450,9 +486,10 @@ public class ImmersiveDialogCore extends JDialog {
         containerPanel.setLayout(new BorderLayout(padding, padding));
 
         // Add the spinner panel to the top of the container
-        if (spinnerPanel != null) {
-            containerPanel.add(spinnerPanel, BorderLayout.NORTH);
-            fetchSpinnerFromPanel(spinnerPanel);
+        if (supplementalPanel != null) {
+            containerPanel.add(supplementalPanel, BorderLayout.NORTH);
+            fetchSpinnerFromPanel(supplementalPanel);
+            fetchComboBoxFromPanel(supplementalPanel);
         }
 
         // Create button panel
@@ -517,7 +554,15 @@ public class ImmersiveDialogCore extends JDialog {
             // Add action listener
             button.addActionListener(evt -> {
                 setDialogChoice(buttons.indexOf(buttonStrings));
-                setSpinnerValue((int) spinner.getValue());
+
+                if (spinner != null) {
+                    setSpinnerValue((int) spinner.getValue());
+                }
+
+                if (comboBox != null) {
+                    setComboBoxChoiceIndex(comboBox.getSelectedIndex());
+                }
+
                 dispose();
             });
 
@@ -572,21 +617,22 @@ public class ImmersiveDialogCore extends JDialog {
      * fallback.
      * </p>
      *
-     * @param spinnerPanel The {@link JPanel} to search for a {@link JSpinner}. Must not be {@code null}.
-     *
-     * @return The {@link JSpinner} instance found in the panel; if no {@link JSpinner} is found, a new, default
-     *       {@link JSpinner} is returned.
+     * @param supplementalPanel The {@link JPanel} to search for a {@link JSpinner}. Must not be {@code null}.
      */
-    private JSpinner fetchSpinnerFromPanel(JPanel spinnerPanel) {
-        for (Component component : spinnerPanel.getComponents()) {
+    private void fetchSpinnerFromPanel(JPanel supplementalPanel) {
+        for (Component component : supplementalPanel.getComponents()) {
             if (component instanceof JSpinner) {
                 spinner = (JSpinner) component;
             }
         }
+    }
 
-        // Return an empty JSpinner if one isn't found and log the error
-        logger.error("No JSpinner found in the provided panel.");
-        return new JSpinner();
+    private void fetchComboBoxFromPanel(JPanel supplementalPanel) {
+        for (Component component : supplementalPanel.getComponents()) {
+            if (component instanceof MMComboBox<?>) {
+                comboBox = (MMComboBox<?>) component;
+            }
+        }
     }
 
 
