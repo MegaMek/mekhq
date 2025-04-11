@@ -50,7 +50,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.log.PersonalLogger;
+import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.Rank;
@@ -373,7 +373,7 @@ public final class BatchXPDialog extends JDialog {
                 // Improve the skill and deduce the cost
                 person.improveSkill(skillName);
                 person.spendXP(cost);
-                PersonalLogger.improvedSkill(campaign,
+                PerformanceLogger.improvedSkill(campaign,
                       person,
                       campaign.getLocalDate(),
                       person.getSkill(skillName).getType().getName(),

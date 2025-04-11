@@ -9033,7 +9033,7 @@ public class Campaign implements ITechManager {
         for (Person p : getPersonnel()) {
             if (!p.getPrimaryRole().isDependent() && p.getPrisonerStatus().isFree()) {
                 LocalDate join = null;
-                for (LogEntry e : p.getPersonnelLog()) {
+                for (LogEntry e : p.getPersonalLog()) {
                     if (join == null) {
                         // If by some nightmare there is no Joined date just use the first entry.
                         join = e.getDate();
@@ -9053,7 +9053,7 @@ public class Campaign implements ITechManager {
         for (Person p : getPersonnel()) {
             if (!p.getPrimaryRole().isDependent() && p.getPrisonerStatus().isFree()) {
                 LocalDate join = null;
-                for (LogEntry e : p.getPersonnelLog()) {
+                for (LogEntry e : p.getPersonalLog()) {
                     if (join == null) {
                         // If by some nightmare there is no date from the below, just use the first
                         // entry.
@@ -9097,7 +9097,7 @@ public class Campaign implements ITechManager {
              */
             LocalDate founding = null;
             for (Person p : getPersonnel()) {
-                for (LogEntry e : p.getPersonnelLog()) {
+                for (LogEntry e : p.getPersonalLog()) {
                     if ((founding == null) || e.getDate().isBefore(founding)) {
                         founding = e.getDate();
                     }
@@ -9109,7 +9109,7 @@ public class Campaign implements ITechManager {
              * they joined came with that `Mek (which is a less certain assumption)
              */
             for (Person p : getPersonnel()) {
-                LocalDate join = p.getPersonnelLog()
+                LocalDate join = p.getPersonalLog()
                                        .stream()
                                        .filter(e -> e.getDesc().startsWith("Joined "))
                                        .findFirst()
@@ -9121,7 +9121,7 @@ public class Campaign implements ITechManager {
                 if (p.getPrimaryRole().isMekWarrior() ||
                           (p.getPrimaryRole().isAerospacePilot() && getCampaignOptions().isAeroRecruitsHaveUnits()) ||
                           p.getPrimaryRole().isProtoMekPilot()) {
-                    for (LogEntry e : p.getPersonnelLog()) {
+                    for (LogEntry e : p.getPersonalLog()) {
                         if (e.getDate().equals(join) && e.getDesc().startsWith("Assigned to ")) {
                             String mek = e.getDesc().substring(12);
                             MekSummary ms = MekSummaryCache.getInstance().getMek(mek);

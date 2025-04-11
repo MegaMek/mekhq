@@ -27,7 +27,15 @@
  */
 package mekhq.campaign.log;
 
-public enum LogEntryType {
-    MEDICAL, AWARD, SERVICE, PERSONAL, CUSTOM, HISTORICAL, //Used for historical daily log
-    ASSIGNMENT, PERFORMANCE
+import java.time.LocalDate;
+
+/**
+ * This class is a specific log entry related to Skill, XP, or SPA gain.
+ *
+ * @author Miguel Azevedo
+ */
+public class PerformanceLogEntry extends LogEntry {
+    public PerformanceLogEntry(LocalDate date, String desc) {
+        super(date, desc, LogEntryType.PERFORMANCE);
+    }
 }

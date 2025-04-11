@@ -50,7 +50,6 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
@@ -135,6 +134,9 @@ public class PersonnelTab {
     private JCheckBox chkDisplayPersonnelLog;
     private JCheckBox chkDisplayScenarioLog;
     private JCheckBox chkDisplayKillRecord;
+    private JCheckBox chkDisplayMedicalRecord;
+    private JCheckBox chkDisplayAssignmentRecord;
+    private JCheckBox chkDisplayPerformanceRecord;
     //end Personnel Logs Tab
 
     //start Personnel Information Tab
@@ -372,6 +374,9 @@ public class PersonnelTab {
         chkDisplayPersonnelLog = new JCheckBox();
         chkDisplayScenarioLog = new JCheckBox();
         chkDisplayKillRecord = new JCheckBox();
+        chkDisplayMedicalRecord = new JCheckBox();
+        chkDisplayAssignmentRecord = new JCheckBox();
+        chkDisplayPerformanceRecord = new JCheckBox();
     }
 
     /**
@@ -673,7 +678,7 @@ public class PersonnelTab {
         comboAwardBonusStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
-                                                          final boolean isSelected, final boolean cellHasFocus) {
+                  final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof AwardBonus) {
                     list.setToolTipText(((AwardBonus) value).getToolTipText());
@@ -974,6 +979,9 @@ public class PersonnelTab {
         chkDisplayPersonnelLog = new CampaignOptionsCheckBox("DisplayPersonnelLog");
         chkDisplayScenarioLog = new CampaignOptionsCheckBox("DisplayScenarioLog");
         chkDisplayKillRecord = new CampaignOptionsCheckBox("DisplayKillRecord");
+        chkDisplayMedicalRecord = new CampaignOptionsCheckBox("DisplayMedicalRecord");
+        chkDisplayAssignmentRecord = new CampaignOptionsCheckBox("DisplayAssignmentRecord");
+        chkDisplayPerformanceRecord = new CampaignOptionsCheckBox("DisplayPerformanceRecord");
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PersonnelLogsPanel", true, "PersonnelLogsPanel");
@@ -1004,6 +1012,15 @@ public class PersonnelTab {
 
         layout.gridy++;
         panel.add(chkDisplayKillRecord, layout);
+
+        layout.gridy++;
+        panel.add(chkDisplayMedicalRecord, layout);
+
+        layout.gridy++;
+        panel.add(chkDisplayAssignmentRecord, layout);
+
+        layout.gridy++;
+        panel.add(chkDisplayPerformanceRecord, layout);
 
         return panel;
     }
@@ -1054,7 +1071,7 @@ public class PersonnelTab {
         comboPrisonerCaptureStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
-                                                          final boolean isSelected, final boolean cellHasFocus) {
+                  final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PrisonerCaptureStyle) {
                     list.setToolTipText(wordWrap(((PrisonerCaptureStyle) value).getTooltip()));
@@ -1393,6 +1410,9 @@ public class PersonnelTab {
         chkDisplayPersonnelLog.setSelected(options.isDisplayPersonnelLog());
         chkDisplayScenarioLog.setSelected(options.isDisplayScenarioLog());
         chkDisplayKillRecord.setSelected(options.isDisplayKillRecord());
+        chkDisplayMedicalRecord.setSelected(options.isDisplayMedicalRecord());
+        chkDisplayAssignmentRecord.setSelected(options.isDisplayAssignmentRecord());
+        chkDisplayPerformanceRecord.setSelected(options.isDisplayPerformanceRecord());
 
         // Personnel Information
         chkUseTimeInService.setSelected(options.isUseTimeInService());
@@ -1491,6 +1511,9 @@ public class PersonnelTab {
         options.setDisplayPersonnelLog(chkDisplayPersonnelLog.isSelected());
         options.setDisplayScenarioLog(chkDisplayScenarioLog.isSelected());
         options.setDisplayKillRecord(chkDisplayKillRecord.isSelected());
+        options.setDisplayMedicalRecord(chkDisplayMedicalRecord.isSelected());
+        options.setDisplayAssignmentRecord(chkDisplayAssignmentRecord.isSelected());
+        options.setDisplayPerformanceRecord(chkDisplayPerformanceRecord.isSelected());
 
         // Personnel Information
         options.setUseTimeInService(chkUseTimeInService.isSelected());

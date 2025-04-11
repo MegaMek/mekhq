@@ -38,7 +38,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.AwardLogger;
-import mekhq.campaign.log.PersonalLogger;
+import mekhq.campaign.log.PerformanceLogger;
 
 /**
  * This class is responsible for the awards given to a person.
@@ -66,6 +66,7 @@ public class PersonAwardController {
 
     /**
      * @param award to check if this person has it
+     *
      * @return true if it has the award
      */
     public boolean hasAward(Award award) {
@@ -75,6 +76,7 @@ public class PersonAwardController {
     /**
      * @param set  String with the name of the set which the award belongs
      * @param name String with the name of the award
+     *
      * @return true if person has an award of that name and set
      */
     public boolean hasAward(String set, String name) {
@@ -89,24 +91,21 @@ public class PersonAwardController {
     }
 
     /**
-     * @return true if this person has one or more awards that are represented with
-     *         a ribbon icon.
+     * @return true if this person has one or more awards that are represented with a ribbon icon.
      */
     public boolean hasAwardsWithRibbons() {
         return awards.stream().anyMatch(a -> a.getNumberOfRibbonFiles() > 0);
     }
 
     /**
-     * @return true if this person has one or more awards that are represented with
-     *         a medal icon.
+     * @return true if this person has one or more awards that are represented with a medal icon.
      */
     public boolean hasAwardsWithMedals() {
         return awards.stream().anyMatch(a -> a.getNumberOfMedalFiles() > 0);
     }
 
     /**
-     * @return true if this person has one or more awards that are represented by a
-     *         misc icon.
+     * @return true if this person has one or more awards that are represented by a misc icon.
      */
     public boolean hasAwardsWithMiscs() {
         return awards.stream().anyMatch(a -> a.getNumberOfMiscFiles() > 0);
@@ -119,8 +118,8 @@ public class PersonAwardController {
      * @param awardName is the name of the award
      * @param date      is the date it was awarded
      */
-    public void addAndLogAward(final Campaign campaign, final String setName,
-            final String awardName, final LocalDate date) {
+    public void addAndLogAward(final Campaign campaign, final String setName, final String awardName,
+          final LocalDate date) {
         final Award award;
         if (hasAward(setName, awardName)) {
             award = getAward(setName, awardName);
@@ -139,8 +138,8 @@ public class PersonAwardController {
             awards.add(award);
         }
 
-        if ((campaign.getCampaignOptions().getAwardBonusStyle().isBoth())
-                || (campaign.getCampaignOptions().getAwardBonusStyle().isXP())) {
+        if ((campaign.getCampaignOptions().getAwardBonusStyle().isBoth()) ||
+                  (campaign.getCampaignOptions().getAwardBonusStyle().isXP())) {
             if (award.getXPReward() < 0) {
                 person.spendXP(-award.getXPReward());
             } else {
@@ -148,12 +147,12 @@ public class PersonAwardController {
             }
         }
 
-        if ((campaign.getCampaignOptions().getAwardBonusStyle().isBoth())
-                || (campaign.getCampaignOptions().getAwardBonusStyle().isEdge())) {
+        if ((campaign.getCampaignOptions().getAwardBonusStyle().isBoth()) ||
+                  (campaign.getCampaignOptions().getAwardBonusStyle().isEdge())) {
             if (award.getEdgeReward() > 0) {
                 person.changeEdge(award.getEdgeReward());
                 person.changeCurrentEdge(award.getEdgeReward());
-                PersonalLogger.gainedEdge(campaign, person, campaign.getLocalDate());
+                PerformanceLogger.gainedEdge(campaign, person, campaign.getLocalDate());
             }
         }
 
@@ -187,8 +186,7 @@ public class PersonAwardController {
      *
      * @param setName     is the name of the set of the award
      * @param awardName   is the name of the award
-     * @param awardedDate is the date it was awarded, or null if it is to be bulk
-     *                    removed
+     * @param awardedDate is the date it was awarded, or null if it is to be bulk removed
      * @param currentDate is the current date
      */
     public void removeAward(String setName, String awardName, LocalDate awardedDate, LocalDate currentDate) {
@@ -211,8 +209,7 @@ public class PersonAwardController {
      *
      * @param setName     is the name of the set of the award
      * @param awardName   is the name of the award
-     * @param awardedDate is the date it was awarded, or null if it is to be bulk
-     *                    removed
+     * @param awardedDate is the date it was awarded, or null if it is to be bulk removed
      */
     public void removeAwardSilent(String setName, String awardName, LocalDate awardedDate) {
         for (Award award : awards) {
@@ -242,6 +239,7 @@ public class PersonAwardController {
     /**
      * @param set  String with the name of the set which the award belongs
      * @param name String with the name of the award
+     *
      * @return the award
      */
     public Award getAward(String set, String name) {
@@ -254,11 +252,11 @@ public class PersonAwardController {
     }
 
     /**
-     * Finds an award with a given name, without taking into account the set name.
-     * This is used for backward compatibility
-     * and should be avoided.
+     * Finds an award with a given name, without taking into account the set name. This is used for backward
+     * compatibility and should be avoided.
      *
      * @param name String with the name of the award
+     *
      * @return the award
      */
     public Award getFirstAwardIgnoringSet(String name) {
@@ -272,6 +270,7 @@ public class PersonAwardController {
 
     /**
      * @param award to be counted.
+     *
      * @return the number of times this award has been awarded to the same person.
      */
     public int getNumberOfAwards(Award award) {

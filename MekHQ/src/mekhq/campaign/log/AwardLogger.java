@@ -27,39 +27,45 @@
  */
 package mekhq.campaign.log;
 
-import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
-import mekhq.campaign.personnel.Award;
-import mekhq.campaign.personnel.Person;
-
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import megamek.common.annotations.Nullable;
+import mekhq.MekHQ;
+import mekhq.campaign.personnel.Award;
+import mekhq.campaign.personnel.Person;
+
 /**
  * This class is responsible to control the logging of Award Log Entries.
+ *
  * @author Miguel Azevedo
  */
 public class AwardLogger {
-    private static final transient ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
-            MekHQ.getMHQOptions().getLocale());
+    private static final transient ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle(
+          "mekhq.resources.LogEntries",
+          MekHQ.getMHQOptions().getLocale());
 
     public static void award(Person person, LocalDate date, Award award) {
         String message = logEntriesResourceMap.getString("awarded.text");
-        person.addLogEntry(new AwardLogEntry(date, MessageFormat.format(message, award.getName(), award.getSet(), award.getDescription())));
+        person.addPersonalLogEntry(new AwardLogEntry(date,
+              MessageFormat.format(message, award.getName(), award.getSet(), award.getDescription())));
     }
 
     public static void removedAward(Person person, LocalDate date, Award award) {
         String message = logEntriesResourceMap.getString("removedAward.text");
-        person.addLogEntry(new AwardLogEntry(date, MessageFormat.format(message, award.getName(), award.getSet())));
+        person.addPersonalLogEntry(new AwardLogEntry(date,
+              MessageFormat.format(message, award.getName(), award.getSet())));
     }
 
     /**
      * Finds the award corresponding to a log entry
-     * @param person owner of the log entry
+     *
+     * @param person       owner of the log entry
      * @param logEntryText text of the log entry
+     *
      * @return award of the owner corresponding to the log entry text
      */
     public static @Nullable Award getAwardFromLogEntry(final @Nullable Person person, final String logEntryText) {
