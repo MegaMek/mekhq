@@ -111,6 +111,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
             PlanetarySystem p = getCampaign().getSystemByName(suggestPlanet.getText());
             if (null != p) {
                 panMap.setSelectedSystem(p);
+                panSystem.updatePlanetarySystem(p);
                 refreshPlanetView();
             }
         });

@@ -199,6 +199,7 @@ public class Person {
     private int toughness;
     private int connections;
     private int wealth;
+    private boolean hasPerformedExtremeExpenditure;
     private int reputation;
     private int unlucky;
     private Attributes atowAttributes;
@@ -215,7 +216,7 @@ public class Person {
 
     // Supports edge usage by a ship's engineer composite crewman
     private int edgeUsedThisRound;
-    // To track how many edge points support personnel have left until next refresh
+    // To track how many edge points personnel have left until next refresh
     private int currentEdge;
 
     // phenotype and background
@@ -428,6 +429,7 @@ public class Person {
         toughness = 0;
         connections = 0;
         wealth = 0;
+        hasPerformedExtremeExpenditure = false;
         reputation = 0;
         unlucky = 0;
         atowAttributes = new Attributes();
@@ -2367,6 +2369,10 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wealth", wealth);
             }
 
+            if (hasPerformedExtremeExpenditure) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasPerformedExtremeExpenditure", true);
+            }
+
             if (reputation != 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reputation", reputation);
             }
@@ -2411,10 +2417,7 @@ public class Person {
                       indent,
                       "edge",
                       getOptionList("::", PersonnelOptions.EDGE_ADVANTAGES));
-                // For support personnel, write an available edge value
-                if (hasSupportRole(true) || isEngineer()) {
-                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edgeAvailable", getCurrentEdge());
-                }
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edgeAvailable", getCurrentEdge());
             }
 
             if (countOptions(PersonnelOptions.MD_ADVANTAGES) > 0) {
@@ -2785,6 +2788,8 @@ public class Person {
                     person.connections = MathUtility.parseInt(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("wealth")) {
                     person.wealth = MathUtility.parseInt(wn2.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("hasPerformedExtremeExpenditure")) {
+                    person.hasPerformedExtremeExpenditure = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("reputation")) {
                     person.reputation = MathUtility.parseInt(wn2.getTextContent());
                 } else if (nodeName.equalsIgnoreCase("unlucky")) {
@@ -4208,7 +4213,28 @@ public class Person {
     // endregion Personnel Options
 
     // region edge
+
+    /**
+     * Retrieves the edge value for the current person.
+     *
+     * <p><b>Usage:</b> This method gets the character's raw Edge score. Generally you likely want to use
+     * {@link #getAdjustedEdge()} instead, as that includes adjustments for the character's {@code unlucky} trait.</p>
+     *
+     * @return The edge value defined in the person's options.
+     */
     public int getEdge() {
+        return getOptions().intOption(OptionsConstants.EDGE);
+    }
+
+    /**
+     * Retrieves the adjusted edge value for the current person.
+     *
+     * <p>The adjusted Edge value is calculated by subtracting the person's level of bad luck (unlucky)
+     * from their base Edge value.</p>
+     *
+     * @return The adjusted edge value after accounting for the person's level of bad luck.
+     */
+    public int getAdjustedEdge() {
         return getOptions().intOption(OptionsConstants.EDGE) - unlucky;
     }
 
@@ -4226,14 +4252,14 @@ public class Person {
     }
 
     /**
-     * Resets support personnel edge points to the purchased level. Used for weekly refresh.
+     * Resets edge points to the purchased level. Used for weekly refresh.
      */
     public void resetCurrentEdge() {
-        setCurrentEdge(getEdge());
+        setCurrentEdge(getAdjustedEdge());
     }
 
     /**
-     * Sets support personnel edge points to the value 'currentEdge'. Used for weekly refresh.
+     * Sets edge points to the value 'currentEdge'. Used for weekly refresh.
      *
      * @param currentEdge - integer used to track this person's edge points available for the current week
      */
@@ -4384,32 +4410,31 @@ public class Person {
     }
 
     /**
-     * Calculates and retrieves the person's current daily available tech time. This does NOT account for any expended
-     * time, but it factors in administrative adjustments if specified.
+     * Calculates and retrieves the current daily available tech time for the person.
      *
-     * <p>The returned value is determined based on the person's role:</p>
+     * <p>This calculation does not account for any expended time but incorporates potential administrative
+     * adjustments if specified.</p>
+     *
+     * <p>The calculation follows these rules:</p>
      * <ul>
-     *   <li>If the primary role is a technician, the primary role's base support
-     *       time is used.</li>
-     *   <li>Otherwise, the secondary role's base support time is used.</li>
+     *   <li>If the person's primary role is a technician, the base support time is determined from the primary
+     *   role.</li>
+     *   <li>Otherwise, the base support time is taken from the secondary role.</li>
      * </ul>
      *
-     * <p>The base time is then adjusted by a multiplier if administrative adjustments
-     * are enabled (via the {@code isTechsUseAdministration} parameter). Maintenance
-     * time is also deducted from the result.</p>
+     * <p>If administrative adjustments are enabled (via the {@code isTechsUseAdministration} parameter),
+     * the support time is multiplied by an administrative adjustment multiplier.</p>
      *
-     * @param isTechsUseAdministration Determines whether administrative adjustments should be applied when calculating
-     *                                 the person's time.
+     * @param isTechsUseAdministration A boolean flag indicating whether administrative adjustments should be applied in
+     *                                 the calculation.
      *
-     * @return The person's current daily available tech time, after applying the multiplier for administrative
-     *       adjustments (if applicable) and deducting maintenance time.
+     * @return The adjusted daily available tech time for the person, after factoring in the appropriate role support
+     *       time, applying the administrative multiplier (if enabled), and deducting maintenance time.
      */
     public int getDailyAvailableTechTime(final boolean isTechsUseAdministration) {
         int baseTime = (getPrimaryRole().isTech() ? PRIMARY_ROLE_SUPPORT_TIME : SECONDARY_ROLE_SUPPORT_TIME);
 
-        // TODO maintenance time should only be deducted when we make a maintenance check
-        return (int) round(baseTime * calculateTechTimeMultiplier(isTechsUseAdministration)) -
-                     getMaintenanceTimeUsing();
+        return (int) round(baseTime * calculateTechTimeMultiplier(isTechsUseAdministration));
     }
 
     public int getMaintenanceTimeUsing() {
@@ -4421,6 +4446,80 @@ public class Person {
 
     public boolean isMothballing() {
         return isTech() && techUnits.stream().anyMatch(Unit::isMothballing);
+    }
+
+    /**
+     * Determines whether this {@code Person} is considered "busy" based on their current status, unit assignment, and
+     * associated tasks.
+     *
+     * <p>This method checks:</p>
+     * <ol>
+     *     <li>If the personnel is active (i.e., has an active {@link PersonnelStatus}).</li>
+     *     <li>Special cases for units that are self-crewed, including activities such as
+     *         mothballing, refitting, or undergoing repairs, during which crew members are
+     *         considered busy.</li>
+     *     <li>If the personnel is a technician, by reviewing their current tech assignments,
+     *         such as units being mothballed, refitted, or repaired.</li>
+     *     <li>If the personnel has a unit assignment and whether that unit is currently deployed.</li>
+     * </ol>
+     *
+     * @return {@code true} if the person is deemed busy due to one of the above conditions; {@code false} otherwise.
+     */
+    public boolean isBusy() {
+        // Personnel status
+        if (!status.isActive()) {
+            return false;
+        }
+
+        final boolean hasUnitAssignment = unit != null;
+        final Entity entity = hasUnitAssignment ? unit.getEntity() : null;
+        final boolean isSpecialCase = entity != null && unit.isSelfCrewed();
+
+        // Special case handlers (self crewed units have their tech teams formed as a composite of their crew, so all
+        // crew are considered to be busy during these states)
+        if (isSpecialCase) {
+            if (unit.isMothballing()) {
+                return true;
+            }
+
+            if (unit.isRefitting()) {
+                return true;
+            }
+
+            if (unit.isUnderRepair()) {
+                return true;
+            }
+        }
+
+        // Tech assignments
+        if (isTech()) {
+            for (Unit unit : techUnits) {
+                boolean isActiveTech = Objects.equals(unit.getRefit().getTech(), this);
+
+                if (unit.isMothballing() && isActiveTech) {
+                    return true;
+                }
+
+                if (unit.isRefitting() && isActiveTech) {
+                    return true;
+                }
+
+                if (unit.isUnderRepair()) {
+                    for (Part part : unit.getParts()) {
+                        if (Objects.equals(part.getTech(), this)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Unit assignments
+        if (hasUnitAssignment) {
+            return unit.isDeployed();
+        }
+
+        return false;
     }
 
     public @Nullable Unit getUnit() {
@@ -4916,7 +5015,20 @@ public class Person {
     }
 
     public void setConnections(final int connections) {
-        this.connections = connections;
+        this.connections = clamp(connections, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+    }
+
+    /**
+     * Adjusts the person's Connections score by the specified amount.
+     *
+     * <p>The change in connections can be positive or negative, depending on the provided delta value.</p>
+     *
+     * @param delta The amount by which to adjust the number of connections. A positive value increases the connections,
+     *              while a negative value decreases them.
+     */
+    public void changeConnections(final int delta) {
+        int newValue = connections + delta;
+        connections = clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
     public int getWealth() {
@@ -4924,7 +5036,28 @@ public class Person {
     }
 
     public void setWealth(final int wealth) {
-        this.wealth = wealth;
+        this.wealth = clamp(wealth, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+    }
+
+    /**
+     * Adjusts the person's wealth by the specified amount.
+     *
+     * <p>The change in wealth can be positive or negative, depending on the provided delta value.</p>
+     *
+     * @param delta The amount by which to adjust the wealth. A positive value increases the wealth, while a negative
+     *              value decreases it.
+     */
+    public void changeWealth(final int delta) {
+        int newValue = wealth + delta;
+        wealth = clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH);
+    }
+
+    public boolean isHasPerformedExtremeExpenditure() {
+        return hasPerformedExtremeExpenditure;
+    }
+
+    public void setHasPerformedExtremeExpenditure(final boolean hasPerformedExtremeExpenditure) {
+        this.hasPerformedExtremeExpenditure = hasPerformedExtremeExpenditure;
     }
 
     public int getReputation() {
@@ -4932,7 +5065,20 @@ public class Person {
     }
 
     public void setReputation(final int reputation) {
-        this.reputation = reputation;
+        this.reputation = clamp(reputation, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+    }
+
+    /**
+     * Adjusts the person's reputation by the specified amount.
+     *
+     * <p>The change in reputation can be positive or negative, depending on the provided delta value.</p>
+     *
+     * @param delta The amount by which to adjust the reputation. A positive value increases the reputation, while a
+     *              negative value decreases it.
+     */
+    public void changeReputation(final int delta) {
+        int newValue = reputation + delta;
+        reputation = clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
     public int getUnlucky() {
@@ -4940,7 +5086,12 @@ public class Person {
     }
 
     public void setUnlucky(final int unlucky) {
-        this.unlucky = unlucky;
+        this.unlucky = clamp(unlucky, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
+    }
+
+    public void changeUnlucky(final int delta) {
+        int newValue = unlucky + delta;
+        unlucky = clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
     }
 
     /**
