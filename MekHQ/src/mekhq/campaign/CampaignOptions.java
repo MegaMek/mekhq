@@ -5938,7 +5938,7 @@ public class CampaignOptions {
                                     Integer.parseInt(wn3.getTextContent().trim()));
                     }
                 } else if (nodeName.equalsIgnoreCase("randomMarriageMethod")) {
-                    retVal.setRandomMarriageMethod(RandomMarriageMethod.valueOf(wn2.getTextContent().trim()));
+                    retVal.setRandomMarriageMethod(RandomMarriageMethod.fromString(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("useRandomClanPersonnelMarriages") ||
                                  nodeName.equalsIgnoreCase("useRandomClannerMarriages")) { // Legacy, 0.49.12 removal
                     retVal.setUseRandomClanPersonnelMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
