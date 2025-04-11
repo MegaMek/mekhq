@@ -140,13 +140,26 @@ public enum RandomMarriageMethod {
      * @since 0.50.05
      */
     public static RandomMarriageMethod fromString(String text) {
+        // Return NONE for null or empty strings
+        if ((text == null) || text.isEmpty()) {
+            logger.error("Null or empty string passed to RandomMarriageMethod.fromString: {}", text);
+            return NONE;
+        }
+
         // String value
         try {
             return RandomMarriageMethod.valueOf(text.toUpperCase().replace(" ", "_"));
         } catch (Exception ignored) {
         }
 
-        // Name
+        // Display name matching
+        for (RandomMarriageMethod method : RandomMarriageMethod.values()) {
+            if (method.toString().equalsIgnoreCase(text)) {
+                return method;
+            }
+        }
+
+        // Name comparison
         for (RandomMarriageMethod method : RandomMarriageMethod.values()) {
             if (method.name().equalsIgnoreCase(text)) {
                 return method;
