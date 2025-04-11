@@ -27,7 +27,7 @@
  */
 package mekhq.gui.dialog;
 
-import static mekhq.utilities.ImageUtilities.scaleImageIcon;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.Component;

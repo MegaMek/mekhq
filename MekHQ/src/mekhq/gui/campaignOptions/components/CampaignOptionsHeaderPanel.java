@@ -28,7 +28,7 @@
 package mekhq.gui.campaignOptions.components;
 
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.utilities.ImageUtilities.scaleImageIcon;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 
 import java.awt.GridBagConstraints;
 import java.util.ResourceBundle;

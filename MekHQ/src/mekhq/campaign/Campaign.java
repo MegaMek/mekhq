@@ -46,6 +46,7 @@ import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performRe
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
+import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
@@ -4326,6 +4327,7 @@ public class Campaign implements ITechManager {
                                  (partWork.getUnit().getEntity() instanceof Jumpship))) {
                     helpMod = 0;
                 }
+
                 if (partWork.getShorthandedMod() < helpMod) {
                     partWork.setShorthandedMod(helpMod);
                 }
@@ -4346,10 +4348,7 @@ public class Campaign implements ITechManager {
                     }
                 } else {
                     report += " cannot be finished because there was no time left after maintenance tasks.</b>";
-                    partWork.resetTimeSpent();
-                    partWork.resetOvertime();
-                    partWork.setTech(null);
-                    partWork.cancelReservation();
+                    partWork.cancelAssignment(true);
                 }
                 MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
                 addReport(report);
@@ -4445,10 +4444,7 @@ public class Campaign implements ITechManager {
             report += " (" + xpGained + "XP gained) ";
         }
         report += wrongType;
-        partWork.resetTimeSpent();
-        partWork.resetOvertime();
-        partWork.setTech(null);
-        partWork.cancelReservation();
+        partWork.cancelAssignment(true);
         MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
         addReport(report);
         return report;
@@ -4915,7 +4911,7 @@ public class Campaign implements ITechManager {
                     processWeeklyRelationshipEvents(person);
                 }
 
-                processWeeklyEdgeResets(person);
+                person.resetCurrentEdge();
 
                 if (!person.getStatus().isMIA()) {
                     processFatigueRecovery(this, person);
@@ -4931,6 +4927,19 @@ public class Campaign implements ITechManager {
                         personnelWhoAdvancedInXP.add(person);
                     }
                 }
+
+                if (person.isCommander() &&
+                          campaignOptions.isAllowMonthlyReinvestment() &&
+                          !person.isHasPerformedExtremeExpenditure()) {
+                    String reportString = performDiscretionarySpending(person, finances, currentDay);
+                    if (reportString != null) {
+                        addReport(reportString);
+                    } else {
+                        logger.error("Unable to process discretionary spending for {}", person.getFullTitle());
+                    }
+                }
+
+                person.setHasPerformedExtremeExpenditure(false);
             }
 
             if (isCommandersDay && !faction.isClan() && (peopleWhoCelebrateCommandersDay < commanderDayTargetNumber)) {
@@ -4991,14 +5000,11 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Process weekly Edge resets for a given person.
-     *
-     * @param person the person for whom weekly Edge resets will be processed
+     * @deprecated use {@link Person#resetCurrentEdge()} instead
      */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     private void processWeeklyEdgeResets(Person person) {
-        if ((person.hasSupportRole(true) || person.isEngineer())) {
-            person.resetCurrentEdge();
-        }
+        person.resetCurrentEdge();
     }
 
     /**
@@ -5190,22 +5196,22 @@ public class Campaign implements ITechManager {
         // the second time to do whatever else. Otherwise, maintenance minutes might
         // get sucked up by other stuff. This is also a good place to ensure that a
         // unit's engineer gets reset and updated.
-        for (Unit u : getUnits()) {
+        for (Unit unit : getUnits()) {
             // do maintenance checks
             try {
-                u.resetEngineer();
-                if (null != u.getEngineer()) {
-                    u.getEngineer().resetMinutesLeft(campaignOptions.isTechsUseAdministration());
+                unit.resetEngineer();
+                if (null != unit.getEngineer()) {
+                    unit.getEngineer().resetMinutesLeft(campaignOptions.isTechsUseAdministration());
                 }
 
-                doMaintenance(u);
+                doMaintenance(unit);
             } catch (Exception ex) {
                 logger.error(ex,
                       "Unable to perform maintenance on {} ({}) due to an error",
-                      u.getName(),
-                      u.getId().toString());
+                      unit.getName(),
+                      unit.getId().toString());
                 addReport(String.format("ERROR: An error occurred performing maintenance on %s, check the log",
-                      u.getName()));
+                      unit.getName()));
             }
         }
 
@@ -5266,7 +5272,7 @@ public class Campaign implements ITechManager {
                           "%s looks at %s, recalls his total lack of skill for working with such technology, then slowly puts the tools down before anybody gets hurt.",
                           tech.getHyperlinkedFullTitle(),
                           part.getName()));
-                    part.setTech(null);
+                    part.cancelAssignment(false);
                 }
             } else {
                 JOptionPane.showMessageDialog(null,
@@ -8766,49 +8772,64 @@ public class Campaign implements ITechManager {
         return false;
     }
 
-    public void doMaintenance(Unit u) {
-        if (!u.requiresMaintenance() || !campaignOptions.isCheckMaintenance()) {
+    public void doMaintenance(Unit unit) {
+        if (!unit.requiresMaintenance() || !campaignOptions.isCheckMaintenance()) {
             return;
         }
         // let's start by checking times
-        Person tech = u.getTech();
-        int minutesUsed = u.getMaintenanceTime();
-        int asTechsUsed = getAvailableAstechs(minutesUsed, false);
-        boolean maintained = ((tech != null) && (tech.getMinutesLeft() >= minutesUsed) && !tech.isMothballing());
+        int minutesUsed = unit.getMaintenanceTime();
+        int asTechsUsed = 0;
+        boolean maintained = false;
         boolean paidMaintenance = true;
-        if (maintained) {
-            // use the time
-            tech.setMinutesLeft(tech.getMinutesLeft() - minutesUsed);
-            astechPoolMinutes -= asTechsUsed * minutesUsed;
-        }
-        u.incrementDaysSinceMaintenance(this, maintained, asTechsUsed);
+
+        unit.incrementDaysSinceMaintenance(this, maintained, asTechsUsed);
 
         int ruggedMultiplier = 1;
-        if (u.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_1)) {
+        if (unit.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_1)) {
             ruggedMultiplier = 2;
         }
 
-        if (u.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_2)) {
+        if (unit.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_2)) {
             ruggedMultiplier = 3;
         }
 
-        if (u.getDaysSinceMaintenance() >= (getCampaignOptions().getMaintenanceCycleDays() * ruggedMultiplier)) {
+        if (unit.getDaysSinceMaintenance() >= (getCampaignOptions().getMaintenanceCycleDays() * ruggedMultiplier)) {
+            Person tech = unit.getTech();
+            if (tech != null) {
+                int availableMinutes = tech.getMinutesLeft();
+
+                maintained = (availableMinutes >= minutesUsed);
+
+                if (!maintained) {
+                    // At this point, insufficient minutes is the only reason why this would be failed.
+                    addReport(String.format(resources.getString("maintenanceNotAvailable.text"), unit.getName()));
+                } else {
+                    maintained = !tech.isMothballing();
+                }
+
+                if (maintained) {
+                    tech.setMinutesLeft(availableMinutes - minutesUsed);
+                    asTechsUsed = getAvailableAstechs(minutesUsed, false);
+                    astechPoolMinutes -= asTechsUsed * minutesUsed;
+                }
+            }
+
             // maybe use the money
             if (campaignOptions.isPayForMaintain()) {
                 if (!(finances.debit(TransactionType.MAINTENANCE,
                       getLocalDate(),
-                      u.getMaintenanceCost(),
-                      "Maintenance for " + u.getName()))) {
+                      unit.getMaintenanceCost(),
+                      "Maintenance for " + unit.getName()))) {
                     addReport("<font color='" +
                                     MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
                                     "'><b>You cannot afford to pay maintenance costs for " +
-                                    u.getHyperlinkedName() +
+                                    unit.getHyperlinkedName() +
                                     "!</b></font>");
                     paidMaintenance = false;
                 }
             }
             // it is time for a maintenance check
-            PartQuality qualityOrig = u.getQuality();
+            PartQuality qualityOrig = unit.getQuality();
             String techName = "Nobody";
             String techNameLinked = techName;
             if (null != tech) {
@@ -8822,9 +8843,9 @@ public class Campaign implements ITechManager {
             StringBuilder maintenanceReport = new StringBuilder("<strong>" +
                                                                       techName +
                                                                       " performing maintenance</strong><br><br>");
-            for (Part p : u.getParts()) {
+            for (Part p : unit.getParts()) {
                 try {
-                    String partReport = doMaintenanceOnUnitPart(u, p, partsToDamage, paidMaintenance);
+                    String partReport = doMaintenanceOnUnitPart(unit, p, partsToDamage, paidMaintenance);
                     if (partReport != null) {
                         maintenanceReport.append(partReport).append("<br>");
                     }
@@ -8833,12 +8854,12 @@ public class Campaign implements ITechManager {
                           "Could not perform maintenance on part {} ({}) for {} ({}) due to an error",
                           p.getName(),
                           p.getId(),
-                          u.getName(),
-                          u.getId().toString());
+                          unit.getName(),
+                          unit.getId().toString());
                     addReport(String.format(
                           "ERROR: An error occurred performing maintenance on %s for unit %s, check the log",
                           p.getName(),
-                          u.getName()));
+                          unit.getName()));
                 }
             }
 
@@ -8855,13 +8876,13 @@ public class Campaign implements ITechManager {
                 }
             }
 
-            u.setLastMaintenanceReport(maintenanceReport.toString());
+            unit.setLastMaintenanceReport(maintenanceReport.toString());
 
             if (getCampaignOptions().isLogMaintenance()) {
                 logger.info(maintenanceReport.toString());
             }
 
-            PartQuality quality = u.getQuality();
+            PartQuality quality = unit.getQuality();
             String qualityString;
             boolean reverse = getCampaignOptions().isReverseQualityNames();
             if (quality.toNumeric() > qualityOrig.toNumeric()) {
@@ -8894,7 +8915,7 @@ public class Campaign implements ITechManager {
                                      "'>" +
                                      damageString +
                                      "</b></font> [<a href='REPAIR|" +
-                                     u.getId() +
+                                     unit.getId() +
                                      "'>Repair bay</a>]";
             }
             String paidString = "";
@@ -8905,17 +8926,17 @@ public class Campaign implements ITechManager {
             }
             addReport(techNameLinked +
                             " performs maintenance on " +
-                            u.getHyperlinkedName() +
+                            unit.getHyperlinkedName() +
                             ". " +
                             paidString +
                             qualityString +
                             ". " +
                             damageString +
                             " [<a href='MAINTENANCE|" +
-                            u.getId() +
+                            unit.getId() +
                             "'>Get details</a>]");
 
-            u.resetDaysSinceMaintenance();
+            unit.resetDaysSinceMaintenance();
         }
     }
 

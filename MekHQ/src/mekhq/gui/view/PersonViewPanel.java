@@ -31,9 +31,10 @@ import static java.awt.Color.BLACK;
 import static java.awt.Color.RED;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
+import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
+import static mekhq.campaign.personnel.skills.SkillType.RP_ONLY_TAG;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
-import static mekhq.utilities.ImageUtilities.addTintToImageIcon;
 import static org.jfree.chart.ChartColor.DARK_BLUE;
 import static org.jfree.chart.ChartColor.DARK_RED;
 
@@ -93,8 +94,6 @@ import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.WrapLayout;
-
-import static megamek.client.ui.WrapLayout.wordWrap;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
@@ -1510,9 +1509,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 }
                 if (type.isRoleplaySkill()) {
                     lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader.roleplay"),
-                          skillName.replaceAll(' ' +
-                                                     Pattern.quote(resourceMap.getString("format.itemHeader.roleplay" +
-                                                                                               ".removal")), "")));
+                          skillName.replaceAll(Pattern.quote(RP_ONLY_TAG), "")));
                 } else {
                     lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), skillName));
                 }
@@ -1602,7 +1599,8 @@ public class PersonViewPanel extends JScrollablePanel {
             }
         }
 
-        if (campaign.getCampaignOptions().isUseEdge() && (person.getEdge() > 0)) {
+        int edge = person.getAdjustedEdge();
+        if (campaign.getCampaignOptions().isUseEdge() && (edge != 0)) {
             lblEdge1.setName("lblEdge1");
             lblEdge1.setText(resourceMap.getString("lblEdge1.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -1614,7 +1612,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
             lblEdge2.setName("lblEdge2");
             lblEdge1.setLabelFor(lblEdge2);
-            lblEdge2.setText(Integer.toString(person.getEdge()));
+            lblEdge2.setText("" + person.getCurrentEdge() + '/' + person.getEdge());
             lblEdge2.setToolTipText(person.getEdgeTooltip());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
@@ -1625,27 +1623,6 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSkills.add(lblEdge2, gridBagConstraints);
-
-            if (campaign.getCampaignOptions().isUseSupportEdge() && person.hasSupportRole(true)) {
-                // Add the Edge Available field for support personnel only
-                lblEdgeAvail1.setName("lblEdgeAvail1");
-                lblEdgeAvail1.setText(resourceMap.getString("lblEdgeAvail1.text"));
-                gridBagConstraints = new GridBagConstraints();
-                gridBagConstraints.gridx = 2;
-                gridBagConstraints.gridy = firsty;
-                gridBagConstraints.fill = GridBagConstraints.NONE;
-                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-                pnlSkills.add(lblEdgeAvail1, gridBagConstraints);
-
-                lblEdgeAvail2.setName("lblEdgeAvail2");
-                lblEdgeAvail1.setLabelFor(lblEdgeAvail2);
-                lblEdgeAvail2.setText(Integer.toString(person.getCurrentEdge()));
-                gridBagConstraints.gridx = 3;
-                gridBagConstraints.gridwidth = 1;
-                gridBagConstraints.weightx = 1.0;
-                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-                pnlSkills.add(lblEdgeAvail2, gridBagConstraints);
-            }
             firsty++;
         }
 
