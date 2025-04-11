@@ -29,16 +29,14 @@ package mekhq.campaign.log;
 
 import java.time.LocalDate;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
- * This class is responsible for instantiating the desired log entries from xml
- * nodes.
+ * This class is responsible for instantiating the desired log entries from xml nodes.
  *
  * @author Miguel Azevedo
  */
@@ -64,35 +62,32 @@ public class LogEntryFactory {
      * @param date date of the log
      * @param desc description of the log
      * @param type type of the log
+     *
      * @return the new log entry
      */
     public LogEntry generateNew(LocalDate date, String desc, LogEntryType type) {
-        switch (type) {
-            case MEDICAL:
-                return new MedicalLogEntry(date, desc);
-            case AWARD:
-                return new AwardLogEntry(date, desc);
-            case SERVICE:
-                return new ServiceLogEntry(date, desc);
-            case PERSONAL:
-                return new PersonalLogEntry(date, desc);
-            case HISTORICAL:
-                return new HistoricalLogEntry(date, desc);
-            case CUSTOM:
-            default:
-                return new CustomLogEntry(date, desc);
-        }
+        return switch (type) {
+            case MEDICAL -> new MedicalLogEntry(date, desc);
+            case AWARD -> new AwardLogEntry(date, desc);
+            case SERVICE -> new ServiceLogEntry(date, desc);
+            case PERSONAL -> new PersonalLogEntry(date, desc);
+            case HISTORICAL -> new HistoricalLogEntry(date, desc);
+            case ASSIGNMENT -> new AssignmentLogEntry(date, desc);
+            case PERFORMANCE -> new PerformanceLogEntry(date, desc);
+            default -> new CustomLogEntry(date, desc);
+        };
     }
 
     /**
      * Generates a log entry from a node
      *
      * @param wn xml node
+     *
      * @return log entry
      */
     public @Nullable LogEntry generateInstanceFromXML(Node wn) {
         LocalDate date = null;
-        String desc = null;
+        String description = null;
         LogEntryType type = null;
 
         try {
@@ -101,7 +96,7 @@ public class LogEntryFactory {
                 Node node = nl.item(x);
                 switch (node.getNodeName()) {
                     case "desc":
-                        desc = MHQXMLUtility.unEscape(node.getTextContent());
+                        description = MHQXMLUtility.unEscape(node.getTextContent());
                         break;
                     case "type":
                         type = LogEntryType.valueOf(node.getTextContent());
@@ -118,6 +113,11 @@ public class LogEntryFactory {
             return null;
         }
 
-        return generateNew(date, desc, type);
+        if (type == null) {
+            logger.error("LogEntry type is null for {}", description);
+            type = LogEntryType.PERSONAL;
+        }
+
+        return generateNew(date, description, type);
     }
 }

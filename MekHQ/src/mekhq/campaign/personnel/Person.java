@@ -33,6 +33,10 @@ import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
+import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
+import static mekhq.campaign.log.LogEntryType.MEDICAL;
+import static mekhq.campaign.log.LogEntryType.PERFORMANCE;
+import static mekhq.campaign.log.LogEntryType.SERVICE;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 
@@ -70,6 +74,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
+import mekhq.campaign.log.LogEntryType;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
@@ -186,6 +191,8 @@ public class Person {
     private List<LogEntry> personnelLog;
     private List<LogEntry> medicalLog;
     private List<LogEntry> scenarioLog;
+    private List<LogEntry> assignmentLog;
+    private List<LogEntry> performanceLog;
 
     // this is used by autoAwards to abstract the support person of the year award
     private int autoAwardSupportPoints;
@@ -448,6 +455,8 @@ public class Person {
         personnelLog = new ArrayList<>();
         medicalLog = new ArrayList<>();
         scenarioLog = new ArrayList<>();
+        assignmentLog = new ArrayList<>();
+        performanceLog = new ArrayList<>();
         awardController = new PersonAwardController(this);
         injuries = new ArrayList<>();
         originalUnitWeight = EntityWeightClass.WEIGHT_ULTRA_LIGHT;
@@ -2458,6 +2467,22 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "scenarioLog");
             }
 
+            if (!assignmentLog.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "assignmentLog");
+                for (LogEntry entry : assignmentLog) {
+                    entry.writeToXML(pw, indent);
+                }
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "assignmentLog");
+            }
+
+            if (!performanceLog.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "performanceLog");
+                for (LogEntry entry : performanceLog) {
+                    entry.writeToXML(pw, indent);
+                }
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "performanceLog");
+            }
+
             if (!getAwardController().getAwards().isEmpty()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "awards");
                 for (Award award : getAwardController().getAwards()) {
@@ -2841,7 +2866,48 @@ public class Person {
 
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
-                            person.addLogEntry(logEntry);
+                            // <50.05 compatibility handler
+                            LogEntryType logEntryType = logEntry.getType();
+                            String logEntryDescription = logEntry.getDesc();
+                            if (logEntryType == MEDICAL) {
+                                person.addMedicalLogEntry(logEntry);
+                            } else if (logEntryType == SERVICE) {
+                                // < 50.05 compatibility handler
+                                List<String> assignmentTargetStrings = List.of("Assigned to",
+                                      "Reassigned from",
+                                      "Removed from",
+                                      "Added to");
+
+                                for (String targetString : assignmentTargetStrings) {
+                                    if (logEntryDescription.startsWith(targetString)) {
+                                        logEntry.setType(ASSIGNMENT);
+                                        person.addAssignmentLogEntry(logEntry);
+                                        break;
+                                    }
+                                }
+                            } else {
+                                // < 50.05 compatibility handler
+                                List<String> performanceTargetStrings = List.of("Changed edge to",
+                                      "Gained",
+                                      "Improved",
+                                      "injuries, gaining",
+                                      "XP from successful medical work");
+
+                                boolean foundPerformanceTarget = false;
+                                for (String targetString : performanceTargetStrings) {
+                                    if (logEntryDescription.startsWith(targetString)) {
+                                        foundPerformanceTarget = true;
+                                        break;
+                                    }
+                                }
+
+                                if (foundPerformanceTarget) {
+                                    logEntry.setType(PERFORMANCE);
+                                    person.addPerformanceLogEntry(logEntry);
+                                } else {
+                                    person.addPersonalLogEntry(logEntry);
+                                }
+                            }
                         }
                     }
                 } else if (nodeName.equalsIgnoreCase("medicalLog")) {
@@ -2882,6 +2948,46 @@ public class Person {
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
                             person.addScenarioLogEntry(logEntry);
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("assignmentLog")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
+                            logger.error("(assignmentLog) Unknown node type not loaded in scenario logEntry nodes: {}",
+                                  wn3.getNodeName());
+                            continue;
+                        }
+
+                        final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
+                        if (logEntry != null) {
+                            person.addAssignmentLogEntry(logEntry);
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("performanceLog")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
+                            logger.error("(performanceLog) Unknown node type not loaded in scenario logEntry nodes: {}",
+                                  wn3.getNodeName());
+                            continue;
+                        }
+
+                        final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
+                        if (logEntry != null) {
+                            person.addPerformanceLogEntry(logEntry);
                         }
                     }
                 } else if (nodeName.equalsIgnoreCase("awards")) {
@@ -5111,7 +5217,15 @@ public class Person {
         this.nTasks = nTasks;
     }
 
+    /**
+     * @deprecated use {@link #getPersonalLog()} instead.
+     */
+    @Deprecated(forRemoval = true, since = "0.50.5")
     public List<LogEntry> getPersonnelLog() {
+        return getPersonalLog();
+    }
+
+    public List<LogEntry> getPersonalLog() {
         personnelLog.sort(Comparator.comparing(LogEntry::getDate));
         return personnelLog;
     }
@@ -5126,7 +5240,25 @@ public class Person {
         return scenarioLog;
     }
 
+    public List<LogEntry> getAssignmentLog() {
+        assignmentLog.sort(Comparator.comparing(LogEntry::getDate));
+        return assignmentLog;
+    }
+
+    public List<LogEntry> getPerformanceLog() {
+        performanceLog.sort(Comparator.comparing(LogEntry::getDate));
+        return performanceLog;
+    }
+
+    /**
+     * @deprecated use {@link #addPersonalLogEntry(LogEntry)} instead.
+     */
+    @Deprecated(forRemoval = true, since = "0.50.5")
     public void addLogEntry(final LogEntry entry) {
+        addPersonalLogEntry(entry);
+    }
+
+    public void addPersonalLogEntry(final LogEntry entry) {
         personnelLog.add(entry);
     }
 
@@ -5136,6 +5268,14 @@ public class Person {
 
     public void addScenarioLogEntry(final LogEntry entry) {
         scenarioLog.add(entry);
+    }
+
+    public void addAssignmentLogEntry(final LogEntry entry) {
+        assignmentLog.add(entry);
+    }
+
+    public void addPerformanceLogEntry(final LogEntry entry) {
+        performanceLog.add(entry);
     }
 
     // region injuries

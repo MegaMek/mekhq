@@ -43,8 +43,7 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
  * @author Miguel Azevedo
  */
 public class MedicalLogger {
-    private static final transient ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle(
-          "mekhq.resources.LogEntries",
+    private static final ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
           MekHQ.getMHQOptions().getLocale());
 
     public static MedicalLogEntry severedSpine(Person person, LocalDate date) {
@@ -192,7 +191,7 @@ public class MedicalLogger {
         String message = logEntriesResourceMap.getString("hasConceived.text");
 
         if (!sizeString.isBlank()) {
-            message += " " + sizeString;
+            message += ' ' + sizeString;
         }
 
         patient.addMedicalLogEntry(new MedicalLogEntry(date, message));

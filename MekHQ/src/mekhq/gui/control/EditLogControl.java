@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -46,30 +46,26 @@ import javax.swing.table.TableColumn;
 
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.dialog.AddOrEditMedicalEntryDialog;
-import mekhq.gui.dialog.EditMedicalLogDialog;
+import mekhq.gui.dialog.AddOrEditLogEntryDialog;
 import mekhq.gui.model.LogTableModel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
- * A control panel for editing a person's medical log entries.
+ * A control panel for editing a person's log entries.
  *
- * <p>This component provides a table view of all medical log entries for a person, along with buttons to add, edit,
- * and delete entries. It manages the underlying data model and handles all user interactions related to medical log
+ * <p>This component provides a table view of all log entries for a person, along with buttons to add, edit,
+ * and delete entries. It manages the underlying data model and handles all user interactions related to log
  * management.</p>
  *
- * <p>The control is typically embedded within the {@link EditMedicalLogDialog} but can be reused in other contexts
- * where medical log editing is needed.</p>
- *
- * @author Illiani
- * @since 0.50.05
+ * @author Taharqa
  */
-public class EditMedicalLogControl extends JPanel {
+public class EditLogControl extends JPanel {
     private static final int PADDING = scaleForGUI(5);
 
     private final JFrame parent;
     private final LocalDate today;
     private final Person person;
+    private final LogType logType;
     private final LogTableModel logModel;
 
     private JButton btnAdd;
@@ -78,20 +74,72 @@ public class EditMedicalLogControl extends JPanel {
     private JTable logsTable;
 
     /**
-     * Constructs a new control panel for editing a person's medical log.
+     * Represents the different types of logs that can be maintained for a person.
      *
-     * @param parent the parent frame for dialogs
-     * @param person the person whose medical log is being edited
-     * @param today  the current date for new entries
+     * <p>Each log type serves a different purpose in tracking aspects of a person's history
+     * and status within the organization.</p>
      *
      * @author Illiani
      * @since 0.50.05
      */
-    public EditMedicalLogControl(JFrame parent, Person person, LocalDate today) {
+    public enum LogType {
+        /**
+         * Personal logs record general events and notes related to the person. These may include personal achievements,
+         * disciplinary actions, or other noteworthy events not covered by other log types.
+         */
+        PERSONAL_LOG,
+
+        /**
+         * Medical logs record health-related events, treatments, injuries, and other medical information pertaining to
+         * the person.
+         */
+        MEDICAL_LOG,
+
+        /**
+         * Assignment logs track a person's positions, deployments, transfers, and other assignment-related information
+         * throughout their service.
+         */
+        ASSIGNMENT_LOG,
+
+        /**
+         * Performance logs are used to track and record a character's skill improvements, and SPA or XP gains.
+         */
+        PERFORMANCE_LOG
+    }
+
+    /**
+     * @deprecated use {@link EditLogControl#EditLogControl(JFrame, Person, LocalDate, LogType)} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public EditLogControl(JFrame parent, Person person, LocalDate today) {
         this.parent = parent;
         this.person = person;
         this.today = today;
-        this.logModel = new LogTableModel(person.getMedicalLog());
+        this.logType = LogType.PERSONAL_LOG;
+        this.logModel = new LogTableModel(person.getPersonalLog());
+
+        initComponents();
+    }
+
+    /**
+     * Constructs a new control panel for editing a person's log.
+     *
+     * @param parent the parent frame for dialogs
+     * @param person the person whose log is being edited
+     * @param today  the current date for new entries
+     */
+    public EditLogControl(JFrame parent, Person person, LocalDate today, LogType logType) {
+        this.parent = parent;
+        this.person = person;
+        this.today = today;
+        this.logType = logType;
+
+        this.logModel = switch (logType) {
+            case PERSONAL_LOG -> new LogTableModel(person.getPersonalLog());
+            case MEDICAL_LOG -> new LogTableModel(person.getMedicalLog());
+            case ASSIGNMENT_LOG -> new LogTableModel(person.getAssignmentLog());
+            case PERFORMANCE_LOG -> new LogTableModel(person.getPerformanceLog());
+        };
 
         initComponents();
     }
@@ -101,9 +149,6 @@ public class EditMedicalLogControl extends JPanel {
      *
      * <p>Sets up the layout, creates the action buttons (add, edit, delete), configures the table for displaying log
      * entries, and sets up the scroll pane containing the table.</p>
-     *
-     * @author Illiani
-     * @since 0.50.05
      */
     private void initComponents() {
         setName("control.name");
@@ -116,17 +161,14 @@ public class EditMedicalLogControl extends JPanel {
 
     /**
      * Initializes the button panel with action buttons.
-     *
-     * @author Illiani
-     * @since 0.50.05
      */
     private void initButtonPanel() {
         JPanel buttonPanel = new JPanel(new GridLayout(1, 0, PADDING, 0));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, PADDING, 0));
 
-        btnAdd = createButton("medicalLog.btnAdd.text", "btnAdd", true, this::addEntry);
-        btnEdit = createButton("medicalLog.btnEdit.text", "btnEdit", false, this::editEntry);
-        btnDelete = createButton("medicalLog.btnDelete.text", "btnDelete", false, this::deleteEntry);
+        btnAdd = createButton("logController.btnAdd.text", "btnAdd", true, this::addEntry);
+        btnEdit = createButton("logController.btnEdit.text", "btnEdit", false, this::editEntry);
+        btnDelete = createButton("logController.btnDelete.text", "btnDelete", false, this::deleteEntry);
 
         buttonPanel.add(btnAdd);
         buttonPanel.add(btnEdit);
@@ -144,9 +186,6 @@ public class EditMedicalLogControl extends JPanel {
      * @param action  action to perform when clicked
      *
      * @return configured button
-     *
-     * @author Illiani
-     * @since 0.50.05
      */
     private JButton createButton(String textKey, String name, boolean enabled, Runnable action) {
         JButton button = new JButton(getFormattedText(textKey));
@@ -158,9 +197,6 @@ public class EditMedicalLogControl extends JPanel {
 
     /**
      * Initializes the logs table with its scroll pane.
-     *
-     * @author Illiani
-     * @since 0.50.05
      */
     private void initLogsTable() {
         logsTable = new JTable(logModel);
@@ -181,9 +217,6 @@ public class EditMedicalLogControl extends JPanel {
 
     /**
      * Configures all columns in the logs table with appropriate widths and renderers.
-     *
-     * @author Illiani
-     * @since 0.50.05
      */
     private void configureTableColumns() {
         for (int i = 0; i < LogTableModel.N_COL; i++) {
@@ -199,9 +232,6 @@ public class EditMedicalLogControl extends JPanel {
      * <p>Enables or disables the edit and delete buttons based on whether a row is selected in the table.</p>
      *
      * @param evt the event that triggered this handler
-     *
-     * @author Illiani
-     * @since 0.50.05
      */
     private void logTableValueChanged(ListSelectionEvent evt) {
         if (evt.getValueIsAdjusting()) {
@@ -214,29 +244,29 @@ public class EditMedicalLogControl extends JPanel {
     }
 
     /**
-     * Opens a dialog to add a new medical log entry.
+     * Opens a dialog to add a new log entry.
      *
-     * <p>If the user confirms the addition, the new entry is added to the person's medical log and the table is
+     * <p>If the user confirms the addition, the new entry is added to the person's log and the table is
      * refreshed.</p>
-     *
-     * @author Illiani
-     * @since 0.50.05
      */
     private void addEntry() {
-        final AddOrEditMedicalEntryDialog dialog = new AddOrEditMedicalEntryDialog(parent, person, today);
+        final AddOrEditLogEntryDialog dialog = new AddOrEditLogEntryDialog(parent, person, today);
         if (dialog.showDialog().isConfirmed()) {
-            person.addMedicalLogEntry(dialog.getEntry());
+            switch (logType) {
+                case PERSONAL_LOG -> person.addPersonalLogEntry(dialog.getEntry());
+                case MEDICAL_LOG -> person.addMedicalLogEntry(dialog.getEntry());
+                case ASSIGNMENT_LOG -> person.addAssignmentLogEntry(dialog.getEntry());
+                case PERFORMANCE_LOG -> person.addPerformanceLogEntry(dialog.getEntry());
+            }
+
             refreshTable();
         }
     }
 
     /**
-     * Opens a dialog to edit the selected medical log entry.
+     * Opens a dialog to edit the selected log entry.
      *
      * <p>Retrieves the selected entry from the model, opens an edit dialog, and refreshes the table afterward.</p>
-     *
-     * @author Illiani
-     * @since 0.50.05
      */
     private void editEntry() {
         int selectedRow = logsTable.getSelectedRow();
@@ -246,18 +276,15 @@ public class EditMedicalLogControl extends JPanel {
 
         final LogEntry entry = logModel.getEntry(selectedRow);
         if (entry != null) {
-            new AddOrEditMedicalEntryDialog(parent, person, entry).showDialog();
+            new AddOrEditLogEntryDialog(parent, person, entry).showDialog();
             refreshTable();
         }
     }
 
     /**
-     * Deletes the selected medical log entry.
+     * Deletes the selected log entry.
      *
-     * <p>Removes the entry from the person's medical log and refreshes the table.</p>
-     *
-     * @author Illiani
-     * @since 0.50.05
+     * <p>Removes the entry from the person's log and refreshes the table.</p>
      */
     private void deleteEntry() {
         int selectedRow = logsTable.getSelectedRow();
@@ -265,22 +292,31 @@ public class EditMedicalLogControl extends JPanel {
             return;
         }
 
-        person.getMedicalLog().remove(selectedRow);
+        switch (logType) {
+            case PERSONAL_LOG -> person.getPersonalLog().remove(selectedRow);
+            case MEDICAL_LOG -> person.getMedicalLog().remove(selectedRow);
+            case ASSIGNMENT_LOG -> person.getAssignmentLog().remove(selectedRow);
+            case PERFORMANCE_LOG -> person.getPerformanceLog().remove(selectedRow);
+        }
+
         refreshTable();
     }
 
     /**
-     * Refreshes the table to reflect the current state of the medical log.
+     * Refreshes the table to reflect the current state of the log.
      *
      * <p>Updates the model with fresh data, then attempts to maintain the user's selection if possible. If the
      * previously selected row no longer exists (e.g., after deletion), it selects the previous row.</p>
-     *
-     * @author Illiani
-     * @since 0.50.05
      */
     private void refreshTable() {
         int selectedRow = logsTable.getSelectedRow();
-        logModel.setData(person.getMedicalLog());
+
+        switch (logType) {
+            case PERSONAL_LOG -> person.getPersonalLog();
+            case MEDICAL_LOG -> person.getMedicalLog();
+            case ASSIGNMENT_LOG -> person.getAssignmentLog();
+            case PERFORMANCE_LOG -> person.getPerformanceLog();
+        }
 
         if (selectedRow != -1 && logsTable.getRowCount() > 0) {
             // Adjust selection if the previously selected row is no longer available

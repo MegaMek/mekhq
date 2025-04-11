@@ -231,6 +231,8 @@ public class CampaignOptions {
     private boolean displayScenarioLog;
     private boolean displayKillRecord;
     private boolean displayMedicalRecord;
+    private boolean displayAssignmentRecord;
+    private boolean displayPerformanceRecord;
 
     // Expanded Personnel Information
     private boolean useTimeInService;
@@ -1649,6 +1651,22 @@ public class CampaignOptions {
 
     public void setDisplayMedicalRecord(final boolean displayMedicalRecord) {
         this.displayMedicalRecord = displayMedicalRecord;
+    }
+
+    public boolean isDisplayAssignmentRecord() {
+        return displayAssignmentRecord;
+    }
+
+    public void setDisplayAssignmentRecord(final boolean displayAssignmentRecord) {
+        this.displayAssignmentRecord = displayAssignmentRecord;
+    }
+
+    public boolean isDisplayPerformanceRecord() {
+        return displayPerformanceRecord;
+    }
+
+    public void setDisplayPerformanceRecord(final boolean displayPerformanceRecord) {
+        this.displayPerformanceRecord = displayPerformanceRecord;
     }
 
     public boolean isUseFatigue() {
@@ -4962,6 +4980,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayScenarioLog", isDisplayScenarioLog());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayKillRecord", isDisplayKillRecord());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayMedicalRecord", isDisplayMedicalRecord());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayAssignmentRecord", isDisplayAssignmentRecord());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayPerformanceRecord", isDisplayPerformanceRecord());
         // endregion General Personnel
 
         // region Expanded Personnel Information
@@ -5735,6 +5755,10 @@ public class CampaignOptions {
                     retVal.setDisplayKillRecord(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("displayMedicalRecord")) {
                     retVal.setDisplayMedicalRecord(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("displayAssignmentRecord")) {
+                    retVal.setDisplayAssignmentRecord(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("displayPerformanceRecord")) {
+                    retVal.setDisplayPerformanceRecord(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     // endregion General Personnel
 
                     // region Expanded Personnel Information
@@ -5946,9 +5970,9 @@ public class CampaignOptions {
                         if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         }
-                        retVal.getMarriageSurnameWeights()
-                              .put(MergingSurnameStyle.parseFromString(wn3.getNodeName().trim()),
-                                    Integer.parseInt(wn3.getTextContent().trim()));
+                        retVal.getMarriageSurnameWeights().put(MergingSurnameStyle.parseFromString(wn3.getNodeName()
+                                                                                                         .trim()),
+                              Integer.parseInt(wn3.getTextContent().trim()));
                     }
                 } else if (nodeName.equalsIgnoreCase("randomMarriageMethod")) {
                     retVal.setRandomMarriageMethod(RandomMarriageMethod.valueOf(wn2.getTextContent().trim()));
@@ -6088,8 +6112,8 @@ public class CampaignOptions {
                         final Node wn3 = nl2.item(i);
                         try {
                             retVal.getEnabledRandomDeathAgeGroups()
-                                  .put(AgeGroup.valueOf(wn3.getNodeName()), Boolean.parseBoolean(wn3.getTextContent()
-                                                                                                       .trim()));
+                                  .put(AgeGroup.valueOf(wn3.getNodeName()),
+                                        Boolean.parseBoolean(wn3.getTextContent().trim()));
                         } catch (Exception ignored) {
 
                         }
@@ -6492,8 +6516,8 @@ public class CampaignOptions {
                 } else if (nodeName.equalsIgnoreCase("originSearchRadius")) { // Legacy, 0.49.7 Removal
                     retVal.getRandomOriginOptions().setOriginSearchRadius(Integer.parseInt(wn2.getTextContent()));
                 } else if (nodeName.equalsIgnoreCase("extraRandomOrigin")) { // Legacy, 0.49.7 Removal
-                    retVal.getRandomOriginOptions()
-                          .setExtraRandomOrigin(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    retVal.getRandomOriginOptions().setExtraRandomOrigin(Boolean.parseBoolean(wn2.getTextContent()
+                                                                                                    .trim()));
                 } else if (nodeName.equalsIgnoreCase("originDistanceScale")) { // Legacy, 0.49.7 Removal
                     retVal.getRandomOriginOptions().setOriginDistanceScale(Double.parseDouble(wn2.getTextContent()
                                                                                                     .trim()));

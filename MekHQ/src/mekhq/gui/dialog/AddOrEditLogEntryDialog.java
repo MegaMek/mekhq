@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
+ * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,7 +36,6 @@ import java.time.LocalDate;
 import java.util.Objects;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -54,10 +54,9 @@ import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
  * <p>This dialog supports both creating new medical log entries and modifying existing ones. It provides fields for
  * the date and description of the entry.</p>
  *
- * @author Illiani
- * @since 0.50.05
+ * @author Taharqa
  */
-public class AddOrEditMedicalEntryDialog extends AbstractMHQButtonDialog {
+public class AddOrEditLogEntryDialog extends AbstractMHQButtonDialog {
     private static final int ADD_OPERATION = 1;
     private static final int EDIT_OPERATION = 2;
 
@@ -75,11 +74,8 @@ public class AddOrEditMedicalEntryDialog extends AbstractMHQButtonDialog {
      * @param parent    the parent frame for this dialog
      * @param person    the person for whom the entry is being added. Can be null
      * @param entryDate the date for the new entry
-     *
-     * @author Illiani
-     * @since 0.50.05
      */
-    public AddOrEditMedicalEntryDialog(final JFrame parent, final @Nullable Person person, final LocalDate entryDate) {
+    public AddOrEditLogEntryDialog(final JFrame parent, final @Nullable Person person, final LocalDate entryDate) {
         this(parent, ADD_OPERATION, person, new PersonalLogEntry(entryDate, ""));
     }
 
@@ -89,11 +85,8 @@ public class AddOrEditMedicalEntryDialog extends AbstractMHQButtonDialog {
      * @param parent the parent frame for this dialog
      * @param person the person whose entry is being edited, may be null
      * @param entry  the log entry to edit
-     *
-     * @author Illiani
-     * @since 0.50.05
      */
-    public AddOrEditMedicalEntryDialog(final JFrame parent, final @Nullable Person person, final LogEntry entry) {
+    public AddOrEditLogEntryDialog(final JFrame parent, final @Nullable Person person, final LogEntry entry) {
         this(parent, EDIT_OPERATION, person, entry);
     }
 
@@ -104,15 +97,12 @@ public class AddOrEditMedicalEntryDialog extends AbstractMHQButtonDialog {
      * @param operationType the type of operation (ADD_OPERATION or EDIT_OPERATION)
      * @param person        the person whose entry is being added or edited, may be null
      * @param entry         the log entry to add or edit
-     *
-     * @author Illiani
-     * @since 0.50.05
      */
-    private AddOrEditMedicalEntryDialog(final JFrame parent, final int operationType, final @Nullable Person person,
+    private AddOrEditLogEntryDialog(final JFrame parent, final int operationType, final @Nullable Person person,
           final LogEntry entry) {
         super(parent,
               "AddOrEditPersonnelEntryDialog",
-              operationType == ADD_OPERATION ? "medicalLog.btnAdd.text" : "medicalLog.btnEdit.text");
+              operationType == ADD_OPERATION ? "logController.btnAdd.text" : "logController.btnEdit.text");
 
         this.person = person;
         this.entry = Objects.requireNonNull(entry);
@@ -130,9 +120,6 @@ public class AddOrEditMedicalEntryDialog extends AbstractMHQButtonDialog {
      * Creates the central panel of the dialog with the date button and description text area.
      *
      * @return the container with the dialog's main components
-     *
-     * @author Illiani
-     * @since 0.50.05
      */
     @Override
     protected Container createCenterPane() {
@@ -143,7 +130,7 @@ public class AddOrEditMedicalEntryDialog extends AbstractMHQButtonDialog {
 
         txtDescription = new JTextArea(entry.getDesc());
         txtDescription.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(getFormattedText(
-                    "medicalLog.txtDescription.title")),
+                    "logController.txtDescription.title")),
               BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING)));
         txtDescription.setName("txtDescription");
         txtDescription.setMinimumSize(scaleForGUI(250, 75));
@@ -163,7 +150,7 @@ public class AddOrEditMedicalEntryDialog extends AbstractMHQButtonDialog {
 
         layout.setVerticalGroup(layout.createSequentialGroup().addComponent(btnDate).addComponent(txtDescription));
 
-        layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
+        layout.setHorizontalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                         .addComponent(btnDate)
                                         .addComponent(txtDescription));
 
@@ -183,9 +170,6 @@ public class AddOrEditMedicalEntryDialog extends AbstractMHQButtonDialog {
      * Opens a date chooser dialog to change the entry date.
      *
      * <p>Updates the button text and stored date if a new date is selected.</p>
-     *
-     * @author Illiani
-     * @since 0.50.05
      */
     private void changeDate() {
         DateChooser dateChooser = new DateChooser(getFrame(), date);

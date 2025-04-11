@@ -27,7 +27,15 @@
  */
 package mekhq.campaign.log;
 
-public enum LogEntryType {
-    MEDICAL, AWARD, SERVICE, PERSONAL, CUSTOM, HISTORICAL, //Used for historical daily log
-    ASSIGNMENT, PERFORMANCE
+import java.time.LocalDate;
+
+/**
+ * This class is a specific log entry related to unit assignments.
+ *
+ * @author Miguel Azevedo
+ */
+public class AssignmentLogEntry extends LogEntry {
+    public AssignmentLogEntry(LocalDate date, String desc) {
+        super(date, desc, LogEntryType.ASSIGNMENT);
+    }
 }
