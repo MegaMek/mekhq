@@ -1600,7 +1600,8 @@ public class PersonViewPanel extends JScrollablePanel {
             }
         }
 
-        if (campaign.getCampaignOptions().isUseEdge() && (person.getEdge() > 0)) {
+        int edge = person.getAdjustedEdge();
+        if (campaign.getCampaignOptions().isUseEdge() && (edge != 0)) {
             lblEdge1.setName("lblEdge1");
             lblEdge1.setText(resourceMap.getString("lblEdge1.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -1612,7 +1613,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
             lblEdge2.setName("lblEdge2");
             lblEdge1.setLabelFor(lblEdge2);
-            lblEdge2.setText(Integer.toString(person.getEdge()));
+            lblEdge2.setText(Integer.toString(edge));
             lblEdge2.setToolTipText(person.getEdgeTooltip());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
