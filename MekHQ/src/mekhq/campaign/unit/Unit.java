@@ -57,6 +57,7 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.*;
 import megamek.common.CrewType;
 import megamek.common.annotations.Nullable;
+import megamek.common.bays.*;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.ArmorType;
 import megamek.common.icons.Camouflage;
@@ -139,9 +140,9 @@ public class Unit implements ITechnology {
     private int forceId;
     protected int scenarioId;
 
-    private List<Person> drivers;
-    private Set<Person> gunners;
-    private List<Person> vesselCrew;
+    private final List<Person> drivers;
+    private final Set<Person> gunners;
+    private final List<Person> vesselCrew;
     // Contains unique Id of each Infantry/BA Entity assigned to this unit as
     // marines
     // Used to calculate marine points (which are based on equipment) as well as
@@ -167,7 +168,7 @@ public class Unit implements ITechnology {
 
     private ArrayList<Part> parts;
     private String lastMaintenanceReport;
-    private ArrayList<PodSpace> podSpace;
+    private final ArrayList<PodSpace> podSpace;
 
     private Refit refit;
 
@@ -227,18 +228,16 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * A convenience function to tell whether the unit can be acted upon e.g. assigned pilots, techs, repaired, etc.
-     *
-     * @return
+     * @return A convenience function to tell whether the unit can be acted upon e.g. assigned pilots, techs, repaired,
+     *       etc.
      */
     public boolean isAvailable() {
         return isAvailable(false);
     }
 
     /**
-     * A convenience function to tell whether the unit can be acted upon e.g. assigned pilots, techs, repaired, etc.
-     *
-     * @return
+     * @return A convenience function to tell whether the unit can be acted upon e.g. assigned pilots, techs, repaired,
+     *       etc.
      */
     public boolean isAvailable(boolean ignoreRefit) {
         return isPresent() && !isDeployed() && (ignoreRefit || !isRefitting()) && !isMothballing() && !isMothballed();
@@ -440,16 +439,6 @@ public class Unit implements ITechnology {
 
     private void addTransportedUnitType(AbstractTransportedUnitsSummary transportedUnitType) {
         transportedUnitsSummaries.add(transportedUnitType);
-    }
-
-    /**
-     * @since 0.50.04
-     * @deprecated No indicated of use
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    private void fixTransportedUnitReferences(AbstractTransportedUnitsSummary currentTransportedUnits,
-          Set<Unit> newTransportedUnits) {
-        currentTransportedUnits.replaceTransportedUnits(newTransportedUnits);
     }
 
     public void setEntity(Entity en) {
@@ -1763,11 +1752,7 @@ public class Unit implements ITechnology {
      * @param unitWeight double Weight in tons of the unit's entity. Important for infantry
      * @param addUnit    boolean value that determines whether to add or subtract 1 from bay capacity
      * @param bayNumber  integer representing the bay number that has been assigned to a cargo entity
-     *
-     * @since 0.50.04
-     * @deprecated - Unknown replacement
      */
-    @Deprecated(since = "0.50.04")
     public void updateBayCapacity(int unitType, double unitWeight, boolean addUnit, int bayNumber) {
         // Default. Consume 1 bay of the appropriate type
         int amount = -1;
@@ -1788,10 +1773,10 @@ public class Unit implements ITechnology {
                 // Craft capacity
                 Bay aeroBay = getEntity().getBayById(bayNumber);
                 if (aeroBay != null) {
-                    if (BayType.getTypeForBay(aeroBay).equals(BayType.FIGHTER)) {
+                    if (aeroBay.getBayType().equals(BayType.FIGHTER)) {
                         setASFCapacity(Math.min((getCurrentASFCapacity() + amount), getASFCapacity()));
                         break;
-                    } else if (BayType.getTypeForBay(aeroBay).equals(BayType.SMALL_CRAFT)) {
+                    } else if (aeroBay.getBayType().equals(BayType.SMALL_CRAFT)) {
                         setSmallCraftCapacity(Math.min((getCurrentSmallCraftCapacity() + amount),
                               getSmallCraftCapacity()));
                         break;
@@ -1825,15 +1810,15 @@ public class Unit implements ITechnology {
                 // Craft capacity
                 Bay tankBay = getEntity().getBayById(bayNumber);
                 if (tankBay != null) {
-                    if (BayType.getTypeForBay(tankBay).equals(BayType.VEHICLE_LIGHT)) {
+                    if (tankBay.getBayType().equals(BayType.VEHICLE_LIGHT)) {
                         setLightVehicleCapacity(Math.min((getCurrentLightVehicleCapacity() + amount),
                               getLightVehicleCapacity()));
                         break;
-                    } else if (BayType.getTypeForBay(tankBay).equals(BayType.VEHICLE_HEAVY)) {
+                    } else if (tankBay.getBayType().equals(BayType.VEHICLE_HEAVY)) {
                         setHeavyVehicleCapacity(Math.min((getCurrentHeavyVehicleCapacity() + amount),
                               getHeavyVehicleCapacity()));
                         break;
-                    } else if (BayType.getTypeForBay(tankBay).equals(BayType.VEHICLE_SH)) {
+                    } else if (tankBay.getBayType().equals(BayType.VEHICLE_SH)) {
                         setSuperHeavyVehicleCapacity(Math.min((getCurrentSuperHeavyVehicleCapacity() + amount),
                               getSuperHeavyVehicleCapacity()));
                         break;
@@ -2441,21 +2426,6 @@ public class Unit implements ITechnology {
      */
     private void addTacticalTransportedUnit(Unit transportedUnit) {
         getTacticalTransportedUnitsSummary().addTransportedUnit(Objects.requireNonNull(transportedUnit));
-    }
-
-    /**
-     * Removes a unit from our set of transported units.
-     *
-     * @param unit The unit to remove from our set of transported units.
-     *
-     * @return True if the unit was removed, otherwise false.
-     *
-     * @since 0.50.04
-     * @deprecated No indications of use.
-     */
-    @Deprecated(since = "0.50.04", forRemoval = true)
-    private boolean removeTacticalTransportedUnit(Unit unit) {
-        return getTacticalTransportedUnitsSummary().removeTransportedUnit(unit);
     }
 
     /**
@@ -3834,7 +3804,7 @@ public class Unit implements ITechnology {
         // Transport Bays
         for (Bay bay : entity.getTransportBays()) {
             bayPartsToAdd.put(bay.getBayNumber(), new ArrayList<>());
-            BayType btype = BayType.getTypeForBay(bay);
+            BayType bayType = bay.getBayType();
             Part bayPart = bays.get(bay.getBayNumber());
             if (null == bayPart) {
                 bayPart = new TransportBayPart((int) entity.getWeight(),
@@ -3849,9 +3819,9 @@ public class Unit implements ITechnology {
                     addPart(door);
                     partsToAdd.add(door);
                 }
-                if (btype.getCategory() == BayType.CATEGORY_NON_INFANTRY) {
+                if (bayType.getCategory() == BayType.CATEGORY_NON_INFANTRY) {
                     for (int i = 0; i < bay.getCapacity(); i++) {
-                        Part cubicle = new Cubicle((int) entity.getWeight(), btype, getCampaign());
+                        Part cubicle = new Cubicle((int) entity.getWeight(), bayType, getCampaign());
                         bayPartsToAdd.get(bay.getBayNumber()).add(cubicle);
                         addPart(cubicle);
                         partsToAdd.add(cubicle);
@@ -3869,13 +3839,13 @@ public class Unit implements ITechnology {
                     partsToAdd.add(door);
                     doors.add(door);
                 }
-                if (btype.getCategory() == BayType.CATEGORY_NON_INFANTRY) {
+                if (bayType.getCategory() == BayType.CATEGORY_NON_INFANTRY) {
                     List<Part> cubicles = bayPart.getChildParts()
                                                 .stream()
                                                 .filter(p -> ((p instanceof Cubicle) || (p instanceof MissingCubicle)))
                                                 .collect(Collectors.toList());
                     while (bay.getCapacity() > cubicles.size()) {
-                        Part cubicle = new MissingCubicle((int) entity.getWeight(), btype, getCampaign());
+                        Part cubicle = new MissingCubicle((int) entity.getWeight(), bayType, getCampaign());
                         bayPartsToAdd.get(bay.getBayNumber()).add(cubicle);
                         addPart(cubicle);
                         partsToAdd.add(cubicle);
@@ -4423,7 +4393,7 @@ public class Unit implements ITechnology {
 
         if (addParts) {
             for (Part p : partsToAdd) {
-                getCampaign().getQuartermaster().addPart(p, 0);
+                getCampaign().getQuartermaster().addPart(p, 0, false);
             }
         }
         // We can't add the child parts to the transport bay part until they have been
@@ -5013,10 +4983,6 @@ public class Unit implements ITechnology {
                     } else {
                         entity.setInternal(0, i);
                     }
-                }
-                if (ntroopers < nGunners) {
-                    // TODO: we have too many soldiers assigned to the available suits - do something!
-                    // probably remove some crew and then re-run resetentityandpilot
                 }
             }
             entity.setInternal(nGunners, Infantry.LOC_INFANTRY);
@@ -6070,12 +6036,6 @@ public class Unit implements ITechnology {
      */
     public int getMarineCount() {
         return 0;
-        // TODO: implement Marines
-        // int count = 0;
-        // for (Person marine : marines) {
-        // count += marine.getGunners().size();
-        // }
-        // return count;
     }
 
     public boolean isDriver(@Nullable Person person) {

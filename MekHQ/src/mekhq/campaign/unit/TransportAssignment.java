@@ -1,45 +1,40 @@
 /**
  * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
- *
+ * <p>
  * This file is part of MekHQ.
- *
- * MekHQ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License (GPL),
- * version 3 or (at your option) any later version,
- * as published by the Free Software Foundation.
- *
- * MekHQ is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * A copy of the GPL should have been included with this project;
- * if not, see <https://www.gnu.org/licenses/>.
- *
- * NOTICE: The MegaMek organization is a non-profit group of volunteers
- * creating free software for the BattleTech community.
- *
- * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
- * of The Topps Company, Inc. All Rights Reserved.
- *
- * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
- * InMediaRes Productions, LLC.
+ * <p>
+ * MekHQ is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * (GPL), version 3 or (at your option) any later version, as published by the Free Software Foundation.
+ * <p>
+ * MekHQ is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>
+ * A copy of the GPL should have been included with this project; if not, see <https://www.gnu.org/licenses/>.
+ * <p>
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers creating free software for the BattleTech
+ * community.
+ * <p>
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks of The Topps Company, Inc. All Rights
+ * Reserved.
+ * <p>
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of InMediaRes Productions, LLC.
  */
 package mekhq.campaign.unit;
 
-import megamek.common.Bay;
+import java.util.Optional;
+
 import megamek.common.Transporter;
 import megamek.common.annotations.Nullable;
+import megamek.common.bays.Bay;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.enums.TransporterType;
 
-import java.util.Optional;
-
 /**
- * Represents an assignment on a transport. Currently only used by TACTICAL_TRANSPORT
- * but this could be used by other transport types.
+ * Represents an assignment on transport. Currently only used by TACTICAL_TRANSPORT but this could be used by other
+ * transport types.
+ *
  * @see TacticalTransportedUnitsSummary
  * @see CampaignTransportType#TACTICAL_TRANSPORT
  */
@@ -62,7 +57,9 @@ public class TransportAssignment implements ITransportAssignment {
     public TransportAssignment(Unit transport, @Nullable Transporter transportedLocation) {
         setTransport(transport);
         setTransportedLocation(transportedLocation);
-        setTransporterType(hasTransportedLocation() ? TransporterType.getTransporterType(getTransportedLocation()) : null);
+        setTransporterType(hasTransportedLocation() ?
+                                 TransporterType.getTransporterType(getTransportedLocation()) :
+                                 null);
     }
 
     public TransportAssignment(Unit transport, int hashedTransportedLocation) {
@@ -78,9 +75,7 @@ public class TransportAssignment implements ITransportAssignment {
 
 
     /**
-     * The transport that is assigned
-     *
-     * @return
+     * @return The transport that is assigned
      */
     @Override
     public Unit getTransport() {
@@ -96,11 +91,10 @@ public class TransportAssignment implements ITransportAssignment {
      * Change the transport assignment to have a new transport
      *
      * @param newTransport transport, or null if none
-     * @return true if a unit was provided, false if it was null
      */
-    protected boolean setTransport(Unit newTransport) {
+    protected void setTransport(Unit newTransport) {
         this.transport = newTransport;
-        return hasTransport();
+        hasTransport();
     }
 
     @Override
@@ -113,9 +107,9 @@ public class TransportAssignment implements ITransportAssignment {
         return transporterType != null;
     }
 
-    protected boolean setTransporterType(TransporterType transporterType) {
+    protected void setTransporterType(TransporterType transporterType) {
         this.transporterType = transporterType;
-        return hasTransporterType();
+        hasTransporterType();
     }
 
     @Override
@@ -135,12 +129,10 @@ public class TransportAssignment implements ITransportAssignment {
 
     /**
      * Set where this unit should be transported
-     *
-     * @return true if a location was provided, false if it was null
      */
-    protected boolean setTransportedLocation(@Nullable Transporter transportedLocation) {
+    protected void setTransportedLocation(@Nullable Transporter transportedLocation) {
         this.transportedLocation = transportedLocation;
-        return hasTransportedLocation();
+        hasTransportedLocation();
     }
 
     /**
@@ -160,12 +152,13 @@ public class TransportAssignment implements ITransportAssignment {
      * After loading UnitRefs need converted to Units
      *
      * @param campaign Campaign we need to fix references for
-     * @param unit the unit that needs references fixed
+     * @param unit     the unit that needs references fixed
+     *
      * @see Unit#fixReferences(Campaign campaign)
      */
     @Override
     public void fixReferences(Campaign campaign, Unit unit) {
-            if (getTransport() instanceof Unit.UnitRef) {
+        if (getTransport() instanceof Unit.UnitRef) {
             Unit transport = campaign.getHangar().getUnit(getTransport().getId());
             if (transport != null) {
                 if (hasTransportedLocation()) {
@@ -173,18 +166,19 @@ public class TransportAssignment implements ITransportAssignment {
 
                 } else if (hasTransporterType()) {
                     setTransport(transport);
-                }
-                else {
+                } else {
                     setTransport(transport);
                     logger.warn(
-                        String.format("Unit %s ('%s') is missing a transportedLocation " +
-                                "and transporterType for tactical transport %s",
-                            unit.getId(), unit.getName(), getTransport().getId()));
+                          "Unit {} ('{}') is missing a transportedLocation and transporterType for tactical transport {}",
+                          unit.getId(),
+                          unit.getName(),
+                          getTransport().getId());
                 }
             } else {
-                logger.error(
-                    String.format("Unit %s ('%s') references missing transport %s",
-                        unit.getId(), unit.getName(), getTransport().getId()));
+                logger.error("Unit {} ('{}') references missing transport {}",
+                      unit.getId(),
+                      unit.getName(),
+                      getTransport().getId());
 
                 unit.setTacticalTransportAssignment(null);
             }
@@ -192,12 +186,12 @@ public class TransportAssignment implements ITransportAssignment {
     }
 
     /**
-     * Bays have some extra functionality other transporters don't have, like
-     * having a tech crew, which will matter for boarding actions against
-     * dropships and other Ship Transports. This method determines if this
-     * transport assignment is for a Bay.
+     * Bays have some extra functionality other transporters don't have, like having a tech crew, which will matter for
+     * boarding actions against dropships and other Ship Transports. This method determines if this transport assignment
+     * is for a Bay.
      *
      * @return true if the unit is transported in a Bay or a subclass
+     *
      * @see Bay
      */
     @Override

@@ -27,7 +27,7 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.BayType;
+import megamek.common.bays.BayType;
 import megamek.common.Entity;
 import megamek.common.ITechnology;
 import megamek.common.annotations.Nullable;
@@ -42,8 +42,7 @@ import java.io.PrintWriter;
 import java.util.Objects;
 
 /**
- * A transport bay cubicle for a Mek, ProtoMek, vehicle, fighter, or small
- * craft.
+ * A transport bay cubicle for a Mek, ProtoMek, vehicle, fighter, or small craft.
  *
  * @author Neoancient
  */
@@ -155,8 +154,7 @@ public class Cubicle extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return (part instanceof Cubicle)
-                && (((Cubicle) part).getBayType() == bayType);
+        return (part instanceof Cubicle) && (((Cubicle) part).getBayType() == bayType);
     }
 
     @Override
@@ -187,7 +185,7 @@ public class Cubicle extends Part {
                 bayType = BayType.parse(bayRawValue);
                 if (null == bayType) {
                     logger.error(String.format("Could not parse bay type %s treating as BayType.Mek",
-                        wn2.getTextContent()));
+                          wn2.getTextContent()));
                     bayType = BayType.MEK;
                 }
                 name = bayType.getDisplayName() + " Cubicle";

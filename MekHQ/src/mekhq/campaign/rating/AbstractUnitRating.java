@@ -35,7 +35,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import megamek.common.*;
+import megamek.common.BattleArmor;
+import megamek.common.Dropship;
+import megamek.common.Entity;
+import megamek.common.Infantry;
+import megamek.common.Jumpship;
+import megamek.common.SpaceStation;
+import megamek.common.UnitType;
+import megamek.common.bays.*;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -170,8 +177,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
      * Returns the average experience level for all combat personnel.
      */
     protected BigDecimal calcAverageExperience() {
-        return hasUnits() ? getTotalSkillLevels().divide(getNumberUnits(), PRECISION, HALF_EVEN)
-                : BigDecimal.ZERO;
+        return hasUnits() ? getTotalSkillLevels().divide(getNumberUnits(), PRECISION, HALF_EVEN) : BigDecimal.ZERO;
     }
 
     /**
@@ -302,17 +308,12 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setTransportPercent(getTransportPercent());
 
         // Compute the score.
-        BigDecimal scoredPercent = getTransportPercent().subtract(
-                new BigDecimal(50));
+        BigDecimal scoredPercent = getTransportPercent().subtract(new BigDecimal(50));
         if (scoredPercent.compareTo(BigDecimal.ZERO) < 0) {
             return value;
         }
-        BigDecimal percentageScore = scoredPercent.divide(new BigDecimal(10),
-                0,
-                RoundingMode.DOWN);
-        value += percentageScore.multiply(new BigDecimal(5))
-                .setScale(0, RoundingMode.DOWN)
-                .intValue();
+        BigDecimal percentageScore = scoredPercent.divide(new BigDecimal(10), 0, RoundingMode.DOWN);
+        value += percentageScore.multiply(new BigDecimal(5)).setScale(0, RoundingMode.DOWN).intValue();
         value = Math.min(value, 25);
 
         // Only the highest of these values should be used, regardless of how
@@ -347,22 +348,15 @@ public abstract class AbstractUnitRating implements IUnitRating {
 
     @Override
     public String getUnitRatingName(int rating) {
-        switch (rating) {
-            case DRAGOON_F:
-                return "F";
-            case DRAGOON_D:
-                return "D";
-            case DRAGOON_C:
-                return "C";
-            case DRAGOON_B:
-                return "B";
-            case DRAGOON_A:
-                return "A";
-            case DRAGOON_ASTAR:
-                return "A*";
-            default:
-                return "Unrated";
-        }
+        return switch (rating) {
+            case DRAGOON_F -> "F";
+            case DRAGOON_D -> "D";
+            case DRAGOON_C -> "C";
+            case DRAGOON_B -> "B";
+            case DRAGOON_A -> "A";
+            case DRAGOON_ASTAR -> "A*";
+            default -> "Unrated";
+        };
     }
 
     @Override
@@ -387,8 +381,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     * Calculates the weighted value of the unit based on if it is Infantry,
-     * Battle Armor or something else.
+     * Calculates the weighted value of the unit based on if it is Infantry, Battle Armor or something else.
      *
      * @param u The {@code Unit} to be evaluated.
      */
@@ -410,7 +403,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     /**
      * Returns the sum of all experience rating for all combat units.
      *
-     * @param canInit Whether or not this method may initialize the values
+     * @param canInit Whether this method may initialize the values
      */
     BigDecimal getTotalSkillLevels(boolean canInit) {
         if (canInit && !isInitialized()) {
@@ -439,8 +432,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     protected abstract int calculateUnitRatingScore();
 
     /**
-     * Recalculates the dragoons rating. If this has already been done, the
-     * initialized flag should already be set true
+     * Recalculates the dragoons rating. If this has already been done, the initialized flag should already be set true
      * and this method will immediately exit.
      */
     protected void initValues() {
@@ -490,11 +482,10 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     * Updates the count of storage bays that may be used in Interstellar transport
-     * (part of transport capacity calculations)
+     * Updates the count of storage bays that may be used in Interstellar transport (part of transport capacity
+     * calculations)
      *
-     * @param e is the unit that may or may not contain bays that need to be
-     *          included in the count
+     * @param e is the unit that may or may not contain bays that need to be included in the count
      */
     void updateBayCount(Entity e) {
         if (((e instanceof Jumpship) || (e instanceof Dropship)) && !(e instanceof SpaceStation)) {
@@ -516,13 +507,18 @@ public abstract class AbstractUnitRating implements IUnitRating {
                 } else if (bay instanceof BattleArmorBay) {
                     setBaBayCount(getBaBayCount() + (int) bay.getCapacity());
                 } else if (bay instanceof InfantryBay) {
-                    setInfantryBayCount(getInfantryBayCount()
-                            + (int) Math.floor(bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight()));
+                    setInfantryBayCount(getInfantryBayCount() +
+                                              (int) Math.floor(bay.getCapacity() /
+                                                                     ((InfantryBay) bay).getPlatoonType().getWeight()));
                 }
             }
         }
     }
 
+    /**
+     * @deprecated no indicated uses.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     void updateDockingCollarCount(Jumpship jumpShip) {
         setDockingCollarCount(getDockingCollarCount() + jumpShip.getDockingCollars().size());
     }
@@ -592,6 +588,10 @@ public abstract class AbstractUnitRating implements IUnitRating {
         infantryUnitCount++;
     }
 
+    /**
+     * @deprecated no indicated uses
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public int getInfantryUnitCount() {
         return infantryUnitCount;
     }
@@ -693,11 +693,8 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     * Calculate the number of infantry "platoons" present in the company, based on
-     * the numbers
-     * of various infantry present. Per CamOps, the simplification is that an
-     * infantry cube can
-     * house 28 infantry.
+     * Calculate the number of infantry "platoons" present in the company, based on the numbers of various infantry
+     * present. Per CamOps, the simplification is that an infantry cube can house 28 infantry.
      *
      * @return Number of infantry "platoons" in the company.
      */
@@ -894,16 +891,16 @@ public abstract class AbstractUnitRating implements IUnitRating {
         if (u.isMothballed()) {
             return;
         }
-        logger.debug("Adding " + u.getName() + " to unit counts.");
+        logger.debug("Adding {} to unit counts.", u.getName());
 
         Entity e = u.getEntity();
         if (null == e) {
-            logger.debug("Unit " + u.getName() + " is not an Entity.  Skipping.");
+            logger.debug("Unit {} is not an Entity. Skipping.", u.getName());
             return;
         }
 
         int unitType = e.getUnitType();
-        logger.debug("Unit " + u.getName() + " is a " + UnitType.getTypeDisplayableName(unitType));
+        logger.debug("Unit {} is a {}", u.getName(), UnitType.getTypeDisplayableName(unitType));
         // TODO : Add Airship when MegaMek supports it.
         switch (unitType) {
             case UnitType.MEK:
@@ -915,7 +912,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
             case UnitType.GUN_EMPLACEMENT:
             case UnitType.VTOL:
             case UnitType.TANK:
-                logger.debug("Unit " + u.getName() + " weight is " + e.getWeight());
+                logger.debug("Unit {} weight is {}", u.getName(), e.getWeight());
                 if (e.getWeight() <= 50f) {
                     incrementLightVeeCount();
                 } else if (e.getWeight() <= 100f) {

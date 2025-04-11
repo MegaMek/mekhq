@@ -44,13 +44,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import megamek.common.*;
+import megamek.common.Aero;
+import megamek.common.BipedMek;
+import megamek.common.Crew;
+import megamek.common.Dropship;
+import megamek.common.Entity;
+import megamek.common.EntityMovementMode;
+import megamek.common.Jumpship;
+import megamek.common.Tank;
+import megamek.common.TechConstants;
+import megamek.common.bays.ASFBay;
+import megamek.common.bays.Bay;
+import megamek.common.bays.MekBay;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.skills.Skill;
@@ -70,10 +79,8 @@ public class FieldManualMercRevDragoonsRatingTest {
     private List<Person> mockPersonnelList;
     private List<Person> mockActivePersonnelList;
 
-    private Skill mockDoctorSkillRegular;
     private Skill mockDoctorSkillGreen;
     private Skill mockMedicSkill;
-    private Skill mockMekTechSkillVeteran;
     private Skill mockMekTechSkillRegular;
     private Skill mockAstechSkill;
 
@@ -89,10 +96,10 @@ public class FieldManualMercRevDragoonsRatingTest {
         Person mockDoctor = mock(Person.class);
         Person mockTech = mock(Person.class);
 
-        mockDoctorSkillRegular = mock(Skill.class);
+        Skill mockDoctorSkillRegular = mock(Skill.class);
         mockDoctorSkillGreen = mock(Skill.class);
         mockMedicSkill = mock(Skill.class);
-        mockMekTechSkillVeteran = mock(Skill.class);
+        Skill mockMekTechSkillVeteran = mock(Skill.class);
         mockMekTechSkillRegular = mock(Skill.class);
         mockAstechSkill = mock(Skill.class);
 
@@ -131,7 +138,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         mockActivePersonnelList.add(mockTech);
 
         when(mockCampaign.getPersonnel()).thenReturn(mockPersonnelList);
-        when(mockCampaign.getActivePersonnel()).thenReturn(mockActivePersonnelList);
+        when(mockCampaign.getActivePersonnel(true)).thenReturn(mockActivePersonnelList);
         when(mockCampaign.getNumberMedics()).thenCallRealMethod();
         when(mockCampaign.getNumberAstechs()).thenCallRealMethod();
         when(mockCampaign.getNumberPrimaryAstechs()).thenCallRealMethod();
@@ -333,25 +340,25 @@ public class FieldManualMercRevDragoonsRatingTest {
         // Regular Doctor = 40 hours.
         // + 4 Medics = 20 * 4 = 80 hours.
         // Total = 120 hours.
-        FieldManualMercRevDragoonsRating testFieldManuMercRevDragoonsRating =
-                new FieldManualMercRevDragoonsRating(mockCampaign);
+        FieldManualMercRevDragoonsRating testFieldManuMercRevDragoonsRating = new FieldManualMercRevDragoonsRating(
+              mockCampaign);
         testFieldManuMercRevDragoonsRating.updateAvailableSupport();
         int expectedHours = 120;
         when(mockCampaign.getMedicPool()).thenReturn(4);
         assertEquals(expectedHours, testFieldManuMercRevDragoonsRating.getMedicalSupportAvailable());
 
-        // Add a mekwarrior who doubles as a back-up medic of Green skill.  This should add another 15 hours.
+        // Add a MekWarrior who doubles as a back-up medic of Green skill.  This should add another 15 hours.
         testFieldManuMercRevDragoonsRating = new FieldManualMercRevDragoonsRating(mockCampaign);
-        Person mockMekwarrior = mock(Person.class);
-        when(mockMekwarrior.getPrimaryRole()).thenReturn(PersonnelRole.MEKWARRIOR);
-        when(mockMekwarrior.getSecondaryRole()).thenReturn(PersonnelRole.DOCTOR);
-        when(mockMekwarrior.isDoctor()).thenReturn(true);
-        doReturn(PersonnelStatus.ACTIVE).when(mockMekwarrior).getStatus();
-        when(mockMekwarrior.isDeployed()).thenReturn(false);
-        when(mockMekwarrior.getSkill(eq(SkillType.S_DOCTOR))).thenReturn(mockDoctorSkillGreen);
-        when(mockMekwarrior.hasSkill(eq(SkillType.S_DOCTOR))).thenReturn(true);
-        mockPersonnelList.add(mockMekwarrior);
-        mockActivePersonnelList.add(mockMekwarrior);
+        Person mockMekWarrior = mock(Person.class);
+        when(mockMekWarrior.getPrimaryRole()).thenReturn(PersonnelRole.MEKWARRIOR);
+        when(mockMekWarrior.getSecondaryRole()).thenReturn(PersonnelRole.DOCTOR);
+        when(mockMekWarrior.isDoctor()).thenReturn(true);
+        doReturn(PersonnelStatus.ACTIVE).when(mockMekWarrior).getStatus();
+        when(mockMekWarrior.isDeployed()).thenReturn(false);
+        when(mockMekWarrior.getSkill(eq(SkillType.S_DOCTOR))).thenReturn(mockDoctorSkillGreen);
+        when(mockMekWarrior.hasSkill(eq(SkillType.S_DOCTOR))).thenReturn(true);
+        mockPersonnelList.add(mockMekWarrior);
+        mockActivePersonnelList.add(mockMekWarrior);
         expectedHours += 15;
         testFieldManuMercRevDragoonsRating.updateAvailableSupport();
         assertEquals(expectedHours, testFieldManuMercRevDragoonsRating.getMedicalSupportAvailable());
@@ -380,8 +387,8 @@ public class FieldManualMercRevDragoonsRatingTest {
         // Regular Tech = 45 hours.
         // + 6 Astechs = 20 * 4 = 120 hours.
         // Total = 165 hours.
-        FieldManualMercRevDragoonsRating testFieldManuMercRevDragoonsRating =
-                new FieldManualMercRevDragoonsRating(mockCampaign);
+        FieldManualMercRevDragoonsRating testFieldManuMercRevDragoonsRating = new FieldManualMercRevDragoonsRating(
+              mockCampaign);
         testFieldManuMercRevDragoonsRating.updateAvailableSupport();
         int expectedHours = 165;
         when(mockCampaign.getAstechPool()).thenReturn(6);
@@ -473,39 +480,41 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(BigDecimal.ZERO).when(testRating).getTransportPercent();
         doReturn(4).when(testRating).getHeavyVeeCount();
         doReturn(4).when(testRating).getLightVeeCount();
-        String expected = "Transportation      -10\n" +
-                          "    DropShip Capacity:       0%\n" +
-                          "        #BattleMek Bays:              0 needed /   0 available\n" +
-                          "        #Fighter Bays:                0 needed /   0 available (plus 0 excess Small Craft)\n" +
-                          "        #Small Craft Bays:            0 needed /   0 available\n" +
-                          "        #ProtoMek Bays:               0 needed /   0 available\n" +
-                          "        #Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
-                          "        #Heavy Vehicle Bays:          4 needed /   0 available (plus 0 excess Super Heavy)\n" +
-                          "        #Light Vehicle Bays:          4 needed /   0 available (plus 0 excess Heavy and 0 excess Super Heavy)\n" +
-                          "        #Battle Armor Bays:           0 needed /   0 available\n" +
-                          "        #Infantry Bays:               0 needed /   0 available\n" +
-                          "    JumpShip?                No\n" +
-                          "    WarShip w/out Collar?    No\n" +
-                          "    WarShip w/ Collar?       No";
+        String expected = """
+              Transportation      -10
+                  DropShip Capacity:       0%
+                      #BattleMek Bays:              0 needed /   0 available
+                      #Fighter Bays:                0 needed /   0 available (plus 0 excess Small Craft)
+                      #Small Craft Bays:            0 needed /   0 available
+                      #ProtoMek Bays:               0 needed /   0 available
+                      #Super Heavy Vehicle Bays:    0 needed /   0 available
+                      #Heavy Vehicle Bays:          4 needed /   0 available (plus 0 excess Super Heavy)
+                      #Light Vehicle Bays:          4 needed /   0 available (plus 0 excess Heavy and 0 excess Super Heavy)
+                      #Battle Armor Bays:           0 needed /   0 available
+                      #Infantry Bays:               0 needed /   0 available
+                  JumpShip?                No
+                  WarShip w/out Collar?    No
+                  WarShip w/ Collar?       No""";
         assertEquals(expected, testRating.getTransportationDetails());
         // Add some heavy vee bays.
         doReturn(0).when(testRating).getTransportValue();
         doReturn(BigDecimal.valueOf(100)).when(testRating).getTransportPercent();
         doReturn(8).when(testRating).getHeavyVeeBayCount();
-        expected = "Transportation        0\n" +
-                   "    DropShip Capacity:      100%\n" +
-                   "        #BattleMek Bays:              0 needed /   0 available\n" +
-                   "        #Fighter Bays:                0 needed /   0 available (plus 0 excess Small Craft)\n" +
-                   "        #Small Craft Bays:            0 needed /   0 available\n" +
-                   "        #ProtoMek Bays:               0 needed /   0 available\n" +
-                   "        #Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
-                   "        #Heavy Vehicle Bays:          4 needed /   8 available (plus 0 excess Super Heavy)\n" +
-                   "        #Light Vehicle Bays:          4 needed /   0 available (plus 4 excess Heavy and 0 excess Super Heavy)\n" +
-                   "        #Battle Armor Bays:           0 needed /   0 available\n" +
-                   "        #Infantry Bays:               0 needed /   0 available\n" +
-                   "    JumpShip?                No\n" +
-                   "    WarShip w/out Collar?    No\n" +
-                   "    WarShip w/ Collar?       No";
+        expected = """
+              Transportation        0
+                  DropShip Capacity:      100%
+                      #BattleMek Bays:              0 needed /   0 available
+                      #Fighter Bays:                0 needed /   0 available (plus 0 excess Small Craft)
+                      #Small Craft Bays:            0 needed /   0 available
+                      #ProtoMek Bays:               0 needed /   0 available
+                      #Super Heavy Vehicle Bays:    0 needed /   0 available
+                      #Heavy Vehicle Bays:          4 needed /   8 available (plus 0 excess Super Heavy)
+                      #Light Vehicle Bays:          4 needed /   0 available (plus 4 excess Heavy and 0 excess Super Heavy)
+                      #Battle Armor Bays:           0 needed /   0 available
+                      #Infantry Bays:               0 needed /   0 available
+                  JumpShip?                No
+                  WarShip w/out Collar?    No
+                  WarShip w/ Collar?       No""";
         assertEquals(expected, testRating.getTransportationDetails());
     }
 
@@ -520,7 +529,6 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(0).when(testRating).getHeavyVeeCount();
         doReturn(5).when(testRating).getLightVeeCount();
 
-        assertEquals(BigDecimal.valueOf(100.0).setScale(0, RoundingMode.HALF_EVEN),
-                testRating.getTransportPercent());
+        assertEquals(BigDecimal.valueOf(100.0).setScale(0, RoundingMode.HALF_EVEN), testRating.getTransportPercent());
     }
 }

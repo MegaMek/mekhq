@@ -28,6 +28,8 @@
 package mekhq.campaign.unit;
 
 import megamek.common.*;
+import megamek.common.bays.ASFBay;
+import megamek.common.bays.Bay;
 import mekhq.campaign.Campaign;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -45,6 +47,7 @@ import static org.mockito.Mockito.*;
 
 /**
  * Psi - Transport has been split into Ship & Tactical transport.
+ *
  * @see UnitTransportTest
  */
 public class LegacyUnitShipTransportTest {
@@ -65,7 +68,6 @@ public class LegacyUnitShipTransportTest {
         Unit transport = new Unit();
         when(mockCampaign.getGame()).thenReturn(mockGame);
         mockCampaign.importUnit(transport);
-
 
 
         // We start with empty transport bays
@@ -175,8 +177,8 @@ public class LegacyUnitShipTransportTest {
 
         // Create a fake entity to back the real transport Unit
         Dropship mockVengeance = mock(Dropship.class);
-        Unit transport = new Unit(mockVengeance,campaign);
-        ASFBay mockASFBay = new ASFBay(100, 1 ,0);
+        Unit transport = new Unit(mockVengeance, campaign);
+        ASFBay mockASFBay = new ASFBay(100, 1, 0);
 
         // Initialize bays
         Vector<Bay> bays = new Vector<>();
@@ -213,8 +215,7 @@ public class LegacyUnitShipTransportTest {
         verify(randomUnit, times(0)).setTransportShipAssignment(eq(null));
 
         // And we should not have had our bay space recalculated.
-        verify(transport, times(0)).updateBayCapacity(anyInt(), anyDouble(),
-                anyBoolean(), anyInt());
+        verify(transport, times(0)).updateBayCapacity(anyInt(), anyDouble(), anyBoolean(), anyInt());
     }
 
     @Test
@@ -235,7 +236,6 @@ public class LegacyUnitShipTransportTest {
         verify(randomUnit, times(0)).setTransportShipAssignment(eq(null));
 
         // And we should not have had our bay space recalculated.
-        verify(transport0, times(0)).updateBayCapacity(anyInt(), anyDouble(),
-                anyBoolean(), anyInt());
+        verify(transport0, times(0)).updateBayCapacity(anyInt(), anyDouble(), anyBoolean(), anyInt());
     }
 }

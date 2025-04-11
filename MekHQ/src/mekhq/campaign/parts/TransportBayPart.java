@@ -29,19 +29,17 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.finances.Money;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.Bay;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.TechAdvancement;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.common.annotations.Nullable;
+import megamek.common.bays.Bay;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Neoancient
@@ -50,6 +48,10 @@ public class TransportBayPart extends Part {
     private int bayNumber;
     private double size;
 
+    /**
+     * @deprecated no indicated uses.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public TransportBayPart() {
         this(0, 0, 0, null);
     }
@@ -95,8 +97,7 @@ public class TransportBayPart extends Part {
             hits = (int) bay.getBayDamage();
             int prevDoorHits = 0;
             for (Part p : getChildParts()) {
-                if ((p instanceof MissingBayDoor)
-                        || ((p instanceof BayDoor) && p.needsFixing())) {
+                if ((p instanceof MissingBayDoor) || ((p instanceof BayDoor) && p.needsFixing())) {
                     prevDoorHits++;
                 }
             }
@@ -105,11 +106,10 @@ public class TransportBayPart extends Part {
                 // exceptions from removing destroyed doors. We might as well filter anything that's
                 // not an undamaged door at the same time.
                 List<Part> doors = getChildParts().stream()
-                        .filter(p -> (p instanceof BayDoor) && !p.needsFixing())
-                        .collect(Collectors.toList());
+                                         .filter(p -> (p instanceof BayDoor) && !p.needsFixing())
+                                         .toList();
                 for (Part door : doors) {
-                    if (checkForDestruction
-                            && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                    if (checkForDestruction && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                         door.remove(false);
                     } else {
                         door.hits = 1;
@@ -123,9 +123,7 @@ public class TransportBayPart extends Part {
             // If checking for destruction we need to remove a number of cubicles (if any)
             // equal to the increase in damage.
             if ((hits > prevHits) && checkForDestruction) {
-                List<Part> cubicles = getChildParts().stream()
-                        .filter(p -> p instanceof Cubicle)
-                        .collect(Collectors.toList());
+                List<Part> cubicles = getChildParts().stream().filter(p -> p instanceof Cubicle).toList();
                 while ((hits > prevHits) && !cubicles.isEmpty()) {
                     Part cubicle = cubicles.get(Compute.randomInt(cubicles.size()));
                     cubicle.remove(false);

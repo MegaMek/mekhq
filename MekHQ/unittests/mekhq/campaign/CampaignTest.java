@@ -30,7 +30,7 @@ package mekhq.campaign;
 
 import static mekhq.campaign.unit.enums.TransporterType.ASF_BAY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -39,24 +39,25 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import java.util.*;
-
-import megamek.common.Bay;
-import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.unit.AbstractTransportedUnitsSummary;
-import org.apache.logging.log4j.LogManager;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 
 import megamek.common.Dropship;
 import megamek.common.EquipmentType;
 import megamek.common.enums.SkillLevel;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.unit.AbstractTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Systems;
+import org.apache.logging.log4j.LogManager;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
@@ -143,7 +144,7 @@ public class CampaignTest {
 
         Campaign testCampaign = mock(Campaign.class);
         when(testCampaign.getPersonnel()).thenReturn(testPersonList);
-        when(testCampaign.getActivePersonnel()).thenReturn(testActivePersonList);
+        when(testCampaign.getActivePersonnel(true)).thenReturn(testActivePersonList);
         when(testCampaign.getTechs()).thenCallRealMethod();
         when(testCampaign.getTechs(anyBoolean())).thenCallRealMethod();
         when(testCampaign.getTechs(anyBoolean(), anyBoolean())).thenCallRealMethod();
@@ -210,26 +211,26 @@ public class CampaignTest {
     }
 
     @Test
-    void testIniative() {
+    void testInitiative() {
         Campaign campaign = new Campaign();
 
         campaign.applyInitiativeBonus(6);
         // should increase bonus to 6 and max to 6
-        assertTrue(campaign.getInitiativeBonus() == 6);
-        assertTrue(campaign.getInitiativeMaxBonus() == 6);
+        assertEquals(6, campaign.getInitiativeBonus());
+        assertEquals(6, campaign.getInitiativeMaxBonus());
         // Should not be able to increment over max of 6
         campaign.initiativeBonusIncrement(true);
-        assertFalse(campaign.getInitiativeBonus() == 7);
+        assertNotEquals(7, campaign.getInitiativeBonus());
         campaign.applyInitiativeBonus(2);
-        assertEquals(campaign.getInitiativeBonus(), 6);
+        assertEquals(6, campaign.getInitiativeBonus());
         // But should be able to decrease below max
         campaign.initiativeBonusIncrement(false);
-        assertEquals(campaign.getInitiativeBonus(), 5);
-        // After setting lower Max Bonus any appied bonus thats less then max should set
+        assertEquals(5, campaign.getInitiativeBonus());
+        // After setting lower Max Bonus any applied bonus that's less than max should set
         // bonus to max
         campaign.setInitiativeMaxBonus(3);
         campaign.applyInitiativeBonus(2);
-        assertEquals(campaign.getInitiativeBonus(), 3);
+        assertEquals(3, campaign.getInitiativeBonus());
 
     }
 }
