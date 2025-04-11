@@ -266,11 +266,19 @@ public class Unit implements ITechnology {
         } else if (!isPresent()) {
             return "In transit (" + getDaysToArrival() + " days)";
         } else if (isRefitting()) {
-            int minutesInHour = 60;
-            int hoursInDay = 24;
-            int minutesInDay = hoursInDay * minutesInHour;
-            int days = (int) ceil((double) getRefit().getTimeLeft() / minutesInDay);
-            return "Refitting" + " (" + days + " days)";
+            double timeLeft = refit.getTimeLeft();
+            Person refitTech = refit.getTech();
+
+            double minutesInWorkDay = TECH_WORK_DAY;
+            if (refitTech != null) {
+                boolean isTechsUseAdmin = getCampaign().getCampaignOptions().isTechsUseAdministration();
+                minutesInWorkDay = refitTech.getDailyAvailableTechTime(isTechsUseAdmin);
+            }
+
+            int daysLeft = (int) Math.ceil(timeLeft / minutesInWorkDay);
+            String dayString = daysLeft == 1 ? "day" : "days";
+
+            return "Refitting" + " (" + daysLeft + ' ' + dayString + ')';
         } else {
             return getCondition();
         }
