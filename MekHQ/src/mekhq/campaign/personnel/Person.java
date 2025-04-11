@@ -184,6 +184,7 @@ public class Person {
     private LocalDate lastRankChangeDate;
     private LocalDate dateOfDeath;
     private List<LogEntry> personnelLog;
+    private List<LogEntry> medicalLog;
     private List<LogEntry> scenarioLog;
 
     // this is used by autoAwards to abstract the support person of the year award
@@ -445,6 +446,7 @@ public class Person {
         currentEdge = 0;
         techUnits = new ArrayList<>();
         personnelLog = new ArrayList<>();
+        medicalLog = new ArrayList<>();
         scenarioLog = new ArrayList<>();
         awardController = new PersonAwardController(this);
         injuries = new ArrayList<>();
@@ -2440,6 +2442,14 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "personnelLog");
             }
 
+            if (!medicalLog.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "medicalLog");
+                for (LogEntry entry : medicalLog) {
+                    entry.writeToXML(pw, indent);
+                }
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "medicalLog");
+            }
+
             if (!scenarioLog.isEmpty()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "scenarioLog");
                 for (LogEntry entry : scenarioLog) {
@@ -2808,7 +2818,8 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("id")) {
-                            logger.error("Unknown node type not loaded in techUnitIds nodes: {}", wn3.getNodeName());
+                            logger.error("(techUnitIds) Unknown node type not loaded in techUnitIds nodes: {}",
+                                  wn3.getNodeName());
                             continue;
                         }
                         person.addTechUnit(new PersonUnitRef(UUID.fromString(wn3.getTextContent())));
@@ -2823,7 +2834,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            logger.error("Unknown node type not loaded in personnel logEntry nodes: {}",
+                            logger.error("(personnelLog) Unknown node type not loaded in personnel logEntry nodes: {}",
                                   wn3.getNodeName());
                             continue;
                         }
@@ -2831,6 +2842,26 @@ public class Person {
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
                             person.addLogEntry(logEntry);
+                        }
+                    }
+                } else if (nodeName.equalsIgnoreCase("medicalLog")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
+                            logger.error("(medicalLog) Unknown node type not loaded in personnel logEntry nodes: {}",
+                                  wn3.getNodeName());
+                            continue;
+                        }
+
+                        final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
+                        if (logEntry != null) {
+                            person.addMedicalLogEntry(logEntry);
                         }
                     }
                 } else if (nodeName.equalsIgnoreCase("scenarioLog")) {
@@ -5085,6 +5116,11 @@ public class Person {
         return personnelLog;
     }
 
+    public List<LogEntry> getMedicalLog() {
+        medicalLog.sort(Comparator.comparing(LogEntry::getDate));
+        return medicalLog;
+    }
+
     public List<LogEntry> getScenarioLog() {
         scenarioLog.sort(Comparator.comparing(LogEntry::getDate));
         return scenarioLog;
@@ -5092,6 +5128,10 @@ public class Person {
 
     public void addLogEntry(final LogEntry entry) {
         personnelLog.add(entry);
+    }
+
+    public void addMedicalLogEntry(final LogEntry entry) {
+        medicalLog.add(entry);
     }
 
     public void addScenarioLogEntry(final LogEntry entry) {

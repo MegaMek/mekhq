@@ -294,6 +294,33 @@ public class PersonViewPanel extends JScrollablePanel {
             gridy++;
         }
 
+        if (!person.getMedicalLog().isEmpty()) {
+            JPanel pnlMedicalLogHeader = new JPanel();
+            pnlMedicalLogHeader.setName("pnlMedicalLogHeader");
+            pnlMedicalLogHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString(
+                  "pnlMedicalLogHeader.title")));
+            pnlMedicalLogHeader.setVisible(!campaign.getCampaignOptions().isDisplayMedicalRecord());
+
+            JPanel pnlMedicalLog = fillMedicalLog();
+            pnlMedicalLog.setName("pnlMedicalLog");
+            pnlMedicalLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlMedicalLog.title")));
+            pnlMedicalLog.setVisible(campaign.getCampaignOptions().isDisplayMedicalRecord());
+
+            pnlMedicalLogHeader.addMouseListener(getSwitchListener(pnlMedicalLogHeader, pnlMedicalLog));
+            pnlMedicalLog.addMouseListener(getSwitchListener(pnlMedicalLog, pnlMedicalLogHeader));
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlMedicalLogHeader, gridBagConstraints);
+            add(pnlMedicalLog, gridBagConstraints);
+            gridy++;
+        }
+
         if (!person.getScenarioLog().isEmpty()) {
             JPanel pnlScenariosLogHeader = new JPanel();
             pnlScenariosLogHeader.setName("scenarioLogHeader");
@@ -1991,6 +2018,45 @@ public class PersonViewPanel extends JScrollablePanel {
         eventModel.setData(logs);
         JTable eventTable = new JTable(eventModel);
         eventTable.getAccessibleContext().setAccessibleName("Event log for " + person.getFullName());
+        eventTable.setRowSelectionAllowed(false);
+        eventTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        TableColumn column;
+        for (int i = 0; i < eventModel.getColumnCount(); ++i) {
+            column = eventTable.getColumnModel().getColumn(i);
+            column.setCellRenderer(eventModel.getRenderer());
+            column.setPreferredWidth(eventModel.getPreferredWidth(i));
+            if (eventModel.hasConstantWidth(i)) {
+                column.setMinWidth(eventModel.getPreferredWidth(i));
+                column.setMaxWidth(eventModel.getPreferredWidth(i));
+            }
+        }
+        eventTable.setIntercellSpacing(new Dimension(0, 0));
+        eventTable.setShowGrid(false);
+        eventTable.setTableHeader(null);
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+
+        pnlLog.add(eventTable, gridBagConstraints);
+
+        return pnlLog;
+    }
+
+    private JPanel fillMedicalLog() {
+        List<LogEntry> logs = person.getMedicalLog();
+        Collections.reverse(logs);
+
+        JPanel pnlLog = new JPanel(new GridBagLayout());
+
+        PersonnelEventLogModel eventModel = new PersonnelEventLogModel();
+        eventModel.setData(logs);
+        JTable eventTable = new JTable(eventModel);
+        eventTable.getAccessibleContext().setAccessibleName("Medical log for " + person.getFullName());
         eventTable.setRowSelectionAllowed(false);
         eventTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         TableColumn column;

@@ -171,6 +171,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_CALLSIGN = "CALLSIGN";
     private static final String CMD_EDIT_PERSONNEL_LOG = "LOG";
     private static final String CMD_ADD_LOG_ENTRY = "ADD_PERSONNEL_LOG_SINGLE";
+    private static final String CMD_EDIT_MEDICAL_LOG = "MEDICAL_LOG";
+    private static final String CMD_ADD_MEDICAL_LOG_ENTRY = "ADD_ADD_MEDICAL_LOG_ENTRY";
     private static final String CMD_EDIT_SCENARIO_LOG = "SCENARIO_LOG";
     private static final String CMD_ADD_SCENARIO_ENTRY = "ADD_SCENARIO_ENTRY";
     private static final String CMD_EDIT_KILL_LOG = "KILL_LOG";
@@ -1190,6 +1192,26 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                     }
                 }
+                break;
+            }
+            case CMD_ADD_MEDICAL_LOG_ENTRY: {
+                final AddOrEditMedicalEntryDialog addMedicalLogDialog = new AddOrEditMedicalEntryDialog(getFrame(),
+                      null,
+                      getCampaign().getLocalDate());
+                if (addMedicalLogDialog.showDialog().isConfirmed()) {
+                    for (Person person : people) {
+                        person.addMedicalLogEntry(addMedicalLogDialog.getEntry().clone());
+                        MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
+                    }
+                }
+                break;
+            }
+            case CMD_EDIT_MEDICAL_LOG: {
+                EditMedicalLogDialog editMedicalLogDialog = new EditMedicalLogDialog(getFrame(),
+                      getCampaign().getLocalDate(),
+                      selectedPerson);
+                editMedicalLogDialog.setVisible(true);
+                MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                 break;
             }
             case CMD_EDIT_SCENARIO_LOG: {
@@ -3234,6 +3256,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.addActionListener(this);
             menu.add(menuItem);
 
+            menuItem = new JMenuItem(resources.getString("editMedicalLog.text"));
+            menuItem.setActionCommand(CMD_EDIT_MEDICAL_LOG);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+
             menuItem = new JMenuItem(resources.getString("editKillLog.text"));
             menuItem.setActionCommand(CMD_EDIT_KILL_LOG);
             menuItem.addActionListener(this);
@@ -3241,6 +3268,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         } else {
             menuItem = new JMenuItem(resources.getString("addSingleLogEntry.text"));
             menuItem.setActionCommand(CMD_ADD_LOG_ENTRY);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+
+            menuItem = new JMenuItem(resources.getString("addSingleMedicalLogEntry.text"));
+            menuItem.setActionCommand(CMD_ADD_MEDICAL_LOG_ENTRY);
             menuItem.addActionListener(this);
             menu.add(menuItem);
 
