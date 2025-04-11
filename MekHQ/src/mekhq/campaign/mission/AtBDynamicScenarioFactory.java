@@ -34,6 +34,7 @@ import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.UnitType.*;
+import static megamek.common.WeaponType.CLASS_ARTILLERY;
 import static megamek.common.planetaryconditions.Atmosphere.THIN;
 import static megamek.common.planetaryconditions.Wind.TORNADO_F4;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
@@ -68,6 +69,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.containers.MunitionTree;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.WeaponMounted;
 import megamek.common.icons.Camouflage;
 import megamek.common.planetaryconditions.Atmosphere;
 import megamek.common.planetaryconditions.Wind;
@@ -1062,6 +1064,12 @@ public class AtBDynamicScenarioFactory {
         if (unidentifiedThirdPartyPresent) {
             generatedForce.setCamouflage(AtBContract.pickRandomCamouflage(currentDate.getYear(), factionCode));
         }
+
+        boolean isDeployOffBoard = forceTemplate.getDeployOffboard();
+        if (isDeployOffBoard) {
+            validateOffBoardCapabilities(generatedEntities);
+        }
+
         scenario.addBotForce(generatedForce, forceTemplate, campaign);
 
         if (!contract.isBatchallAccepted()) {
@@ -1230,6 +1238,46 @@ public class AtBDynamicScenarioFactory {
         }
 
         return generatedLanceCount;
+    }
+
+    /**
+     * Validates whether a force contains the required artillery weapons to deploy off-board, adjusting deployment
+     * settings if necessary.
+     *
+     * <p>This method iterates through the generated entities in a force, checking if they have at least one weapon
+     * classified as artillery. If any entity in the force doesn't have an artillery weapon, the entire force is moved
+     * on-board, as forces cannot be split between on-board and off-board deployments.</p>
+     *
+     * @param generatedEntities A list of {@link Entity} objects representing the units generated for the force. Each
+     *                          entity and its weapon list will be checked for artillery capability.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public static void validateOffBoardCapabilities(List<Entity> generatedEntities) {
+        for (Entity entity : generatedEntities) {
+            boolean hasArtillery = false;
+            for (WeaponMounted weapon : entity.getTotalWeaponList()) {
+                WeaponType type = weapon.getType();
+
+                if (type == null) {
+                    continue;
+                }
+
+                int attackClass = type.getAtClass();
+
+                if (attackClass == CLASS_ARTILLERY) {
+                    hasArtillery = true;
+                    break;
+                }
+            }
+
+            if (!hasArtillery) {
+                logger.info("{} was meant to deploy off board, but they don't have an artillery weapon." +
+                                  " Moving them on board.", entity.getDisplayName());
+                entity.setOffBoard(0, OffBoardDirection.NONE);
+            }
+        }
     }
 
     /**
@@ -2041,13 +2089,15 @@ public class AtBDynamicScenarioFactory {
         MekSummary unitData = campaign.getUnitGenerator().generate(params);
 
         if (unitData == null) {
-
             // If XCT troops were requested but none were found, generate without the role
             if (useTempXCT && params.getMissionRoles().contains(XCT)) {
                 noXCTParams = params.clone();
-                noXCTParams.getMissionRoles().remove(XCT);
-                unitData = campaign.getUnitGenerator().generate(noXCTParams);
-                temporaryXCT = true;
+
+                if (noXCTParams != null) {
+                    noXCTParams.getMissionRoles().remove(XCT);
+                    unitData = campaign.getUnitGenerator().generate(noXCTParams);
+                    temporaryXCT = true;
+                }
             }
             if (unitData == null) {
                 if (!params.getMissionRoles().isEmpty()) {
@@ -2212,16 +2262,21 @@ public class AtBDynamicScenarioFactory {
                 while (remainingCount > 0) {
 
                     // Set base random generation parameters
+                    logger.info("Generating infantry bay for params {}", params);
                     UnitGeneratorParameters newParams = params.clone();
-                    newParams.clearMovementModes();
-                    newParams.setWeightClass(AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED);
+                    if (newParams == null) {
+                        logger.info("newParams is null");
+                    } else {
+                        newParams.clearMovementModes();
+                        newParams.setWeightClass(AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED);
+                    }
 
                     Entity transportedUnit = null;
                     Entity mechanizedBAUnit = null;
 
                     // If a roll against the battle armor target number succeeds, try to generate a
                     // battle armor unit first
-                    if (d6(2) >= infantryToBAUpgradeTNs[params.getQuality()]) {
+                    if (newParams != null && d6(2) >= infantryToBAUpgradeTNs[params.getQuality()]) {
                         newParams.setMissionRoles(requiredRoles.getOrDefault(BATTLE_ARMOR, new HashSet<>()));
                         transportedUnit = generateTransportedBAUnit(newParams, bayCapacity, skill, false, campaign);
 
@@ -2238,7 +2293,7 @@ public class AtBDynamicScenarioFactory {
 
                     // If a battle armor unit wasn't generated and conditions permit, try generating
                     // conventional infantry. Generate air assault infantry for VTOL transports.
-                    if (transportedUnit == null && allowInfantry) {
+                    if (newParams != null && transportedUnit == null && allowInfantry) {
                         newParams.setMissionRoles(requiredRoles.getOrDefault(INFANTRY, new HashSet<>()));
                         if (transport.getUnitType() == VTOL && !newParams.getMissionRoles().contains(XCT)) {
                             UnitGeneratorParameters paratrooperParams = newParams.clone();
@@ -2303,10 +2358,15 @@ public class AtBDynamicScenarioFactory {
      *
      * @return Generated infantry unit, or null if one cannot be generated
      */
-    private static Entity generateTransportedInfantryUnit(UnitGeneratorParameters params, double bayCapacity,
+    private static @Nullable Entity generateTransportedInfantryUnit(UnitGeneratorParameters params, double bayCapacity,
           SkillLevel skill, boolean useTempXCT, Campaign campaign) {
 
         UnitGeneratorParameters newParams = params.clone();
+        if (newParams == null) {
+            logger.warn("newParams is null");
+            return null;
+        }
+
         newParams.setUnitType(INFANTRY);
         MekSummary unitData;
         boolean temporaryXCT = false;
@@ -2317,7 +2377,6 @@ public class AtBDynamicScenarioFactory {
         // which may
         // include other types
         if (bayCapacity <= IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT) {
-
             if (newParams.getMissionRoles().contains(PARATROOPER)) {
                 newParams.setMovementModes(IUnitGenerator.ALL_INFANTRY_MODES);
             } else {
@@ -2331,9 +2390,12 @@ public class AtBDynamicScenarioFactory {
                 // If XCT troops were requested but none were found, generate without the role
                 if (useTempXCT && newParams.getMissionRoles().contains(XCT)) {
                     noXCTParams = newParams.clone();
-                    noXCTParams.getMissionRoles().remove(XCT);
-                    unitData = campaign.getUnitGenerator().generate(noXCTParams);
-                    temporaryXCT = true;
+
+                    if (noXCTParams != null) {
+                        noXCTParams.getMissionRoles().remove(XCT);
+                        unitData = campaign.getUnitGenerator().generate(noXCTParams);
+                        temporaryXCT = true;
+                    }
                 }
                 if (unitData == null) {
                     return null;
@@ -2362,9 +2424,12 @@ public class AtBDynamicScenarioFactory {
                 // If XCT troops were requested but none were found, generate without the role
                 if (useTempXCT && newParams.getMissionRoles().contains(XCT)) {
                     noXCTParams = newParams.clone();
-                    noXCTParams.getMissionRoles().remove(XCT);
-                    unitData = campaign.getUnitGenerator().generate(noXCTParams);
-                    temporaryXCT = true;
+
+                    if (noXCTParams != null) {
+                        noXCTParams.getMissionRoles().remove(XCT);
+                        unitData = campaign.getUnitGenerator().generate(noXCTParams);
+                        temporaryXCT = true;
+                    }
                 }
                 if (unitData == null) {
                     return null;
@@ -2394,7 +2459,7 @@ public class AtBDynamicScenarioFactory {
      *
      * @return Generated battle armor entity with crew, null if one cannot be generated
      */
-    private static Entity generateTransportedBAUnit(UnitGeneratorParameters params, double bayCapacity,
+    private static @Nullable Entity generateTransportedBAUnit(UnitGeneratorParameters params, double bayCapacity,
           SkillLevel skill, boolean retryAsMechanized, Campaign campaign) {
 
         // Ensure a proposed non-mechanized carrier has enough bay space
@@ -2403,23 +2468,24 @@ public class AtBDynamicScenarioFactory {
         }
 
         UnitGeneratorParameters newParams = params.clone();
-        newParams.setUnitType(BATTLE_ARMOR);
+        if (newParams != null) {
+            newParams.setUnitType(BATTLE_ARMOR);
+            newParams.getMovementModes().addAll(IUnitGenerator.ALL_BATTLE_ARMOR_MODES);
 
-        newParams.getMovementModes().addAll(IUnitGenerator.ALL_BATTLE_ARMOR_MODES);
-
-        // Set the parameters to filter out types that are too heavy for the provided
-        // bay space, or those that cannot use mechanized BA travel
-        if (bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT) {
-            newParams.setFilter(inf -> inf.getTons() <= bayCapacity);
-        } else {
-            newParams.addMissionRole(MECHANIZED_BA);
+            // Set the parameters to filter out types that are too heavy for the provided
+            // bay space, or those that cannot use mechanized BA travel
+            if (bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT) {
+                newParams.setFilter(inf -> inf.getTons() <= bayCapacity);
+            } else {
+                newParams.addMissionRole(MECHANIZED_BA);
+            }
         }
 
         MekSummary unitData = campaign.getUnitGenerator().generate(newParams);
 
         // If generating for an internal bay fails, try again as mechanized if the flag is set
         if (unitData == null) {
-            if (bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT && retryAsMechanized) {
+            if (newParams != null && bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT && retryAsMechanized) {
                 newParams.setFilter(null);
                 newParams.addMissionRole((MECHANIZED_BA));
                 unitData = campaign.getUnitGenerator().generate(newParams);
@@ -2430,7 +2496,11 @@ public class AtBDynamicScenarioFactory {
         }
 
         // Add an appropriate crew
-        return createEntityWithCrew(newParams.getFaction(), skill, campaign, unitData);
+        if (newParams != null && unitData != null) {
+            return createEntityWithCrew(newParams.getFaction(), skill, campaign, unitData);
+        } else {
+            return null;
+        }
     }
 
     /**

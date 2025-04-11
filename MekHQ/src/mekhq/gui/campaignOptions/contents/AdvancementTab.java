@@ -113,6 +113,7 @@ public class AdvancementTab {
 
     //start Skill Randomization Tab
     private JCheckBox chkExtraRandomness;
+    private JCheckBox chkRandomizeTraits;
     private JCheckBox chkComingOfAgeSPAs;
 
     private JPanel pnlPhenotype;
@@ -520,6 +521,7 @@ public class AdvancementTab {
      */
     private void initializeSkillRandomizationTab() {
         chkExtraRandomness = new JCheckBox();
+        chkRandomizeTraits = new JCheckBox();
         chkComingOfAgeSPAs = new JCheckBox();
 
         pnlPhenotype = new JPanel();
@@ -605,6 +607,7 @@ public class AdvancementTab {
 
         // Contents
         chkExtraRandomness = new CampaignOptionsCheckBox("ExtraRandomness");
+        chkRandomizeTraits = new CampaignOptionsCheckBox("RandomizeTraits");
         chkComingOfAgeSPAs = new CampaignOptionsCheckBox("ComingOfAgeAbilities");
 
         pnlPhenotype = createPhenotypePanel();
@@ -624,7 +627,9 @@ public class AdvancementTab {
         panel.add(chkExtraRandomness, layout);
 
         layout.gridy++;
-        layout.gridwidth = 1;
+        panel.add(chkRandomizeTraits, layout);
+
+        layout.gridy++;
         panel.add(chkComingOfAgeSPAs, layout);
 
         layout.gridx = 0;
@@ -1138,6 +1143,7 @@ public class AdvancementTab {
 
         //start Skill Randomization Tab
         chkExtraRandomness.setSelected(skillPreferences.randomizeSkill());
+        chkRandomizeTraits.setSelected(skillPreferences.isRandomizeTraits());
         chkComingOfAgeSPAs.setSelected(options.isRewardComingOfAgeAbilities());
         final int[] phenotypeProbabilities = options.getPhenotypeProbabilities();
         for (int i = 0; i < phenotypeSpinners.length; i++) {
@@ -1224,6 +1230,7 @@ public class AdvancementTab {
 
         //start Skill Randomization Tab
         skillPreferences.setRandomizeSkill(chkExtraRandomness.isSelected());
+        skillPreferences.setRandomizeTraits(chkRandomizeTraits.isSelected());
         for (int i = 0; i < phenotypeSpinners.length; i++) {
             options.setPhenotypeProbability(i, (int) phenotypeSpinners[i].getValue());
         }

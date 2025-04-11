@@ -467,6 +467,7 @@ public class CampaignOptions {
     private FinancialYearDuration financialYearDuration;
     private boolean newFinancialYearFinancesToCSVExport;
     private boolean simulateGrayMonday;
+    private boolean allowMonthlyReinvestment;
 
     // Price Multipliers
     private double commonPartPriceMultiplier;
@@ -1070,6 +1071,7 @@ public class CampaignOptions {
         setFinancialYearDuration(FinancialYearDuration.ANNUAL);
         newFinancialYearFinancesToCSVExport = false;
         simulateGrayMonday = false;
+        allowMonthlyReinvestment = false;
 
         // Price Multipliers
         setCommonPartPriceMultiplier(1.0);
@@ -3392,6 +3394,14 @@ public class CampaignOptions {
         this.simulateGrayMonday = simulateGrayMonday;
     }
 
+    public boolean isAllowMonthlyReinvestment() {
+        return allowMonthlyReinvestment;
+    }
+
+    public void setAllowMonthlyReinvestment(final boolean allowMonthlyReinvestment) {
+        this.allowMonthlyReinvestment = allowMonthlyReinvestment;
+    }
+
     // region Price Multipliers
     public double getCommonPartPriceMultiplier() {
         return commonPartPriceMultiplier;
@@ -5289,6 +5299,7 @@ public class CampaignOptions {
               "newFinancialYearFinancesToCSVExport",
               newFinancialYearFinancesToCSVExport);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "simulateGrayMonday", simulateGrayMonday);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowMonthlyReinvestment", allowMonthlyReinvestment);
 
         // region Price Multipliers
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commonPartPriceMultiplier", getCommonPartPriceMultiplier());
@@ -6221,6 +6232,8 @@ public class CampaignOptions {
                     retVal.newFinancialYearFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("simulateGrayMonday")) {
                     retVal.simulateGrayMonday = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("allowMonthlyReinvestment")) {
+                    retVal.allowMonthlyReinvestment = Boolean.parseBoolean(wn2.getTextContent().trim());
 
                     // region Price Multipliers
                 } else if (nodeName.equalsIgnoreCase("commonPartPriceMultiplier")) {

@@ -27,6 +27,12 @@
  */
 package mekhq.campaign.stratcon;
 
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.namespace.QName;
+
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Marshaller;
@@ -43,12 +49,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import org.w3c.dom.Node;
-
-import javax.xml.namespace.QName;
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Contract-level state object for a StratCon campaign.
@@ -117,6 +117,10 @@ public class StratconCampaignState {
         return tracks;
     }
 
+    public int getTrackCount() {
+        return tracks.size();
+    }
+
     public void addTrack(StratconTrackState track) {
         tracks.add(track);
     }
@@ -144,13 +148,13 @@ public class StratconCampaignState {
      * Modifies the current support points by the specified amount.
      *
      * <p>
-     * This method increases or decreases the support points by the given number.
-     * It adds the value of {@code change} to the existing support points total.
-     * This can be used to reflect changes due to various gameplay events or actions.
+     * This method increases or decreases the support points by the given number. It adds the value of {@code change} to
+     * the existing support points total. This can be used to reflect changes due to various gameplay events or
+     * actions.
      * </p>
      *
-     * @param change The amount to adjust the support points by. Positive values will
-     *               increase the support points, while negative values will decrease them.
+     * @param change The amount to adjust the support points by. Positive values will increase the support points, while
+     *               negative values will decrease them.
      */
     public void changeSupportPoints(int change) {
         supportPoints += change;
@@ -210,10 +214,11 @@ public class StratconCampaignState {
     }
 
     /**
-     * Convenience/speed method of determining whether or not a force with the given
-     * ID has been deployed to a track in this campaign.
+     * Convenience/speed method of determining whether or not a force with the given ID has been deployed to a track in
+     * this campaign.
      *
      * @param forceID the force ID to check
+     *
      * @return Deployed or not.
      */
     public boolean isForceDeployedHere(int forceID) {
@@ -227,8 +232,7 @@ public class StratconCampaignState {
     }
 
     /**
-     * Removes the scenario with the given campaign scenario ID from any tracks
-     * where it's present
+     * Removes the scenario with the given campaign scenario ID from any tracks where it's present
      */
     public void removeStratconScenario(int scenarioID) {
         for (StratconTrackState trackState : tracks) {
@@ -240,23 +244,23 @@ public class StratconCampaignState {
      * Retrieves the {@link StratconScenario} associated with a given {@link AtBScenario}.
      *
      * <p>
-     * This method searches through all {@link StratconTrackState} objects in the {@link StratconCampaignState}
-     * to find the first {@link StratconScenario} whose backing scenario matches the specified {@link AtBScenario}.
-     * If no such scenario is found, it returns {@code null}.
+     * This method searches through all {@link StratconTrackState} objects in the {@link StratconCampaignState} to find
+     * the first {@link StratconScenario} whose backing scenario matches the specified {@link AtBScenario}. If no such
+     * scenario is found, it returns {@code null}.
      * </p>
      *
      * <strong>Usage:</strong>
      * <p>
-     * Use this method to easily fetch the {@link StratconScenario} associated with the provided
-     * {@link AtBScenario}.
+     * Use this method to easily fetch the {@link StratconScenario} associated with the provided {@link AtBScenario}.
      * </p>
      *
      * @param campaign The {@link Campaign} containing the data to search through.
      * @param scenario The {@link AtBScenario} to find the corresponding {@link StratconScenario} for.
+     *
      * @return The matching {@link StratconScenario}, or {@code null} if no corresponding scenario is found.
      */
     public static @Nullable StratconScenario getStratconScenarioFromAtBScenario(Campaign campaign,
-                                                                                AtBScenario scenario) {
+          AtBScenario scenario) {
         AtBContract contract = scenario.getContract(campaign);
         if (contract == null) {
             return null;
@@ -279,8 +283,7 @@ public class StratconCampaignState {
     }
 
     /**
-     * Serialize this instance of a campaign state to a PrintWriter
-     * Omits initial xml declaration
+     * Serialize this instance of a campaign state to a PrintWriter Omits initial xml declaration
      *
      * @param pw The destination print writer
      */
@@ -288,7 +291,8 @@ public class StratconCampaignState {
         try {
             JAXBContext context = JAXBContext.newInstance(StratconCampaignState.class);
             JAXBElement<StratconCampaignState> stateElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME),
-                    StratconCampaignState.class, this);
+                  StratconCampaignState.class,
+                  this);
             Marshaller m = context.createMarshaller();
             m.setProperty(Marshaller.JAXB_FRAGMENT, true);
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -299,10 +303,10 @@ public class StratconCampaignState {
     }
 
     /**
-     * Attempt to deserialize an instance of a Campaign State from the passed-in XML
-     * Node
+     * Attempt to deserialize an instance of a Campaign State from the passed-in XML Node
      *
      * @param xmlNode The node with the campaign state
+     *
      * @return Possibly an instance of a StratconCampaignState
      */
     public static StratconCampaignState Deserialize(Node xmlNode) {
@@ -331,8 +335,8 @@ public class StratconCampaignState {
     }
 
     /**
-     * This adapter provides a way to convert between a LocalDate and the ISO-8601 string
-     * representation of the date that is used for XML marshaling and unmarshalling in JAXB.
+     * This adapter provides a way to convert between a LocalDate and the ISO-8601 string representation of the date
+     * that is used for XML marshaling and unmarshalling in JAXB.
      */
     public static class LocalDateAdapter extends XmlAdapter<String, LocalDate> {
         @Override

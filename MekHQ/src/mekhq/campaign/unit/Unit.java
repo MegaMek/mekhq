@@ -266,11 +266,19 @@ public class Unit implements ITechnology {
         } else if (!isPresent()) {
             return "In transit (" + getDaysToArrival() + " days)";
         } else if (isRefitting()) {
-            int minutesInHour = 60;
-            int hoursInDay = 24;
-            int minutesInDay = hoursInDay * minutesInHour;
-            int days = (int) ceil((double) getRefit().getTimeLeft() / minutesInDay);
-            return "Refitting" + " (" + days + " days)";
+            double timeLeft = refit.getTimeLeft();
+            Person refitTech = refit.getTech();
+
+            double minutesInWorkDay = TECH_WORK_DAY;
+            if (refitTech != null) {
+                boolean isTechsUseAdmin = getCampaign().getCampaignOptions().isTechsUseAdministration();
+                minutesInWorkDay = refitTech.getDailyAvailableTechTime(isTechsUseAdmin);
+            }
+
+            int daysLeft = (int) Math.ceil(timeLeft / minutesInWorkDay);
+            String dayString = daysLeft == 1 ? "day" : "days";
+
+            return "Refitting" + " (" + daysLeft + ' ' + dayString + ')';
         } else {
             return getCondition();
         }
@@ -4834,12 +4842,12 @@ public class Unit implements ITechnology {
                 if (getCampaign().getCampaignOptions().isUseEdge()) {
                     double sumEdge = 0;
                     for (Person p : drivers) {
-                        sumEdge += p.getEdge();
+                        sumEdge += p.getCurrentEdge();
                     }
                     // Again, don't count infantrymen twice
                     if (!entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
                         for (Person p : gunners) {
-                            sumEdge += p.getEdge();
+                            sumEdge += p.getCurrentEdge();
                         }
                     }
                     // Average the edge values of pilots and gunners. The Spacecraft Engineer
@@ -5043,7 +5051,7 @@ public class Unit implements ITechnology {
         // limits
         // and set it to true when we start up through MHQ
         entity.getCrew().setPiloting(Math.min(max(piloting, 0), 8), 0);
-        entity.getCrew().setGunnery(Math.min(max(gunnery, 0), 7), 0);
+        entity.getCrew().setGunnery(Math.min(max(gunnery, 0), 8), 0);
         entity.getCrew().setArtillery(Math.min(max(artillery, 0), 8), 0);
         if (entity instanceof SmallCraft || entity instanceof Jumpship) {
             // Use tacops crew hits calculations and current size versus maximum size
@@ -5104,9 +5112,9 @@ public class Unit implements ITechnology {
         }
         LAMPilot crew = (LAMPilot) entity.getCrew();
         crew.setPiloting(Math.min(max(pilotingMek, 0), 8));
-        crew.setGunnery(Math.min(max(gunneryMek, 0), 7));
+        crew.setGunnery(Math.min(max(gunneryMek, 0), 8));
         crew.setPilotingAero(Math.min(max(pilotingAero, 0), 8));
-        crew.setGunneryAero(Math.min(max(gunneryAero, 0), 7));
+        crew.setGunneryAero(Math.min(max(gunneryAero, 0), 8));
         entity.getCrew().setArtillery(Math.min(max(artillery, 0), 8), 0);
         entity.getCrew().setSize(1);
         entity.getCrew().setMissing(false, 0);
@@ -5145,12 +5153,12 @@ public class Unit implements ITechnology {
             artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options);
         }
         entity.getCrew().setPiloting(Math.min(max(piloting, 0), 8), slot);
-        entity.getCrew().setGunnery(Math.min(max(gunnery, 0), 7), slot);
+        entity.getCrew().setGunnery(Math.min(max(gunnery, 0), 8), slot);
         // also set RPG gunnery skills in case present in game options
-        entity.getCrew().setGunneryL(Math.min(max(gunnery, 0), 7), slot);
-        entity.getCrew().setGunneryM(Math.min(max(gunnery, 0), 7), slot);
-        entity.getCrew().setGunneryB(Math.min(max(gunnery, 0), 7), slot);
-        entity.getCrew().setArtillery(Math.min(max(artillery, 0), 7), slot);
+        entity.getCrew().setGunneryL(Math.min(max(gunnery, 0), 8), slot);
+        entity.getCrew().setGunneryM(Math.min(max(gunnery, 0), 8), slot);
+        entity.getCrew().setGunneryB(Math.min(max(gunnery, 0), 8), slot);
+        entity.getCrew().setArtillery(Math.min(max(artillery, 0), 8), slot);
         entity.getCrew().setToughness(person.getToughness(), slot);
 
         entity.getCrew().setExternalIdAsString(person.getId().toString(), slot);
@@ -5233,7 +5241,7 @@ public class Unit implements ITechnology {
                         }
                         sumEdgeUsed = engineer.getEdgeUsed();
                     }
-                    sumEdge += p.getEdge();
+                    sumEdge += p.getAdjustedEdge();
 
                     if (p.hasSkill(SkillType.S_TECH_VESSEL)) {
                         sumSkill += p.getSkill(SkillType.S_TECH_VESSEL).getLevel();
@@ -5267,7 +5275,7 @@ public class Unit implements ITechnology {
                     }
                     engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill / nCrew, sumBonus / nCrew);
                     engineer.setEdgeUsed(sumEdgeUsed);
-                    engineer.setCurrentEdge((sumEdge - sumEdgeUsed) / nCrew);
+                    engineer.setCurrentEdge(max(0, (sumEdge - sumEdgeUsed) / nCrew));
                     engineer.setUnit(this);
                 } else {
                     engineer = null;
