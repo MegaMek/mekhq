@@ -52,6 +52,7 @@ public class RandomSkillPreferences {
     private int overallRecruitBonus;
     Map<PersonnelRole, Integer> recruitmentBonuses;
     private boolean randomizeSkill;
+    private boolean randomizeTraits;
     private boolean useClanBonuses;
     private int antiMekProb;
     private int[] specialAbilityBonus;
@@ -68,6 +69,7 @@ public class RandomSkillPreferences {
         overallRecruitBonus = 0;
         recruitmentBonuses = new HashMap<>();
         randomizeSkill = true;
+        randomizeTraits = false;
         useClanBonuses = true;
         antiMekProb = 10;
         combatSmallArmsBonus = -3;
@@ -173,6 +175,14 @@ public class RandomSkillPreferences {
         return randomizeSkill;
     }
 
+    public boolean isRandomizeTraits() {
+        return randomizeTraits;
+    }
+
+    public void setRandomizeTraits(boolean randomizeTraits) {
+        this.randomizeTraits = randomizeTraits;
+    }
+
     public void setUseClanBonuses(boolean b) {
         this.useClanBonuses = b;
     }
@@ -269,6 +279,7 @@ public class RandomSkillPreferences {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandSkillsModifier", commandSkillsModifier);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "roleplaySkillsModifier", roleplaySkillsModifier);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeSkill", randomizeSkill);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeTraits", randomizeTraits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanBonuses", useClanBonuses);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "antiMekProb", antiMekProb);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "combatSmallArmsBonus", combatSmallArmsBonus);
@@ -303,6 +314,8 @@ public class RandomSkillPreferences {
                     retVal.overallRecruitBonus = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomizeSkill")) {
                     retVal.randomizeSkill = wn2.getTextContent().equalsIgnoreCase("true");
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomizeTraits")) {
+                    retVal.randomizeTraits = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("useClanBonuses")) {
                     retVal.useClanBonuses = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("antiMekProb")) {
