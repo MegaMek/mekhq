@@ -311,6 +311,8 @@ public class CampaignXmlParser {
                     processFinances(campaign, wn);
                 } else if (xn.equalsIgnoreCase("location")) {
                     campaign.setLocation(CurrentLocation.generateInstanceFromXML(wn, campaign));
+                } else if (xn.equalsIgnoreCase("isAvoidingEmptySystems")) {
+                    campaign.setIsAvoidingEmptySystems(Boolean.parseBoolean(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("skillTypes")) {
                     processSkillTypeNodes(wn);
                 } else if (xn.equalsIgnoreCase("specialAbilities")) {
