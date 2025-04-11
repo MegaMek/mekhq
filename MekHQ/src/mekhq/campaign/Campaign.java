@@ -64,6 +64,7 @@ import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_CLARION_NOTE;
 import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.MINIMUM_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMAN;
 import static mekhq.campaign.stratcon.StratconRulesManager.processIgnoredDynamicScenario;
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
@@ -6413,8 +6414,21 @@ public class Campaign implements ITechManager {
     }
 
     public void setTemporaryPrisonerCapacity(int temporaryPrisonerCapacity) {
-        this.temporaryPrisonerCapacity = max(PrisonerEventManager.MINIMUM_TEMPORARY_CAPACITY,
-              temporaryPrisonerCapacity);
+        this.temporaryPrisonerCapacity = max(MINIMUM_TEMPORARY_CAPACITY, temporaryPrisonerCapacity);
+    }
+
+    /**
+     * Adjusts the temporary prisoner capacity by the specified delta value.
+     *
+     * <p>he new capacity is constrained to be at least the minimum allowed temporary capacity, as defined by {@code
+     * PrisonerEventManager.MINIMUM_TEMPORARY_CAPACITY}.</p>T
+     *
+     * @param delta the amount by which to change the temporary prisoner capacity. A positive value increases the
+     *              capacity, while a negative value decreases it.
+     */
+    public void changeTemporaryPrisonerCapacity(int delta) {
+        int newCapacity = temporaryPrisonerCapacity + delta;
+        temporaryPrisonerCapacity = max(MINIMUM_TEMPORARY_CAPACITY, newCapacity);
     }
 
     public RandomEventLibraries getRandomEventLibraries() {

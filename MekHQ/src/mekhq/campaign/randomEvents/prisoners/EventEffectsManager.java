@@ -60,10 +60,10 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
@@ -239,9 +239,7 @@ public class EventEffectsManager {
      */
     String eventEffectPrisonerCapacity(EventResult result) {
         final int magnitude = result.magnitude();
-        int currentTemporarilyPrisonerCapacity = campaign.getTemporaryPrisonerCapacity();
-
-        campaign.setTemporaryPrisonerCapacity(currentTemporarilyPrisonerCapacity + magnitude);
+        campaign.changeTemporaryPrisonerCapacity(magnitude);
 
         String colorOpen = magnitude > 0 ?
                                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()) :

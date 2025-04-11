@@ -31,6 +31,7 @@ import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
 import static mekhq.campaign.mission.enums.MissionStatus.PARTIAL;
 import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
 import static mekhq.campaign.mission.enums.ScenarioStatus.REFUSED_ENGAGEMENT;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -421,7 +422,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         if (xpAward > 0) {
             LocalDate today = getCampaign().getLocalDate();
-            for (Person person : getCampaign().getActivePersonnel()) {
+            for (Person person : getCampaign().getActivePersonnel(false)) {
                 if (person.isChild(today)) {
                     continue;
                 }
@@ -437,12 +438,17 @@ public final class BriefingTab extends CampaignGuiTab {
         // Prisoners
         boolean wasOverallSuccess = cmd.getStatus() == SUCCESS || cmd.getStatus() == PARTIAL;
 
-        if (!getCampaign().getFriendlyPrisoners().isEmpty()) {
-            prisoners.handlePrisoners(wasOverallSuccess, true);
-        }
+        // We only resolve prisoners if there are no active Missions
+        if (getCampaign().getActiveMissions(false).isEmpty()) {
+            if (!getCampaign().getFriendlyPrisoners().isEmpty()) {
+                prisoners.handlePrisoners(wasOverallSuccess, true);
+            }
 
-        if (!getCampaign().getCurrentPrisoners().isEmpty()) {
-            prisoners.handlePrisoners(wasOverallSuccess, false);
+            if (!getCampaign().getCurrentPrisoners().isEmpty()) {
+                prisoners.handlePrisoners(wasOverallSuccess, false);
+            }
+
+            getCampaign().setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
         }
 
         // resolve turnover
