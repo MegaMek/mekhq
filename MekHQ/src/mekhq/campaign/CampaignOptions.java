@@ -230,6 +230,7 @@ public class CampaignOptions {
     private boolean displayPersonnelLog;
     private boolean displayScenarioLog;
     private boolean displayKillRecord;
+    private boolean rewardComingOfAgeAbilities;
 
     // Expanded Personnel Information
     private boolean useTimeInService;
@@ -773,6 +774,7 @@ public class CampaignOptions {
         setDisplayPersonnelLog(false);
         setDisplayScenarioLog(false);
         setDisplayKillRecord(false);
+        setRewardComingOfAgeAbilities(false);
 
         // Expanded Personnel Information
         setUseTimeInService(false);
@@ -1641,6 +1643,14 @@ public class CampaignOptions {
 
     public void setDisplayKillRecord(final boolean displayKillRecord) {
         this.displayKillRecord = displayKillRecord;
+    }
+
+    public boolean isRewardComingOfAgeAbilities() {
+        return rewardComingOfAgeAbilities;
+    }
+
+    public void setRewardComingOfAgeAbilities(final boolean rewardComingOfAgeAbilities) {
+        this.rewardComingOfAgeAbilities = rewardComingOfAgeAbilities;
     }
 
     public boolean isUseFatigue() {
@@ -4961,6 +4971,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayPersonnelLog", isDisplayPersonnelLog());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayScenarioLog", isDisplayScenarioLog());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayKillRecord", isDisplayKillRecord());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rewardComingOfAgeAbilities", isRewardComingOfAgeAbilities());
         // endregion General Personnel
 
         // region Expanded Personnel Information
@@ -5733,6 +5744,8 @@ public class CampaignOptions {
                     retVal.setDisplayScenarioLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("displayKillRecord")) {
                     retVal.setDisplayKillRecord(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("rewardComingOfAgeAbilities")) {
+                    retVal.setRewardComingOfAgeAbilities(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     // endregion General Personnel
 
                     // region Expanded Personnel Information
