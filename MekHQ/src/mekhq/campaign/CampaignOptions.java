@@ -233,6 +233,7 @@ public class CampaignOptions {
     private boolean displayMedicalRecord;
     private boolean displayAssignmentRecord;
     private boolean displayPerformanceRecord;
+    private boolean rewardComingOfAgeAbilities;
 
     // Expanded Personnel Information
     private boolean useTimeInService;
@@ -469,6 +470,7 @@ public class CampaignOptions {
     private FinancialYearDuration financialYearDuration;
     private boolean newFinancialYearFinancesToCSVExport;
     private boolean simulateGrayMonday;
+    private boolean allowMonthlyReinvestment;
 
     // Price Multipliers
     private double commonPartPriceMultiplier;
@@ -776,6 +778,7 @@ public class CampaignOptions {
         setDisplayScenarioLog(false);
         setDisplayKillRecord(false);
         setDisplayMedicalRecord(false);
+        setRewardComingOfAgeAbilities(false);
 
         // Expanded Personnel Information
         setUseTimeInService(false);
@@ -1072,6 +1075,7 @@ public class CampaignOptions {
         setFinancialYearDuration(FinancialYearDuration.ANNUAL);
         newFinancialYearFinancesToCSVExport = false;
         simulateGrayMonday = false;
+        allowMonthlyReinvestment = false;
 
         // Price Multipliers
         setCommonPartPriceMultiplier(1.0);
@@ -1667,6 +1671,14 @@ public class CampaignOptions {
 
     public void setDisplayPerformanceRecord(final boolean displayPerformanceRecord) {
         this.displayPerformanceRecord = displayPerformanceRecord;
+    }
+
+    public boolean isRewardComingOfAgeAbilities() {
+        return rewardComingOfAgeAbilities;
+    }
+
+    public void setRewardComingOfAgeAbilities(final boolean rewardComingOfAgeAbilities) {
+        this.rewardComingOfAgeAbilities = rewardComingOfAgeAbilities;
     }
 
     public boolean isUseFatigue() {
@@ -3410,6 +3422,14 @@ public class CampaignOptions {
         this.simulateGrayMonday = simulateGrayMonday;
     }
 
+    public boolean isAllowMonthlyReinvestment() {
+        return allowMonthlyReinvestment;
+    }
+
+    public void setAllowMonthlyReinvestment(final boolean allowMonthlyReinvestment) {
+        this.allowMonthlyReinvestment = allowMonthlyReinvestment;
+    }
+
     // region Price Multipliers
     public double getCommonPartPriceMultiplier() {
         return commonPartPriceMultiplier;
@@ -4982,6 +5002,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayMedicalRecord", isDisplayMedicalRecord());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayAssignmentRecord", isDisplayAssignmentRecord());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayPerformanceRecord", isDisplayPerformanceRecord());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rewardComingOfAgeAbilities", isRewardComingOfAgeAbilities());
         // endregion General Personnel
 
         // region Expanded Personnel Information
@@ -5309,6 +5330,7 @@ public class CampaignOptions {
               "newFinancialYearFinancesToCSVExport",
               newFinancialYearFinancesToCSVExport);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "simulateGrayMonday", simulateGrayMonday);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowMonthlyReinvestment", allowMonthlyReinvestment);
 
         // region Price Multipliers
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commonPartPriceMultiplier", getCommonPartPriceMultiplier());
@@ -5759,6 +5781,8 @@ public class CampaignOptions {
                     retVal.setDisplayAssignmentRecord(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("displayPerformanceRecord")) {
                     retVal.setDisplayPerformanceRecord(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("rewardComingOfAgeAbilities")) {
+                    retVal.setRewardComingOfAgeAbilities(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     // endregion General Personnel
 
                     // region Expanded Personnel Information
@@ -5975,7 +5999,7 @@ public class CampaignOptions {
                               Integer.parseInt(wn3.getTextContent().trim()));
                     }
                 } else if (nodeName.equalsIgnoreCase("randomMarriageMethod")) {
-                    retVal.setRandomMarriageMethod(RandomMarriageMethod.valueOf(wn2.getTextContent().trim()));
+                    retVal.setRandomMarriageMethod(RandomMarriageMethod.fromString(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("useRandomClanPersonnelMarriages") ||
                                  nodeName.equalsIgnoreCase("useRandomClannerMarriages")) { // Legacy, 0.49.12 removal
                     retVal.setUseRandomClanPersonnelMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -6056,7 +6080,7 @@ public class CampaignOptions {
                 } else if (nodeName.equalsIgnoreCase("logProcreation")) {
                     retVal.setLogProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("randomProcreationMethod")) {
-                    retVal.setRandomProcreationMethod(RandomProcreationMethod.valueOf(wn2.getTextContent().trim()));
+                    retVal.setRandomProcreationMethod(RandomProcreationMethod.fromString(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("useRelationshiplessRandomProcreation")) {
                     retVal.setUseRelationshiplessRandomProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("useRandomClanPersonnelProcreation")) {
@@ -6245,6 +6269,8 @@ public class CampaignOptions {
                     retVal.newFinancialYearFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("simulateGrayMonday")) {
                     retVal.simulateGrayMonday = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("allowMonthlyReinvestment")) {
+                    retVal.allowMonthlyReinvestment = Boolean.parseBoolean(wn2.getTextContent().trim());
 
                     // region Price Multipliers
                 } else if (nodeName.equalsIgnoreCase("commonPartPriceMultiplier")) {

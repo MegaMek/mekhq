@@ -55,6 +55,7 @@ public class MercenaryAuction {
     private static final String RESOURCE_BUNDLE = "mekhq.resources." + MercenaryAuctionDialog.class.getSimpleName();
 
     private static final int AUCTION_TIER_SUCCESS_PERCENT = 20;
+    private static final int DECLINE_AUCTION_OPTION = 0;
 
     /**
      * Creates and processes a mercenary auction.
@@ -67,7 +68,7 @@ public class MercenaryAuction {
      * @param unitType The type of unit being auctioned (e.g., `MECH`, `VEHICLE`).
      */
     public MercenaryAuction(Campaign campaign, int requiredCombatTeams, StratconCampaignState campaignState,
-                            int unitType) {
+          int unitType) {
         String faction = campaign.getFaction().getShortName();
 
         Entity entity = getEntity(faction,
@@ -127,42 +128,44 @@ public class MercenaryAuction {
               max(requiredCombatTeams, 1));
         int finalBid = (mercenaryAuctionDialog.getSpinnerValue() / minimumBid) * AUCTION_TIER_SUCCESS_PERCENT;
 
-        // If the player confirmed the auction (option 0) then check whether they were successful,
+        // If the player confirmed the auction, then check whether they were successful,
         // deliver the unit, and deduct funds.
-        if (mercenaryAuctionDialog.getDialogChoice() == 0) {
-            // The use of <= is important here as it ensures that even if the user bids 50 %, they can
-            // still win.
-            if (randomInt(100) <= finalBid) {
-                campaignState.changeSupportPoints(finalBid);
+        if (mercenaryAuctionDialog.getDialogChoice() == DECLINE_AUCTION_OPTION) {
+            return;
+        }
 
-                // The delivery time is so that the unit addition is picked up by the 'mothball'
-                // campaign option. It also makes sense the unit wouldn't magically materialize in your
-                // hangar and has to get there.
-                int deliveryTime = d6();
-                // The +1 here is to account for this being an end of day event, so we automatically
-                // eat the first day.
-                campaign.addNewUnit(entity, false, deliveryTime + 1);
+        // The use of <= is important here as it ensures that even if the user bids 50 %, they can
+        // still win.
+        if (randomInt(100) <= finalBid) {
+            campaignState.changeSupportPoints(finalBid);
 
-                // This dialog informs the player their bid was successful
-                new ImmersiveDialogSimple(campaign,
-                      campaign.getSeniorAdminPerson(TRANSPORT),
-                      null,
-                      getFormattedTextAt(RESOURCE_BUNDLE, "auction.successful", entity.getChassis(), deliveryTime),
-                      null,
-                      null,
-                      null,
-                      true);
-            } else {
-                // This dialog informs the player their bid was unsuccessful
-                new ImmersiveDialogSimple(campaign,
-                      campaign.getSeniorAdminPerson(TRANSPORT),
-                      null,
-                      getFormattedTextAt(RESOURCE_BUNDLE, "auction.failure", entity.getChassis()),
-                      null,
-                      null,
-                      null,
-                      true);
-            }
+            // The delivery time is so that the unit addition is picked up by the 'mothball'
+            // campaign option. It also makes sense the unit wouldn't magically materialize in your
+            // hangar and has to get there.
+            int deliveryTime = d6();
+            // The +1 here is to account for this being an end of day event, so we automatically
+            // eat the first day.
+            campaign.addNewUnit(entity, false, deliveryTime + 1);
+
+            // This dialog informs the player their bid was successful
+            new ImmersiveDialogSimple(campaign,
+                  campaign.getSeniorAdminPerson(TRANSPORT),
+                  null,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "auction.successful", entity.getChassis(), deliveryTime),
+                  null,
+                  null,
+                  null,
+                  true);
+        } else {
+            // This dialog informs the player their bid was unsuccessful
+            new ImmersiveDialogSimple(campaign,
+                  campaign.getSeniorAdminPerson(TRANSPORT),
+                  null,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "auction.failure", entity.getChassis()),
+                  null,
+                  null,
+                  null,
+                  true);
         }
     }
 }
