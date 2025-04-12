@@ -335,7 +335,7 @@ public abstract class AbstractProcreation {
      * @param isNoReport true if no message should be posted to the daily report
      */
     public void addPregnancy(final Campaign campaign, final LocalDate today, final Person mother, final int size,
-                             boolean isNoReport) {
+          boolean isNoReport) {
         if (size < 1) {
             return;
         }
@@ -506,7 +506,7 @@ public abstract class AbstractProcreation {
      * @param father   the father of the baby, null if unknown
      */
     private static void logAndUpdateFamily(Campaign campaign, LocalDate today, Person mother, Person baby,
-                                           Person father) {
+          Person father) {
         if (campaign.getCampaignOptions().isLogProcreation()) {
             MedicalLogger.deliveredBaby(mother, baby, today);
             if (father != null) {
@@ -537,7 +537,7 @@ public abstract class AbstractProcreation {
      * @return the babies
      */
     public List<Person> birthHistoric(final Campaign campaign, final LocalDate today, final Person mother,
-                                      @Nullable final Person father) {
+          @Nullable final Person father) {
         List<Person> babies = new ArrayList<>();
 
         // Determine the number of children
@@ -668,7 +668,7 @@ public abstract class AbstractProcreation {
             }
 
             if (campaign.getCampaignOptions().isUseMaternityLeave()) {
-                if (person.getStatus().isActive() && (person.getDueDate().minusWeeks(20).isBefore(today))) {
+                if (!person.isBusy() && (person.getDueDate().minusWeeks(20).isBefore(today))) {
                     person.changeStatus(campaign, today, PersonnelStatus.ON_MATERNITY_LEAVE);
                 }
             }
@@ -690,7 +690,7 @@ public abstract class AbstractProcreation {
      * @param isNoReport true, if the player shouldn't be informed, otherwise false
      */
     public void processRandomProcreationCheck(final Campaign campaign, final LocalDate today, final Person person,
-                                              boolean isNoReport) {
+          boolean isNoReport) {
         if (randomlyProcreates(today, person)) {
             addPregnancy(campaign, today, person, isNoReport);
         }
