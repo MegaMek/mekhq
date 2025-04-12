@@ -419,12 +419,6 @@ public class ResolveScenarioTracker {
                     }
                 }
             } else if (wreck.getOwner().isEnemyOf(client.getLocalPlayer())) {
-                // MekHQ doesn't support gun emplacements, so we don't want the player salvaging them
-                if (wreck instanceof GunEmplacement) {
-                    appendKillCredit(wreck);
-                    continue;
-                }
-
                 if (wreck.isDropShip() && scenario.getBoardType() != T_SPACE) {
                     double dropShipBonusPercentage = (double) campaign.getCampaignOptions()
                                                                     .getDropShipBonusPercentage() / 100;

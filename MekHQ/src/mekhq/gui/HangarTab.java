@@ -79,16 +79,16 @@ public final class HangarTab extends CampaignGuiTab {
     private static final int UV_GRAPHIC = 0;
     private static final int UV_GENERAL = 1;
     private static final int UV_DETAILS = 2;
-    private static final int UV_STATUS  = 3;
-    private static final int UV_NUM     = 4;
+    private static final int UV_STATUS = 3;
+    private static final int UV_NUM = 4;
 
-    private JSplitPane        splitUnit;
-    private JTable            unitTable;
+    private JSplitPane splitUnit;
+    private JTable unitTable;
     private JComboBox<String> choiceUnit;
     private JComboBox<String> choiceUnitView;
-    private JScrollPane       scrollUnitView;
+    private JScrollPane scrollUnitView;
 
-    private UnitTableModel                 unitModel;
+    private UnitTableModel unitModel;
     private TableRowSorter<UnitTableModel> unitSorter;
 
     private final IPreferenceChangeListener scalingChangeListener = e -> changeUnitView();
@@ -120,11 +120,11 @@ public final class HangarTab extends CampaignGuiTab {
         setLayout(new GridBagLayout());
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx   = 0;
-        gridBagConstraints.gridy   = 0;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor  = GridBagConstraints.WEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(new JLabel(resourceMap.getString("lblUnitChoice.text")), gridBagConstraints);
 
         DefaultComboBoxModel<String> unitGroupModel = new DefaultComboBoxModel<>();
@@ -138,18 +138,18 @@ public final class HangarTab extends CampaignGuiTab {
         choiceUnit = new JComboBox<>(unitGroupModel);
         choiceUnit.setSelectedIndex(0);
         choiceUnit.addActionListener(ev -> filterUnits());
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 1;
-        gridBagConstraints.gridy   = 0;
-        gridBagConstraints.fill    = GridBagConstraints.NONE;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor  = GridBagConstraints.WEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(choiceUnit, gridBagConstraints);
 
-        gridBagConstraints        = new GridBagConstraints();
-        gridBagConstraints.gridx  = 2;
-        gridBagConstraints.gridy  = 0;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(new JLabel(resourceMap.getString("lblUnitView.text")), gridBagConstraints);
@@ -161,13 +161,13 @@ public final class HangarTab extends CampaignGuiTab {
         choiceUnitView = new JComboBox<>(unitViewModel);
         choiceUnitView.setSelectedIndex(UV_GENERAL);
         choiceUnitView.addActionListener(ev -> changeUnitView());
-        gridBagConstraints         = new GridBagConstraints();
-        gridBagConstraints.gridx   = 3;
-        gridBagConstraints.gridy   = 0;
-        gridBagConstraints.fill    = GridBagConstraints.NONE;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.anchor  = GridBagConstraints.WEST;
-        gridBagConstraints.insets  = new Insets(5, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(choiceUnitView, gridBagConstraints);
 
         unitModel = new UnitTableModel(getCampaign());
@@ -214,12 +214,12 @@ public final class HangarTab extends CampaignGuiTab {
         splitUnit.setOneTouchExpandable(true);
         splitUnit.setResizeWeight(1.0);
         splitUnit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, pce -> refreshUnitView());
-        gridBagConstraints.gridx     = 0;
-        gridBagConstraints.gridy     = 1;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 6;
-        gridBagConstraints.fill      = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx   = 1.0;
-        gridBagConstraints.weighty   = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
         add(splitUnit, gridBagConstraints);
 
         UnitTableMouseAdapter.connect(getCampaignGui(), unitTable, unitModel, splitUnit);
@@ -273,11 +273,11 @@ public final class HangarTab extends CampaignGuiTab {
                     return true;
                 }
                 UnitTableModel unitModel = entry.getModel();
-                Unit           unit      = unitModel.getUnit(entry.getIdentifier());
+                Unit unit = unitModel.getUnit(entry.getIdentifier());
 
                 if (nGroup < UnitType.SIZE) {
-                    Entity en   = unit.getEntity();
-                    int    type = -1;
+                    Entity en = unit.getEntity();
+                    int type = -1;
                     if (en != null) {
                         type = en.getUnitType();
                     }
@@ -311,7 +311,7 @@ public final class HangarTab extends CampaignGuiTab {
     }
 
     public void changeUnitView() {
-        int               view        = choiceUnitView.getSelectedIndex();
+        int view = choiceUnitView.getSelectedIndex();
         XTableColumnModel columnModel = (XTableColumnModel) unitTable.getColumnModel();
         unitTable.setRowHeight(UIUtil.scaleForGUI(15));
 
@@ -416,6 +416,8 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN),
                   getCampaign().getCampaignOptions().isPayForMaintain());
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN_CYCLE),
+                  getCampaign().getCampaignOptions().isCheckMaintenance());
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), true);
@@ -473,7 +475,7 @@ public final class HangarTab extends CampaignGuiTab {
 
     public void refreshUnitList() {
         UUID selectedUUID = null;
-        int  selectedRow  = unitTable.getSelectedRow();
+        int selectedRow = unitTable.getSelectedRow();
         if (selectedRow != -1) {
             Unit u = unitModel.getUnit(unitTable.convertRowIndexToModel(selectedRow));
             if (null != u) {
@@ -493,7 +495,7 @@ public final class HangarTab extends CampaignGuiTab {
         getCampaignGui().refreshLab();
     }
 
-    private ActionScheduler unitListScheduler   = new ActionScheduler(this::refreshUnitList);
+    private ActionScheduler unitListScheduler = new ActionScheduler(this::refreshUnitList);
     private ActionScheduler filterUnitScheduler = new ActionScheduler(this::filterUnits);
 
     @Subscribe

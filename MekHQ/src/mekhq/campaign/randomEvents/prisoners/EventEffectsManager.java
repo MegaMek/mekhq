@@ -242,9 +242,7 @@ public class EventEffectsManager {
      */
     String eventEffectPrisonerCapacity(EventResult result) {
         final int magnitude = result.magnitude();
-        int currentTemporarilyPrisonerCapacity = campaign.getTemporaryPrisonerCapacity();
-
-        campaign.setTemporaryPrisonerCapacity(currentTemporarilyPrisonerCapacity + magnitude);
+        campaign.changeTemporaryPrisonerCapacity(magnitude);
 
         String colorOpen = magnitude > 0 ?
                                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()) :

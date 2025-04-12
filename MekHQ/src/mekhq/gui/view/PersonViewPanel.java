@@ -33,6 +33,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
+import static mekhq.campaign.personnel.skills.SkillType.RP_ONLY_TAG;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 import static org.jfree.chart.ChartColor.DARK_BLUE;
 import static org.jfree.chart.ChartColor.DARK_RED;
@@ -65,6 +66,7 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.logging.MMLogger;
+import megamek.utilities.ImageUtilities;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -102,7 +104,7 @@ import mekhq.gui.utilities.WrapLayout;
 public class PersonViewPanel extends JScrollablePanel {
     private static final MMLogger logger = MMLogger.create(PersonViewPanel.class);
 
-    private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 4;
+    private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 3;
 
     private final CampaignGUI gui;
 
@@ -406,13 +408,18 @@ public class PersonViewPanel extends JScrollablePanel {
                 int awardTierCount = getAwardTierCount(award, maximumTiers);
 
                 String ribbonFileName = award.getRibbonFileName(awardTierCount);
+                String directory = award.getSet() + "/ribbons/";
 
-                ribbon = (Image) MHQStaticDirectoryManager.getAwardIcons()
-                                       .getItem(award.getSet() + "/ribbons/", ribbonFileName);
+                ribbon = (Image) MHQStaticDirectoryManager.getAwardIcons().getItem(directory, ribbonFileName);
                 if (ribbon == null) {
+                    logger.warn("No ribbon icon found for award: {}", directory + ribbonFileName);
                     continue;
                 }
-                ribbon = ribbon.getScaledInstance(25, 8, Image.SCALE_DEFAULT);
+
+                ImageIcon ribbonAsImageIcon = new ImageIcon(ribbon);
+                ribbonAsImageIcon = ImageUtilities.scaleImageIcon(ribbonAsImageIcon, 8, false);
+                ribbon = ribbonAsImageIcon.getImage();
+
                 ribbonLabel.setIcon(new ImageIcon(ribbon));
                 ribbonLabel.setToolTipText(award.getTooltip(campaign.getCampaignOptions(), person));
                 rowRibbonsBox.add(ribbonLabel, 0);
@@ -479,23 +486,17 @@ public class PersonViewPanel extends JScrollablePanel {
                 int awardTierCount = getAwardTierCount(award, maximumTiers);
 
                 String medalFileName = award.getMedalFileName(awardTierCount);
+                String directory = award.getSet() + "/medals/";
 
-                medal = (Image) MHQStaticDirectoryManager.getAwardIcons()
-                                      .getItem(award.getSet() + "/medals/", medalFileName);
+                medal = (Image) MHQStaticDirectoryManager.getAwardIcons().getItem(directory, medalFileName);
                 if (medal == null) {
+                    logger.warn("No medal icon found for award: {}", directory + medalFileName);
                     continue;
                 }
 
-                int width = medal.getWidth(null);
-                int height = medal.getHeight(null);
-
-                if (width == height) {
-                    medal = medal.getScaledInstance(40, 40, Image.SCALE_FAST);
-                } else if (width < height) {
-                    medal = medal.getScaledInstance(20, 40, Image.SCALE_FAST);
-                } else {
-                    medal = medal.getScaledInstance(40, 20, Image.SCALE_FAST);
-                }
+                ImageIcon medalAsImageIcon = new ImageIcon(medal);
+                medalAsImageIcon = ImageUtilities.scaleImageIcon(medalAsImageIcon, 40, false);
+                medal = medalAsImageIcon.getImage();
 
                 medalLabel.setIcon(new ImageIcon(medal));
                 medalLabel.setToolTipText(award.getTooltip(campaign.getCampaignOptions(), person));
@@ -527,27 +528,21 @@ public class PersonViewPanel extends JScrollablePanel {
 
             Image misc;
             try {
-                int maximumTiers = award.getNumberOfMedalFiles();
+                int maximumTiers = award.getNumberOfMiscFiles();
                 int awardTierCount = getAwardTierCount(award, maximumTiers);
 
                 String miscFileName = award.getMiscFileName(awardTierCount);
+                String directory = award.getSet() + "/misc/";
 
-                misc = (Image) MHQStaticDirectoryManager.getAwardIcons()
-                                     .getItem(award.getSet() + "/misc/", miscFileName);
+                misc = (Image) MHQStaticDirectoryManager.getAwardIcons().getItem(directory, miscFileName);
                 if (misc == null) {
+                    logger.warn("No misc icon found for award: {}", directory + miscFileName);
                     continue;
                 }
 
-                int width = misc.getWidth(null);
-                int height = misc.getHeight(null);
-
-                if (width == height) {
-                    misc = misc.getScaledInstance(40, 40, Image.SCALE_FAST);
-                } else if (width < height) {
-                    misc = misc.getScaledInstance(20, 40, Image.SCALE_FAST);
-                } else {
-                    misc = misc.getScaledInstance(40, 20, Image.SCALE_FAST);
-                }
+                ImageIcon miscAsImageIcon = new ImageIcon(misc);
+                miscAsImageIcon = ImageUtilities.scaleImageIcon(miscAsImageIcon, 40, false);
+                misc = miscAsImageIcon.getImage();
 
                 miscLabel.setIcon(new ImageIcon(misc));
                 miscLabel.setToolTipText(award.getTooltip(campaign.getCampaignOptions(), person));
@@ -1508,9 +1503,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 }
                 if (type.isRoleplaySkill()) {
                     lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader.roleplay"),
-                          skillName.replaceAll(' ' +
-                                                     Pattern.quote(resourceMap.getString("format.itemHeader.roleplay" +
-                                                                                               ".removal")), "")));
+                          skillName.replaceAll(Pattern.quote(RP_ONLY_TAG), "")));
                 } else {
                     lblName = new JLabel(String.format(resourceMap.getString("format.itemHeader"), skillName));
                 }
@@ -1600,7 +1593,8 @@ public class PersonViewPanel extends JScrollablePanel {
             }
         }
 
-        if (campaign.getCampaignOptions().isUseEdge() && (person.getEdge() > 0)) {
+        int edge = person.getAdjustedEdge();
+        if (campaign.getCampaignOptions().isUseEdge() && (edge != 0)) {
             lblEdge1.setName("lblEdge1");
             lblEdge1.setText(resourceMap.getString("lblEdge1.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -1612,7 +1606,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
             lblEdge2.setName("lblEdge2");
             lblEdge1.setLabelFor(lblEdge2);
-            lblEdge2.setText(Integer.toString(person.getEdge()));
+            lblEdge2.setText("" + person.getCurrentEdge() + '/' + person.getEdge());
             lblEdge2.setToolTipText(person.getEdgeTooltip());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
@@ -1623,27 +1617,6 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSkills.add(lblEdge2, gridBagConstraints);
-
-            if (campaign.getCampaignOptions().isUseSupportEdge() && person.hasSupportRole(true)) {
-                // Add the Edge Available field for support personnel only
-                lblEdgeAvail1.setName("lblEdgeAvail1");
-                lblEdgeAvail1.setText(resourceMap.getString("lblEdgeAvail1.text"));
-                gridBagConstraints = new GridBagConstraints();
-                gridBagConstraints.gridx = 2;
-                gridBagConstraints.gridy = firsty;
-                gridBagConstraints.fill = GridBagConstraints.NONE;
-                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-                pnlSkills.add(lblEdgeAvail1, gridBagConstraints);
-
-                lblEdgeAvail2.setName("lblEdgeAvail2");
-                lblEdgeAvail1.setLabelFor(lblEdgeAvail2);
-                lblEdgeAvail2.setText(Integer.toString(person.getCurrentEdge()));
-                gridBagConstraints.gridx = 3;
-                gridBagConstraints.gridwidth = 1;
-                gridBagConstraints.weightx = 1.0;
-                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-                pnlSkills.add(lblEdgeAvail2, gridBagConstraints);
-            }
             firsty++;
         }
 

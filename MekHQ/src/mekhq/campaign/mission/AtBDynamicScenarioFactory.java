@@ -34,8 +34,10 @@ import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.UnitType.*;
+import static megamek.common.WeaponType.CLASS_ARTILLERY;
 import static megamek.common.planetaryconditions.Atmosphere.THIN;
 import static megamek.common.planetaryconditions.Wind.TORNADO_F4;
+import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.mission.AtBScenario.selectBotTeamCommanders;
 import static mekhq.campaign.mission.Scenario.T_GROUND;
@@ -68,6 +70,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.containers.MunitionTree;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.WeaponMounted;
 import megamek.common.icons.Camouflage;
 import megamek.common.planetaryconditions.Atmosphere;
 import megamek.common.planetaryconditions.Wind;
@@ -1062,6 +1065,12 @@ public class AtBDynamicScenarioFactory {
         if (unidentifiedThirdPartyPresent) {
             generatedForce.setCamouflage(AtBContract.pickRandomCamouflage(currentDate.getYear(), factionCode));
         }
+
+        boolean isDeployOffBoard = forceTemplate.getDeployOffboard();
+        if (isDeployOffBoard) {
+            validateOffBoardCapabilities(generatedEntities);
+        }
+
         scenario.addBotForce(generatedForce, forceTemplate, campaign);
 
         if (!contract.isBatchallAccepted()) {
@@ -1230,6 +1239,46 @@ public class AtBDynamicScenarioFactory {
         }
 
         return generatedLanceCount;
+    }
+
+    /**
+     * Validates whether a force contains the required artillery weapons to deploy off-board, adjusting deployment
+     * settings if necessary.
+     *
+     * <p>This method iterates through the generated entities in a force, checking if they have at least one weapon
+     * classified as artillery. If any entity in the force doesn't have an artillery weapon, the entire force is moved
+     * on-board, as forces cannot be split between on-board and off-board deployments.</p>
+     *
+     * @param generatedEntities A list of {@link Entity} objects representing the units generated for the force. Each
+     *                          entity and its weapon list will be checked for artillery capability.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public static void validateOffBoardCapabilities(List<Entity> generatedEntities) {
+        for (Entity entity : generatedEntities) {
+            boolean hasArtillery = false;
+            for (WeaponMounted weapon : entity.getTotalWeaponList()) {
+                WeaponType type = weapon.getType();
+
+                if (type == null) {
+                    continue;
+                }
+
+                int attackClass = type.getAtClass();
+
+                if (attackClass == CLASS_ARTILLERY) {
+                    hasArtillery = true;
+                    break;
+                }
+            }
+
+            if (!hasArtillery) {
+                logger.info("{} was meant to deploy off board, but they don't have an artillery weapon." +
+                                  " Moving them on board.", entity.getDisplayName());
+                entity.setOffBoard(0, OffBoardDirection.NONE);
+            }
+        }
     }
 
     /**
@@ -1891,7 +1940,7 @@ public class AtBDynamicScenarioFactory {
     /**
      * Use the force generator system to randomly select a unit based on parameters
      *
-     * @param faction     The faction code to use for locating the correct RAT and assigning a crew name
+     * @param factionCode The faction code to use for locating the correct RAT and assigning a crew name
      * @param skill       The {@link SkillLevel} of the overall force.
      * @param quality     The equipment rating of the force.
      * @param unitType    The {@link UnitType} constant of the type of unit to generate.
@@ -1901,20 +1950,23 @@ public class AtBDynamicScenarioFactory {
      *
      * @return A randomly selected Entity from the parameters specified, with crew. May return null.
      */
-    public static @Nullable Entity getEntity(String faction, SkillLevel skill, int quality, int unitType,
+    public static @Nullable Entity getEntity(String factionCode, SkillLevel skill, int quality, int unitType,
           int weightClass, @Nullable Collection<MissionRole> rolesByType, Campaign campaign) {
         MekSummary unitData;
 
         // Set up random unit generation parameters
         UnitGeneratorParameters params = new UnitGeneratorParameters();
-        params.setFaction(faction);
+        params.setFaction(factionCode);
         params.setQuality(quality);
         params.setUnitType(unitType);
         params.setYear(campaign.getGameYear());
         params.setMissionRoles(rolesByType);
 
-        // This filter is to ensure we don't generate trailers or other units that cannot move
-        if (unitType != GUN_EMPLACEMENT) {
+        if (filterOutClanTech(campaign, isFactionClan(factionCode))) {
+            params.setFilter(mekSummary -> !mekSummary.isClan() &&
+                                                 (unitType == GUN_EMPLACEMENT || mekSummary.getWalkMp() >= 1));
+        } else if (unitType != GUN_EMPLACEMENT) {
+            // This filter is to ensure we don't generate trailers or other units that cannot move
             params.setFilter(mekSummary -> mekSummary.getWalkMp() >= 1);
         }
 
@@ -1933,7 +1985,7 @@ public class AtBDynamicScenarioFactory {
             return null;
         }
 
-        return createEntityWithCrew(faction, skill, campaign, unitData);
+        return createEntityWithCrew(factionCode, skill, campaign, unitData);
     }
 
     /**
@@ -1997,8 +2049,13 @@ public class AtBDynamicScenarioFactory {
         if (campaign.getCampaignOptions().isOpForUsesVTOLs()) {
             params.getMovementModes().addAll(IUnitGenerator.MIXED_TANK_VTOL);
         } else {
-            params.setFilter(v -> !v.getUnitType().equals("VTOL"));
+            if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
+                params.setFilter(mekSummary -> !mekSummary.isClan() && !mekSummary.getUnitType().equals("VTOL"));
+            } else {
+                params.setFilter(mekSummary -> !mekSummary.getUnitType().equals("VTOL"));
+            }
         }
+
         MekSummary unitData = campaign.getUnitGenerator().generate(params);
 
         if (unitData == null) {
@@ -2016,6 +2073,52 @@ public class AtBDynamicScenarioFactory {
         }
 
         return createEntityWithCrew(params.getFaction(), skill, campaign, unitData);
+    }
+
+    /**
+     * Filters out Clan technology based on the campaign timeline and unit type.
+     *
+     * <p>Special handling for pre-Tukayyid, where Clan units shouldn't be appearing in non-Clan forces. Clan tech,
+     * at that time, would be closely guarded and not something we want OpFors to be generating with.</p>
+     *
+     * @param campaign The campaign object which contains timeline details.
+     * @param isClan   A boolean indicating whether the unit is Clan technology.
+     *
+     * @return {@code true} if the unit should be filtered out (not Clan and before the Battle of Tukayyid),
+     *       {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    private static boolean filterOutClanTech(Campaign campaign, boolean isClan) {
+        boolean isBeforeTukayyid = campaign.getLocalDate().isBefore(BATTLE_OF_TUKAYYID);
+
+        return isBeforeTukayyid && !isClan;
+    }
+
+    /**
+     * Checks whether a given faction, identified by its name or identifier, belongs to the Clan faction group.
+     *
+     * <p>If the specified faction code cannot be parsed into a {@link Faction}, a warning is logged and {@code false}
+     * is returned.</p>
+     *
+     * @param params the name or identifier of the faction to check
+     *
+     * @return {@code true} if the specified faction exists and is classified as a Clan faction; {@code false} if the
+     *       faction does not exist or is not a Clan faction
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    private static boolean isFactionClan(String params) {
+        Faction faction = Factions.getInstance().getFaction(params);
+
+        if (faction == null) {
+            logger.warn("AtBDynamicScenarioFactory#isFactionClan) Faction {} does not exist.", params);
+            return false;
+        }
+
+        return faction.isClan();
     }
 
     /**
@@ -2041,13 +2144,15 @@ public class AtBDynamicScenarioFactory {
         MekSummary unitData = campaign.getUnitGenerator().generate(params);
 
         if (unitData == null) {
-
             // If XCT troops were requested but none were found, generate without the role
             if (useTempXCT && params.getMissionRoles().contains(XCT)) {
                 noXCTParams = params.clone();
-                noXCTParams.getMissionRoles().remove(XCT);
-                unitData = campaign.getUnitGenerator().generate(noXCTParams);
-                temporaryXCT = true;
+
+                if (noXCTParams != null) {
+                    noXCTParams.getMissionRoles().remove(XCT);
+                    unitData = campaign.getUnitGenerator().generate(noXCTParams);
+                    temporaryXCT = true;
+                }
             }
             if (unitData == null) {
                 if (!params.getMissionRoles().isEmpty()) {
@@ -2212,16 +2317,21 @@ public class AtBDynamicScenarioFactory {
                 while (remainingCount > 0) {
 
                     // Set base random generation parameters
+                    logger.info("Generating infantry bay for params {}", params);
                     UnitGeneratorParameters newParams = params.clone();
-                    newParams.clearMovementModes();
-                    newParams.setWeightClass(AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED);
+                    if (newParams == null) {
+                        logger.info("newParams is null");
+                    } else {
+                        newParams.clearMovementModes();
+                        newParams.setWeightClass(AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED);
+                    }
 
                     Entity transportedUnit = null;
                     Entity mechanizedBAUnit = null;
 
                     // If a roll against the battle armor target number succeeds, try to generate a
                     // battle armor unit first
-                    if (d6(2) >= infantryToBAUpgradeTNs[params.getQuality()]) {
+                    if (newParams != null && d6(2) >= infantryToBAUpgradeTNs[params.getQuality()]) {
                         newParams.setMissionRoles(requiredRoles.getOrDefault(BATTLE_ARMOR, new HashSet<>()));
                         transportedUnit = generateTransportedBAUnit(newParams, bayCapacity, skill, false, campaign);
 
@@ -2238,7 +2348,7 @@ public class AtBDynamicScenarioFactory {
 
                     // If a battle armor unit wasn't generated and conditions permit, try generating
                     // conventional infantry. Generate air assault infantry for VTOL transports.
-                    if (transportedUnit == null && allowInfantry) {
+                    if (newParams != null && transportedUnit == null && allowInfantry) {
                         newParams.setMissionRoles(requiredRoles.getOrDefault(INFANTRY, new HashSet<>()));
                         if (transport.getUnitType() == VTOL && !newParams.getMissionRoles().contains(XCT)) {
                             UnitGeneratorParameters paratrooperParams = newParams.clone();
@@ -2303,10 +2413,15 @@ public class AtBDynamicScenarioFactory {
      *
      * @return Generated infantry unit, or null if one cannot be generated
      */
-    private static Entity generateTransportedInfantryUnit(UnitGeneratorParameters params, double bayCapacity,
+    private static @Nullable Entity generateTransportedInfantryUnit(UnitGeneratorParameters params, double bayCapacity,
           SkillLevel skill, boolean useTempXCT, Campaign campaign) {
 
         UnitGeneratorParameters newParams = params.clone();
+        if (newParams == null) {
+            logger.warn("newParams is null");
+            return null;
+        }
+
         newParams.setUnitType(INFANTRY);
         MekSummary unitData;
         boolean temporaryXCT = false;
@@ -2317,13 +2432,20 @@ public class AtBDynamicScenarioFactory {
         // which may
         // include other types
         if (bayCapacity <= IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT) {
-
             if (newParams.getMissionRoles().contains(PARATROOPER)) {
                 newParams.setMovementModes(IUnitGenerator.ALL_INFANTRY_MODES);
             } else {
                 newParams.getMovementModes().add(EntityMovementMode.INF_LEG);
             }
-            newParams.setFilter(inf -> inf.getTons() <= IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT);
+
+            if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
+                params.setFilter(mekSummary -> !mekSummary.isClan() &&
+                                                     mekSummary.getTons() <=
+                                                           IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT);
+            } else {
+                params.setFilter(mekSummary -> mekSummary.getTons() <= IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT);
+            }
+
             unitData = campaign.getUnitGenerator().generate(newParams);
 
             if (unitData == null) {
@@ -2331,9 +2453,12 @@ public class AtBDynamicScenarioFactory {
                 // If XCT troops were requested but none were found, generate without the role
                 if (useTempXCT && newParams.getMissionRoles().contains(XCT)) {
                     noXCTParams = newParams.clone();
-                    noXCTParams.getMissionRoles().remove(XCT);
-                    unitData = campaign.getUnitGenerator().generate(noXCTParams);
-                    temporaryXCT = true;
+
+                    if (noXCTParams != null) {
+                        noXCTParams.getMissionRoles().remove(XCT);
+                        unitData = campaign.getUnitGenerator().generate(noXCTParams);
+                        temporaryXCT = true;
+                    }
                 }
                 if (unitData == null) {
                     return null;
@@ -2354,7 +2479,13 @@ public class AtBDynamicScenarioFactory {
 
         } else {
             newParams.getMovementModes().addAll(IUnitGenerator.ALL_INFANTRY_MODES);
-            newParams.setFilter(inf -> inf.getTons() <= bayCapacity);
+
+            if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
+                params.setFilter(mekSummary -> !mekSummary.isClan() && mekSummary.getTons() <= bayCapacity);
+            } else {
+                params.setFilter(mekSummary -> mekSummary.getTons() <= bayCapacity);
+            }
+
             unitData = campaign.getUnitGenerator().generate(newParams);
 
             if (unitData == null) {
@@ -2362,9 +2493,12 @@ public class AtBDynamicScenarioFactory {
                 // If XCT troops were requested but none were found, generate without the role
                 if (useTempXCT && newParams.getMissionRoles().contains(XCT)) {
                     noXCTParams = newParams.clone();
-                    noXCTParams.getMissionRoles().remove(XCT);
-                    unitData = campaign.getUnitGenerator().generate(noXCTParams);
-                    temporaryXCT = true;
+
+                    if (noXCTParams != null) {
+                        noXCTParams.getMissionRoles().remove(XCT);
+                        unitData = campaign.getUnitGenerator().generate(noXCTParams);
+                        temporaryXCT = true;
+                    }
                 }
                 if (unitData == null) {
                     return null;
@@ -2394,7 +2528,7 @@ public class AtBDynamicScenarioFactory {
      *
      * @return Generated battle armor entity with crew, null if one cannot be generated
      */
-    private static Entity generateTransportedBAUnit(UnitGeneratorParameters params, double bayCapacity,
+    private static @Nullable Entity generateTransportedBAUnit(UnitGeneratorParameters params, double bayCapacity,
           SkillLevel skill, boolean retryAsMechanized, Campaign campaign) {
 
         // Ensure a proposed non-mechanized carrier has enough bay space
@@ -2403,24 +2537,34 @@ public class AtBDynamicScenarioFactory {
         }
 
         UnitGeneratorParameters newParams = params.clone();
-        newParams.setUnitType(BATTLE_ARMOR);
+        if (newParams != null) {
+            newParams.setUnitType(BATTLE_ARMOR);
+            newParams.getMovementModes().addAll(IUnitGenerator.ALL_BATTLE_ARMOR_MODES);
 
-        newParams.getMovementModes().addAll(IUnitGenerator.ALL_BATTLE_ARMOR_MODES);
-
-        // Set the parameters to filter out types that are too heavy for the provided
-        // bay space, or those that cannot use mechanized BA travel
-        if (bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT) {
-            newParams.setFilter(inf -> inf.getTons() <= bayCapacity);
-        } else {
-            newParams.addMissionRole(MECHANIZED_BA);
+            // Set the parameters to filter out types that are too heavy for the provided
+            // bay space, or those that cannot use mechanized BA travel
+            if (bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT) {
+                if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
+                    params.setFilter(mekSummary -> !mekSummary.isClan() && mekSummary.getTons() <= bayCapacity);
+                } else {
+                    params.setFilter(mekSummary -> mekSummary.getTons() <= bayCapacity);
+                }
+            } else {
+                newParams.addMissionRole(MECHANIZED_BA);
+            }
         }
 
         MekSummary unitData = campaign.getUnitGenerator().generate(newParams);
 
         // If generating for an internal bay fails, try again as mechanized if the flag is set
         if (unitData == null) {
-            if (bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT && retryAsMechanized) {
-                newParams.setFilter(null);
+            if (newParams != null && bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT && retryAsMechanized) {
+                if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
+                    params.setFilter(mekSummary -> !mekSummary.isClan());
+                } else {
+                    newParams.setFilter(null);
+                }
+
                 newParams.addMissionRole((MECHANIZED_BA));
                 unitData = campaign.getUnitGenerator().generate(newParams);
             }
@@ -2430,7 +2574,11 @@ public class AtBDynamicScenarioFactory {
         }
 
         // Add an appropriate crew
-        return createEntityWithCrew(newParams.getFaction(), skill, campaign, unitData);
+        if (newParams != null && unitData != null) {
+            return createEntityWithCrew(newParams.getFaction(), skill, campaign, unitData);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -3649,11 +3797,15 @@ public class AtBDynamicScenarioFactory {
     private static void setBotForceParameters(BotForce generatedForce, ScenarioForceTemplate forceTemplate,
           ForceAlignment forceAlignment, AtBContract contract) {
         if (forceAlignment == ForceAlignment.Allied) {
-            generatedForce.setName(String.format("%s %s", contract.getAllyBotName(), forceTemplate.getForceName()));
+            generatedForce.setName(java.lang.String.format("%s %s",
+                  contract.getAllyBotName(),
+                  forceTemplate.getForceName()));
             generatedForce.setColour(contract.getAllyColour());
             generatedForce.setCamouflage(contract.getAllyCamouflage().clone());
         } else if (forceAlignment == ForceAlignment.Opposing) {
-            generatedForce.setName(String.format("%s %s", contract.getEnemyBotName(), forceTemplate.getForceName()));
+            generatedForce.setName(java.lang.String.format("%s %s",
+                  contract.getEnemyBotName(),
+                  forceTemplate.getForceName()));
             generatedForce.setColour(contract.getEnemyColour());
             generatedForce.setCamouflage(contract.getEnemyCamouflage().clone());
         } else {
