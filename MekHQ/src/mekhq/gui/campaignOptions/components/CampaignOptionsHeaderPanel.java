@@ -27,8 +27,10 @@
  */
 package mekhq.gui.campaignOptions.components;
 
+import static java.awt.Color.BLACK;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.utilities.ImageUtilities.scaleImageIcon;
+import static megamek.utilities.ImageUtilities.addTintToImageIcon;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 
 import java.awt.GridBagConstraints;
 import java.util.ResourceBundle;
@@ -88,6 +90,7 @@ public class CampaignOptionsHeaderPanel extends JPanel {
         // Load and scale the image using the provided file path
         ImageIcon imageIcon = new ImageIcon(imageAddress);
         imageIcon = scaleImageIcon(imageIcon, 100, true);
+        imageIcon = addTintToImageIcon(imageIcon.getImage(), BLACK);
 
         // Create a JLabel to display the image in the panel
         JLabel lblImage = new JLabel(imageIcon);

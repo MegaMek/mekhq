@@ -27,14 +27,6 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import mekhq.MekHQ;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
-import mekhq.campaign.personnel.divorce.RandomDivorce;
-import org.junit.jupiter.api.Test;
-
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -42,12 +34,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ResourceBundle;
+
+import mekhq.MekHQ;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
+import mekhq.campaign.personnel.divorce.RandomDivorce;
+import org.junit.jupiter.api.Test;
+
 public class RandomDivorceMethodTest {
     //region Variable Declarations
     private static final RandomDivorceMethod[] methods = RandomDivorceMethod.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Getters
@@ -101,9 +101,31 @@ public class RandomDivorceMethodTest {
 
     @Test
     public void testToStringOverride() {
-        assertEquals(resources.getString("RandomDivorceMethod.NONE.text"),
-                RandomDivorceMethod.NONE.toString());
+        assertEquals(resources.getString("RandomDivorceMethod.NONE.text"), RandomDivorceMethod.NONE.toString());
         assertEquals(resources.getString("RandomDivorceMethod.DICE_ROLL.text"),
-                RandomDivorceMethod.DICE_ROLL.toString());
+              RandomDivorceMethod.DICE_ROLL.toString());
+    }
+
+    @Test
+    public void testFromStringValidEnums() {
+        assertEquals(RandomDivorceMethod.NONE, RandomDivorceMethod.fromString("NONE"));
+        assertEquals(RandomDivorceMethod.DICE_ROLL, RandomDivorceMethod.fromString("DICE_ROLL"));
+        assertEquals(RandomDivorceMethod.DICE_ROLL,
+              RandomDivorceMethod.fromString("dice roll")); // Case and space insensitive
+    }
+
+    @Test
+    public void testFromStringInvalidEnums() {
+        assertEquals(RandomDivorceMethod.NONE, RandomDivorceMethod.fromString(null));
+        assertEquals(RandomDivorceMethod.NONE, RandomDivorceMethod.fromString(""));
+        assertEquals(RandomDivorceMethod.NONE, RandomDivorceMethod.fromString("InvalidMethod"));
+    }
+
+    @Test
+    public void testFromStringOrdinalNumbers() {
+        assertEquals(RandomDivorceMethod.NONE, RandomDivorceMethod.fromString("0")); // Ordinal mapping
+        assertEquals(RandomDivorceMethod.DICE_ROLL, RandomDivorceMethod.fromString("1"));
+        assertEquals(RandomDivorceMethod.NONE,
+              RandomDivorceMethod.fromString("2")); // Non-existent ordinal returns default
     }
 }

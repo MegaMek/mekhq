@@ -30,11 +30,14 @@ package mekhq.campaign.randomEvents.prisoners;
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static mekhq.campaign.force.ForceType.SECURITY;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_POISON_RESISTANCE;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -60,10 +63,10 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
@@ -239,9 +242,7 @@ public class EventEffectsManager {
      */
     String eventEffectPrisonerCapacity(EventResult result) {
         final int magnitude = result.magnitude();
-        int currentTemporarilyPrisonerCapacity = campaign.getTemporaryPrisonerCapacity();
-
-        campaign.setTemporaryPrisonerCapacity(currentTemporarilyPrisonerCapacity + magnitude);
+        campaign.changeTemporaryPrisonerCapacity(magnitude);
 
         String colorOpen = magnitude > 0 ?
                                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()) :
@@ -786,7 +787,7 @@ public class EventEffectsManager {
         }
 
         final boolean isGuard = result.isGuard();
-        final int magnitude = result.magnitude();
+        int magnitude = result.magnitude();
 
         Person target = getRandomTarget(isGuard);
 
@@ -794,8 +795,7 @@ public class EventEffectsManager {
             return "";
         }
 
-        boolean hasGlassJaw = target.getOptions().booleanOption(FLAW_GLASS_JAW);
-        target.changeFatigue(hasGlassJaw ? magnitude * 2 : magnitude);
+        target.changeFatigue(magnitude);
 
         if (campaign.getCampaignOptions().isUseFatigue()) {
             Fatigue.processFatigueActions(campaign, target);
@@ -846,8 +846,7 @@ public class EventEffectsManager {
         }
 
         for (Person target : targets) {
-            boolean hasGlassJaw = target.getOptions().booleanOption(FLAW_GLASS_JAW);
-            target.changeFatigue(hasGlassJaw ? magnitude * 2 : magnitude);
+            target.changeFatigue(magnitude);
 
             if (campaign.getCampaignOptions().isUseFatigue()) {
                 Fatigue.processFatigueActions(campaign, target);
@@ -1075,8 +1074,12 @@ public class EventEffectsManager {
             Person target = getRandomItem(potentialTargets);
 
             int fatigueChange = d6(magnitude);
-            boolean hasGlassJaw = target.getOptions().booleanOption(FLAW_GLASS_JAW);
-            target.changeFatigue(hasGlassJaw ? fatigueChange * 2 : fatigueChange);
+
+            if (target.getOptions().booleanOption(ATOW_POISON_RESISTANCE)) {
+                continue;
+            }
+
+            target.changeFatigue(fatigueChange);
 
             if (campaign.getCampaignOptions().isUseFatigue()) {
                 Fatigue.processFatigueActions(campaign, target);

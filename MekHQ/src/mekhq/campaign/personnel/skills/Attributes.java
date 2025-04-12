@@ -28,11 +28,21 @@
 package mekhq.campaign.personnel.skills;
 
 import static megamek.codeUtilities.MathUtility.clamp;
+import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_BODY;
+import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_CHARISMA;
+import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_DEXTERITY;
+import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_INTELLIGENCE;
+import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_REFLEXES;
+import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_STRENGTH;
+import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_WILLPOWER;
+import static mekhq.campaign.personnel.PersonnelOptions.MUTATION_FREAKISH_STRENGTH;
 
 import java.io.PrintWriter;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -118,25 +128,20 @@ public class Attributes {
         charisma = DEFAULT_ATTRIBUTE_SCORE;
     }
 
+
     /**
-     * Constructs a new {@code Attributes} object with the specified attribute values.
+     * Creates an instance of {@code Attributes} with specified values for each {@link SkillAttribute}.
      *
-     * @param strength     the {@link SkillAttribute#STRENGTH} value of the character, representing physical power.
-     * @param body         the {@link SkillAttribute#BODY} value of the character, representing endurance and physical
-     *                     resilience.
-     * @param reflexes     the {@link SkillAttribute#REFLEXES} value of the character, representing reaction speed and
-     *                     agility.
-     * @param dexterity    the {@link SkillAttribute#DEXTERITY} value of the character, representing skillfulness and
-     *                     precision.
-     * @param intelligence the {@link SkillAttribute#INTELLIGENCE} value of the character, representing cognitive
-     *                     ability and reasoning.
-     * @param willpower    the {@link SkillAttribute#WILLPOWER} value of the character, representing mental strength and
-     *                     determination.
-     * @param charisma     the {@link SkillAttribute#CHARISMA} value of the character, representing persuasiveness and
-     *                     social skills.
+     * @param strength     The initial value for the strength {@link SkillAttribute}.
+     * @param body         The initial value for the body {@link SkillAttribute}.
+     * @param reflexes     The initial value for the reflexes {@link SkillAttribute}.
+     * @param dexterity    The initial value for the dexterity {@link SkillAttribute}.
+     * @param intelligence The initial value for the intelligence {@link SkillAttribute}.
+     * @param willpower    The initial value for the willpower {@link SkillAttribute}.
+     * @param charisma     The initial value for the charisma {@link SkillAttribute}.
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
     public Attributes(int strength, int body, int reflexes, int dexterity, int intelligence, int willpower,
           int charisma) {
@@ -147,6 +152,28 @@ public class Attributes {
         this.intelligence = intelligence;
         this.willpower = willpower;
         this.charisma = charisma;
+    }
+
+    /**
+     * Initializes all attributes with the same specified value.
+     *
+     * <p>This constructor is primarily intended to facilitate testing by allowing all attribute fields to be set
+     * to the same value with a single argument.</p>
+     *
+     * @param singleValue The value to be assigned to all attribute fields, such as strength, body, reflexes, dexterity,
+     *                    intelligence, willpower, and charisma.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public Attributes(int singleValue) {
+        this.strength = singleValue;
+        this.body = singleValue;
+        this.reflexes = singleValue;
+        this.dexterity = singleValue;
+        this.intelligence = singleValue;
+        this.willpower = singleValue;
+        this.charisma = singleValue;
     }
 
     // Getters and Setters
@@ -178,158 +205,252 @@ public class Attributes {
     }
 
     /**
-     * @return the current strength value.
+     * Retrieves the score for a given attribute.
      *
-     * @since 0.50.5
+     * <p>If an invalid or unsupported {@link SkillAttribute} is provided, this method logs an error and returns a
+     * default value of {@link Attributes#DEFAULT_ATTRIBUTE_SCORE}.</p>
+     *
+     * @param attribute The {@link SkillAttribute} whose score should be retrieved.
+     *
+     * @return The score corresponding to the specified skill attribute, or {@link Attributes#DEFAULT_ATTRIBUTE_SCORE}
+     *       if the attribute is invalid.
+     *
+     * @author Illiani
+     * @since 0.50.05
      */
+    public int getAttributeScore(SkillAttribute attribute) {
+        if (attribute == null || attribute.isNone()) {
+            logger.warn("(getAttributeScore) attribute is null or NONE.");
+            return DEFAULT_ATTRIBUTE_SCORE;
+        }
+
+        return switch (attribute) {
+            case STRENGTH -> strength;
+            case BODY -> body;
+            case REFLEXES -> reflexes;
+            case DEXTERITY -> dexterity;
+            case INTELLIGENCE -> intelligence;
+            case WILLPOWER -> willpower;
+            case CHARISMA -> charisma;
+            default -> {
+                logger.error("(getAttributeScore) Invalid attribute requested: {}", attribute);
+                yield DEFAULT_ATTRIBUTE_SCORE;
+            }
+        };
+    }
+
+    /**
+     * Sets the score for a specific skill attribute while respecting its attribute cap.
+     *
+     * <p>This method updates the score of the provided {@link SkillAttribute} to the specified value. The score is
+     * clamped to ensure it remains within the range of {@link Attributes#MINIMUM_ATTRIBUTE_SCORE} and the calculated
+     * cap for the attribute.</p>
+     *
+     * <p>The attribute cap is determined using the provided {@link Phenotype} and may be further influenced by
+     * {@link PersonnelOptions}, such as special abilities or conditions modifying the cap.</p>
+     *
+     * <p>If the provided {@link SkillAttribute} is <code>null</code>, represents "NONE", or is unrecognized,
+     * the method logs a warning or error and exits without making any changes.</p>
+     *
+     * @param phenotype The {@link Phenotype} object used to derive the attribute cap for the skill.
+     * @param options   The {@link PersonnelOptions} containing context-specific modifiers (e.g., special abilities).
+     * @param attribute The {@link SkillAttribute} representing the attribute to update. Must not be <code>null</code>
+     *                  or "NONE".
+     * @param score     The new score to set for the specified attribute. This value will be clamped within
+     *                  {@link Attributes#MINIMUM_ATTRIBUTE_SCORE} and the calculated cap.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public void setAttributeScore(Phenotype phenotype, PersonnelOptions options, SkillAttribute attribute, int score) {
+        if (attribute == null || attribute.isNone()) {
+            logger.warn("(setAttributeScore) attribute is null or NONE.");
+            return;
+        }
+
+        int cap = getAttributeCap(phenotype, options, attribute);
+
+        // This ensures we never fall outside the hard boundaries, no matter how many SPAs or other weirdness the
+        // player piles on.
+        cap = clamp(cap, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+
+        switch (attribute) {
+            case STRENGTH -> strength = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
+            case BODY -> body = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
+            case REFLEXES -> reflexes = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
+            case DEXTERITY -> dexterity = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
+            case INTELLIGENCE -> intelligence = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
+            case WILLPOWER -> willpower = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
+            case CHARISMA -> charisma = clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
+            default -> logger.error("(setAttributeScore) Invalid attribute requested: {}", attribute);
+        }
+    }
+
+    /**
+     * Determines the maximum allowable value (cap) for the specified skill attribute.
+     *
+     * <p>This method calculates the cap for the given {@link SkillAttribute} based on the provided {@link Phenotype}
+     * and {@link PersonnelOptions}. The base cap is retrieved from the {@code phenotype}, and adjustments are applied
+     * if the character has specific traits (flags in {@code options}) that raise the cap for certain attributes.</p>
+     *
+     * <p>If the attribute is invalid or unrecognized, an error message is logged, and a default value of {@code 0} is
+     * used.</p>
+     *
+     * @param phenotype The {@link Phenotype} that provides the base cap for the given attribute. Must not be
+     *                  <code>null</code>.
+     * @param options   The {@link PersonnelOptions} that may modify the attribute cap based on specific traits. Must
+     *                  not be <code>null</code>.
+     * @param attribute The {@link SkillAttribute} whose maximum value is being determined. Must not be
+     *                  <code>null</code>.
+     *
+     * @return The maximum allowable value (cap) for the given attribute, based on the phenotype and applicable trait
+     *       modifiers.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public int getAttributeCap(Phenotype phenotype, PersonnelOptions options, SkillAttribute attribute) {
+        // This determines the base cap
+        int cap = phenotype.getAttributeCap(attribute);
+
+        // This is where you'd use options to verify if a character has SPAs that modify their maximum attribute score
+        boolean hasExceptionalStrength = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_STRENGTH);
+        boolean hasFreakishStrength = options.booleanOption(MUTATION_FREAKISH_STRENGTH);
+        boolean hasExceptionalBody = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_BODY);
+        boolean hasExceptionalReflexes = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_REFLEXES);
+        boolean hasExceptionalDexterity = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_DEXTERITY);
+        boolean hasExceptionalIntelligence = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_INTELLIGENCE);
+        boolean hasExceptionalWillpower = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_WILLPOWER);
+        boolean hasExceptionalCharisma = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_CHARISMA);
+
+        cap += switch (attribute) {
+            case STRENGTH -> {
+                int modifier = hasExceptionalStrength ? 1 : 0;
+                modifier += hasFreakishStrength ? 1 : 0;
+                yield modifier;
+            }
+            case BODY -> hasExceptionalBody ? 1 : 0;
+            case DEXTERITY -> hasExceptionalReflexes ? 1 : 0;
+            case REFLEXES -> hasExceptionalDexterity ? 1 : 0;
+            case INTELLIGENCE -> hasExceptionalIntelligence ? 1 : 0;
+            case WILLPOWER -> hasExceptionalWillpower ? 1 : 0;
+            case CHARISMA -> hasExceptionalCharisma ? 1 : 0;
+            default -> {
+                logger.error("(setAttributeScore) Invalid attribute requested for cap modifier: {}", attribute);
+                yield 0;
+            }
+        };
+        return cap;
+    }
+
+    /**
+     * @deprecated use {@link #getAttributeScore(SkillAttribute)}  instead
+     */
+    @Deprecated(since = "0.50.5", forRemoval = true)
     public int getStrength() {
         return strength;
     }
 
     /**
-     * Sets the strength attribute, ensuring it is clamped between the defined minimum and maximum values.
-     *
-     * @param strength the new strength value.
-     *
-     * @see #MINIMUM_ATTRIBUTE_SCORE
-     * @see #MAXIMUM_ATTRIBUTE_SCORE
-     * @since 0.50.5
+     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
      */
+    @Deprecated(since = "0.50.5", forRemoval = true)
     public void setStrength(int strength) {
         this.strength = clamp(strength, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
     }
 
     /**
-     * @return the current body value.
-     *
-     * @since 0.50.5
+     * @deprecated use {@link #getAttributeScore(SkillAttribute)}  instead
      */
+    @Deprecated(since = "0.50.5", forRemoval = true)
     public int getBody() {
         return body;
     }
 
-
     /**
-     * Sets the body attribute, ensuring it is clamped between the defined minimum and maximum values.
-     *
-     * @param body the new body value.
-     *
-     * @see #MINIMUM_ATTRIBUTE_SCORE
-     * @see #MAXIMUM_ATTRIBUTE_SCORE
-     * @since 0.50.5
+     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
      */
+    @Deprecated(since = "0.50.5", forRemoval = true)
     public void setBody(int body) {
         this.body = clamp(body, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
     }
 
     /**
-     * @return the current reflexes value.
-     *
-     * @since 0.50.5
+     * @deprecated use {@link #getAttributeScore(SkillAttribute)}  instead
      */
+    @Deprecated(since = "0.50.5", forRemoval = true)
     public int getReflexes() {
         return reflexes;
     }
 
-
     /**
-     * Sets the reflexes attribute, ensuring it is clamped between the defined minimum and maximum values.
-     *
-     * @param reflexes the new reflexes value.
-     *
-     * @see #MINIMUM_ATTRIBUTE_SCORE
-     * @see #MAXIMUM_ATTRIBUTE_SCORE
-     * @since 0.50.5
+     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
      */
+    @Deprecated(since = "0.50.5", forRemoval = true)
     public void setReflexes(int reflexes) {
         this.reflexes = clamp(reflexes, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
     }
 
     /**
-     * @return the current dexterity value.
-     *
-     * @since 0.50.5
+     * @deprecated use {@link #getAttributeScore(SkillAttribute)}  instead
      */
+    @Deprecated(since = "0.50.5", forRemoval = true)
     public int getDexterity() {
         return dexterity;
     }
 
-
     /**
-     * Sets the dexterity attribute, ensuring it is clamped between the defined minimum and maximum values.
-     *
-     * @param dexterity the new dexterity value.
-     *
-     * @see #MINIMUM_ATTRIBUTE_SCORE
-     * @see #MAXIMUM_ATTRIBUTE_SCORE
-     * @since 0.50.5
+     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
      */
+    @Deprecated(since = "0.50.5", forRemoval = true)
     public void setDexterity(int dexterity) {
         this.dexterity = clamp(dexterity, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
     }
 
     /**
-     * @return the current intelligence value.
-     *
-     * @since 0.50.5
+     * @deprecated use {@link #getAttributeScore(SkillAttribute)}  instead
      */
+    @Deprecated(since = "0.50.5", forRemoval = true)
     public int getIntelligence() {
         return intelligence;
     }
 
     /**
-     * Sets the intelligence attribute, ensuring it is clamped between the defined minimum and maximum values.
-     *
-     * @param intelligence the new intelligence value.
-     *
-     * @see #MINIMUM_ATTRIBUTE_SCORE
-     * @see #MAXIMUM_ATTRIBUTE_SCORE
-     * @since 0.50.5
+     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
      */
+    @Deprecated(since = "0.50.5", forRemoval = true)
     public void setIntelligence(int intelligence) {
         this.intelligence = clamp(intelligence, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
     }
 
     /**
-     * @return the current willpower value.
-     *
-     * @since 0.50.5
+     * @deprecated use {@link #getAttributeScore(SkillAttribute)}  instead
      */
+    @Deprecated(since = "0.50.5", forRemoval = true)
     public int getWillpower() {
         return willpower;
     }
 
     /**
-     * Sets the willpower attribute, ensuring it is clamped between the defined minimum and maximum values.
-     *
-     * @param willpower the new willpower value.
-     *
-     * @see #MINIMUM_ATTRIBUTE_SCORE
-     * @see #MAXIMUM_ATTRIBUTE_SCORE
-     * @since 0.50.5
+     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
      */
+    @Deprecated(since = "0.50.5", forRemoval = true)
     public void setWillpower(int willpower) {
         this.willpower = clamp(willpower, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
     }
 
     /**
-     * @return the current charisma value.
-     *
-     * @since 0.50.5
+     * @deprecated use {@link #getAttributeScore(SkillAttribute)}  instead
      */
+    @Deprecated(since = "0.50.5", forRemoval = true)
     public int getCharisma() {
         return charisma;
     }
 
     /**
-     * Sets the charisma attribute, ensuring it is clamped between the defined minimum and maximum values.
-     *
-     * @param charisma the new charisma value.
-     *
-     * @see #MINIMUM_ATTRIBUTE_SCORE
-     * @see #MAXIMUM_ATTRIBUTE_SCORE
-     * @since 0.50.5
+     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
      */
+    @Deprecated(since = "0.50.5", forRemoval = true)
     public void setCharisma(int charisma) {
         this.charisma = clamp(charisma, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
     }
@@ -337,22 +458,82 @@ public class Attributes {
     // Utility Methods
 
     /**
-     * Applies a delta to all attributes, incrementing or decrementing their values by the specified amount while
-     * clamping results within bounds.
+     * Adjusts the scores of all skill attributes by a specified delta.
      *
-     * @param delta the value to add to each attribute. A positive delta will increase the attribute scores, while a
-     *              negative delta will decrease them.
+     * <p>This method iterates through all available {@link SkillAttribute} values and applies the given delta to each,
+     * modifying their scores accordingly. Attribute values are clamped within valid bounds as defined by the
+     * {@code changeAttribute} and {@code setAttributeScore} methods, ensuring no invalid scores are set.</p>
      *
+     * <p>Attributes marked as {@link SkillAttribute#NONE} are skipped during the iteration and are not modified.</p>
+     *
+     * @param phenotype The {@link Phenotype} used to determine the caps for all skill attributes.
+     * @param options   The {@link PersonnelOptions} containing context-specific modifiers that may affect attribute
+     *                  caps.
+     * @param delta     The value to adjust each attribute's score. A positive delta increases the scores, while a
+     *                  negative delta decreases them.
+     *
+     * @author Illiani
      * @since 0.50.5
      */
-    public void changeAllAttributes(int delta) {
-        changeStrength(delta);
-        changeBody(delta);
-        changeReflexes(delta);
-        changeDexterity(delta);
-        changeIntelligence(delta);
-        changeWillpower(delta);
-        changeCharisma(delta);
+    public void changeAllAttributes(Phenotype phenotype, PersonnelOptions options, int delta) {
+        if (phenotype == null) {
+            logger.warn("(changeAllAttributes) phenotype is null.");
+            return;
+        }
+
+        if (options == null) {
+            logger.warn("(changeAllAttributes) options is null.");
+            return;
+        }
+
+        for (SkillAttribute attribute : SkillAttribute.values()) {
+            if (attribute.isNone()) {
+                continue;
+            }
+
+            changeAttribute(phenotype, options, attribute, delta);
+        }
+    }
+
+    /**
+     * Adjusts the score of a specified skill attribute by a given delta.
+     *
+     * <p>This method modifies the score of the provided {@link SkillAttribute} by adding the given delta to its
+     * current score. The updated score is passed to
+     * {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} to ensure it complies with the
+     * applicable constraints and caps defined by the provided {@link Phenotype} and {@link PersonnelOptions}.</p>
+     *
+     * <p>If the {@code phenotype}, {@code options}, or {@code attribute} is <code>null</code>, or if the attribute
+     * represents "NONE", the method logs a warning and exits without making any changes.</p>
+     *
+     * @param phenotype The {@link Phenotype} used to determine the cap for the skill attribute. Must not be
+     *                  <code>null</code>.
+     * @param options   The {@link PersonnelOptions} containing context-specific modifiers that may influence the cap
+     *                  for the attribute. Must not be <code>null</code>.
+     * @param attribute The {@link SkillAttribute} whose score is to be modified. Must not be <code>null</code> or
+     *                  "NONE".
+     * @param delta     The value to adjust the current score of the attribute, where a positive value increases the
+     *                  score and a negative value decreases it.
+     */
+    public void changeAttribute(Phenotype phenotype, PersonnelOptions options, SkillAttribute attribute, int delta) {
+        if (phenotype == null) {
+            logger.warn("(changeAttribute) phenotype is null.");
+            return;
+        }
+        if (options == null) {
+            logger.warn("(changeAttribute) options is null.");
+            return;
+        }
+
+        if (attribute == null || attribute.isNone()) {
+            logger.warn("(changeAttribute) attribute is null or NONE.");
+            return;
+        }
+
+        int currentScore = getAttributeScore(attribute);
+        // We defer ensuring this falls within permissible values to setAttributeScore
+        int newScore = currentScore + delta;
+        setAttributeScore(phenotype, options, attribute, newScore);
     }
 
     /**
@@ -365,6 +546,7 @@ public class Attributes {
      *
      * @since 0.50.5
      */
+    @Deprecated(since = "0.50.5", forRemoval = true)
     public void changeStrength(int delta) {
         strength += delta;
         strength = clamp(strength, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);

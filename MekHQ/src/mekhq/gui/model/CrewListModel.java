@@ -39,7 +39,6 @@ import megamek.common.Aero;
 import megamek.common.Tank;
 import megamek.common.VTOL;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -52,14 +51,14 @@ import mekhq.gui.BasicInfo;
  */
 public class CrewListModel extends AbstractListModel<Person> {
     enum CrewRole {
-        COMMANDER (0, "Commander"),
-        CONSOLE_CMDR (1, "Commander"),
-        PILOT (2, "Pilot"),
-        NAVIGATOR (3, "Navigator"),
-        DRIVER (4, "Driver"),
-        GUNNER (5, "Gunner"),
-        TECH_OFFICER (6, "Tech Officer"),
-        CREW (7, "Crew");
+        COMMANDER(0, "Commander"),
+        CONSOLE_CMDR(1, "Commander"),
+        PILOT(2, "Pilot"),
+        NAVIGATOR(3, "Navigator"),
+        DRIVER(4, "Driver"),
+        GUNNER(5, "Gunner"),
+        TECH_OFFICER(6, "Tech Officer"),
+        CREW(7, "Crew");
 
         private final int sortOrder;
         private final String displayName;
@@ -117,6 +116,7 @@ public class CrewListModel extends AbstractListModel<Person> {
     public int getSize() {
         return crew.size();
     }
+
     @Override
     public Person getElementAt(int index) {
         if (index < 0 || index >= crew.size()) {
@@ -135,21 +135,28 @@ public class CrewListModel extends AbstractListModel<Person> {
         }
 
         @Override
-        public Component getListCellRendererComponent(JList<? extends Person> list, Person value,
-                                                      int index, boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList<? extends Person> list, Person value, int index,
+              boolean isSelected, boolean cellHasFocus) {
             setOpaque(true);
             Person person = getElementAt(index);
             String gunSkill = SkillType.getGunnerySkillFor(unit.getEntity());
             String driveSkill = SkillType.getDrivingSkillFor(unit.getEntity());
             PersonnelOptions options = person.getOptions();
-            int reputation = person.getReputation();
-            String sb = "<html><font><b>" + person.getFullTitle() + "</b><br/>"
-                    + CrewRole.getCrewRole(person, unit).getDisplayName()
-                    + " ("
-                    + (person.hasSkill(gunSkill) ? person.getSkill(gunSkill).getFinalSkillValue(options, reputation) : "-")
-                    + '/'
-                    + (person.hasSkill(driveSkill) ? person.getSkill(driveSkill).getFinalSkillValue(options, reputation) : "-")
-                    + ")</font></html>";
+            String sb = "<html><font><b>" +
+                              person.getFullTitle() +
+                              "</b><br/>" +
+                              CrewRole.getCrewRole(person, unit).getDisplayName() +
+                              " ("
+                              // Shooting and driving don't benefit from Reputation, so no need to pass that in.
+                              +
+                              (person.hasSkill(gunSkill) ?
+                                     person.getSkill(gunSkill).getFinalSkillValue(options, 0) :
+                                     "-") +
+                              '/' +
+                              (person.hasSkill(driveSkill) ?
+                                     person.getSkill(driveSkill).getFinalSkillValue(options, 0) :
+                                     "-") +
+                              ")</font></html>";
             setHtmlText(sb);
             if (isSelected) {
                 highlightBorder();

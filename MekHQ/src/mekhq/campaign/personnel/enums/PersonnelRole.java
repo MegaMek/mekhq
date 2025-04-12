@@ -27,16 +27,17 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import megamek.common.annotations.Nullable;
+import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 /**
  * The PersonnelRole enum represents various roles a person can have. Each role is associated with a name, an optional
@@ -47,79 +48,216 @@ public enum PersonnelRole {
     /**
      * Individual roles with corresponding name texts and mnemonics.
      */
-    MEKWARRIOR("PersonnelRole.MEKWARRIOR.text", KeyEvent.VK_M),
-    LAM_PILOT("PersonnelRole.LAM_PILOT.text", KeyEvent.VK_UNDEFINED),
-    GROUND_VEHICLE_DRIVER("PersonnelRole.GROUND_VEHICLE_DRIVER.text", KeyEvent.VK_V),
-    NAVAL_VEHICLE_DRIVER("PersonnelRole.NAVAL_VEHICLE_DRIVER.text", KeyEvent.VK_N),
-    VTOL_PILOT("PersonnelRole.VTOL_PILOT.text", KeyEvent.VK_UNDEFINED),
-    VEHICLE_GUNNER("PersonnelRole.VEHICLE_GUNNER.text", KeyEvent.VK_G),
-    VEHICLE_CREW("PersonnelRole.VEHICLE_CREW.text", KeyEvent.VK_UNDEFINED),
-    AEROSPACE_PILOT("PersonnelRole.AEROSPACE_PILOT.text", KeyEvent.VK_A),
-    CONVENTIONAL_AIRCRAFT_PILOT("PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT.text", KeyEvent.VK_C),
-    PROTOMEK_PILOT("PersonnelRole.PROTOMEK_PILOT.text", KeyEvent.VK_P),
-    BATTLE_ARMOUR("PersonnelRole.BATTLE_ARMOUR.text", "PersonnelRole.BATTLE_ARMOUR.clan.text", KeyEvent.VK_B),
-    SOLDIER("PersonnelRole.SOLDIER.text", KeyEvent.VK_S),
-    VESSEL_PILOT("PersonnelRole.VESSEL_PILOT.text", KeyEvent.VK_I),
-    VESSEL_GUNNER("PersonnelRole.VESSEL_GUNNER.text", KeyEvent.VK_U),
-    VESSEL_CREW("PersonnelRole.VESSEL_CREW.text", KeyEvent.VK_W),
-    VESSEL_NAVIGATOR("PersonnelRole.VESSEL_NAVIGATOR.text", KeyEvent.VK_Y),
-    MEK_TECH("PersonnelRole.MEK_TECH.text", KeyEvent.VK_T),
-    MECHANIC("PersonnelRole.MECHANIC.text", KeyEvent.VK_E),
-    AERO_TEK("PersonnelRole.AERO_TEK.text", KeyEvent.VK_O),
-    BA_TECH("PersonnelRole.BA_TECH.text", KeyEvent.VK_UNDEFINED),
-    ASTECH("PersonnelRole.ASTECH.text", KeyEvent.VK_UNDEFINED),
-    DOCTOR("PersonnelRole.DOCTOR.text", KeyEvent.VK_D),
-    MEDIC("PersonnelRole.MEDIC.text", KeyEvent.VK_UNDEFINED),
-    ADMINISTRATOR_COMMAND("PersonnelRole.ADMINISTRATOR_COMMAND.text", KeyEvent.VK_UNDEFINED),
-    ADMINISTRATOR_LOGISTICS("PersonnelRole.ADMINISTRATOR_LOGISTICS.text", KeyEvent.VK_L),
-    ADMINISTRATOR_TRANSPORT("PersonnelRole.ADMINISTRATOR_TRANSPORT.text", KeyEvent.VK_R),
-    ADMINISTRATOR_HR("PersonnelRole.ADMINISTRATOR_HR.text", KeyEvent.VK_H),
-    DEPENDENT("PersonnelRole.DEPENDENT.text", KeyEvent.VK_UNDEFINED),
-    NONE("PersonnelRole.NONE.text", KeyEvent.VK_UNDEFINED);
+    // I used an average of the modifiers from the MekWarrior, Hot Shot, and Grizzled Veteran ATOW Archetypes
+    MEKWARRIOR(true, KeyEvent.VK_M, 4, 5, 6, 6, 4, 4, 4),
+
+    // I used an average of the modifiers from the MekWarrior, and Aerospace Pilot ATOW Archetypes
+    LAM_PILOT(true, KeyEvent.VK_UNDEFINED, 4, 4, 6, 6, 4, 4, 41),
+
+    // ATOW: Tanker Archetype
+    GROUND_VEHICLE_DRIVER(true, KeyEvent.VK_V, 4, 5, 5, 6, 4, 4, 4),
+
+    // ATOW: Tanker Archetype
+    NAVAL_VEHICLE_DRIVER(true, KeyEvent.VK_N, 4, 5, 5, 6, 4, 4, 4),
+
+    // ATOW: Companion Chopper Pilot Archetype
+    VTOL_PILOT(true, KeyEvent.VK_UNDEFINED, 4, 4, 5, 5, 4, 4, 4),
+
+    // ATOW: Tanker Archetype
+    VEHICLE_GUNNER(true, KeyEvent.VK_G, 4, 5, 5, 6, 4, 4, 4),
+
+    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
+    // Technician skill)
+    VEHICLE_CREW(true, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
+
+    // ATOW: Aerospace Pilot Archetype
+    AEROSPACE_PILOT(true, KeyEvent.VK_A, 2, 3, 5, 5, 4, 4, 0),
+
+    // ATOW: Aerospace Pilot Archetype
+    CONVENTIONAL_AIRCRAFT_PILOT(true, KeyEvent.VK_C, 2, 3, 5, 5, 4, 4, 0),
+
+    // ATOW: Aerospace Pilot Archetype (most ProtoMek pilots are Aerospace Sibkbo washouts, so this made the most sense)
+    PROTOMEK_PILOT(true, KeyEvent.VK_P, 2, 3, 5, 5, 4, 4, 0),
+
+    // ATOW: Elemental Archetype
+    BATTLE_ARMOUR(true, true, KeyEvent.VK_B, 7, 6, 4, 0, 3, 4, 3),
+
+    // ATOW: Renegade Warrior Archetype
+    SOLDIER(true, KeyEvent.VK_S, 5, 5, 4, 5, 4, 6, 3),
+
+    // ATOW: Tanker Archetype
+    VESSEL_PILOT(true, KeyEvent.VK_I, 4, 5, 5, 6, 4, 4, 4),
+
+    // ATOW: Tanker Archetype
+    VESSEL_GUNNER(true, KeyEvent.VK_U, 4, 5, 5, 6, 4, 4, 4),
+
+    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
+    // Technician skill)
+    VESSEL_CREW(true, KeyEvent.VK_W, 5, 4, 5, 3, 5, 4, 3),
+
+    // ATOW: Battlefield Tech Archetype
+    VESSEL_NAVIGATOR(true, KeyEvent.VK_Y, 5, 4, 5, 3, 5, 4, 3),
+
+    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
+    // Technician skill)
+    MEK_TECH(false, KeyEvent.VK_T, 5, 4, 5, 3, 5, 4, 3),
+
+    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
+    // Technician skill)
+    MECHANIC(false, KeyEvent.VK_E, 5, 4, 5, 3, 5, 4, 3),
+
+    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
+    // Technician skill)
+    AERO_TEK(false, KeyEvent.VK_O, 5, 4, 5, 3, 5, 4, 3),
+
+    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
+    // Technician skill)
+    BA_TECH(false, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
+
+    // ATOW: Battlefield Tech Archetype (but with the reduced Dexterity removed, as that's a Linked Attribute for the
+    // Technician skill)
+    ASTECH(false, KeyEvent.VK_UNDEFINED, 5, 4, 5, 3, 5, 4, 3),
+
+    // ATOW: Communications Specialist Archetype (this might seem like an odd choice, but the Attributes for this Archetype
+    // work really well for this profession
+    DOCTOR(false, KeyEvent.VK_D, 3, 4, 4, 5, 6, 4, 4),
+
+    // ATOW: Communications Specialist Archetype (this might seem like an odd choice, but the Attributes for this Archetype
+    // work really well for this profession
+    MEDIC(false, KeyEvent.VK_UNDEFINED, 3, 4, 4, 5, 6, 4, 4),
+
+    // ATOW: Faceman Archetype
+    ADMINISTRATOR_COMMAND(false, KeyEvent.VK_UNDEFINED, 3, 3, 3, 4, 6, 3, 5),
+
+    // ATOW: Faceman Archetype
+    ADMINISTRATOR_LOGISTICS(false, KeyEvent.VK_L, 3, 3, 3, 4, 6, 3, 5),
+
+    // ATOW: Faceman Archetype
+    ADMINISTRATOR_TRANSPORT(false, KeyEvent.VK_R, 3, 3, 3, 4, 6, 3, 5),
+
+    // ATOW: Faceman Archetype
+    ADMINISTRATOR_HR(false, KeyEvent.VK_H, 3, 3, 3, 4, 6, 3, 5),
+
+    // No archetype, but ATOW pg 35 states that the Attribute scores for an average person are 4
+    DEPENDENT(false, KeyEvent.VK_UNDEFINED, 4, 4, 4, 4, 4, 4, 4),
+
+    // If we're generating a character without a Profession, we're just going to leave them with middle of the road
+    // Attribute scores (5 in everything)
+    NONE(KeyEvent.VK_UNDEFINED);
     // endregion Enum Declarations
 
     // region Variable Declarations
-    private final String name;
-    private final String clanName;
+    private static final MMLogger logger = MMLogger.create(PersonnelRole.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources." + PersonnelRole.class.getSimpleName();
+
+    private final boolean isCombat;
+    private final boolean hasClanName;
     private final int mnemonic; // Unused: J, K, Q, X, Z
+    private final int strength;
+    private final int body;
+    private final int dexterity;
+    private final int reflexes;
+    private final int intelligence;
+    private final int willpower;
+    private final int charisma;
     // endregion Variable Declarations
 
     // region Constructors
-
-    /**
-     * Constructs a new PersonnelRole with the given name and mnemonic.
-     *
-     * @param name     the name of the personnel role
-     * @param mnemonic the mnemonic of the personnel role
-     */
-    PersonnelRole(final String name, final int mnemonic) {
-        this(name, null, mnemonic);
+    PersonnelRole(final int mnemonic) {
+        this(false, false, mnemonic, 5, 5, 5, 5, 5, 5, 5);
     }
 
-    /**
-     * Main constructor that initializes the role with name, clanName, and mnemonic. ClanName is optional and defaults
-     * to name if {@code null}.
-     *
-     * @param name     the name of the role.
-     * @param clanName the clan name of the role can be {@code null}.
-     * @param mnemonic the mnemonic associated with the role.
-     */
-    PersonnelRole(final String name, @Nullable final String clanName, final int mnemonic) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-              MekHQ.getMHQOptions().getLocale());
-        this.name = resources.getString(name);
-        this.clanName = (clanName == null) ? this.name : resources.getString(clanName);
+    PersonnelRole(final boolean isCombat, final int mnemonic, final int strength, final int body, final int dexterity,
+          final int reflexes, final int intelligence, final int willpower, final int charisma) {
+        this(isCombat, false, mnemonic, strength, body, dexterity, reflexes, intelligence, willpower, charisma);
+    }
+
+    PersonnelRole(final boolean isCombat, final boolean hasClanName, final int mnemonic, final int strength,
+          final int body, final int dexterity, final int reflexes, final int intelligence, final int willpower,
+          final int charisma) {
+        this.isCombat = isCombat;
+        this.hasClanName = hasClanName;
         this.mnemonic = mnemonic;
+        this.strength = strength;
+        this.body = body;
+        this.dexterity = dexterity;
+        this.reflexes = reflexes;
+        this.intelligence = intelligence;
+        this.willpower = willpower;
+        this.charisma = charisma;
     }
     // endregion Constructors
 
     // region Getters
+
+    /**
+     * @deprecated use {@link #getLabel(boolean)} instead
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public String getName(final boolean isClan) {
-        return isClan ? clanName : name;
+        return getLabel(isClan);
+    }
+
+    /**
+     * Retrieves the label for this instance, optionally using a clan-specific label if applicable.
+     *
+     * <p>This method generates a label based on a specific resource bundle key. If the specified
+     * option to use a clan label is enabled and a clan name is available, it retrieves the clan-specific label.
+     * Otherwise, it retrieves the standard label.</p>
+     *
+     * @param isClan A flag indicating whether to use the clan-specific label. If {@code true} and the instance has a
+     *               clan name, the clan-specific label will be used.
+     *
+     * @return The formatted label string, either clan-specific or standard, based on the provided flag and
+     *       availability.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public String getLabel(final boolean isClan) {
+        final boolean useClan = isClan && hasClanName;
+        return getFormattedTextAt(RESOURCE_BUNDLE, name() + ".label" + (useClan ? ".clan" : ""));
     }
 
     public int getMnemonic() {
         return mnemonic;
+    }
+
+    /**
+     * Retrieves the corresponding modifier value for the given {@link SkillAttribute}.
+     *
+     * <p>This method determines the modifier by matching the input {@link SkillAttribute}
+     * to its associated property within the class. The mapping is as follows:</p>
+     * <ul>
+     *     <li>{@link SkillAttribute#NONE}: Returns {@code 0} as no modification is applicable.</li>
+     *     <li>{@link SkillAttribute#STRENGTH}: Returns the value of the {@code strength} modifier.</li>
+     *     <li>{@link SkillAttribute#BODY}: Returns the value of the {@code body} modifier.</li>
+     *     <li>{@link SkillAttribute#REFLEXES}: Returns the value of the {@code reflexes} modifier.</li>
+     *     <li>{@link SkillAttribute#DEXTERITY}: Returns the value of the {@code dexterity} modifier.</li>
+     *     <li>{@link SkillAttribute#INTELLIGENCE}: Returns the value of the {@code intelligence} modifier.</li>
+     *     <li>{@link SkillAttribute#WILLPOWER}: Returns the value of the {@code willpower} modifier.</li>
+     *     <li>{@link SkillAttribute#CHARISMA}: Returns the value of the {@code charisma} modifier.</li>
+     * </ul>
+     *
+     * @param attribute The {@link SkillAttribute} for which the modifier value is requested. Must not be {@code null}.
+     *
+     * @return The integer value of the modifier corresponding to the given {@link SkillAttribute}.
+     */
+    public int getAttributeModifier(final SkillAttribute attribute) {
+        if (attribute == null) {
+            return 0;
+        }
+
+        return switch (attribute) {
+            case NONE -> 0;
+            case STRENGTH -> strength;
+            case BODY -> body;
+            case REFLEXES -> reflexes;
+            case DEXTERITY -> dexterity;
+            case INTELLIGENCE -> intelligence;
+            case WILLPOWER -> willpower;
+            case CHARISMA -> charisma;
+        };
     }
     // endregion Getters
 
@@ -332,25 +470,7 @@ public enum PersonnelRole {
      * @return {@code true} if the character has a combat role, {@code true} otherwise.
      */
     public boolean isCombat() {
-        return switch (this) {
-            case MEKWARRIOR,
-                 LAM_PILOT,
-                 GROUND_VEHICLE_DRIVER,
-                 NAVAL_VEHICLE_DRIVER,
-                 VTOL_PILOT,
-                 VEHICLE_GUNNER,
-                 VEHICLE_CREW,
-                 AEROSPACE_PILOT,
-                 CONVENTIONAL_AIRCRAFT_PILOT,
-                 PROTOMEK_PILOT,
-                 BATTLE_ARMOUR,
-                 SOLDIER,
-                 VESSEL_PILOT,
-                 VESSEL_GUNNER,
-                 VESSEL_CREW,
-                 VESSEL_NAVIGATOR -> true;
-            default -> false;
-        };
+        return isCombat;
     }
 
     /**
@@ -572,87 +692,65 @@ public enum PersonnelRole {
     }
     // endregion Static Methods
 
-    /**
-     * Parses a string representation of a {@link PersonnelRole} and returns the corresponding enum value.
-     *
-     * @param personnelRole the string representation of the {@link PersonnelRole}
-     *
-     * @return the corresponding {@link PersonnelRole} enum value, or {@code NONE} if parsing fails
-     */
     // region File I/O
+
+    /**
+     * @deprecated use {@link #fromString(String)} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public static PersonnelRole parseFromString(final String personnelRole) {
+        return fromString(personnelRole);
+    }
+
+    /**
+     * Converts a given string into a {@code PersonnelRole}.
+     *
+     * <p>This method attempts to parse the input string into a {@code PersonnelRole} using a series of steps:</p>
+     *
+     * <ol>
+     *   <li>If the input is {@code null} or blank, the method logs an error and returns {@code NONE}.</li>
+     *   <li>Tries to parse the input as an enum name by converting it to uppercase and replacing spaces with underscores.</li>
+     *   <li>Attempts to match the input string with the labels of available {@code PersonnelRole} values, both standard and clan-specific.</li>
+     *   <li>Includes compatibility handling for versions earlier than 50.1 with specific string mappings.</li>
+     *   <li>Finally, tries to parse the input as an ordinal value of the enum.</li>
+     *   <li>If all attempts fail, the method logs an error and returns {@code NONE}.</li>
+     * </ol>
+     *
+     * @param text The input string to be converted into a {@code PersonnelRole}.
+     *
+     * @return The corresponding {@code PersonnelRole} if successfully parsed, or {@code NONE} if parsing fails.
+     *
+     * @author Illiani
+     * @since 0.50.5
+     */
+    public static PersonnelRole fromString(String text) {
+        if (text == null || text.isBlank()) {
+            logger.error("Unable to parse text into a PersonnelRole. Returning NONE");
+            return NONE;
+        }
+
+        // Parse from name
         try {
-            return valueOf(personnelRole);
+            return PersonnelRole.valueOf(text.toUpperCase().replace(" ", "_"));
         } catch (Exception ignored) {
         }
 
-        // Magic Number Save Format
+        // Parse from label
         try {
-            switch (Integer.parseInt(personnelRole)) {
-                case 0:
-                    return NONE;
-                case 1:
-                    return MEKWARRIOR;
-                case 2:
-                    return AEROSPACE_PILOT;
-                case 3:
-                    return GROUND_VEHICLE_DRIVER;
-                case 4:
-                    return NAVAL_VEHICLE_DRIVER;
-                case 5:
-                    return VTOL_PILOT;
-                case 6:
-                    return VEHICLE_GUNNER;
-                case 7:
-                    return BATTLE_ARMOUR;
-                case 8:
-                    return SOLDIER;
-                case 9:
-                    return PROTOMEK_PILOT;
-                case 10:
-                    return CONVENTIONAL_AIRCRAFT_PILOT;
-                case 11:
-                    return VESSEL_PILOT;
-                case 12:
-                    return VESSEL_CREW;
-                case 13:
-                    return VESSEL_GUNNER;
-                case 14:
-                    return VESSEL_NAVIGATOR;
-                case 15:
-                    return MEK_TECH;
-                case 16:
-                    return MECHANIC;
-                case 17:
-                    return AERO_TEK;
-                case 18:
-                    return BA_TECH;
-                case 19:
-                    return ASTECH;
-                case 20:
-                    return DOCTOR;
-                case 21:
-                    return MEDIC;
-                case 22:
-                    return ADMINISTRATOR_COMMAND;
-                case 23:
-                    return ADMINISTRATOR_LOGISTICS;
-                case 24:
-                    return ADMINISTRATOR_TRANSPORT;
-                case 25:
-                    return ADMINISTRATOR_HR;
-                case 26:
-                    return LAM_PILOT;
-                case 27:
-                    return VEHICLE_CREW;
-                default:
-                    break;
+            for (PersonnelRole personnelRole : PersonnelRole.values()) {
+                if (personnelRole.getLabel(false).equalsIgnoreCase(text)) {
+                    return personnelRole;
+                }
+
+                if (personnelRole.getLabel(true).equalsIgnoreCase(text)) {
+                    return personnelRole;
+                }
             }
         } catch (Exception ignored) {
         }
 
         // <50.1 compatibility
-        switch (personnelRole) {
+        switch (text.toUpperCase().replace(" ", "_")) {
             case "MECHWARRIOR" -> {
                 return MEKWARRIOR;
             }
@@ -669,12 +767,13 @@ public enum PersonnelRole {
             }
         }
 
-        // Error report, if parsing fails.
-        // Ignore IDEA's suggestion of concatenating the error log, as this
-        // functionality doesn't
-        // exist within MMLogger
-        MMLogger.create(PersonnelRole.class)
-              .error("Unable to parse {} into a PersonnelRole. Returning {}.", personnelRole, NONE);
+        // Parse from ordinal
+        try {
+            return PersonnelRole.values()[MathUtility.parseInt(text, NONE.ordinal())];
+        } catch (Exception ignored) {
+        }
+
+        logger.error("Unable to parse {} into a PersonnelRole. Returning NONE", text);
         return NONE;
     }
     // endregion File I/O
@@ -686,6 +785,6 @@ public enum PersonnelRole {
      */
     @Override
     public String toString() {
-        return name;
+        return getLabel(false);
     }
 }

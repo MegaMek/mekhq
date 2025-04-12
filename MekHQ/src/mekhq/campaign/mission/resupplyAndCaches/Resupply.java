@@ -33,6 +33,7 @@ import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.common.MiscType.F_SPONSON_TURRET;
 import static megamek.common.enums.SkillLevel.NONE;
+import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.force.ForceType.STANDARD;
@@ -73,15 +74,13 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 
 /**
- * The {@code Resupply} class manages the resupply process during a campaign.
- * It calculates the required resupply resources, organizes parts pools (e.g., parts, armor, ammo),
- * and handles player convoy logistics and negotiation skills.
+ * The {@code Resupply} class manages the resupply process during a campaign. It calculates the required resupply
+ * resources, organizes parts pools (e.g., parts, armor, ammo), and handles player convoy logistics and negotiation
+ * skills.
  * <p>
- * It supports functionality such as
- * - Calculating target resupply tonnage based on combat unit weight and allowances.
- * - Building pools for parts (e.g., spare parts, ammo, and armor).
- * - Managing player convoy logistics.
- * - Handling procurement and negotiation results for administered resources.
+ * It supports functionality such as - Calculating target resupply tonnage based on combat unit weight and allowances. -
+ * Building pools for parts (e.g., spare parts, ammo, and armor). - Managing player convoy logistics. - Handling
+ * procurement and negotiation results for administered resources.
  */
 public class Resupply {
     private final Campaign campaign;
@@ -111,7 +110,6 @@ public class Resupply {
     public static final int CARGO_MINIMUM_WEIGHT = 4;
     public static final int RESUPPLY_AMMO_TONNAGE = 1;
     public static final int RESUPPLY_ARMOR_TONNAGE = 5;
-    final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
 
     private static final MMLogger logger = MMLogger.create(Resupply.class);
 
@@ -123,12 +121,11 @@ public class Resupply {
     }
 
     /**
-     * Constructs a new {@link Resupply} instance and initializes resupply parameters for the
-     * given campaign and contract. This includes setting faction data, calculating target cargo
-     * tonnage, and building parts pools.
+     * Constructs a new {@link Resupply} instance and initializes resupply parameters for the given campaign and
+     * contract. This includes setting faction data, calculating target cargo tonnage, and building parts pools.
      *
-     * @param campaign   The current campaign.
-     * @param contract   The specific contract under which the resupply process is conducted.
+     * @param campaign The current campaign.
+     * @param contract The specific contract under which the resupply process is conducted.
      */
     public Resupply(Campaign campaign, AtBContract contract, ResupplyType resupplyType) {
         this.campaign = campaign;
@@ -179,8 +176,8 @@ public class Resupply {
     }
 
     /**
-     * Retrieves the current resupply type being used.
-     * The resupply type indicates the method by which supplies are obtained.
+     * Retrieves the current resupply type being used. The resupply type indicates the method by which supplies are
+     * obtained.
      *
      * @return A {@link ResupplyType} representing the current method of resupply.
      */
@@ -189,9 +186,8 @@ public class Resupply {
     }
 
     /**
-     * Retrieves the target cargo tonnage calculated for the resupply process.
-     * This value represents the expected tonnage of supplies to be delivered
-     * based on the current campaign and contract conditions.
+     * Retrieves the target cargo tonnage calculated for the resupply process. This value represents the expected
+     * tonnage of supplies to be delivered based on the current campaign and contract conditions.
      *
      * @return The target cargo tonnage.
      */
@@ -207,6 +203,7 @@ public class Resupply {
     public double getFocusAmmo() {
         return focusAmmo;
     }
+
     /**
      * Sets the focus percentage allocated for ammunition resupply.
      *
@@ -224,6 +221,7 @@ public class Resupply {
     public double getFocusArmor() {
         return focusArmor;
     }
+
     /**
      * Sets the focus percentage allocated for armor resupply.
      *
@@ -241,6 +239,7 @@ public class Resupply {
     public double getFocusParts() {
         return focusParts;
     }
+
     /**
      * Sets the focus percentage allocated for general parts resupply.
      *
@@ -251,8 +250,8 @@ public class Resupply {
     }
 
     /**
-     * Retrieves the pool of general parts available for resupply.
-     * This pool includes non-specific parts that have passed all eligibility checks.
+     * Retrieves the pool of general parts available for resupply. This pool includes non-specific parts that have
+     * passed all eligibility checks.
      *
      * @return A list of general parts available for resupply.
      */
@@ -261,8 +260,8 @@ public class Resupply {
     }
 
     /**
-     * Retrieves the pool of armor parts available for resupply.
-     * This includes any eligible armor components that have been processed.
+     * Retrieves the pool of armor parts available for resupply. This includes any eligible armor components that have
+     * been processed.
      *
      * @return A list of armor parts available for resupply.
      */
@@ -271,8 +270,8 @@ public class Resupply {
     }
 
     /**
-     * Retrieves the pool of ammo bins available for resupply.
-     * This includes eligible ammunition bins that have been processed.
+     * Retrieves the pool of ammo bins available for resupply. This includes eligible ammunition bins that have been
+     * processed.
      *
      * @return A list of ammo bins available for resupply.
      */
@@ -281,8 +280,8 @@ public class Resupply {
     }
 
     /**
-     * Retrieves the negotiation skill level of the designated negotiator for the resupply process.
-     * This skill level is used to influence procurement outcomes and quality.
+     * Retrieves the negotiation skill level of the designated negotiator for the resupply process. This skill level is
+     * used to influence procurement outcomes and quality.
      *
      * @return The negotiation skill level of the negotiator.
      */
@@ -291,8 +290,8 @@ public class Resupply {
     }
 
     /**
-     * Retrieves the target cargo tonnage used when the player is providing convoy units.
-     * This value represents the desired amount of cargo that the player's convoy aims to carry.
+     * Retrieves the target cargo tonnage used when the player is providing convoy units. This value represents the
+     * desired amount of cargo that the player's convoy aims to carry.
      *
      * @return The target cargo tonnage for the player's convoy.
      */
@@ -301,8 +300,8 @@ public class Resupply {
     }
 
     /**
-     * Retrieves the total cargo capacity available in the player's convoy.
-     * This capacity indicates the maximum amount of cargo that the convoy can hold.
+     * Retrieves the total cargo capacity available in the player's convoy. This capacity indicates the maximum amount
+     * of cargo that the convoy can hold.
      *
      * @return The total cargo capacity of the player's convoy.
      */
@@ -311,17 +310,18 @@ public class Resupply {
     }
 
     /**
-     * Retrieves the current list of parts in the convoy's inventory.
-     * This method provides access to the parts being transported by the convoy.
+     * Retrieves the current list of parts in the convoy's inventory. This method provides access to the parts being
+     * transported by the convoy.
      *
      * @return A list of parts contained within the convoy.
      */
     public List<Part> getConvoyContents() {
         return convoyContents;
     }
+
     /**
-     * Sets the list of parts to be included in the convoy's inventory.
-     * This method allows the assignment or modification of the parts being transported by the convoy.
+     * Sets the list of parts to be included in the convoy's inventory. This method allows the assignment or
+     * modification of the parts being transported by the convoy.
      *
      * @param convoyContents The list of parts to be assigned to the convoy.
      */
@@ -330,72 +330,74 @@ public class Resupply {
     }
 
     /**
-     * Retrieves the base value of the contents in the convoy.
-     * This value typically represents the estimated or predetermined worth of the convoy's cargo.
+     * Retrieves the base value of the contents in the convoy. This value typically represents the estimated or
+     * predetermined worth of the convoy's cargo.
      *
      * @return A {@link Money} object representing the base value of the convoy contents.
      */
     public Money getConvoyContentsValueBase() {
         return convoyContentsValueBase;
     }
+
     /**
-     * Sets the base value of the contents in the convoy.
-     * This is used to define the predetermined or estimated worth of the convoy's cargo.
+     * Sets the base value of the contents in the convoy. This is used to define the predetermined or estimated worth of
+     * the convoy's cargo.
      *
-     * @param convoyContentsValueBase A {@link Money} object representing the base value of the
-     *                               convoy contents.
+     * @param convoyContentsValueBase A {@link Money} object representing the base value of the convoy contents.
      */
     public void setConvoyContentsValueBase(Money convoyContentsValueBase) {
         this.convoyContentsValueBase = convoyContentsValueBase;
     }
 
     /**
-     * Retrieves the calculated value of the convoy's contents.
-     * This value is typically dynamic and may include various adjustments based on gameplay scenarios.
+     * Retrieves the calculated value of the convoy's contents. This value is typically dynamic and may include various
+     * adjustments based on gameplay scenarios.
      *
      * @return A {@link Money} object representing the calculated value of the convoy contents.
      */
     public Money getConvoyContentsValueCalculated() {
         return convoyContentsValueCalculated;
     }
+
     /**
-     * Sets the calculated value of the convoy's contents.
-     * This value may be adjusted dynamically during the campaign or based on external factors.
+     * Sets the calculated value of the convoy's contents. This value may be adjusted dynamically during the campaign or
+     * based on external factors.
      *
-     * @param convoyContentsValueCalculated A {@link Money} object representing the calculated value
-     *                                     of the convoy contents.
+     * @param convoyContentsValueCalculated A {@link Money} object representing the calculated value of the convoy
+     *                                      contents.
      */
     public void setConvoyContentsValueCalculated(Money convoyContentsValueCalculated) {
         this.convoyContentsValueCalculated = convoyContentsValueCalculated;
     }
 
     /**
-     * Retrieves the player convoys and their corresponding cargo capacities.
-     * This method provides a mapping of player-controlled forces to their available cargo capacity.
+     * Retrieves the player convoys and their corresponding cargo capacities. This method provides a mapping of
+     * player-controlled forces to their available cargo capacity.
      *
-     * @return A {@link Map} where the key is a {@link Force} representing the player's convoy,
-     *         and the value is a {@link Double} indicating its cargo capacity.
+     * @return A {@link Map} where the key is a {@link Force} representing the player's convoy, and the value is a
+     *       {@link Double} indicating its cargo capacity.
      */
     public Map<Force, Double> getPlayerConvoys() {
         return playerConvoys;
     }
 
     /**
-     * Checks whether the player's convoy is set to be used for resupply purposes.
-     * This indicates if resupply operations take into account the player's convoy.
+     * Checks whether the player's convoy is set to be used for resupply purposes. This indicates if resupply operations
+     * take into account the player's convoy.
      *
-     * @return A {@code boolean} indicating whether the player's convoy is being used.
-     *         Returns {@code true} if the player's convoy is used, {@code false} otherwise.
+     * @return A {@code boolean} indicating whether the player's convoy is being used. Returns {@code true} if the
+     *       player's convoy is used, {@code false} otherwise.
      */
     public boolean getUsePlayerConvoy() {
         return usePlayerConvoy;
     }
+
     /**
-     * Sets whether the player's convoy should be used for resupply purposes.
-     * This determines if cargo and resupply operations will consider the player's convoy.
+     * Sets whether the player's convoy should be used for resupply purposes. This determines if cargo and resupply
+     * operations will consider the player's convoy.
      *
-     * @param usePlayerConvoy A {@code boolean} indicating whether the player's convoy should be used.
-     *                        {@code true} to use the player's convoy, {@code false} otherwise.
+     * @param usePlayerConvoy A {@code boolean} indicating whether the player's convoy should be used. {@code true} to
+     *                        use the player's convoy, {@code false} otherwise.
      */
     public void setUsePlayerConvoy(boolean usePlayerConvoy) {
         this.usePlayerConvoy = usePlayerConvoy;
@@ -451,17 +453,15 @@ public class Resupply {
     /**
      * Determines if the given entity is a prohibited unit type based on specific criteria.
      *
-     * @param entity the entity to check for prohibited unit type
-     * @param excludeDropShipsFromCheck if true, DropShip entities are excluded from being
-     *                                 considered prohibited
-     * @param excludeSuperHeaviesFromCheck if true, Super Heavy entities are excluded from being
-     *                                    considered prohibited
-     * @return {@code true} if the entity is a prohibited unit type such as Small Craft, Large
-     * Craft, or Conventional Infantry, and not excluded by the specified parameters; {@code false}
-     * otherwise
+     * @param entity                       the entity to check for prohibited unit type
+     * @param excludeDropShipsFromCheck    if true, DropShip entities are excluded from being considered prohibited
+     * @param excludeSuperHeaviesFromCheck if true, Super Heavy entities are excluded from being considered prohibited
+     *
+     * @return {@code true} if the entity is a prohibited unit type such as Small Craft, Large Craft, or Conventional
+     *       Infantry, and not excluded by the specified parameters; {@code false} otherwise
      */
     public static boolean isProhibitedUnitType(Entity entity, boolean excludeDropShipsFromCheck,
-                                               boolean excludeSuperHeaviesFromCheck) {
+          boolean excludeSuperHeaviesFromCheck) {
         if (entity.isDropShip() && excludeDropShipsFromCheck) {
             return false;
         }
@@ -470,16 +470,14 @@ public class Resupply {
             return false;
         }
 
-        return entity.isSmallCraft()
-            || entity.isLargeCraft()
-            || entity.isConventionalInfantry();
+        return entity.isSmallCraft() || entity.isLargeCraft() || entity.isConventionalInfantry();
     }
 
     /**
-     * Builds the pools of parts (e.g., general parts, ammo bins, and armor) for the resupply drop.
-     * Parts are procured, shuffled, and organized into their respective pools for distribution.
+     * Builds the pools of parts (e.g., general parts, ammo bins, and armor) for the resupply drop. Parts are procured,
+     * shuffled, and organized into their respective pools for distribution.
      *
-     * @param potentialParts   A map of potential parts to include in the supply drop, keyed by part name.
+     * @param potentialParts A map of potential parts to include in the supply drop, keyed by part name.
      */
     private void buildPartsPools(Map<Part, PartDetails> potentialParts) {
         partsPool = new ArrayList<>();
@@ -519,26 +517,24 @@ public class Resupply {
     }
 
     /**
-     * Collects all eligible parts from campaign units and organizes them into a map, where each part
-     * is associated with its corresponding details. The collection process considers various factors,
-     * including exclusion lists, location validation, and warehouse resources, to determine the
-     * eligibility and weight of each part.
+     * Collects all eligible parts from campaign units and organizes them into a map, where each part is associated with
+     * its corresponding details. The collection process considers various factors, including exclusion lists, location
+     * validation, and warehouse resources, to determine the eligibility and weight of each part.
      *
      * <p>This method leverages the campaign's existing parts in use, filters them based on specific
-     * criteria (e.g., unit exclusion, allowed quality levels), and applies warehouse-specific weight
-     * modifiers to calculate the resulting details.</p>
+     * criteria (e.g., unit exclusion, allowed quality levels), and applies warehouse-specific weight modifiers to
+     * calculate the resulting details.</p>
      *
      * @return A {@link Map} where:
-     *         <ul>
-     *             <li>The key is a {@link Part} object representing the eligible part.</li>
-     *             <li>The value is a {@link PartDetails} object that contains detailed information
-     *                 about the part, such as adjusted weight, based on warehouse modifiers.</li>
-     *         </ul>
+     *       <ul>
+     *           <li>The key is a {@link Part} object representing the eligible part.</li>
+     *           <li>The value is a {@link PartDetails} object that contains detailed information
+     *               about the part, such as adjusted weight, based on warehouse modifiers.</li>
+     *       </ul>
      */
 
     private Map<Part, PartDetails> collectParts() {
-        Set<PartInUse> partsInUse = campaign.getPartsInUse(true, true,
-            PartQuality.QUALITY_A);
+        Set<PartInUse> partsInUse = campaign.getPartsInUse(true, true, PartQuality.QUALITY_A);
 
         Faction campaignFaction = campaign.getFaction();
         LocalDate today = campaign.getLocalDate();
@@ -563,26 +559,27 @@ public class Resupply {
     }
 
     /**
-     * Checks if a part is ineligible for inclusion in the resupply process. Ineligibility is
-     * determined based on exclusion lists, unit structure compatibility, and transporter checks.
+     * Checks if a part is ineligible for inclusion in the resupply process. Ineligibility is determined based on
+     * exclusion lists, unit structure compatibility, and transporter checks.
      *
-     * @param part   The part being checked.
+     * @param part The part being checked.
+     *
      * @return {@code true} if the part is ineligible, {@code false} otherwise.
      */
     private boolean isIneligiblePart(Part part) {
-        return checkExclusionList(part)
-            || checkMekLocation(part)
-            || checkTankLocation(part)
-            || checkMotiveSystem(part)
-            || checkTransporter(part);
+        return checkExclusionList(part) ||
+                     checkMekLocation(part) ||
+                     checkTankLocation(part) ||
+                     checkMotiveSystem(part) ||
+                     checkTransporter(part);
     }
 
     /**
-     * Checks if a part is in the exclusion list and should not be considered for resupply.
-     * Equipment parts are evaluated for specific flags, such as {@code F_SPONSON_TURRET},
-     * which would disqualify them from inclusion.
+     * Checks if a part is in the exclusion list and should not be considered for resupply. Equipment parts are
+     * evaluated for specific flags, such as {@code F_SPONSON_TURRET}, which would disqualify them from inclusion.
      *
-     * @param part   The part to check.
+     * @param part The part to check.
+     *
      * @return {@code true} if the part is in the exclusion list, {@code false} otherwise.
      */
     private boolean checkExclusionList(Part part) {
@@ -596,6 +593,7 @@ public class Resupply {
      * Checks if the given part is an instance of {@code MotiveSystem}.
      *
      * @param part the {@link Part} to be checked.
+     *
      * @return {@code true} if the part is a {@link MotiveSystem}, {@code false} otherwise.
      */
     private boolean checkMotiveSystem(Part part) {
@@ -603,24 +601,23 @@ public class Resupply {
     }
 
     /**
-     * Checks if a part belonging to a 'Mek' unit is eligible for resupply, based on its location.
-     * For example, parts located in the center torso or parts from extinct units are deemed
-     * ineligible.
+     * Checks if a part belonging to a 'Mek' unit is eligible for resupply, based on its location. For example, parts
+     * located in the center torso or parts from extinct units are deemed ineligible.
      *
-     * @param part   The part to check.
-     * @return {@code true} if the part is ineligible due to its location or extinction,
-     * {@code false} otherwise.
+     * @param part The part to check.
+     *
+     * @return {@code true} if the part is ineligible due to its location or extinction, {@code false} otherwise.
      */
     private boolean checkMekLocation(Part part) {
-        return part instanceof MekLocation &&
-            (((MekLocation) part).getLoc() == Mek.LOC_CT);
+        return part instanceof MekLocation && (((MekLocation) part).getLoc() == Mek.LOC_CT);
     }
 
     /**
-     * Verifies if a vehicle part is eligible for resupply. Parts such as rotors
-     * and turrets are always eligible, while other tank locations may be disqualified.
+     * Verifies if a vehicle part is eligible for resupply. Parts such as rotors and turrets are always eligible, while
+     * other tank locations may be disqualified.
      *
-     * @param part   The part to check.
+     * @param part The part to check.
+     *
      * @return {@code true} if the part is ineligible for resupply, {@code false} otherwise.
      */
     private boolean checkTankLocation(Part part) {
@@ -628,10 +625,11 @@ public class Resupply {
     }
 
     /**
-     * Determines whether a part is a transporter-related part, such as a `TransportBayPart`,
-     * which makes it ineligible for consideration in the resupply process.
+     * Determines whether a part is a transporter-related part, such as a `TransportBayPart`, which makes it ineligible
+     * for consideration in the resupply process.
      *
-     * @param part   The part to check.
+     * @param part The part to check.
+     *
      * @return {@code true} if the part is a transporter part, {@code false} otherwise.
      */
     private boolean checkTransporter(Part part) {
@@ -639,22 +637,23 @@ public class Resupply {
     }
 
     /**
-     * Applies modifiers to adjust the weight of parts based on their usage and availability
-     * in the warehouse. This method calculates the adjusted weight for each part by taking
-     * into account its use count, store count, and a multiplier specific to the part.
+     * Applies modifiers to adjust the weight of parts based on their usage and availability in the warehouse. This
+     * method calculates the adjusted weight for each part by taking into account its use count, store count, and a
+     * multiplier specific to the part.
      *
      * <p>The resulting adjusted weight is used to determine the importance or priority of the part,
      * and only parts with a positive weight are included in the output map.</p>
      *
-     * @param partsInUse A {@link Set} of {@link PartInUse} objects containing information about
-     *                   parts currently in use and their quantities in the warehouse.
+     * @param partsInUse A {@link Set} of {@link PartInUse} objects containing information about parts currently in use
+     *                   and their quantities in the warehouse.
+     *
      * @return A {@link Map} where:
-     *         <ul>
-     *             <li>The key is a {@link Part} object representing the eligible part.</li>
-     *             <li>The value is a {@link PartDetails} object containing the adjusted weight of
-     *                 the part, calculated using its usage data and a multiplier.</li>
-     *         </ul>
-     *         Only parts with a positive adjusted weight are included in the resulting map.
+     *       <ul>
+     *           <li>The key is a {@link Part} object representing the eligible part.</li>
+     *           <li>The value is a {@link PartDetails} object containing the adjusted weight of
+     *               the part, calculated using its usage data and a multiplier.</li>
+     *       </ul>
+     *       Only parts with a positive adjusted weight are included in the resulting map.
      */
 
     private Map<Part, PartDetails> applyWarehouseWeightModifiers(Set<PartInUse> partsInUse) {
@@ -671,8 +670,7 @@ public class Resupply {
                 continue;
             }
 
-            if ((resupplyType != ResupplyType.RESUPPLY_LOOT)
-                && (resupplyType != ResupplyType.RESUPPLY_SMUGGLER)) {
+            if ((resupplyType != ResupplyType.RESUPPLY_LOOT) && (resupplyType != ResupplyType.RESUPPLY_SMUGGLER)) {
                 part.setBrandNew(true);
             }
 
@@ -691,11 +689,11 @@ public class Resupply {
     }
 
     /**
-     * Retrieves the multiplier value for a specific part type to calculate its priority
-     * in the resupply process. This multiplier affects how the part is weighted when
-     * included in the pool of available resupply resources.
+     * Retrieves the multiplier value for a specific part type to calculate its priority in the resupply process. This
+     * multiplier affects how the part is weighted when included in the pool of available resupply resources.
      *
-     * @param part   The part to determine the multiplier for.
+     * @param part The part to determine the multiplier for.
+     *
      * @return A multiplier value for the given part type.
      */
     private static double getPartMultiplier(Part part) {
@@ -708,10 +706,10 @@ public class Resupply {
             if (((MekLocation) part).getLoc() == Mek.LOC_HEAD) {
                 multiplier = 2;
             }
-        } else if (part instanceof MASC
-            || part instanceof MekGyro
-            || part instanceof EnginePart
-            || checkEquipmentSubType(part)) {
+        } else if (part instanceof MASC ||
+                         part instanceof MekGyro ||
+                         part instanceof EnginePart ||
+                         checkEquipmentSubType(part)) {
             multiplier = 0.5;
         } else if (part instanceof AmmoBin || part instanceof Armor) {
             multiplier = 5;
@@ -721,10 +719,11 @@ public class Resupply {
     }
 
     /**
-     * Determines whether a part is an eligible equipment subtype for the resupply process.
-     * Excludes certain types such as ammo, ammo storage, heat sinks, and jump jets.
+     * Determines whether a part is an eligible equipment subtype for the resupply process. Excludes certain types such
+     * as ammo, ammo storage, heat sinks, and jump jets.
      *
-     * @param part   The part to check.
+     * @param part The part to check.
+     *
      * @return {@code true} if the part is an eligible equipment subtype, {@code false} otherwise.
      */
     private static boolean checkEquipmentSubType(Part part) {
@@ -752,9 +751,9 @@ public class Resupply {
     }
 
     /**
-     * Calculates the negotiation skill level by selecting the most qualified negotiator
-     * in the current campaign. If the contract type is classified as guerrilla warfare, the
-     * flagged commander is prioritized. Otherwise, Admin/Logistics personnel are evaluated.
+     * Calculates the negotiation skill level by selecting the most qualified negotiator in the current campaign. If the
+     * contract type is classified as guerrilla warfare, the flagged commander is prioritized. Otherwise,
+     * Admin/Logistics personnel are evaluated.
      */
     private void calculateNegotiationSkill() {
         Person negotiator;
@@ -766,10 +765,9 @@ public class Resupply {
             negotiator = null;
 
             for (Person admin : campaign.getAdmins()) {
-                if (admin.getPrimaryRole().isAdministratorLogistics()
-                    || admin.getSecondaryRole().isAdministratorLogistics()) {
-                    if (negotiator == null
-                        || (admin.outRanksUsingSkillTiebreaker(campaign, negotiator))) {
+                if (admin.getPrimaryRole().isAdministratorLogistics() ||
+                          admin.getSecondaryRole().isAdministratorLogistics()) {
+                    if (negotiator == null || (admin.outRanksUsingSkillTiebreaker(campaign, negotiator))) {
                         negotiator = admin;
                     }
                 }
@@ -780,16 +778,19 @@ public class Resupply {
             Skill skill = negotiator.getSkill(SkillType.S_NEG);
 
             if (skill != null) {
-                int skillLevel = skill.getFinalSkillValue(negotiator.getOptions(), negotiator.getReputation());
+                int reputation = negotiator.getAdjustedReputation(campaign.getCampaignOptions().isUseAgeEffects(),
+                      campaign.isClanCampaign(),
+                      campaign.getLocalDate(),
+                      negotiator.getRankLevel());
+                int skillLevel = skill.getFinalSkillValue(negotiator.getOptions(), reputation);
                 negotiatorSkill = skill.getType().getExperienceLevel(skillLevel);
             }
         }
     }
 
     /**
-     * Calculates the total cargo capacity available in player-controlled convoys.
-     * Convoy forces and their units are evaluated for cargo capacity, and disabled,
-     * damaged, or uncrewed units are excluded from the totals.
+     * Calculates the total cargo capacity available in player-controlled convoys. Convoy forces and their units are
+     * evaluated for cargo capacity, and disabled, damaged, or uncrewed units are excluded from the totals.
      */
     private void calculatePlayerConvoyValues() {
         playerConvoys = new HashMap<>();
@@ -812,9 +813,7 @@ public class Resupply {
                     Unit unit = campaign.getUnit(unitId);
                     Entity entity = unit.getEntity();
 
-                    if (unit.isDamaged()
-                        || !unit.isFullyCrewed()
-                        || isProhibitedUnitType(entity, true, true)) {
+                    if (unit.isDamaged() || !unit.isFullyCrewed() || isProhibitedUnitType(entity, true, true)) {
                         continue;
                     }
 
@@ -841,8 +840,8 @@ public class Resupply {
     }
 
     /**
-     * Represents details about a part used during the collection and sorting process
-     * for resupply resources. Contains the part itself and its weight value.
+     * Represents details about a part used during the collection and sorting process for resupply resources. Contains
+     * the part itself and its weight value.
      */
     private static class PartDetails {
         private final Part part;
@@ -851,8 +850,8 @@ public class Resupply {
         /**
          * Constructs a new {@code PartDetails} instance.
          *
-         * @param part    The associated part.
-         * @param weight  The weight or priority of the part.
+         * @param part   The associated part.
+         * @param weight The weight or priority of the part.
          */
         public PartDetails(Part part, double weight) {
             this.part = part;
@@ -880,7 +879,7 @@ public class Resupply {
         /**
          * Sets the current weight of the part.
          *
-         * @param weight   The new weight to assign.
+         * @param weight The new weight to assign.
          */
         public void setWeight(double weight) {
             this.weight = weight;

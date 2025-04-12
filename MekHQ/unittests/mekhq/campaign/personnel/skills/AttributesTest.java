@@ -27,194 +27,239 @@
  */
 package mekhq.campaign.personnel.skills;
 
+import static java.lang.Math.min;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.BODY;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.DEXTERITY;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.INTELLIGENCE;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.REFLEXES;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.STRENGTH;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import org.junit.jupiter.api.Test;
 
 public class AttributesTest {
     @Test
     public void testDefaultConstructor() {
         Attributes attributes = new Attributes();
-        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getStrength());
-        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getBody());
-        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getReflexes());
-        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getDexterity());
-        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getIntelligence());
-        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getWillpower());
-        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getCharisma());
+        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getAttributeScore(STRENGTH));
+        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getAttributeScore(BODY));
+        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getAttributeScore(REFLEXES));
+        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getAttributeScore(DEXTERITY));
+        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getAttributeScore(INTELLIGENCE));
+        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getAttributeScore(WILLPOWER));
+        assertEquals(DEFAULT_ATTRIBUTE_SCORE, attributes.getAttributeScore(CHARISMA));
     }
 
     @Test
     public void testSetStrength() {
-        Attributes attributes = new Attributes();
+        final Attributes attributes = new Attributes();
+        final Phenotype phenotype = Phenotype.GENERAL;
+        final PersonnelOptions options = new PersonnelOptions();
 
-        attributes.setStrength(MAXIMUM_ATTRIBUTE_SCORE + 1);
-        assertEquals(MAXIMUM_ATTRIBUTE_SCORE, attributes.getStrength());
+        final int attributeCap = phenotype.getAttributeCap(STRENGTH);
 
-        attributes.setStrength(MINIMUM_ATTRIBUTE_SCORE - 1);
-        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getStrength());
+        attributes.setAttributeScore(phenotype, options, STRENGTH, MAXIMUM_ATTRIBUTE_SCORE + 1);
+        assertEquals(attributeCap, attributes.getAttributeScore(STRENGTH));
+
+        attributes.setAttributeScore(phenotype, options, STRENGTH, MINIMUM_ATTRIBUTE_SCORE - 1);
+        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getAttributeScore(STRENGTH));
 
         for (int i = MINIMUM_ATTRIBUTE_SCORE; i <= MAXIMUM_ATTRIBUTE_SCORE; i++) {
-            attributes.setStrength(i);
-            assertEquals(i, attributes.getStrength());
+            attributes.setAttributeScore(phenotype, options, STRENGTH, i);
+            int expected = min(i, attributeCap);
+            assertEquals(expected, attributes.getAttributeScore(STRENGTH));
         }
     }
 
     @Test
     public void testSetBody() {
-        Attributes attributes = new Attributes();
+        final Attributes attributes = new Attributes();
+        final Phenotype phenotype = Phenotype.GENERAL;
+        final PersonnelOptions options = new PersonnelOptions();
 
-        attributes.setBody(MAXIMUM_ATTRIBUTE_SCORE + 1);
-        assertEquals(MAXIMUM_ATTRIBUTE_SCORE, attributes.getBody());
+        final int attributeCap = phenotype.getAttributeCap(BODY);
 
-        attributes.setBody(MINIMUM_ATTRIBUTE_SCORE - 1);
-        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getBody());
+        attributes.setAttributeScore(phenotype, options, BODY, MAXIMUM_ATTRIBUTE_SCORE + 1);
+        assertEquals(attributeCap, attributes.getAttributeScore(BODY));
+
+        attributes.setAttributeScore(phenotype, options, BODY, MINIMUM_ATTRIBUTE_SCORE - 1);
+        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getAttributeScore(BODY));
 
         for (int i = MINIMUM_ATTRIBUTE_SCORE; i <= MAXIMUM_ATTRIBUTE_SCORE; i++) {
-            attributes.setBody(i);
-            assertEquals(i, attributes.getBody());
+            attributes.setAttributeScore(phenotype, options, BODY, i);
+            int expected = min(i, attributeCap);
+            assertEquals(expected, attributes.getAttributeScore(BODY));
         }
     }
 
     @Test
     public void testSetReflexes() {
-        Attributes attributes = new Attributes();
+        final Attributes attributes = new Attributes();
+        final Phenotype phenotype = Phenotype.GENERAL;
+        final PersonnelOptions options = new PersonnelOptions();
 
-        attributes.setReflexes(MAXIMUM_ATTRIBUTE_SCORE + 1);
-        assertEquals(MAXIMUM_ATTRIBUTE_SCORE, attributes.getReflexes());
+        final int attributeCap = phenotype.getAttributeCap(REFLEXES);
 
-        attributes.setReflexes(MINIMUM_ATTRIBUTE_SCORE - 1);
-        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getReflexes());
+        attributes.setAttributeScore(phenotype, options, REFLEXES, MAXIMUM_ATTRIBUTE_SCORE + 1);
+        assertEquals(attributeCap, attributes.getAttributeScore(REFLEXES));
+
+        attributes.setAttributeScore(phenotype, options, REFLEXES, MINIMUM_ATTRIBUTE_SCORE - 1);
+        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getAttributeScore(REFLEXES));
 
         for (int i = MINIMUM_ATTRIBUTE_SCORE; i <= MAXIMUM_ATTRIBUTE_SCORE; i++) {
-            attributes.setReflexes(i);
-            assertEquals(i, attributes.getReflexes());
+            attributes.setAttributeScore(phenotype, options, REFLEXES, i);
+            int expected = min(i, attributeCap);
+            assertEquals(expected, attributes.getAttributeScore(REFLEXES));
         }
     }
 
     @Test
     public void testSetDexterity() {
-        Attributes attributes = new Attributes();
+        final Attributes attributes = new Attributes();
+        final Phenotype phenotype = Phenotype.GENERAL;
+        final PersonnelOptions options = new PersonnelOptions();
 
-        attributes.setDexterity(MAXIMUM_ATTRIBUTE_SCORE + 1);
-        assertEquals(MAXIMUM_ATTRIBUTE_SCORE, attributes.getDexterity());
+        final int attributeCap = phenotype.getAttributeCap(DEXTERITY);
 
-        attributes.setDexterity(MINIMUM_ATTRIBUTE_SCORE - 1);
-        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getDexterity());
+        attributes.setAttributeScore(phenotype, options, DEXTERITY, MAXIMUM_ATTRIBUTE_SCORE + 1);
+        assertEquals(attributeCap, attributes.getAttributeScore(DEXTERITY));
+
+        attributes.setAttributeScore(phenotype, options, DEXTERITY, MINIMUM_ATTRIBUTE_SCORE - 1);
+        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getAttributeScore(DEXTERITY));
 
         for (int i = MINIMUM_ATTRIBUTE_SCORE; i <= MAXIMUM_ATTRIBUTE_SCORE; i++) {
-            attributes.setDexterity(i);
-            assertEquals(i, attributes.getDexterity());
+            attributes.setAttributeScore(phenotype, options, DEXTERITY, i);
+            int expected = min(i, attributeCap);
+            assertEquals(expected, attributes.getAttributeScore(DEXTERITY));
         }
     }
 
     @Test
     public void testSetIntelligence() {
-        Attributes attributes = new Attributes();
+        final Attributes attributes = new Attributes();
+        final Phenotype phenotype = Phenotype.GENERAL;
+        final PersonnelOptions options = new PersonnelOptions();
 
-        attributes.setIntelligence(MAXIMUM_ATTRIBUTE_SCORE + 1);
-        assertEquals(MAXIMUM_ATTRIBUTE_SCORE, attributes.getIntelligence());
+        final int attributeCap = phenotype.getAttributeCap(INTELLIGENCE);
 
-        attributes.setIntelligence(MINIMUM_ATTRIBUTE_SCORE - 1);
-        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getIntelligence());
+        attributes.setAttributeScore(phenotype, options, INTELLIGENCE, MAXIMUM_ATTRIBUTE_SCORE + 1);
+        assertEquals(attributeCap, attributes.getAttributeScore(INTELLIGENCE));
+
+        attributes.setAttributeScore(phenotype, options, INTELLIGENCE, MINIMUM_ATTRIBUTE_SCORE - 1);
+        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getAttributeScore(INTELLIGENCE));
 
         for (int i = MINIMUM_ATTRIBUTE_SCORE; i <= MAXIMUM_ATTRIBUTE_SCORE; i++) {
-            attributes.setIntelligence(i);
-            assertEquals(i, attributes.getIntelligence());
+            attributes.setAttributeScore(phenotype, options, INTELLIGENCE, i);
+            int expected = min(i, attributeCap);
+            assertEquals(expected, attributes.getAttributeScore(INTELLIGENCE));
         }
     }
 
     @Test
     public void testSetWillpower() {
-        Attributes attributes = new Attributes();
+        final Attributes attributes = new Attributes();
+        final Phenotype phenotype = Phenotype.GENERAL;
+        final PersonnelOptions options = new PersonnelOptions();
 
-        attributes.setWillpower(MAXIMUM_ATTRIBUTE_SCORE + 1);
-        assertEquals(MAXIMUM_ATTRIBUTE_SCORE, attributes.getWillpower());
+        final int attributeCap = phenotype.getAttributeCap(WILLPOWER);
 
-        attributes.setWillpower(MINIMUM_ATTRIBUTE_SCORE - 1);
-        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getWillpower());
+        attributes.setAttributeScore(phenotype, options, WILLPOWER, MAXIMUM_ATTRIBUTE_SCORE + 1);
+        assertEquals(phenotype.getAttributeCap(WILLPOWER), attributes.getAttributeScore(WILLPOWER));
+
+        attributes.setAttributeScore(phenotype, options, WILLPOWER, MINIMUM_ATTRIBUTE_SCORE - 1);
+        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getAttributeScore(WILLPOWER));
 
         for (int i = MINIMUM_ATTRIBUTE_SCORE; i <= MAXIMUM_ATTRIBUTE_SCORE; i++) {
-            attributes.setWillpower(i);
-            assertEquals(i, attributes.getWillpower());
+            attributes.setAttributeScore(phenotype, options, WILLPOWER, i);
+            int expected = min(i, attributeCap);
+            assertEquals(expected, attributes.getAttributeScore(WILLPOWER));
         }
     }
 
     @Test
     public void testSetCharisma() {
-        Attributes attributes = new Attributes();
+        final Attributes attributes = new Attributes();
+        final Phenotype phenotype = Phenotype.GENERAL;
+        final PersonnelOptions options = new PersonnelOptions();
 
-        attributes.setCharisma(MAXIMUM_ATTRIBUTE_SCORE + 1);
-        assertEquals(MAXIMUM_ATTRIBUTE_SCORE, attributes.getCharisma());
+        final int attributeCap = phenotype.getAttributeCap(CHARISMA);
 
-        attributes.setCharisma(MINIMUM_ATTRIBUTE_SCORE - 1);
-        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getCharisma());
+        attributes.setAttributeScore(phenotype, options, CHARISMA, MAXIMUM_ATTRIBUTE_SCORE + 1);
+        assertEquals(phenotype.getAttributeCap(CHARISMA), attributes.getAttributeScore(CHARISMA));
+
+        attributes.setAttributeScore(phenotype, options, CHARISMA, MINIMUM_ATTRIBUTE_SCORE - 1);
+        assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getAttributeScore(CHARISMA));
 
         for (int i = MINIMUM_ATTRIBUTE_SCORE; i <= MAXIMUM_ATTRIBUTE_SCORE; i++) {
-            attributes.setCharisma(i);
-            assertEquals(i, attributes.getCharisma());
+            attributes.setAttributeScore(phenotype, options, CHARISMA, i);
+            assertEquals(min(i, phenotype.getAttributeCap(CHARISMA)), attributes.getAttributeScore(CHARISMA));
         }
     }
 
     @Test
     public void testChangeAllAttributes_BelowMinimum() {
-        Attributes attributes = new Attributes();
-        attributes.changeAllAttributes(-999);
-        assertEqualsAllAttributes(MINIMUM_ATTRIBUTE_SCORE, attributes);
+        final Attributes attributes = new Attributes();
+        final Phenotype phenotype = Phenotype.GENERAL;
+        final PersonnelOptions options = new PersonnelOptions();
+
+        attributes.changeAllAttributes(phenotype, options, -999);
+
+        for (SkillAttribute attribute : SkillAttribute.values()) {
+            if (attribute.isNone()) {
+                continue;
+            }
+
+            assertEquals(MINIMUM_ATTRIBUTE_SCORE, attributes.getAttributeScore(attribute));
+        }
     }
 
     @Test
     public void testChangeAllAttributes_AboveMaximum() {
-        Attributes attributes = new Attributes();
-        attributes.changeAllAttributes(999);
-        assertEqualsAllAttributes(MAXIMUM_ATTRIBUTE_SCORE, attributes);
+        final Attributes attributes = new Attributes();
+        final Phenotype phenotype = Phenotype.GENERAL;
+        final PersonnelOptions options = new PersonnelOptions();
+
+        attributes.changeAllAttributes(phenotype, options, 999);
+
+        for (SkillAttribute attribute : SkillAttribute.values()) {
+            if (attribute.isNone()) {
+                continue;
+            }
+
+            assertEquals(phenotype.getAttributeCap(attribute), attributes.getAttributeScore(attribute));
+        }
     }
 
     @Test
     public void testChangeAllAttributes_AllPossibleValues() {
-        int minimum = MINIMUM_ATTRIBUTE_SCORE - DEFAULT_ATTRIBUTE_SCORE;
-        int maximum = MAXIMUM_ATTRIBUTE_SCORE - DEFAULT_ATTRIBUTE_SCORE;
+        final Phenotype phenotype = Phenotype.GENERAL;
+        final PersonnelOptions options = new PersonnelOptions();
 
-        for (int i = minimum; i <= maximum; i++) {
-            Attributes attributes = new Attributes();
-            int expectation = DEFAULT_ATTRIBUTE_SCORE + i;
+        for (int i = MINIMUM_ATTRIBUTE_SCORE; i <= MAXIMUM_ATTRIBUTE_SCORE; i++) {
+            // reset attributes
+            Attributes attributes = new Attributes(MINIMUM_ATTRIBUTE_SCORE);
 
-            attributes.changeAllAttributes(i);
-            assertEqualsAllAttributes(expectation, attributes);
+            attributes.changeAllAttributes(phenotype, options, i);
+
+            for (SkillAttribute attribute : SkillAttribute.values()) {
+                if (attribute.isNone()) {
+                    continue;
+                }
+
+                int newValue = attributes.getAttributeScore(attribute);
+                int expected = MINIMUM_ATTRIBUTE_SCORE + i;
+                // Account for attribute caps
+                expected = min(expected, phenotype.getAttributeCap(attribute));
+                assertEquals(expected, newValue);
+            }
         }
-    }
-
-    /**
-     * Asserts that all attributes of the given {@link Attributes} object are equal to the expected value.
-     *
-     * <p>This utility method performs assertions on the following attributes:</p>
-     * <ul>
-     *     <li>Strength</li>
-     *     <li>Body</li>
-     *     <li>Reflexes</li>
-     *     <li>Dexterity</li>
-     *     <li>Intelligence</li>
-     *     <li>Willpower</li>
-     *     <li>Charisma</li>
-     * </ul>
-     * <p>If any attribute does not match the expected value, an assertion error will be thrown.</p>
-     *
-     * @param expectation the expected value for all attributes.
-     * @param attributes  the {@link Attributes} object whose attributes are being tested.
-     *
-     * @throws AssertionError if any attribute does not match the expected value.
-     * @since 0.50.5
-     */
-    private static void assertEqualsAllAttributes(int expectation, Attributes attributes) {
-        assertEquals(expectation, attributes.getStrength());
-        assertEquals(expectation, attributes.getBody());
-        assertEquals(expectation, attributes.getReflexes());
-        assertEquals(expectation, attributes.getDexterity());
-        assertEquals(expectation, attributes.getIntelligence());
-        assertEquals(expectation, attributes.getWillpower());
-        assertEquals(expectation, attributes.getCharisma());
     }
 }

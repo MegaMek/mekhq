@@ -27,21 +27,24 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import static megamek.common.Compute.d6;
+import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import megamek.common.Compute;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 public class DefaultSkillGenerator extends AbstractSkillGenerator {
     //region Constructors
@@ -147,9 +150,97 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
                 }
             }
 
-            String selSkill = possibleSkills.get(Compute.randomInt(possibleSkills.size()));
+            String selSkill = possibleSkills.get(randomInt(possibleSkills.size()));
             int secondLvl = Utilities.generateExpLevel(rskillPrefs.getSecondSkillBonus());
             addSkill(person, selSkill, secondLvl, rskillPrefs.randomizeSkill(), 0);
+        }
+    }
+
+    @Override
+    public void generateAttributes(Person person) {
+        RandomSkillPreferences skillPreferences = getSkillPreferences();
+        boolean extraRandomAttributes = skillPreferences.isRandomizeAttributes();
+
+        PersonnelRole profession = person.getPrimaryRole();
+        Phenotype phenotype = person.getPhenotype();
+        for (SkillAttribute attribute : SkillAttribute.values()) {
+            if (attribute.isNone()) {
+                continue;
+            }
+
+            // Profession && Phenotype adjustments
+            int baseAttributeScore = profession.getAttributeModifier(attribute);
+            int attributeModifier = phenotype.getAttributeModifier(attribute);
+            person.setAttributeScore(attribute, baseAttributeScore + attributeModifier);
+
+            // Attribute randomization
+            int roll = d6();
+
+            if (roll == 1) {
+                person.changeAttributeScore(attribute, -1);
+
+                if (extraRandomAttributes) {
+                    while ((d6() == 1) && (person.getAttributeScore(attribute) > MINIMUM_ATTRIBUTE_SCORE)) {
+                        person.changeAttributeScore(attribute, -1);
+                    }
+                }
+            } else if (roll == 6) {
+                person.changeAttributeScore(attribute, 1);
+
+                if (extraRandomAttributes) {
+                    int attributeCap = person.getPhenotype().getAttributeCap(attribute);
+                    while ((d6() == 6) && (person.getAttributeScore(attribute) < attributeCap)) {
+                        person.changeAttributeScore(attribute, 1);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Generates traits for the specified person based on random or pre-determined criteria.
+     *
+     * <p>When randomization is enabled, this method calculates and assigns specific traits such as connections,
+     * reputation, wealth, and bad luck using random rolls. Each trait has its own set of rules for adjustment.</p>
+     *
+     * @param person The person whose traits will be updated. Traits are adjusted based on random rolls when
+     *               randomization is enabled.
+     */
+    @Override
+    public void generateTraits(Person person) {
+        if (!getSkillPreferences().isRandomizeTraits()) {
+            return;
+        }
+
+        // Connections
+        if (d6() == 6) {
+            person.setConnections(1);
+        } else {
+            person.setConnections(0);
+        }
+
+        // Reputation
+        int roll = d6();
+        if (roll == 6 || roll == 1) {
+            person.setReputation(roll == 6 ? 1 : -1);
+        } else {
+            person.setReputation(0);
+        }
+
+        // Wealth
+        roll = d6();
+        if (roll == 6 || roll == 1) {
+            person.setWealth(roll == 6 ? 1 : -1);
+        } else {
+            person.setWealth(0);
+        }
+
+        // Unlucky
+        roll = randomInt(20);
+        if (roll == 0) {
+            person.setUnlucky(1);
+        } else {
+            person.setUnlucky(0);
         }
     }
 }

@@ -48,7 +48,7 @@ public enum UnitMarketRarity {
     // region Constructors
     UnitMarketRarity(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
     }
     // endregion Constructors
@@ -93,8 +93,7 @@ public enum UnitMarketRarity {
             case "3", "Common" -> COMMON;
             case "4", "Very Common" -> VERY_COMMON;
             default -> throw new IllegalStateException(
-                    "Unexpected value in mekhq/campaign/market/enums/UnitMarketRarity.java/parseFromString: "
-                            + text);
+                  "Unexpected value in mekhq/campaign/market/enums/UnitMarketRarity.java/fromString: " + text);
         };
     }
     // endregion File I/O

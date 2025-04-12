@@ -52,7 +52,9 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import megamek.Version;
 import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Aero;
@@ -67,6 +69,7 @@ import megamek.common.Tank;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
@@ -83,6 +86,14 @@ import org.w3c.dom.NodeList;
  */
 public class SkillType {
     private static final MMLogger logger = MMLogger.create(SkillType.class);
+
+    /**
+     * A constant string value representing the suffix " (RP Only)".
+     *
+     * <p><b>Usage:</b> This is used to denote a skill that has no mechanical benefits. This tag should be
+     * progressively removed as mechanics are expanded to use these skills.</p>
+     */
+    public static final String RP_ONLY_TAG = " (RP Only)";
 
     // combat skills
     public static final String S_PILOT_MEK = "Piloting/Mek";
@@ -121,46 +132,46 @@ public class SkillType {
     public static final String S_TACTICS = "Tactics";
 
     // roleplay skills
-    public static final String S_ACROBATICS = "Acrobatics (RP Only)";
-    public static final String S_ACTING = "Acting (RP Only)";
-    public static final String S_ANIMAL_HANDLING = "Animal Handling (RP Only)";
-    public static final String S_APPRAISAL = "Appraisal (RP Only)";
-    public static final String S_ARCHERY = "Archery (RP Only)";
-    public static final String S_ART_DANCING = "Art/Dancing (RP Only)";
-    public static final String S_ART_DRAWING = "Art/Drawing (RP Only)";
-    public static final String S_ART_PAINTING = "Art/Painting (RP Only)";
-    public static final String S_ART_WRITING = "Art/Writing (RP Only)";
-    public static final String S_CLIMBING = "Climbing (RP Only)";
-    public static final String S_COMMUNICATIONS = "Communications (RP Only)";
-    public static final String S_COMPUTERS = "Computers (RP Only)";
-    public static final String S_CRYPTOGRAPHY = "Cryptography (RP Only)";
-    public static final String S_DEMOLITIONS = "Demolitions (RP Only)";
-    public static final String S_DISGUISE = "Disguise (RP Only)";
-    public static final String S_ESCAPE_ARTIST = "Escape Artist (RP Only)";
-    public static final String S_FORGERY = "Forgery (RP Only)";
-    public static final String S_INTEREST_HISTORY = "Interest/History (RP Only)";
-    public static final String S_INTEREST_LITERATURE = "Interest/Literature (RP Only)";
-    public static final String S_INTEREST_HOLO_GAMES = "Interest/Holo-Games (RP Only)";
-    public static final String S_INTEREST_SPORTS = "Interest/Sports (RP Only)";
-    public static final String S_INTERROGATION = "Interrogation (RP Only)";
-    public static final String S_INVESTIGATION = "Investigation (RP Only)";
-    public static final String S_LANGUAGES = "Languages (RP Only)";
-    public static final String S_MARTIAL_ARTS = "Martial Arts (RP Only)";
-    public static final String S_PERCEPTION = "Perception (RP Only)";
-    public static final String S_SLEIGHT_OF_HAND = "Sleight of Hand (RP Only)";
-    public static final String S_PROTOCOLS = "Protocols (RP Only)";
-    public static final String S_SCIENCE_BIOLOGY = "Science/Biology (RP Only)";
-    public static final String S_SCIENCE_CHEMISTRY = "Science/Chemistry (RP Only)";
-    public static final String S_SCIENCE_MATHEMATICS = "Science/Mathematics (RP Only)";
-    public static final String S_SCIENCE_PHYSICS = "Science/Physics (RP Only)";
-    public static final String S_SECURITY_SYSTEMS_ELECTRONIC = "Security Systems/Electronic (RP Only)";
-    public static final String S_SCIENCE_SYSTEMS_MECHANICAL = "Security Systems/Mechanical (RP Only)";
-    public static final String S_SENSOR_OPERATIONS = "Sensor Operations (RP Only)";
-    public static final String S_STEALTH = "Stealth (RP Only)";
-    public static final String S_STREETWISE = "Streetwise (RP Only)";
-    public static final String S_SURVIVAL = "Survival (RP Only)";
-    public static final String S_TRACKING = "Tracking (RP Only)";
-    public static final String S_TRAINING = "Training (RP Only)";
+    public static final String S_ACROBATICS = "Acrobatics" + RP_ONLY_TAG;
+    public static final String S_ACTING = "Acting" + RP_ONLY_TAG;
+    public static final String S_ANIMAL_HANDLING = "Animal Handling" + RP_ONLY_TAG;
+    public static final String S_APPRAISAL = "Appraisal" + RP_ONLY_TAG;
+    public static final String S_ARCHERY = "Archery" + RP_ONLY_TAG;
+    public static final String S_ART_DANCING = "Art/Dancing" + RP_ONLY_TAG;
+    public static final String S_ART_DRAWING = "Art/Drawing" + RP_ONLY_TAG;
+    public static final String S_ART_PAINTING = "Art/Painting" + RP_ONLY_TAG;
+    public static final String S_ART_WRITING = "Art/Writing" + RP_ONLY_TAG;
+    public static final String S_CLIMBING = "Climbing" + RP_ONLY_TAG;
+    public static final String S_COMMUNICATIONS = "Communications" + RP_ONLY_TAG;
+    public static final String S_COMPUTERS = "Computers" + RP_ONLY_TAG;
+    public static final String S_CRYPTOGRAPHY = "Cryptography" + RP_ONLY_TAG;
+    public static final String S_DEMOLITIONS = "Demolitions" + RP_ONLY_TAG;
+    public static final String S_DISGUISE = "Disguise" + RP_ONLY_TAG;
+    public static final String S_ESCAPE_ARTIST = "Escape Artist" + RP_ONLY_TAG;
+    public static final String S_FORGERY = "Forgery" + RP_ONLY_TAG;
+    public static final String S_INTEREST_HISTORY = "Interest/History" + RP_ONLY_TAG;
+    public static final String S_INTEREST_LITERATURE = "Interest/Literature" + RP_ONLY_TAG;
+    public static final String S_INTEREST_HOLO_GAMES = "Interest/Holo-Games" + RP_ONLY_TAG;
+    public static final String S_INTEREST_SPORTS = "Interest/Sports" + RP_ONLY_TAG;
+    public static final String S_INTERROGATION = "Interrogation" + RP_ONLY_TAG;
+    public static final String S_INVESTIGATION = "Investigation" + RP_ONLY_TAG;
+    public static final String S_LANGUAGES = "Languages" + RP_ONLY_TAG;
+    public static final String S_MARTIAL_ARTS = "Martial Arts" + RP_ONLY_TAG;
+    public static final String S_PERCEPTION = "Perception" + RP_ONLY_TAG;
+    public static final String S_SLEIGHT_OF_HAND = "Sleight of Hand" + RP_ONLY_TAG;
+    public static final String S_PROTOCOLS = "Protocols" + RP_ONLY_TAG;
+    public static final String S_SCIENCE_BIOLOGY = "Science/Biology" + RP_ONLY_TAG;
+    public static final String S_SCIENCE_CHEMISTRY = "Science/Chemistry" + RP_ONLY_TAG;
+    public static final String S_SCIENCE_MATHEMATICS = "Science/Mathematics" + RP_ONLY_TAG;
+    public static final String S_SCIENCE_PHYSICS = "Science/Physics" + RP_ONLY_TAG;
+    public static final String S_SECURITY_SYSTEMS_ELECTRONIC = "Security Systems/Electronic" + RP_ONLY_TAG;
+    public static final String S_SCIENCE_SYSTEMS_MECHANICAL = "Security Systems/Mechanical" + RP_ONLY_TAG;
+    public static final String S_SENSOR_OPERATIONS = "Sensor Operations" + RP_ONLY_TAG;
+    public static final String S_STEALTH = "Stealth" + RP_ONLY_TAG;
+    public static final String S_STREETWISE = "Streetwise" + RP_ONLY_TAG;
+    public static final String S_SURVIVAL = "Survival" + RP_ONLY_TAG;
+    public static final String S_TRACKING = "Tracking" + RP_ONLY_TAG;
+    public static final String S_TRAINING = "Training" + RP_ONLY_TAG;
 
     public static final int NUM_LEVELS = 11;
 
@@ -328,7 +339,7 @@ public class SkillType {
         this.name = "MISSING_NAME";
         this.target = 7;
         this.countUp = false;
-        this.subType = COMBAT_GUNNERY;
+        this.subType = SkillSubType.NONE;
         this.firstAttribute = REFLEXES;
         this.secondAttribute = DEXTERITY;
         this.greenLvl = 1;
@@ -378,10 +389,10 @@ public class SkillType {
      *
      *                        <p>For example:</p>
      *                        <pre>
-     *                                                                                                                                                                                                                                                                                     Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                                                                                                                                                                                     SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                                                                                                                                                                                            SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                                                                                                                                                                                     </pre>
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              </pre>
      *
      * @author Illiani
      * @since 0.50.05
@@ -460,12 +471,70 @@ public class SkillType {
                      this.subType == ROLEPLAY_SECURITY;
     }
 
+    /**
+     * Checks if the current instance is affected by the "Gremlins" or "Tech Empathy" SPAs.
+     *
+     * @return {@code true} if the {@code name} field matches one of the known tech or electronic-related skills,
+     *       {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public boolean isAffectedByGremlinsOrTechEmpathy() {
+        return Objects.equals(this.name, S_TECH_BA) ||
+                     Objects.equals(this.name, S_TECH_AERO) ||
+                     Objects.equals(this.name, S_TECH_MECHANIC) ||
+                     Objects.equals(this.name, S_TECH_MEK) ||
+                     Objects.equals(this.name, S_TECH_VESSEL) ||
+                     Objects.equals(this.name, S_COMPUTERS) ||
+                     Objects.equals(this.name, S_COMMUNICATIONS) ||
+                     Objects.equals(this.name, S_SECURITY_SYSTEMS_ELECTRONIC);
+    }
+
+    /**
+     * Checks if the current instance is affected by the "Impatient" or "Patient" SPAs.
+     *
+     * @return {@code true} if the instance is related to one of the affected subtypes or names, {@code false}
+     *       otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public boolean isAffectedByImpatientOrPatient() {
+        return this.isSubTypeOf(ROLEPLAY_ART) ||
+                     this.isSubTypeOf(ROLEPLAY_SECURITY) ||
+                     Objects.equals(this.name, S_CRYPTOGRAPHY) ||
+                     Objects.equals(this.name, S_DEMOLITIONS) ||
+                     Objects.equals(this.name, S_INVESTIGATION) ||
+                     Objects.equals(this.name, S_PROTOCOLS) ||
+                     Objects.equals(this.name, S_STRATEGY) ||
+                     Objects.equals(this.name, S_TACTICS) ||
+                     Objects.equals(this.name, S_TRAINING);
+    }
+
     public SkillAttribute getFirstAttribute() {
         return firstAttribute;
     }
 
     public SkillAttribute getSecondAttribute() {
         return secondAttribute;
+    }
+
+    /**
+     * Determines whether the skill type has the specified attribute.
+     *
+     * <p>This method checks if the provided {@link SkillAttribute} matches either of the two attributes associated
+     * with the skill type.</p>
+     *
+     * @param attribute the {@link SkillAttribute} to check
+     *
+     * @return {@code true} if the skill type includes the specified attribute; {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public boolean hasAttribute(SkillAttribute attribute) {
+        return (firstAttribute == attribute) || (secondAttribute == attribute);
     }
 
     /**
@@ -855,11 +924,26 @@ public class SkillType {
     }
 
     /**
+     * @deprecated use {@link #generateInstanceFromXML(Node, Version)} instead
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public static void generateInstanceFromXML(Node workingNode) {
+        generateInstanceFromXML(workingNode, MHQConstants.VERSION);
+    }
+
+    /**
      * Generates an instance of {@link SkillType} from an XML node.
      *
      * @param workingNode The XML node containing the skill data.
+     * @param version     The current version.
      */
-    public static void generateInstanceFromXML(Node workingNode) {
+    public static void generateInstanceFromXML(Node workingNode, Version version) {
+        // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
+        boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.05"));
+        if (preDatesSkillChanges) {
+            return;
+        }
+
         try {
             SkillType skillType = new SkillType();
             NodeList nodeList = workingNode.getChildNodes();
@@ -915,20 +999,28 @@ public class SkillType {
                 }
             }
 
-            // <50.05 compatibility handler
-            if (skillType.getSubType() == null ||
-                      skillType.getFirstAttribute() == null ||
-                      skillType.getSecondAttribute() == null) {
-                compatibilityHandler(skillType);
-            }
-
             lookupHash.put(skillType.name, skillType);
         } catch (Exception ex) {
             logger.error("", ex);
         }
     }
 
+    /**
+     * @deprecated use {@link #generateSeparateInstanceFromXML(Node, Map, Version)} instead
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public static void generateSeparateInstanceFromXML(final Node wn, final Map<String, SkillType> hash) {
+        generateSeparateInstanceFromXML(wn, hash, MHQConstants.VERSION);
+    }
+
+    public static void generateSeparateInstanceFromXML(final Node wn, final Map<String, SkillType> hash,
+          Version version) {
+        // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
+        boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.05"));
+        if (preDatesSkillChanges) {
+            return;
+        }
+
         try {
             SkillType skillType = new SkillType();
             NodeList nl = wn.getChildNodes();
@@ -963,13 +1055,6 @@ public class SkillType {
                 }
             }
 
-            // <50.05 compatibility handler
-            if (skillType.getSubType() == null ||
-                      skillType.getFirstAttribute() == null ||
-                      skillType.getSecondAttribute() == null) {
-                compatibilityHandler(skillType);
-            }
-
             hash.put(skillType.name, skillType);
         } catch (Exception ex) {
             logger.error("", ex);
@@ -977,35 +1062,9 @@ public class SkillType {
     }
 
     /**
-     * Handles compatibility upgrades for outdated or incomplete {@link SkillType} definitions.
-     *
-     * <p>This method ensures that instances of {@link SkillType} are updated to meet current standards by:
-     * assigning suitable subtypes and attributes based on predefined mappings. If the skill type is recognized as
-     * outdated or missing attributes, the method creates a temporary reference skill and updates the original skill
-     * instance. All changes are logged, and unrecognized skill types are flagged with an error log.</p>
-     *
-     * <p><b>Behavior:</b></p>
-     * <ul>
-     *     <li>Checks if the {@code skillType} is {@code null} and logs a message. If {@code null}, no processing is
-     *     performed.</li>
-     *     <li>Matches the name of the {@link SkillType} against predefined mappings to check for compatibility issues.</li>
-     *     <li>Uses a factory method to create a temporary {@link SkillType} instance designed for the corresponding skill
-     *     (e.g., {@code createPilotingMek()}, {@code createGunneryAero()}).</li>
-     *     <li>Updates incomplete attributes (subtype, first attribute, or second attribute) on the original
-     *     {@link SkillType} to match the temporary reference. Logs the updates for traceability.</li>
-     *     <li>If the skill type name is not recognized, logs an error and halts further processing.</li>
-     * </ul>
-     *
-     * <p><strong>Error Handling:</strong></p>
-     * <ul>
-     *     <li>If the skill type is {@code null}, logs a warning and skips the update process.</li>
-     *     <li>If the skill type name is invalid or unmapped, logs an error with the message
-     *     "Unexpected value in compatibilityHandler".</li>
-     * </ul>
-     *
-     * @param skillType the {@link SkillType} instance to be checked and updated for compatibility. If the
-     *                  {@code skillType} is {@code null}, no action is performed.
+     * @deprecated Unused
      */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     private static void compatibilityHandler(SkillType skillType) {
         if (skillType == null) {
             logger.info("SkillType is null, unable to update compatibility. " +

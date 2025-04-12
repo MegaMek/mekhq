@@ -29,6 +29,7 @@ package mekhq.gui.enums;
 
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -60,6 +61,7 @@ import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
+import mekhq.gui.sorter.AttributeScoreSorter;
 import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.DateStringComparator;
 import mekhq.gui.sorter.FormattedNumberSorter;
@@ -531,8 +533,17 @@ public enum PersonnelTableModelColumn {
 
     public String getCellValue(final Campaign campaign, final PersonnelMarket personnelMarket, final Person person,
           final boolean loadAssignmentFromMarket, final boolean groupByUnit) {
-        PersonnelOptions options = person.getOptions();
+        final PersonnelOptions options = person.getOptions();
+
+        // We define these here, as they're used in multiple cases
+        int currentAttributeValue;
+        int attributeCap;
+
         String sign;
+
+        boolean isUseAgeEffects = campaign.getCampaignOptions().isUseAgeEffects();
+        boolean isClanCampaign = campaign.isClanCampaign();
+        LocalDate today = campaign.getLocalDate();
 
         switch (this) {
             case PERSON:
@@ -790,7 +801,11 @@ public enum PersonnelTableModelColumn {
             case NEGOTIATION:
                 return person.hasSkill(SkillType.S_NEG) ?
                              Integer.toString(person.getSkill(SkillType.S_NEG)
-                                                    .getFinalSkillValue(options, person.getReputation())) :
+                                                    .getFinalSkillValue(options,
+                                                          person.getAdjustedReputation(isUseAgeEffects,
+                                                                isClanCampaign,
+                                                                today,
+                                                                person.getRankLevel()))) :
                              "-";
             case SCROUNGE:
                 return person.hasSkill(SkillType.S_SCROUNGE) ?
@@ -852,7 +867,10 @@ public enum PersonnelTableModelColumn {
             case WEALTH:
                 return Integer.toString(person.getWealth());
             case REPUTATION:
-                return Integer.toString(person.getReputation());
+                return Integer.toString(person.getAdjustedReputation(isUseAgeEffects,
+                      isClanCampaign,
+                      today,
+                      person.getRankLevel()));
             case UNLUCKY:
                 return Integer.toString(person.getUnlucky());
             case FATIGUE:
@@ -895,19 +913,33 @@ public enum PersonnelTableModelColumn {
 
                 return String.valueOf(reasoning.ordinal());
             case STRENGTH:
-                return String.valueOf(person.getAttributeScore(SkillAttribute.STRENGTH));
+                currentAttributeValue = person.getAttributeScore(SkillAttribute.STRENGTH);
+                attributeCap = person.getAttributeCap(SkillAttribute.STRENGTH);
+                return currentAttributeValue + " / " + attributeCap;
             case BODY:
-                return String.valueOf(person.getAttributeScore(SkillAttribute.BODY));
+                currentAttributeValue = person.getAttributeScore(SkillAttribute.BODY);
+                attributeCap = person.getAttributeCap(SkillAttribute.BODY);
+                return currentAttributeValue + " / " + attributeCap;
             case REFLEXES:
-                return String.valueOf(person.getAttributeScore(SkillAttribute.REFLEXES));
+                currentAttributeValue = person.getAttributeScore(SkillAttribute.REFLEXES);
+                attributeCap = person.getAttributeCap(SkillAttribute.REFLEXES);
+                return currentAttributeValue + " / " + attributeCap;
             case DEXTERITY:
-                return String.valueOf(person.getAttributeScore(SkillAttribute.DEXTERITY));
+                currentAttributeValue = person.getAttributeScore(SkillAttribute.DEXTERITY);
+                attributeCap = person.getAttributeCap(SkillAttribute.DEXTERITY);
+                return currentAttributeValue + " / " + attributeCap;
             case INTELLIGENCE:
-                return String.valueOf(person.getAttributeScore(SkillAttribute.INTELLIGENCE));
+                currentAttributeValue = person.getAttributeScore(SkillAttribute.INTELLIGENCE);
+                attributeCap = person.getAttributeCap(SkillAttribute.INTELLIGENCE);
+                return currentAttributeValue + " / " + attributeCap;
             case WILLPOWER:
-                return String.valueOf(person.getAttributeScore(SkillAttribute.WILLPOWER));
+                currentAttributeValue = person.getAttributeScore(SkillAttribute.WILLPOWER);
+                attributeCap = person.getAttributeCap(SkillAttribute.WILLPOWER);
+                return currentAttributeValue + " / " + attributeCap;
             case CHARISMA:
-                return String.valueOf(person.getAttributeScore(SkillAttribute.CHARISMA));
+                currentAttributeValue = person.getAttributeScore(SkillAttribute.CHARISMA);
+                attributeCap = person.getAttributeCap(SkillAttribute.CHARISMA);
+                return currentAttributeValue + " / " + attributeCap;
             default:
                 return "UNIMPLEMENTED";
         }
@@ -1156,14 +1188,8 @@ public enum PersonnelTableModelColumn {
                  SPA_COUNT,
                  IMPLANT_COUNT,
                  LOYALTY,
-                 REASONING,
-                 STRENGTH,
-                 BODY,
-                 REFLEXES,
-                 DEXTERITY,
-                 INTELLIGENCE,
-                 WILLPOWER,
-                 CHARISMA -> new IntegerStringSorter();
+                 REASONING -> new IntegerStringSorter();
+            case STRENGTH, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, CHARISMA -> new AttributeScoreSorter();
             case SALARY -> new FormattedNumberSorter();
             default -> new NaturalOrderComparator();
         };
