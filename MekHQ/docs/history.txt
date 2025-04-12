@@ -163,6 +163,51 @@ MEKHQ VERSION HISTORY:
 + Fix #2968, #2996, #3758, #5332, #6469: Fixed Missing Part Resets when Failing or Cancelling Work Job
 + PR #6598: Fixed Refitting Units With Bays
 + PR #6863: Fixed Princess Not Acting of Their Rounds
++ Fix #305: Added Medical Log, Assignment Log, Performance Report
++ Fix #1460: Corrected Naming of the Planet Herculaneum/Marius's Tears
++ Fix #2183, #3819, #4788: Corrected Hydrogen-Based Fuel Cost Calculation
++ Fix #3799: Added Option To Avoid Empty Systems In Pathfinding
++ Fix #3964: Added Clan Tech Refit Restrictions Before Battle Of Tukayyid
++ Fix #4710: Added Ad-Hoc Maintenance Option
++ Fix #4717: Added Display Of Days Till Next Maintenance Check To Hangar Table
++ Fix #4828, #6476: Updated Maintenance Handling and Tech Assignment Display
++ Fix 6245: Moved logic for adding refit kits from to ensure it works when added via GM Commands
++ Fix #6341: Improved Name Escaping when Saving Unit in MekHQ's MekLab
++ Fix #6409: Corrected Crew Gunnery Skill Limits From 7 to 8
++ Fix #6439: Fixed Turnover Unit Assignment for Characters Breaking Contract
++ Fix #6449: Fixed Find Planet and Planet View Panel Interaction
++ Fix #6544: Restored Ability to Salvage Turrets
++ Fix #6545: Prevented Self-Crewed Unit Crew from Going on Maternity Leave Mid-Refit, Mid-Repair, or Mid-Mothballing
++ Fix #6546: Fixed Display of Misc Award Images; Upgraded Award Image Scaling
++ Fix #6563: Fixed In Transit Sorting in Warehouse Tab
++ PR #6564: Refactored Phenotype Enum; Added ATOW Attributes to Character Generation; Added 'Extra Attribute Randomization' Campaign Option
++ PR #6565: Added Discretionary Spending System Based on Wealth Trait
++ PR #6568: Fixed Facility Capacities Display Logic In Command Center Tab
++ PR #6569: Added Campaign Option To Reset Criminal Record
++ PR #6570: Added Option To Reset Temporary Prisoner Capacity
++ PR #6572: Added Randomize Traits Option For Character Creation
++ PR #6573: Refactored Edge Handling to Use Adjusted Edge Values
++ PR #6575: Updated Aging Effects to Include Clan Reputation Modifiers & Glass Jaw Gain
++ PR #6578: Added Skill Check Dialog Using New Centralized Skill Check Utility
++ PR #6579: Updated Edge Handling and GUI Support (Sentry)
++ PR #6580: Fixed Infinite Loop in getAvailableForceIDs (Sentry)
++ PR #6581: Ensured StratCon Campaigns Always Generate At Least One Track (Sentry)
++ PR #6593: Added Prisoner Capture Target Number to Logs
++ Fix #6596: Added Off-Board Deployment Validation and Improved Generation Safety
++ PR #6597: Refactored Temporary Prisoner Capacity Management
++ PR #6602: Fixed 24-hour Work Day in Refit Display
++ PR #6604: Fixed Mercenary Auction Decline Auction Option
++ PR #6608: Added Option to Award Children a Single SPA When They Turn 16
++ Fix #6609: Increased Width of Finance Summary
++ PR #6613: Added Tint To Campaign Options Tab Images
++ PR #6615: Fixed Skills Failing to Load into Campaign Options if Out-of-Date
++ Fix #6616: Fixed Convoys Not Deploying to Scenarios
++ Fix #6618: Implemented Pre-Tukayyid Clan Tech Restrictions to Force Generation
++ PR #6625: Adjusted Missing Team Fallback Logging
++ PR #6626: Implemented Graceful Failure when Loading Random Marriage Settings from Older Versions
++ PR #6627: Implemented Graceful Failure when Loading Random Procreation Settings from Older Versions
++ PR #6628: Fixed Error On Loading Campaign That Predates Combat Teams
++ PR #6607: Added 29 Brand New, Fully Implemented SPAs from A Time of War; Added 2 New Unofficial SPAs
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
@@ -368,8 +413,6 @@ MEKHQ VERSION HISTORY:
 + PR #6319: Added Early Exit for Objective Determination Self-Correction Loop
 + PR #6323: Added MekHQ New Player Guide
 + PR #6325: Updated New Player Guide PDF
-+ Fix #6596: Added Off-Board Deployment Validation and Improved Generation Safety
-
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment
