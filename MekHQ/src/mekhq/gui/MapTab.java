@@ -27,6 +27,27 @@
  */
 package mekhq.gui;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel.abandonMissingPersonnel;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Objects;
+import java.util.ResourceBundle;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JViewport;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
+
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.JumpPath;
@@ -40,15 +61,6 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.JumpPathViewPanel;
 import mekhq.gui.view.PlanetViewPanel;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Objects;
-import java.util.ResourceBundle;
-
-import static mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel.abandonMissingPersonnel;
 
 /**
  * Displays interstellar map and contains transit controls.
@@ -81,7 +93,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     @Override
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
 
         panMapView = new JPanel(new BorderLayout());
 
@@ -92,14 +104,14 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        panTopButtons.add(new JLabel(resourceMap.getString("lblFindPlanet.text")),
-                gridBagConstraints);
+        panTopButtons.add(new JLabel(resourceMap.getString("lblFindPlanet.text")), gridBagConstraints);
 
         suggestPlanet = new JSuggestField(getFrame(), getCampaign().getSystemNames());
         suggestPlanet.addActionListener(ev -> {
             PlanetarySystem p = getCampaign().getSystemByName(suggestPlanet.getText());
             if (null != p) {
                 panMap.setSelectedSystem(p);
+                panSystem.updatePlanetarySystem(p);
                 refreshPlanetView();
             }
         });
@@ -136,6 +148,20 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         gridBagConstraints.weighty = 0.0;
         panTopButtons.add(btnBeginTransit, gridBagConstraints);
 
+        JCheckBox chkAvoidAbandonedSystems = new JCheckBox(resourceMap.getString("chkAvoidAbandonedSystems.text"));
+        chkAvoidAbandonedSystems.setToolTipText(wordWrap(resourceMap.getString("chkAvoidAbandonedSystems.toolTipText")));
+        chkAvoidAbandonedSystems.addActionListener(ev -> getCampaign().setIsAvoidingEmptySystems(
+              chkAvoidAbandonedSystems.isSelected()));
+        chkAvoidAbandonedSystems.setSelected(getCampaign().isAvoidingEmptySystems());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weighty = 0.0;
+        panTopButtons.add(chkAvoidAbandonedSystems, gridBagConstraints);
+
         panMapView.add(panTopButtons, BorderLayout.PAGE_START);
 
         //the actual map
@@ -145,7 +171,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         panMapView.add(panMap, BorderLayout.CENTER);
 
         mapView = new JViewport();
-        mapView.setMinimumSize(new Dimension(600,600));
+        mapView.setMinimumSize(new Dimension(600, 600));
         mapView.setView(panMapView);
 
         scrollPlanetView = new JScrollPaneWithSpeed();
@@ -180,8 +206,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
     private void calculateJumpPath() {
         if (null != panMap.getSelectedSystem()) {
-            panMap.setJumpPath(
-                    getCampaign().calculateJumpPath(getCampaign().getCurrentSystem(), panMap.getSelectedSystem()));
+            panMap.setJumpPath(getCampaign().calculateJumpPath(getCampaign().getCurrentSystem(),
+                  panMap.getSelectedSystem()));
             refreshPlanetView();
         }
     }
@@ -234,8 +260,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     }
 
     /**
-     * Switch to the planetary system view, highlighting
-     * a specific {@link Planet}
+     * Switch to the planetary system view, highlighting a specific {@link Planet}
+     *
      * @param p The {@link Planet} to select.
      */
     public void switchPlanetaryMap(Planet p) {
@@ -247,8 +273,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     }
 
     /**
-     * Switches to the planetary system view, highlighting
-     * a specific {@link PlanetarySystem}.
+     * Switches to the planetary system view, highlighting a specific {@link PlanetarySystem}.
+     *
      * @param s The {@link PlanetarySystem} to select.
      */
     public void switchPlanetaryMap(PlanetarySystem s) {
@@ -259,8 +285,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     }
 
     /**
-     * Switches to the interstellar map view, highlighting
-     * a specific {@link PlanetarySystem}.
+     * Switches to the interstellar map view, highlighting a specific {@link PlanetarySystem}.
+     *
      * @param s The {@link PlanetarySystem} to select.
      */
     public void switchSystemsMap(PlanetarySystem s) {

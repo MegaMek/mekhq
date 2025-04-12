@@ -63,7 +63,7 @@ public class BirthAnnouncement {
     private final Person parent;
 
     private final static double AVERAGE_BABY_WEIGHT_IN_KG = 3.5;
-    private final static int SUPPRESS_DIALOG_RESPONSE_INDEX = 3;
+    private final static int SUPPRESS_DIALOG_RESPONSE_INDEX = 2;
 
 
     /**
@@ -92,7 +92,7 @@ public class BirthAnnouncement {
 
         if (dialog.getDialogChoice() == SUPPRESS_DIALOG_RESPONSE_INDEX) {
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
-            campaignOptions.setShowLifeEventDialogBirths(false);
+            campaignOptions.setShowLifeEventDialogBirths(true);
         }
     }
 

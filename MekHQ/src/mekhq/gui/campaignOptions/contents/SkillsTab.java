@@ -71,25 +71,6 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
-import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.gui.campaignOptions.components.*;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.*;
-import java.util.List;
-
-import static megamek.common.enums.SkillLevel.*;
-import static mekhq.campaign.personnel.skills.SkillType.isCombatSkill;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
-import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.personnel.skills.enums.SkillSubType;
-import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
-import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
-import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
  * SkillsTab is a component of the campaign options user interface that allows players to configure the rules and costs
@@ -220,7 +201,7 @@ public class SkillsTab {
             SkillSubType subType = skill.getSubType();
 
             boolean isCorrectType = switch (category) {
-                case COMBAT_GUNNERY -> subType == COMBAT_GUNNERY;
+                case NONE, COMBAT_GUNNERY -> subType == COMBAT_GUNNERY;
                 case COMBAT_PILOTING -> subType == COMBAT_PILOTING;
                 case SUPPORT -> subType == SUPPORT || subType == SUPPORT_COMMAND;
                 case ROLEPLAY_GENERAL -> subType == ROLEPLAY_GENERAL ||
@@ -518,7 +499,7 @@ public class SkillsTab {
      * @param comboBox   the combo box that triggered the action.
      */
     private static void milestoneActionListener(List<JComboBox<SkillLevel>> comboBoxes,
-                                                JComboBox<SkillLevel> comboBox) {
+          JComboBox<SkillLevel> comboBox) {
         int originIndex = comboBoxes.indexOf(comboBox);
 
         SkillLevel currentSelection = (SkillLevel) comboBox.getSelectedItem();
@@ -572,7 +553,7 @@ public class SkillsTab {
      *                          instead.
      */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
-                                              Map<String, SkillType> presetSkillValues) {
+          Map<String, SkillType> presetSkillValues) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -642,7 +623,7 @@ public class SkillsTab {
      * @return the corresponding {@link SkillLevel} for the given milestone.
      */
     private SkillLevel determineMilestoneLevel(int index, int greenIndex, int regularIndex, int veteranIndex,
-                                               int eliteIndex) {
+          int eliteIndex) {
         if (index < greenIndex) {
             return ULTRA_GREEN;
         }
@@ -671,7 +652,7 @@ public class SkillsTab {
      *                              values will use the campaign's default values.
      */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions,
-                                               @Nullable Map<String, SkillType> presetSkills) {
+          @Nullable Map<String, SkillType> presetSkills) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;

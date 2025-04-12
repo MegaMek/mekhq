@@ -50,7 +50,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.log.PersonalLogger;
+import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.Rank;
@@ -170,7 +170,7 @@ public final class BatchXPDialog extends JDialog {
         personTypeModel.addElement(new PersonTypeItem(resourceMap.getString("primaryRole.choice.text"), null));
         final PersonnelRole[] personnelRoles = PersonnelRole.values();
         for (PersonnelRole personnelRole : personnelRoles) {
-            personTypeModel.addElement(new PersonTypeItem(personnelRole.getName(campaign.getFaction().isClan()),
+            personTypeModel.addElement(new PersonTypeItem(personnelRole.getLabel(campaign.getFaction().isClan()),
                   personnelRole.ordinal()));
         }
         choiceType.setModel(personTypeModel);
@@ -373,11 +373,11 @@ public final class BatchXPDialog extends JDialog {
                 // Improve the skill and deduce the cost
                 person.improveSkill(skillName);
                 person.spendXP(cost);
-                PersonalLogger.improvedSkill(campaign,
+                PerformanceLogger.improvedSkill(campaign,
                       person,
                       campaign.getLocalDate(),
                       person.getSkill(skillName).getType().getName(),
-                      person.getSkill(skillName).toString(person.getOptions(), person.getReputation()));
+                      person.getSkill(skillName).toString());
                 campaign.personUpdated(person);
             }
 

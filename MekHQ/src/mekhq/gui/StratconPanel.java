@@ -30,10 +30,10 @@ package mekhq.gui;
 import static java.awt.Color.BLACK;
 import static java.awt.Color.BLUE;
 import static java.awt.Font.BOLD;
+import static megamek.utilities.ImageUtilities.addTintToBufferedImage;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
 import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
 import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.UNRESOLVED;
-import static mekhq.utilities.ImageUtilities.addTintToBufferedImage;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;

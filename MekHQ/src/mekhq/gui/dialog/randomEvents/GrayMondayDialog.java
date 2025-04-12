@@ -27,9 +27,9 @@
  */
 package mekhq.gui.dialog.randomEvents;
 
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
-import static mekhq.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.Component;
