@@ -1643,7 +1643,7 @@ public class StratconRulesManager {
 
         if (isGMReinforcement) {
             reportStatus.append(String.format(resources.getString("reinforcementsAttempt.text.gm"),
-                  scenario.getName()));
+                  scenario.getHyperlinkedName()));
             reportStatus.append(' ');
             reportStatus.append(String.format(resources.getString("reinforcementsAutomaticSuccess.text"),
                   spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
@@ -1652,7 +1652,7 @@ public class StratconRulesManager {
             return SUCCESS;
         } else {
             reportStatus.append(String.format(resources.getString("reinforcementsAttempt.text"),
-                  scenario.getName(),
+                  scenario.getHyperlinkedName(),
                   roll,
                   maneuverRoleReport,
                   reinforcementTargetNumber));

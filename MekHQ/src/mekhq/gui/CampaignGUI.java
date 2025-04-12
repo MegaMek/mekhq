@@ -1350,6 +1350,60 @@ public class CampaignGUI extends JPanel {
         tabMain.setSelectedIndex(getTabIndexByName(resourceMap.getString("panHangar.TabConstraints.tabTitle")));
     }
 
+    /**
+     * Focuses the UI on a specific scenario by its ID.
+     *
+     * <p>This method first retrieves the Briefing Room tab. If the tab exists, it:</p>
+     *
+     * <ol>
+     *   <li>Delegates to the {@link BriefingTab}'s {@link BriefingTab#focusOnScenario} method to select the
+     *   specific scenario</li>
+     *   <li>Switches the main tab view to display the Briefing Room tab</li>
+     * </ol>
+     *
+     * <p>If the Briefing Room tab cannot be found, no action is taken.</p>
+     *
+     * @param targetId The unique identifier of the scenario to focus on
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public void focusOnScenario(int targetId) {
+        BriefingTab briefingTab = (BriefingTab) getTab(MHQTabType.BRIEFING_ROOM);
+        if (briefingTab == null) {
+            return;
+        }
+        briefingTab.focusOnScenario(targetId);
+        tabMain.setSelectedIndex(getTabIndexByName(resourceMap.getString("panBriefing.TabConstraints.tabTitle")));
+    }
+
+    /**
+     * Focuses the UI on a specific mission by its ID.
+     *
+     * <p>This method first retrieves the {@link BriefingTab} tab. If the tab exists, it:</p>
+     *
+     * <ol>
+     *   <li>Delegates to the {@link BriefingTab}'s {@link BriefingTab#focusOnMission} method to select the specific
+     *   mission</li>
+     *   <li>Switches the main tab view to display the Briefing Room tab</li>
+     * </ol>
+     *
+     * <p>If the Briefing Room tab cannot be found, no action is taken.</p>
+     *
+     * @param targetId The unique identifier of the mission to focus on
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public void focusOnMission(int targetId) {
+        BriefingTab briefingTab = (BriefingTab) getTab(MHQTabType.BRIEFING_ROOM);
+        if (briefingTab == null) {
+            return;
+        }
+        briefingTab.focusOnMission(targetId);
+        tabMain.setSelectedIndex(getTabIndexByName(resourceMap.getString("panBriefing.TabConstraints.tabTitle")));
+    }
+
     public void focusOnUnitInRepairBay(UUID id) {
         if (null == id) {
             return;
