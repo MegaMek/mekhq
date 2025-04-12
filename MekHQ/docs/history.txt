@@ -197,6 +197,7 @@ MEKHQ VERSION HISTORY:
 + PR #6597: Refactored Temporary Prisoner Capacity Management
 + PR #6602: Fixed 24-hour Work Day in Refit Display
 + PR #6604: Fixed Mercenary Auction Decline Auction Option
++ PR #6607: Added 29 Brand New, Fully Implemented SPAs from A Time of War; Added 2 New Unofficial SPAs
 + PR #6608: Added Option to Award Children a Single SPA When They Turn 16
 + Fix #6609: Increased Width of Finance Summary
 + PR #6613: Added Tint To Campaign Options Tab Images
@@ -207,7 +208,7 @@ MEKHQ VERSION HISTORY:
 + PR #6626: Implemented Graceful Failure when Loading Random Marriage Settings from Older Versions
 + PR #6627: Implemented Graceful Failure when Loading Random Procreation Settings from Older Versions
 + PR #6628: Fixed Error On Loading Campaign That Predates Combat Teams
-+ PR #6607: Added 29 Brand New, Fully Implemented SPAs from A Time of War; Added 2 New Unofficial SPAs
++ PR #6634: Fixed NPE When Loading Units Without an Engine
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
