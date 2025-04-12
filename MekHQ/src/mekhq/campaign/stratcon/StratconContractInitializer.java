@@ -279,7 +279,7 @@ public class StratconContractInitializer {
             //
             //                    if (hiddenCache != null) {
             //                        logger.info(String.format("A secret cache has been spawned for contract %s",
-            //                            contract.getName()));
+            //                            contract.getLabel()));
             //                    }
             //                } else {
             //                    logger.error("'Chasing a Rumor' scenario failed to deserialize");

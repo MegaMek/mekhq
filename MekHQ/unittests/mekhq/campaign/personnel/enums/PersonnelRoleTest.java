@@ -27,6 +27,8 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import static mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,31 +37,29 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Set;
 
-import mekhq.MekHQ;
 import org.junit.jupiter.api.Test;
 
 class PersonnelRoleTest {
-    // region Variable Declarations
     private static final PersonnelRole[] roles = PersonnelRole.values();
 
-    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-          MekHQ.getMHQOptions().getLocale());
-    // endregion Variable Declarations
-
-    // region Getters
     @Test
-    void testGetName() {
-        assertEquals(resources.getString("PersonnelRole.MEKWARRIOR.text"), PersonnelRole.MEKWARRIOR.getName(false));
-        assertEquals(resources.getString("PersonnelRole.MEKWARRIOR.text"), PersonnelRole.MEKWARRIOR.getName(true));
-        assertEquals(resources.getString("PersonnelRole.BATTLE_ARMOUR.text"),
-              PersonnelRole.BATTLE_ARMOUR.getName(false));
-        assertEquals(resources.getString("PersonnelRole.BATTLE_ARMOUR.clan.text"),
-              PersonnelRole.BATTLE_ARMOUR.getName(true));
-        assertEquals(resources.getString("PersonnelRole.ADMINISTRATOR_LOGISTICS.text"),
-              PersonnelRole.ADMINISTRATOR_LOGISTICS.getName(false));
+    void testGetLabel_NotClan() {
+        for (final PersonnelRole personnelRole : roles) {
+            String label = personnelRole.getLabel(false);
+            boolean isValid = isResourceKeyValid(label);
+            assertTrue(isValid, "Invalid resource key: " + label);
+        }
+    }
+
+    @Test
+    void testGetLabel_IsClan() {
+        for (final PersonnelRole personnelRole : roles) {
+            String label = personnelRole.getLabel(true);
+            boolean isValid = isResourceKeyValid(label);
+            assertTrue(isValid, "Invalid resource key: " + label);
+        }
     }
 
     @Test
@@ -75,6 +75,7 @@ class PersonnelRoleTest {
             usedMnemonics.add(role.getMnemonic());
         }
     }
+
     // endregion Getters
 
     // region Boolean Comparison Methods
@@ -191,7 +192,7 @@ class PersonnelRoleTest {
     @Test
     void testIsBattleArmour() {
         for (final PersonnelRole personnelRole : roles) {
-            if (personnelRole == PersonnelRole.BATTLE_ARMOUR) {
+            if (personnelRole == BATTLE_ARMOUR) {
                 assertTrue(personnelRole.isBattleArmour());
             } else {
                 assertFalse(personnelRole.isBattleArmour());
@@ -519,7 +520,7 @@ class PersonnelRoleTest {
     @Test
     void testIsSoldierOrBattleArmour() {
         for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.SOLDIER) || (personnelRole == PersonnelRole.BATTLE_ARMOUR)) {
+            if ((personnelRole == PersonnelRole.SOLDIER) || (personnelRole == BATTLE_ARMOUR)) {
                 assertTrue(personnelRole.isSoldierOrBattleArmour());
             } else {
                 assertFalse(personnelRole.isSoldierOrBattleArmour());
@@ -647,6 +648,34 @@ class PersonnelRoleTest {
     }
 
     @Test
+    void testFromString() {
+        // Valid inputs
+        assertEquals(PersonnelRole.MEKWARRIOR, PersonnelRole.fromString("MEKWARRIOR"));
+        assertEquals(PersonnelRole.GROUND_VEHICLE_DRIVER, PersonnelRole.fromString("GROUND_VEHICLE_DRIVER"));
+        assertEquals(PersonnelRole.ASTECH, PersonnelRole.fromString("ASTECH"));
+
+        // Valid inputs with variations in casing
+        assertEquals(PersonnelRole.MEKWARRIOR, PersonnelRole.fromString("MekWarrior"));
+        assertEquals(PersonnelRole.VEHICLE_CREW, PersonnelRole.fromString("vehicle_crew"));
+
+        // Valid inputs with Clan variance
+        assertEquals(BATTLE_ARMOUR, PersonnelRole.fromString("elemental"));
+        assertEquals(BATTLE_ARMOUR, PersonnelRole.fromString("Battle Armor Pilot"));
+
+        // Deprecated names
+        assertEquals(PersonnelRole.MEKWARRIOR, PersonnelRole.fromString("MechWarrior"));
+        assertEquals(PersonnelRole.PROTOMEK_PILOT, PersonnelRole.fromString("protomek PILOT"));
+
+        // Index input
+        assertEquals(BATTLE_ARMOUR, PersonnelRole.fromString(BATTLE_ARMOUR.ordinal() + ""));
+
+        // Invalid inputs
+        assertEquals(PersonnelRole.NONE, PersonnelRole.fromString("INVALID_ROLE"));
+        assertEquals(PersonnelRole.NONE, PersonnelRole.fromString(""));
+        assertEquals(PersonnelRole.NONE, PersonnelRole.fromString(null));
+    }
+
+    @Test
     void testGetPrimaryRoles() {
         // This should be all roles bar one, namely PersonnelRole.NONE
         final List<PersonnelRole> primaryRoles = PersonnelRole.getPrimaryRoles();
@@ -693,23 +722,5 @@ class PersonnelRoleTest {
     // endregion Static Methods
 
     // region File I/O
-    @Test
-    void testParseFromString() {
-        // Normal Parsing
-        assertEquals(PersonnelRole.NONE, PersonnelRole.parseFromString("NONE"));
-        assertEquals(PersonnelRole.BATTLE_ARMOUR, PersonnelRole.parseFromString("BATTLE_ARMOUR"));
-        assertEquals(PersonnelRole.ADMINISTRATOR_LOGISTICS, PersonnelRole.parseFromString("ADMINISTRATOR_LOGISTICS"));
-
-        // Error Case
-        assertEquals(PersonnelRole.NONE, PersonnelRole.parseFromString("28"));
-        assertEquals(PersonnelRole.NONE, PersonnelRole.parseFromString("blah"));
-    }
     // endregion File I/O
-
-    @Test
-    void testToStringOverride() {
-        assertEquals(resources.getString("PersonnelRole.MEKWARRIOR.text"), PersonnelRole.MEKWARRIOR.toString());
-        assertEquals(resources.getString("PersonnelRole.ADMINISTRATOR_LOGISTICS.text"),
-              PersonnelRole.ADMINISTRATOR_LOGISTICS.toString());
-    }
 }

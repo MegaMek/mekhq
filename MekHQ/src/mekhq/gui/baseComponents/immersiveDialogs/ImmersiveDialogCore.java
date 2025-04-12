@@ -710,12 +710,12 @@ public class ImmersiveDialogCore extends JDialog {
 
             PersonnelRole primaryRole = speaker.getPrimaryRole();
             if (!primaryRole.isNone()) {
-                speakerDescription.append("<br>").append(primaryRole.getName(isClan));
+                speakerDescription.append("<br>").append(primaryRole.getLabel(isClan));
             }
 
             PersonnelRole secondaryRole = speaker.getSecondaryRole();
             if (!secondaryRole.isNone()) {
-                speakerDescription.append("<br>").append(secondaryRole.getName(isClan));
+                speakerDescription.append("<br>").append(secondaryRole.getLabel(isClan));
             }
 
             Unit assignedUnit = speaker.getUnit();

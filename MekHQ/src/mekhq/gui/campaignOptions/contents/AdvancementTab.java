@@ -113,6 +113,7 @@ public class AdvancementTab {
 
     //start Skill Randomization Tab
     private JCheckBox chkExtraRandomness;
+    private JCheckBox chkRandomizeAttributes;
     private JCheckBox chkRandomizeTraits;
     private JCheckBox chkComingOfAgeSPAs;
 
@@ -521,6 +522,7 @@ public class AdvancementTab {
      */
     private void initializeSkillRandomizationTab() {
         chkExtraRandomness = new JCheckBox();
+        chkRandomizeAttributes = new JCheckBox();
         chkRandomizeTraits = new JCheckBox();
         chkComingOfAgeSPAs = new JCheckBox();
 
@@ -607,6 +609,7 @@ public class AdvancementTab {
 
         // Contents
         chkExtraRandomness = new CampaignOptionsCheckBox("ExtraRandomness");
+        chkRandomizeAttributes = new CampaignOptionsCheckBox("RandomizeAttributes");
         chkRandomizeTraits = new CampaignOptionsCheckBox("RandomizeTraits");
         chkComingOfAgeSPAs = new CampaignOptionsCheckBox("ComingOfAgeAbilities");
 
@@ -625,6 +628,9 @@ public class AdvancementTab {
         layout.gridy++;
         layout.gridwidth = 1;
         panel.add(chkExtraRandomness, layout);
+
+        layout.gridy++;
+        panel.add(chkRandomizeAttributes, layout);
 
         layout.gridy++;
         panel.add(chkRandomizeTraits, layout);
@@ -1039,7 +1045,7 @@ public class AdvancementTab {
             layout.gridx = currentColumn * 2;
             layout.gridy = currentRow;
 
-            lblRecruitmentBonusCombat[i] = new JLabel(roles.get(i).getName(false));
+            lblRecruitmentBonusCombat[i] = new JLabel(roles.get(i).getLabel(false));
             spnRecruitmentBonusCombat[i] = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
 
             panel.add(lblRecruitmentBonusCombat[i], layout);
@@ -1081,7 +1087,7 @@ public class AdvancementTab {
             layout.gridx = currentColumn * 2;
             layout.gridy = currentRow;
 
-            lblRecruitmentBonusSupport[i] = new JLabel(roles.get(i).getName(false));
+            lblRecruitmentBonusSupport[i] = new JLabel(roles.get(i).getLabel(false));
             spnRecruitmentBonusSupport[i] = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
 
             panel.add(lblRecruitmentBonusSupport[i], layout);
@@ -1143,6 +1149,7 @@ public class AdvancementTab {
 
         //start Skill Randomization Tab
         chkExtraRandomness.setSelected(skillPreferences.randomizeSkill());
+        chkRandomizeAttributes.setSelected(skillPreferences.isRandomizeAttributes());
         chkRandomizeTraits.setSelected(skillPreferences.isRandomizeTraits());
         chkComingOfAgeSPAs.setSelected(options.isRewardComingOfAgeAbilities());
         final int[] phenotypeProbabilities = options.getPhenotypeProbabilities();
@@ -1230,6 +1237,7 @@ public class AdvancementTab {
 
         //start Skill Randomization Tab
         skillPreferences.setRandomizeSkill(chkExtraRandomness.isSelected());
+        skillPreferences.setRandomizeAttributes(chkRandomizeAttributes.isSelected());
         skillPreferences.setRandomizeTraits(chkRandomizeTraits.isSelected());
         for (int i = 0; i < phenotypeSpinners.length; i++) {
             options.setPhenotypeProbability(i, (int) phenotypeSpinners[i].getValue());

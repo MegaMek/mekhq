@@ -763,6 +763,66 @@ If XP adjustments from a high or low Reasoning are enabled, those adjustments ar
         <removeAbilities>flaw_slow_learner</removeAbilities>
     </ability>
     <ability>
+        <lookupName>exceptional_attribute_strength</lookupName>
+        <displayName>Exceptional Attribute - Strength (ATOW)</displayName>
+        <desc><![CDATA[Characters can only increase their Attributes up to a maximum determined by their Phenotype.
+
+This SPA increases that maximum by 1, but does not increase the Attribute itself.]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>exceptional_attribute_body</lookupName>
+        <displayName>Exceptional Attribute - Body (ATOW)</displayName>
+        <desc><![CDATA[Characters can only increase their Attributes up to a maximum determined by their Phenotype.
+
+This SPA increases that maximum by 1, but does not increase the Attribute itself.]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>exceptional_attribute_reflexes</lookupName>
+        <displayName>Exceptional Attribute - Reflexes (ATOW)</displayName>
+        <desc><![CDATA[Characters can only increase their Attributes up to a maximum determined by their Phenotype.
+
+This SPA increases that maximum by 1, but does not increase the Attribute itself.]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>exceptional_attribute_dexterity</lookupName>
+        <displayName>Exceptional Attribute - Dexterity (ATOW)</displayName>
+        <desc><![CDATA[Characters can only increase their Attributes up to a maximum determined by their Phenotype.
+
+This SPA increases that maximum by 1, but does not increase the Attribute itself.]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>exceptional_attribute_intelligence</lookupName>
+        <displayName>Exceptional Attribute - Intelligence (ATOW)</displayName>
+        <desc><![CDATA[Characters can only increase their Attributes up to a maximum determined by their Phenotype.
+
+This SPA increases that maximum by 1, but does not increase the Attribute itself.]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>exceptional_attribute_willpower</lookupName>
+        <displayName>Exceptional Attribute - Willpower (ATOW)</displayName>
+        <desc><![CDATA[Characters can only increase their Attributes up to a maximum determined by their Phenotype.
+
+This SPA increases that maximum by 1, but does not increase the Attribute itself.]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
         <lookupName>eagle_eyes</lookupName>
         <xpCost>100</xpCost>
         <weight>2</weight>

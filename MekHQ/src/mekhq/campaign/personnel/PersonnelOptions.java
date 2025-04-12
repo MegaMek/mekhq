@@ -95,6 +95,14 @@ public class PersonnelOptions extends PilotOptions {
     public static final String MUTATION_CAT_GIRL = "mutation_cat_girl";
     public static final String MUTATION_CAT_GIRL_UNOFFICIAL = "mutation_cat_girl_unofficial";
 
+    public static final String EXCEPTIONAL_ATTRIBUTE_STRENGTH = "exceptional_attribute_strength";
+    public static final String EXCEPTIONAL_ATTRIBUTE_BODY = "exceptional_attribute_body";
+    public static final String EXCEPTIONAL_ATTRIBUTE_REFLEXES = "exceptional_attribute_reflexes";
+    public static final String EXCEPTIONAL_ATTRIBUTE_DEXTERITY = "exceptional_attribute_dexterity";
+    public static final String EXCEPTIONAL_ATTRIBUTE_INTELLIGENCE = "exceptional_attribute_intelligence";
+    public static final String EXCEPTIONAL_ATTRIBUTE_WILLPOWER = "exceptional_attribute_willpower";
+    public static final String EXCEPTIONAL_ATTRIBUTE_CHARISMA = "exceptional_attribute_charisma";
+
     @Override
     public void initialize() {
         super.initialize();
@@ -169,6 +177,14 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, MUTATION_SERIOUS_DISFIGUREMENT, false);
         addOption(l3a, MUTATION_CAT_GIRL, false);
         addOption(l3a, MUTATION_CAT_GIRL_UNOFFICIAL, false);
+
+        addOption(l3a, EXCEPTIONAL_ATTRIBUTE_STRENGTH, false);
+        addOption(l3a, EXCEPTIONAL_ATTRIBUTE_BODY, false);
+        addOption(l3a, EXCEPTIONAL_ATTRIBUTE_REFLEXES, false);
+        addOption(l3a, EXCEPTIONAL_ATTRIBUTE_DEXTERITY, false);
+        addOption(l3a, EXCEPTIONAL_ATTRIBUTE_INTELLIGENCE, false);
+        addOption(l3a, EXCEPTIONAL_ATTRIBUTE_WILLPOWER, false);
+        addOption(l3a, EXCEPTIONAL_ATTRIBUTE_CHARISMA, false);
 
         addOption(edge, EDGE_MEDICAL, true);
         addOption(edge, EDGE_REPAIR_BREAK_PART, true);

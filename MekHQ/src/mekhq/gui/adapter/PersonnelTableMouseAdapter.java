@@ -27,6 +27,7 @@
  */
 package mekhq.gui.adapter;
 
+import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.Compute.d6;
@@ -220,6 +221,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_PERSONALITY = "PERSONALITY";
     private static final String CMD_ADD_RANDOM_ABILITY = "ADD_RANDOM_ABILITY";
     private static final String CMD_GENERATE_ROLEPLAY_SKILLS = "GENERATE_ROLEPLAY_SKILLS";
+    private static final String CMD_GENERATE_ROLEPLAY_ATTRIBUTES = "GENERATE_ROLEPLAY_ATTRIBUTES";
     private static final String CMD_GENERATE_ROLEPLAY_TRAITS = "GENERATE_ROLEPLAY_TRAITS";
 
     private static final String CMD_FREE = "FREE";
@@ -1400,6 +1402,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPreferences);
                 for (Person person : people) {
                     skillGenerator.generateRoleplaySkills(person, person.getExperienceLevel(getCampaign(), false));
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
+            case CMD_GENERATE_ROLEPLAY_ATTRIBUTES: {
+                RandomSkillPreferences skillPreferences = getCampaign().getRandomSkillPreferences();
+                AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPreferences);
+                for (Person person : people) {
+                    skillGenerator.generateAttributes(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -2879,7 +2890,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       String.valueOf(attribute),
                       String.valueOf(attributeCost)));
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(target <= MAXIMUM_ATTRIBUTE_SCORE && person.getXP() >= attributeCost);
+                int attributeCap = min(person.getPhenotype().getAttributeCap(attribute), MAXIMUM_ATTRIBUTE_SCORE);
+                menuItem.setEnabled(target <= attributeCap && person.getXP() >= attributeCost);
                 attributesMenuIncrease.add(menuItem);
             }
             menu.add(attributesMenuIncrease);
@@ -3693,6 +3705,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             menuItem = new JMenuItem(resources.getString("generateRoleplaySkills.text"));
             menuItem.setActionCommand(CMD_GENERATE_ROLEPLAY_SKILLS);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+
+            menuItem = new JMenuItem(resources.getString("generateRoleplayAttributes.text"));
+            menuItem.setActionCommand(CMD_GENERATE_ROLEPLAY_ATTRIBUTES);
             menuItem.addActionListener(this);
             menu.add(menuItem);
 

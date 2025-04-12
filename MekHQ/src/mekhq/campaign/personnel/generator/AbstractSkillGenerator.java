@@ -79,6 +79,13 @@ public abstract class AbstractSkillGenerator {
     public abstract void generateTraits(Person person);
 
     /**
+     * Generates attributes for a specified person based on their phenotype.
+     *
+     * @param person The {@link Person} for whom attributes are to be generated.
+     */
+    public abstract void generateAttributes(Person person);
+
+    /**
      * Generates the default skills for a {@link Person} based on their primary role.
      *
      * @param person       The {@link Person} to add default skills.

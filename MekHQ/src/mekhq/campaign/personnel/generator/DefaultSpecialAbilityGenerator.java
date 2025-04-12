@@ -27,14 +27,18 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
+
+import java.util.List;
+
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.Phenotype;
 
 public class DefaultSpecialAbilityGenerator extends AbstractSpecialAbilityGenerator {
     @Override
-    public boolean generateSpecialAbilities(final Campaign campaign, final Person person,
-            final int expLvl) {
+    public boolean generateSpecialAbilities(final Campaign campaign, final Person person, final int expLvl) {
         if (campaign.getCampaignOptions().isUseAbilities()) {
             SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
             singleSpecialAbilityGenerator.setSkillPreferences(getSkillPreferences());
@@ -44,9 +48,19 @@ public class DefaultSpecialAbilityGenerator extends AbstractSpecialAbilityGenera
 
             // Then we generate up to that number, stopping if there are no potential
             // abilities to generate
-            while ((numAbilities > 0)
-                    && singleSpecialAbilityGenerator.generateSpecialAbilities(campaign, person, expLvl)) {
+            while ((numAbilities > 0) &&
+                         singleSpecialAbilityGenerator.generateSpecialAbilities(campaign, person, expLvl)) {
                 numAbilities--;
+            }
+
+            // Finally, we add any SPAs from the character's phenotype
+            Phenotype phenotype = person.getPhenotype();
+            if (phenotype != null) {
+                List<String> bonusTraits = phenotype.getBonusTraits();
+
+                for (String bonusTrait : bonusTraits) {
+                    person.getOptions().acquireAbility(LVL3_ADVANTAGES, bonusTrait, true);
+                }
             }
 
             return true;
