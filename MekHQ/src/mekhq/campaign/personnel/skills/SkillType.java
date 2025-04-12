@@ -389,10 +389,10 @@ public class SkillType {
      *
      *                        <p>For example:</p>
      *                        <pre>
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              </pre>
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </pre>
      *
      * @author Illiani
      * @since 0.50.05
@@ -938,12 +938,6 @@ public class SkillType {
      * @param version     The current version.
      */
     public static void generateInstanceFromXML(Node workingNode, Version version) {
-        // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
-        boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.05"));
-        if (preDatesSkillChanges) {
-            return;
-        }
-
         try {
             SkillType skillType = new SkillType();
             NodeList nodeList = workingNode.getChildNodes();
@@ -999,6 +993,12 @@ public class SkillType {
                 }
             }
 
+            // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
+            boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.05"));
+            if (preDatesSkillChanges) {
+                compatibilityHandler(skillType);
+            }
+
             lookupHash.put(skillType.name, skillType);
         } catch (Exception ex) {
             logger.error("", ex);
@@ -1015,11 +1015,6 @@ public class SkillType {
 
     public static void generateSeparateInstanceFromXML(final Node wn, final Map<String, SkillType> hash,
           Version version) {
-        // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
-        boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.05"));
-        if (preDatesSkillChanges) {
-            return;
-        }
 
         try {
             SkillType skillType = new SkillType();
@@ -1055,6 +1050,12 @@ public class SkillType {
                 }
             }
 
+            // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
+            boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.05"));
+            if (preDatesSkillChanges) {
+                compatibilityHandler(skillType);
+            }
+
             hash.put(skillType.name, skillType);
         } catch (Exception ex) {
             logger.error("", ex);
@@ -1062,9 +1063,18 @@ public class SkillType {
     }
 
     /**
-     * @deprecated Unused
+     * Updates {@link SkillType} from <0.50.05 by setting its subtype and attributes based on the skill name.
+     *
+     * <p>The method creates a temporary {@link SkillType} with the correct configuration based on the input skill
+     * name,
+     * then copies the {@link SkillType#subType}, {@link SkillType#firstAttribute}, and
+     * {@link SkillType#secondAttribute} values to the provided {@link SkillType}.<p>
+     *
+     * <p>For each skill type, it logs the updates made to help with debugging and tracking compatibility changes.</p>
+     *
+     * @param skillType the {@link SkillType} to update with compatible configuration If {@code null}, the method logs
+     *                  an error and returns without making changes
      */
-    @Deprecated(since = "0.50.05", forRemoval = true)
     private static void compatibilityHandler(SkillType skillType) {
         if (skillType == null) {
             logger.info("SkillType is null, unable to update compatibility. " +
@@ -1157,26 +1167,20 @@ public class SkillType {
             return;
         }
 
-        if (skillType.getSubType() == null) {
-            skillType.subType = temporarySkillType.getSubType();
-            logger.info("SkillType {} has been updated to sub type {}",
-                  skillType.getName(),
-                  temporarySkillType.getSubType());
-        }
+        skillType.subType = temporarySkillType.getSubType();
+        logger.info("SkillType {} has been updated to sub type {}",
+              skillType.getName(),
+              temporarySkillType.getSubType());
 
-        if (skillType.getFirstAttribute() == null) {
-            skillType.firstAttribute = temporarySkillType.getFirstAttribute();
-            logger.info("SkillType {} has been updated to first attribute {}",
-                  skillType.getName(),
-                  temporarySkillType.getFirstAttribute());
-        }
+        skillType.firstAttribute = temporarySkillType.getFirstAttribute();
+        logger.info("SkillType {} has been updated to first attribute {}",
+              skillType.getName(),
+              temporarySkillType.getFirstAttribute());
 
-        if (skillType.getSecondAttribute() == null) {
-            skillType.secondAttribute = temporarySkillType.getSecondAttribute();
-            logger.info("SkillType {} has been updated to second attribute {}",
-                  skillType.getName(),
-                  temporarySkillType.getSecondAttribute());
-        }
+        skillType.secondAttribute = temporarySkillType.getSecondAttribute();
+        logger.info("SkillType {} has been updated to second attribute {}",
+              skillType.getName(),
+              temporarySkillType.getSecondAttribute());
     }
 
 
