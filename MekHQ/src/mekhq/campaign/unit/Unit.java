@@ -6119,7 +6119,7 @@ public class Unit implements ITechnology {
         refit = r;
     }
 
-    public Refit getRefit() {
+    public @Nullable Refit getRefit() {
         return refit;
     }
 

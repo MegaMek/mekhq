@@ -41,10 +41,10 @@ import static mekhq.campaign.log.LogEntryType.PERFORMANCE;
 import static mekhq.campaign.log.LogEntryType.SERVICE;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
+import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
-import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 
 import java.io.PrintWriter;
@@ -86,6 +86,7 @@ import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.enums.BloodGroup;
 import mekhq.campaign.personnel.enums.ManeiDominiClass;
 import mekhq.campaign.personnel.enums.ManeiDominiRank;
@@ -4720,7 +4721,8 @@ public class Person {
         // Tech assignments
         if (isTech()) {
             for (Unit unit : techUnits) {
-                boolean isActiveTech = Objects.equals(unit.getRefit().getTech(), this);
+                Refit refit = unit.getRefit();
+                boolean isActiveTech = refit != null && Objects.equals(refit.getTech(), this);
 
                 if (unit.isMothballing() && isActiveTech) {
                     return true;
