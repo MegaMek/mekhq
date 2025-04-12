@@ -54,6 +54,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import megamek.Version;
 import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Aero;
@@ -68,6 +69,7 @@ import megamek.common.Tank;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
@@ -337,7 +339,7 @@ public class SkillType {
         this.name = "MISSING_NAME";
         this.target = 7;
         this.countUp = false;
-        this.subType = COMBAT_GUNNERY;
+        this.subType = SkillSubType.NONE;
         this.firstAttribute = REFLEXES;
         this.secondAttribute = DEXTERITY;
         this.greenLvl = 1;
@@ -387,10 +389,10 @@ public class SkillType {
      *
      *                        <p>For example:</p>
      *                        <pre>
-     *                                                                                                                                                                                                                                                                                                                                   Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                                                                                                                                                                                                                                   SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                                                                                                                                                                                                                                          SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                                                                                                                                                                                                                                   </pre>
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              </pre>
      *
      * @author Illiani
      * @since 0.50.05
@@ -922,11 +924,26 @@ public class SkillType {
     }
 
     /**
+     * @deprecated use {@link #generateInstanceFromXML(Node, Version)} instead
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public static void generateInstanceFromXML(Node workingNode) {
+        generateInstanceFromXML(workingNode, MHQConstants.VERSION);
+    }
+
+    /**
      * Generates an instance of {@link SkillType} from an XML node.
      *
      * @param workingNode The XML node containing the skill data.
+     * @param version     The current version.
      */
-    public static void generateInstanceFromXML(Node workingNode) {
+    public static void generateInstanceFromXML(Node workingNode, Version version) {
+        // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
+        boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.05"));
+        if (preDatesSkillChanges) {
+            return;
+        }
+
         try {
             SkillType skillType = new SkillType();
             NodeList nodeList = workingNode.getChildNodes();
@@ -982,20 +999,28 @@ public class SkillType {
                 }
             }
 
-            // <50.05 compatibility handler
-            if (skillType.getSubType() == null ||
-                      skillType.getFirstAttribute() == null ||
-                      skillType.getSecondAttribute() == null) {
-                compatibilityHandler(skillType);
-            }
-
             lookupHash.put(skillType.name, skillType);
         } catch (Exception ex) {
             logger.error("", ex);
         }
     }
 
+    /**
+     * @deprecated use {@link #generateSeparateInstanceFromXML(Node, Map, Version)} instead
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public static void generateSeparateInstanceFromXML(final Node wn, final Map<String, SkillType> hash) {
+        generateSeparateInstanceFromXML(wn, hash, MHQConstants.VERSION);
+    }
+
+    public static void generateSeparateInstanceFromXML(final Node wn, final Map<String, SkillType> hash,
+          Version version) {
+        // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
+        boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.05"));
+        if (preDatesSkillChanges) {
+            return;
+        }
+
         try {
             SkillType skillType = new SkillType();
             NodeList nl = wn.getChildNodes();
@@ -1030,13 +1055,6 @@ public class SkillType {
                 }
             }
 
-            // <50.05 compatibility handler
-            if (skillType.getSubType() == null ||
-                      skillType.getFirstAttribute() == null ||
-                      skillType.getSecondAttribute() == null) {
-                compatibilityHandler(skillType);
-            }
-
             hash.put(skillType.name, skillType);
         } catch (Exception ex) {
             logger.error("", ex);
@@ -1044,35 +1062,9 @@ public class SkillType {
     }
 
     /**
-     * Handles compatibility upgrades for outdated or incomplete {@link SkillType} definitions.
-     *
-     * <p>This method ensures that instances of {@link SkillType} are updated to meet current standards by:
-     * assigning suitable subtypes and attributes based on predefined mappings. If the skill type is recognized as
-     * outdated or missing attributes, the method creates a temporary reference skill and updates the original skill
-     * instance. All changes are logged, and unrecognized skill types are flagged with an error log.</p>
-     *
-     * <p><b>Behavior:</b></p>
-     * <ul>
-     *     <li>Checks if the {@code skillType} is {@code null} and logs a message. If {@code null}, no processing is
-     *     performed.</li>
-     *     <li>Matches the name of the {@link SkillType} against predefined mappings to check for compatibility issues.</li>
-     *     <li>Uses a factory method to create a temporary {@link SkillType} instance designed for the corresponding skill
-     *     (e.g., {@code createPilotingMek()}, {@code createGunneryAero()}).</li>
-     *     <li>Updates incomplete attributes (subtype, first attribute, or second attribute) on the original
-     *     {@link SkillType} to match the temporary reference. Logs the updates for traceability.</li>
-     *     <li>If the skill type name is not recognized, logs an error and halts further processing.</li>
-     * </ul>
-     *
-     * <p><strong>Error Handling:</strong></p>
-     * <ul>
-     *     <li>If the skill type is {@code null}, logs a warning and skips the update process.</li>
-     *     <li>If the skill type name is invalid or unmapped, logs an error with the message
-     *     "Unexpected value in compatibilityHandler".</li>
-     * </ul>
-     *
-     * @param skillType the {@link SkillType} instance to be checked and updated for compatibility. If the
-     *                  {@code skillType} is {@code null}, no action is performed.
+     * @deprecated Unused
      */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     private static void compatibilityHandler(SkillType skillType) {
         if (skillType == null) {
             logger.info("SkillType is null, unable to update compatibility. " +

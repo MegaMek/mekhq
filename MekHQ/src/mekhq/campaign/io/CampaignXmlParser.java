@@ -314,7 +314,7 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("isAvoidingEmptySystems")) {
                     campaign.setIsAvoidingEmptySystems(Boolean.parseBoolean(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("skillTypes")) {
-                    processSkillTypeNodes(wn);
+                    processSkillTypeNodes(wn, version);
                 } else if (xn.equalsIgnoreCase("specialAbilities")) {
                     processSpecialAbilityNodes(campaign, wn, version);
                 } else if (xn.equalsIgnoreCase("storyArc")) {
@@ -994,7 +994,7 @@ public class CampaignXmlParser {
         logger.info("Load Personnel Nodes Complete!");
     }
 
-    private static void processSkillTypeNodes(Node wn) {
+    private static void processSkillTypeNodes(Node wn, Version version) {
         logger.info("Loading Skill Type Nodes from XML...");
 
         NodeList wList = wn.getChildNodes();
@@ -1018,7 +1018,7 @@ public class CampaignXmlParser {
             }
 
             // TODO: make SkillType a Campaign instance
-            SkillType.generateInstanceFromXML(wn2);
+            SkillType.generateInstanceFromXML(wn2, version);
         }
 
         logger.info("Load Skill Type Nodes Complete!");
