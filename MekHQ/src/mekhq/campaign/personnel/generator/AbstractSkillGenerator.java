@@ -76,6 +76,8 @@ public abstract class AbstractSkillGenerator {
      */
     public abstract void generateSkills(Campaign campaign, Person person, int expLvl);
 
+    public abstract void generateTraits(Person person);
+
     /**
      * Generates attributes for a specified person based on their phenotype.
      *

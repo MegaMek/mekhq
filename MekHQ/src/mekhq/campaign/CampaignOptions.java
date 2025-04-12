@@ -230,6 +230,7 @@ public class CampaignOptions {
     private boolean displayPersonnelLog;
     private boolean displayScenarioLog;
     private boolean displayKillRecord;
+    private boolean rewardComingOfAgeAbilities;
 
     // Expanded Personnel Information
     private boolean useTimeInService;
@@ -466,6 +467,7 @@ public class CampaignOptions {
     private FinancialYearDuration financialYearDuration;
     private boolean newFinancialYearFinancesToCSVExport;
     private boolean simulateGrayMonday;
+    private boolean allowMonthlyReinvestment;
 
     // Price Multipliers
     private double commonPartPriceMultiplier;
@@ -772,6 +774,7 @@ public class CampaignOptions {
         setDisplayPersonnelLog(false);
         setDisplayScenarioLog(false);
         setDisplayKillRecord(false);
+        setRewardComingOfAgeAbilities(false);
 
         // Expanded Personnel Information
         setUseTimeInService(false);
@@ -1068,6 +1071,7 @@ public class CampaignOptions {
         setFinancialYearDuration(FinancialYearDuration.ANNUAL);
         newFinancialYearFinancesToCSVExport = false;
         simulateGrayMonday = false;
+        allowMonthlyReinvestment = false;
 
         // Price Multipliers
         setCommonPartPriceMultiplier(1.0);
@@ -1639,6 +1643,14 @@ public class CampaignOptions {
 
     public void setDisplayKillRecord(final boolean displayKillRecord) {
         this.displayKillRecord = displayKillRecord;
+    }
+
+    public boolean isRewardComingOfAgeAbilities() {
+        return rewardComingOfAgeAbilities;
+    }
+
+    public void setRewardComingOfAgeAbilities(final boolean rewardComingOfAgeAbilities) {
+        this.rewardComingOfAgeAbilities = rewardComingOfAgeAbilities;
     }
 
     public boolean isUseFatigue() {
@@ -3382,6 +3394,14 @@ public class CampaignOptions {
         this.simulateGrayMonday = simulateGrayMonday;
     }
 
+    public boolean isAllowMonthlyReinvestment() {
+        return allowMonthlyReinvestment;
+    }
+
+    public void setAllowMonthlyReinvestment(final boolean allowMonthlyReinvestment) {
+        this.allowMonthlyReinvestment = allowMonthlyReinvestment;
+    }
+
     // region Price Multipliers
     public double getCommonPartPriceMultiplier() {
         return commonPartPriceMultiplier;
@@ -4951,6 +4971,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayPersonnelLog", isDisplayPersonnelLog());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayScenarioLog", isDisplayScenarioLog());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayKillRecord", isDisplayKillRecord());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rewardComingOfAgeAbilities", isRewardComingOfAgeAbilities());
         // endregion General Personnel
 
         // region Expanded Personnel Information
@@ -5278,6 +5299,7 @@ public class CampaignOptions {
               "newFinancialYearFinancesToCSVExport",
               newFinancialYearFinancesToCSVExport);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "simulateGrayMonday", simulateGrayMonday);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowMonthlyReinvestment", allowMonthlyReinvestment);
 
         // region Price Multipliers
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commonPartPriceMultiplier", getCommonPartPriceMultiplier());
@@ -5722,6 +5744,8 @@ public class CampaignOptions {
                     retVal.setDisplayScenarioLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("displayKillRecord")) {
                     retVal.setDisplayKillRecord(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("rewardComingOfAgeAbilities")) {
+                    retVal.setRewardComingOfAgeAbilities(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     // endregion General Personnel
 
                     // region Expanded Personnel Information
@@ -5938,7 +5962,7 @@ public class CampaignOptions {
                                     Integer.parseInt(wn3.getTextContent().trim()));
                     }
                 } else if (nodeName.equalsIgnoreCase("randomMarriageMethod")) {
-                    retVal.setRandomMarriageMethod(RandomMarriageMethod.valueOf(wn2.getTextContent().trim()));
+                    retVal.setRandomMarriageMethod(RandomMarriageMethod.fromString(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("useRandomClanPersonnelMarriages") ||
                                  nodeName.equalsIgnoreCase("useRandomClannerMarriages")) { // Legacy, 0.49.12 removal
                     retVal.setUseRandomClanPersonnelMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -6019,7 +6043,7 @@ public class CampaignOptions {
                 } else if (nodeName.equalsIgnoreCase("logProcreation")) {
                     retVal.setLogProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("randomProcreationMethod")) {
-                    retVal.setRandomProcreationMethod(RandomProcreationMethod.valueOf(wn2.getTextContent().trim()));
+                    retVal.setRandomProcreationMethod(RandomProcreationMethod.fromString(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("useRelationshiplessRandomProcreation")) {
                     retVal.setUseRelationshiplessRandomProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("useRandomClanPersonnelProcreation")) {
@@ -6208,6 +6232,8 @@ public class CampaignOptions {
                     retVal.newFinancialYearFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("simulateGrayMonday")) {
                     retVal.simulateGrayMonday = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("allowMonthlyReinvestment")) {
+                    retVal.allowMonthlyReinvestment = Boolean.parseBoolean(wn2.getTextContent().trim());
 
                     // region Price Multipliers
                 } else if (nodeName.equalsIgnoreCase("commonPartPriceMultiplier")) {
@@ -6482,8 +6508,8 @@ public class CampaignOptions {
                     retVal.getRandomOriginOptions()
                           .setExtraRandomOrigin(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("originDistanceScale")) { // Legacy, 0.49.7 Removal
-                    retVal.getRandomOriginOptions()
-                          .setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
+                    retVal.getRandomOriginOptions().setOriginDistanceScale(Double.parseDouble(wn2.getTextContent()
+                                                                                                    .trim()));
                 } else if (nodeName.equalsIgnoreCase("dependentsNeverLeave")) { // Legacy - 0.49.7 Removal
                     retVal.setUseRandomDependentRemoval(!Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("marriageAgeRange")) { // Legacy - 0.49.6 Removal

@@ -27,22 +27,23 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+
+import java.util.ResourceBundle;
+
+import megamek.codeUtilities.MathUtility;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
 import mekhq.campaign.personnel.marriage.RandomMarriage;
 
-import java.util.ResourceBundle;
-
-import static megamek.client.ui.WrapLayout.wordWrap;
-
 /**
  * The {@link RandomMarriageMethod} enum represents different methods of getting random marriages.
  * <p>
- * The available methods are:
- * - {@code NONE}: No random marriage method.
- * - {@code DICE_ROLL}: Random marriage method using dice roll.
+ * The available methods are: - {@code NONE}: No random marriage method. - {@code DICE_ROLL}: Random marriage method
+ * using dice roll.
  */
 public enum RandomMarriageMethod {
     //region Enum Declarations
@@ -50,22 +51,24 @@ public enum RandomMarriageMethod {
     DICE_ROLL("RandomMarriageMethod.DICE_ROLL.text", "RandomMarriageMethod.DICE_ROLL.toolTipText");
     //endregion Enum Declarations
 
+    private static final MMLogger logger = MMLogger.create(RandomMarriageMethod.class);
+
     //region Variable Declarations
     private final String name;
     private final String toolTipText;
     //endregion Variable Declarations
 
     /**
-     * Constructor for the {@link RandomMarriageMethod} class.
-     * Initializes the name and toolTipText variables using the specified name and toolTipText resources.
+     * Constructor for the {@link RandomMarriageMethod} class. Initializes the name and toolTipText variables using the
+     * specified name and toolTipText resources.
      *
-     * @param name          the name resource key used to retrieve the name from the resource bundle
-     * @param toolTipText   the tooltip text resource key used to retrieve the tool tip text from the resource bundle
+     * @param name        the name resource key used to retrieve the name from the resource bundle
+     * @param toolTipText the tooltip text resource key used to retrieve the tool tip text from the resource bundle
      */
     //region Constructors
     RandomMarriageMethod(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
+              MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = wordWrap(resources.getString(toolTipText));
     }
@@ -81,11 +84,11 @@ public enum RandomMarriageMethod {
     //endregion Getters
 
     //region Boolean Comparison Methods
+
     /**
      * Checks if the current {@link RandomMarriageMethod} is {@code NONE}.
      *
-     * @return {@code true} if the current {@link RandomMarriageMethod} is {@code NONE},
-     * {@code false} otherwise.
+     * @return {@code true} if the current {@link RandomMarriageMethod} is {@code NONE}, {@code false} otherwise.
      */
     public boolean isNone() {
         return this == NONE;
@@ -94,8 +97,7 @@ public enum RandomMarriageMethod {
     /**
      * Checks if the current {@link RandomMarriageMethod} is {@code DICE_ROLL}.
      *
-     * @return {@code true} if the current {@link RandomMarriageMethod} is {@code DICE_ROLL},
-     * {@code false} otherwise.
+     * @return {@code true} if the current {@link RandomMarriageMethod} is {@code DICE_ROLL}, {@code false} otherwise.
      */
     public boolean isDiceRoll() {
         return this == DICE_ROLL;
@@ -104,6 +106,7 @@ public enum RandomMarriageMethod {
 
     /**
      * @param options the {@link CampaignOptions} object used to initialize the {@link AbstractMarriage} instance
+     *
      * @return an instance of {@link AbstractMarriage} based on the {@link RandomMarriageMethod}
      */
     public AbstractMarriage getMethod(final CampaignOptions options) {
@@ -112,6 +115,66 @@ public enum RandomMarriageMethod {
         } else {
             return new DisabledRandomMarriage(options);
         }
+    }
+
+    /**
+     * Converts a string representation to a {@link RandomMarriageMethod} enum value.
+     *
+     * <p>This method attempts to parse the input string in several different ways:
+     *
+     * <ol>
+     *   <li>First, it tries to match the string as an enum constant (converting to uppercase
+     *       and replacing spaces with underscores)</li>
+     *   <li>Next, it checks if the string matches any enum name directly (case-insensitive)</li>
+     *   <li>Finally, it attempts to parse the string as an integer ordinal value</li>
+     * </ol>
+     *
+     * <p>If all conversion attempts fail, it returns the {@link #NONE} value.</p>
+     *
+     * @param text the string to convert, which may be the enum name (with or without spaces), or its ordinal value as a
+     *             string
+     *
+     * @return the corresponding RandomMarriageMethod, or {@link #NONE} if the string could not be converted
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public static RandomMarriageMethod fromString(String text) {
+        // Return NONE for null or empty strings
+        if ((text == null) || text.isEmpty()) {
+            logger.error("Null or empty string passed to RandomMarriageMethod.fromString: {}", text);
+            return NONE;
+        }
+
+        // String value
+        try {
+            return RandomMarriageMethod.valueOf(text.toUpperCase().replace(" ", "_"));
+        } catch (Exception ignored) {
+        }
+
+        // Display name matching
+        for (RandomMarriageMethod method : RandomMarriageMethod.values()) {
+            if (method.toString().equalsIgnoreCase(text)) {
+                return method;
+            }
+        }
+
+        // Name comparison
+        for (RandomMarriageMethod method : RandomMarriageMethod.values()) {
+            if (method.name().equalsIgnoreCase(text)) {
+                return method;
+            }
+        }
+
+        // Ordinal
+        try {
+            return RandomMarriageMethod.values()[MathUtility.parseInt(text)];
+        } catch (Exception ignored) {
+        }
+
+
+        logger.error("Unknown RandomMarriageMethod: {} - returning {}.", text, NONE);
+        return NONE;
     }
 
     @Override
