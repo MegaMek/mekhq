@@ -621,8 +621,7 @@ They also gain Fatigue based on the campaign options fatigue rate (default 1).]]
     <ability>
         <lookupName>mutation_freakish_strength</lookupName>
         <displayName>Freakish Strength (ATOW:Companion)</displayName>
-        <desc><![CDATA[Increases Strength Attribute by 2 and maximum Strength by 1. Neither increase may take this
-         Attribute above 10.
+        <desc><![CDATA[Increases Strength Attribute by 2 and maximum Strength by 1. Neither increase may take this Attribute above 10.
 
 Increases the target number of all Charisma-based skills by 2 due to inhumanly shaped bulk.]]></desc>
         <xpCost>300</xpCost>
@@ -833,12 +832,11 @@ If XP adjustments from a high or low Reasoning are enabled, those adjustments ar
         <lookupName>atow_combat_paralysis</lookupName>
         <xpCost>-400</xpCost>
         <weight>1</weight>
-        <desc>Unit Reputation is decreased by 1 if this character is the campaign commander.
+        <desc><![CDATA[Unit Reputation is decreased by 1 if this character is the campaign commander.
 
-            A pilot who has Combat Sense rolls three dice per initiative check, keeping the top two rolls.
+A pilot who has Combat Sense rolls three dice per initiative check, keeping the top two rolls.
 
-            If individual initiative is enabled, this penalty applies only to the pilot's unit. Otherwise, the penalty is applied only if the pilot's unit is the force commander.
-        </desc>
+If individual initiative is enabled, this penalty applies only to the pilot's unit. Otherwise, the penalty is applied only if the pilot's unit is the force commander.]]></desc>
         <skillPrereq/>
         <removeAbilities>atow_combat_sense</removeAbilities>
     </ability>
@@ -846,12 +844,11 @@ If XP adjustments from a high or low Reasoning are enabled, those adjustments ar
         <lookupName>atow_combat_sense</lookupName>
         <xpCost>400</xpCost>
         <weight>1</weight>
-        <desc>Unit Reputation is increased by 1 if this character is the campaign commander.
+        <desc><![CDATA[Unit Reputation is increased by 1 if this character is the campaign commander.
 
-            A pilot who has Combat Sense rolls three dice per initiative check, keeping the top two rolls.
+A pilot who has Combat Sense rolls three dice per initiative check, keeping the top two rolls.
 
-            If individual initiative is enabled, this bonus applies only to the pilot's unit. Otherwise, the bonus is applied only if the pilot's unit is the force commander.
-        </desc>
+If individual initiative is enabled, this bonus applies only to the pilot's unit. Otherwise, the bonus is applied only if the pilot's unit is the force commander.]]></desc>
         <skillPrereq>
             <skill>Gunnery/Mek::Veteran</skill>
             <skill>Piloting/Aircraft::Veteran</skill>
@@ -979,7 +976,7 @@ If XP adjustments from a high or low Reasoning are enabled, those adjustments ar
     <ability>
         <lookupName>tech_weapon_specialist</lookupName>
         <displayName>Tech Specialist, Weapon (Unofficial)</displayName>
-        <desc>-1 to repair and maintenance checks when working with weapons</desc>
+        <desc><![CDATA[-1 to repair and maintenance checks when working with weapons.]]></desc>
         <xpCost>50</xpCost>
         <weight>2</weight>
         <skillPrereq>
@@ -993,7 +990,7 @@ If XP adjustments from a high or low Reasoning are enabled, those adjustments ar
     <ability>
         <lookupName>tech_armor_specialist</lookupName>
         <displayName>Tech Specialist, Armor (Unofficial)</displayName>
-        <desc>-1 to repair and maintenance checks when working with armor</desc>
+        <desc><![CDATA[-1 to repair and maintenance checks when working with armor.]]></desc>
         <xpCost>50</xpCost>
         <weight>2</weight>
         <skillPrereq>
@@ -1007,7 +1004,7 @@ If XP adjustments from a high or low Reasoning are enabled, those adjustments ar
     <ability>
         <lookupName>tech_internal_specialist</lookupName>
         <displayName>Tech Specialist, Internal (Unofficial)</displayName>
-        <desc>-1 to repair and maintenance checks when working with internal systems</desc>
+        <desc><![CDATA[-1 to repair and maintenance checks when working with internal systems</desc>
         <xpCost>100</xpCost>
         <weight>2</weight>
         <skillPrereq>
@@ -1021,7 +1018,7 @@ If XP adjustments from a high or low Reasoning are enabled, those adjustments ar
     <ability>
         <lookupName>tech_engineer</lookupName>
         <displayName>Engineer (unofficial)</displayName>
-        <desc>-2 on refit rolls</desc>
+        <desc><![CDATA[-2 on refit rolls.]]></desc>
         <xpCost>100</xpCost>
         <weight>2</weight>
         <skillPrereq>
@@ -1035,7 +1032,7 @@ If XP adjustments from a high or low Reasoning are enabled, those adjustments ar
     <ability>
         <lookupName>tech_fixer</lookupName>
         <displayName>Mr/Ms Fix-it (unofficial)</displayName>
-        <desc>Ignore first point of penalty for repair and maintenance on low quality equipment</desc>
+        <desc><![CDATA[Ignore first point of penalty for repair and maintenance on low quality equipment.]]></desc>
         <xpCost>50</xpCost>
         <weight>2</weight>
         <skillPrereq>
@@ -1049,7 +1046,7 @@ If XP adjustments from a high or low Reasoning are enabled, those adjustments ar
     <ability>
         <lookupName>tech_maintainer</lookupName>
         <displayName>Maintainer (Unofficial)</displayName>
-        <desc>The tech is slow and methodical at their work. They take a +1 penalty to their repair rolls, but are better at maintaining units than most, with a -1 bonus.</desc>
+        <desc><![CDATA[The tech is slow and methodical at their work. They take a +1 penalty to their repair rolls, but are better at maintaining units than most, with a -1 bonus.]]></desc>
         <xpCost>100</xpCost>
         <weight>1</weight>
         <skillPrereq>
@@ -1082,22 +1079,22 @@ If XP adjustments from a high or low Reasoning are enabled, those adjustments ar
     <ability>
         <lookupName>edge_when_heal_crit_fail</lookupName>
         <displayName>Use Edge for doctor critical failure.</displayName>
-        <desc>Healing check critical failure will be rerolled with Edge.</desc>
+        <desc><![CDATA[Healing check critical failure will be rerolled with Edge.]]></desc>
     </ability>
     <ability>
         <lookupName>edge_when_repair_break_part</lookupName>
         <displayName>Use Edge for tech breaking part.</displayName>
-        <desc>Failed repair check that breaks the part will be rerolled with Edge.</desc>
+        <desc><![CDATA[Failed repair check that breaks the part will be rerolled with Edge.]]></desc>
     </ability>
     <ability>
         <lookupName>edge_when_fail_refit_check</lookupName>
         <displayName>Use Edge for refit failure.</displayName>
-        <desc>Failed refit check will be rerolled with Edge.</desc>
+        <desc><![CDATA[Failed refit check will be rerolled with Edge.]]></desc>
     </ability>
     <ability>
         <lookupName>edge_when_admin_acquire_fail</lookupName>
         <displayName>Use Edge for acquisition failure.</displayName>
-        <desc>Failed acquisition check will be rerolled with edge.</desc>
+        <desc><![CDATA[Failed acquisition check will be rerolled with edge.]]></desc>
     </ability>
 
     <!-- Example entries corresponding to the examples in customspa.xml
@@ -1111,20 +1108,20 @@ If XP adjustments from a high or low Reasoning are enabled, those adjustments ar
         <skillPrereq>
             <skill>Administration</skill>
         </skillPrereq>
-        <desc>Increase the capacity of a cargo or transport bay.</desc>
+        <desc><![CDATA[Increase the capacity of a cargo or transport bay.]]></desc>
         <choiceValues>None::Cargo::Mek::Vehicle::Fighter::Infantry</choiceValues>
     </ability>
 
     <edgeTrigger>
         <lookupName>edge_paper_cut</lookupName>
         <displayName>Use Edge to avoid paper cut.</displayName>
-        <desc>A paper cut injury check will be rerolled with edge.</desc>
+        <desc><![CDATA[A paper cut injury check will be rerolled with edge.]]></desc>
     </edgeTrigger>
 
     <implant>
         <lookupName>md_prosthetic_blowtorch</lookupName>
         <displayName>Prosthetic Blowtorch</displayName>
-        <desc>Reduce repair times by 10%</desc>
+        <desc><![CDATA[Reduce repair times by 10%.]]></desc>
         <skillPrereq>
             <skill>Tech/Mek</skill>
             <skill>Tech/Mechanic</skill>
