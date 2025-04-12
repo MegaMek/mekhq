@@ -68,6 +68,7 @@ import megamek.common.Tank;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
@@ -387,10 +388,10 @@ public class SkillType {
      *
      *                        <p>For example:</p>
      *                        <pre>
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       </pre>
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              Integer[] costs = new Integer[] {8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1};
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              SkillType skillType = new SkillType("Example Skill", 7, false, SkillSubType.COMBAT,
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     SkillAttribute.DEXTERITY, SkillAttribute.INTELLIGENCE, 1, 3, 4, 5, costs);
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              </pre>
      *
      * @author Illiani
      * @since 0.50.05
@@ -864,6 +865,14 @@ public class SkillType {
     }
 
     /**
+     * @deprecated use {@link #generateInstanceFromXML(Node, Version)} instead
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public static void generateInstanceFromXML(Node workingNode) {
+        generateInstanceFromXML(workingNode, MHQConstants.VERSION);
+    }
+
+    /**
      * Generates an instance of {@link SkillType} from an XML node.
      *
      * @param workingNode The XML node containing the skill data.
@@ -937,6 +946,14 @@ public class SkillType {
         }
     }
 
+    /**
+     * @deprecated use {@link #generateSeparateInstanceFromXML(Node, Map, Version)} instead
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public static void generateSeparateInstanceFromXML(final Node wn, final Map<String, SkillType> hash) {
+        generateSeparateInstanceFromXML(wn, hash, MHQConstants.VERSION);
+    }
+
     public static void generateSeparateInstanceFromXML(final Node wn, final Map<String, SkillType> hash,
           Version version) {
         // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
@@ -982,6 +999,124 @@ public class SkillType {
             hash.put(skillType.name, skillType);
         } catch (Exception ex) {
             logger.error("", ex);
+        }
+    }
+
+    /**
+     * @deprecated Unused
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    private static void compatibilityHandler(SkillType skillType) {
+        if (skillType == null) {
+            logger.info("SkillType is null, unable to update compatibility. " +
+                              "This suggests a deeper issue and should be reported.");
+            return;
+        }
+
+        SkillType temporarySkillType = switch (skillType.getName()) {
+            case S_PILOT_MEK, "Piloting/Mech" -> createPilotingMek();
+            case S_GUN_MEK, "Gunnery/Mech" -> createGunneryMek();
+            case S_PILOT_AERO -> createPilotingAero();
+            case S_GUN_AERO -> createGunneryAero();
+            case S_PILOT_JET -> createPilotingJet();
+            case S_GUN_JET -> createGunneryJet();
+            case S_PILOT_SPACE -> createPilotingSpace();
+            case S_GUN_SPACE -> createGunnerySpace();
+            case S_PILOT_GVEE -> createPilotingGroundVee();
+            case S_PILOT_NVEE -> createPilotingNavalVee();
+            case S_PILOT_VTOL -> createPilotingVTOL();
+            case S_GUN_VEE -> createGunneryVehicle();
+            case S_ARTILLERY -> createArtillery();
+            case S_GUN_BA, "Gunnery/Battlesuit" -> createGunneryBA();
+            case S_GUN_PROTO, "Gunnery/ProtoMech" -> createGunneryProto();
+            case S_SMALL_ARMS -> createSmallArms();
+            case S_ANTI_MEK, "Anti-Mech" -> createAntiMek();
+            case S_TECH_MEK, "Tech/Mech" -> createTechMek();
+            case S_TECH_MECHANIC -> createTechMechanic();
+            case S_TECH_AERO -> createTechAero();
+            case S_TECH_BA, "Tech/BA" -> createTechBA();
+            case S_TECH_VESSEL -> createTechVessel();
+            case S_ASTECH -> createAstech();
+            case S_DOCTOR -> createDoctor();
+            case S_MEDTECH, "Medtech" -> createMedTech();
+            case S_NAV -> createNav();
+            case S_ADMIN -> createAdmin();
+            case S_NEG -> createNegotiation();
+            case S_LEADER -> createLeadership();
+            case S_SCROUNGE -> createScrounge();
+            case S_STRATEGY -> createStrategy();
+            case S_TACTICS -> createTactics();
+            case S_ACROBATICS -> createAcrobatics();
+            case S_ACTING -> createActing();
+            case S_ANIMAL_HANDLING -> createAnimalHandling();
+            case S_APPRAISAL -> createAppraisal();
+            case S_ARCHERY -> createArchery();
+            case S_ART_DANCING -> createArtDancing();
+            case S_ART_DRAWING -> createArtDrawing();
+            case S_ART_PAINTING -> createArtPainting();
+            case S_ART_WRITING -> createArtWriting();
+            case S_CLIMBING -> createClimbing();
+            case S_COMMUNICATIONS -> createCommunications();
+            case S_COMPUTERS -> createComputers();
+            case S_CRYPTOGRAPHY -> createCryptography();
+            case S_DEMOLITIONS -> createDemolitions();
+            case S_DISGUISE -> createDisguise();
+            case S_ESCAPE_ARTIST -> createEscapeArtist();
+            case S_FORGERY -> createForgery();
+            case S_INTEREST_HISTORY -> createInterestHistory();
+            case S_INTEREST_LITERATURE -> createInterestLiterature();
+            case S_INTEREST_HOLO_GAMES -> createInterestHoloGames();
+            case S_INTEREST_SPORTS -> createInterestSports();
+            case S_INTERROGATION -> createInterrogation();
+            case S_INVESTIGATION -> createInvestigation();
+            case S_LANGUAGES -> createLanguages();
+            case S_MARTIAL_ARTS -> createMartialArts();
+            case S_PERCEPTION -> createPerception();
+            case S_SLEIGHT_OF_HAND -> createSleightOfHand();
+            case S_PROTOCOLS -> createProtocols();
+            case S_SCIENCE_BIOLOGY -> createScienceBiology();
+            case S_SCIENCE_CHEMISTRY -> createScienceChemistry();
+            case S_SCIENCE_MATHEMATICS -> createScienceMathematics();
+            case S_SCIENCE_PHYSICS -> createSciencePhysics();
+            case S_SECURITY_SYSTEMS_ELECTRONIC -> createSecuritySystemsElectronic();
+            case S_SCIENCE_SYSTEMS_MECHANICAL -> createSecuritySystemsMechanical();
+            case S_SENSOR_OPERATIONS -> createSensorOperations();
+            case S_STEALTH -> createStealth();
+            case S_STREETWISE -> createStreetwise();
+            case S_SURVIVAL -> createSurvival();
+            case S_TRACKING -> createTracking();
+            case S_TRAINING -> createTraining();
+            default -> {
+                logger.errorDialog("REPORT TO MEGAMEK TEAM",
+                      "Unexpected value in compatibilityHandler: {}",
+                      skillType.getName());
+                yield null;
+            }
+        };
+
+        if (temporarySkillType == null) {
+            return;
+        }
+
+        if (skillType.getSubType() == null) {
+            skillType.subType = temporarySkillType.getSubType();
+            logger.info("SkillType {} has been updated to sub type {}",
+                  skillType.getName(),
+                  temporarySkillType.getSubType());
+        }
+
+        if (skillType.getFirstAttribute() == null) {
+            skillType.firstAttribute = temporarySkillType.getFirstAttribute();
+            logger.info("SkillType {} has been updated to first attribute {}",
+                  skillType.getName(),
+                  temporarySkillType.getFirstAttribute());
+        }
+
+        if (skillType.getSecondAttribute() == null) {
+            skillType.secondAttribute = temporarySkillType.getSecondAttribute();
+            logger.info("SkillType {} has been updated to second attribute {}",
+                  skillType.getName(),
+                  temporarySkillType.getSecondAttribute());
         }
     }
 
