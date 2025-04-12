@@ -223,6 +223,11 @@ public enum TransactionType {
             return FINANCIAL_TERM_END_CARRYOVER;
         }
 
+        // < 0.50.05 compatibility handler
+        if ("RETIREMENT".equalsIgnoreCase(text)) {
+            return PAYOUT;
+        }
+
         try {
             switch (Integer.parseInt(text)) {
                 case 0:
