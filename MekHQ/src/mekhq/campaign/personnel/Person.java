@@ -5235,7 +5235,43 @@ public class Person {
             return DEFAULT_ATTRIBUTE_SCORE;
         }
 
-        return atowAttributes.getAttributeScore(attribute);
+        boolean hasFreakishStrength = options.booleanOption(MUTATION_FREAKISH_STRENGTH);
+        boolean hasExoticAppearance = options.booleanOption(MUTATION_EXOTIC_APPEARANCE);
+        boolean hasFacialHair = options.booleanOption(MUTATION_FACIAL_HAIR);
+        boolean hasSeriousDisfigurement = options.booleanOption(MUTATION_SERIOUS_DISFIGUREMENT);
+        boolean isCatGirl = options.booleanOption(MUTATION_CAT_GIRL);
+        boolean isCatGirlUnofficial = options.booleanOption(MUTATION_CAT_GIRL_UNOFFICIAL);
+
+        return switch (attribute) {
+            case NONE -> 0;
+            case STRENGTH -> {
+                int attributeScore = atowAttributes.getAttributeScore(attribute);
+                if (hasFreakishStrength) {
+                    attributeScore += 2;
+                }
+                yield min(attributeScore, MAXIMUM_ATTRIBUTE_SCORE);
+            }
+            case BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER -> atowAttributes.getAttributeScore(attribute);
+            case CHARISMA -> {
+                int attributeScore = atowAttributes.getAttributeScore(attribute);
+                if (hasExoticAppearance) {
+                    attributeScore++;
+                }
+                if (hasFacialHair) {
+                    attributeScore--;
+                }
+                if (hasSeriousDisfigurement) {
+                    attributeScore -= 3;
+                }
+                if (isCatGirl) {
+                    attributeScore -= 3;
+                }
+                if (isCatGirlUnofficial) {
+                    attributeScore++;
+                }
+                yield clamp(attributeScore, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            }
+        };
     }
 
     /**

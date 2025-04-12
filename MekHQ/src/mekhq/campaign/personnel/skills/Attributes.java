@@ -35,6 +35,7 @@ import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_IN
 import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_REFLEXES;
 import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_STRENGTH;
 import static mekhq.campaign.personnel.PersonnelOptions.EXCEPTIONAL_ATTRIBUTE_WILLPOWER;
+import static mekhq.campaign.personnel.PersonnelOptions.MUTATION_FREAKISH_STRENGTH;
 
 import java.io.PrintWriter;
 
