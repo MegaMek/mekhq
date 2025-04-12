@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import megamek.common.Engine;
 import megamek.common.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -165,6 +166,13 @@ public record Accountant(Campaign campaign) {
 
             // While there will be times when a unit is unavailable, we don't check for that as we also don't track
             // hydrogen stored, and we don't want to unfairly penalize the player.
+            Engine engine = entity.getEngine();
+
+            if (engine == null) {
+                logger.debug("(getMonthlyFuel) engine is null for {}", unit);
+                continue;
+            }
+
             if (entity.getEngine().isFusion()) {
                 totalFusionEngines++;
             }
