@@ -27,6 +27,7 @@
  */
 package mekhq.gui;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel.abandonMissingPersonnel;
 
 import java.awt.BorderLayout;
@@ -38,6 +39,7 @@ import java.awt.event.ActionListener;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -145,6 +147,20 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.0;
         panTopButtons.add(btnBeginTransit, gridBagConstraints);
+
+        JCheckBox chkAvoidAbandonedSystems = new JCheckBox(resourceMap.getString("chkAvoidAbandonedSystems.text"));
+        chkAvoidAbandonedSystems.setToolTipText(wordWrap(resourceMap.getString("chkAvoidAbandonedSystems.toolTipText")));
+        chkAvoidAbandonedSystems.addActionListener(ev -> getCampaign().setIsAvoidingEmptySystems(
+              chkAvoidAbandonedSystems.isSelected()));
+        chkAvoidAbandonedSystems.setSelected(getCampaign().isAvoidingEmptySystems());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weighty = 0.0;
+        panTopButtons.add(chkAvoidAbandonedSystems, gridBagConstraints);
 
         panMapView.add(panTopButtons, BorderLayout.PAGE_START);
 
