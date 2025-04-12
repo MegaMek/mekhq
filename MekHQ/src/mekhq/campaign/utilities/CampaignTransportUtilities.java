@@ -28,15 +28,18 @@
 
 package mekhq.campaign.utilities;
 
+import static mekhq.campaign.unit.enums.TransporterType.*;
+
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Vector;
+
 import megamek.common.*;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.utilities.MHQInternationalization;
 import org.apache.commons.math3.util.Pair;
-
-import java.util.*;
-
-import static mekhq.campaign.unit.enums.TransporterType.*;
 
 public class CampaignTransportUtilities {
     // region Static Helpers
@@ -289,6 +292,8 @@ public class CampaignTransportUtilities {
         retVal.add(new Pair<>(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "CampaignTransportUtilities.selectTransport.null.text"), null));
         retVal.add(new Pair<>(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "CampaignTransportUtilities.selectTransport.TACTICAL_TRANSPORT.text"), CampaignTransportType.TACTICAL_TRANSPORT));
         retVal.add(new Pair<>(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "CampaignTransportUtilities.selectTransport.SHIP_TRANSPORT.text"), CampaignTransportType.SHIP_TRANSPORT));
+        retVal.add(new Pair<>(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport",
+              "CampaignTransportUtilities.selectTransport.TOW_TRANSPORT.text"), CampaignTransportType.TOW_TRANSPORT));
 
         return retVal;
     }
