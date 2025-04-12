@@ -33,6 +33,7 @@ import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.common.MiscType.F_SPONSON_TURRET;
 import static megamek.common.enums.SkillLevel.NONE;
+import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.force.ForceType.STANDARD;
@@ -109,7 +110,6 @@ public class Resupply {
     public static final int CARGO_MINIMUM_WEIGHT = 4;
     public static final int RESUPPLY_AMMO_TONNAGE = 1;
     public static final int RESUPPLY_ARMOR_TONNAGE = 5;
-    final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
 
     private static final MMLogger logger = MMLogger.create(Resupply.class);
 

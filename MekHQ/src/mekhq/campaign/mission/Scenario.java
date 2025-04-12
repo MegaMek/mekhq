@@ -899,7 +899,7 @@ public class Scenario implements IPlayerSettings {
         if (!getStatus().isCurrent()) {
             return false;
         }
-        if (getForces(c).getAllUnits(true).isEmpty()) {
+        if (getForces(c).getAllUnits(false).isEmpty()) {
             return false;
         }
         if (!includesRequiredPersonnel(c)) {
@@ -1097,7 +1097,7 @@ public class Scenario implements IPlayerSettings {
                     Node team = wn2.getAttributes().getNamedItem("team");
                     if (team != null) {
                         teamValue = Integer.parseInt(MHQXMLUtility.unEscape(team.getTextContent()));
-                    } else {
+                    } else if (retVal.getStatus().isCurrent()) {
                         // Campaigns <50.05 won't have 'team' recorded, so we need to use a fallback value.
                         // The value is equal to 'Allied' which means the scenario will inherit the pre-change behavior
                         logger.info("Scenario {} predates Blind Drop changes. Using fallback team of 1.",

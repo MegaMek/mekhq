@@ -340,4 +340,8 @@ public final class MHQConstants extends SuiteConstants {
     // endregion Backgrounds
 
     // endregion File Paths
+
+    // startregion Important Dates
+    public static final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
+    // endregion Important Dates
 }

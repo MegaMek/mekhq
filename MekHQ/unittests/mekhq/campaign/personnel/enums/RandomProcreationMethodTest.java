@@ -27,14 +27,6 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import mekhq.MekHQ;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
-import mekhq.campaign.personnel.procreation.RandomProcreation;
-import org.junit.jupiter.api.Test;
-
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -42,21 +34,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ResourceBundle;
+
+import mekhq.MekHQ;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
+import mekhq.campaign.personnel.procreation.RandomProcreation;
+import org.junit.jupiter.api.Test;
+
 public class RandomProcreationMethodTest {
     //region Variable Declarations
     private static final RandomProcreationMethod[] methods = RandomProcreationMethod.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Getters
     @Test
     public void testGetToolTipText() {
         assertEquals(resources.getString("RandomProcreationMethod.NONE.toolTipText"),
-                RandomProcreationMethod.NONE.getToolTipText());
+              RandomProcreationMethod.NONE.getToolTipText());
         assertEquals(resources.getString("RandomProcreationMethod.DICE_ROLL.toolTipText"),
-                RandomProcreationMethod.DICE_ROLL.getToolTipText());
+              RandomProcreationMethod.DICE_ROLL.getToolTipText());
     }
     //endregion Getters
 
@@ -101,9 +101,24 @@ public class RandomProcreationMethodTest {
 
     @Test
     public void testToStringOverride() {
-        assertEquals(resources.getString("RandomProcreationMethod.NONE.text"),
-                RandomProcreationMethod.NONE.toString());
+        assertEquals(resources.getString("RandomProcreationMethod.NONE.text"), RandomProcreationMethod.NONE.toString());
         assertEquals(resources.getString("RandomProcreationMethod.DICE_ROLL.text"),
-                RandomProcreationMethod.DICE_ROLL.toString());
+              RandomProcreationMethod.DICE_ROLL.toString());
+    }
+
+    @Test
+    public void testFromString() {
+        assertEquals(RandomProcreationMethod.NONE, RandomProcreationMethod.fromString("NONE"));
+        assertEquals(RandomProcreationMethod.DICE_ROLL, RandomProcreationMethod.fromString("DICE_ROLL"));
+        assertEquals(RandomProcreationMethod.NONE, RandomProcreationMethod.fromString("none"));
+        assertEquals(RandomProcreationMethod.DICE_ROLL, RandomProcreationMethod.fromString("dice_roll"));
+    }
+
+    @Test
+    public void testFromStringInvalidInput() {
+        assertEquals(RandomProcreationMethod.NONE, RandomProcreationMethod.fromString(null));
+        assertEquals(RandomProcreationMethod.NONE, RandomProcreationMethod.fromString(""));
+        assertEquals(RandomProcreationMethod.NONE, RandomProcreationMethod.fromString("INVALID_VALUE"));
+        assertEquals(RandomProcreationMethod.NONE, RandomProcreationMethod.fromString("123"));
     }
 }

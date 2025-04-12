@@ -46,6 +46,7 @@ import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performRe
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
+import static mekhq.campaign.personnel.DiscretionarySpending.performDiscretionarySpending;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
@@ -64,6 +65,7 @@ import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_CLARION_NOTE;
 import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.MINIMUM_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMAN;
 import static mekhq.campaign.stratcon.StratconRulesManager.processIgnoredDynamicScenario;
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
@@ -179,6 +181,7 @@ import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
+import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.lifeEvents.ComingOfAgeAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement;
 import mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement;
@@ -329,6 +332,7 @@ public class Campaign implements ITechManager {
     private Finances finances;
 
     private CurrentLocation location;
+    private boolean isAvoidingEmptySystems;
 
     private final News news;
 
@@ -425,6 +429,7 @@ public class Campaign implements ITechManager {
         techFactionCode = ITechnology.F_MERC;
         CurrencyManager.getInstance().setCampaign(this);
         location = new CurrentLocation(Systems.getInstance().getSystems().get("Galatea"), 0);
+        isAvoidingEmptySystems = true;
         currentReport = new ArrayList<>();
         currentReportHTML = "";
         newReports = new ArrayList<>();
@@ -581,6 +586,14 @@ public class Campaign implements ITechManager {
 
     public PlanetarySystem getCurrentSystem() {
         return location.getCurrentSystem();
+    }
+
+    public boolean isAvoidingEmptySystems() {
+        return isAvoidingEmptySystems;
+    }
+
+    public void setIsAvoidingEmptySystems(boolean isAvoidingEmptySystems) {
+        this.isAvoidingEmptySystems = isAvoidingEmptySystems;
     }
 
     /**
@@ -4910,7 +4923,7 @@ public class Campaign implements ITechManager {
                     processWeeklyRelationshipEvents(person);
                 }
 
-                processWeeklyEdgeResets(person);
+                person.resetCurrentEdge();
 
                 if (!person.getStatus().isMIA()) {
                     processFatigueRecovery(this, person);
@@ -4926,6 +4939,19 @@ public class Campaign implements ITechManager {
                         personnelWhoAdvancedInXP.add(person);
                     }
                 }
+
+                if (person.isCommander() &&
+                          campaignOptions.isAllowMonthlyReinvestment() &&
+                          !person.isHasPerformedExtremeExpenditure()) {
+                    String reportString = performDiscretionarySpending(person, finances, currentDay);
+                    if (reportString != null) {
+                        addReport(reportString);
+                    } else {
+                        logger.error("Unable to process discretionary spending for {}", person.getFullTitle());
+                    }
+                }
+
+                person.setHasPerformedExtremeExpenditure(false);
             }
 
             if (isCommandersDay && !faction.isClan() && (peopleWhoCelebrateCommandersDay < commanderDayTargetNumber)) {
@@ -4986,14 +5012,11 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Process weekly Edge resets for a given person.
-     *
-     * @param person the person for whom weekly Edge resets will be processed
+     * @deprecated use {@link Person#resetCurrentEdge()} instead
      */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     private void processWeeklyEdgeResets(Person person) {
-        if ((person.hasSupportRole(true) || person.isEngineer())) {
-            person.resetCurrentEdge();
-        }
+        person.resetCurrentEdge();
     }
 
     /**
@@ -5121,6 +5144,12 @@ public class Campaign implements ITechManager {
             updateAllSkillAgeModifiers(currentDay, person);
             applyAgingSPA(age, person);
         }
+
+        if (campaignOptions.isRewardComingOfAgeAbilities() && isBirthday && (person.getAge(currentDay) == 16)) {
+            SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
+            singleSpecialAbilityGenerator.rollSPA(this, person);
+            MekHQ.triggerEvent(new PersonChangedEvent(person));
+        }
     }
 
     /**
@@ -5187,22 +5216,22 @@ public class Campaign implements ITechManager {
         // the second time to do whatever else. Otherwise, maintenance minutes might
         // get sucked up by other stuff. This is also a good place to ensure that a
         // unit's engineer gets reset and updated.
-        for (Unit u : getUnits()) {
+        for (Unit unit : getUnits()) {
             // do maintenance checks
             try {
-                u.resetEngineer();
-                if (null != u.getEngineer()) {
-                    u.getEngineer().resetMinutesLeft(campaignOptions.isTechsUseAdministration());
+                unit.resetEngineer();
+                if (null != unit.getEngineer()) {
+                    unit.getEngineer().resetMinutesLeft(campaignOptions.isTechsUseAdministration());
                 }
 
-                doMaintenance(u);
+                doMaintenance(unit);
             } catch (Exception ex) {
                 logger.error(ex,
                       "Unable to perform maintenance on {} ({}) due to an error",
-                      u.getName(),
-                      u.getId().toString());
+                      unit.getName(),
+                      unit.getId().toString());
                 addReport(String.format("ERROR: An error occurred performing maintenance on %s, check the log",
-                      u.getName()));
+                      unit.getName()));
             }
         }
 
@@ -6420,8 +6449,21 @@ public class Campaign implements ITechManager {
     }
 
     public void setTemporaryPrisonerCapacity(int temporaryPrisonerCapacity) {
-        this.temporaryPrisonerCapacity = max(PrisonerEventManager.MINIMUM_TEMPORARY_CAPACITY,
-              temporaryPrisonerCapacity);
+        this.temporaryPrisonerCapacity = max(MINIMUM_TEMPORARY_CAPACITY, temporaryPrisonerCapacity);
+    }
+
+    /**
+     * Adjusts the temporary prisoner capacity by the specified delta value.
+     *
+     * <p>he new capacity is constrained to be at least the minimum allowed temporary capacity, as defined by {@code
+     * PrisonerEventManager.MINIMUM_TEMPORARY_CAPACITY}.</p>T
+     *
+     * @param delta the amount by which to change the temporary prisoner capacity. A positive value increases the
+     *              capacity, while a negative value decreases it.
+     */
+    public void changeTemporaryPrisonerCapacity(int delta) {
+        int newCapacity = temporaryPrisonerCapacity + delta;
+        temporaryPrisonerCapacity = max(MINIMUM_TEMPORARY_CAPACITY, newCapacity);
     }
 
     public RandomEventLibraries getRandomEventLibraries() {
@@ -6533,6 +6575,7 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "forces");
         finances.writeToXML(pw, indent);
         location.writeToXML(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isAvoidingEmptySystems", isAvoidingEmptySystems);
         shoppingList.writeToXML(pw, indent);
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "kills");
@@ -6793,110 +6836,164 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Use an A* algorithm to find the best path between two planets For right now, we are just going to minimize the
-     * number of jumps, but we could extend this to take advantage of recharge information or other variables as well
-     * Based on <a href="http://www.policyalmanac.org/games/aStarTutorial.htm">Policy Almanac A Star Tutorial</a>
+     * Calculates the optimal jump path between two planetary systems using the A* algorithm.
      *
-     * @param start Starting System
-     * @param end   Ending System
+     * <p>This implementation minimizes a combination of jump counts and recharge times to find the most efficient
+     * route between systems. The algorithm uses a heuristic based on straight-line distance combined with actual path
+     * costs from the starting system.</p>
      *
-     * @return A {@link JumpPath} if found.
+     * <p>The algorithm will optionally avoid systems without population when the {@code
+     * isAvoidingEmptySystems} flag equals {@code true}.</p>
+     *
+     * <p>Implementation is based on:
+     * <a href="http://www.policyalmanac.org/games/aStarTutorial.htm">Policy Almanac A* Tutorial</a></p>
+     *
+     * @param start The starting planetary system
+     * @param end   The destination planetary system
+     *
+     * @return A {@link JumpPath} containing the sequence of systems to traverse, or {@code null} if no valid path
+     *       exists between the systems. If start and end are the same system, returns a path containing only that
+     *       system.
      */
     public @Nullable JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end) {
+        // Handle edge cases
         if (null == start) {
             return null;
         }
         if ((null == end) || start.getId().equals(end.getId())) {
-            JumpPath jpath = new JumpPath();
-            jpath.addSystem(start);
-            return jpath;
+            JumpPath jumpPath = new JumpPath();
+            jumpPath.addSystem(start);
+            return jumpPath;
         }
 
+        // Initialize A* algorithm variables
         String startKey = start.getId();
         String endKey = end.getId();
 
-        String current = startKey;
         Set<String> closed = new HashSet<>();
         Set<String> open = new HashSet<>();
-        boolean found = false;
-        int jumps = 0;
 
-        // we are going to through and set up some hashes that will make our
-        // work easier
-        // hash of parent key
         Map<String, String> parent = new HashMap<>();
-        // hash of H for each planet which will not change
-        Map<String, Double> scoreH = new HashMap<>();
-        // hash of G for each planet which might change
-        Map<String, Double> scoreG = new HashMap<>();
+        Map<String, Double> scoreH = new HashMap<>(); // Heuristic scores (estimated cost to goal)
+        Map<String, Double> scoreG = new HashMap<>(); // Path costs from start
 
-        for (String key : Systems.getInstance().getSystems().keySet()) {
-            scoreH.put(key, end.getDistanceTo(Systems.getInstance().getSystems().get(key)));
+        // Precompute heuristics
+        Systems systemsInstance = Systems.getInstance();
+        Map<String, PlanetarySystem> allSystems = systemsInstance.getSystems();
+
+        for (Entry<String, PlanetarySystem> entry : allSystems.entrySet()) {
+            scoreH.put(entry.getKey(), end.getDistanceTo(entry.getValue()));
         }
+
+        // Initialize starting node
+        String current = startKey;
         scoreG.put(current, 0.0);
         closed.add(current);
 
-        while (!found && jumps < 10000) {
-            jumps++;
-            double currentG = scoreG.get(current) +
-                                    Systems.getInstance().getSystemById(current).getRechargeTime(getLocalDate());
-
+        // A* search
+        final int MAX_JUMPS = 10000;
+        for (int jumps = 0; jumps < MAX_JUMPS; jumps++) {
+            // Get current node's information
+            PlanetarySystem currentSystem = systemsInstance.getSystemById(current);
+            double currentG = scoreG.get(current) + currentSystem.getRechargeTime(getLocalDate());
             final String localCurrent = current;
-            Systems.getInstance().visitNearbySystems(Systems.getInstance().getSystemById(current), 30, p -> {
-                if (closed.contains(p.getId())) {
-                } else if (open.contains(p.getId())) {
-                    // is the current G better than the existing G
-                    if (currentG < scoreG.get(p.getId())) {
-                        // then change G and parent
-                        scoreG.put(p.getId(), currentG);
-                        parent.put(p.getId(), localCurrent);
+
+            // Explore neighbors
+            systemsInstance.visitNearbySystems(currentSystem, 30, neighborSystem -> {
+                String neighborId = neighborSystem.getId();
+
+                // Skip systems without population if avoiding empty systems
+                if (isAvoidingEmptySystems && neighborSystem.getPopulation(currentDay) <= 0) {
+                    return;
+                }
+
+                if (closed.contains(neighborId)) {
+                    return; // Already evaluated
+                }
+
+                if (open.contains(neighborId)) {
+                    // Check if this path is better than the previously found one
+                    if (currentG < scoreG.get(neighborId)) {
+                        scoreG.put(neighborId, currentG);
+                        parent.put(neighborId, localCurrent);
                     }
                 } else {
-                    // put the current G for this one in memory
-                    scoreG.put(p.getId(), currentG);
-                    // put the parent in memory
-                    parent.put(p.getId(), localCurrent);
-                    open.add(p.getId());
+                    // Discover a new node
+                    scoreG.put(neighborId, currentG);
+                    parent.put(neighborId, localCurrent);
+                    open.add(neighborId);
                 }
             });
 
-            String bestMatch = null;
-            double bestF = Double.POSITIVE_INFINITY;
-            for (String possible : open) {
-                // calculate F
-                double currentF = scoreG.get(possible) + scoreH.get(possible);
-                if (currentF < bestF) {
-                    bestMatch = possible;
-                    bestF = currentF;
-                }
+            // Find the open node with the lowest f score
+            String bestMatch = findNodeWithLowestFScore(open, scoreG, scoreH);
+
+            if (bestMatch == null) {
+                break; // No path exists
             }
 
+            // Move to the best node
             current = bestMatch;
-            if (null == current) {
-                // We're done - probably failed to find anything
-                break;
-            }
-
             closed.add(current);
             open.remove(current);
+
+            // Check if we've reached the destination
             if (current.equals(endKey)) {
-                found = true;
+                return reconstructPath(current, parent, systemsInstance);
             }
         }
 
-        // now we just need to back up from the last current by parents until we
-        // hit null
+        // No path found or maximum jumps reached
+        return reconstructPath(current, parent, systemsInstance);
+    }
+
+    /**
+     * Finds the node in the open set with the lowest f-score (g + h).
+     *
+     * @param openSet The set of nodes to evaluate
+     * @param gScores Map of path costs from start
+     * @param hScores Map of heuristic distances to goal
+     *
+     * @return The node with the lowest f-score, or null if openSet is empty
+     */
+    private String findNodeWithLowestFScore(Set<String> openSet, Map<String, Double> gScores,
+          Map<String, Double> hScores) {
+        String bestMatch = null;
+        double bestF = Double.POSITIVE_INFINITY;
+
+        for (String candidate : openSet) {
+            double f = gScores.get(candidate) + hScores.get(candidate);
+            if (f < bestF) {
+                bestMatch = candidate;
+                bestF = f;
+            }
+        }
+
+        return bestMatch;
+    }
+
+    /**
+     * Reconstructs the path from the parent map.
+     *
+     * @param current         The final node in the path
+     * @param parent          Map of parent nodes
+     * @param systemsInstance The systems registry
+     *
+     * @return A JumpPath containing the sequence of systems
+     */
+    private JumpPath reconstructPath(String current, Map<String, String> parent, Systems systemsInstance) {
+        // Reconstruct path
         List<PlanetarySystem> path = new ArrayList<>();
         String nextKey = current;
-        while (null != nextKey) {
-            path.add(Systems.getInstance().getSystemById(nextKey));
-            // MekHQApp.logMessage(nextKey);
+
+        while (nextKey != null) {
+            path.add(systemsInstance.getSystemById(nextKey));
             nextKey = parent.get(nextKey);
         }
 
-        // now reverse the direction
+        // Create the final path in the correct order (start to end)
         JumpPath finalPath = new JumpPath();
-        for (int i = (path.size() - 1); i >= 0; i--) {
+        for (int i = path.size() - 1; i >= 0; i--) {
             finalPath.addSystem(path.get(i));
         }
 
@@ -8765,49 +8862,64 @@ public class Campaign implements ITechManager {
         return false;
     }
 
-    public void doMaintenance(Unit u) {
-        if (!u.requiresMaintenance() || !campaignOptions.isCheckMaintenance()) {
+    public void doMaintenance(Unit unit) {
+        if (!unit.requiresMaintenance() || !campaignOptions.isCheckMaintenance()) {
             return;
         }
         // let's start by checking times
-        Person tech = u.getTech();
-        int minutesUsed = u.getMaintenanceTime();
-        int asTechsUsed = getAvailableAstechs(minutesUsed, false);
-        boolean maintained = ((tech != null) && (tech.getMinutesLeft() >= minutesUsed) && !tech.isMothballing());
+        int minutesUsed = unit.getMaintenanceTime();
+        int asTechsUsed = 0;
+        boolean maintained = false;
         boolean paidMaintenance = true;
-        if (maintained) {
-            // use the time
-            tech.setMinutesLeft(tech.getMinutesLeft() - minutesUsed);
-            astechPoolMinutes -= asTechsUsed * minutesUsed;
-        }
-        u.incrementDaysSinceMaintenance(this, maintained, asTechsUsed);
+
+        unit.incrementDaysSinceMaintenance(this, maintained, asTechsUsed);
 
         int ruggedMultiplier = 1;
-        if (u.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_1)) {
+        if (unit.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_1)) {
             ruggedMultiplier = 2;
         }
 
-        if (u.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_2)) {
+        if (unit.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_2)) {
             ruggedMultiplier = 3;
         }
 
-        if (u.getDaysSinceMaintenance() >= (getCampaignOptions().getMaintenanceCycleDays() * ruggedMultiplier)) {
+        if (unit.getDaysSinceMaintenance() >= (getCampaignOptions().getMaintenanceCycleDays() * ruggedMultiplier)) {
+            Person tech = unit.getTech();
+            if (tech != null) {
+                int availableMinutes = tech.getMinutesLeft();
+
+                maintained = (availableMinutes >= minutesUsed);
+
+                if (!maintained) {
+                    // At this point, insufficient minutes is the only reason why this would be failed.
+                    addReport(String.format(resources.getString("maintenanceNotAvailable.text"), unit.getName()));
+                } else {
+                    maintained = !tech.isMothballing();
+                }
+
+                if (maintained) {
+                    tech.setMinutesLeft(availableMinutes - minutesUsed);
+                    asTechsUsed = getAvailableAstechs(minutesUsed, false);
+                    astechPoolMinutes -= asTechsUsed * minutesUsed;
+                }
+            }
+
             // maybe use the money
             if (campaignOptions.isPayForMaintain()) {
                 if (!(finances.debit(TransactionType.MAINTENANCE,
                       getLocalDate(),
-                      u.getMaintenanceCost(),
-                      "Maintenance for " + u.getName()))) {
+                      unit.getMaintenanceCost(),
+                      "Maintenance for " + unit.getName()))) {
                     addReport("<font color='" +
                                     MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
                                     "'><b>You cannot afford to pay maintenance costs for " +
-                                    u.getHyperlinkedName() +
+                                    unit.getHyperlinkedName() +
                                     "!</b></font>");
                     paidMaintenance = false;
                 }
             }
             // it is time for a maintenance check
-            PartQuality qualityOrig = u.getQuality();
+            PartQuality qualityOrig = unit.getQuality();
             String techName = "Nobody";
             String techNameLinked = techName;
             if (null != tech) {
@@ -8821,9 +8933,9 @@ public class Campaign implements ITechManager {
             StringBuilder maintenanceReport = new StringBuilder("<strong>" +
                                                                       techName +
                                                                       " performing maintenance</strong><br><br>");
-            for (Part p : u.getParts()) {
+            for (Part p : unit.getParts()) {
                 try {
-                    String partReport = doMaintenanceOnUnitPart(u, p, partsToDamage, paidMaintenance);
+                    String partReport = doMaintenanceOnUnitPart(unit, p, partsToDamage, paidMaintenance);
                     if (partReport != null) {
                         maintenanceReport.append(partReport).append("<br>");
                     }
@@ -8832,12 +8944,12 @@ public class Campaign implements ITechManager {
                           "Could not perform maintenance on part {} ({}) for {} ({}) due to an error",
                           p.getName(),
                           p.getId(),
-                          u.getName(),
-                          u.getId().toString());
+                          unit.getName(),
+                          unit.getId().toString());
                     addReport(String.format(
                           "ERROR: An error occurred performing maintenance on %s for unit %s, check the log",
                           p.getName(),
-                          u.getName()));
+                          unit.getName()));
                 }
             }
 
@@ -8854,13 +8966,13 @@ public class Campaign implements ITechManager {
                 }
             }
 
-            u.setLastMaintenanceReport(maintenanceReport.toString());
+            unit.setLastMaintenanceReport(maintenanceReport.toString());
 
             if (getCampaignOptions().isLogMaintenance()) {
                 logger.info(maintenanceReport.toString());
             }
 
-            PartQuality quality = u.getQuality();
+            PartQuality quality = unit.getQuality();
             String qualityString;
             boolean reverse = getCampaignOptions().isReverseQualityNames();
             if (quality.toNumeric() > qualityOrig.toNumeric()) {
@@ -8893,7 +9005,7 @@ public class Campaign implements ITechManager {
                                      "'>" +
                                      damageString +
                                      "</b></font> [<a href='REPAIR|" +
-                                     u.getId() +
+                                     unit.getId() +
                                      "'>Repair bay</a>]";
             }
             String paidString = "";
@@ -8904,17 +9016,17 @@ public class Campaign implements ITechManager {
             }
             addReport(techNameLinked +
                             " performs maintenance on " +
-                            u.getHyperlinkedName() +
+                            unit.getHyperlinkedName() +
                             ". " +
                             paidString +
                             qualityString +
                             ". " +
                             damageString +
                             " [<a href='MAINTENANCE|" +
-                            u.getId() +
+                            unit.getId() +
                             "'>Get details</a>]");
 
-            u.resetDaysSinceMaintenance();
+            unit.resetDaysSinceMaintenance();
         }
     }
 

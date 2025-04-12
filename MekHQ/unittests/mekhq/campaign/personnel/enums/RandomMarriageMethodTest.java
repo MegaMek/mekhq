@@ -27,14 +27,6 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import mekhq.MekHQ;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
-import mekhq.campaign.personnel.marriage.RandomMarriage;
-import org.junit.jupiter.api.Test;
-
-import java.util.ResourceBundle;
-
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -43,21 +35,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ResourceBundle;
+
+import mekhq.MekHQ;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
+import mekhq.campaign.personnel.marriage.RandomMarriage;
+import org.junit.jupiter.api.Test;
+
 public class RandomMarriageMethodTest {
     //region Variable Declarations
     private static final RandomMarriageMethod[] methods = RandomMarriageMethod.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale());
+          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Getters
     @Test
     public void testGetToolTipText() {
         assertEquals(wordWrap(resources.getString("RandomMarriageMethod.NONE.toolTipText")),
-                RandomMarriageMethod.NONE.getToolTipText());
+              RandomMarriageMethod.NONE.getToolTipText());
         assertEquals(wordWrap(resources.getString("RandomMarriageMethod.DICE_ROLL.toolTipText")),
-                RandomMarriageMethod.DICE_ROLL.getToolTipText());
+              RandomMarriageMethod.DICE_ROLL.getToolTipText());
     }
     //endregion Getters
 
@@ -86,6 +86,22 @@ public class RandomMarriageMethodTest {
     //endregion Boolean Comparison Methods
 
     @Test
+    public void testFromString() {
+        // Valid inputs
+        assertEquals(RandomMarriageMethod.NONE, RandomMarriageMethod.fromString("NONE"));
+        assertEquals(RandomMarriageMethod.DICE_ROLL, RandomMarriageMethod.fromString("DICE_ROLL"));
+        assertEquals(RandomMarriageMethod.NONE, RandomMarriageMethod.fromString("none"));
+        assertEquals(RandomMarriageMethod.DICE_ROLL, RandomMarriageMethod.fromString("dice_roll"));
+        assertEquals(RandomMarriageMethod.NONE, RandomMarriageMethod.fromString("None"));
+
+        // Invalid inputs
+        assertEquals(RandomMarriageMethod.NONE, RandomMarriageMethod.fromString("InvalidInput"));
+        assertEquals(RandomMarriageMethod.NONE, RandomMarriageMethod.fromString(""));
+        assertEquals(RandomMarriageMethod.NONE, RandomMarriageMethod.fromString(null));
+        assertEquals(RandomMarriageMethod.NONE, RandomMarriageMethod.fromString("123"));
+    }
+
+    @Test
     public void testGetMethod() {
         final CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockOptions.isUseClanPersonnelMarriages()).thenReturn(false);
@@ -101,8 +117,8 @@ public class RandomMarriageMethodTest {
     @Test
     public void testToStringOverride() {
         assertEquals(resources.getString("RandomMarriageMethod.NONE.text").trim(),
-                RandomMarriageMethod.NONE.toString().trim());
+              RandomMarriageMethod.NONE.toString().trim());
         assertEquals(resources.getString("RandomMarriageMethod.DICE_ROLL.text").trim(),
-                RandomMarriageMethod.DICE_ROLL.toString().trim());
+              RandomMarriageMethod.DICE_ROLL.toString().trim());
     }
 }
