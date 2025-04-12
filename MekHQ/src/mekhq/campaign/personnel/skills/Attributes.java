@@ -352,7 +352,7 @@ public class Attributes {
     }
 
     /**
-     * @deprecated use {@link #setAttributeScore(SkillAttribute, int)} instead.
+     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
      */
     @Deprecated(since = "0.50.5", forRemoval = true)
     public void setStrength(int strength) {
@@ -368,7 +368,7 @@ public class Attributes {
     }
 
     /**
-     * @deprecated use {@link #setAttributeScore(SkillAttribute, int)} instead.
+     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
      */
     @Deprecated(since = "0.50.5", forRemoval = true)
     public void setBody(int body) {
@@ -384,7 +384,7 @@ public class Attributes {
     }
 
     /**
-     * @deprecated use {@link #setAttributeScore(SkillAttribute, int)} instead.
+     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
      */
     @Deprecated(since = "0.50.5", forRemoval = true)
     public void setReflexes(int reflexes) {
@@ -400,7 +400,7 @@ public class Attributes {
     }
 
     /**
-     * @deprecated use {@link #setAttributeScore(SkillAttribute, int)} instead.
+     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
      */
     @Deprecated(since = "0.50.5", forRemoval = true)
     public void setDexterity(int dexterity) {
@@ -416,7 +416,7 @@ public class Attributes {
     }
 
     /**
-     * @deprecated use {@link #setAttributeScore(SkillAttribute, int)} instead.
+     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
      */
     @Deprecated(since = "0.50.5", forRemoval = true)
     public void setIntelligence(int intelligence) {
@@ -432,7 +432,7 @@ public class Attributes {
     }
 
     /**
-     * @deprecated use {@link #setAttributeScore(SkillAttribute, int)} instead.
+     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
      */
     @Deprecated(since = "0.50.5", forRemoval = true)
     public void setWillpower(int willpower) {
@@ -448,7 +448,7 @@ public class Attributes {
     }
 
     /**
-     * @deprecated use {@link #setAttributeScore(SkillAttribute, int)} instead.
+     * @deprecated use {@link #setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} instead.
      */
     @Deprecated(since = "0.50.5", forRemoval = true)
     public void setCharisma(int charisma) {
