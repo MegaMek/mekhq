@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -31,8 +31,6 @@ import java.time.LocalDate;
 
 /**
  * This class is a specific log entry related to unit assignments.
- *
- * @author Miguel Azevedo
  */
 public class AssignmentLogEntry extends LogEntry {
     public AssignmentLogEntry(LocalDate date, String desc) {
