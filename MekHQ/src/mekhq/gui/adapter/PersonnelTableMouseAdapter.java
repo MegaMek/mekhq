@@ -610,7 +610,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_IMPROVE: {
                 String type = data[1];
                 int cost = MathUtility.parseInt(data[2]);
-                int oldExpLevel = selectedPerson.getExperienceLevel(getCampaign(), false);
                 selectedPerson.improveSkill(type);
                 selectedPerson.spendXP(cost);
 
@@ -618,8 +617,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       selectedPerson,
                       getCampaign().getLocalDate(),
                       selectedPerson.getSkill(type).getType().getName(),
-                      selectedPerson.getSkill(type)
-                            .toString(selectedPerson.getOptions(), selectedPerson.getReputation()));
+                      selectedPerson.getSkill(type).toString());
                 getCampaign().addReport(String.format(resources.getString("improved.format"),
                       selectedPerson.getHyperlinkedName(),
                       type));
@@ -2874,7 +2872,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             traitsMenu.add(menuItem);
 
             // Reputation
-            int reputation = person.getReputation();
+            int reputation = person.getAdjustedReputation(getCampaignOptions().isUseAgeEffects(),
+                  getCampaign().isClanCampaign(),
+                  getCampaign().getLocalDate(),
+                  person.getRankLevel());
             target = reputation + 1;
             menuItem = new JMenuItem(String.format(resources.getString("spendOnReputation.text"), target, traitCost));
             menuItem.setToolTipText(wordWrap(String.format(resources.getString("spendOnReputation.tooltip"),

@@ -723,7 +723,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         lblUnlucky.setText(resourceMap.getString("lblUnlucky.text"));
         lblReputation.setName("lblUnlucky");
 
-        textUnlucky.setText(Integer.toString(person.getReputation()));
+        textUnlucky.setText(Integer.toString(person.getUnlucky()));
         textUnlucky.setName("textUnlucky");
 
         gridBagConstraints = new GridBagConstraints();

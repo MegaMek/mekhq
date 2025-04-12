@@ -54,6 +54,7 @@ import static mekhq.campaign.personnel.lifeEvents.CommandersDayAnnouncement.isCo
 import static mekhq.campaign.personnel.lifeEvents.FreedomDayAnnouncement.isFreedomDay;
 import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewYear;
 import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWinterHolidayMajorDay;
+import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
@@ -5096,6 +5097,7 @@ public class Campaign implements ITechManager {
     private void processAnniversaries(Person person) {
         LocalDate birthday = person.getBirthday(getGameYear());
         boolean isBirthday = birthday != null && birthday.equals(currentDay);
+        int age = person.getAge(currentDay);
 
         if ((person.getRank().isOfficer()) || (!campaignOptions.isAnnounceOfficersOnly())) {
             if (isBirthday && campaignOptions.isAnnounceBirthdays()) {
@@ -5132,7 +5134,7 @@ public class Campaign implements ITechManager {
         }
 
         if (campaignOptions.isShowLifeEventDialogComingOfAge()) {
-            if ((person.getAge(currentDay) == 16) && (isBirthday)) {
+            if ((age == 16) && (isBirthday)) {
                 new ComingOfAgeAnnouncement(this, person);
             }
         }
@@ -5140,6 +5142,7 @@ public class Campaign implements ITechManager {
         if (campaignOptions.isUseAgeEffects() && isBirthday) {
             // This is where we update all the aging modifiers for the character.
             updateAllSkillAgeModifiers(currentDay, person);
+            applyAgingSPA(age, person);
         }
 
         if (campaignOptions.isRewardComingOfAgeAbilities() && isBirthday && (person.getAge(currentDay) == 16)) {
@@ -6112,6 +6115,21 @@ public class Campaign implements ITechManager {
 
     public Faction getFaction() {
         return faction;
+    }
+
+    /**
+     * Determines whether the current campaign is a clan campaign.
+     *
+     * <p>This method checks if the faction associated with the campaign is a clan, returning {@code true}
+     * if it is, and {@code false} otherwise.</p>
+     *
+     * @return {@code true} if the campaign belongs to a clan faction, {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public boolean isClanCampaign() {
+        return faction.isClan();
     }
 
     public void setFaction(final Faction faction) {

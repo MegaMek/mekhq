@@ -44,6 +44,7 @@ import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Aging.getReputationAgeModifier;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 
 import java.io.PrintWriter;
@@ -5285,8 +5286,46 @@ public class Person {
         this.hasPerformedExtremeExpenditure = hasPerformedExtremeExpenditure;
     }
 
+    /**
+     * Retrieves the raw reputation value of the character.
+     *
+     * <p>This method returns the unadjusted reputation value associated with the character.</p>
+     *
+     * <p><b>Usage:</b> If aging effects are enabled, you likely want to use
+     * {@link #getAdjustedReputation(boolean, boolean, LocalDate, int)}  instead.</p>
+     *
+     * @return The raw reputation value.
+     */
     public int getReputation() {
         return reputation;
+    }
+
+    /**
+     * Calculates the adjusted reputation value for the character based on aging effects, the current campaign type,
+     * date, and rank.
+     *
+     * <p>This method computes the character's reputation by applying age-based modifiers, which depend on factors such
+     * as whether aging effects are enabled, whether the campaign is clan-specific, the character's bloodname status,
+     * and their rank in the clan hierarchy. If aging effects are disabled, the reputation remains unchanged.</p>
+     *
+     * <p><b>Usage:</b> If aging effects are disabled, the result will be equivalent to the base reputation value
+     * provided by {@link #getReputation()}.</p>
+     *
+     * @param isUseAgingEffects Indicates whether aging effects should be applied to the reputation calculation.
+     * @param isClanCampaign    Indicates whether the current campaign is specific to a clan.
+     * @param today             The current date used to calculate the character's age.
+     * @param rankIndex         The rank index of the character, which can adjust the reputation modifier in clan-based
+     *                          campaigns.
+     *
+     * @return The adjusted reputation value, accounting for factors like age, clan campaign status, bloodname
+     *       possession, and rank. If aging effects are disabled, the base reputation value is returned.
+     */
+    public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today,
+          int rankIndex) {
+        return reputation +
+                     (isUseAgingEffects ?
+                            getReputationAgeModifier(getAge(today), isClanCampaign, !bloodname.isBlank(), rankIndex) :
+                            0);
     }
 
     public void setReputation(final int reputation) {
