@@ -6041,7 +6041,7 @@ public class CampaignOptions {
                                     Integer.parseInt(wn3.getTextContent().trim()));
                     }
                 } else if (nodeName.equalsIgnoreCase("randomDivorceMethod")) {
-                    retVal.setRandomDivorceMethod(RandomDivorceMethod.valueOf(wn2.getTextContent().trim()));
+                    retVal.setRandomDivorceMethod(RandomDivorceMethod.fromString(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("useRandomOppositeSexDivorce")) {
                     retVal.setUseRandomOppositeSexDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("useRandomSameSexDivorce")) {
@@ -6542,11 +6542,11 @@ public class CampaignOptions {
                 } else if (nodeName.equalsIgnoreCase("originSearchRadius")) { // Legacy, 0.49.7 Removal
                     retVal.getRandomOriginOptions().setOriginSearchRadius(Integer.parseInt(wn2.getTextContent()));
                 } else if (nodeName.equalsIgnoreCase("extraRandomOrigin")) { // Legacy, 0.49.7 Removal
-                    retVal.getRandomOriginOptions().setExtraRandomOrigin(Boolean.parseBoolean(wn2.getTextContent()
-                                                                                                    .trim()));
+                    retVal.getRandomOriginOptions()
+                          .setExtraRandomOrigin(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("originDistanceScale")) { // Legacy, 0.49.7 Removal
-                    retVal.getRandomOriginOptions().setOriginDistanceScale(Double.parseDouble(wn2.getTextContent()
-                                                                                                    .trim()));
+                    retVal.getRandomOriginOptions()
+                          .setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("dependentsNeverLeave")) { // Legacy - 0.49.7 Removal
                     retVal.setUseRandomDependentRemoval(!Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("marriageAgeRange")) { // Legacy - 0.49.6 Removal
