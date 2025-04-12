@@ -78,7 +78,7 @@ import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.UnitArrivedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
@@ -5427,9 +5427,9 @@ public class Unit implements ITechnology {
         person.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
+            AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
-            ServiceLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
+            AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
@@ -5446,9 +5446,9 @@ public class Unit implements ITechnology {
         person.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
+            AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
-            ServiceLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
+            AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
@@ -5465,9 +5465,9 @@ public class Unit implements ITechnology {
         person.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
+            AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
-            ServiceLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
+            AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
@@ -5484,9 +5484,9 @@ public class Unit implements ITechnology {
         person.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
+            AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
-            ServiceLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
+            AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
@@ -5507,9 +5507,9 @@ public class Unit implements ITechnology {
         person.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
+            AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
-            ServiceLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
+            AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
@@ -5523,7 +5523,7 @@ public class Unit implements ITechnology {
         ensurePersonIsRegistered(p);
         tech = p;
         p.addTechUnit(this);
-        ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+        AssignmentLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
         MekHQ.triggerEvent(new PersonTechAssignmentEvent(p, this));
     }
 
@@ -5564,15 +5564,15 @@ public class Unit implements ITechnology {
         person.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
-            ServiceLogger.reassignedTOEForce(getCampaign(),
+            AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
+            AssignmentLogger.reassignedTOEForce(getCampaign(),
                   person,
                   getCampaign().getLocalDate(),
                   getCampaign().getForceFor(oldUnit),
                   getCampaign().getForceFor(this));
         } else {
-            ServiceLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
-            ServiceLogger.addedToTOEForce(getCampaign(),
+            AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
+            AssignmentLogger.addedToTOEForce(getCampaign(),
                   person,
                   getCampaign().getLocalDate(),
                   getCampaign().getForceFor(this));
@@ -5624,8 +5624,8 @@ public class Unit implements ITechnology {
         }
 
         if (log) {
-            ServiceLogger.removedFrom(person, getCampaign().getLocalDate(), getName());
-            ServiceLogger.removedFromTOEForce(getCampaign(),
+            AssignmentLogger.removedFrom(person, getCampaign().getLocalDate(), getName());
+            AssignmentLogger.removedFromTOEForce(getCampaign(),
                   person,
                   getCampaign().getLocalDate(),
                   getCampaign().getForceFor(this));

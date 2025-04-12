@@ -28,9 +28,10 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
+
 import java.awt.BorderLayout;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.time.LocalDate;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -40,54 +41,65 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.control.EditPersonnelLogControl;
+import mekhq.gui.control.EditLogControl;
+import mekhq.gui.control.EditLogControl.LogType;
 
 /**
+ * A dialog for editing a person's log.
+ *
+ * <p>This dialog provides an interface for viewing and modifying the history of the provided character. It
+ * uses the {@link EditLogControl} to handle the actual editing functionality.</p>
+ *
  * @author Taharqa
  */
-public class EditPersonnelLogDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(EditPersonnelLogDialog.class);
+public class EditLogDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(EditLogDialog.class);
 
-    private JFrame   frame;
-    private Campaign campaign;
-    private Person   person;
+    private final JFrame frame;
+    private final Person person;
+    private final LocalDate today;
+    private final LogType logType;
 
-    private EditPersonnelLogControl editPersonnelLogControl;
-    private JButton                 btnOK;
-
-    /** Creates new form EditPersonnelLogDialog */
-    public EditPersonnelLogDialog(JFrame parent, boolean modal, Campaign c, Person p) {
-        super(parent, modal);
-        Objects.requireNonNull(c);
-        Objects.requireNonNull(p);
+    /**
+     * Constructs a new dialog for editing a person's log.
+     *
+     * @param parent the parent frame for this dialog
+     * @param person the person whose log is being edited
+     * @param today  the current campaign date
+     */
+    public EditLogDialog(JFrame parent, LocalDate today, Person person, LogType logType) {
+        super(parent, true);
 
         this.frame = parent;
-        campaign   = c;
-        person     = p;
+        this.today = today;
+        this.person = person;
+        this.logType = logType;
 
         initComponents();
         setLocationRelativeTo(parent);
         setUserPreferences();
     }
 
+    /**
+     * Initializes the dialog components.
+     *
+     * <p>Sets up the dialog's basic properties, creates and adds the log editing control, and adds a
+     * confirmation button to close the dialog.</p>
+     */
     private void initComponents() {
-        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelLogDialog",
-              MekHQ.getMHQOptions().getLocale());
-
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setName(resourceMap.getString("dialog.name"));
-        setTitle(resourceMap.getString("dialog.title") + " " + person.getFullName());
+        setName("EditLogDialog");
+        setTitle(getFormattedText("editLog.dialog.title", person.getFullTitle()));
         getContentPane().setLayout(new BorderLayout());
 
-        editPersonnelLogControl = new EditPersonnelLogControl(frame, campaign, person);
-        getContentPane().add(editPersonnelLogControl, BorderLayout.CENTER);
+        EditLogControl editLogControl = new EditLogControl(frame, person, today, logType);
+        getContentPane().add(editLogControl, BorderLayout.CENTER);
 
-        btnOK = new JButton();
-        btnOK.setText(resourceMap.getString("btnOK.text"));
+        JButton btnOK = new JButton();
         btnOK.setName("btnOK");
-        btnOK.addActionListener(x -> this.setVisible(false));
+        btnOK.setText(getFormattedText("editLog.btnOK.text"));
+        btnOK.addActionListener(x -> this.dispose());
         getContentPane().add(btnOK, BorderLayout.PAGE_END);
 
         pack();
@@ -102,7 +114,7 @@ public class EditPersonnelLogDialog extends JDialog {
     @Deprecated(since = "0.50.04")
     private void setUserPreferences() {
         try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditPersonnelLogDialog.class);
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditLogDialog.class);
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -27,7 +27,13 @@
  */
 package mekhq.campaign.log;
 
-public enum LogEntryType {
-    MEDICAL, AWARD, SERVICE, PERSONAL, CUSTOM, HISTORICAL, //Used for historical daily log
-    ASSIGNMENT, PERFORMANCE
+import java.time.LocalDate;
+
+/**
+ * This class is a specific log entry related to Skill, XP, or SPA gain.
+ */
+public class PerformanceLogEntry extends LogEntry {
+    public PerformanceLogEntry(LocalDate date, String desc) {
+        super(date, desc, LogEntryType.PERFORMANCE);
+    }
 }

@@ -136,6 +136,9 @@ public class PersonnelTab {
     private JCheckBox chkDisplayPersonnelLog;
     private JCheckBox chkDisplayScenarioLog;
     private JCheckBox chkDisplayKillRecord;
+    private JCheckBox chkDisplayMedicalRecord;
+    private JCheckBox chkDisplayAssignmentRecord;
+    private JCheckBox chkDisplayPerformanceRecord;
     //end Personnel Logs Tab
 
     //start Personnel Information Tab
@@ -375,6 +378,9 @@ public class PersonnelTab {
         chkDisplayPersonnelLog = new JCheckBox();
         chkDisplayScenarioLog = new JCheckBox();
         chkDisplayKillRecord = new JCheckBox();
+        chkDisplayMedicalRecord = new JCheckBox();
+        chkDisplayAssignmentRecord = new JCheckBox();
+        chkDisplayPerformanceRecord = new JCheckBox();
     }
 
     /**
@@ -977,6 +983,9 @@ public class PersonnelTab {
         chkDisplayPersonnelLog = new CampaignOptionsCheckBox("DisplayPersonnelLog");
         chkDisplayScenarioLog = new CampaignOptionsCheckBox("DisplayScenarioLog");
         chkDisplayKillRecord = new CampaignOptionsCheckBox("DisplayKillRecord");
+        chkDisplayMedicalRecord = new CampaignOptionsCheckBox("DisplayMedicalRecord");
+        chkDisplayAssignmentRecord = new CampaignOptionsCheckBox("DisplayAssignmentRecord");
+        chkDisplayPerformanceRecord = new CampaignOptionsCheckBox("DisplayPerformanceRecord");
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PersonnelLogsPanel", true, "PersonnelLogsPanel");
@@ -1007,6 +1016,15 @@ public class PersonnelTab {
 
         layout.gridy++;
         panel.add(chkDisplayKillRecord, layout);
+
+        layout.gridy++;
+        panel.add(chkDisplayMedicalRecord, layout);
+
+        layout.gridy++;
+        panel.add(chkDisplayAssignmentRecord, layout);
+
+        layout.gridy++;
+        panel.add(chkDisplayPerformanceRecord, layout);
 
         return panel;
     }
@@ -1403,6 +1421,9 @@ public class PersonnelTab {
         chkDisplayPersonnelLog.setSelected(options.isDisplayPersonnelLog());
         chkDisplayScenarioLog.setSelected(options.isDisplayScenarioLog());
         chkDisplayKillRecord.setSelected(options.isDisplayKillRecord());
+        chkDisplayMedicalRecord.setSelected(options.isDisplayMedicalRecord());
+        chkDisplayAssignmentRecord.setSelected(options.isDisplayAssignmentRecord());
+        chkDisplayPerformanceRecord.setSelected(options.isDisplayPerformanceRecord());
 
         // Personnel Information
         chkUseTimeInService.setSelected(options.isUseTimeInService());
@@ -1502,6 +1523,9 @@ public class PersonnelTab {
         options.setDisplayPersonnelLog(chkDisplayPersonnelLog.isSelected());
         options.setDisplayScenarioLog(chkDisplayScenarioLog.isSelected());
         options.setDisplayKillRecord(chkDisplayKillRecord.isSelected());
+        options.setDisplayMedicalRecord(chkDisplayMedicalRecord.isSelected());
+        options.setDisplayAssignmentRecord(chkDisplayAssignmentRecord.isSelected());
+        options.setDisplayPerformanceRecord(chkDisplayPerformanceRecord.isSelected());
 
         // Personnel Information
         options.setUseTimeInService(chkUseTimeInService.isSelected());

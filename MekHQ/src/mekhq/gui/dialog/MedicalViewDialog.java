@@ -67,22 +67,6 @@ import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.Paperdoll;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.Period;
-import java.util.*;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
 public class MedicalViewDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(MedicalViewDialog.class);
 
@@ -94,28 +78,28 @@ public class MedicalViewDialog extends JDialog {
     // private static final Key<String> PAPERDOLL = new StringKey("paperdoll_xml_file");
 
     private final Campaign campaign;
-    private final Person   person;
+    private final Person person;
 
     private Paperdoll defaultMaleDoll;
     private Paperdoll defaultFemaleDoll;
-    private JPanel    dollWrapper;
+    private JPanel dollWrapper;
     private Paperdoll doll;
-    private JPanel    injuryPanel;
+    private JPanel injuryPanel;
     private JTextArea notesArea;
 
     private ActionListener dollActionListener;
 
-    private transient       Font           labelFont;
-    private transient       Font           handwritingFont;
-    private transient       Color          labelColor;
-    private transient       ImageIcon      healImageIcon;
+    private transient Font labelFont;
+    private transient Font handwritingFont;
+    private transient Color labelColor;
+    private transient ImageIcon healImageIcon;
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog",
           MekHQ.getMHQOptions().getLocale());
 
     public MedicalViewDialog(Window parent, Campaign c, Person p) {
         super();
         this.campaign = Objects.requireNonNull(c);
-        this.person   = Objects.requireNonNull(p);
+        this.person = Objects.requireNonNull(p);
 
         // Preload default paperdolls
         try (InputStream fis = new FileInputStream(c.getApp()
@@ -140,20 +124,20 @@ public class MedicalViewDialog extends JDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(parent);
 
-        labelFont       = UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.PLAIN, 16);
+        labelFont = UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.PLAIN, 16);
         handwritingFont = Font.decode(MekHQ.getMHQOptions().getMedicalViewDialogHandwritingFont())
                                 .deriveFont(Font.PLAIN, 22);
-        labelColor      = new Color(170, 170, 170);
-        healImageIcon   = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage()
-                                              .getScaledInstance(16,
-                                                    16,
-                                                    Image.SCALE_DEFAULT)); // TODO : Remove inline file path
+        labelColor = new Color(170, 170, 170);
+        healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage()
+                                            .getScaledInstance(16,
+                                                  16,
+                                                  Image.SCALE_DEFAULT)); // TODO : Remove inline file path
 
         dollActionListener = ae -> {
-            final BodyLocation loc            = BodyLocation.of(ae.getActionCommand());
-            final boolean      locationPicked = !loc.locationName().isEmpty();
-            Point              mousePos       = doll.getMousePosition();
-            JPopupMenu         popup          = new JPopupMenu();
+            final BodyLocation loc = BodyLocation.of(ae.getActionCommand());
+            final boolean locationPicked = !loc.locationName().isEmpty();
+            Point mousePos = doll.getMousePosition();
+            JPopupMenu popup = new JPopupMenu();
             if (locationPicked) {
                 JLabel header = new JLabel(Utilities.capitalize(loc.locationName()));
                 header.setFont(UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.BOLD));
@@ -162,9 +146,9 @@ public class MedicalViewDialog extends JDialog {
             }
             if (locationPicked) {
                 ActionListener addActionListener = addEvent -> {
-                    String[]   commands = addEvent.getActionCommand().split(MENU_CMD_SEPARATOR, 2);
+                    String[] commands = addEvent.getActionCommand().split(MENU_CMD_SEPARATOR, 2);
                     InjuryType addIType = InjuryType.byKey(commands[0]);
-                    int        severity = Integer.parseInt(commands[1]);
+                    int severity = Integer.parseInt(commands[1]);
                     person.addInjury(addIType.newInjury(c, person, loc, severity));
                     revalidate();
                 };
@@ -175,7 +159,7 @@ public class MedicalViewDialog extends JDialog {
                       .sorted((it1, it2) -> it1.getSimpleName().compareToIgnoreCase(it2.getSimpleName()))
                       .forEach(it -> IntStream.range(1, it.getMaxSeverity() + 1).forEach(severity -> {
                           JMenuItem add = new JMenuItem(resourceMap.getString("menuMore.text") +
-                                                        it.getSimpleName(severity));
+                                                              it.getSimpleName(severity));
                           add.setActionCommand(it.getKey() + MENU_CMD_SEPARATOR + severity);
                           add.addActionListener(addActionListener);
                           addMenu.add(add);
@@ -231,12 +215,12 @@ public class MedicalViewDialog extends JDialog {
 
         GridBagConstraints gbc;
 
-        gbc            = new GridBagConstraints();
-        gbc.gridx      = 0;
-        gbc.gridy      = 0;
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         gbc.gridheight = 6;
-        gbc.weighty    = 1.0;
-        gbc.fill       = GridBagConstraints.VERTICAL;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.VERTICAL;
 
         dollWrapper = new JPanel(null);
         dollWrapper.setLayout(new BoxLayout(dollWrapper, BoxLayout.Y_AXIS));
@@ -246,12 +230,12 @@ public class MedicalViewDialog extends JDialog {
         dollWrapper.setAlignmentY(Component.TOP_ALIGNMENT);
         cont.add(dollWrapper, gbc);
 
-        gbc.gridx      = 1;
+        gbc.gridx = 1;
         gbc.gridheight = 1;
-        gbc.weightx    = 1.0;
-        gbc.weighty    = 0.0;
-        gbc.insets     = new Insets(10, 10, 10, 10);
-        gbc.fill       = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.0;
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.BOTH;
 
         cont.add(genBaseData(campaign, person), gbc);
 
@@ -346,7 +330,7 @@ public class MedicalViewDialog extends JDialog {
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
         String givenName = p.getGivenName();
-        String surname   = p.getSurname();
+        String surname = p.getSurname();
 
         if (p.isClanPersonnel()) {
             surname = p.getBloodname();
@@ -358,10 +342,10 @@ public class MedicalViewDialog extends JDialog {
                                  resourceMap.getString("baselinePhenotype.text") :
                                  p.getPhenotype().toString();
 
-        Force  f     = c.getForceFor(p);
+        Force f = c.getForceFor(p);
         String force = (null != f) ? f.getFullName() : "-";
 
-        Person doc    = c.getPerson(p.getDoctorId());
+        Person doc = c.getPerson(p.getDoctorId());
         String doctor = resourceMap.getString("none.text");
         if ((null != doc) && doc.getStatus().isActive()) {
             doctor = doc.getFullTitle();
@@ -396,7 +380,7 @@ public class MedicalViewDialog extends JDialog {
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.add(genLabel(resourceMap.getString("medicalHistory.text")));
-        Map<String, List<LogEntry>> groupedEntries = p.getPersonnelLog()
+        Map<String, List<LogEntry>> groupedEntries = p.getMedicalLog()
                                                            .stream()
                                                            .filter(entry -> entry.getType() == LogEntryType.MEDICAL)
                                                            .sorted(Comparator.comparing(LogEntry::getDate))
@@ -595,17 +579,17 @@ public class MedicalViewDialog extends JDialog {
     }
 
     private static class InjuryLabelMouseAdapter extends MouseAdapter {
-        private final JLabel         label;
-        private final Person         person;
-        private final Injury         injury;
-        private       ImageIcon      healImageIcon;
-        private       ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog",
+        private final JLabel label;
+        private final Person person;
+        private final Injury injury;
+        private ImageIcon healImageIcon;
+        private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog",
               MekHQ.getMHQOptions().getLocale());
 
         public InjuryLabelMouseAdapter(JLabel label, Person person, Injury injury) {
-            this.label         = label;
-            this.person        = person;
-            this.injury        = injury;
+            this.label = label;
+            this.person = person;
+            this.injury = injury;
             this.healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage()
                                                      .getScaledInstance(16,
                                                            16,
@@ -629,8 +613,8 @@ public class MedicalViewDialog extends JDialog {
         @Override
         public void mouseClicked(MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON1) {
-                JPopupMenu popup  = new JPopupMenu();
-                JLabel     header = new JLabel(injury.getFluff());
+                JPopupMenu popup = new JPopupMenu();
+                JLabel header = new JLabel(injury.getFluff());
                 header.setFont(UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.BOLD));
                 popup.add(header);
                 popup.addSeparator();

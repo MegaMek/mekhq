@@ -95,7 +95,7 @@ import mekhq.campaign.event.PersonStatusChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.LogEntry;
-import mekhq.campaign.log.PersonalLogger;
+import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.AwardsFactory;
@@ -138,6 +138,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
+import mekhq.gui.control.EditLogControl.LogType;
 import mekhq.gui.dialog.*;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.menus.AssignPersonToUnitMenu;
@@ -178,6 +179,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_CALLSIGN = "CALLSIGN";
     private static final String CMD_EDIT_PERSONNEL_LOG = "LOG";
     private static final String CMD_ADD_LOG_ENTRY = "ADD_PERSONNEL_LOG_SINGLE";
+    private static final String CMD_EDIT_MEDICAL_LOG = "MEDICAL_LOG";
+    private static final String CMD_ADD_MEDICAL_LOG_ENTRY = "ADD_ADD_MEDICAL_LOG_ENTRY";
+    private static final String CMD_EDIT_ASSIGNMENT_LOG = "ASSIGNMENT_LOG";
+    private static final String CMD_ADD_ASSIGNMENT_LOG_ENTRY = "ADD_ADD_ASSIGNMENT_LOG_ENTRY";
+    private static final String CMD_EDIT_PERFORMANCE_LOG = "PERFORMANCE_LOG";
+    private static final String CMD_ADD_PERFORMANCE_LOG_ENTRY = "ADD_ADD_PERFORMANCE_LOG_ENTRY";
     private static final String CMD_EDIT_SCENARIO_LOG = "SCENARIO_LOG";
     private static final String CMD_ADD_SCENARIO_ENTRY = "ADD_SCENARIO_ENTRY";
     private static final String CMD_EDIT_KILL_LOG = "KILL_LOG";
@@ -607,7 +614,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 selectedPerson.improveSkill(type);
                 selectedPerson.spendXP(cost);
 
-                PersonalLogger.improvedSkill(getCampaign(),
+                PerformanceLogger.improvedSkill(getCampaign(),
                       selectedPerson,
                       getCampaign().getLocalDate(),
                       selectedPerson.getSkill(type).getType().getName(),
@@ -679,7 +686,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 selectedPerson.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, selected, true);
                 selectedPerson.spendXP(cost);
                 final String displayName = SpecialAbility.getDisplayName(selected);
-                PersonalLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
+                PerformanceLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
                 getCampaign().addReport(String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
@@ -697,7 +704,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 final String displayName = String.format("%s %s",
                       SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_WEAPON_SPECIALIST),
                       selected);
-                PersonalLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
+                PerformanceLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
                 getCampaign().addReport(String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
@@ -713,7 +720,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 final String displayName = String.format("%s %s",
                       SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_SANDBLASTER),
                       selected);
-                PersonalLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
+                PerformanceLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
                 getCampaign().addReport(String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
@@ -729,7 +736,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 final String displayName = String.format("%s %s",
                       SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_SPECIALIST),
                       selected);
-                PersonalLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
+                PerformanceLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
                 getCampaign().addReport(String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
@@ -747,7 +754,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 final String displayName = String.format("%s %s",
                       SpecialAbility.getDisplayName(OptionsConstants.GUNNERY_RANGE_MASTER),
                       selected);
-                PersonalLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
+                PerformanceLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
                 getCampaign().addReport(String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
@@ -763,7 +770,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 final String displayName = String.format("%s %s",
                       SpecialAbility.getDisplayName(OptionsConstants.MISC_ENV_SPECIALIST),
                       selected);
-                PersonalLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
+                PerformanceLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
                 getCampaign().addReport(String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
@@ -779,7 +786,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 final String displayName = String.format("%s %s",
                       SpecialAbility.getDisplayName(OptionsConstants.MISC_HUMAN_TRO),
                       selected);
-                PersonalLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
+                PerformanceLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
                 getCampaign().addReport(String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
@@ -793,7 +800,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 selectedPerson.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, ability, selected);
                 selectedPerson.spendXP(cost);
                 final String displayName = String.format("%s %s", SpecialAbility.getDisplayName(ability), selected);
-                PersonalLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
+                PerformanceLogger.gainedSPA(getCampaign(), selectedPerson, getCampaign().getLocalDate(), displayName);
                 getCampaign().addReport(String.format(resources.getString("spaGainedChoices.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
@@ -1141,7 +1148,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     // Make the new edge point available to support personnel, but don't reset until
                     // the week ends
                     person.changeCurrentEdge(1);
-                    PersonalLogger.gainedEdge(getCampaign(), person, getCampaign().getLocalDate());
+                    PerformanceLogger.gainedEdge(getCampaign(), person, getCampaign().getLocalDate());
                     getCampaign().addReport(String.format(resources.getString("gainedEdge.format"),
                           selectedPerson.getHyperlinkedName()));
                     getCampaign().personUpdated(person);
@@ -1164,7 +1171,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     person.setEdge(i);
                     // Reset currentEdge for support people
                     person.resetCurrentEdge();
-                    PersonalLogger.changedEdge(getCampaign(), person, getCampaign().getLocalDate());
+                    PerformanceLogger.changedEdge(getCampaign(), person, getCampaign().getLocalDate());
                     getCampaign().personUpdated(person);
                 }
                 break;
@@ -1211,24 +1218,87 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_EDIT_PERSONNEL_LOG: {
-                EditPersonnelLogDialog epld = new EditPersonnelLogDialog(getFrame(),
-                      true,
-                      getCampaign(),
-                      selectedPerson);
-                epld.setVisible(true);
+                EditLogDialog editLogDialog = new EditLogDialog(getFrame(),
+                      getCampaign().getLocalDate(),
+                      selectedPerson,
+                      LogType.PERSONAL_LOG);
+                editLogDialog.setVisible(true);
                 MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                 break;
             }
             case CMD_ADD_LOG_ENTRY: {
-                final AddOrEditPersonnelEntryDialog addPersonnelLogDialog = new AddOrEditPersonnelEntryDialog(getFrame(),
+                final AddOrEditLogEntryDialog addLogDialog = new AddOrEditLogEntryDialog(getFrame(),
                       null,
                       getCampaign().getLocalDate());
-                if (addPersonnelLogDialog.showDialog().isConfirmed()) {
+                if (addLogDialog.showDialog().isConfirmed()) {
                     for (Person person : people) {
-                        person.addLogEntry(addPersonnelLogDialog.getEntry().clone());
+                        person.addPersonalLogEntry(addLogDialog.getEntry().clone());
                         MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                     }
                 }
+                break;
+            }
+            case CMD_ADD_MEDICAL_LOG_ENTRY: {
+                final AddOrEditLogEntryDialog addLogDialog = new AddOrEditLogEntryDialog(getFrame(),
+                      null,
+                      getCampaign().getLocalDate());
+                if (addLogDialog.showDialog().isConfirmed()) {
+                    for (Person person : people) {
+                        person.addMedicalLogEntry(addLogDialog.getEntry().clone());
+                        MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
+                    }
+                }
+                break;
+            }
+            case CMD_EDIT_MEDICAL_LOG: {
+                EditLogDialog editLogDialog = new EditLogDialog(getFrame(),
+                      getCampaign().getLocalDate(),
+                      selectedPerson,
+                      LogType.MEDICAL_LOG);
+                editLogDialog.setVisible(true);
+                MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
+                break;
+            }
+            case CMD_ADD_ASSIGNMENT_LOG_ENTRY: {
+                final AddOrEditLogEntryDialog addLogDialog = new AddOrEditLogEntryDialog(getFrame(),
+                      null,
+                      getCampaign().getLocalDate());
+                if (addLogDialog.showDialog().isConfirmed()) {
+                    for (Person person : people) {
+                        person.addAssignmentLogEntry(addLogDialog.getEntry().clone());
+                        MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
+                    }
+                }
+                break;
+            }
+            case CMD_EDIT_ASSIGNMENT_LOG: {
+                EditLogDialog editLogDialog = new EditLogDialog(getFrame(),
+                      getCampaign().getLocalDate(),
+                      selectedPerson,
+                      LogType.ASSIGNMENT_LOG);
+                editLogDialog.setVisible(true);
+                MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
+                break;
+            }
+            case CMD_ADD_PERFORMANCE_LOG_ENTRY: {
+                final AddOrEditLogEntryDialog addLogDialog = new AddOrEditLogEntryDialog(getFrame(),
+                      null,
+                      getCampaign().getLocalDate());
+                if (addLogDialog.showDialog().isConfirmed()) {
+                    for (Person person : people) {
+                        person.addPerformanceLogEntry(addLogDialog.getEntry().clone());
+                        MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
+                    }
+                }
+                break;
+            }
+            case CMD_EDIT_PERFORMANCE_LOG: {
+                EditLogDialog editLogDialog = new EditLogDialog(getFrame(),
+                      getCampaign().getLocalDate(),
+                      selectedPerson,
+                      LogType.PERFORMANCE_LOG);
+                editLogDialog.setVisible(true);
+                MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                 break;
             }
             case CMD_EDIT_SCENARIO_LOG: {
@@ -3297,8 +3367,23 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.addActionListener(this);
             menu.add(menuItem);
 
+            menuItem = new JMenuItem(resources.getString("editMedicalLog.text"));
+            menuItem.setActionCommand(CMD_EDIT_MEDICAL_LOG);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+
             menuItem = new JMenuItem(resources.getString("editKillLog.text"));
             menuItem.setActionCommand(CMD_EDIT_KILL_LOG);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+
+            menuItem = new JMenuItem(resources.getString("editAssignmentLog.text"));
+            menuItem.setActionCommand(CMD_ADD_ASSIGNMENT_LOG_ENTRY);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+
+            menuItem = new JMenuItem(resources.getString("editPerformanceLog.text"));
+            menuItem.setActionCommand(CMD_ADD_PERFORMANCE_LOG_ENTRY);
             menuItem.addActionListener(this);
             menu.add(menuItem);
         } else {
@@ -3312,6 +3397,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.addActionListener(this);
             menu.add(menuItem);
 
+            menuItem = new JMenuItem(resources.getString("addSingleMedicalLogEntry.text"));
+            menuItem.setActionCommand(CMD_ADD_MEDICAL_LOG_ENTRY);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+
             if (StaticChecks.allHaveSameUnit(selected)) {
                 menuItem = new JMenuItem(resources.getString("assignKill.text"));
                 menuItem.setActionCommand(CMD_ADD_KILL);
@@ -3319,6 +3409,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.setEnabled(true);
                 menu.add(menuItem);
             }
+
+            menuItem = new JMenuItem(resources.getString("addSingleAssignmentLogEntry.text"));
+            menuItem.setActionCommand(CMD_ADD_ASSIGNMENT_LOG_ENTRY);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+
+            menuItem = new JMenuItem(resources.getString("addSinglePerformanceLogEntry.text"));
+            menuItem.setActionCommand(CMD_ADD_PERFORMANCE_LOG_ENTRY);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
         }
 
         JMenuHelpers.addMenuIfNonEmpty(popup, menu);
