@@ -2260,26 +2260,26 @@ public class PersonViewPanel extends JScrollablePanel {
      *
      * @return an HTML encoded string of effects
      */
-    private String getAdvancedMedalEffectString(Person p) {
-        StringBuilder sb = new StringBuilder("<html>");
-        final int pilotingMod = p.getPilotingInjuryMod();
-        final int gunneryMod = p.getGunneryInjuryMod();
+    private String getAdvancedMedalEffectString(Person person) {
+        StringBuilder medicalEffects = new StringBuilder("<html>");
+        final int pilotingMod = person.getInjuryModifiers(true);
+        final int gunneryMod = person.getInjuryModifiers(false);
         if ((pilotingMod != 0) && (pilotingMod < Integer.MAX_VALUE)) {
-            sb.append(String.format("  Piloting %+d <br>", pilotingMod));
+            medicalEffects.append(String.format("  Piloting %+d <br>", pilotingMod));
         } else if (pilotingMod == Integer.MAX_VALUE) {
-            sb.append("  Piloting: <i>Impossible</i>  <br>");
+            medicalEffects.append("  Piloting: <i>Impossible</i>  <br>");
         }
 
         if ((gunneryMod != 0) && (gunneryMod < Integer.MAX_VALUE)) {
-            sb.append(String.format("  Gunnery: %+d <br>", gunneryMod));
+            medicalEffects.append(String.format("  Gunnery: %+d <br>", gunneryMod));
         } else if (gunneryMod == Integer.MAX_VALUE) {
-            sb.append("  Gunnery: <i>Impossible</i>  <br>");
+            medicalEffects.append("  Gunnery: <i>Impossible</i>  <br>");
         }
 
         if ((gunneryMod == 0) && (pilotingMod == 0)) {
-            sb.append("None");
+            medicalEffects.append("None");
         }
-        return sb.append("</html>").toString();
+        return medicalEffects.append("</html>").toString();
     }
 
     private JPanel fillKillRecord() {
