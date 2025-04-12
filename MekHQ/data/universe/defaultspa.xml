@@ -462,12 +462,305 @@
 
     <!-- Misc SPA -->
     <ability>
-        <lookupName>flaw_glass_jaw</lookupName>
-        <displayName>Glass Jaw (ATOW)</displayName>
-        <desc>All injuries suffered and fatigue gained is doubled</desc>
+        <lookupName>atow_alternate_id</lookupName>
+        <displayName>Alternate ID (ATOW)</displayName>
+        <desc><![CDATA[A low Reputation trait infers a penalty to Negotiation, Streetwise and Protocols skill checks. This SPA reduces that penalty by 2.
+
+While this SPA does exist in ATOW (and that's where you'll find its description), these effects are unique to MekHQ.]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>flaw_animal_antipathy</lookupName>
+        <displayName>Animal Antipathy (ATOW)</displayName>
+        <desc><![CDATA[Increases the Target Number for all Animal Handling checks by 2.]]></desc>
+        <xpCost>-100</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>atow_animal_empathy</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>atow_animal_empathy</lookupName>
+        <displayName>Animal Empathy (ATOW)</displayName>
+        <desc><![CDATA[Decreases the Target Number for all Animal Handling checks by 2.]]></desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>flaw_animal_antipathy</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>atow_ambidextrous</lookupName>
+        <displayName>Ambidextrous (ATOW)</displayName>
+        <desc><![CDATA[Removes the penalties from a single missing arm or hand (Advanced Medical only).]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>flaw_animal_antipathy</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>flaw_unattractive</lookupName>
+        <displayName>Unattractive (ATOW)</displayName>
+        <desc><![CDATA[Increases the target number of all Charisma-based skills by 2.]]></desc>
+        <xpCost>-200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>atow_attractive</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>atow_attractive</lookupName>
+        <displayName>Attractive (ATOW)</displayName>
+        <desc><![CDATA[Decreases the target number of all Charisma-based skills by 2.]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>flaw_unattractive</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>flaw_unfit</lookupName>
+        <displayName>Unfit (Unofficial)</displayName>
+        <desc><![CDATA[Doubles all Fatigue gain.]]></desc>
+        <xpCost>-200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>atow_fit</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>atow_fit</lookupName>
+        <displayName>Fit (ATOW)</displayName>
+        <desc><![CDATA[Half all Fatigue gained (rounding down).]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>flaw_unfit</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>flaw_poor_hearing</lookupName>
+        <displayName>Poor Hearing (ATOW)</displayName>
+        <desc><![CDATA[The Target Number of all Perception checks is increased by 1.]]></desc>
+        <xpCost>-100</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>atow_good_hearing</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>atow_good_hearing</lookupName>
+        <displayName>Good Hearing (ATOW)</displayName>
+        <desc><![CDATA[The Target Number of all Perception checks is decreased by 1.]]></desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>flaw_poor_hearing</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>flaw_poor_vision</lookupName>
+        <displayName>Poor Vision (ATOW)</displayName>
+        <desc><![CDATA[The Target Number of all Perception checks is increased by 1.]]></desc>
+        <xpCost>-100</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>atow_good_vision</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>atow_good_vision</lookupName>
+        <displayName>Good Vision (ATOW)</displayName>
+        <desc><![CDATA[The Target Number of all Perception checks is decreased by 1.]]></desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>flaw_poor_vision</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>flaw_introvert</lookupName>
+        <displayName>Introvert (ATOW)</displayName>
+        <desc><![CDATA[The Target Number of all Acting and Negotiation checks are increased by 1.]]></desc>
+        <xpCost>-100</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>atow_gregarious</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>atow_gregarious</lookupName>
+        <displayName>Gregarious (ATOW)</displayName>
+        <desc><![CDATA[The Target Number of all Acting and Negotiation checks are decreased by 1.]]></desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>flaw_introvert</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>flaw_impatient</lookupName>
+        <displayName>Impatient (ATOW)</displayName>
+        <desc><![CDATA[The Target Number of Art/Any, Cryptography, Demolitions, Investigation, Protocols, Security Systems/Any, Strategy, Tactics and Training checks is increased by 1.]]></desc>
+        <xpCost>-100</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>atow_patient</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>atow_patient</lookupName>
+        <displayName>Patient (ATOW:Companion)</displayName>
+        <desc><![CDATA[The Target Number of Art/Any, Cryptography, Demolitions, Investigation, Protocols, Security Systems/Any, Strategy, Tactics and Training checks is decreased by 1.]]></desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>flaw_impatient</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>flaw_transit_disorientation_syndrome</lookupName>
+        <displayName>Transit Disorientation Syndrome (ATOW)</displayName>
+        <desc><![CDATA[Is violently ill following a hyperspace jump.
+
+They increase the Target Number of Piloting and Gunnery checks by 1 for 48 hours following the jump (Advanced Medical only).
+
+They also gain Fatigue based on the campaign options fatigue rate (default 1).]]></desc>
+        <xpCost>-100</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>mutation_freakish_strength</lookupName>
+        <displayName>Freakish Strength (ATOW:Companion)</displayName>
+        <desc><![CDATA[Increases Strength Attribute by 2 and maximum Strength by 1. Neither increase may take this Attribute above 10.
+
+Increases the target number of all Charisma-based skills by 2 due to inhumanly shaped bulk.]]></desc>
+        <xpCost>300</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <invalidAbilities>flaw_unattractive</invalidAbilities>
+    </ability>
+    <ability>
+        <lookupName>mutation_exceptional_immune_system</lookupName>
+        <displayName>Exceptional Immune System (ATOW:Companion)</displayName>
+        <desc><![CDATA[Recover from injuries at twice the normal rate (Advanced Medical only).]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>mutation_exotic_appearance</lookupName>
+        <displayName>Exotic Yet Pleasing Appearance (ATOW:Companion)</displayName>
+        <desc><![CDATA[Increases Charisma Attribute by 1 (may not take it above 10).]]></desc>
+        <xpCost>100</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>mutation_facial_hair</lookupName>
+        <displayName>Extremely Excess Facial Hair (ATOW:Companion)</displayName>
+        <desc><![CDATA[Decreases Charisma Attribute by 1 (may not take it below 1).]]></desc>
+        <xpCost>-100</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>mutation_serious_disfigurement</lookupName>
+        <displayName>Serious Disfigurement (ATOW:Companion)</displayName>
+        <desc><![CDATA[Decreases Charisma Attribute by 3 (may not take it below 1).]]></desc>
+        <xpCost>-400</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>mutation_cat_girl</lookupName>
+        <displayName>Functional Tail and Mobile Ears (ATOW:Companion)</displayName>
+        <desc><![CDATA[Decreases Charisma Attribute by 3 (may not take it below 1).
+
+The Target Number of all Perception checks decreased by 1 due to improved hearing.]]></desc>
         <xpCost>-300</xpCost>
         <weight>1</weight>
         <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>mutation_cat_girl_unofficial</lookupName>
+        <displayName>Functional Tail and Mobile Ears (Unofficial)</displayName>
+        <desc><![CDATA[Increases Charisma Attribute by 1 (may not take it above 10).
+
+The Target Number of all Perception checks decreased by 1 due to improved hearing.]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <invalidAbilities>mutation_cat_girl</invalidAbilities>
+    </ability>
+    <ability>
+        <lookupName>flaw_gremlins</lookupName>
+        <displayName>Gremlins (ATOW)</displayName>
+        <desc><![CDATA[The cost of purchasing and improving the Tech/Any, Computers, Communications, or Security Systems/Electronic skills is increased by 10% (rounded normally).
+
+Furthermore, the Target Number of checks made with such skills is increased by 1.]]></desc>
+        <xpCost>-300</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>atow_tech_empathy</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>atow_tech_empathy</lookupName>
+        <displayName>Tech Empathy (ATOW)</displayName>
+        <desc><![CDATA[The cost of purchasing and improving the Tech/Any, Computers, Communications, or Security Systems/Electronic skills is decreased by 10% (rounded normally).
+
+Furthermore, the Target Number of checks made with such skills is decreased by 1.]]></desc>
+        <xpCost>300</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>flaw_gremlins</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>atow_poison_resistance</lookupName>
+        <displayName>Poison Resistance (ATOW)</displayName>
+        <desc><![CDATA[The character cannot be poisoned.
+
+Mechanically, this offers few benefits; however, the character will be completely immune to the Fatigue gain from the 'Poisoning' Prisoner Event.]]></desc>
+        <xpCost>200</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>atow_sixth_sense</lookupName>
+        <displayName>Sixth Sense (ATOW)</displayName>
+        <desc><![CDATA[The Target Number of all Perception checks are decreased by 3.]]></desc>
+        <xpCost>400</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+    </ability>
+    <ability>
+        <lookupName>flaw_glass_jaw</lookupName>
+        <displayName>Glass Jaw (ATOW)</displayName>
+        <desc><![CDATA[All injuries suffered and fatigue gained is doubled. Fatigue gain from sustaining injuries is not doubled.]]></desc>
+        <xpCost>-300</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>atow_toughness</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>atow_toughness</lookupName>
+        <displayName>Toughness (ATOW)</displayName>
+        <desc><![CDATA[All injuries suffered are reduced by 25% and Fatigue gain is halved. Fatigue gain from sustaining injuries is not halved.]]></desc>
+        <xpCost>300</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>flaw_glass_jaw</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>flaw_slow_learner</lookupName>
+        <displayName>Slow Learner (ATOW)</displayName>
+        <desc><![CDATA[Increases the cost of purchasing and improving Skills by 20% (rounded normally).
+
+If XP adjustments from a high or low Reasoning are enabled, those adjustments are additive. So a 20% increase from this SPA and a 5% decrease from Reasoning would equal a 15% increase.]]></desc>
+        <xpCost>-300</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>atow_fast_learner</removeAbilities>
+    </ability>
+    <ability>
+        <lookupName>atow_fast_learner</lookupName>
+        <displayName>Fast Learner (ATOW)</displayName>
+        <desc><![CDATA[Decreases the cost of purchasing and improving Skills by 20% (rounded normally).
+
+If XP adjustments from a high or low Reasoning are enabled, those adjustments are additive. So a 20% decrease from this SPA and a 5% increase from Reasoning would equal a 15% decrease.]]></desc>
+        <xpCost>300</xpCost>
+        <weight>1</weight>
+        <skillPrereq/>
+        <removeAbilities>flaw_slow_learner</removeAbilities>
     </ability>
     <ability>
         <lookupName>eagle_eyes</lookupName>
@@ -539,12 +832,11 @@
         <lookupName>atow_combat_paralysis</lookupName>
         <xpCost>-400</xpCost>
         <weight>1</weight>
-        <desc>Unit Reputation is decreased by 1 if this character is the campaign commander.
+        <desc><![CDATA[Unit Reputation is decreased by 1 if this character is the campaign commander.
 
 A pilot who has Combat Sense rolls three dice per initiative check, keeping the top two rolls.
 
-If individual initiative is enabled, this penalty applies only to the pilot's unit. Otherwise, the penalty is applied only if the pilot's unit is the force commander.
-        </desc>
+If individual initiative is enabled, this penalty applies only to the pilot's unit. Otherwise, the penalty is applied only if the pilot's unit is the force commander.]]></desc>
         <skillPrereq/>
         <removeAbilities>atow_combat_sense</removeAbilities>
     </ability>
@@ -552,12 +844,11 @@ If individual initiative is enabled, this penalty applies only to the pilot's un
         <lookupName>atow_combat_sense</lookupName>
         <xpCost>400</xpCost>
         <weight>1</weight>
-        <desc>Unit Reputation is increased by 1 if this character is the campaign commander.
+        <desc><![CDATA[Unit Reputation is increased by 1 if this character is the campaign commander.
 
 A pilot who has Combat Sense rolls three dice per initiative check, keeping the top two rolls.
 
-If individual initiative is enabled, this bonus applies only to the pilot's unit. Otherwise, the bonus is applied only if the pilot's unit is the force commander.
-        </desc>
+If individual initiative is enabled, this bonus applies only to the pilot's unit. Otherwise, the bonus is applied only if the pilot's unit is the force commander.]]></desc>
         <skillPrereq>
             <skill>Gunnery/Mek::Veteran</skill>
             <skill>Piloting/Aircraft::Veteran</skill>
@@ -685,7 +976,7 @@ If individual initiative is enabled, this bonus applies only to the pilot's unit
     <ability>
         <lookupName>tech_weapon_specialist</lookupName>
         <displayName>Tech Specialist, Weapon (Unofficial)</displayName>
-        <desc>-1 to repair and maintenance checks when working with weapons</desc>
+        <desc><![CDATA[-1 to repair and maintenance checks when working with weapons.]]></desc>
         <xpCost>50</xpCost>
         <weight>2</weight>
         <skillPrereq>
@@ -699,7 +990,7 @@ If individual initiative is enabled, this bonus applies only to the pilot's unit
     <ability>
         <lookupName>tech_armor_specialist</lookupName>
         <displayName>Tech Specialist, Armor (Unofficial)</displayName>
-        <desc>-1 to repair and maintenance checks when working with armor</desc>
+        <desc><![CDATA[-1 to repair and maintenance checks when working with armor.]]></desc>
         <xpCost>50</xpCost>
         <weight>2</weight>
         <skillPrereq>
@@ -713,7 +1004,7 @@ If individual initiative is enabled, this bonus applies only to the pilot's unit
     <ability>
         <lookupName>tech_internal_specialist</lookupName>
         <displayName>Tech Specialist, Internal (Unofficial)</displayName>
-        <desc>-1 to repair and maintenance checks when working with internal systems</desc>
+        <desc><![CDATA[-1 to repair and maintenance checks when working with internal systems</desc>
         <xpCost>100</xpCost>
         <weight>2</weight>
         <skillPrereq>
@@ -727,7 +1018,7 @@ If individual initiative is enabled, this bonus applies only to the pilot's unit
     <ability>
         <lookupName>tech_engineer</lookupName>
         <displayName>Engineer (unofficial)</displayName>
-        <desc>-2 on refit rolls</desc>
+        <desc><![CDATA[-2 on refit rolls.]]></desc>
         <xpCost>100</xpCost>
         <weight>2</weight>
         <skillPrereq>
@@ -741,7 +1032,7 @@ If individual initiative is enabled, this bonus applies only to the pilot's unit
     <ability>
         <lookupName>tech_fixer</lookupName>
         <displayName>Mr/Ms Fix-it (unofficial)</displayName>
-        <desc>Ignore first point of penalty for repair and maintenance on low quality equipment</desc>
+        <desc><![CDATA[Ignore first point of penalty for repair and maintenance on low quality equipment.]]></desc>
         <xpCost>50</xpCost>
         <weight>2</weight>
         <skillPrereq>
@@ -755,7 +1046,7 @@ If individual initiative is enabled, this bonus applies only to the pilot's unit
     <ability>
         <lookupName>tech_maintainer</lookupName>
         <displayName>Maintainer (Unofficial)</displayName>
-        <desc>The tech is slow and methodical at their work. They take a +1 penalty to their repair rolls, but are better at maintaining units than most, with a -1 bonus.</desc>
+        <desc><![CDATA[The tech is slow and methodical at their work. They take a +1 penalty to their repair rolls, but are better at maintaining units than most, with a -1 bonus.]]></desc>
         <xpCost>100</xpCost>
         <weight>1</weight>
         <skillPrereq>
@@ -788,22 +1079,22 @@ If individual initiative is enabled, this bonus applies only to the pilot's unit
     <ability>
         <lookupName>edge_when_heal_crit_fail</lookupName>
         <displayName>Use Edge for doctor critical failure.</displayName>
-        <desc>Healing check critical failure will be rerolled with Edge.</desc>
+        <desc><![CDATA[Healing check critical failure will be rerolled with Edge.]]></desc>
     </ability>
     <ability>
         <lookupName>edge_when_repair_break_part</lookupName>
         <displayName>Use Edge for tech breaking part.</displayName>
-        <desc>Failed repair check that breaks the part will be rerolled with Edge.</desc>
+        <desc><![CDATA[Failed repair check that breaks the part will be rerolled with Edge.]]></desc>
     </ability>
     <ability>
         <lookupName>edge_when_fail_refit_check</lookupName>
         <displayName>Use Edge for refit failure.</displayName>
-        <desc>Failed refit check will be rerolled with Edge.</desc>
+        <desc><![CDATA[Failed refit check will be rerolled with Edge.]]></desc>
     </ability>
     <ability>
         <lookupName>edge_when_admin_acquire_fail</lookupName>
         <displayName>Use Edge for acquisition failure.</displayName>
-        <desc>Failed acquisition check will be rerolled with edge.</desc>
+        <desc><![CDATA[Failed acquisition check will be rerolled with edge.]]></desc>
     </ability>
 
     <!-- Example entries corresponding to the examples in customspa.xml
@@ -817,20 +1108,20 @@ If individual initiative is enabled, this bonus applies only to the pilot's unit
         <skillPrereq>
             <skill>Administration</skill>
         </skillPrereq>
-        <desc>Increase the capacity of a cargo or transport bay.</desc>
+        <desc><![CDATA[Increase the capacity of a cargo or transport bay.]]></desc>
         <choiceValues>None::Cargo::Mek::Vehicle::Fighter::Infantry</choiceValues>
     </ability>
 
     <edgeTrigger>
         <lookupName>edge_paper_cut</lookupName>
         <displayName>Use Edge to avoid paper cut.</displayName>
-        <desc>A paper cut injury check will be rerolled with edge.</desc>
+        <desc><![CDATA[A paper cut injury check will be rerolled with edge.]]></desc>
     </edgeTrigger>
 
     <implant>
         <lookupName>md_prosthetic_blowtorch</lookupName>
         <displayName>Prosthetic Blowtorch</displayName>
-        <desc>Reduce repair times by 10%</desc>
+        <desc><![CDATA[Reduce repair times by 10%.]]></desc>
         <skillPrereq>
             <skill>Tech/Mek</skill>
             <skill>Tech/Mechanic</skill>

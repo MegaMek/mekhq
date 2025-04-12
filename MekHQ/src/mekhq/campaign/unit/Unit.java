@@ -4945,7 +4945,7 @@ public class Unit implements ITechnology {
                 nGunners++;
             }
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
-                sumPiloting += person.getPilotingInjuryMod();
+                sumPiloting += person.getInjuryModifiers(true);
             }
         }
         for (Person person : gunners) {
@@ -4962,7 +4962,7 @@ public class Unit implements ITechnology {
                 artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(options);
             }
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
-                sumGunnery += person.getGunneryInjuryMod();
+                sumGunnery += person.getInjuryModifiers(false);
             }
         }
 
@@ -5104,11 +5104,11 @@ public class Unit implements ITechnology {
         }
 
         if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
-            pilotingMek += pilot.getPilotingInjuryMod();
-            gunneryMek += pilot.getGunneryInjuryMod();
-            pilotingAero += pilot.getPilotingInjuryMod();
-            gunneryAero += pilot.getGunneryInjuryMod();
-            artillery += pilot.getGunneryInjuryMod();
+            pilotingMek += pilot.getInjuryModifiers(true);
+            gunneryMek += pilot.getInjuryModifiers(false);
+            pilotingAero += pilot.getInjuryModifiers(true);
+            gunneryAero += pilot.getInjuryModifiers(false);
+            artillery += pilot.getInjuryModifiers(false);
         }
         LAMPilot crew = (LAMPilot) entity.getCrew();
         crew.setPiloting(Math.min(max(pilotingMek, 0), 8));
@@ -5143,7 +5143,7 @@ public class Unit implements ITechnology {
             gunnery = person.getSkill(gunType).getFinalSkillValue(options);
         }
         if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
-            gunnery += person.getGunneryInjuryMod();
+            gunnery += person.getInjuryModifiers(false);
         }
         if (person.hasSkill(driveType)) {
             piloting = person.getSkill(driveType).getFinalSkillValue(options);

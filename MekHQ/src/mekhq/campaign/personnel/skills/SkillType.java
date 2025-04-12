@@ -52,6 +52,7 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
@@ -470,12 +471,70 @@ public class SkillType {
                      this.subType == ROLEPLAY_SECURITY;
     }
 
+    /**
+     * Checks if the current instance is affected by the "Gremlins" or "Tech Empathy" SPAs.
+     *
+     * @return {@code true} if the {@code name} field matches one of the known tech or electronic-related skills,
+     *       {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public boolean isAffectedByGremlinsOrTechEmpathy() {
+        return Objects.equals(this.name, S_TECH_BA) ||
+                     Objects.equals(this.name, S_TECH_AERO) ||
+                     Objects.equals(this.name, S_TECH_MECHANIC) ||
+                     Objects.equals(this.name, S_TECH_MEK) ||
+                     Objects.equals(this.name, S_TECH_VESSEL) ||
+                     Objects.equals(this.name, S_COMPUTERS) ||
+                     Objects.equals(this.name, S_COMMUNICATIONS) ||
+                     Objects.equals(this.name, S_SECURITY_SYSTEMS_ELECTRONIC);
+    }
+
+    /**
+     * Checks if the current instance is affected by the "Impatient" or "Patient" SPAs.
+     *
+     * @return {@code true} if the instance is related to one of the affected subtypes or names, {@code false}
+     *       otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public boolean isAffectedByImpatientOrPatient() {
+        return this.isSubTypeOf(ROLEPLAY_ART) ||
+                     this.isSubTypeOf(ROLEPLAY_SECURITY) ||
+                     Objects.equals(this.name, S_CRYPTOGRAPHY) ||
+                     Objects.equals(this.name, S_DEMOLITIONS) ||
+                     Objects.equals(this.name, S_INVESTIGATION) ||
+                     Objects.equals(this.name, S_PROTOCOLS) ||
+                     Objects.equals(this.name, S_STRATEGY) ||
+                     Objects.equals(this.name, S_TACTICS) ||
+                     Objects.equals(this.name, S_TRAINING);
+    }
+
     public SkillAttribute getFirstAttribute() {
         return firstAttribute;
     }
 
     public SkillAttribute getSecondAttribute() {
         return secondAttribute;
+    }
+
+    /**
+     * Determines whether the skill type has the specified attribute.
+     *
+     * <p>This method checks if the provided {@link SkillAttribute} matches either of the two attributes associated
+     * with the skill type.</p>
+     *
+     * @param attribute the {@link SkillAttribute} to check
+     *
+     * @return {@code true} if the skill type includes the specified attribute; {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public boolean hasAttribute(SkillAttribute attribute) {
+        return (firstAttribute == attribute) || (secondAttribute == attribute);
     }
 
     /**
