@@ -27,6 +27,7 @@
  */
 package mekhq.campaign.personnel.lifeEvents;
 
+import static megamek.client.ui.swing.util.UIUtil.scaleForGUI;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
@@ -37,6 +38,7 @@ import java.util.List;
 import javax.swing.ImageIcon;
 
 import megamek.common.annotations.Nullable;
+import megamek.utilities.ImageUtilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
@@ -78,13 +80,16 @@ public class CommandersDayAnnouncement {
         String inCharacterMessage = getInCharacterMessage();
         String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "commandersDay.message.ooc");
 
+        ImageIcon banner = new ImageIcon("data/images/misc/hcdbanner.png");
+        banner = ImageUtilities.scaleImageIcon(banner, scaleForGUI(400), true);
+
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
               getSpeaker(),
               null,
               inCharacterMessage,
               getButtonLabels(),
               outOfCharacterMessage,
-              new ImageIcon("data/images/misc/hcdbanner.png"),
+              banner,
               true);
 
         if (dialog.getDialogChoice() == SUPPRESS_DIALOG_RESPONSE_INDEX) {
