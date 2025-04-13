@@ -27,6 +27,26 @@
  */
 package mekhq.gui.panels;
 
+import static mekhq.MHQConstants.LAUNCHER_NEW_PLAYER_QUICKSTART_PATH;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.List;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.client.ui.swing.widget.MegaMekButton;
 import megamek.client.ui.swing.widget.SkinSpecification;
@@ -48,21 +68,13 @@ import mekhq.gui.dialog.DataLoadingDialog;
 import mekhq.gui.dialog.MHQOptionsDialog;
 import mekhq.gui.dialog.StoryArcSelectionDialog;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.List;
-
 public class StartupScreenPanel extends AbstractMHQPanel {
     private static final MMLogger logger = MMLogger.create(StartupScreenPanel.class);
 
     // region Variable Declarations
     private MekHQ app;
     private File lastSaveFile;
+    private File newPlayerQuickstartFile;
     private BufferedImage backgroundIcon;
 
     // Save file filtering needs to avoid loading some special files
@@ -72,8 +84,8 @@ public class StartupScreenPanel extends AbstractMHQPanel {
             // Allow any .xml, .cpnx, and .cpnx.gz file that is not in the list of excluded
             // files
             List<String> toReject = List.of(PreferenceManager.DEFAULT_CFG_FILE_NAME.toLowerCase());
-            return (((name.toLowerCase().endsWith(".cpnx") || name.toLowerCase().endsWith(".xml"))
-                    || name.toLowerCase().endsWith(".cpnx.gz")) && !toReject.contains(name.toLowerCase()));
+            return (((name.toLowerCase().endsWith(".cpnx") || name.toLowerCase().endsWith(".xml")) ||
+                           name.toLowerCase().endsWith(".cpnx.gz")) && !toReject.contains(name.toLowerCase()));
         }
     };
 
@@ -85,6 +97,9 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
         this.app = app;
         lastSaveFile = Utilities.lastFileModified(MekHQ.getCampaignsDirectory().getValue(), saveFilter);
+        newPlayerQuickstartFile = new File(MekHQ.getCampaignsDirectory().getValue() +
+                                                 File.separator +
+                                                 LAUNCHER_NEW_PLAYER_QUICKSTART_PATH);
 
         initialize();
     }
@@ -99,13 +114,12 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
         Dimension scaledMonitorSize = UIUtil.getScaledScreenSize(getFrame());
         JLabel splash = UIUtil.createSplashComponent(app.getIconPackage().getStartupScreenImagesScreenImages(),
-                getFrame());
+              getFrame());
         add(splash, BorderLayout.CENTER);
 
         if (skinSpec.hasBackgrounds()) {
             if (skinSpec.backgrounds.size() > 1) {
-                File file = new MegaMekFile(Configuration.widgetsDir(),
-                        skinSpec.backgrounds.get(1)).getFile();
+                File file = new MegaMekFile(Configuration.widgetsDir(), skinSpec.backgrounds.get(1)).getFile();
                 if (!file.exists()) {
                     logger.error("Background icon doesn't exist: " + file.getAbsolutePath());
                 } else {
@@ -116,15 +130,18 @@ public class StartupScreenPanel extends AbstractMHQPanel {
             backgroundIcon = null;
         }
 
-        final JLabel lblVersion = new JLabel(String.format("%s %s %s", MHQConstants.PROJECT_NAME,
-                resources.getString("Version.text"), MHQConstants.VERSION), JLabel.CENTER);
+        final JLabel lblVersion = new JLabel(String.format("%s %s %s",
+              MHQConstants.PROJECT_NAME,
+              resources.getString("Version.text"),
+              MHQConstants.VERSION), JLabel.CENTER);
         lblVersion.setPreferredSize(new Dimension(250, 15));
         if (!skinSpec.fontColors.isEmpty()) {
             lblVersion.setForeground(skinSpec.fontColors.get(0));
         }
 
         MegaMekButton btnNewCampaign = new MegaMekButton(resources.getString("btnNewCampaign.text"),
-                UIComponents.MainMenuButton.getComp(), true);
+              UIComponents.MainMenuButton.getComp(),
+              true);
         btnNewCampaign.addActionListener(evt -> {
             btnNewCampaign.setEnabled(false);
 
@@ -138,7 +155,8 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         });
 
         MegaMekButton btnLoadCampaign = new MegaMekButton(resources.getString("btnLoadCampaign.text"),
-                UIComponents.MainMenuButton.getComp(), true);
+              UIComponents.MainMenuButton.getComp(),
+              true);
         btnLoadCampaign.addActionListener(evt -> {
             btnLoadCampaign.setEnabled(false);
 
@@ -155,15 +173,26 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         });
 
         MegaMekButton btnLoadLastCampaign = new MegaMekButton(resources.getString("btnLoadLastCampaign.text"),
-                UIComponents.MainMenuButton.getComp(), true);
+              UIComponents.MainMenuButton.getComp(),
+              true);
         btnLoadLastCampaign.setEnabled(lastSaveFile != null);
         btnLoadLastCampaign.addActionListener(evt -> {
             btnLoadLastCampaign.setEnabled(false);
             startCampaign(lastSaveFile);
         });
 
+        MegaMekButton btnNewPlayerQuickstart = new MegaMekButton(resources.getString("btnNewPlayerQuickstart.text"),
+              UIComponents.MainMenuButton.getComp(),
+              true);
+        btnNewPlayerQuickstart.setEnabled(newPlayerQuickstartFile != null);
+        btnNewPlayerQuickstart.addActionListener(evt -> {
+            btnNewPlayerQuickstart.setEnabled(false);
+            startCampaign(newPlayerQuickstartFile);
+        });
+
         MegaMekButton btnLoadStoryArc = new MegaMekButton(resources.getString("btnLoadStoryArc.text"),
-                UIComponents.MainMenuButton.getComp(), true);
+              UIComponents.MainMenuButton.getComp(),
+              true);
         btnLoadStoryArc.addActionListener(evt -> {
             btnLoadStoryArc.setEnabled(false);
 
@@ -180,11 +209,13 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         });
 
         MegaMekButton btnMHQOptions = new MegaMekButton(resources.getString("MHQOptions.text"),
-              UIComponents.MainMenuButton.getComp(), true);
+              UIComponents.MainMenuButton.getComp(),
+              true);
         btnMHQOptions.addActionListener(evt -> new MHQOptionsDialog(getFrame()).setVisible(true));
 
         MegaMekButton btnQuit = new MegaMekButton(resources.getString("Quit.text"),
-                UIComponents.MainMenuButton.getComp(), true);
+              UIComponents.MainMenuButton.getComp(),
+              true);
         btnQuit.addActionListener(evt -> System.exit(0));
 
         FontMetrics metrics = btnNewCampaign.getFontMetrics(btnNewCampaign.getFont());
@@ -212,6 +243,8 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         btnLoadCampaign.setPreferredSize(minButtonDim);
         btnLoadLastCampaign.setMinimumSize(minButtonDim);
         btnLoadLastCampaign.setPreferredSize(minButtonDim);
+        btnNewPlayerQuickstart.setMinimumSize(minButtonDim);
+        btnNewPlayerQuickstart.setPreferredSize(minButtonDim);
         btnLoadStoryArc.setMinimumSize(minButtonDim);
         btnLoadStoryArc.setPreferredSize(minButtonDim);
         btnMHQOptions.setMinimumSize(minButtonDim);
@@ -246,6 +279,8 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         c.gridx = 1;
         c.gridy = 0;
         add(lblVersion, c);
+        c.gridy++;
+        add(btnNewPlayerQuickstart, c);
         c.gridy++;
         add(btnNewCampaign, c);
         c.gridy++;
