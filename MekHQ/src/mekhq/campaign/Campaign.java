@@ -8933,22 +8933,22 @@ public class Campaign implements ITechManager {
             StringBuilder maintenanceReport = new StringBuilder("<strong>" +
                                                                       techName +
                                                                       " performing maintenance</strong><br><br>");
-            for (Part p : unit.getParts()) {
+            for (Part part : unit.getParts()) {
                 try {
-                    String partReport = doMaintenanceOnUnitPart(unit, p, partsToDamage, paidMaintenance);
+                    String partReport = doMaintenanceOnUnitPart(unit, part, partsToDamage, paidMaintenance);
                     if (partReport != null) {
                         maintenanceReport.append(partReport).append("<br>");
                     }
                 } catch (Exception ex) {
                     logger.error(ex,
                           "Could not perform maintenance on part {} ({}) for {} ({}) due to an error",
-                          p.getName(),
-                          p.getId(),
+                          part.getName(),
+                          part.getId(),
                           unit.getName(),
                           unit.getId().toString());
                     addReport(String.format(
                           "ERROR: An error occurred performing maintenance on %s for unit %s, check the log",
-                          p.getName(),
+                          part.getName(),
                           unit.getName()));
                 }
             }
@@ -9030,13 +9030,13 @@ public class Campaign implements ITechManager {
         }
     }
 
-    private String doMaintenanceOnUnitPart(Unit u, Part p, Map<Part, Integer> partsToDamage, boolean paidMaintenance) {
-        String partReport = "<b>" + p.getName() + "</b> (Quality " + p.getQualityName() + ')';
-        if (!p.needsMaintenance()) {
+    private String doMaintenanceOnUnitPart(Unit unit, Part part, Map<Part, Integer> partsToDamage, boolean paidMaintenance) {
+        String partReport = "<b>" + part.getName() + "</b> (Quality " + part.getQualityName() + ')';
+        if (!part.needsMaintenance()) {
             return null;
         }
-        PartQuality oldQuality = p.getQuality();
-        TargetRoll target = getTargetForMaintenance(p, u.getTech());
+        PartQuality oldQuality = part.getQuality();
+        TargetRoll target = getTargetForMaintenance(part, unit.getTech());
         if (!paidMaintenance) {
             // TODO : Make this modifier user inputable
             target.addModifier(1, "did not pay for maintenance");
@@ -9047,103 +9047,103 @@ public class Campaign implements ITechManager {
         int margin = roll - target.getValue();
         partReport += " rolled a " + roll + ", margin of " + margin;
 
-        switch (p.getQuality()) {
+        switch (part.getQuality()) {
             case QUALITY_A: {
                 if (margin >= 4) {
-                    p.improveQuality();
+                    part.improveQuality();
                 }
                 if (!campaignOptions.isUseUnofficialMaintenance()) {
                     if (margin < -6) {
-                        partsToDamage.put(p, 4);
+                        partsToDamage.put(part, 4);
                     } else if (margin < -4) {
-                        partsToDamage.put(p, 3);
+                        partsToDamage.put(part, 3);
                     } else if (margin == -4) {
-                        partsToDamage.put(p, 2);
+                        partsToDamage.put(part, 2);
                     } else if (margin < -1) {
-                        partsToDamage.put(p, 1);
+                        partsToDamage.put(part, 1);
                     }
                 } else if (margin < -6) {
-                    partsToDamage.put(p, 1);
+                    partsToDamage.put(part, 1);
                 }
                 break;
             }
             case QUALITY_B: {
                 if (margin >= 4) {
-                    p.improveQuality();
+                    part.improveQuality();
                 } else if (margin < -5) {
-                    p.reduceQuality();
+                    part.reduceQuality();
                 }
                 if (!campaignOptions.isUseUnofficialMaintenance()) {
                     if (margin < -6) {
-                        partsToDamage.put(p, 2);
+                        partsToDamage.put(part, 2);
                     } else if (margin < -2) {
-                        partsToDamage.put(p, 1);
+                        partsToDamage.put(part, 1);
                     }
                 }
                 break;
             }
             case QUALITY_C: {
                 if (margin < -4) {
-                    p.reduceQuality();
+                    part.reduceQuality();
                 } else if (margin >= 5) {
-                    p.improveQuality();
+                    part.improveQuality();
                 }
                 if (!campaignOptions.isUseUnofficialMaintenance()) {
                     if (margin < -6) {
-                        partsToDamage.put(p, 2);
+                        partsToDamage.put(part, 2);
                     } else if (margin < -3) {
-                        partsToDamage.put(p, 1);
+                        partsToDamage.put(part, 1);
                     }
                 }
                 break;
             }
             case QUALITY_D: {
                 if (margin < -3) {
-                    p.reduceQuality();
+                    part.reduceQuality();
                     if ((margin < -4) && !campaignOptions.isUseUnofficialMaintenance()) {
-                        partsToDamage.put(p, 1);
+                        partsToDamage.put(part, 1);
                     }
                 } else if (margin >= 5) {
-                    p.improveQuality();
+                    part.improveQuality();
                 }
                 break;
             }
             case QUALITY_E:
                 if (margin < -2) {
-                    p.reduceQuality();
+                    part.reduceQuality();
                     if ((margin < -5) && !campaignOptions.isUseUnofficialMaintenance()) {
-                        partsToDamage.put(p, 1);
+                        partsToDamage.put(part, 1);
                     }
                 } else if (margin >= 6) {
-                    p.improveQuality();
+                    part.improveQuality();
                 }
                 break;
             case QUALITY_F:
             default:
                 if (margin < -2) {
-                    p.reduceQuality();
+                    part.reduceQuality();
                     if (margin < -6 && !campaignOptions.isUseUnofficialMaintenance()) {
-                        partsToDamage.put(p, 1);
+                        partsToDamage.put(part, 1);
                     }
                 }
 
                 break;
         }
-        if (p.getQuality().toNumeric() > oldQuality.toNumeric()) {
+        if (part.getQuality().toNumeric() > oldQuality.toNumeric()) {
             partReport += ": " +
                                 ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
                                                                                           .getFontColorPositiveHexColor(),
-                                      "new quality is " + p.getQualityName());
-        } else if (p.getQuality().toNumeric() < oldQuality.toNumeric()) {
+                                      "new quality is " + part.getQualityName());
+        } else if (part.getQuality().toNumeric() < oldQuality.toNumeric()) {
             partReport += ": " +
                                 ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
                                                                                           .getFontColorNegativeHexColor(),
-                                      "new quality is " + p.getQualityName());
+                                      "new quality is " + part.getQualityName());
         } else {
-            partReport += ": quality remains " + p.getQualityName();
+            partReport += ": quality remains " + part.getQualityName();
         }
-        if (null != partsToDamage.get(p)) {
-            if (partsToDamage.get(p) > 3) {
+        if (null != partsToDamage.get(part)) {
+            if (partsToDamage.get(part) > 3) {
                 partReport += ", " +
                                     ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
                                                                                               .getFontColorNegativeHexColor(),
