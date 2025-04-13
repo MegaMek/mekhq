@@ -7441,7 +7441,7 @@ public class Campaign implements ITechManager {
         return target;
     }
 
-    public TargetRoll getTargetForMaintenance(IPartWork partWork, Person tech) {
+    public TargetRoll getTargetForMaintenance(IPartWork partWork, Person tech, int asTechsUsed) {
         int value = 10;
         String skillLevel = "Unmaintained";
         if (null != tech) {
@@ -7495,30 +7495,17 @@ public class Campaign implements ITechManager {
         }
 
         if (null != partWork.getUnit() && null != tech) {
-            // we have no official rules for what happens when a tech is only
-            // assigned
-            // for part of the maintenance cycle, so we will create our own
-            // penalties
-            if (partWork.getUnit().getMaintainedPct() < .5) {
-                target.addModifier(2, "partial maintenance");
-            } else if (partWork.getUnit().getMaintainedPct() < 1) {
-                target.addModifier(1, "partial maintenance");
-            }
-
             // the astech issue is crazy, because you can actually be better off
             // not maintaining
             // than going it short-handed, but that is just the way it is.
             // Still, there is also some fuzziness about what happens if you are
             // short astechs
-            // for part of the cycle. We will keep track of the total
-            // "astech days" used over
-            // the cycle and take the average per day rounding down as our team
-            // size
+            // for part of the cycle.
             final int helpMod;
             if (partWork.getUnit().isSelfCrewed()) {
                 helpMod = getShorthandedModForCrews(partWork.getUnit().getEntity().getCrew());
             } else {
-                helpMod = getShorthandedMod(partWork.getUnit().getAstechsMaintained(), false);
+                helpMod = getShorthandedMod(asTechsUsed, false);
             }
 
             if (helpMod > 0) {
@@ -8887,7 +8874,6 @@ public class Campaign implements ITechManager {
             Person tech = unit.getTech();
             if (tech != null) {
                 int availableMinutes = tech.getMinutesLeft();
-
                 maintained = (availableMinutes >= minutesUsed);
 
                 if (!maintained) {
@@ -8935,7 +8921,7 @@ public class Campaign implements ITechManager {
                                                                       " performing maintenance</strong><br><br>");
             for (Part p : unit.getParts()) {
                 try {
-                    String partReport = doMaintenanceOnUnitPart(unit, p, partsToDamage, paidMaintenance);
+                    String partReport = doMaintenanceOnUnitPart(unit, p, partsToDamage, paidMaintenance, asTechsUsed);
                     if (partReport != null) {
                         maintenanceReport.append(partReport).append("<br>");
                     }
@@ -9030,13 +9016,14 @@ public class Campaign implements ITechManager {
         }
     }
 
-    private String doMaintenanceOnUnitPart(Unit u, Part p, Map<Part, Integer> partsToDamage, boolean paidMaintenance) {
+    private String doMaintenanceOnUnitPart(Unit u, Part p, Map<Part, Integer> partsToDamage, boolean paidMaintenance,
+          int asTechsUsed) {
         String partReport = "<b>" + p.getName() + "</b> (Quality " + p.getQualityName() + ')';
         if (!p.needsMaintenance()) {
             return null;
         }
         PartQuality oldQuality = p.getQuality();
-        TargetRoll target = getTargetForMaintenance(p, u.getTech());
+        TargetRoll target = getTargetForMaintenance(p, u.getTech(), asTechsUsed);
         if (!paidMaintenance) {
             // TODO : Make this modifier user inputable
             target.addModifier(1, "did not pay for maintenance");
