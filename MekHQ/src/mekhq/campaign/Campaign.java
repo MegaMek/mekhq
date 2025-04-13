@@ -623,6 +623,24 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Retrieves all units in the Table of Organization and Equipment (TOE).
+     *
+     * <p>This method provides a list of unique identifiers for all units currently included in the force's TOE
+     * structure.</p>
+     *
+     * @param standardForcesOnly if {@code true}, returns only units in {@link ForceType#STANDARD} forces; if
+     *                           {@code false}, returns all units.
+     *
+     * @return a List of UUID objects representing all units in the TOE according to the specified filter
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public List<UUID> getAllUnitsInTheTOE(boolean standardForcesOnly) {
+        return forces.getAllUnits(standardForcesOnly);
+    }
+
+    /**
      * Adds a {@link CombatTeam} to the {@code combatTeams} {@link Hashtable} using {@code forceId} as the key.
      *
      * @param combatTeam the {@link CombatTeam} to be added to the {@link Hashtable}
