@@ -36,6 +36,7 @@ import megamek.common.autoresolve.acar.SimulationContext;
 import megamek.common.autoresolve.converter.*;
 import megamek.common.copy.CrewRefBreak;
 import megamek.common.force.Forces;
+
 import megamek.common.options.OptionsConstants;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
@@ -46,10 +47,7 @@ import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.Unit;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 
 import static megamek.common.force.Force.NO_FORCE;
@@ -66,10 +64,6 @@ public class AtBSetupForces extends SetupForces {
     private final ForceConsolidation forceConsolidationMethod;
     private final Set<Integer> teamIds = new HashSet<>();
     private final OrderFactory orderFactory;
-
-    public AtBSetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario) {
-        this(campaign, units, scenario, new SingletonForces(), new OrderFactory(campaign, scenario));
-    }
 
     public AtBSetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario,
             ForceConsolidation forceConsolidationMethod) {
@@ -166,7 +160,40 @@ public class AtBSetupForces extends SetupForces {
         var entities = setupPlayerForces(player);
         var playerSkill = campaign.getReputation().getAverageSkillLevel();
         game.setPlayerSkillLevel(player.getId(), playerSkill);
-        sendEntities(entities, game);
+        sendEntities(entities, game, player);
+    }
+
+    private List<Entity> moveByCopy(List<Entity> entities) {
+        if (entities == null || entities.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        try {
+            // Use ByteArrayOutputStream to hold the serialized data
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+
+            // Serialize the entities
+            oos.writeObject(entities);
+            oos.flush();
+
+            // Get the serialized data
+            byte[] serializedData = baos.toByteArray();
+            oos.close();
+
+            // Deserialize to create new instances
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(serializedData);
+            ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+
+            @SuppressWarnings("unchecked")
+            List<Entity> result = (List<Entity>) objectInputStream.readObject();
+            objectInputStream.close();
+
+            return result;
+        } catch (Exception e) {
+            logger.error("Failed to break references for entities", e);
+            return new ArrayList<>();
+        }
     }
 
     /**
@@ -205,7 +232,7 @@ public class AtBSetupForces extends SetupForces {
             bf.generateRandomForces(units, campaign);
             var entities = bf.getFullEntityList(campaign);
             var botEntities = setupBotEntities(bot, entities, bf.getDeployRound());
-            sendEntities(botEntities, game);
+            sendEntities(botEntities, game, bot);
         }
     }
 
@@ -491,10 +518,10 @@ public class AtBSetupForces extends SetupForces {
      * @param entities The entities to send
      * @param game     the game object to send the entities to
      */
-    private void sendEntities(List<Entity> entities, SimulationContext game) {
+    private void sendEntities(List<Entity> entities, SimulationContext game, Player player) {
         Map<Integer, Integer> forceMapping = new HashMap<>();
-        for (final Entity entity : new ArrayList<>(entities)) {
-            lastTouchesBeforeSendingEntity(game, entity);
+        for (final Entity entity : moveByCopy(entities)) {
+            lastTouchesBeforeSendingEntity(game, entity, player);
             game.getPlayer(entity.getOwnerId()).changeInitialEntityCount(1);
 
             // Restore forces from MULs or other external sources from the forceString, if
@@ -526,7 +553,10 @@ public class AtBSetupForces extends SetupForces {
         }
     }
 
-    private static void lastTouchesBeforeSendingEntity(SimulationContext game, Entity entity) {
+    private static void lastTouchesBeforeSendingEntity(SimulationContext game, Entity entity, Player player) {
+        if (entity.getOwner() == null) {
+            entity.setOwner(player);
+        }
         if (entity instanceof ProtoMek) {
             int numPlayerProtos = game.getSelectedEntityCount(new EntitySelector() {
                 private final int ownerId = entity.getOwnerId();
