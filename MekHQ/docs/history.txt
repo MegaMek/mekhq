@@ -216,6 +216,9 @@ MEKHQ VERSION HISTORY:
 + PR #6639: Fixed Commander's Day Dialog To Scale Banner Image Properly
 + PR #6640: Fixed Incorrect Constants and Pronoun Placement in BirthAnnouncement
 + PR #6641: Fixed Null Pointer Issue in Refit Handling
++ Fix #6646: Fixed Skill XP Costs Resetting
++ PR #6650: Better differentiate transport type in TOE
++ PR #6649: Fix what units are passed to detach trailer/tractor so it only shows when needed
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
