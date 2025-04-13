@@ -5,7 +5,30 @@
 <br>
 <br>Most options remain enabled, but some of the more punishing or complex systems have been disabled. The idea is that you can enable them one-by-one as you grow more experienced with the program.
 <br>
-<br>This preset is recommended for <b><span style="color: green;">new MekHQ players</span></b>, or those returning from an extended break.]]></description>
+<br>This preset is recommended for <b><span style="color: green;">new MekHQ players</span></b>, or those returning from an extended break.
+<br>
+<br><h3>Features</h3>
+<ul>
+    <li>Easier maintenance and repairs.</li>
+    <li>Lower tech level, for a more streamlined experience.</li>
+    <li>Easier and quicker procurement.</li>
+    <li>Planetary Acquisitions disabled.</li>
+    <li>Slightly higher contract pay.</li>
+    <li>The effects of aging, disabled.</li>
+    <li>Easier healing.</li>
+    <li>No prisoner management.</li>
+    <li>Easier employee turnover, with both Management Skill and Unit Cohesion disabled.</li>
+    <li>Fatigue disabled.</li>
+    <li>Maternity Leave disabled.</li>
+    <li>Cheaper monthly expenses.</li>
+    <li>Free recruitment.</li>
+    <li>Gray Monday effects disabled.</li>
+    <li>Taxes disabled.</li>
+    <li>Instant unit purchase deliveries.</li>
+    <li>Reduced scenario difficulty.</li>
+    <li>Auto-Resolve shows chances of success.</li>
+    <li>Easier procurement while on contract.</li>
+</ul>]]></description>
     <date>3151-01-01</date>
     <contractCount>2</contractCount>
     <gm>false</gm>
