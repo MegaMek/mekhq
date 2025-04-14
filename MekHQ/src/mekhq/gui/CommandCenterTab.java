@@ -479,6 +479,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         procurementTable.getAccessibleContext().setAccessibleName("Pending Procurements");
         TableRowSorter<ProcurementTableModel> shoppingSorter = new TableRowSorter<>(procurementModel);
         shoppingSorter.setComparator(ProcurementTableModel.COL_COST, new FormattedNumberSorter());
+        shoppingSorter.setComparator(ProcurementTableModel.COL_TOTAL_COST, new FormattedNumberSorter());
         shoppingSorter.setComparator(ProcurementTableModel.COL_TARGET, new TargetSorter());
         procurementTable.setRowSorter(shoppingSorter);
         TableColumn column;
