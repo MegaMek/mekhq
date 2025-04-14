@@ -1181,6 +1181,8 @@ public class SkillType {
         logger.info("SkillType {} has been updated to second attribute {}",
               skillType.getName(),
               temporarySkillType.getSecondAttribute());
+
+        skillType.countUp = temporarySkillType.isCountUp();
     }
 
 
