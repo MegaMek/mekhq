@@ -28,15 +28,39 @@
 
 package mekhq.campaign.autoresolve;
 
+import static megamek.common.force.Force.NO_FORCE;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
 import io.sentry.Sentry;
 import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.*;
-import megamek.common.alphaStrike.conversion.ASConverter;
+import megamek.common.Entity;
+import megamek.common.EntitySelector;
+import megamek.common.Infantry;
+import megamek.common.MapSettings;
+import megamek.common.Minefield;
+import megamek.common.Player;
+import megamek.common.ProtoMek;
+import megamek.common.UnitType;
 import megamek.common.autoresolve.acar.SimulationContext;
-import megamek.common.autoresolve.converter.*;
-import megamek.common.copy.CrewRefBreak;
+import megamek.common.autoresolve.converter.EntityAsUnit;
+import megamek.common.autoresolve.converter.ForceConsolidation;
+import megamek.common.autoresolve.converter.SetupForces;
 import megamek.common.force.Forces;
-
 import megamek.common.options.OptionsConstants;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
@@ -46,11 +70,6 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.Unit;
-
-import java.io.*;
-import java.util.*;
-
-import static megamek.common.force.Force.NO_FORCE;
 
 /**
  * @author Luana Coppio
@@ -160,39 +179,34 @@ public class AtBSetupForces extends SetupForces {
         var entities = setupPlayerForces(player);
         var playerSkill = campaign.getReputation().getAverageSkillLevel();
         game.setPlayerSkillLevel(player.getId(), playerSkill);
-        sendEntities(entities, game, player);
+        sendEntities(entities, game);
     }
 
-    private List<Entity> moveByCopy(List<Entity> entities) {
-        if (entities == null || entities.isEmpty()) {
-            return new ArrayList<>();
-        }
-
+    /**
+     * Move the entity by copying it, this is used to break references to the original instance
+     * @param entity The entity to copy
+     * @return The copied entity
+     */
+    private Entity moveByCopy(Entity entity) {
         try {
-            // Use ByteArrayOutputStream to hold the serialized data
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+                try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream)) {
+                    // Serialize the entities
+                    objectOutputStream.writeObject(entity);
+                    objectOutputStream.flush();
+                    byte[] serializedData = byteArrayOutputStream.toByteArray();
 
-            // Serialize the entities
-            oos.writeObject(entities);
-            oos.flush();
-
-            // Get the serialized data
-            byte[] serializedData = baos.toByteArray();
-            oos.close();
-
-            // Deserialize to create new instances
-            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(serializedData);
-            ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-
-            @SuppressWarnings("unchecked")
-            List<Entity> result = (List<Entity>) objectInputStream.readObject();
-            objectInputStream.close();
-
-            return result;
+                    // Deserialize to create new instances
+                    try(ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(serializedData)) {
+                        try (ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)) {
+                            return (Entity) objectInputStream.readObject();
+                        }
+                    }
+                }
+            }
         } catch (Exception e) {
-            logger.error("Failed to break references for entities", e);
-            return new ArrayList<>();
+            logger.error(e, "Failed to break references for entity {}", entity);
+            return null;
         }
     }
 
@@ -208,8 +222,8 @@ public class AtBSetupForces extends SetupForces {
         var allySkill = (scenario.getContract(campaign)).getAllySkill();
         var localBots = new HashMap<String, Player>();
         for (int i = 0; i < scenario.getNumBots(); i++) {
-            BotForce bf = scenario.getBotForce(i);
-            String name = bf.getName();
+            BotForce botForce = scenario.getBotForce(i);
+            String name = botForce.getName();
             if (localBots.containsKey(name)) {
                 int append = 2;
                 while (localBots.containsKey(name + append)) {
@@ -219,20 +233,19 @@ public class AtBSetupForces extends SetupForces {
             }
             var highestPlayerId = game.getPlayersList().stream().mapToInt(Player::getId).max().orElse(0);
             Player bot = new Player(highestPlayerId + 1, name);
-            bot.setTeam(bf.getTeam());
+            bot.setTeam(botForce.getTeam());
 
             localBots.put(name, bot);
-            configureBot(bot, bf, forbiddenColor);
+            configureBot(bot, botForce, forbiddenColor);
             game.addPlayer(bot.getId(), bot);
             if (bot.isEnemyOf(campaign.getPlayer())) {
                 game.setPlayerSkillLevel(bot.getId(), enemySkill);
             } else {
                 game.setPlayerSkillLevel(bot.getId(), allySkill);
             }
-            bf.generateRandomForces(units, campaign);
-            var entities = bf.getFullEntityList(campaign);
-            var botEntities = setupBotEntities(bot, entities, bf.getDeployRound());
-            sendEntities(botEntities, game, bot);
+            botForce.generateRandomForces(units, campaign);
+            var botEntities = setupBotEntities(bot, botForce.getFullEntityList(campaign), botForce.getDeployRound());
+            sendEntities(botEntities, game);
         }
     }
 
@@ -270,106 +283,152 @@ public class AtBSetupForces extends SetupForces {
      * @return A list of entities for the player
      */
     private List<Entity> setupPlayerForces(Player player) {
-        boolean useDropship = false;
+        boolean useDropship = isUsingDropship();
+        List<Entity> entities = new ArrayList<>();
+        entities.addAll(getCopyOfEntities(player, useDropship, new UnitEntitySource()));
+        entities.addAll(getCopyOfEntities(player, useDropship, new AllyEntitySource()));
+        return entities;
+    }
+
+    private List<Entity> getCopyOfEntities(Player player, boolean useDropship, EntitySource entitySource) {
+        List<Entity> entities = new ArrayList<>();
+        for (Object source : entitySource.getSources()) {
+            Entity entity = entitySource.setupEntity(player, source, useDropship);
+            if (entity == null) {
+                continue;
+            }
+            entities.add(entity);
+        }
+        return entities;
+    }
+
+    private interface EntitySource {
+        Iterable<?> getSources();
+        Entity setupEntity(Player player, Object source, boolean useDropship);
+    }
+
+    private class UnitEntitySource implements EntitySource {
+        @Override
+        public Iterable<?> getSources() {
+            return units;
+        }
+
+        @Override
+        public Entity setupEntity(Player player, Object source, boolean useDropship) {
+            return setupPlayerEntityFromUnit(player, (Unit) source, useDropship);
+        }
+    }
+
+    private class AllyEntitySource implements EntitySource {
+        @Override
+        public Iterable<?> getSources() {
+            return scenario.getAlliesPlayer();
+        }
+
+        @Override
+        public Entity setupEntity(Player player, Object source, boolean useDropship) {
+            return setupPlayerAllyEntity(player, (Entity) source, useDropship);
+        }
+    }
+
+    private Entity setupPlayerAllyEntity(Player player, Entity originalAllyEntity, boolean useDropship) {
+        var entity = moveByCopy(originalAllyEntity);
+        if (Objects.isNull(entity)) {
+            logger.error("Could not setup ally entity {}", originalAllyEntity);
+            return null;
+        }
+
+        entity.setOwner(player);
+
+        int deploymentRound = entity.getDeployRound();
+        if (!(scenario instanceof AtBDynamicScenario)) {
+            int speed = entity.getWalkMP();
+            if (entity.getAnyTypeMaxJumpMP() > 0) {
+                if (entity instanceof Infantry) {
+                    speed = entity.getJumpMP();
+                } else {
+                    speed++;
+                }
+            }
+            deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
+            if (!useDropship
+                    && scenario.getCombatRole().isPatrol()
+                    && (scenario.getCombatTeamById(campaign) != null)
+                    && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())) {
+                deploymentRound = Math.max(deploymentRound, 6 - speed);
+            }
+        }
+
+        entity.setDeployRound(deploymentRound);
+        return entity;
+    }
+
+    private Entity setupPlayerEntityFromUnit(Player player, Unit unit, boolean useDropship) {
+        var entity = moveByCopy(unit.getEntity());
+        if (Objects.isNull(entity)) {
+            logger.error("Could not setup unit {} for player {}", unit, player);
+            return null;
+        }
+        entity.setOwner(player);
+
+        // Set the TempID for auto reporting
+        entity.setExternalIdAsString(unit.getId().toString());
+
+        // If this unit is a spacecraft, set the crew size and marine size values
+        if (entity.isLargeCraft() || (entity.getUnitType() == UnitType.SMALL_CRAFT)) {
+            entity.setNCrew(unit.getActiveCrew().size());
+            entity.setNMarines(unit.getMarineCount());
+        }
+        // Calculate deployment round
+        int deploymentRound = entity.getDeployRound();
+        if (!(scenario instanceof AtBDynamicScenario)) {
+            int speed = entity.getWalkMP();
+            if (entity.getAnyTypeMaxJumpMP() > 0) {
+                if (entity instanceof Infantry) {
+                    speed = entity.getJumpMP();
+                } else {
+                    speed++;
+                }
+            }
+            // Set scenario type-specific delay
+            deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
+            // Lances deployed in scout roles always deploy units in 6-walking speed turns
+            if (scenario.getCombatRole().isPatrol()
+                    && (scenario.getCombatTeamById(campaign) != null)
+                    && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())
+                    && !useDropship) {
+                deploymentRound = Math.max(deploymentRound, 6 - speed);
+            }
+        }
+        entity.setDeployRound(deploymentRound);
+        var force = campaign.getForceFor(unit);
+        if (force != null) {
+            entity.setForceString(force.getFullMMName());
+        } else if (!unit.getEntity().getForceString().isBlank()) {
+            // this was added mostly to make it easier to run tests
+            entity.setForceString(unit.getEntity().getForceString());
+        }
+        return entity;
+    }
+
+    /**
+     * Check if using dropships for patrol scenario
+     * @return True if using dropships under specific conditions, false otherwise
+     */
+    private boolean isUsingDropship() {
         if (scenario.getCombatRole().isPatrol()) {
             for (Entity en : scenario.getAlliesPlayer()) {
                 if (en.getUnitType() == UnitType.DROPSHIP) {
-                    useDropship = true;
-                    break;
+                    return true;
                 }
             }
-            if (!useDropship) {
-                for (Unit unit : units) {
-                    if (unit.getEntity().getUnitType() == UnitType.DROPSHIP) {
-                        useDropship = true;
-                        break;
-                    }
+            for (Unit unit : units) {
+                if (unit.getEntity().getUnitType() == UnitType.DROPSHIP) {
+                    return true;
                 }
             }
         }
-        var entities = new ArrayList<Entity>();
-
-        for (Unit unit : units) {
-            // Get the Entity
-            var entity = ASConverter.getUndamagedEntity(unit.getEntity());
-            // Set the TempID for auto reporting
-            if (Objects.isNull(entity)) {
-                continue;
-            }
-
-            entity.setExternalIdAsString(unit.getId().toString());
-            // Set the owner
-            entity.setOwner(player);
-
-            // If this unit is a spacecraft, set the crew size and marine size values
-            if (entity.isLargeCraft() || (entity.getUnitType() == UnitType.SMALL_CRAFT)) {
-                entity.setNCrew(unit.getActiveCrew().size());
-                entity.setNMarines(unit.getMarineCount());
-            }
-            // Calculate deployment round
-            int deploymentRound = entity.getDeployRound();
-            if (!(scenario instanceof AtBDynamicScenario)) {
-                int speed = entity.getWalkMP();
-                if (entity.getAnyTypeMaxJumpMP() > 0) {
-                    if (entity instanceof Infantry) {
-                        speed = entity.getJumpMP();
-                    } else {
-                        speed++;
-                    }
-                }
-                // Set scenario type-specific delay
-                deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
-                // Lances deployed in scout roles always deploy units in 6-walking speed turns
-                if (scenario.getCombatRole().isPatrol()
-                        && (scenario.getCombatTeamById(campaign) != null)
-                        && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())
-                        && !useDropship) {
-                    deploymentRound = Math.max(deploymentRound, 6 - speed);
-                }
-            }
-            entity.setDeployRound(deploymentRound);
-            var force = campaign.getForceFor(unit);
-            if (force != null) {
-                entity.setForceString(force.getFullMMName());
-            } else if (!unit.getEntity().getForceString().isBlank()) {
-                // this was added mostly to make it easier to run tests
-                entity.setForceString(unit.getEntity().getForceString());
-            }
-            var newCrewRef = new CrewRefBreak(unit.getEntity().getCrew()).copy();
-            entity.setCrew(newCrewRef);
-            entities.add(entity);
-        }
-
-        for (Entity entity : scenario.getAlliesPlayer()) {
-            if (null == entity) {
-                continue;
-            }
-            entity.setOwner(player);
-
-            int deploymentRound = entity.getDeployRound();
-            if (!(scenario instanceof AtBDynamicScenario)) {
-                int speed = entity.getWalkMP();
-                if (entity.getAnyTypeMaxJumpMP() > 0) {
-                    if (entity instanceof Infantry) {
-                        speed = entity.getJumpMP();
-                    } else {
-                        speed++;
-                    }
-                }
-                deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
-                if (!useDropship
-                        && scenario.getCombatRole().isPatrol()
-                        && (scenario.getCombatTeamById(campaign) != null)
-                        && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())) {
-                    deploymentRound = Math.max(deploymentRound, 6 - speed);
-                }
-            }
-
-            entity.setDeployRound(deploymentRound);
-            entities.add(entity);
-        }
-
-        return entities;
+        return false;
     }
 
     /**
@@ -465,7 +524,8 @@ public class AtBSetupForces extends SetupForces {
         var entities = new ArrayList<Entity>();
 
         for (Entity originalBotEntity : originalEntities) {
-            var entity = ASConverter.getUndamagedEntity(originalBotEntity);
+            var entity = moveByCopy(originalBotEntity);
+
             if (entity == null) {
                 logger.warn("Could not convert entity for bot {} - {}", bot.getName(), originalBotEntity);
                 continue;
@@ -473,10 +533,7 @@ public class AtBSetupForces extends SetupForces {
 
             entity.setOwner(bot);
             entity.setForceString(forceName);
-            entity.setCrew(new CrewRefBreak(entity.getCrew()).copy());
             entity.setId(originalBotEntity.getId());
-            entity.setExternalIdAsString(originalBotEntity.getExternalIdAsString());
-            entity.setCommander(originalBotEntity.isCommander());
 
             if (entity.getDeployRound() == 0) {
                 entity.setDeployRound(deployRound);
@@ -518,10 +575,10 @@ public class AtBSetupForces extends SetupForces {
      * @param entities The entities to send
      * @param game     the game object to send the entities to
      */
-    private void sendEntities(List<Entity> entities, SimulationContext game, Player player) {
+    private void sendEntities(List<Entity> entities, SimulationContext game) {
         Map<Integer, Integer> forceMapping = new HashMap<>();
-        for (final Entity entity : moveByCopy(entities)) {
-            lastTouchesBeforeSendingEntity(game, entity, player);
+        for (final Entity entity : entities) {
+            lastTouchesBeforeSendingEntity(game, entity);
             game.getPlayer(entity.getOwnerId()).changeInitialEntityCount(1);
 
             // Restore forces from MULs or other external sources from the forceString, if
@@ -553,10 +610,7 @@ public class AtBSetupForces extends SetupForces {
         }
     }
 
-    private static void lastTouchesBeforeSendingEntity(SimulationContext game, Entity entity, Player player) {
-        if (entity.getOwner() == null) {
-            entity.setOwner(player);
-        }
+    private static void lastTouchesBeforeSendingEntity(SimulationContext game, Entity entity) {
         if (entity instanceof ProtoMek) {
             int numPlayerProtos = game.getSelectedEntityCount(new EntitySelector() {
                 private final int ownerId = entity.getOwnerId();
