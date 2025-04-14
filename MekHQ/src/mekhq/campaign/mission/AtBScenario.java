@@ -28,11 +28,6 @@
  */
 package mekhq.campaign.mission;
 
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.time.LocalDate;
-import java.util.*;
-
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_PARALYSIS;
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_SENSE;
 
@@ -849,7 +844,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (campaign.getCampaignOptions().isUseDropShips()) {
             if (canAddDropShips()) {
                 boolean dropshipFound = false;
-                for (UUID id : campaign.getForces().getAllUnits(true)) {
+                for (UUID id : campaign.getAllUnitsInTheTOE(true)) {
                     if ((campaign.getUnit(id).getEntity().getEntityType() & Entity.ETYPE_DROPSHIP) != 0 &&
                               campaign.getUnit(id).isAvailable()) {
                         addUnit(id);
@@ -1000,7 +995,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @param everyoneElse          The list to hold entities without special abilities.
      */
     private static void categorizeEntities(List<Entity> entities, List<Entity> combatSenseHavers,
-                                           List<Entity> combatParalysisHavers, List<Entity> everyoneElse) {
+          List<Entity> combatParalysisHavers, List<Entity> everyoneElse) {
         for (Entity entity : entities) {
             if (entity.hasAbility(ATOW_COMBAT_SENSE)) {
                 combatSenseHavers.add(entity);
@@ -1029,7 +1024,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @param everyoneElse          The list of remaining entities.
      */
     private static void assignCommander(List<Entity> combatSenseHavers, List<Entity> combatParalysisHavers,
-                                        List<Entity> everyoneElse) {
+          List<Entity> everyoneElse) {
         Entity commander = null;
 
         if (!combatSenseHavers.isEmpty()) {
@@ -1047,7 +1042,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+          ArrayList<Entity> enemyEntities) {
         int enemyStart;
         int playerHome;
 
@@ -1131,7 +1126,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @param campaign
      */
     protected void addEnemyForce(List<Entity> list, int weightClass, int maxWeight, int rollMod, int weightMod,
-                                 Campaign campaign) {
+          Campaign campaign) {
         String org = AtBConfiguration.getParentFactionType(getContract(campaign).getEnemy());
 
         String lances = campaign.getAtBConfig().selectBotLances(org, weightClass, rollMod / 20f);
@@ -1198,7 +1193,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @return A randomly selected Entity from the parameters specified, with crew. May return null.
      */
     protected @Nullable Entity getEntity(String faction, SkillLevel skill, int quality, int unitType, int weightClass,
-                                         Campaign campaign) {
+          Campaign campaign) {
         return AtBDynamicScenarioFactory.getEntity(faction, skill, quality, unitType, weightClass, null, campaign);
     }
 
@@ -1255,12 +1250,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * Convenience functions overloaded to provide default values.
      */
     protected void addLance(List<Entity> list, String faction, SkillLevel skill, int quality, int weightClass,
-                            Campaign campaign) {
+          Campaign campaign) {
         addLance(list, faction, skill, quality, weightClass, EntityWeightClass.WEIGHT_ASSAULT, campaign, 0);
     }
 
     protected void addLance(List<Entity> list, String faction, SkillLevel skill, int quality, int weightClass,
-                            int maxWeight, Campaign c) {
+          int maxWeight, Campaign c) {
         addLance(list, faction, skill, quality, weightClass, maxWeight, c, 0);
     }
 
@@ -1277,7 +1272,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @param arrivalTurn The turn in which the Lance is deployed in the scenario.
      */
     private void addLance(List<Entity> list, String faction, SkillLevel skill, int quality, int weightClass,
-                          int maxWeight, Campaign campaign, int arrivalTurn) {
+          int maxWeight, Campaign campaign, int arrivalTurn) {
         if (Factions.getInstance().getFaction(faction).isClan()) {
             addStar(list, faction, skill, quality, weightClass, maxWeight, campaign, arrivalTurn);
             return;
@@ -1370,7 +1365,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @param arrivalTurn The turn in which the Lance is deployed in the scenario.
      */
     private void addStar(List<Entity> list, String faction, SkillLevel skill, int quality, int weightClass,
-                         int maxWeight, Campaign campaign, int arrivalTurn) {
+          int maxWeight, Campaign campaign, int arrivalTurn) {
         int forceType = FORCE_MEK;
         /*
          * 1 chance in 12 of a Nova, per AtB rules; CHH/CSL
@@ -1478,7 +1473,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @param arrivalTurn The turn in which the Lance is deployed in the scenario.
      */
     private void addLevelII(List<Entity> list, String faction, SkillLevel skill, int quality, int weightClass,
-                            int maxWeight, Campaign campaign, int arrivalTurn) {
+          int maxWeight, Campaign campaign, int arrivalTurn) {
         String weights = campaign.getAtBConfig().selectBotUnitWeights(AtBConfiguration.ORG_CS, weightClass);
         if (weights == null) {
             // we can't generate a weight, so cancel adding the Level II
@@ -1561,7 +1556,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @param faction  The faction the turrets are being generated for
      */
     protected void addTurrets(List<Entity> list, int num, SkillLevel skill, int quality, Campaign campaign,
-                              Faction faction) {
+          Faction faction) {
         list.addAll(AtBDynamicScenarioFactory.generateTurrets(num, skill, quality, campaign, faction));
     }
 
