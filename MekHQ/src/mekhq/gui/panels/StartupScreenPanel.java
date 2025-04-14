@@ -98,9 +98,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
         this.app = app;
         lastSaveFile = Utilities.lastFileModified(MekHQ.getCampaignsDirectory().getValue(), saveFilter);
-        newPlayerQuickstartFile = new File(MekHQ.getCampaignsDirectory().getValue() +
-                                                 File.separator +
-                                                 LAUNCHER_NEW_PLAYER_QUICKSTART_PATH);
+        newPlayerQuickstartFile = new File(LAUNCHER_NEW_PLAYER_QUICKSTART_PATH);
 
         initialize();
     }
