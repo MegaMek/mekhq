@@ -526,7 +526,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         for (Force sub : campaign.getForces().getSubForces()) {
             writeForce(sub, 1);
         }
-        for (UUID uid : campaign.getForces().getUnits()) {
+        for (UUID uid : campaign.getAllUnitsInTheTOE(false)) {
             Unit u = campaign.getUnit(uid);
             if ((u != null) && (u.getCommander() != null)) {
                 forceHash.put(u.getCommander().getId(), 1);
