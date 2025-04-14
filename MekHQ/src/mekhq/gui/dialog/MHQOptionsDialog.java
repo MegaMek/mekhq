@@ -1585,9 +1585,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         spinnerSavedGamesCount.setValue(MekHQ.getMHQOptions().getMaximumNumberOfAutosavesValue());
 
         chkNewDayAstechPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayAstechPoolFill());
-        chkNewDayMedicPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments());
-        chkNewDayMRMS.setSelected(MekHQ.getMHQOptions().getNewDayMedicPoolFill());
-        chkNewDayOptimizeMedicalAssignments.setSelected(MekHQ.getMHQOptions().getNewDayMRMS());
+        chkNewDayMedicPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayMedicPoolFill());
+        chkNewDayMRMS.setSelected(MekHQ.getMHQOptions().getNewDayMRMS());
+        chkNewDayOptimizeMedicalAssignments.setSelected(MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments());
         if (chkNewDayForceIconOperationalStatus.isSelected() !=
                   MekHQ.getMHQOptions().getNewDayForceIconOperationalStatus()) {
             chkNewDayForceIconOperationalStatus.doClick();
