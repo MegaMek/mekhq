@@ -584,7 +584,7 @@ public class ForceViewPanel extends JScrollablePanel {
             toReturn += "</i>";
         }
         if (unit.hasTransportShipAssignment()) {
-            toReturn += "<br><i>" + "Transported by: ";
+            toReturn += "<br><i>" + "Transported (Ship) by: ";
             toReturn += unit.getTransportShipAssignment().getTransportShip().getName();
             toReturn += "</i>";
         }
@@ -613,7 +613,7 @@ public class ForceViewPanel extends JScrollablePanel {
         }
         //Let's get preferred transport too
         if (unit.hasTacticalTransportAssignment()) {
-            toReturn += "<br><i>" + "Transported by: ";
+            toReturn += "<br><i>" + "Transported (Tactical) by: ";
             toReturn += unit.getTacticalTransportAssignment().getTransport().getName();
             toReturn += "</i>";
         }

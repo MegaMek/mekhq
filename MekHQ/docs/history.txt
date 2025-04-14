@@ -216,6 +216,20 @@ MEKHQ VERSION HISTORY:
 + PR #6639: Fixed Commander's Day Dialog To Scale Banner Image Properly
 + PR #6640: Fixed Incorrect Constants and Pronoun Placement in BirthAnnouncement
 + PR #6641: Fixed Null Pointer Issue in Refit Handling
++ Fix #6646: Fixed Skill XP Costs Resetting
++ PR #6650: Better differentiate transport type in TOE
++ PR #6649: Fix what units are passed to detach trailer/tractor so it only shows when needed
++ Fix #6651: Removed Partial Maintenance and fixed Shorthanded Penalty
++ Fix #6652: Fixed Use Player DropShips Always Picking the Same Unit
++ Fix #6653: Updated Doctor/Tech Uses Administration to No Longer Factor Administration into Experience Level
++ Fix #6654: Added New Player Quickstart Option
++ PR #6657: Renamed "Company Generator" to "Quick Start Company Generator"
++ PR #6661: Updated Presets to 50.05
++ PR #6662: A Couple of SPA XML Fixes
++ PR #6663: Fixed Skill Panel Layout Calculation in Campaign Options IIC
++ PR #6667: Fixed an NPE During Contract Resolution (Sentry)
++ Fix #6668: Fixed Creative Accounting for Ammunition in Resupplies
++ Fix #6672: Corrected swapped new day Optimize Medical Assignments and MRMS
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times

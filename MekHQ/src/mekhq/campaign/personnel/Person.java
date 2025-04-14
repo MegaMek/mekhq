@@ -3660,8 +3660,6 @@ public class Person {
         final PersonnelRole role = secondary ? getSecondaryRole() : getPrimaryRole();
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final boolean isAlternativeQualityAveraging = campaignOptions.isAlternativeQualityAveraging();
-        final boolean isDoctorsHaveAdministration = campaignOptions.isDoctorsUseAdministration();
-        final boolean isTechsHaveAdministration = campaignOptions.isTechsUseAdministration();
 
         switch (role) {
             case MEKWARRIOR:
@@ -3747,32 +3745,10 @@ public class Person {
                         return SkillType.EXP_NONE;
                     }
                 }
-            case VEHICLE_CREW:
+            case VEHICLE_CREW, MECHANIC:
                 return hasSkill(SkillType.S_TECH_MECHANIC) ?
                              getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() :
                              SkillType.EXP_NONE;
-            case MECHANIC:
-                if (isTechsHaveAdministration) {
-                    if (hasSkill(SkillType.S_TECH_MECHANIC) && hasSkill(S_ADMIN)) {
-                        if (isAlternativeQualityAveraging) {
-                            int rawScore = (int) floor((getSkill(SkillType.S_TECH_MECHANIC).getLevel() +
-                                                              getSkill(S_ADMIN).getLevel()) / 2.0);
-                            if (getSkill(SkillType.S_TECH_MECHANIC).getType().getExperienceLevel(rawScore) ==
-                                      getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
-                                return getSkill(SkillType.S_TECH_MECHANIC).getType().getExperienceLevel(rawScore);
-                            }
-                        }
-
-                        return (int) floor((getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() +
-                                                  getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
-                    } else {
-                        return SkillType.EXP_NONE;
-                    }
-                } else {
-                    return hasSkill(SkillType.S_TECH_MECHANIC) ?
-                                 getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() :
-                                 SkillType.EXP_NONE;
-                }
             case AEROSPACE_PILOT:
                 if (hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO)) {
                     if (isAlternativeQualityAveraging) {
@@ -3838,121 +3814,31 @@ public class Person {
                              getSkill(SkillType.S_GUN_SPACE).getExperienceLevel() :
                              SkillType.EXP_NONE;
             case VESSEL_CREW:
-                if (isTechsHaveAdministration) {
-                    if (hasSkill(SkillType.S_TECH_VESSEL) && hasSkill(S_ADMIN)) {
-                        if (isAlternativeQualityAveraging) {
-                            int rawScore = (int) floor((getSkill(SkillType.S_TECH_VESSEL).getLevel() +
-                                                              getSkill(S_ADMIN).getLevel()) / 2.0);
-                            if (getSkill(SkillType.S_TECH_VESSEL).getType().getExperienceLevel(rawScore) ==
-                                      getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
-                                return getSkill(SkillType.S_TECH_VESSEL).getType().getExperienceLevel(rawScore);
-                            }
-                        }
-
-                        return (int) floor((getSkill(SkillType.S_TECH_VESSEL).getExperienceLevel() +
-                                                  getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
-                    } else {
-                        return SkillType.EXP_NONE;
-                    }
-                } else {
-                    return hasSkill(SkillType.S_TECH_VESSEL) ?
-                                 getSkill(SkillType.S_TECH_VESSEL).getExperienceLevel() :
-                                 SkillType.EXP_NONE;
-                }
+                return hasSkill(SkillType.S_TECH_VESSEL) ?
+                             getSkill(SkillType.S_TECH_VESSEL).getExperienceLevel() :
+                             SkillType.EXP_NONE;
             case VESSEL_NAVIGATOR:
                 return hasSkill(SkillType.S_NAV) ? getSkill(SkillType.S_NAV).getExperienceLevel() : SkillType.EXP_NONE;
             case MEK_TECH:
-                if (isTechsHaveAdministration) {
-                    if (hasSkill(SkillType.S_TECH_MEK) && hasSkill(S_ADMIN)) {
-                        if (isAlternativeQualityAveraging) {
-                            int rawScore = (int) floor((getSkill(SkillType.S_TECH_MEK).getLevel() +
-                                                              getSkill(S_ADMIN).getLevel()) / 2.0);
-                            if (getSkill(SkillType.S_TECH_MEK).getType().getExperienceLevel(rawScore) ==
-                                      getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
-                                return getSkill(SkillType.S_TECH_MEK).getType().getExperienceLevel(rawScore);
-                            }
-                        }
-
-                        return (int) floor((getSkill(SkillType.S_TECH_MEK).getExperienceLevel() +
-                                                  getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
-                    } else {
-                        return SkillType.EXP_NONE;
-                    }
-                } else {
-                    return hasSkill(SkillType.S_TECH_MEK) ?
-                                 getSkill(SkillType.S_TECH_MEK).getExperienceLevel() :
-                                 SkillType.EXP_NONE;
-                }
+                return hasSkill(SkillType.S_TECH_MEK) ?
+                             getSkill(SkillType.S_TECH_MEK).getExperienceLevel() :
+                             SkillType.EXP_NONE;
             case AERO_TEK:
-                if (isTechsHaveAdministration) {
-                    if (hasSkill(SkillType.S_TECH_AERO) && hasSkill(S_ADMIN)) {
-                        if (isAlternativeQualityAveraging) {
-                            int rawScore = (int) floor((getSkill(SkillType.S_TECH_AERO).getLevel() +
-                                                              getSkill(S_ADMIN).getLevel()) / 2.0);
-                            if (getSkill(SkillType.S_TECH_AERO).getType().getExperienceLevel(rawScore) ==
-                                      getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
-                                return getSkill(SkillType.S_TECH_AERO).getType().getExperienceLevel(rawScore);
-                            }
-                        }
-
-                        return (int) floor((getSkill(SkillType.S_TECH_AERO).getExperienceLevel() +
-                                                  getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
-                    } else {
-                        return SkillType.EXP_NONE;
-                    }
-                } else {
-                    return hasSkill(SkillType.S_TECH_AERO) ?
-                                 getSkill(SkillType.S_TECH_AERO).getExperienceLevel() :
-                                 SkillType.EXP_NONE;
-                }
+                return hasSkill(SkillType.S_TECH_AERO) ?
+                             getSkill(SkillType.S_TECH_AERO).getExperienceLevel() :
+                             SkillType.EXP_NONE;
             case BA_TECH:
-                if (isTechsHaveAdministration) {
-                    if (hasSkill(SkillType.S_TECH_BA) && hasSkill(S_ADMIN)) {
-                        if (isAlternativeQualityAveraging) {
-                            int rawScore = (int) floor((getSkill(SkillType.S_TECH_BA).getLevel() +
-                                                              getSkill(S_ADMIN).getLevel()) / 2.0);
-                            if (getSkill(SkillType.S_TECH_BA).getType().getExperienceLevel(rawScore) ==
-                                      getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
-                                return getSkill(SkillType.S_TECH_BA).getType().getExperienceLevel(rawScore);
-                            }
-                        }
-
-                        return (int) floor((getSkill(SkillType.S_TECH_BA).getExperienceLevel() +
-                                                  getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
-                    } else {
-                        return SkillType.EXP_NONE;
-                    }
-                } else {
-                    return hasSkill(SkillType.S_TECH_BA) ?
-                                 getSkill(SkillType.S_TECH_BA).getExperienceLevel() :
-                                 SkillType.EXP_NONE;
-                }
+                return hasSkill(SkillType.S_TECH_BA) ?
+                             getSkill(SkillType.S_TECH_BA).getExperienceLevel() :
+                             SkillType.EXP_NONE;
             case ASTECH:
                 return hasSkill(SkillType.S_ASTECH) ?
                              getSkill(SkillType.S_ASTECH).getExperienceLevel() :
                              SkillType.EXP_NONE;
             case DOCTOR:
-                if (isDoctorsHaveAdministration) {
-                    if (hasSkill(SkillType.S_DOCTOR) && hasSkill(S_ADMIN)) {
-                        if (isAlternativeQualityAveraging) {
-                            int rawScore = (int) floor((getSkill(SkillType.S_DOCTOR).getLevel() +
-                                                              getSkill(S_ADMIN).getLevel()) / 2.0);
-                            if (getSkill(SkillType.S_DOCTOR).getType().getExperienceLevel(rawScore) ==
-                                      getSkill(S_ADMIN).getType().getExperienceLevel(rawScore)) {
-                                return getSkill(SkillType.S_DOCTOR).getType().getExperienceLevel(rawScore);
-                            }
-                        }
-
-                        return (int) floor((getSkill(SkillType.S_DOCTOR).getExperienceLevel() +
-                                                  getSkill(S_ADMIN).getExperienceLevel()) / 2.0);
-                    } else {
-                        return SkillType.EXP_NONE;
-                    }
-                } else {
-                    return hasSkill(SkillType.S_DOCTOR) ?
-                                 getSkill(SkillType.S_DOCTOR).getExperienceLevel() :
-                                 SkillType.EXP_NONE;
-                }
+                return hasSkill(SkillType.S_DOCTOR) ?
+                             getSkill(SkillType.S_DOCTOR).getExperienceLevel() :
+                             SkillType.EXP_NONE;
             case MEDIC:
                 return hasSkill(SkillType.S_MEDTECH) ?
                              getSkill(SkillType.S_MEDTECH).getExperienceLevel() :
