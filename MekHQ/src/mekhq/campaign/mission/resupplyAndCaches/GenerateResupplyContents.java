@@ -45,6 +45,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static java.lang.Math.min;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
 
 /**
@@ -155,20 +157,21 @@ public class GenerateResupplyContents {
             }
 
             if (partFetched) {
-                switch (dropType) {
-                    case DROP_TYPE_PARTS -> partsPool.remove(potentialPart);
-                    case DROP_TYPE_ARMOR -> armorPool.remove(potentialPart);
-                    case DROP_TYPE_AMMO -> ammoBinPool.remove(potentialPart);
-                }
-
-                // Ammo and Armor are delivered in batches of 5t,
-                // so we need to make sure we're treating them as 5t no matter their actual weight.
-                double partWeight = 5;
-
-                if (dropType == DropType.DROP_TYPE_PARTS) {
-                    partWeight = potentialPart.getTonnage();
-                    partWeight = partWeight == 0 ? RESUPPLY_MINIMUM_PART_WEIGHT : partWeight;
-                }
+                double partWeight = switch (dropType) {
+                    case DROP_TYPE_PARTS -> {
+                        partsPool.remove(potentialPart);
+                        double tonnage = potentialPart.getTonnage();
+                        yield tonnage == 0 ? RESUPPLY_MINIMUM_PART_WEIGHT : tonnage;
+                    }
+                    case DROP_TYPE_ARMOR -> {
+                        armorPool.remove(potentialPart);
+                        yield RESUPPLY_ARMOR_TONNAGE;
+                    }
+                    case DROP_TYPE_AMMO -> {
+                        ammoBinPool.remove(potentialPart);
+                        yield RESUPPLY_AMMO_TONNAGE;
+                    }
+                };
 
                 currentLoad += partWeight;
                 droppedItems.add(potentialPart);
