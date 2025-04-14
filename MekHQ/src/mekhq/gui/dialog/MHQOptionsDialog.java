@@ -1586,8 +1586,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
         chkNewDayAstechPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayAstechPoolFill());
         chkNewDayMedicPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayMedicPoolFill());
-        chkNewDayMRMS.setSelected(MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments());
-        chkNewDayOptimizeMedicalAssignments.setSelected(MekHQ.getMHQOptions().getNewDayMRMS());
+        chkNewDayMRMS.setSelected(MekHQ.getMHQOptions().getNewDayMRMS());
+        chkNewDayOptimizeMedicalAssignments.setSelected(MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments());
         if (chkNewDayForceIconOperationalStatus.isSelected() !=
                   MekHQ.getMHQOptions().getNewDayForceIconOperationalStatus()) {
             chkNewDayForceIconOperationalStatus.doClick();
