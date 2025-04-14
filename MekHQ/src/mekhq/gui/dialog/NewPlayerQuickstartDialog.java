@@ -78,7 +78,8 @@ public class NewPlayerQuickstartDialog extends JDialog {
      * @since 0.50.05
      */
     public NewPlayerQuickstartDialog(Frame parent) {
-        super(parent, "New Player Quickstart", true);
+        super(parent, getFormattedTextAt("mekhq.resources.NewPlayerQuickstartDialog",
+              "NewPlayerQuickstartDialog.header"), true);
         initComponents();
         setPreferredSize(new Dimension(DIALOG_WIDTH, (int) (getPreferredSize().height * 1.1)));
         setMinimumSize(new Dimension(DIALOG_WIDTH, (int) (getPreferredSize().height * 1.1)));
