@@ -3837,7 +3837,7 @@ public class Person {
                              SkillType.EXP_NONE;
             case DOCTOR:
                 return hasSkill(SkillType.S_DOCTOR) ?
-                             getSkill(SkillType.S_TECH_BA).getExperienceLevel() :
+                             getSkill(SkillType.S_DOCTOR).getExperienceLevel() :
                              SkillType.EXP_NONE;
             case MEDIC:
                 return hasSkill(SkillType.S_MEDTECH) ?
