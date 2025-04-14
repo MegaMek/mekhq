@@ -42,6 +42,11 @@ import mekhq.utilities.MHQInternationalization;
 import org.apache.commons.math3.util.Pair;
 
 public class CampaignTransportUtilities {
+    // region Static Variables
+    static final String ASSIGN_FORCE_TO_TRANSPORT_BUNDLE = "mekhq.resources.AssignForceToTransport";
+    static final String SELECT_TRANSPORT_KEY = "CampaignTransportUtilities.selectTransport";
+    // endregion Static Variables
+
     // region Static Helpers
 
     interface Visitor<T extends Entity> {
@@ -289,11 +294,14 @@ public class CampaignTransportUtilities {
      */
     public static Vector<Pair<String, CampaignTransportType>> getLeadershipDropdownVectorPair() {
         Vector<Pair<String, CampaignTransportType>> retVal = new Vector<>();
-        retVal.add(new Pair<>(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "CampaignTransportUtilities.selectTransport.null.text"), null));
-        retVal.add(new Pair<>(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "CampaignTransportUtilities.selectTransport.TACTICAL_TRANSPORT.text"), CampaignTransportType.TACTICAL_TRANSPORT));
-        retVal.add(new Pair<>(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "CampaignTransportUtilities.selectTransport.SHIP_TRANSPORT.text"), CampaignTransportType.SHIP_TRANSPORT));
-        retVal.add(new Pair<>(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport",
-              "CampaignTransportUtilities.selectTransport.TOW_TRANSPORT.text"), CampaignTransportType.TOW_TRANSPORT));
+        retVal.add(new Pair<>(MHQInternationalization.getTextAt(ASSIGN_FORCE_TO_TRANSPORT_BUNDLE,
+              SELECT_TRANSPORT_KEY + ".null.text"), null));
+        retVal.add(new Pair<>(MHQInternationalization.getTextAt(ASSIGN_FORCE_TO_TRANSPORT_BUNDLE,
+              SELECT_TRANSPORT_KEY + ".TACTICAL_TRANSPORT.text"), CampaignTransportType.TACTICAL_TRANSPORT));
+        retVal.add(new Pair<>(MHQInternationalization.getTextAt(ASSIGN_FORCE_TO_TRANSPORT_BUNDLE,
+              SELECT_TRANSPORT_KEY + ".SHIP_TRANSPORT.text"), CampaignTransportType.SHIP_TRANSPORT));
+        retVal.add(new Pair<>(MHQInternationalization.getTextAt(ASSIGN_FORCE_TO_TRANSPORT_BUNDLE,
+              SELECT_TRANSPORT_KEY + ".TOW_TRANSPORT.text"), CampaignTransportType.TOW_TRANSPORT));
 
         return retVal;
     }
