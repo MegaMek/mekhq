@@ -515,10 +515,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
                         procurementModel.incrementItem(procurementTable.convertRowIndexToModel(row));
                     }
                 }
-                procurmantTotalCostLabel.setText("Total Cost: " +
-                                                       getCampaign().getShoppingList()
-                                                             .getTotalBuyCost()
-                                                             .toAmountAndSymbolString());
+                refreshProcurmentTotalCost();
             }
         });
 
@@ -534,10 +531,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
                         procurementModel.decrementItem(row);
                     }
                 }
-                procurmantTotalCostLabel.setText("Total Cost: " +
-                                                       getCampaign().getShoppingList()
-                                                             .getTotalBuyCost()
-                                                             .toAmountAndSymbolString());
+                refreshProcurmentTotalCost();
             }
         });
 
@@ -757,6 +751,17 @@ public final class CommandCenterTab extends CampaignGuiTab {
      */
     private void refreshProcurementList() {
         procurementModel.setData(getCampaign().getShoppingList().getShoppingList());
+        refreshProcurmentTotalCost();
+    }
+
+    /**
+     * refresh the total cost of procurement
+     */
+    private void refreshProcurmentTotalCost() {
+        procurmantTotalCostLabel.setText("Total Cost: " +
+                                               getCampaign().getShoppingList()
+                                                     .getTotalBuyCost()
+                                                     .toAmountAndSymbolString());
     }
 
     /**
