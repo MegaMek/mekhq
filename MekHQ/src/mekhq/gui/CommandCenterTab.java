@@ -119,6 +119,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
     // procurement table
     private JPanel panProcurement;
     private JTable procurementTable;
+    private JPanel panTotalCost;
+    private JLabel procurmantTotalCostLabel;
     private ProcurementTableModel procurementModel;
     private JButton btnGetUnit;
     private JButton btnGetParts;
@@ -474,6 +476,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panProcurementButtons.add(btnMRMSInstant);
 
         /* shopping table */
+        procurmantTotalCostLabel = new JLabel();
+        procurmantTotalCostLabel.setText("Total Cost: " +
+                                               getCampaign().getShoppingList()
+                                                     .getTotalBuyCost()
+                                                     .toAmountAndSymbolString());
         procurementModel = new ProcurementTableModel(getCampaign());
         procurementTable = new JTable(procurementModel);
         procurementTable.getAccessibleContext().setAccessibleName("Pending Procurements");
@@ -508,6 +515,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
                         procurementModel.incrementItem(procurementTable.convertRowIndexToModel(row));
                     }
                 }
+                procurmantTotalCostLabel.setText("Total Cost: " +
+                                                       getCampaign().getShoppingList()
+                                                             .getTotalBuyCost()
+                                                             .toAmountAndSymbolString());
             }
         });
 
@@ -523,6 +534,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
                         procurementModel.decrementItem(row);
                     }
                 }
+                procurmantTotalCostLabel.setText("Total Cost: " +
+                                                       getCampaign().getShoppingList()
+                                                             .getTotalBuyCost()
+                                                             .toAmountAndSymbolString());
             }
         });
 
@@ -545,6 +560,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         panProcurement.add(scrollProcurement, gridBagConstraints);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        panProcurement.add(procurmantTotalCostLabel, gridBagConstraints);
     }
 
     /**
