@@ -66,6 +66,7 @@ import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
 import mekhq.gui.dialog.DataLoadingDialog;
 import mekhq.gui.dialog.MHQOptionsDialog;
+import mekhq.gui.dialog.NewPlayerQuickstartDialog;
 import mekhq.gui.dialog.StoryArcSelectionDialog;
 
 public class StartupScreenPanel extends AbstractMHQPanel {
@@ -187,6 +188,9 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         btnNewPlayerQuickstart.setEnabled(newPlayerQuickstartFile != null);
         btnNewPlayerQuickstart.addActionListener(evt -> {
             btnNewPlayerQuickstart.setEnabled(false);
+
+            new NewPlayerQuickstartDialog(getFrame());
+
             startCampaign(newPlayerQuickstartFile);
         });
 
