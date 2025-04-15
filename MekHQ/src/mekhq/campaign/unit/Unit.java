@@ -54,8 +54,8 @@ import javax.swing.UIManager;
 import megamek.Version;
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.*;
 import megamek.common.CrewType;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.ArmorType;
@@ -64,6 +64,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
+import megamek.common.util.C3Util;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
@@ -468,6 +469,7 @@ public class Unit implements ITechnology {
             en.setDuplicateMarker(this.entity.getDuplicateMarker());
             en.generateShortName();
             en.generateDisplayName();
+            C3Util.copyC3Networks(this.entity, en);
         }
         this.entity = en;
     }
