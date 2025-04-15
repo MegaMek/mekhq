@@ -40,7 +40,6 @@ The winner of this battle will control the field when the engagement is over. Yo
                     <deploymentZone>6</deploymentZone>
                     <deploymentZone>7</deploymentZone>
                     <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
@@ -52,7 +51,7 @@ The winner of this battle will control the field when the engagement is over. Yo
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
                 <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>0</startingAltitude>
+                <startingAltitude>5</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
             </value>
@@ -69,19 +68,9 @@ The winner of this battle will control the field when the engagement is over. Yo
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones>
-                    <deploymentZone>1</deploymentZone>
-                    <deploymentZone>2</deploymentZone>
-                    <deploymentZone>3</deploymentZone>
-                    <deploymentZone>4</deploymentZone>
-                    <deploymentZone>5</deploymentZone>
-                    <deploymentZone>6</deploymentZone>
-                    <deploymentZone>7</deploymentZone>
-                    <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
-                </deploymentZones>
+                <deploymentZones />
                 <destinationZone>5</destinationZone>
-                <fixedUnitCount>0</fixedUnitCount>
+                <fixedUnitCount>5</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
                 <forceName>OpFor</forceName>
@@ -91,7 +80,8 @@ The winner of this battle will control the field when the engagement is over. Yo
                 <minWeightClass>1</minWeightClass>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>None</syncDeploymentType>
+                <syncDeploymentType>OppositeEdge</syncDeploymentType>
+                <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
             </value>
         </entry>

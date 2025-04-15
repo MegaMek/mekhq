@@ -64,7 +64,9 @@ We will control the field at the conclusion of the battle. This means you have f
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones />
+                <deploymentZones>
+                    <deploymentZone>10</deploymentZone>
+                </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
@@ -77,8 +79,7 @@ We will control the field at the conclusion of the battle. This means you have f
                 <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>OppositeEdge</syncDeploymentType>
-                <syncedForceName>Convoy</syncedForceName>
+                <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
                 <roleChoices>
                     <forceRole>RAIDER</forceRole>

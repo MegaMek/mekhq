@@ -32,7 +32,9 @@ No distractions. No delays. No mercy. Execute the raid, cripple their supply lin
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones />
+                <deploymentZones>
+                    <deploymentZone>10</deploymentZone>
+                </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
@@ -44,8 +46,7 @@ No distractions. No delays. No mercy. Execute the raid, cripple their supply lin
                 <minWeightClass>0</minWeightClass>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>OppositeArc</syncDeploymentType>
-                <syncedForceName>Convoy</syncedForceName>
+                <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
             </value>
         </entry>
@@ -91,10 +92,7 @@ No distractions. No delays. No mercy. Execute the raid, cripple their supply lin
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>2</deploymentZone>
-                    <deploymentZone>4</deploymentZone>
                     <deploymentZone>6</deploymentZone>
-                    <deploymentZone>8</deploymentZone>
                 </deploymentZones>
                 <destinationZone>6</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>

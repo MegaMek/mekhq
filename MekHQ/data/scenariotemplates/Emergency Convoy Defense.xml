@@ -113,7 +113,7 @@ We will control the battlefield at the end of this engagement, allowing us to re
                     <objectiveLinkedForce>OpFor</objectiveLinkedForce>
                 </objectiveLinkedForces>
                 <syncDeploymentType>SameEdge</syncDeploymentType>
-                <syncedForceName>Player</syncedForceName>
+                <syncedForceName>Resupply Convoy</syncedForceName>
                 <useArtillery>false</useArtillery>
                 <roleChoices>
                     <forceRole>RAIDER</forceRole>

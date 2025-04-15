@@ -31,12 +31,7 @@ We will control the field at the end of the engagement, ensuring that any wrecka
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones>
-                    <deploymentZone>2</deploymentZone>
-                    <deploymentZone>4</deploymentZone>
-                    <deploymentZone>6</deploymentZone>
-                    <deploymentZone>8</deploymentZone>
-                </deploymentZones>
+                <deploymentZones />
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
@@ -49,7 +44,8 @@ We will control the field at the end of the engagement, ensuring that any wrecka
                 <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>5</startingAltitude>
-                <syncDeploymentType>None</syncDeploymentType>
+                <syncDeploymentType>OppositeEdge</syncDeploymentType>
+                <syncedForceName>DropShip</syncedForceName>
                 <useArtillery>false</useArtillery>
             </value>
         </entry>
@@ -65,8 +61,10 @@ We will control the field at the end of the engagement, ensuring that any wrecka
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones />
-                <destinationZone>6</destinationZone>
+                <deploymentZones>
+                    <deploymentZone>6</deploymentZone>
+                </deploymentZones>
+                <destinationZone>2</destinationZone>
                 <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>

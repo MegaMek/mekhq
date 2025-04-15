@@ -40,8 +40,6 @@ There will be no time to secure the battlefield at the end of the engagement, me
                     <deploymentZone>6</deploymentZone>
                     <deploymentZone>7</deploymentZone>
                     <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
-                    <deploymentZone>10</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
@@ -53,7 +51,7 @@ There will be no time to secure the battlefield at the end of the engagement, me
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
                 <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>0</startingAltitude>
+                <startingAltitude>5</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
             </value>
