@@ -182,7 +182,7 @@ public class CombatTeam {
         this.role = role;
     }
 
-    public UUID getCommanderId() {
+    public @Nullable UUID getCommanderId() {
         return commanderId;
     }
 
@@ -388,7 +388,7 @@ public class CombatTeam {
     }
 
     /* Code to find unit commander from ForceViewPanel */
-    public static UUID findCommander(int forceId, Campaign campaign) {
+    public static @Nullable UUID findCommander(int forceId, Campaign campaign) {
         return campaign.getForce(forceId).getForceCommanderID();
     }
 
