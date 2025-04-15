@@ -2,11 +2,11 @@
 <ScenarioTemplate>
     <name>Covert Strike</name>
     <shortBriefing>Eliminate VIP behind enemy lines.</shortBriefing>
-    <detailedBriefing>Your mission is simple but dangerous—eliminate a high-value target deep behind enemy lines. The VIP is heavily guarded by a formidable escort. The objective is singular and absolute: kill the VIP by any means necessary.
+    <detailedBriefing><![CDATA[Your mission is simple but dangerous—eliminate a high-value target deep behind enemy lines. The VIP is heavily guarded by a formidable escort. The objective is singular and absolute: kill the VIP by any means necessary.
 
 The enemy will not allow this to happen easily. Expect heavy resistance, tight security, and potential countermeasures to obscure or protect the target. Do not waste time engaging unnecessary forces—strike fast, neutralize the VIP, and disengage before the enemy can fully react.
 
-Be advised, the enemy will control the field at the end of the engagement. You will not be able to hold ground or claim battlefield salvage. This is an execution, not a siege. Kill the target and get out—nothing else matters.</detailedBriefing>
+Be advised, the enemy will control the field at the end of the engagement. You will not be able to hold ground or claim battlefield salvage. This is an execution, not a siege. Kill the target and get out—nothing else matters.]]></detailedBriefing>
     <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />

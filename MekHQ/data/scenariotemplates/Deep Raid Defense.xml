@@ -2,12 +2,12 @@
 <ScenarioTemplate>
     <name>Deep Raid Defense</name>
     <shortBriefing>Defend grounded DropShip from raid.</shortBriefing>
-    <detailedBriefing>The enemy has launched a deep strike behind our lines, targeting one of our DropShips before it can take off. This is a calculated assault meant to cripple our logistics and deny us critical mobility. Your mission is to defend the DropShip until it can launch or eliminate at least 50% of the attacking force to force their retreat.
+    <detailedBriefing><![CDATA[The enemy has launched a deep strike behind our lines, targeting one of our DropShips before it can take off. This is a calculated assault meant to cripple our logistics and deny us critical mobility. Your mission is to defend the DropShip until it can launch or eliminate at least 50% of the attacking force to force their retreat.
 
 Expect long-range bombardment. The enemy is likely to deploy artillery strikes to weaken our defenses before engaging directly. You must counter their firepower while maintaining a strong perimeter around the DropShip. Close the distance where possible, neutralize their artillery assets, and prevent them from overwhelming our position before liftoff.
 
 We will control the battlefield at the end of the engagement, ensuring access to salvage and preventing any lingering enemy forces from regrouping. Hold the line, protect the DropShip, and make the enemy pay dearly for their incursion.
-    </detailedBriefing>
+    ]]></detailedBriefing>
     <battlefieldControl>PLAYER</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
