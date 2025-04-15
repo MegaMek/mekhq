@@ -673,6 +673,7 @@ public class Force {
         }
 
         if (highestRankedPerson == null) {
+            logger.info("Force {} has no eligible commanders", getName());
             forceCommanderID = null;
         } else {
             forceCommanderID = highestRankedPerson.getId();
