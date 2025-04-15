@@ -3,9 +3,9 @@
     <name>Chasing a Rumor</name>
     <stratConScenarioType>SPECIAL_LOSTECH</stratConScenarioType>
     <shortBriefing>Fight to secure the hidden cache</shortBriefing>
-    <detailedBriefing>Intel suggests there is a hidden cache in this region. Unfortunately, enemy forces seem to have caught wind of this intel. The objective is to either destroy or force them to retreat. At least 50% of the enemy must be neutralized, while maintaining 50% of friendly forces.
+    <detailedBriefing><![CDATA[Intel suggests there is a hidden cache in this region. Unfortunately, enemy forces seem to have caught wind of this intel. The objective is to either destroy or force them to retreat. At least 50% of the enemy must be neutralized, while maintaining 50% of friendly forces.
 
-    If this scenario is lost, so too is the hidden cache.</detailedBriefing>
+If this scenario is lost, so too is the hidden cache.]]></detailedBriefing>
     <battlefieldControl>VICTOR</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
@@ -39,8 +39,6 @@
                     <deploymentZone>6</deploymentZone>
                     <deploymentZone>7</deploymentZone>
                     <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
-                    <deploymentZone>10</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
