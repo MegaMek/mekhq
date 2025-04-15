@@ -94,7 +94,7 @@ No distractions. No delays. No mercy. Execute the raid, cripple their supply lin
                 <deploymentZones>
                     <deploymentZone>6</deploymentZone>
                 </deploymentZones>
-                <destinationZone>6</destinationZone>
+                <destinationZone>2</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>0.5</forceMultiplier>
