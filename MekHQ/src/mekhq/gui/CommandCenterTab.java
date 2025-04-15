@@ -57,6 +57,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CampaignSummary;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.FinancialReport;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -477,10 +478,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         /* shopping table */
         procurmantTotalCostLabel = new JLabel();
-        procurmantTotalCostLabel.setText("Total Cost: " +
-                                               getCampaign().getShoppingList()
-                                                     .getTotalBuyCost()
-                                                     .toAmountAndSymbolString());
+        refreshProcurmentTotalCost();
         procurementModel = new ProcurementTableModel(getCampaign());
         procurementTable = new JTable(procurementModel);
         procurementTable.getAccessibleContext().setAccessibleName("Pending Procurements");
@@ -758,10 +756,22 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * refresh the total cost of procurement
      */
     private void refreshProcurmentTotalCost() {
-        procurmantTotalCostLabel.setText("Total Cost: " +
-                                               getCampaign().getShoppingList()
-                                                     .getTotalBuyCost()
-                                                     .toAmountAndSymbolString());
+
+        String formatString, totalCostString;
+        Money totalCost, funds;
+        formatString = resourceMap.getString("lblProcurementTotalCost.text");
+        totalCost = getCampaign().getShoppingList().getTotalBuyCost();
+        funds = getCampaign().getFunds();
+        if (funds.compareTo(totalCost) < 0) {
+            totalCostString = " <font color='" +
+                                    MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                    "'>" +
+                                    totalCost.toAmountAndSymbolString() +
+                                    "</font>";
+        } else {
+            totalCostString = totalCost.toAmountAndSymbolString();
+        }
+        procurmantTotalCostLabel.setText(String.format(formatString, totalCostString));
     }
 
     /**
