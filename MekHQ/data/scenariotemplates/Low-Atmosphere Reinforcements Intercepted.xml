@@ -2,11 +2,11 @@
 <ScenarioTemplate>
     <name>Low-Atmosphere Reinforcements Intercepted</name>
     <shortBriefing>Destroy hostile air forces.</shortBriefing>
-    <detailedBriefing>Your reinforcements have been intercepted by enemy forces, cutting them off before they can complete their original mission. This is an intentional move to stall our operations and weaken our ability to project force. Your mission is to break free from the engagement by destroying at least 50% of the enemy force. Until that threshold is met, you will remain pinned down and unable to proceed.
+    <detailedBriefing><![CDATA[Your reinforcements have been intercepted by enemy forces, cutting them off before they can complete their original mission. This is an intentional move to stall our operations and weaken our ability to project force. Your mission is to break free from the engagement by destroying at least 50% of the enemy force. Until that threshold is met, you will remain pinned down and unable to proceed.
 
 The enemy will press hard to keep you contained, using aggressive maneuvers and potentially overwhelming numbers to delay your advance. Do not get bogged down in a prolonged engagement—focus fire, break their cohesion, and force them into retreat. Once their losses become unsustainable, the path forward will be clear.
 
-There will be no time to secure the battlefield at the end of the engagement, meaning any salvage will be lost. Speed is essential—eliminate the enemy and move out before reinforcements arrive.</detailedBriefing>
+There will be no time to secure the battlefield at the end of the engagement, meaning any salvage will be lost. Speed is essential—eliminate the enemy and move out before reinforcements arrive.]]></detailedBriefing>
     <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
@@ -40,8 +40,6 @@ There will be no time to secure the battlefield at the end of the engagement, me
                     <deploymentZone>6</deploymentZone>
                     <deploymentZone>7</deploymentZone>
                     <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
-                    <deploymentZone>10</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
@@ -53,7 +51,7 @@ There will be no time to secure the battlefield at the end of the engagement, me
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
                 <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>0</startingAltitude>
+                <startingAltitude>5</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
             </value>

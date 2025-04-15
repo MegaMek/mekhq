@@ -2,11 +2,11 @@
 <ScenarioTemplate>
     <name>Base Defense</name>
     <shortBriefing>Defend allied facility, minimize damage.</shortBriefing>
-    <detailedBriefing>Your orders are clear: defend the base against the incoming enemy assault. At least 25% of the base infrastructure must remain intact by the end of the engagement.
+    <detailedBriefing><![CDATA[Your orders are clear: defend the base against the incoming enemy assault. At least 25% of the base infrastructure must remain intact by the end of the engagement.
 
 At the same time, this is not just about survival. You are to destroy at least 50% of enemy forces before the battle concludes.
 
-The victor will control the field when this is over. Ensure that it is us.</detailedBriefing>
+The victor will control the field when this is over. Ensure that it is us.]]></detailedBriefing>
     <battlefieldControl>VICTOR</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>true</isAlliedFacility>
@@ -69,15 +69,6 @@ The victor will control the field when this is over. Ensure that it is us.</deta
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>1</deploymentZone>
-                    <deploymentZone>2</deploymentZone>
-                    <deploymentZone>3</deploymentZone>
-                    <deploymentZone>4</deploymentZone>
-                    <deploymentZone>5</deploymentZone>
-                    <deploymentZone>6</deploymentZone>
-                    <deploymentZone>7</deploymentZone>
-                    <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
                     <deploymentZone>10</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
@@ -109,14 +100,6 @@ The victor will control the field when this is over. Ensure that it is us.</deta
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>1</deploymentZone>
-                    <deploymentZone>2</deploymentZone>
-                    <deploymentZone>3</deploymentZone>
-                    <deploymentZone>4</deploymentZone>
-                    <deploymentZone>5</deploymentZone>
-                    <deploymentZone>6</deploymentZone>
-                    <deploymentZone>7</deploymentZone>
-                    <deploymentZone>8</deploymentZone>
                     <deploymentZone>9</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>

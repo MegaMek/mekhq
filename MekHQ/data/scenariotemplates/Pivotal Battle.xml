@@ -2,11 +2,11 @@
 <ScenarioTemplate>
     <name>Pivotal Engagement</name>
     <shortBriefing>Decisive battle—defeat enemy forces.</shortBriefing>
-    <detailedBriefing>A massive enemy force has taken to the field, and if they are allowed to gain momentum, they will become an unstoppable threat. Your mission is to blunt their advance by destroying at least 25% of their forces, forcing them to slow their assault and reconsider their position.
+    <detailedBriefing><![CDATA[A massive enemy force has taken to the field, and if they are allowed to gain momentum, they will become an unstoppable threat. Your mission is to blunt their advance by destroying at least 25% of their forces, forcing them to slow their assault and reconsider their position.
 
 The enemy is relying on overwhelming numbers, expecting to steamroll our defenses. Target high-value units, disrupt their formations, and make them bleed for every inch of ground. If they hesitate or falter, their offensive will collapse before it can reach full strength.
 
-The victor will control the battlefield at the end of the engagement, ensuring we hold the ground and any remaining salvage. Stand firm, inflict maximum damage, and break their momentum before it’s too late.</detailedBriefing>
+The victor will control the battlefield at the end of the engagement, ensuring we hold the ground and any remaining salvage. Stand firm, inflict maximum damage, and break their momentum before it’s too late.]]></detailedBriefing>
     <battlefieldControl>VICTOR</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
@@ -40,8 +40,6 @@ The victor will control the battlefield at the end of the engagement, ensuring w
                     <deploymentZone>6</deploymentZone>
                     <deploymentZone>7</deploymentZone>
                     <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
-                    <deploymentZone>10</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>

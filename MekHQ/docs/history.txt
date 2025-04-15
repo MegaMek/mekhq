@@ -233,6 +233,9 @@ MEKHQ VERSION HISTORY:
 + Fix #6619: Fixed C3 Links made in MM lobby persist back into MekHQ 
 + PR #6648: Tractor transport types can now be used for leadership bonus unit selections
 + PR #6675: Fixed Command Skills Counting Down not Up
++ PR #6677: Fixed NPE in updateCommander (Sentry)
++ Fix #6688: Corrected Fuel Cost Calculation for DS
++ Fix #6412, #6422: Fixed Multiple Scenario Template Issues
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
