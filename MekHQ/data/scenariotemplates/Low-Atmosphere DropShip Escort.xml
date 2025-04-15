@@ -12,7 +12,7 @@ The victor will control the battlefield at the end of the engagement, ensuring w
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
         <allowedTerrainTypes />
-        <allowRotation>true</allowRotation>
+        <allowRotation>false</allowRotation>
         <baseHeight>17</baseHeight>
         <baseWidth>50</baseWidth>
         <heightScalingIncrement>5</heightScalingIncrement>
