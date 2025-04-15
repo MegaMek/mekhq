@@ -112,7 +112,7 @@ We will control the field at the conclusion of the battle. This means you have f
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>1</minWeightClass>
                 <objectiveLinkedForces />
-                <retreatThreshold>50</retreatThreshold>
+                <retreatThreshold>0</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>

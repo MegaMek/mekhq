@@ -103,7 +103,7 @@ No distractions. No delays. No mercy. Execute the raid, cripple their supply lin
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>1</minWeightClass>
-                <retreatThreshold>50</retreatThreshold>
+                <retreatThreshold>0</retreatThreshold>
                 <subjectToRandomRemoval>false</subjectToRandomRemoval>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>

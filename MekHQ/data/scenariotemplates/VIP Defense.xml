@@ -79,7 +79,7 @@ We will control the battlefield at the end of the engagement, ensuring that any 
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>3</minWeightClass>
-                <retreatThreshold>0</retreatThreshold>
+                <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>SameEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>

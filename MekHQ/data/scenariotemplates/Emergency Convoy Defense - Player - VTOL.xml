@@ -47,7 +47,7 @@ We will control the battlefield at the conclusion of this engagement, ensuring t
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
                 <objectiveLinkedForces />
-                <retreatThreshold>0</retreatThreshold>
+                <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
