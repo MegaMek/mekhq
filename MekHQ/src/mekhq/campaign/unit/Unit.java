@@ -6661,7 +6661,7 @@ public class Unit implements ITechnology {
 
         // Calculate base fuel costs by entity type
         if (entity.isLargeCraft() || entity.isSmallCraft()) {
-            hydrogenUsage = getTonsBurnDay(entity);
+            fuelCost = fuelCost.plus(getTonsBurnMonthCost(entity));
         } else if (entity.isConventionalFighter()) {
             fuelCost = fuelCost.plus(getFighterFuelCost(entity));
         } else if (entity.isAerospaceFighter()) {
@@ -6687,25 +6687,31 @@ public class Unit implements ITechnology {
         return fuelCost;
     }
 
-    public double getTonsBurnDay(Entity e) {
+    /**
+     * On average, how much does this spaceshift spend burning fuel per month?
+     * Based on CO p. 24
+     * @param entity
+     * @return fuel cost for operating this Entity for a month
+     */
+    public Money getTonsBurnMonthCost(Entity entity) {
         double tonsburnday = 0;
-        if (e instanceof Dropship) {
-            if (((SmallCraft) e).getDesignType() != Dropship.MILITARY) {
-                if (e.getWeight() < 1000) {
+        if (entity instanceof Dropship) {
+            if (((SmallCraft) entity).getDesignType() != Dropship.MILITARY) {
+                if (entity.getWeight() < 1000) {
                     tonsburnday = 1.84;
-                } else if (e.getWeight() < 4000) {
+                } else if (entity.getWeight() < 4000) {
                     tonsburnday = 2.82;
-                } else if (e.getWeight() < 9000) {
+                } else if (entity.getWeight() < 9000) {
                     tonsburnday = 3.37;
-                } else if (e.getWeight() < 20000) {
+                } else if (entity.getWeight() < 20000) {
                     tonsburnday = 4.22;
-                } else if (e.getWeight() < 30000) {
+                } else if (entity.getWeight() < 30000) {
                     tonsburnday = 6.52;
-                } else if (e.getWeight() < 40000) {
+                } else if (entity.getWeight() < 40000) {
                     tonsburnday = 7.71;
-                } else if (e.getWeight() < 50000) {
+                } else if (entity.getWeight() < 50000) {
                     tonsburnday = 7.74;
-                } else if (e.getWeight() < 70000) {
+                } else if (entity.getWeight() < 70000) {
                     tonsburnday = 8.37;
                 } else {
                     tonsburnday = 8.83;
@@ -6713,25 +6719,25 @@ public class Unit implements ITechnology {
             } else {
                 tonsburnday = 1.84;
             }
-            return (tonsburnday * 15 * 15000);
-        } else if ((e instanceof SmallCraft)) {
-            return (1.84 * 15 * 15000);
-        } else if (e instanceof Jumpship) {
-            if (e.getWeight() < 50000) {
+            return Money.of(tonsburnday * 15 * 15000);
+        } else if ((entity instanceof SmallCraft)) {
+            return Money.of(1.84 * 15 * 15000);
+        } else if (entity instanceof Jumpship) {
+            if (entity.getWeight() < 50000) {
                 tonsburnday = 2.82;
-            } else if (e.getWeight() < 100000) {
+            } else if (entity.getWeight() < 100000) {
                 tonsburnday = 9.77;
-            } else if (e.getWeight() < 200000) {
+            } else if (entity.getWeight() < 200000) {
                 tonsburnday = 19.75;
             } else {
                 tonsburnday = 39.52;
             }
-            if (e instanceof Warship) {
-                return (tonsburnday * 15 * 15000);
+            if (entity instanceof Warship) {
+                return Money.of(tonsburnday * 15 * 15000);
             }
-            return (tonsburnday * 3 * 15000);
+            return Money.of(tonsburnday * 3 * 15000);
         }
-        return tonsburnday;
+        return Money.of(tonsburnday);
     }
 
     public Money getFighterFuelCost(Entity e) {
