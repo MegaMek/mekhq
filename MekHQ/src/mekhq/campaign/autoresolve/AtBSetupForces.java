@@ -50,6 +50,7 @@ import io.sentry.Sentry;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.Entity;
 import megamek.common.EntitySelector;
+import megamek.common.Game;
 import megamek.common.Infantry;
 import megamek.common.MapSettings;
 import megamek.common.Minefield;
@@ -83,6 +84,7 @@ public class AtBSetupForces extends SetupForces {
     private final ForceConsolidation forceConsolidationMethod;
     private final Set<Integer> teamIds = new HashSet<>();
     private final OrderFactory orderFactory;
+    private final Game dummyGame;
 
     public AtBSetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario,
             ForceConsolidation forceConsolidationMethod) {
@@ -92,6 +94,7 @@ public class AtBSetupForces extends SetupForces {
     public AtBSetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario,
             ForceConsolidation forceConsolidationMethod, OrderFactory orderFactory) {
         this.campaign = campaign;
+        this.dummyGame = campaign.getGame();
         this.units = units;
         this.scenario = scenario;
         this.forceConsolidationMethod = forceConsolidationMethod;
@@ -603,7 +606,7 @@ public class AtBSetupForces extends SetupForces {
                     topLevel = false;
                 }
                 entity.setForceString("");
-                entity.setIGame(game);
+                entity.setGame(dummyGame);
                 game.addEntity(entity);
                 game.getForces().addEntity(entity, realId);
             }
