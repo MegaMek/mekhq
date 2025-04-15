@@ -6661,7 +6661,7 @@ public class Unit implements ITechnology {
 
         // Calculate base fuel costs by entity type
         if (entity.isLargeCraft() || entity.isSmallCraft()) {
-            hydrogenUsage = getTonsBurnDay(entity);
+            fuelCost = fuelCost.plus(getTonsBurnDay(entity));
         } else if (entity.isConventionalFighter()) {
             fuelCost = fuelCost.plus(getFighterFuelCost(entity));
         } else if (entity.isAerospaceFighter()) {
