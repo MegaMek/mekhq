@@ -6395,7 +6395,7 @@ public class CampaignOptions {
 
                     // region AtB Tab
                 } else if (nodeName.equalsIgnoreCase("skillLevel")) {
-                    retVal.setSkillLevel(SkillLevel.valueOf(wn2.getTextContent().trim()));
+                    retVal.setSkillLevel(SkillLevel.parseFromString(wn2.getTextContent().trim()));
                     // region ACAR Tab
                 } else if (nodeName.equalsIgnoreCase("autoResolveMethod")) {
                     retVal.setAutoResolveMethod(AutoResolveMethod.valueOf(wn2.getTextContent().trim()));
