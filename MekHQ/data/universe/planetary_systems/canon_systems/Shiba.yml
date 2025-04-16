@@ -151,9 +151,7 @@ planet:
     event:
       - date: '2723-04-14'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 57096.0
         socioIndustrial: C-D-B-D-D
       - date: '2730-09-15'
@@ -223,14 +221,10 @@ planet:
         population: 2012845760.0
       - date: '3031-11-01'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3034-03-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3040-01-01'
         population: 2007437158.0
       - date: '3047-01-01'
@@ -271,9 +265,7 @@ planet:
         population: 2214545378.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
   - name: Watanabe
     type: ICE_GIANT
     orbitalDist: 2.6

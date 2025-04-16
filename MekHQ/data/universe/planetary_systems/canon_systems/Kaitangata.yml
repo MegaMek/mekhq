@@ -65,9 +65,7 @@ planet:
     event:
       - date: '2350-12-19'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 40695.0
         socioIndustrial: D-C-B-D-A
       - date: '2360-01-01'
@@ -214,17 +212,17 @@ planet:
         population: 240481870.0
       - date: '3020-01-01'
         population: 241063911.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 242710842.0
       - date: '3034-01-01'
         socioIndustrial: C-C-C-C-B
       - date: '3040-01-01'
         population: 245591794.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: B-C-B-C-A
       - date: '3050-01-01'
@@ -233,7 +231,7 @@ planet:
         population: 250052472.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -258,15 +256,8 @@ planet:
         population: 268693355.0
       - date: '3145-04-08'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 269446750.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FS
   - name: Oglala Lakota
     type: ICE_GIANT
     orbitalDist: 3.64

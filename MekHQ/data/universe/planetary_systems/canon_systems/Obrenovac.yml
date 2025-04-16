@@ -65,9 +65,7 @@ planet:
     event:
       - date: '2540-10-25'
         faction:
-          source: canon
-          value:
-            - MOC
+          - MOC
         population: 50926.0
         socioIndustrial: C-D-C-C-F
       - date: '2550-01-01'
@@ -78,24 +76,18 @@ planet:
         population: 6438742.0
       - date: '2579-03-19'
         faction:
-          source: canon
-          value:
-            - MOC
-            - SL
+          - MOC
+          - SL
       - date: '2579-03-25'
         faction:
-          source: canon
-          value:
-            - SL
+          - SL
       - date: '2580-01-01'
         population: 15180260.0
       - date: '2590-01-01'
         population: 28659408.0
       - date: '2597-03-21'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2600-07-28'
         population: 45837690.0
         socioIndustrial: D-D-C-C-F
@@ -207,9 +199,7 @@ planet:
         population: 174500267.0
       - date: '3081-06-25'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 175901868.0
       - date: '3095-01-01'
@@ -230,12 +220,7 @@ planet:
         population: 187265289.0
       - date: '3148-09-01'
         faction:
-          source: canon
-          value:
-            - MOC
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - MOC
   - name: Komljenovic's Home

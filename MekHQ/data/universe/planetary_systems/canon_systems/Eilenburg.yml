@@ -66,9 +66,7 @@ planet:
     event:
       - date: '2250-11-19'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 41367.0
         socioIndustrial: D-D-C-F-C
       - date: '2260-01-01'
@@ -95,9 +93,7 @@ planet:
         population: 203699914.0
       - date: '2360-02-03'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 289509999.0
       - date: '2370-01-01'
         population: 391118257.0
@@ -245,22 +241,22 @@ planet:
         population: 2950407825.0
       - date: '3027-01-01'
         socioIndustrial: B-C-D-B-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 2938433383.0
       - date: '3040-01-01'
         population: 2964998648.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: A-B-C-A-B
       - date: '3050-01-01'
         population: 3001393187.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -286,9 +282,7 @@ planet:
         population: 3312080615.0
       - date: '3145-09-14'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 3342023883.0
   - name: Kanassa
     type: TERRESTRIAL

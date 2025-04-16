@@ -167,9 +167,7 @@ planet:
     event:
       - date: '2342-08-23'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 45765.0
         socioIndustrial: D-D-F-D-D
       - date: '2350-01-01'
@@ -328,15 +326,11 @@ planet:
         population: 1237296475.0
       - date: '3015-01-13'
         faction:
-          source: canon
-          value:
-            - FWL
-            - FWLR
+          - FWL
+          - FWLR
       - date: '3015-01-22'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 1236025083.0
       - date: '3025-01-01'
@@ -363,16 +357,12 @@ planet:
         population: 636189445.0
       - date: '3079-02-20'
         faction:
-          source: canon
-          value:
-            - DO
+          - DO
       - date: '3080-01-01'
         population: 643869708.0
       - date: '3086-04-03'
         faction:
-          source: canon
-          value:
-            - OP
+          - OP
       - date: '3090-01-01'
         population: 654909061.0
       - date: '3100-01-01'
@@ -393,11 +383,6 @@ planet:
         population: 710022307.0
       - date: '3145-01-01'
         population: 714581022.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Calloway VII
     type: DWARF_TERRESTRIAL
     orbitalDist: 14.0

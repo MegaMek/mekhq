@@ -51,9 +51,7 @@ planet:
     event:
       - date: '2604-04-07'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 51062.0
         socioIndustrial: D-D-D-D-D
       - date: '2610-01-01'
@@ -128,9 +126,7 @@ planet:
         socioIndustrial: C-C-D-C-C
       - date: '2900-01-28'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 3694651516.0
       - date: '2910-01-01'
         population: 3654095136.0
@@ -158,20 +154,18 @@ planet:
         population: 3113772658.0
       - date: '3025-06-26'
         faction:
-          source: canon
+          - FS
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
           value:
-            - FS
+            - FC
       - date: '3030-01-01'
         population: 3103313888.0
       - date: '3033-01-01'
         socioIndustrial: B-C-D-B-C
       - date: '3040-01-01'
         population: 3136697632.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3046-01-01'
         socioIndustrial: A-B-D-A-C
       - date: '3050-01-01'
@@ -180,7 +174,7 @@ planet:
         population: 3189520324.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
@@ -203,11 +197,6 @@ planet:
         population: 3320683173.0
       - date: '3145-01-01'
         population: 3332659176.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - CC
   - name: Swan Belt
     type: ASTEROID_BELT
     orbitalDist: 0.8

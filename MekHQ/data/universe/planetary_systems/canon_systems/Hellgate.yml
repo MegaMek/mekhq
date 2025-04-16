@@ -49,9 +49,7 @@ planet:
     event:
       - date: '2802-02-11'
         faction:
-          source: canon
-          value:
-            - CSR
+          - CSR
         population: 9571.0
         socioIndustrial: B-C-C-C-D
       - date: '2803-10-05'
@@ -74,9 +72,7 @@ planet:
         population: 1035884.0
       - date: '2864-09-02'
         faction:
-          source: canon
-          value:
-            - CSR
+          - CSR
       - date: '2870-01-01'
         population: 1387911.0
       - date: '2880-01-01'
@@ -85,9 +81,7 @@ planet:
         population: 2068810.0
       - date: '2899-01-30'
         faction:
-          source: canon
-          value:
-            - CSV
+          - CSV
       - date: '2900-01-01'
         population: 2373388.0
       - date: '2910-01-01'
@@ -116,9 +110,7 @@ planet:
         population: 3785139.0
       - date: '3025-05-13'
         faction:
-          source: canon
-          value:
-            - CSV
+          - CSV
       - date: '3030-01-01'
         population: 3822405.0
       - date: '3040-01-01'
@@ -129,38 +121,30 @@ planet:
         population: 3923394.0
       - date: '3051-12-20'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CSR
             - CJF
       - date: '3057-12-03'
         faction:
-          source: canon
-          value:
-            - CSR
+          - CSR
       - date: '3060-01-01'
         population: 3969513.0
       - date: '3070-01-01'
         population: 4012018.0
       - date: '3070-06-01'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CCO
-            - CSR
+          - CCC
+          - CCO
+          - CSR
       - date: '3072-05-22'
         faction:
-          source: canon
-          value:
-            - CCC
-            - CCO
-            - SOC
+          - CCC
+          - CCO
+          - SOC
       - date: '3072-11-27'
         faction:
-          source: canon
-          value:
-            - CCC
+          - CCC
       - date: '3080-01-01'
         population: 4058828.0
       - date: '3090-01-01'

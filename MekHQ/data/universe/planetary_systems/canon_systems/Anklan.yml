@@ -43,9 +43,7 @@ planet:
     event:
       - date: '2891-12-02'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 2127.0
         socioIndustrial: C-D-A-C-F
       - date: '2900-01-01'
@@ -106,9 +104,7 @@ planet:
         population: 2690.0
       - date: '3140-11-15'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 2704.0
   - name:
@@ -148,9 +144,7 @@ planet:
     event:
       - date: '2891-07-31'
         faction:
-          source: canon
-          value:
-            - HL
+          - HL
         population: 48404.0
         socioIndustrial: C-D-A-D-F
       - date: '2895-12-31'
@@ -215,9 +209,7 @@ planet:
         population: 172660.0
       - date: '3140-11-15'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
       - date: '3145-01-01'
         population: 173977.0
   - name: Avital

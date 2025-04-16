@@ -140,9 +140,7 @@ planet:
     event:
       - date: '2737-07-14'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 56675.0
         socioIndustrial: C-D-B-D-C
       - date: '2739-02-03'
@@ -158,60 +156,41 @@ planet:
       - date: '2780-01-01'
         population: 6829695.0
       - date: '2790-01-01'
-        population: 12375066.0
         hpg:
           source: canon
           value: X
+        population: 12375066.0
       - date: '2800-01-01'
         population: 19855545.0
       - date: '2810-01-01'
         population: 28942777.0
       - date: '2814-02-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2910-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
       - date: '3025-03-01'
         faction:
-          source: assumption
-          value:
-            - ARC
-            - ARD
+          - ARC
+          - ARD
       - date: '3025-05-01'
         faction:
-          source: assumption
-          value:
-            - ARC
-            - ARD
-            - TC
+          - ARC
+          - ARD
+          - TC
       - date: '3025-08-15'
         faction:
-          source: assumption
-          value:
-            - ARC
+          - ARC
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
         population:
           source: canon
           value: 3200000.0
         socioIndustrial:
           source: canon
           value: D-C-C-C-D
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN

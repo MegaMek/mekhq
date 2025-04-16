@@ -64,9 +64,7 @@ planet:
     event:
       - date: '2604-05-14'
         faction:
-          source: canon
-          value:
-            - MOC
+          - MOC
         population: 51328.0
         socioIndustrial: C-F-B-F-D
       - date: '2610-01-01'
@@ -199,11 +197,6 @@ planet:
         population: 101390199.0
       - date: '3145-01-01'
         population: 101776214.0
-      - date: '2108-12-05'
-        name: Adhara
-      - date: '3040-01-01'
-        name: Trip
-        message: Adhara renamed to Trip
   - name: Yama Belt
     type: ASTEROID_BELT
     orbitalDist: 1.44

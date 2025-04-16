@@ -109,9 +109,7 @@ planet:
     event:
       - date: '2669-01-20'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
         population: 47019.0
         socioIndustrial: C-D-C-D-B
       - date: '2670-01-01'
@@ -148,46 +146,29 @@ planet:
         population: 10960991.0
       - date: '2814-02-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3011-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
       - date: '3025-01-25'
         faction:
-          source: assumption
-          value:
-            - ARC
-            - ARD
+          - ARC
+          - ARD
       - date: '3025-02-20'
         faction:
-          source: assumption
-          value:
-            - ARC
+          - ARC
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
         population:
           source: canon
           value: 1227000.0
         socioIndustrial:
           source: canon
           value: D-C-C-C-D
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Morrigu
     type: TERRESTRIAL
     orbitalDist: 1.1

@@ -64,9 +64,7 @@ planet:
     event:
       - date: '2166-02-13'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 49673.0
         socioIndustrial: D-D-D-D-F
       - date: '2170-01-01'
@@ -87,9 +85,7 @@ planet:
         population: 61915.0
       - date: '2242-06-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 63535.0
       - date: '2260-01-01'
@@ -112,16 +108,12 @@ planet:
         population: 67535.0
       - date: '2334-11-18'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2340-01-01'
         population: 67719.0
       - date: '2341-12-28'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
       - date: '2350-01-01'
         population: 67902.0
       - date: '2360-01-01'
@@ -217,9 +209,7 @@ planet:
         population: 76479.0
       - date: '2775-10-20'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 76401.0
       - date: '2790-01-01'
@@ -287,7 +277,7 @@ planet:
           value: A-B-D-C-F
       - date: '3049-09-24'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3050-01-01'
@@ -298,15 +288,11 @@ planet:
         population: 54693.0
       - date: '3071-01-28'
         faction:
-          source: canon
-          value:
-            - CW
-            - CHH
+          - CW
+          - CHH
       - date: '3071-02-07'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
       - date: '3079-01-01'
         population:
           source: canon
@@ -319,9 +305,7 @@ planet:
         population: 56471.0
       - date: '3100-02-07'
         faction:
-          source: canon
-          value:
-            - TB
+          - TB
       - date: '3110-01-01'
         population: 56845.0
       - date: '3113-01-01'
@@ -334,11 +318,6 @@ planet:
         population: 58647.0
       - date: '3145-01-01'
         population: 59130.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - IND
   - name: Lugh
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.2

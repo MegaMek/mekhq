@@ -65,9 +65,7 @@ planet:
     event:
       - date: '2343-10-22'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 48226.0
         socioIndustrial: D-D-A-D-B
       - date: '2350-01-01'
@@ -234,9 +232,7 @@ planet:
         population: 335788435.0
       - date: '3079-10-25'
         faction:
-          source: canon
-          value:
-            - DA
+          - DA
       - date: '3080-01-01'
         population: 338147200.0
       - date: '3090-01-01'
@@ -257,18 +253,11 @@ planet:
         population: 364410618.0
       - date: '3145-09-15'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 366383758.0
       - date: '3148-03-01'
         faction:
-          source: canon
-          value:
-            - DA
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - DA
   - name: KYA1 Belt

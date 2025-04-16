@@ -69,9 +69,7 @@ planet:
     event:
       - date: '2700-09-28'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 47889.0
         socioIndustrial: C-C-D-D-B
       - date: '2702-10-17'
@@ -157,9 +155,7 @@ planet:
         population: 215467989.0
       - date: '3081-07-29'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 215295684.0
       - date: '3100-01-01'
@@ -178,9 +174,7 @@ planet:
         population: 222207661.0
       - date: '3145-05-03'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 223947658.0
   - name: Djojopoespito's Hole
     type: TERRESTRIAL

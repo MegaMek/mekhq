@@ -105,9 +105,7 @@ planet:
     event:
       - date: '2728-01-15'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 46318.0
         socioIndustrial: D-F-A-D-D
       - date: '2729-09-18'
@@ -179,31 +177,27 @@ planet:
         socioIndustrial: B-B-B-B-D
       - date: '3020-01-01'
         population: 1244727535.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1260681990.0
       - date: '3040-01-01'
         population: 1267694003.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: A-A-B-A-C
       - date: '3050-01-01'
         population: 1275164285.0
       - date: '3057-12-01'
         faction:
-          source: canon
-          value:
-            - ARDC
+          - ARDC
       - date: '3060-01-01'
         population: 1286819902.0
       - date: '3067-06-25'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3070-01-01'
         population: 1296204441.0
       - date: '3080-01-01'
@@ -226,9 +220,7 @@ planet:
         population: 1351263842.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Jutas
     type: GIANT_TERRESTRIAL
     orbitalDist: 3.92

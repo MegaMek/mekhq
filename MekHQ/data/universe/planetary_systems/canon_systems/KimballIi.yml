@@ -88,9 +88,7 @@ planet:
     event:
       - date: '2239-01-05'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 55240.0
         socioIndustrial: D-D-B-D-D
       - date: '2240-01-01'
@@ -107,9 +105,7 @@ planet:
         population: 11249362.0
       - date: '2299-03-03'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 21813192.0
       - date: '2310-01-01'
@@ -120,9 +116,9 @@ planet:
         population: 97552248.0
       - date: '2340-01-01'
         population: 141987823.0
-      - date: '2341-10-29'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -256,9 +252,7 @@ planet:
         population: 1508939394.0
       - date: '2932-12-15'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2940-01-01'
         population: 1520478060.0
       - date: '2950-01-01'
@@ -279,31 +273,20 @@ planet:
         population: 1186404675.0
       - date: '3025-12-23'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3030-08-29'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 1167498704.0
       - date: '3033-01-01'
         socioIndustrial: B-D-C-C-C
       - date: '3040-01-01'
         population: 1174172449.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: A-C-B-B-C
       - date: '3048-11-14'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3050-01-01'
         population: 1183721868.0
       - date: '3060-01-01'
@@ -314,9 +297,7 @@ planet:
         population: 1211505257.0
       - date: '3081-08-13'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1217334461.0
       - date: '3100-01-01'
@@ -333,18 +314,11 @@ planet:
         hpg: X
       - date: '3135-12-17'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3140-01-01'
         population: 1238206053.0
       - date: '3145-01-01'
         population: 1241677888.0
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - IND
   - name: Kimball III
     type: TERRESTRIAL
     orbitalDist: 1.0

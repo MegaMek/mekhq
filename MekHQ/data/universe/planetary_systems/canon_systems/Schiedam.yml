@@ -39,9 +39,7 @@ planet:
     event:
       - date: '2604-04-03'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 47714.0
         socioIndustrial: C-F-A-F-B
       - date: '2607-01-01'
@@ -162,9 +160,7 @@ planet:
         population: 279800154.0
       - date: '3081-07-25'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 282216812.0
       - date: '3092-01-01'
@@ -177,9 +173,7 @@ planet:
         population: 287515167.0
       - date: '3130-07-06'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
         population: 287170356.0
       - date: '3132-08-07'
         hpg: X
@@ -187,11 +181,6 @@ planet:
         population: 286653914.0
       - date: '3145-01-01'
         population: 286883329.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Le Gall's Belt
     type: ASTEROID_BELT
     orbitalDist: 0.28

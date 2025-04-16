@@ -51,9 +51,7 @@ planet:
     event:
       - date: '2779-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 42715.0
         socioIndustrial: C-D-B-F-F
       - date: '2780-01-01'
@@ -112,16 +110,12 @@ planet:
         population: 6920416.0
       - date: '3012-09-23'
         faction:
-          source: canon
-          value:
-            - OC
+          - OC
       - date: '3020-01-01'
         population: 6998649.0
       - date: '3025-08-16'
         faction:
-          source: canon
-          value:
-            - OC
+          - OC
       - date: '3030-01-01'
         population: 7082710.0
       - date: '3040-01-01'
@@ -130,13 +124,13 @@ planet:
         socioIndustrial: D-F-B-C-D
       - date: '3049-08-01'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
             - OC
       - date: '3049-08-07'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3050-01-01'
@@ -147,9 +141,7 @@ planet:
         population: 7301775.0
       - date: '3071-01-25'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
       - date: '3080-01-01'
         population: 7364841.0
       - date: '3090-01-01'
@@ -160,9 +152,7 @@ planet:
         population: 7601286.0
       - date: '3100-02-07'
         faction:
-          source: canon
-          value:
-            - TB
+          - TB
       - date: '3110-01-01'
         population: 7702288.0
       - date: '3120-01-01'
@@ -173,11 +163,6 @@ planet:
         population: 7742444.0
       - date: '3145-01-01'
         population: 7739348.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FCo
   - name: Holmes
     type: GIANT_TERRESTRIAL
     orbitalDist: 0.8

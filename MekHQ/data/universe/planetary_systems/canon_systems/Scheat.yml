@@ -89,9 +89,7 @@ planet:
     event:
       - date: '2301-04-18'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 42102.0
         socioIndustrial: D-D-B-D-F
       - date: '2310-01-01'
@@ -106,9 +104,7 @@ planet:
         population: 7892004.0
       - date: '2360-06-11'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 15212613.0
       - date: '2370-01-01'
         population: 26666016.0
@@ -208,9 +204,7 @@ planet:
         population: 794807763.0
       - date: '2821-06-04'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2830-01-01'
         population: 785529960.0
       - date: '2840-01-01'
@@ -229,9 +223,7 @@ planet:
         population: 778932531.0
       - date: '2900-11-14'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 780221763.0
       - date: '2910-01-01'
         population: 782483055.0
@@ -277,9 +269,7 @@ planet:
         population: 743025700.0
       - date: '3081-04-04'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 744662156.0
       - date: '3097-01-01'
@@ -296,16 +286,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 756975307.0
       - date: '3145-02-11'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 757126717.0
   - name: Tătărăștii de Jos
     type: GIANT_TERRESTRIAL

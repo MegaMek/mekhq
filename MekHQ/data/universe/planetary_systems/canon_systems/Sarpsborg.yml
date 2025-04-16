@@ -83,9 +83,7 @@ planet:
     event:
       - date: '2596-10-07'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 53841.0
         socioIndustrial: C-F-D-D-F
       - date: '2600-01-01'
@@ -191,22 +189,22 @@ planet:
         population: 5882850800.0
       - date: '3028-01-01'
         socioIndustrial: C-C-D-B-F
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 5903822773.0
       - date: '3040-01-01'
         population: 5954814599.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: B-B-D-A-F
       - date: '3050-01-01'
         population: 5984064795.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -233,9 +231,7 @@ planet:
         population: 6659870692.0
       - date: '3145-12-03'
         faction:
-          source: canon
-          value:
-            - CWE
+          - CWE
         population: 6689238685.0
   - name: G4C1 Belt
     type: ASTEROID_BELT

@@ -81,9 +81,7 @@ planet:
     event:
       - date: '2606-12-30'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 56005.0
         socioIndustrial: C-D-B-D-D
       - date: '2610-01-01'
@@ -185,7 +183,7 @@ planet:
         population: 147701666.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-01-01'
@@ -196,22 +194,20 @@ planet:
         population: 149679219.0
       - date: '3050-05-01'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
             - FRR
       - date: '3050-06-25'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3060-01-01'
         population: 150610113.0
       - date: '3062-05-07'
         faction:
-          source: canon
-          value:
-            - CGB
+          - CGB
       - date: '3070-01-01'
         population: 151759111.0
       - date: '3080-01-01'
@@ -223,9 +219,7 @@ planet:
         socioIndustrial: D-C-C-C-C
       - date: '3103-03-13'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
       - date: '3110-01-01'
         population: 160596413.0
       - date: '3120-01-01'

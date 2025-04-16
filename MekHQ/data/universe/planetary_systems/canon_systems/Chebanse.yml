@@ -70,14 +70,15 @@ planet:
       - name: New Toowoomba
     event:
       - date: '2303-11-24'
-        faction:
-          source: canon
-          value:
-            - FS
         population: 38394.0
         socioIndustrial: D-D-B-D-F
       - date: '2310-01-01'
         population: 101420.0
+      - date: '2317-06-26'
+        faction:
+          source: 'Handbook: House Davion'
+          value:
+            - FS
       - date: '2320-01-01'
         population: 341802.0
       - date: '2330-01-01'
@@ -233,15 +234,15 @@ planet:
         population: 328380060.0
       - date: '3020-01-01'
         population: 328298272.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 329467286.0
       - date: '3040-01-01'
         population: 331980777.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: C-D-B-C-F
       - date: '3050-01-01'
@@ -250,7 +251,7 @@ planet:
         population: 335686291.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'

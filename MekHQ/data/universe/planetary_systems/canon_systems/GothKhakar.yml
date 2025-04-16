@@ -85,9 +85,7 @@ planet:
     event:
       - date: '2733-07-11'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 41635.0
         socioIndustrial: C-D-D-D-F
       - date: '2734-07-11'
@@ -152,14 +150,10 @@ planet:
         population: 76764330.0
       - date: '3014-03-22'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3015-03-15'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 77323603.0
       - date: '3030-01-01'
@@ -177,9 +171,7 @@ planet:
         population: 82938802.0
       - date: '3081-05-30'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 83187992.0
       - date: '3100-01-01'
@@ -192,9 +184,7 @@ planet:
         population: 82922216.0
       - date: '3130-09-11'
         faction:
-          source: canon
-          value:
-            - RCM
+          - RCM
         population: 82922216.0
       - date: '3132-08-07'
         hpg: X
@@ -202,11 +192,6 @@ planet:
         population: 82905633.0
       - date: '3145-01-01'
         population: 83038388.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Dalbandin Nok Kun
     type: ICE_GIANT
     orbitalDist: 4.48

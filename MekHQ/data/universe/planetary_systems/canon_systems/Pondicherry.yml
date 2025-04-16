@@ -69,9 +69,7 @@ planet:
     event:
       - date: '2171-06-07'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 54570.0
         socioIndustrial: D-D-A-D-C
       - date: '2180-01-01'
@@ -90,9 +88,7 @@ planet:
         population: 6233975.0
       - date: '2242-02-14'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 9406594.0
       - date: '2260-01-01'
@@ -113,9 +109,7 @@ planet:
         population: 56445448.0
       - date: '2321-12-22'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2330-01-01'
         population: 66339382.0
       - date: '2340-01-01'
@@ -168,9 +162,7 @@ planet:
         population: 208690430.0
       - date: '2571-01-11'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2580-01-01'
         population: 211100538.0
       - date: '2590-01-01'
@@ -294,9 +286,7 @@ planet:
         population: 145571967.0
       - date: '3120-10-15'
         faction:
-          source: canon
-          value:
-            - RA
+          - RA
         population: 146096971.0
       - date: '3130-01-01'
         population: 147594786.0
@@ -330,9 +320,7 @@ planet:
     event:
       - date: '2171-12-16'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 60201.0
         socioIndustrial: D-D-A-D-F
       - date: '2180-01-01'
@@ -351,9 +339,7 @@ planet:
         population: 3805288.0
       - date: '2242-07-06'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 5456183.0
       - date: '2260-01-01'
@@ -372,9 +358,7 @@ planet:
         population: 26828870.0
       - date: '2321-10-03'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2330-01-01'
         population: 30741152.0
       - date: '2340-01-01'
@@ -431,9 +415,7 @@ planet:
         population: 83147605.0
       - date: '2571-03-16'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2580-01-01'
         population: 83791131.0
       - date: '2590-01-01'
@@ -558,9 +540,7 @@ planet:
         population: 57436252.0
       - date: '3120-12-06'
         faction:
-          source: canon
-          value:
-            - RA
+          - RA
         population: 58152895.0
       - date: '3130-01-01'
         population: 59019959.0

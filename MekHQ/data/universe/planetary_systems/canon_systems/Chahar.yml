@@ -73,9 +73,7 @@ planet:
     event:
       - date: '2409-06-26'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 49517.0
         socioIndustrial: C-D-B-D-F
       - date: '2410-01-01'
@@ -213,32 +211,30 @@ planet:
         population: 170762828.0
       - date: '3020-01-01'
         population: 167624116.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 167388418.0
       - date: '3040-06-25'
         population: 169290634.0
         socioIndustrial: B-D-B-C-D
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: C-D-B-C-D
       - date: '3050-01-01'
         population: 171368630.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
         population: 173941140.0
       - date: '3067-09-19'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
       - date: '3070-01-01'
         population: 176146664.0
       - date: '3080-01-01'
@@ -265,9 +261,7 @@ planet:
         population: 186926776.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Zhang Sheng
     type: TERRESTRIAL
     orbitalDist: 1.1

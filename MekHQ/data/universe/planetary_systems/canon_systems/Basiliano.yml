@@ -44,9 +44,7 @@ planet:
     event:
       - date: '2456-08-05'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 42527.0
         socioIndustrial: B-D-A-F-D
       - date: '2460-01-01'
@@ -139,9 +137,7 @@ planet:
         population: 299447542.0
       - date: '2864-11-27'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2870-01-01'
         population: 295197947.0
       - date: '2875-01-01'
@@ -154,9 +150,7 @@ planet:
         socioIndustrial: C-D-B-C-C
       - date: '2900-12-20'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 291734600.0
       - date: '2910-01-01'
         population: 293769177.0
@@ -184,13 +178,11 @@ planet:
         population: 279819656.0
       - date: '3030-07-13'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
         population: 279686407.0
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3036-01-01'
@@ -202,13 +194,13 @@ planet:
         population: 285793351.0
       - date: '3050-08-04'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
             - FRR
       - date: '3050-08-08'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CW
       - date: '3060-01-01'
@@ -217,15 +209,11 @@ planet:
         population: 289822597.0
       - date: '3071-08-16'
         faction:
-          source: canon
-          value:
-            - CHH
-            - CW
+          - CHH
+          - CW
       - date: '3071-10-27'
         faction:
-          source: canon
-          value:
-            - CW
+          - CW
       - date: '3080-01-01'
         population: 292501268.0
       - date: '3090-01-01'
@@ -244,9 +232,7 @@ planet:
         socioIndustrial: A-D-A-B-C
       - date: '3140-05-30'
         faction:
-          source: canon
-          value:
-            - CHH
+          - CHH
         population: 327231870.0
       - date: '3145-01-01'
         population: 329926203.0

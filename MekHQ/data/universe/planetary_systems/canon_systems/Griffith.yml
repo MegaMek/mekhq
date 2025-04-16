@@ -40,9 +40,7 @@ planet:
     event:
       - date: '2673-09-14'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 49212.0
         socioIndustrial: C-D-A-D-F
       - date: '2674-01-01'
@@ -102,9 +100,7 @@ planet:
         socioIndustrial: D-F-C-F-F
       - date: '2900-08-17'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 15432834.0
       - date: '2910-01-01'
         population: 15102941.0
@@ -148,9 +144,7 @@ planet:
         population: 14188400.0
       - date: '3079-03-04'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
       - date: '3080-01-01'
         population: 14256668.0
       - date: '3090-01-01'
@@ -165,9 +159,7 @@ planet:
         population: 14313809.0
       - date: '3130-12-26'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 14345334.0
       - date: '3132-08-07'
         hpg: X
@@ -175,15 +167,8 @@ planet:
         population: 14512709.0
       - date: '3145-04-08'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
         population: 14600047.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Weddin
     type: DWARF_TERRESTRIAL
     orbitalDist: 0.07

@@ -47,9 +47,7 @@ planet:
     event:
       - date: '2654-05-15'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
         population: 46058.0
         socioIndustrial: C-F-B-D-F
       - date: '2660-01-01'
@@ -102,35 +100,22 @@ planet:
         population: 2632303.0
       - date: '2870-01-01'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         population: 0.0
         socioIndustrial: X-X-X-X-X
       - date: '3014-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
         population: 4712361.0
         socioIndustrial: D-D-B-D-D
       - date: '3022-01-01'
         faction:
-          source: canon
-          value:
-            - ARD
+          - ARD
       - date: '3026-01-01'
         faction:
-          source: canon
-          value:
-            - ARC
+          - ARC
         population: 4712361.0
         socioIndustrial: D-D-B-D-D
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Virasana
     type: ICE_GIANT
     orbitalDist: 0.14

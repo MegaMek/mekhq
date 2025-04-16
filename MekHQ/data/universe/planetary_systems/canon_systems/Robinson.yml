@@ -102,9 +102,7 @@ planet:
     event:
       - date: '2171-12-21'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 44375.0
         socioIndustrial: D-D-B-D-D
       - date: '2180-01-01'
@@ -125,9 +123,7 @@ planet:
         socioIndustrial: C-C-B-C-D
       - date: '2242-04-15'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 70325972.0
       - date: '2260-01-01'
@@ -150,9 +146,7 @@ planet:
         population: 1369629057.0
       - date: '2350-11-27'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
         population: 1611499777.0
       - date: '2360-01-01'
         population: 1864424089.0
@@ -273,16 +267,12 @@ planet:
         population: 5682709112.0
       - date: '2858-08-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2860-01-01'
         population: 5661819957.0
       - date: '2864-06-28'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2870-01-01'
         population: 5653957227.0
       - date: '2880-01-01'
@@ -291,9 +281,7 @@ planet:
         population: 5667133480.0
       - date: '2891-08-01'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2895-01-01'
         socioIndustrial: C-C-D-C-F
       - date: '2900-01-01'
@@ -324,15 +312,15 @@ planet:
         population: 5491911416.0
       - date: '3027-01-01'
         socioIndustrial: B-B-C-C-D
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 5519196210.0
       - date: '3040-01-01'
         population: 5564083246.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial:
           source: canon
@@ -347,22 +335,18 @@ planet:
           value: 5675350000.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
         population: 5696957358.0
       - date: '3071-11-12'
         faction:
-          source: canon
-          value:
-            - FS
-            - WOB
+          - FS
+          - WOB
       - date: '3075-05-21'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '3080-01-01'
         population: 5765732673.0
       - date: '3090-01-01'
@@ -387,17 +371,10 @@ planet:
         population: 5889271086.0
       - date: '3145-08-01'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3149-11-25'
         faction:
-          source: canon
-          value:
-            - FS
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FS
   - name: New Oakland Park

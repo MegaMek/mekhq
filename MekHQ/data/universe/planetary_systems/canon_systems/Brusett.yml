@@ -81,9 +81,7 @@ planet:
     event:
       - date: '2308-09-08'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 44137.0
         socioIndustrial: D-D-A-D-C
       - date: '2310-01-01'
@@ -146,29 +144,21 @@ planet:
         population: 2463211385.0
       - date: '2571-04-20'
         faction:
-          source: canon
-          value:
-            - TC
+          - TC
       - date: '2580-01-01'
         population: 2509454570.0
       - date: '2581-07-02'
         faction:
-          source: canon
-          value:
-            - SL
-            - TC
+          - SL
+          - TC
       - date: '2582-08-12'
         faction:
-          source: canon
-          value:
-            - SL
+          - SL
       - date: '2590-01-01'
         population: 2551538607.0
       - date: '2596-09-22'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '2600-01-01'
         population: 2616636929.0
       - date: '2602-01-01'
@@ -263,17 +253,17 @@ planet:
         population: 2612463945.0
       - date: '3020-01-01'
         population: 2591503249.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 2601861035.0
       - date: '3033-01-01'
         socioIndustrial: B-B-B-B-C
       - date: '3040-01-01'
         population: 2637224324.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3044-01-01'
         socioIndustrial: A-A-A-A-B
       - date: '3050-01-01'
@@ -282,22 +272,18 @@ planet:
         population: 2689423805.0
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - FS
       - date: '3070-01-01'
         population: 2706420658.0
       - date: '3075-01-15'
         faction:
-          source: canon
-          value:
-            - FS
-            - TC
+          - FS
+          - TC
       - date: '3075-02-20'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
       - date: '3080-01-01'
         population: 2742382235.0
       - date: '3090-01-01'
@@ -320,12 +306,7 @@ planet:
         population: 3049040563.0
       - date: '3146-10-01'
         faction:
-          source: canon
-          value:
-            - CDS
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - CDS
   - name: Payne's Hold

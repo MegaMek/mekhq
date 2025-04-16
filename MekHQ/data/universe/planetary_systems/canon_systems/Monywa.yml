@@ -36,9 +36,7 @@ planet:
     event:
       - date: '2536-11-11'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 53185.0
         socioIndustrial: C-D-B-D-D
       - date: '2540-01-01'

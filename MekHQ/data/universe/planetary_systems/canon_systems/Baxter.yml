@@ -118,9 +118,7 @@ planet:
     event:
       - date: '2144-04-11'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 38609.0
         socioIndustrial: D-D-D-D-F
       - date: '2146-01-01'
@@ -147,9 +145,7 @@ planet:
         population: 139341439.0
       - date: '2242-12-28'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 214137244.0
       - date: '2260-01-01'
@@ -162,9 +158,7 @@ planet:
         population: 770945095.0
       - date: '2299-10-29'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 972182061.0
       - date: '2310-01-01'
@@ -175,9 +169,9 @@ planet:
         population: 1715639931.0
       - date: '2340-01-01'
         population: 1992512956.0
-      - date: '2341-09-06'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -326,21 +320,21 @@ planet:
         population: 5747477388.0
       - date: '3026-01-01'
         socioIndustrial: C-B-D-B-F
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 5745559025.0
       - date: '3040-09-23'
         population: 5799821915.0
         socioIndustrial: C-A-D-A-D
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3050-01-01'
         population: 5844068486.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -351,9 +345,7 @@ planet:
         population: 6020842579.0
       - date: '3081-11-21'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 6085002960.0
       - date: '3100-01-01'
@@ -370,20 +362,14 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-10'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 6474214017.0
       - date: '3145-11-01'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 6535358558.0
   - name: Durham Park
     type: TERRESTRIAL

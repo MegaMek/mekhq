@@ -132,9 +132,7 @@ planet:
     event:
       - date: '2176-12-18'
         faction:
-          source: canon
-          value:
-            - SSUP
+          - SSUP
         population: 44848.0
         socioIndustrial: D-D-A-D-F
       - date: '2180-01-01'
@@ -167,14 +165,10 @@ planet:
         population: 147295150.0
       - date: '2304-08-18'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2309-02-22'
         faction:
-          source: canon
-          value:
-            - SSUP
+          - SSUP
       - date: '2310-01-01'
         population: 189849535.0
       - date: '2320-01-01'
@@ -189,7 +183,7 @@ planet:
         population: 442821264.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -338,54 +332,37 @@ planet:
         socioIndustrial: C-B-C-B-D
       - date: '3028-08-29'
         faction:
-          source: canon
-          value:
-            - CC
-            - FS
+          - CC
+          - FC
       - date: '3028-09-26'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
       - date: '3030-01-01'
         population: 986086116.0
       - date: '3030-02-28'
         faction:
-          source: canon
-          value:
-            - LA
+          - FC
       - date: '3040-01-01'
         population: 991524531.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: B-A-B-A-D
       - date: '3050-01-01'
         population: 998090236.0
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - CM
+          - CM
       - date: '3060-01-01'
         population: 1008625397.0
       - date: '3062-08-08'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3070-01-01'
         population: 1019577586.0
       - date: '3080-01-01'
         population: 1024073612.0
       - date: '3085-03-28'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1025713441.0
       - date: '3100-01-01'
@@ -400,9 +377,7 @@ planet:
         population: 1024278447.0
       - date: '3135-02-04'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3140-01-01'
         population: 1022845460.0
       - date: '3145-01-01'

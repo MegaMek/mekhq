@@ -34,9 +34,7 @@ planet:
     event:
       - date: '2617-09-09'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 55592.0
         socioIndustrial: D-D-A-F-D
       - date: '2620-01-01'
@@ -79,16 +77,12 @@ planet:
         population: 105575707.0
       - date: '2779-02-20'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2780-01-01'
         population: 104767666.0
       - date: '2785-06-01'
         faction:
-          source: canon
-          value:
-            - CIR
+          - CIR
       - date: '2790-01-01'
         population: 104070965.0
       - date: '2800-01-01'
@@ -160,9 +154,7 @@ planet:
         population: 100612841.0
       - date: '3081-05-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 101339867.0
       - date: '3100-01-01'
@@ -181,11 +173,6 @@ planet:
         population: 104467905.0
       - date: '3145-01-01'
         population: 105180707.0
-      - date: '2108-12-05'
-        name: Iolas
-      - date: '3025-01-01'
-        name: Diedre's Den
-        message: Iolas renamed to Diedre's Den
   - name: Chang Fei
     type: TERRESTRIAL
     orbitalDist: 0.49

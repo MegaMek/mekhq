@@ -85,9 +85,7 @@ planet:
     event:
       - date: '2278-10-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 45191.0
         socioIndustrial: D-D-B-D-D
       - date: '2280-01-01'
@@ -104,9 +102,7 @@ planet:
         population: 6255036.0
       - date: '2322-02-23'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2330-01-01'
         population: 13734159.0
       - date: '2340-01-01'
@@ -272,9 +268,7 @@ planet:
         population: 769379146.0
       - date: '3081-09-10'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 774938666.0
       - date: '3093-01-01'
@@ -291,16 +285,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 792334686.0
       - date: '3145-03-19'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 794397437.0
   - name: Uryū Gun
     type: GAS_GIANT

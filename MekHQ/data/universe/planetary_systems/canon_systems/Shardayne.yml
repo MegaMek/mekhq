@@ -64,16 +64,17 @@ planet:
       - name: New Vargem Grande Paulista
     event:
       - date: '2325-02-17'
-        faction:
-          source: canon
-          value:
-            - LA
         population: 58657.0
         socioIndustrial: D-D-C-F-F
       - date: '2330-01-01'
         population: 123163.0
       - date: '2340-01-01'
         population: 455892.0
+      - date: '2341-01-01'
+        faction:
+          source: 'Handbook: House Steiner'
+          value:
+            - LA
       - date: '2350-01-01'
         population: 1386351.0
       - date: '2360-01-01'
@@ -199,9 +200,7 @@ planet:
         population: 3820.0
       - date: '2921-03-30'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X

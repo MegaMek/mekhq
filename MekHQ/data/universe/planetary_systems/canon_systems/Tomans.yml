@@ -49,9 +49,7 @@ planet:
     event:
       - date: '2168-03-15'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 52630.0
         socioIndustrial: D-D-A-D-C
       - date: '2170-01-01'
@@ -70,9 +68,7 @@ planet:
         population: 6182054.0
       - date: '2235-03-14'
         faction:
-          source: canon
-          value:
-            - TamP
+          - TamP
       - date: '2240-01-01'
         population: 9979360.0
       - date: '2250-01-01'
@@ -97,9 +93,9 @@ planet:
         population: 113058394.0
       - date: '2340-01-01'
         population: 129555407.0
-      - date: '2341-12-08'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -246,23 +242,23 @@ planet:
         population: 382573522.0
       - date: '3020-01-01'
         population: 380463664.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-12-06'
         population: 380242472.0
         socioIndustrial: D-D-B-C-C
       - date: '3040-01-01'
         population: 384371346.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3045-01-01'
         socioIndustrial: C-D-A-C-C
       - date: '3050-01-01'
         population: 389283992.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -271,9 +267,7 @@ planet:
         population: 399458202.0
       - date: '3070-01-18'
         faction:
-          source: canon
-          value:
-            - CW
+          - CW
       - date: '3080-01-01'
         population: 404523218.0
       - date: '3090-01-01'
@@ -292,17 +286,13 @@ planet:
         hpg: X
       - date: '3140-09-23'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 412200191.0
       - date: '3145-01-01'
         population: 413108030.0
       - date: '3152-01-20'
         faction:
-          source: canon
-          value:
-            - NTamP
+          - NTamP
   - name: Heret Belt
     type: ASTEROID_BELT
     orbitalDist: 0.7

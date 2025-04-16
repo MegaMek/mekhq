@@ -44,9 +44,7 @@ planet:
     event:
       - date: '2215-09-04'
         faction:
-          source: canon
-          value:
-            - SSUP
+          - SSUP
         population: 63389.0
         socioIndustrial: D-F-C-F-F
       - date: '2219-01-01'
@@ -83,7 +81,7 @@ planet:
         population: 422718175.0
       - date: '2367-07-01'
         faction:
-          source: canon
+          source: 'Handbook: House Liao'
           value:
             - CC
       - date: '2370-01-01'
@@ -185,9 +183,7 @@ planet:
         population: 1350590447.0
       - date: '2821-08-30'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '2830-01-01'
         population: 1305975611.0
       - date: '2840-01-01'
@@ -200,9 +196,7 @@ planet:
         population: 1184001099.0
       - date: '2864-03-16'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '2870-01-01'
         population: 1151142845.0
       - date: '2880-01-01'
@@ -241,37 +235,24 @@ planet:
         socioIndustrial: C-D-D-C-D
       - date: '3030-09-06'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
         population: 935418364.0
       - date: '3039-06-20'
         faction:
-          source: canon
-          value:
-            - FWL
-            - FS
+          - FWL
+          - FC
       - date: '3039-07-12'
         faction:
-          source: canon
-          value:
-            - FS
+          - FC
       - date: '3040-01-01'
         population: 944441622.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3048-01-01'
         socioIndustrial: C-C-C-C-D
       - date: '3050-01-01'
         population: 951171019.0
       - date: '3057-11-01'
         faction:
-          source: canon
-          value:
-            - CC
+          - CC
       - date: '3060-01-01'
         population: 956895200.0
       - date: '3070-01-01'

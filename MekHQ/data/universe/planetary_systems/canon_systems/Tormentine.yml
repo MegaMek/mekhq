@@ -86,9 +86,7 @@ planet:
     event:
       - date: '2750-10-28'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 54649.0
         socioIndustrial: C-D-B-F-F
       - date: '2752-04-22'
@@ -163,9 +161,7 @@ planet:
         population: 97890094.0
       - date: '3081-04-21'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3090-01-01'
         population: 98321759.0
       - date: '3100-01-01'
@@ -178,9 +174,7 @@ planet:
         population: 100810786.0
       - date: '3130-12-23'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
         population: 102252511.0
       - date: '3132-08-07'
         hpg: X
@@ -190,17 +184,12 @@ planet:
         population: 104799118.0
       - date: '3150-08-30'
         faction:
-          source: canon
+          source: Shattered Fortress
           value:
             - MH
       - date: '3150-12-01'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Threlfall's Belt A

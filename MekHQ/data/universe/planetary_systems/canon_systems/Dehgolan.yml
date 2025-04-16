@@ -41,9 +41,7 @@ planet:
     event:
       - date: '2168-02-08'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 39005.0
         socioIndustrial: D-F-B-D-C
       - date: '2170-01-01'
@@ -62,9 +60,7 @@ planet:
         population: 8334273.0
       - date: '2235-12-05'
         faction:
-          source: canon
-          value:
-            - TamP
+          - TamP
       - date: '2240-01-01'
         population: 14323292.0
       - date: '2250-01-01'
@@ -89,9 +85,9 @@ planet:
         population: 220131456.0
       - date: '2340-01-01'
         population: 259467201.0
-      - date: '2341-02-15'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -207,14 +203,10 @@ planet:
         population: 1109573792.0
       - date: '2864-12-18'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2865-08-17'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2868-01-01'
         socioIndustrial: B-D-C-C-B
       - date: '2870-01-01'
@@ -255,7 +247,7 @@ planet:
         socioIndustrial: C-D-D-C-B
       - date: '3034-03-13'
         faction:
-          source: canon
+          source: 20 Year Update
           value:
             - FRR
       - date: '3040-01-01'
@@ -270,9 +262,7 @@ planet:
         population: 962148578.0
       - date: '3075-03-04'
         faction:
-          source: canon
-          value:
-            - CGB
+          - CGB
       - date: '3080-01-01'
         population: 974348347.0
       - date: '3090-01-01'
@@ -283,9 +273,7 @@ planet:
         population: 996818678.0
       - date: '3103-03-13'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
       - date: '3110-01-01'
         population: 1015329923.0
       - date: '3120-01-01'

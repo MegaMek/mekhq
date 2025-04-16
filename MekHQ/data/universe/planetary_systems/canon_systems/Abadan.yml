@@ -124,9 +124,7 @@ planet:
     event:
       - date: '2168-01-31'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 49239.0
         socioIndustrial: D-D-D-D-D
       - date: '2170-01-01'
@@ -147,9 +145,7 @@ planet:
         population: 2726622.0
       - date: '2241-06-16'
         faction:
-          source: canon
-          value:
-            - MCM
+          - MCM
       - date: '2250-01-01'
         population: 3802795.0
       - date: '2260-01-01'
@@ -158,7 +154,7 @@ planet:
         population: 6732521.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -324,14 +320,10 @@ planet:
         population: 62226135.0
       - date: '3014-10-15'
         faction:
-          source: canon
-          value:
-            - FWLR
+          - FWLR
       - date: '3014-11-03'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
       - date: '3020-01-01'
         population: 62198520.0
       - date: '3030-01-01'
@@ -352,16 +344,12 @@ planet:
         socioIndustrial: C-C-D-B-C
       - date: '3079-03-24'
         faction:
-          source: canon
-          value:
-            - MSC
+          - MSC
       - date: '3080-01-01'
         population: 65293840.0
       - date: '3082-07-01'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 66506368.0
       - date: '3100-01-01'
@@ -378,33 +366,17 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3137-08-01'
         faction:
-          source: canon
-          value:
-            - MiC
+          - MiC
       - date: '3139-07-01'
         faction:
-          source: canon
-          value:
-            - CP
+          - CP
       - date: '3140-01-01'
         population: 71829675.0
       - date: '3145-01-01'
         population: 72435586.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
-      - date: '3152-06-01'
-        faction:
-          source: sucs
-          value:
-            - CP
   - name: Mictlancihuatl Belt
     type: ASTEROID_BELT
     orbitalDist: 5.2

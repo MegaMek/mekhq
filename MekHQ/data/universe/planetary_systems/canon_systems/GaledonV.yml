@@ -159,9 +159,7 @@ planet:
     event:
       - date: '2270-11-23'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 56109.0
         socioIndustrial: D-D-A-D-B
       - date: '2280-01-01'
@@ -172,14 +170,12 @@ planet:
         population: 2680644.0
       - date: '2302-05-06'
         faction:
-          source: canon
-          value:
-            - AG
+          - AG
       - date: '2310-01-01'
         population: 6914339.0
-      - date: '2319-03-09'
+      - date: '2319-11-15'
         faction:
-          source: canon
+          source: 'Handbook: House Kurita'
           value:
             - DC
       - date: '2320-01-01'
@@ -192,9 +188,7 @@ planet:
         population: 58425310.0
       - date: '2341-09-05'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2350-01-01'
         population: 99155078.0
       - date: '2360-01-01'
@@ -364,47 +358,30 @@ planet:
         population: 256858935.0
       - date: '3068-11-18'
         faction:
-          source: canon
-          value:
-            - DC
-            - FS
+          - DC
+          - FS
       - date: '3068-12-03'
         faction:
-          source: canon
-          value:
-            - FS
+          - FS
+      - date: '3069-04-04'
+        faction:
+          - FS
+          - DC
+      - date: '3069-05-15'
+        faction:
+          - DC
+      - date: '3069-06-01'
+        faction:
+          - DC
+          - CSR
       - date: '3069-06-28'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg:
           source: canon
           value: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
-      - date: '3069-04-04'
-        faction:
-          source: canon
-          value:
-            - FS
-            - DC
-      - date: '3069-05-15'
-        faction:
-          source: canon
-          value:
-            - DC
-      - date: '3069-06-01'
-        faction:
-          source: canon
-          value:
-            - DC
-            - CSR
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - ABN
   - name: Galedon VI
     type: ICE_GIANT
     orbitalDist: 3.64

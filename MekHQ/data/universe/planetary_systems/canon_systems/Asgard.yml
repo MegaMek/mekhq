@@ -116,9 +116,7 @@ planet:
     event:
       - date: '2170-02-01'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 58200.0
         socioIndustrial: C-C-B-C-B
       - date: '2180-01-01'
@@ -137,9 +135,7 @@ planet:
         population: 12393800.0
       - date: '2242-10-20'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 19462512.0
       - date: '2260-01-01'
@@ -156,23 +152,17 @@ planet:
         population: 118934916.0
       - date: '2310-01-27'
         faction:
-          source: canon
-          value:
-            - AG
+          - AG
       - date: '2311-09-15'
         faction:
-          source: canon
-          value:
-            - IND
-            - AG
+          - IND
+          - AG
       - date: '2312-08-01'
         faction:
-          source: canon
-          value:
-            - AG
-      - date: '2319-09-20'
+          - AG
+      - date: '2319-11-15'
         faction:
-          source: canon
+          source: 'Handbook: House Kurita'
           value:
             - DC
       - date: '2320-01-01'
@@ -341,20 +331,18 @@ planet:
         population: 449666372.0
       - date: '3052-02-01'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CSJ
             - DC
       - date: '3052-02-25'
         faction:
-          source: canon
+          source: Invading Clans
           value:
             - CSJ
       - date: '3059-05-29'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '3060-01-01'
         population: 452417720.0
       - date: '3070-01-01'
@@ -367,21 +355,15 @@ planet:
         socioIndustrial: B-C-B-C-A
       - date: '3099-06-14'
         faction:
-          source: canon
-          value:
-            - DC
-            - CNC
-            - CGB
+          - DC
+          - CNC
+          - CGB
       - date: '3099-07-02'
         faction:
-          source: canon
-          value:
-            - CGB
+          - CGB
       - date: '3100-03-03'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 472296003.0
       - date: '3110-01-01'
         population: 480970488.0
@@ -399,9 +381,7 @@ planet:
         population: 510814195.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
   - name: Laudio
     type: DWARF_TERRESTRIAL
     orbitalDist: 1.4

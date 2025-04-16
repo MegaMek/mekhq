@@ -37,9 +37,7 @@ planet:
     event:
       - date: '3080-11-14'
         faction:
-          source: canon
-          value:
-            - CEI
+          - CEI
         hpg: A
         population: 523.0
         socioIndustrial: A-X-X-X-X

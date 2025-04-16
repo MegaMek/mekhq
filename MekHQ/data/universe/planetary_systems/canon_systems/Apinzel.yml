@@ -62,9 +62,7 @@ planet:
     event:
       - date: '2502-05-16'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 50318.0
         socioIndustrial: C-D-D-D-B
       - date: '2510-01-01'
@@ -129,9 +127,7 @@ planet:
         population: 152755830.0
       - date: '2775-12-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-01-01'
         population: 154434852.0
       - date: '2790-01-01'
@@ -148,9 +144,7 @@ planet:
         population: 8537.0
       - date: '2848-02-06'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         hpg: X
         population: 0.0
         socioIndustrial: X-X-X-X-X
@@ -179,9 +173,7 @@ planet:
     event:
       - date: '2502-05-11'
         faction:
-          source: canon
-          value:
-            - RWR
+          - RWR
         population: 43101.0
         socioIndustrial: C-D-A-D-D
       - date: '2510-01-01'
@@ -243,9 +235,7 @@ planet:
         population: 132362213.0
       - date: '2775-12-01'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2780-01-01'
         population: 132220043.0
       - date: '2790-01-01'
@@ -264,9 +254,7 @@ planet:
         socioIndustrial: D-F-B-D-F
       - date: '2848-11-22'
         faction:
-          source: canon
-          value:
-            - ABN
+          - ABN
         population: 0.0
         socioIndustrial: X-X-X-X-X
   - name: Ika Tere Maeri

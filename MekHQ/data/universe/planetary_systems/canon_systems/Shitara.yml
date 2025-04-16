@@ -133,9 +133,7 @@ planet:
     event:
       - date: '2269-04-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 47026.0
         socioIndustrial: D-D-C-D-D
       - date: '2270-01-01'
@@ -152,9 +150,7 @@ planet:
         population: 8660371.0
       - date: '2322-11-18'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
       - date: '2330-01-01'
         population: 16512493.0
       - date: '2340-01-01'
@@ -322,16 +318,12 @@ planet:
         population: 649731071.0
       - date: '3075-10-31'
         faction:
-          source: canon
-          value:
-            - AB
+          - AB
       - date: '3080-01-01'
         population: 657706340.0
       - date: '3081-07-28'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 668447955.0
       - date: '3100-01-01'
@@ -348,16 +340,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 696563208.0
       - date: '3145-10-22'
         faction:
-          source: canon
-          value:
-            - DC
+          - DC
         population: 702017646.0
   - name: Mørch
     type: TERRESTRIAL

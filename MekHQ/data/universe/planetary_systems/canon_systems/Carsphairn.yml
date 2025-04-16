@@ -127,9 +127,7 @@ planet:
     event:
       - date: '2270-08-04'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
         population: 44777.0
         socioIndustrial: F-D-C-D-B
       - date: '2280-01-01'
@@ -138,9 +136,7 @@ planet:
         population: 614933.0
       - date: '2299-12-24'
         faction:
-          source: canon
-          value:
-            - FoS
+          - FoS
       - date: '2300-01-01'
         population: 1762571.0
       - date: '2310-01-01'
@@ -151,9 +147,9 @@ planet:
         population: 18867205.0
       - date: '2340-01-01'
         population: 33921841.0
-      - date: '2341-08-12'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2346-01-01'
@@ -303,24 +299,24 @@ planet:
         population: 1365072607.0
       - date: '3020-01-01'
         population: 1365341305.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 1371094230.0
       - date: '3032-01-01'
         socioIndustrial: C-C-C-C-B
       - date: '3040-01-01'
         population: 1381968772.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial: B-B-C-B-A
       - date: '3050-01-01'
         population: 1391398184.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -331,9 +327,7 @@ planet:
         population: 1429906602.0
       - date: '3081-08-02'
         faction:
-          source: canon
-          value:
-            - ROS
+          - ROS
       - date: '3090-01-01'
         population: 1439087352.0
       - date: '3100-01-01'
@@ -350,16 +344,12 @@ planet:
         hpg: X
       - date: '3135-10-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '3140-01-01'
         population: 1523193517.0
       - date: '3145-08-17'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
         population: 1534506957.0
   - name: Holtom's Delight
     type: DWARF_TERRESTRIAL

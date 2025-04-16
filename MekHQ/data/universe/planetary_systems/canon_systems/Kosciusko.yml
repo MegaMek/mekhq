@@ -84,9 +84,7 @@ planet:
     event:
       - date: '2608-03-10'
         faction:
-          source: canon
-          value:
-            - FWL
+          - FWL
         population: 56885.0
         socioIndustrial: C-D-B-D-C
       - date: '2610-01-01'
@@ -196,9 +194,7 @@ planet:
         population: 288983781.0
       - date: '3079-11-22'
         faction:
-          source: canon
-          value:
-            - DTA
+          - DTA
       - date: '3080-01-01'
         population: 292413988.0
       - date: '3090-01-01'
@@ -219,11 +215,6 @@ planet:
         population: 311366466.0
       - date: '3145-01-01'
         population: 312989789.0
-      - date: '3151-01-01'
-        faction:
-          source: sucs
-          value:
-            - FWL
   - name: Muhamad's World
     type: TERRESTRIAL
     orbitalDist: 3.08

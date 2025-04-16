@@ -38,9 +38,7 @@ planet:
     event:
       - date: '2143-09-20'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 46103.0
         socioIndustrial: D-D-A-D-C
       - date: '2150-01-01'
@@ -67,9 +65,7 @@ planet:
         population: 40102354.0
       - date: '2242-04-11'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
       - date: '2250-01-01'
         population: 56870551.0
       - date: '2260-01-01'
@@ -92,9 +88,7 @@ planet:
         population: 370472110.0
       - date: '2345-03-29'
         faction:
-          source: canon
-          value:
-            - LA
+          - LA
       - date: '2350-01-01'
         population: 414534929.0
       - date: '2360-01-01'
@@ -242,22 +236,22 @@ planet:
         population: 947056387.0
       - date: '3025-01-01'
         socioIndustrial: C-C-B-C-C
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 950274423.0
       - date: '3040-01-01'
         population: 960304872.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3043-01-01'
         socioIndustrial: B-C-A-C-B
       - date: '3050-01-01'
         population: 971120742.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
@@ -282,17 +276,13 @@ planet:
         hpg: X
       - date: '3140-03-18'
         faction:
-          source: canon
-          value:
-            - CJF
+          - CJF
         population: 1033649279.0
       - date: '3145-01-01'
         population: 1039453953.0
       - date: '3152-06-01'
         faction:
-          source: canon
-          value:
-            - IND
+          - IND
   - name: Sears
     type: ICE_GIANT
     orbitalDist: 0.35

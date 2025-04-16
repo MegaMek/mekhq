@@ -70,9 +70,7 @@ planet:
     event:
       - date: '2247-10-28'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
         population: 60394.0
         socioIndustrial: D-D-B-D-D
       - date: '2250-01-01'
@@ -83,7 +81,7 @@ planet:
         population: 964369.0
       - date: '2271-06-01'
         faction:
-          source: canon
+          source: 'Handbook: House Marik'
           value:
             - FWL
       - date: '2280-01-01'
@@ -263,16 +261,12 @@ planet:
         population: 1069322437.0
       - date: '3078-05-01'
         faction:
-          source: canon
-          value:
-            - PR
+          - PR
       - date: '3080-01-01'
         population: 1075757658.0
       - date: '3086-02-01'
         faction:
-          source: canon
-          value:
-            - RF
+          - RF
       - date: '3090-01-01'
         population: 1086569203.0
       - date: '3099-01-01'
@@ -293,12 +287,7 @@ planet:
         population: 1185808964.0
       - date: '3148-07-07'
         faction:
-          source: canon
-          value:
-            - FWL
-      - date: '3151-01-01'
-        faction:
-          source: sucs
+          source: Shattered Fortress
           value:
             - FWL
   - name: Albunea

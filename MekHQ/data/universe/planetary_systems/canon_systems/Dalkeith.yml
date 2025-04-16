@@ -152,9 +152,7 @@ planet:
     event:
       - date: '2145-09-17'
         faction:
-          source: canon
-          value:
-            - TA
+          - TA
         population: 49754.0
         socioIndustrial: D-D-C-D-F
       - date: '2150-01-01'
@@ -177,9 +175,7 @@ planet:
         population: 28377842.0
       - date: '2235-08-26'
         faction:
-          source: canon
-          value:
-            - TamP
+          - TamP
       - date: '2240-01-01'
         population: 42630633.0
       - date: '2250-01-01'
@@ -202,9 +198,9 @@ planet:
         population: 371743116.0
       - date: '2340-01-01'
         population: 420279912.0
-      - date: '2341-07-27'
+      - date: '2341-01-01'
         faction:
-          source: canon
+          source: 'Handbook: House Steiner'
           value:
             - LA
       - date: '2350-01-01'
@@ -356,6 +352,11 @@ planet:
         population: 638635003.0
       - date: '3020-01-01'
         population: 630018100.0
+      - date: '3028-08-20'
+        faction:
+          source: 20 Year Update
+          value:
+            - FC
       - date: '3030-01-01'
         population: 625427296.0
       - date: '3034-01-01'
@@ -364,11 +365,6 @@ planet:
         socioIndustrial: B-C-C-C-D
       - date: '3040-01-01'
         population: 631270901.0
-      - date: '3040-01-19'
-        faction:
-          source: canon
-          value:
-            - FC
       - date: '3041-01-01'
         socioIndustrial:
           source: canon
@@ -377,20 +373,20 @@ planet:
         population: 635387526.0
       - date: '3057-09-18'
         faction:
-          source: canon
+          source: Chaos March
           value:
             - LA
       - date: '3060-01-01'
         population: 639083482.0
       - date: '3064-02-01'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - LA
             - FC
       - date: '3067-04-20'
         faction:
-          source: canon
+          source: FedCom Civil War
           value:
             - LA
       - date: '3070-01-01'
@@ -415,9 +411,7 @@ planet:
           value: X
       - date: '3140-11-19'
         faction:
-          source: canon
-          value:
-            - RD
+          - RD
         population: 666096857.0
       - date: '3145-01-01'
         population: 668365440.0
