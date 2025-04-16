@@ -570,7 +570,7 @@ public class Force {
         this.id = i;
     }
 
-    public UUID getForceCommanderID() {
+    public @Nullable UUID getForceCommanderID() {
         return forceCommanderID;
     }
 
@@ -583,7 +583,7 @@ public class Force {
      * @see #setOverrideForceCommanderID(UUID)
      * @see #updateCommander(Campaign)
      */
-    private void setForceCommanderID(UUID commanderID) {
+    private void setForceCommanderID(@Nullable UUID commanderID) {
         forceCommanderID = commanderID;
     }
 
@@ -672,7 +672,13 @@ public class Force {
             }
         }
 
-        forceCommanderID = highestRankedPerson.getId();
+        if (highestRankedPerson == null) {
+            logger.info("Force {} has no eligible commanders", getName());
+            forceCommanderID = null;
+        } else {
+            forceCommanderID = highestRankedPerson.getId();
+        }
+
         updateCombatTeamCommanderIfCombatTeam(campaign);
 
         if (getParentForce() != null) {
