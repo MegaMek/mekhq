@@ -46,6 +46,8 @@ import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -333,7 +335,7 @@ public class Person {
     // Generic extra data, for use with plugins and mods
     private ExtraData extraData;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+    private final static ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
           MekHQ.getMHQOptions().getLocale());
     private static final MMLogger logger = MMLogger.create(Person.class);
 
@@ -3264,14 +3266,18 @@ public class Person {
             // potentially as far back as 2014. The next two handlers should never be removed.
             if (!person.canPerformRole(campaign.getLocalDate(), person.getPrimaryRole(), true)) {
                 person.setPrimaryRole(campaign, PersonnelRole.NONE);
-                logger.info("{} was found to be ineligible for their primary role. That role has been removed and " +
-                                  "they were assigned the NONE role.", person.getFullTitle());
+
+                campaign.addReport(String.format(resources.getString("ineligibleForPrimaryRole"),
+                      spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                      CLOSING_SPAN_TAG, person.getHyperlinkedFullTitle()));
             }
 
             if (!person.canPerformRole(campaign.getLocalDate(), person.getSecondaryRole(), false)) {
                 person.setSecondaryRole(PersonnelRole.NONE);
-                logger.info("{} was found to be ineligible for their secondary role. That role has been removed and " +
-                                  "they were assigned the NONE role.", person.getFullTitle());
+
+                campaign.addReport(String.format(resources.getString("ineligibleForSecondaryRole"),
+                      spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                      CLOSING_SPAN_TAG, person.getHyperlinkedFullTitle()));
             }
         } catch (Exception e) {
             logger.error(e, "Failed to read person {} from file", person.getFullName());
