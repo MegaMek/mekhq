@@ -218,6 +218,8 @@ public class KillAwards {
                                     Force originNode = campaign.getForce(originForce);
                                     temporaryKills = walkToeForKills(killData, originNode);
                                 } catch (Exception e) {
+                                    logger.warn("Could not walk toe for force {}. Exception: {} Stacktrace: {}",
+                                          originForce, e.getMessage(), e.getStackTrace());
                                     temporaryKills.addAll(killData.get(forceId));
                                 }
 
