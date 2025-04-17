@@ -342,10 +342,8 @@ public class KillAwards {
      *                     Force ID and the value is a list of associated Kill
      *                     objects.
      * @param originNode   the initial Force node from which the traversal begins.
-     * @param forceCredits the set containing the Force ID's that are eligible for
-     *                     collecting kills.
      * @return a list of Kill objects that are associated with the traversed Force
-     *         nodes that are also present in the 'forceCredits' set.
+     *         nodes
      */
     private static List<Kill> walkToeForKills(Map<Integer, List<Kill>> killData, Force originNode) {
         List<Kill> kills = new ArrayList<>();
