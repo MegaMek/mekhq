@@ -105,7 +105,7 @@ import mekhq.utilities.MHQInternationalization;
  * The main class of the application.
  */
 public class MekHQ implements GameListener {
-    private static final MMLogger logger = MMLogger.create(MekHQ.class);
+    private static final MMLogger LOGGER = MMLogger.create(MekHQ.class);
 
     // region Variable Declarations
     private static final SuitePreferences mhqPreferences = new SuitePreferences();
@@ -275,7 +275,7 @@ public class MekHQ implements GameListener {
             financesDirectory = new ObservableString("financesDirectory", ".");
             preferences.manage(new StringPreference(financesDirectory));
         } catch (Exception ex) {
-            logger.error(ex, "Failed to set user preferences");
+            LOGGER.error(ex, "Failed to set user preferences");
         }
     }
 
@@ -323,7 +323,9 @@ public class MekHQ implements GameListener {
             options.setEnableExternalConfiguration(true);
             options.setDsn("https://a05b2064798e2b8d46ac620b4497a072@sentry.tapenvy.us/10");
             options.setEnvironment("production");
-            options.setTracesSampleRate(0.2);
+            options.setTracesSampleRate(1.0);
+            options.setProfilesSampleRate(1.0);
+            options.setEnableAppStartProfiling(true);
             options.setDebug(true);
             options.setServerName("MekHQClient");
             options.setRelease(SuiteConstants.VERSION.toString());
@@ -334,7 +336,7 @@ public class MekHQ implements GameListener {
             final String name = t.getClass().getName();
             final String message = String.format(MMLoggingConstants.UNHANDLED_EXCEPTION, name);
             final String title = String.format(MMLoggingConstants.UNHANDLED_EXCEPTION_TITLE, name);
-            logger.errorDialog(t, message, title);
+            LOGGER.errorDialog(t, message, title);
         });
 
         // Second, let's handle logging
@@ -349,11 +351,11 @@ public class MekHQ implements GameListener {
         SwingUtilities.invokeLater(() -> MekHQ.getInstance().startup());
 
         // log jvm parameters
-        logger.info(ManagementFactory.getRuntimeMXBean().getInputArguments());
+        LOGGER.info(ManagementFactory.getRuntimeMXBean().getInputArguments());
     }
 
     public static void initializeLogging(final String originProject) {
-        logger.info(getUnderlyingInformation(originProject));
+        LOGGER.info(getUnderlyingInformation(originProject));
     }
 
     /**
@@ -389,10 +391,10 @@ public class MekHQ implements GameListener {
     }
 
     /**
-     * @param campaigngui the {@link CampaignGUI} to set
+     * @param campaignGUI the {@link CampaignGUI} to set
      */
-    public void setCampaigngui(CampaignGUI campaigngui) {
-        this.campaignGUI = campaigngui;
+    public void setCampaigngui(CampaignGUI campaignGUI) {
+        this.campaignGUI = campaignGUI;
     }
 
     public void joinGame(Scenario scenario, List<Unit> meks) {
@@ -411,7 +413,7 @@ public class MekHQ implements GameListener {
         try {
             client = new Client(playerName, serverAddress, port);
         } catch (Exception ex) {
-            logger.error(ex, "Failed to connect to server properly");
+            LOGGER.error(ex, "Failed to connect to server properly");
             return;
         }
 
@@ -428,11 +430,11 @@ public class MekHQ implements GameListener {
      * connect to it.
      *
      * @param scenario     The scenario to host
-     * @param loadSavegame Whether to load a savegame
+     * @param loadSaveGame Whether to load a save game
      * @param meks         The units you want to use in the scenario
      */
-    public void startHost(Scenario scenario, boolean loadSavegame, List<Unit> meks) {
-        startHost(scenario, loadSavegame, meks, null);
+    public void startHost(Scenario scenario, boolean loadSaveGame, List<Unit> meks) {
+        startHost(scenario, loadSaveGame, meks, null);
     }
 
     /**
@@ -440,13 +442,13 @@ public class MekHQ implements GameListener {
      * connect to it.
      *
      * @param scenario                    The scenario to host
-     * @param loadSavegame                Whether to load a savegame
+     * @param loadSaveGame                Whether to load a save game
      * @param meks                        The units you want to use in the scenario
      * @param autoResolveBehaviorSettings The auto resolve behavior settings to use if running an AtB scenario and auto
      *                                    resolve is wanted
      */
-    public void startHost(Scenario scenario, boolean loadSavegame, List<Unit> meks,
-                          @Nullable BehaviorSettings autoResolveBehaviorSettings) {
+    public void startHost(Scenario scenario, boolean loadSaveGame, List<Unit> meks,
+          @Nullable BehaviorSettings autoResolveBehaviorSettings) {
         HostDialog hostDialog = new HostDialog(campaignGUI.getFrame(), getCampaign().getName());
         hostDialog.setVisible(true);
 
@@ -461,23 +463,23 @@ public class MekHQ implements GameListener {
         final String password = hostDialog.getServerPass();
         final int port = hostDialog.getPort();
         final boolean register = hostDialog.isRegister();
-        final String metaserver = register ? hostDialog.getMetaserver() : "";
+        final String metaServer = register ? hostDialog.getMetaserver() : "";
 
         // Force cleanup of the current modal, since we are (possibly) about to display a new one and macOS seems to
         // struggle with that (see https://github.com/MegaMek/mekhq/issues/953)
         hostDialog.dispose();
 
         try {
-            myServer = new Server(password, port, new TWGameManager(), register, metaserver);
-            if (loadSavegame) {
-                FileDialog f = new FileDialog(campaignGUI.getFrame(), "Load Savegame");
+            myServer = new Server(password, port, new TWGameManager(), register, metaServer);
+            if (loadSaveGame) {
+                FileDialog f = new FileDialog(campaignGUI.getFrame(), "Load Save Game");
                 f.setDirectory(System.getProperty("user.dir") + "/savegames");
                 f.setVisible(true);
                 if (null != f.getFile()) {
                     getMyServer().loadGame(new File(f.getDirectory(), f.getFile()));
                 } else {
                     stopHost();
-                    return; // exceptions as flow control? no thanks.
+                    return; // exceptions as flow control? no, thanks.
                 }
             }
         } catch (FileNotFoundException ex) {
@@ -485,7 +487,7 @@ public class MekHQ implements GameListener {
             stopHost();
             return;
         } catch (Exception ex) {
-            logger.error(ex, "Failed to start up server");
+            LOGGER.error(ex, "Failed to start up server");
             stopHost();
             return;
         }
@@ -623,7 +625,7 @@ public class MekHQ implements GameListener {
             PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), currentScenario, tracker);
 
         } catch (Exception ex) {
-            logger.error(ex, "gameVictory()");
+            LOGGER.error(ex, "gameVictory()");
         } finally {
             gameThread.requestStop();
         }
@@ -800,7 +802,7 @@ public class MekHQ implements GameListener {
             resolveDialog.setVisible(true);
             // TODO remove these safeties once the investigation is concluded -Illiani
             if (resolveDialog == null) {
-                logger.errorDialog(new IllegalStateException(),
+                LOGGER.errorDialog(new IllegalStateException(),
                       "resolveDialog is null please report this as a bug",
                       "UNDER ACTIVE INVESTIGATION");
             }
@@ -808,7 +810,7 @@ public class MekHQ implements GameListener {
                 // TODO remove these safeties once the investigation is concluded -Illiani
                 Map<UUID, ?> peopleStatus = tracker.getPeopleStatus();
                 if (peopleStatus == null) {
-                    logger.errorDialog(new IllegalStateException(),
+                    LOGGER.errorDialog(new IllegalStateException(),
                           "People status map in tracker is null please report this as a bug",
                           "UNDER ACTIVE INVESTIGATION");
                 }
@@ -816,7 +818,7 @@ public class MekHQ implements GameListener {
                 for (UUID personId : tracker.getPeopleStatus().keySet()) {
                     // TODO remove these safeties once the investigation is concluded -Illiani
                     if (getCampaign() == null) {
-                        logger.errorDialog(new IllegalStateException(),
+                        LOGGER.errorDialog(new IllegalStateException(),
                               "Campaign instance is null please report this as a bug",
                               "UNDER ACTIVE INVESTIGATION");
                     }
@@ -825,19 +827,17 @@ public class MekHQ implements GameListener {
 
                     if (person == null) {
                         // TODO remove these safeties once the investigation is concluded -Illiani
-                        logger.errorDialog(new IllegalStateException(),
+                        LOGGER.errorDialog(new IllegalStateException(),
                               "Person with ID " +
                                     personId +
-                                    " does not exist in the campaign" +
-                                    " please report this" +
-                                    " as a bug",
+                                    " does not exist in the campaign please report this as a bug",
                               "UNDER ACTIVE INVESTIGATION");
                     }
 
                     Integer priorHits = person.getHitsPrior();
                     // TODO remove these safeties once the investigation is concluded -Illiani
                     if (priorHits == null) {
-                        logger.errorDialog(new IllegalStateException(),
+                        LOGGER.errorDialog(new IllegalStateException(),
                               "Person's prior hits are not set for person " +
                                     person.getFullName() +
                                     " please report this as a bug",
@@ -849,7 +849,7 @@ public class MekHQ implements GameListener {
             }
             PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), scenario, tracker);
         } catch (Exception ex) {
-            logger.error("Error during auto resolve concluded", ex);
+            LOGGER.error("Error during auto resolve concluded", ex);
         }
     }
 
@@ -900,7 +900,7 @@ public class MekHQ implements GameListener {
                            InstantiationException |
                            IllegalAccessException |
                            UnsupportedLookAndFeelException e) {
-                logger.error(e, "setLookAndFeel()");
+                LOGGER.error(e, "setLookAndFeel() with exception {}", e.getMessage());
             }
             try {
                 UIManager.setLookAndFeel(defaultTheme);
@@ -918,7 +918,7 @@ public class MekHQ implements GameListener {
                            InstantiationException |
                            IllegalAccessException |
                            UnsupportedLookAndFeelException e) {
-                logger.error(e, "setLookAndFeel()");
+                LOGGER.error(e, "setLookAndFeel()");
             }
         };
         SwingUtilities.invokeLater(runnable);
