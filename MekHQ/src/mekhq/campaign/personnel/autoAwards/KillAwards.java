@@ -182,9 +182,7 @@ public class KillAwards {
                             // but that's ok, in that case we just use a default value
                             try {
                                 originForce = campaign.getPerson(person).getUnit().getForceId();
-                            } catch (Exception ignored) {
-                                Exception ex = ignored;
-                            }
+                            } catch (Exception ignored) {}
 
                             if ((originForce != -1) && (!forceCredits.contains(originForce))) {
                                 forceCredits.add(originForce);
