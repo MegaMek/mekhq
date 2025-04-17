@@ -243,6 +243,7 @@ MEKHQ VERSION HISTORY:
 + PR #6694: Made 'Invalid Profession' Errors More Visible With Advance for Older Campaigns
 + PR #6695: Skip Turrets / Gun Emplacements when auto-configuring NPC ammo loadouts
 + PR #6696: Updated New Player Guide for 50.05; Added Print Friendly Version
++ PR #6699: Thunderbird Battle Armor (3145/NTNU RS Upgrade versions) had no space between (Upgrade) and [Wepaon Type] in MHQ, but it did in MM.
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
