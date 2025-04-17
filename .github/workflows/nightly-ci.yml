@@ -91,7 +91,7 @@ jobs:
 
       - name: Build with Gradle
         working-directory: mekhq
-        run: ./gradlew build -x test
+        run: ./gradlew build -x test -PextraVersion="nightly-$(date +'%Y-%m-%d')"
 
       - name: CodeCov.io Coverage Report
         uses: codecov/codecov-action@v5
