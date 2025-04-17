@@ -27,6 +27,25 @@
  */
 package mekhq.campaign.personnel.autoAwards;
 
+import static mekhq.campaign.force.FormationLevel.ARMY;
+import static mekhq.campaign.force.FormationLevel.BATTALION;
+import static mekhq.campaign.force.FormationLevel.BRIGADE;
+import static mekhq.campaign.force.FormationLevel.COMPANY;
+import static mekhq.campaign.force.FormationLevel.CORPS;
+import static mekhq.campaign.force.FormationLevel.DIVISION;
+import static mekhq.campaign.force.FormationLevel.LANCE;
+import static mekhq.campaign.force.FormationLevel.NONE;
+import static mekhq.campaign.force.FormationLevel.REGIMENT;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
+import java.util.UUID;
+
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
@@ -34,10 +53,6 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
-
-import java.util.*;
-
-import static mekhq.campaign.force.FormationLevel.*;
 
 public class KillAwards {
     private static final MMLogger logger = MMLogger.create(KillAwards.class);
@@ -167,7 +182,9 @@ public class KillAwards {
                             // but that's ok, in that case we just use a default value
                             try {
                                 originForce = campaign.getPerson(person).getUnit().getForceId();
-                            } catch (Exception ignored) {}
+                            } catch (Exception ignored) {
+                                Exception ex = ignored;
+                            }
 
                             if ((originForce != -1) && (!forceCredits.contains(originForce))) {
                                 forceCredits.add(originForce);
@@ -201,7 +218,7 @@ public class KillAwards {
                                     }
 
                                     Force originNode = campaign.getForce(originForce);
-                                    temporaryKills = walkToeForKills(killData, originNode, new HashSet<>(forceCredits));
+                                    temporaryKills = walkToeForKills(killData, originNode);
                                 } catch (Exception e) {
                                     temporaryKills.addAll(killData.get(forceId));
                                 }
@@ -330,8 +347,7 @@ public class KillAwards {
      * @return a list of Kill objects that are associated with the traversed Force
      *         nodes that are also present in the 'forceCredits' set.
      */
-    private static List<Kill> walkToeForKills(Map<Integer, List<Kill>> killData, Force originNode,
-            Set<Integer> forceCredits) {
+    private static List<Kill> walkToeForKills(Map<Integer, List<Kill>> killData, Force originNode) {
         List<Kill> kills = new ArrayList<>();
 
         Stack<Force> stack = new Stack<>();
@@ -344,7 +360,7 @@ public class KillAwards {
             Force currentNode = stack.pop();
 
             if (!visitedForces.contains(currentNode.getId())) {
-                if (forceCredits.contains(currentNode.getId())) {
+                if (killData.containsKey(currentNode.getId())) {
                     kills.addAll(killData.get(currentNode.getId()));
                 }
 
