@@ -219,6 +219,30 @@ MEKHQ VERSION HISTORY:
 + Fix #6646: Fixed Skill XP Costs Resetting
 + PR #6650: Better differentiate transport type in TOE
 + PR #6649: Fix what units are passed to detach trailer/tractor so it only shows when needed
++ Fix #6651: Removed Partial Maintenance and fixed Shorthanded Penalty
++ Fix #6652: Fixed Use Player DropShips Always Picking the Same Unit
++ Fix #6653: Updated Doctor/Tech Uses Administration to No Longer Factor Administration into Experience Level
++ Fix #6654: Added New Player Quickstart Option
++ PR #6657: Renamed "Company Generator" to "Quick Start Company Generator"
++ PR #6661: Updated Presets to 50.05
++ PR #6662: A Couple of SPA XML Fixes
++ PR #6663: Fixed Skill Panel Layout Calculation in Campaign Options IIC
++ PR #6667: Fixed an NPE During Contract Resolution (Sentry)
++ Fix #6668: Fixed Creative Accounting for Ammunition in Resupplies
++ Fix #6672: Corrected swapped new day Optimize Medical Assignments and MRMS
++ Fix #6619: Fixed C3 Links made in MM lobby persist back into MekHQ 
++ PR #6648: Tractor transport types can now be used for leadership bonus unit selections
++ PR #6675: Fixed Command Skills Counting Down not Up
++ PR #6677: Fixed NPE in updateCommander (Sentry)
++ Fix #6688: Corrected Fuel Cost Calculation for DS
++ Fix #6412, #6422: Fixed Multiple Scenario Template Issues
++ Fix #6669: acar move entity by copy and fix the problem with ammo
++ PR #6690: Fixed Sorting and Updating of Procurement Table
++ PR #6692: Improved Handling of Unit Rating Report for Older Campaigns
++ PR #6693: Improved SkillLevel Parsing from Older Campaigns
++ PR #6694: Made 'Invalid Profession' Errors More Visible With Advance for Older Campaigns
++ PR #6695: Skip Turrets / Gun Emplacements when auto-configuring NPC ammo loadouts
++ PR #6696: Updated New Player Guide for 50.05; Added Print Friendly Version
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times

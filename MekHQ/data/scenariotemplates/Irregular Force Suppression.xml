@@ -2,11 +2,11 @@
 <ScenarioTemplate>
     <name>Irregular Force Suppression</name>
     <shortBriefing>Engage and defeat irregular-supported force.</shortBriefing>
-    <detailedBriefing>Local insurgent forces are receiving direct military support in this region, strengthening their ability to disrupt our operations. If they are not dealt with decisively, they will continue to erode our control and pose a long-term threat. Your mission is to engage and destroy at least 50% of the combined enemy force, cutting off their ability to operate effectively.
+    <detailedBriefing><![CDATA[Local insurgent forces are receiving direct military support in this region, strengthening their ability to disrupt our operations. If they are not dealt with decisively, they will continue to erode our control and pose a long-term threat. Your mission is to engage and destroy at least 50% of the combined enemy force, cutting off their ability to operate effectively.
 
 Expect a blend of unconventional tactics and structured military resistance. The insurgents will use ambushes, terrain familiarity, and hit-and-run attacks, while their military allies will bring firepower, coordination, and heavier assets into the fight. Dismantle their cohesion, eliminate key targets, and disrupt their ability to function as a fighting force.
 
-The victor will control the battlefield at the end of the engagement, securing any remaining assets and ensuring this region remains under our command. This mission is about eradication—strike hard, leave no room for recovery, and establish total dominance.</detailedBriefing>
+The victor will control the battlefield at the end of the engagement, securing any remaining assets and ensuring this region remains under our command. This mission is about eradication—strike hard, leave no room for recovery, and establish total dominance.]]></detailedBriefing>
     <battlefieldControl>VICTOR</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
@@ -46,7 +46,6 @@ The victor will control the battlefield at the end of the engagement, securing a
                     <deploymentZone>6</deploymentZone>
                     <deploymentZone>7</deploymentZone>
                     <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>

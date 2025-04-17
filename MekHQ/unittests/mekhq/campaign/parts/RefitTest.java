@@ -84,20 +84,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(value = MockitoExtension.class)
 public class RefitTest {
     @Mock
@@ -805,6 +791,7 @@ public class RefitTest {
         Player mockPlayer = mock(Player.class);
         when(mockPlayer.getName()).thenReturn("Test Player");
         oldEntity.setOwner(mockPlayer);
+        oldEntity.setGame(mockGame);
 
         // Create the entity we're going to refit to
         Entity newEntity = UnitTestUtilities.getHeavyTrackedApcStandard();

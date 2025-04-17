@@ -2,11 +2,11 @@
 <ScenarioTemplate>
     <name>Minor Engagement</name>
     <shortBriefing>Engage and destroy enemy forces.</shortBriefing>
-    <detailedBriefing>The enemy has positioned forces in this area, but they are not yet fully committed to battle. Your objective is to inflict enough damage to force them to withdraw. Destroy at least 25% of their forces to break their resolve and make it clear that holding this position is not worth the cost.
+    <detailedBriefing><![CDATA[The enemy has positioned forces in this area, but they are not yet fully committed to battle. Your objective is to inflict enough damage to force them to withdraw. Destroy at least 25% of their forces to break their resolve and make it clear that holding this position is not worth the cost.
 
 This is a show of strength—hit them hard, make them bleed, and leave no doubt that further resistance is futile. They may attempt a counteroffensive, but once their losses mount, they will have no choice but to retreat.
 
-The victor will control the battlefield at the end of the engagement, securing the area and denying the enemy any future foothold here. Send a message—this ground belongs to us.</detailedBriefing>
+The victor will control the battlefield at the end of the engagement, securing the area and denying the enemy any future foothold here. Send a message—this ground belongs to us.]]></detailedBriefing>
     <battlefieldControl>VICTOR</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
@@ -40,8 +40,6 @@ The victor will control the battlefield at the end of the engagement, securing t
                     <deploymentZone>6</deploymentZone>
                     <deploymentZone>7</deploymentZone>
                     <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
-                    <deploymentZone>10</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>

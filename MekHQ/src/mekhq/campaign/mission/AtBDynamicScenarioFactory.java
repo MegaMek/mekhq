@@ -819,8 +819,10 @@ public class AtBDynamicScenarioFactory {
                 Game cGame = campaign.getGame();
                 TeamLoadOutGenerator tlg = new TeamLoadOutGenerator(cGame);
                 if (campaign.getCampaignOptions().isAutoConfigMunitions()) {
-                    // Configure *all* generated units with appropriate munitions (for BV calcs)
-                    ArrayList<Entity> arrayGeneratedLance = new ArrayList<>(generatedLance);
+                    // Configure non-Turret generated units with appropriate munitions (for BV calcs)
+                    ArrayList<Entity> arrayGeneratedLance = new ArrayList<>(
+                          generatedLance.stream().filter(e -> !(e instanceof GunEmplacement)).toList()
+                    );
                     // bin fill ratio will be adjusted by the load out generator based on piracy and
                     // quality
                     ReconfigurationParameters rp = TeamLoadOutGenerator.generateParameters(cGame,
