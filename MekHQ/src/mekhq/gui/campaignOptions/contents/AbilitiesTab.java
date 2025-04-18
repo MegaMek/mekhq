@@ -27,6 +27,13 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillType.S_GUN_BA;
+import static mekhq.campaign.personnel.skills.SkillType.S_GUN_PROTO;
+import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
 import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.CHARACTER_CREATION_ONLY;
 import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.CHARACTER_FLAW;
 import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.COMBAT_ABILITY;
@@ -42,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
@@ -57,10 +65,15 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
+import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillPerquisite;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
@@ -235,37 +248,38 @@ public class AbilitiesTab {
             return CHARACTER_FLAW;
         }
 
+        boolean isManeuvering = false;
         for (SkillPerquisite skillPerquisite : ability.getPrereqSkills()) {
-            // Is the ability classified as a Combat Ability?
-            boolean isCombatAbility = false;
-            for (String word : new String[] { "Gunnery", "Artillery", "Small Arms" }) {
-                if (Pattern.compile("\\b" + word).matcher(skillPerquisite.toString()).find()) {
-                    isCombatAbility = true;
-                    break; // Exit loop early since a match is found
+            String skillPerquisiteString = skillPerquisite.toString();
+            // Step 1: Remove extra information
+            skillPerquisiteString = skillPerquisiteString.replaceAll("\\{", "").replaceAll("}", "");
+            skillPerquisiteString = skillPerquisiteString.replaceAll("OR ", "");
+
+            // Step 2: remove experience levels
+            for (int i = 0; i < EXP_ELITE; i++) {
+                skillPerquisiteString = skillPerquisiteString.replaceAll(getExperienceLevelName(i) + ' ', "");
+            }
+
+            // Step 3: Split the string by <br>
+            String[] parts = skillPerquisiteString.split("<br>");
+
+            // Step 4: Test each part
+            List<String> specialAbilitySkills = List.of(S_GUN_PROTO, S_GUN_BA);
+            for (String part : parts) {
+                SkillType skillType = SkillType.getType(part);
+
+                if (skillType.isSubTypeOf(COMBAT_GUNNERY) && !specialAbilitySkills.contains(part)) {
+                    return COMBAT_ABILITY;
                 }
-            }
 
-            if (isCombatAbility) {
-                return COMBAT_ABILITY;
-            }
-
-            // Is the ability classified as a Maneuvering Ability?
-            boolean isManeuveringAbility = false;
-            for (String word : new String[] { "Piloting", "Anti-Mek" }) {
-                if (Pattern.compile("\\b" + word).matcher(skillPerquisite.toString()).find()) {
-                    isManeuveringAbility = true;
-                    break;
+                if (skillType.isSubTypeOf(COMBAT_PILOTING) || specialAbilitySkills.contains(part)) {
+                    isManeuvering = true;
                 }
-            }
-
-
-            if (isManeuveringAbility) {
-                return MANEUVERING_ABILITY;
             }
         }
 
         // If it isn't a Combat or Maneuvering ability, it's a utility ability
-        return UTILITY_ABILITY;
+        return isManeuvering ? MANEUVERING_ABILITY : UTILITY_ABILITY;
     }
 
     /**
