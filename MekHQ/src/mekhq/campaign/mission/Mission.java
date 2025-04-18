@@ -35,10 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -47,10 +43,13 @@ import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Missions are primarily holder objects for a set of scenarios.
- *
+ * <p>
  * The really cool stuff will happen when we subclass this into Contract
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -88,6 +87,22 @@ public class Mission {
         return name;
     }
 
+    /**
+     * Returns the name of this object as an HTML hyperlink.
+     *
+     * <p>The hyperlink is formatted with a "MISSION:" protocol prefix followed by the object's ID. This allows UI
+     * components that support HTML to render the name as a clickable link, which can be used to navigate to or focus on
+     * this specific object when clicked.</p>
+     *
+     * @return An HTML formatted string containing the object's name as a hyperlink with its ID
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public String getHyperlinkedName() {
+        return String.format("<a href='MISSION:%s'>%s</a>", getId(), getName());
+    }
+
     public void setName(String n) {
         this.name = n;
     }
@@ -113,9 +128,8 @@ public class Mission {
     }
 
     /**
-     * Convenience property to return the name of the current planet.
-     * Sometimes, the "current planet" doesn't match up with an existing planet in
-     * our planet database, in which case we return whatever was stored.
+     * Convenience property to return the name of the current planet. Sometimes, the "current planet" doesn't match up
+     * with an existing planet in our planet database, in which case we return whatever was stored.
      *
      * @return
      */
@@ -165,25 +179,26 @@ public class Mission {
     }
 
     public List<Scenario> getCurrentScenarios() {
-        return getScenarios().stream().filter(scenario -> scenario.getStatus().isCurrent())
-                .collect(Collectors.toList());
+        return getScenarios().stream()
+                     .filter(scenario -> scenario.getStatus().isCurrent())
+                     .collect(Collectors.toList());
     }
 
     public List<AtBScenario> getCurrentAtBScenarios() {
         return getScenarios().stream()
-                .filter(scenario -> scenario.getStatus().isCurrent() && (scenario instanceof AtBScenario))
-                .map(scenario -> (AtBScenario) scenario)
-                .collect(Collectors.toList());
+                     .filter(scenario -> scenario.getStatus().isCurrent() && (scenario instanceof AtBScenario))
+                     .map(scenario -> (AtBScenario) scenario)
+                     .collect(Collectors.toList());
     }
 
     public List<Scenario> getCompletedScenarios() {
-        return getScenarios().stream().filter(scenario -> !scenario.getStatus().isCurrent())
-                .collect(Collectors.toList());
+        return getScenarios().stream()
+                     .filter(scenario -> !scenario.getStatus().isCurrent())
+                     .collect(Collectors.toList());
     }
 
     /**
-     * Don't use this method directly as it will not add an id to the added
-     * scenario. Use Campaign#AddScenario instead
+     * Don't use this method directly as it will not add an id to the added scenario. Use Campaign#AddScenario instead
      *
      * @param scenario the scenario to add this this mission
      */
@@ -199,7 +214,7 @@ public class Mission {
     public boolean hasPendingScenarios() {
         // scenarios that are pending, but have not been revealed don't count
         return getScenarios().stream()
-                .anyMatch(scenario -> (scenario.getStatus().isCurrent() && !scenario.isCloaked()));
+                     .anyMatch(scenario -> (scenario.getStatus().isCurrent() && !scenario.isCloaked()));
     }
     // endregion Scenarios
 
@@ -265,8 +280,8 @@ public class Mission {
 
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.name = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("planetId")
-                        || wn2.getNodeName().equalsIgnoreCase("systemId")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("planetId") ||
+                                 wn2.getNodeName().equalsIgnoreCase("systemId")) {
                     retVal.systemId = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetName")) {
                     PlanetarySystem system = c.getSystemByName(wn2.getTextContent());

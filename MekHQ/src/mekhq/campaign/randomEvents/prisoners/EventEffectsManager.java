@@ -30,13 +30,10 @@ package mekhq.campaign.randomEvents.prisoners;
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static java.lang.Math.round;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static mekhq.campaign.force.ForceType.SECURITY;
-import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
-import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_POISON_RESISTANCE;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
@@ -925,7 +922,7 @@ public class EventEffectsManager {
         return getFormattedTextAt(RESOURCE_BUNDLE,
               "SUPPORT_POINT.report",
               context,
-              target.getName(),
+              target.getHyperlinkedName(),
               colorOpen,
               direction,
               CLOSING_SPAN_TAG,

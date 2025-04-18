@@ -323,6 +323,24 @@ public class StratconScenario implements IStratconDisplayable {
         return backingScenario.getName();
     }
 
+    /**
+     * Returns the name of this object as an HTML hyperlink.
+     *
+     * <p>The hyperlink is formatted with a "SCENARIO:" protocol prefix followed by the object's ID. This allows UI
+     * components that support HTML to render the name as a clickable link, which can be used to navigate to or focus on
+     * this specific object when clicked.</p>
+     *
+     * @return An HTML formatted string containing the object's name as a hyperlink with its ID
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public String getHyperlinkedName() {
+        return String.format("<a href='SCENARIO:%s'>%s</a>",
+              backingScenario != null ? backingScenario.getId() : -1,
+              getName());
+    }
+
     public int getRequiredPlayerLances() {
         return requiredPlayerLances;
     }
@@ -518,7 +536,8 @@ public class StratconScenario implements IStratconDisplayable {
      * @return The {@link StratconTrackState} that contains this scenario, or {@code null} if no matching track is found
      *       or if enough data to derive the campaign state is unavailable.
      */
-    public @Nullable StratconTrackState getTrackForScenario(Campaign campaign, @Nullable StratconCampaignState campaignState) {
+    public @Nullable StratconTrackState getTrackForScenario(Campaign campaign,
+          @Nullable StratconCampaignState campaignState) {
         // If a campaign state hasn't been provided, we try to derive it from the available
         // scenario information.
         if (campaignState == null) {

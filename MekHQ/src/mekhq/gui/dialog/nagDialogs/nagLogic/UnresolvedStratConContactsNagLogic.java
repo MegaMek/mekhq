@@ -115,8 +115,8 @@ public class UnresolvedStratConContactsNagLogic {
                         // Append formatted unresolved scenario information
                         unresolvedContacts.append(getFormattedTextAt(RESOURCE_BUNDLE,
                               "UnresolvedStratConContactsNagDialog.report",
-                              scenario.getName(),
-                              contract.getName(),
+                              scenario.getHyperlinkedName(),
+                              contract.getHyperlinkedName(),
                               track.getDisplayableName(),
                               scenario.getCoords().toBTString(),
                               addendum));

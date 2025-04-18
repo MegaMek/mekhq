@@ -124,8 +124,8 @@ public class OutstandingScenariosNagLogic {
                         // Append formatted unresolved scenario information
                         activeScenarios.append(getFormattedTextAt(RESOURCE_BUNDLE,
                               "UnresolvedStratConContactsNagDialog.report",
-                              scenario.getName(),
-                              contract.getName(),
+                              scenario.getHyperlinkedName(),
+                              contract.getHyperlinkedName(),
                               track == null ? "" : track.getDisplayableName(),
                               stratconScenario.getCoords().toBTString(),
                               addendum));
@@ -134,9 +134,9 @@ public class OutstandingScenariosNagLogic {
                     // Add non-track scenarios
                     activeScenarios.append("<p>- ")
                           .append("<b>")
-                          .append(scenario.getName())
+                          .append(scenario.getHyperlinkedName())
                           .append("</b>, ")
-                          .append(contract.getName());
+                          .append(contract.getHyperlinkedName());
                 }
             }
         }

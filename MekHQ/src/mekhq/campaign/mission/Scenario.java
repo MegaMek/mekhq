@@ -205,6 +205,22 @@ public class Scenario implements IPlayerSettings {
         return name;
     }
 
+    /**
+     * Returns the name of this object as an HTML hyperlink.
+     *
+     * <p>The hyperlink is formatted with a "SCENARIO:" protocol prefix followed by the object's ID. This allows UI
+     * components that support HTML to render the name as a clickable link, which can be used to navigate to or focus on
+     * this specific object when clicked.</p>
+     *
+     * @return An HTML formatted string containing the object's name as a hyperlink with its ID
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public String getHyperlinkedName() {
+        return String.format("<a href='SCENARIO:%s'>%s</a>", getId(), getName());
+    }
+
     public void setName(String n) {
         this.name = n;
     }
