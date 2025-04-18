@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<campaignPreset version="0.50.05-SNAPSHOT">
+<campaignPreset version="0.50.05">
     <title>3 - Campaign Operations</title>
     <description><![CDATA[This preset follows the rules from the official Campaign Operations manual, designed for human GMs managing CamOps campaigns in MekHQ.
 <br>
