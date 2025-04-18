@@ -477,21 +477,44 @@ public class SkillCheckUtility {
     }
 
     /**
-     * Calculates the total attribute modifier for a given skill type based on the character's attributes.
+     * Calculates the total attribute modifier for a given skill type based on the character's attributes
+     * and applies the modifiers to the target roll.
      *
-     * <p>The modifier is determined by summing up the individual attribute modifiers for the skill's linked
-     * attributes.</p>
+     * <p>This method retrieves the attributes linked to the specified {@link SkillType} and calculates
+     * the total contribution of their modifiers to the target roll. Each attribute's score is converted
+     * into an individual modifier using {@link #getIndividualAttributeModifier(int)}, and the modifier is
+     * then added to both:</p>
      *
-     * @param targetNumber
-     * @param characterAttributes the {@link Attributes} of the person performing the skill check
-     * @param skillType           the {@link SkillType} being checked
+     * <ul>
+     *   <li>The total attribute modifier (returned by the method), and</li>
+     *   <li>The {@link TargetRoll}, where the attribute modifier is applied as a negative value.</li>
+     * </ul>
      *
-     * @return the total attribute modifier for the skill check
+     * <p></p>Attributes that are set to {@link SkillAttribute#NONE} are ignored during this process.</p>
+     *
+     * <p>The calculated attribute modifiers are applied directly to the {@link TargetRoll} using
+     * {@link TargetRoll#addModifier(int, String)}, where the negative modifier is associated with the
+     * attribute's label.</p>
+     *
+     * @param targetNumber         the {@link TargetRoll} representing the current target number,
+     *                             which will be adjusted based on the character's attribute modifiers
+     * @param characterAttributes  the {@link Attributes} object representing the character's
+     *                             raw attribute scores that determine the skill check modifiers
+     * @param skillType            the {@link SkillType} being assessed, whose linked attributes
+     *                             contribute to the total modifier calculation
+     *
+     * @return the total attribute modifier calculated for the given skill type, which is the sum
+     *         of the individual modifiers for each linked attribute. If any of the parameters are {@code null}
+     *         returns 0.
      *
      * @author Illiani
      * @since 0.50.05
      */
     public static int getTotalAttributeModifier(TargetRoll targetNumber, final Attributes characterAttributes, final SkillType skillType) {
+        if (targetNumber == null || characterAttributes == null || skillType == null) {
+            return 0;
+        }
+
         List<SkillAttribute> linkedAttributes = List.of(skillType.getFirstAttribute(), skillType.getSecondAttribute());
 
         int totalModifier = 0;
