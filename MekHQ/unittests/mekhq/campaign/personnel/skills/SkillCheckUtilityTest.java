@@ -30,10 +30,13 @@ package mekhq.campaign.personnel.skills;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_SKILL_MODIFIER;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_TARGET_NUMBER_ONE_LINKED_ATTRIBUTE;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES;
+import static mekhq.campaign.personnel.skills.SkillCheckUtility.determineTargetNumber;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.getIndividualAttributeModifier;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.getTotalAttributeModifier;
+import static mekhq.campaign.personnel.skills.SkillCheckUtility.getTotalAttributeScoreForSkill;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.performQuickSkillCheck;
 import static mekhq.campaign.personnel.skills.SkillType.S_GUN_MEK;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.DISASTROUS;
@@ -47,6 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import megamek.common.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -87,7 +91,7 @@ class SkillCheckUtilityTest {
         assertEquals(expectedResultsText, checkUtility.getResultsText());
 
         int expectedTargetNumber = Integer.MAX_VALUE;
-        assertEquals(expectedTargetNumber, checkUtility.getTargetNumber());
+        assertEquals(expectedTargetNumber, checkUtility.getTargetNumber().getValue());
 
         int expectedRoll = Integer.MIN_VALUE;
         assertEquals(expectedRoll, checkUtility.getRoll());
@@ -105,7 +109,7 @@ class SkillCheckUtilityTest {
         assertEquals(expectedResultsText, checkUtility.getResultsText());
 
         int expectedTargetNumber = Integer.MAX_VALUE;
-        assertEquals(expectedTargetNumber, checkUtility.getTargetNumber());
+        assertEquals(expectedTargetNumber, checkUtility.getTargetNumber().getValue());
 
         int expectedRoll = Integer.MIN_VALUE;
         assertEquals(expectedRoll, checkUtility.getRoll());
@@ -132,8 +136,10 @@ class SkillCheckUtilityTest {
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE);
 
+        TargetRoll targetNumber = new TargetRoll();
+
         // Act
-        int totalModifier = SkillCheckUtility.getTotalAttributeModifier(attributes, testSkillType);
+        int totalModifier = SkillCheckUtility.getTotalAttributeModifier(targetNumber, attributes, testSkillType);
 
         // Assert
         assertEquals(1, totalModifier);
@@ -154,8 +160,10 @@ class SkillCheckUtilityTest {
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE);
 
+        TargetRoll targetNumber = new TargetRoll();
+
         // Act
-        int totalModifier = SkillCheckUtility.getTotalAttributeModifier(attributes, testSkillType);
+        int totalModifier = SkillCheckUtility.getTotalAttributeModifier(targetNumber, attributes, testSkillType);
 
         // Assert
         assertEquals(2, totalModifier);
@@ -176,8 +184,10 @@ class SkillCheckUtilityTest {
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE);
 
+        TargetRoll targetNumber = new TargetRoll();
+
         // Act
-        int totalModifier = SkillCheckUtility.getTotalAttributeModifier(attributes, testSkillType);
+        int totalModifier = SkillCheckUtility.getTotalAttributeModifier(targetNumber, attributes, testSkillType);
 
         // Assert
         assertEquals(0, totalModifier);
@@ -219,11 +229,13 @@ class SkillCheckUtilityTest {
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE);
 
+        TargetRoll targetNumber = new TargetRoll();
+
         // Act
-        int totalScore = SkillCheckUtility.getTotalAttributeScoreForSkill(attributes, testSkillType);
+        int totalScore = SkillCheckUtility.getTotalAttributeScoreForSkill(targetNumber, attributes, testSkillType);
 
         // Assert
-        assertEquals(7, totalScore);
+        assertEquals(7, totalScore, targetNumber.toString());
     }
 
     @Test
@@ -241,11 +253,13 @@ class SkillCheckUtilityTest {
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE);
 
+        TargetRoll targetNumber = new TargetRoll();
+
         // Act
-        int totalScore = SkillCheckUtility.getTotalAttributeScoreForSkill(attributes, testSkillType);
+        SkillCheckUtility.getTotalAttributeScoreForSkill(targetNumber, attributes, testSkillType);
 
         // Assert
-        assertEquals(14, totalScore);
+        assertEquals(-14, targetNumber.getValue(), targetNumber.toString());
     }
 
     @Test
@@ -263,8 +277,10 @@ class SkillCheckUtilityTest {
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE);
 
+        TargetRoll targetNumber = new TargetRoll();
+
         // Act
-        int totalScore = SkillCheckUtility.getTotalAttributeScoreForSkill(attributes, testSkillType);
+        int totalScore = SkillCheckUtility.getTotalAttributeScoreForSkill(targetNumber, attributes, testSkillType);
 
         // Assert
         assertEquals(0, totalScore);
@@ -285,11 +301,13 @@ class SkillCheckUtilityTest {
               DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE);
 
+        TargetRoll targetNumber = new TargetRoll();
+
         // Act
-        int totalScore = SkillCheckUtility.getTotalAttributeScoreForSkill(attributes, testSkillType);
+        SkillCheckUtility.getTotalAttributeScoreForSkill(targetNumber, attributes, testSkillType);
 
         // Assert
-        assertEquals(7, totalScore);
+        assertEquals(-7, targetNumber.getValue(), targetNumber.toString());
     }
 
     @Test
@@ -305,12 +323,13 @@ class SkillCheckUtilityTest {
             mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
 
             // Act
-            int targetNumber = SkillCheckUtility.determineTargetNumber(person, testSkillType, 0);
+            TargetRoll targetNumber = determineTargetNumber(person, testSkillType, 0);
 
             // Assert
-            int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_ONE_LINKED_ATTRIBUTE -
-                                             person.getAttributeScore(REFLEXES);
-            assertEquals(expectedTargetNumber, targetNumber);
+            int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_ONE_LINKED_ATTRIBUTE
+                                             + UNTRAINED_SKILL_MODIFIER
+                                             - person.getAttributeScore(REFLEXES);
+            assertEquals(expectedTargetNumber, targetNumber.getValue(), targetNumber.toString());
         }
     }
 
@@ -326,13 +345,14 @@ class SkillCheckUtilityTest {
             mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
 
             // Act
-            int targetNumber = SkillCheckUtility.determineTargetNumber(person, testSkillType, 0);
+            TargetRoll targetNumber = determineTargetNumber(person, testSkillType, 0);
 
             // Assert
-            int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES -
-                                             person.getAttributeScore(REFLEXES) -
-                                             person.getAttributeScore(DEXTERITY);
-            assertEquals(expectedTargetNumber, targetNumber);
+            int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES
+                                             - person.getAttributeScore(REFLEXES)
+                                             - person.getAttributeScore(DEXTERITY)
+                                             + UNTRAINED_SKILL_MODIFIER;
+            assertEquals(expectedTargetNumber, targetNumber.getValue(), targetNumber.toString());
         }
     }
 
@@ -364,13 +384,13 @@ class SkillCheckUtilityTest {
                 mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
 
                 // Act
-                int targetNumber = SkillCheckUtility.determineTargetNumber(mockPerson, testSkillType, 0);
+                TargetRoll targetNumber = determineTargetNumber(mockPerson, testSkillType, 0);
 
                 // Assert
                 int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), 0);
-                int attributeAdjustment = getTotalAttributeModifier(characterAttributes, testSkillType);
+                int attributeAdjustment = getTotalAttributeModifier(new TargetRoll(), characterAttributes, testSkillType);
                 assertEquals(skillTargetNumber - attributeAdjustment,
-                      targetNumber,
+                      targetNumber.getValue(),
                       "Attribute Score: " + attributeScore);
             }
         }
@@ -403,12 +423,14 @@ class SkillCheckUtilityTest {
             mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
 
             // Act
-            int targetNumber = SkillCheckUtility.determineTargetNumber(mockPerson, testSkillType, 0);
+            TargetRoll targetNumber = determineTargetNumber(mockPerson, testSkillType, 0);
 
             // Assert
             int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), 0);
-            int attributeAdjustment = getTotalAttributeModifier(characterAttributes, testSkillType);
-            assertEquals(skillTargetNumber - attributeAdjustment, targetNumber, "Attribute Score: " + 300);
+            int attributeAdjustment = getTotalAttributeModifier(new TargetRoll(), characterAttributes, testSkillType);
+            int expectedValue = skillTargetNumber - attributeAdjustment;
+
+            assertEquals(expectedValue, targetNumber.getValue(), targetNumber.toString());
         }
     }
 
@@ -439,14 +461,14 @@ class SkillCheckUtilityTest {
                 mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
 
                 // Act
-                int targetNumber = SkillCheckUtility.determineTargetNumber(mockPerson, testSkillType, 0);
+                TargetRoll targetNumber = determineTargetNumber(mockPerson, testSkillType, 0);
 
                 // Assert
                 int skillTargetNumber = skill.getFinalSkillValue(new PersonnelOptions(), 0);
-                int attributeAdjustment = getTotalAttributeModifier(characterAttributes, testSkillType);
+                int attributeAdjustment = getTotalAttributeModifier(new TargetRoll(), characterAttributes, testSkillType);
                 assertEquals(skillTargetNumber - attributeAdjustment,
-                      targetNumber,
-                      "Attribute Score: " + attributeScore);
+                      targetNumber.getValue(),
+                      targetNumber + " [Attribute Score: " + attributeScore + ']');
             }
         }
     }
@@ -468,13 +490,14 @@ class SkillCheckUtilityTest {
             mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
 
             // Act
-            int targetNumber = SkillCheckUtility.determineTargetNumber(person, testSkillType, 0);
+            TargetRoll targetNumber = determineTargetNumber(person, testSkillType, 0);
 
             // Assert
-            int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES -
-                                             SkillCheckUtility.getTotalAttributeScoreForSkill(invalidAttributes,
-                                                   testSkillType);
-            assertEquals(expectedTargetNumber, targetNumber);
+            int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES
+                                             + UNTRAINED_SKILL_MODIFIER
+                                             - SkillCheckUtility.getTotalAttributeScoreForSkill(new TargetRoll(),
+                  invalidAttributes, testSkillType);
+            assertEquals(expectedTargetNumber, targetNumber.getValue(), targetNumber.toString());
         }
     }
 
@@ -494,10 +517,11 @@ class SkillCheckUtilityTest {
             mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(edgeCaseSkillType);
 
             // Act
-            int targetNumber = SkillCheckUtility.determineTargetNumber(person, edgeCaseSkillType, 0);
+            TargetRoll targetNumber = determineTargetNumber(person, edgeCaseSkillType, 0);
 
             // Assert
-            assertEquals(UNTRAINED_TARGET_NUMBER_ONE_LINKED_ATTRIBUTE, targetNumber);
+            int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_ONE_LINKED_ATTRIBUTE + UNTRAINED_SKILL_MODIFIER;
+            assertEquals(expectedTargetNumber, targetNumber.getValue(), targetNumber.toString());
         }
     }
 
@@ -507,10 +531,7 @@ class SkillCheckUtilityTest {
         Campaign mockCampaign = mock(Campaign.class);
         Person person = new Person(mockCampaign);
 
-        Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE, DEFAULT_ATTRIBUTE_SCORE, 3,
-              // A valid negative modifier attribute
-              2,
-              // A valid negative modifier attribute
+        Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE, DEFAULT_ATTRIBUTE_SCORE, 1, 1,
               DEFAULT_ATTRIBUTE_SCORE, DEFAULT_ATTRIBUTE_SCORE, DEFAULT_ATTRIBUTE_SCORE);
 
         person.setATOWAttributes(attributes);
@@ -523,13 +544,14 @@ class SkillCheckUtilityTest {
             mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
 
             // Act
-            int targetNumber = SkillCheckUtility.determineTargetNumber(person, testSkillType, 0);
+            TargetRoll targetNumber = determineTargetNumber(person, testSkillType, 0);
 
             // Assert
-            int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES -
-                                             SkillCheckUtility.getTotalAttributeScoreForSkill(attributes,
+            int expectedTargetNumber = UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES
+                                             + UNTRAINED_SKILL_MODIFIER
+                                             - getTotalAttributeScoreForSkill(new TargetRoll(), attributes,
                                                    testSkillType);
-            assertEquals(expectedTargetNumber, targetNumber);
+            assertEquals(expectedTargetNumber, targetNumber.getValue(), targetNumber.toString());
         }
     }
 }

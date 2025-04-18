@@ -32,8 +32,6 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.common.Compute.d6;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
-import static mekhq.campaign.personnel.skills.Skill.COUNT_DOWN_MIN_VALUE;
-import static mekhq.campaign.personnel.skills.Skill.COUNT_UP_MAX_VALUE;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.DISASTROUS;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue;
@@ -45,6 +43,7 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.util.List;
 
+import megamek.common.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PersonChangedEvent;
@@ -58,7 +57,7 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
  * resulting margin of success and corresponding text description.
  *
  * @author Illiani
- * @since 0.50.5
+ * @since 0.50.05
  */
 public class SkillCheckUtility {
     private static final MMLogger logger = MMLogger.create(SkillCheckUtility.class);
@@ -74,11 +73,16 @@ public class SkillCheckUtility {
      */
     protected static final int UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES = 18; // ATOW pg 43
 
+    /**
+     * The penalty for attempting a skill check with an untrained skill.
+     */
+    protected static final int UNTRAINED_SKILL_MODIFIER = 4; // ATOW pg 43
+
     private final Person person;
     private final String skillName;
     private int marginOfSuccess;
     private String resultsText;
-    private int targetNumber;
+    private TargetRoll targetNumber;
     boolean isCountUp;
     private int roll;
     private boolean usedEdge;
@@ -100,7 +104,7 @@ public class SkillCheckUtility {
      * @param useEdge      whether the person should use edge for a re-roll if the first attempt fails
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
     public SkillCheckUtility(final Person person, final String skillName, final int miscModifier,
           final boolean useEdge) {
@@ -135,7 +139,7 @@ public class SkillCheckUtility {
      * @return {@code true} if the skill check is successful, {@code false} otherwise
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
     public static boolean performQuickSkillCheck(final Person person, final String skillName, final int miscModifier) {
         SkillCheckUtility skillCheck = new SkillCheckUtility(person, skillName, miscModifier, false);
@@ -153,7 +157,7 @@ public class SkillCheckUtility {
      * @return {@code true} if the {@code person} is {@code null}, {@code false} otherwise.
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
     private boolean isPersonNull() {
         if (person == null) {
@@ -162,7 +166,7 @@ public class SkillCheckUtility {
 
             marginOfSuccess = getMarginValue(DISASTROUS);
             resultsText = getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.nullPerson");
-            targetNumber = Integer.MAX_VALUE;
+            targetNumber = new TargetRoll(Integer.MAX_VALUE, "ERROR");
             roll = Integer.MIN_VALUE;
             return true;
         }
@@ -193,7 +197,7 @@ public class SkillCheckUtility {
      *       name is {@code null}.
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
     private String generateResultsText() {
         if (skillName == null) {
@@ -250,7 +254,7 @@ public class SkillCheckUtility {
      * @return the margin of success
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
     public int getMarginOfSuccess() {
         return marginOfSuccess;
@@ -268,7 +272,7 @@ public class SkillCheckUtility {
      * @return {@code true} if the skill check succeeded, {@code false} otherwise
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
     public boolean isSuccess() {
         return marginOfSuccess >= getMarginValue(BARELY_MADE_IT);
@@ -283,7 +287,7 @@ public class SkillCheckUtility {
      * @return the results text for the skill check
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
     public String getResultsText() {
         return resultsText;
@@ -298,9 +302,9 @@ public class SkillCheckUtility {
      * @return the target number for the skill check
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
-    public int getTargetNumber() {
+    public TargetRoll getTargetNumber() {
         return targetNumber;
     }
 
@@ -312,7 +316,7 @@ public class SkillCheckUtility {
      * @return the roll result for the skill check
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
     public int getRoll() {
         return roll;
@@ -327,7 +331,7 @@ public class SkillCheckUtility {
      * @return {@code true} if edge was used during the skill check, {@code false} otherwise
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
     public boolean isUsedEdge() {
         return usedEdge;
@@ -349,40 +353,43 @@ public class SkillCheckUtility {
      * @return the target number for the skill check
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
-    public static int determineTargetNumber(Person person, SkillType skillType, int miscModifier) {
+    public static TargetRoll determineTargetNumber(Person person, SkillType skillType, int miscModifier) {
         final String skillName = skillType.getName();
         final Attributes characterAttributes = person.getATOWAttributes();
 
         boolean isUntrained = !person.hasSkill(skillName);
         int linkedAttributeCount = skillType.getLinkedAttributeCount();
 
-        int targetNumber;
-        int attributeModifier;
+        TargetRoll targetNumber = new TargetRoll();
 
         if (isUntrained) {
             if (linkedAttributeCount > 1) {
-                targetNumber = UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES;
+                targetNumber.addModifier(UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES,
+                      getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.untrained.twoLinkedAttributes"));
             } else {
-                targetNumber = UNTRAINED_TARGET_NUMBER_ONE_LINKED_ATTRIBUTE;
+                targetNumber.addModifier(UNTRAINED_TARGET_NUMBER_ONE_LINKED_ATTRIBUTE,
+                      getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.untrained.oneLinkedAttribute"));
             }
 
-            attributeModifier = getTotalAttributeScoreForSkill(characterAttributes, skillType);
+            getTotalAttributeScoreForSkill(targetNumber, characterAttributes, skillType);
+
+            targetNumber.addModifier(UNTRAINED_SKILL_MODIFIER, getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.untrained.skill"));
         } else {
             Skill skill = person.getSkill(skillName);
-            targetNumber = skill.getFinalSkillValue(person.getOptions(), person.getReputation());
-            attributeModifier = getTotalAttributeModifier(characterAttributes, skillType);
+            int skillValue = skill.getFinalSkillValue(person.getOptions(), person.getReputation());
+            targetNumber.addModifier(skillValue, skillName);
+            getTotalAttributeModifier(targetNumber, characterAttributes, skillType);
         }
 
-        targetNumber -= attributeModifier;
         if (skillType.isCountUp()) {
-            targetNumber -= miscModifier;
-            return min(targetNumber, COUNT_UP_MAX_VALUE);
+            targetNumber.addModifier(-miscModifier, getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.miscModifier"));
         } else {
-            targetNumber += miscModifier;
-            return max(targetNumber, COUNT_DOWN_MIN_VALUE);
+            targetNumber.addModifier(miscModifier, getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.miscModifier"));
         }
+
+        return targetNumber;
     }
 
     /**
@@ -398,7 +405,7 @@ public class SkillCheckUtility {
      *                {@code true}, edge use will be attempted, subject to availability.
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
     void performCheck(boolean useEdge) {
         roll = d6(2);
@@ -424,15 +431,16 @@ public class SkillCheckUtility {
      *       {@code false} if further action (re-roll using edge) is required.
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
     boolean performInitialRoll(boolean useEdge) {
         int availableEdge = person.getCurrentEdge();
+        int targetNumberValue = targetNumber.getValue();
 
-        if (roll >= targetNumber || !useEdge || availableEdge < 1) {
-            int difference = isCountUp ? targetNumber - roll : roll - targetNumber;
+        if (roll >= targetNumberValue || !useEdge || availableEdge < 1) {
+            int difference = isCountUp ? targetNumberValue - roll : roll - targetNumberValue;
 
-            logger.info("Initial roll for skill check {}: {} vs {}. Margin of success: {}.",
+            logger.info(getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.report"),
                   skillName,
                   roll,
                   targetNumber,
@@ -454,14 +462,17 @@ public class SkillCheckUtility {
      * new margin of success and results text based on the re-roll.
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
     private void rollWithEdge() {
         person.changeCurrentEdge(-1);
         MekHQ.triggerEvent(new PersonChangedEvent(person));
         usedEdge = true;
 
-        marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(roll - targetNumber);
+        int targetNumberValue = targetNumber.getValue();
+
+        int difference = isCountUp ? targetNumberValue - roll : roll - targetNumberValue;
+        marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(difference);
         resultsText = generateResultsText();
     }
 
@@ -471,15 +482,16 @@ public class SkillCheckUtility {
      * <p>The modifier is determined by summing up the individual attribute modifiers for the skill's linked
      * attributes.</p>
      *
+     * @param targetNumber
      * @param characterAttributes the {@link Attributes} of the person performing the skill check
      * @param skillType           the {@link SkillType} being checked
      *
      * @return the total attribute modifier for the skill check
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
-    public static int getTotalAttributeModifier(final Attributes characterAttributes, final SkillType skillType) {
+    public static int getTotalAttributeModifier(TargetRoll targetNumber, final Attributes characterAttributes, final SkillType skillType) {
         List<SkillAttribute> linkedAttributes = List.of(skillType.getFirstAttribute(), skillType.getSecondAttribute());
 
         int totalModifier = 0;
@@ -489,7 +501,9 @@ public class SkillCheckUtility {
             }
 
             int attributeScore = characterAttributes.getAttribute(attribute);
-            totalModifier += getIndividualAttributeModifier(attributeScore);
+            int attributeModifier = getIndividualAttributeModifier(attributeScore);
+            totalModifier += attributeModifier;
+            targetNumber.addModifier(-attributeModifier, attribute.getLabel());
         }
 
         return totalModifier;
@@ -506,7 +520,7 @@ public class SkillCheckUtility {
      * @return the attribute modifier for the given score
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
     public static int getIndividualAttributeModifier(int attributeScore) {
         int actualScore = max(attributeScore, 0);
@@ -523,29 +537,61 @@ public class SkillCheckUtility {
     }
 
     /**
-     * Calculates the total score for all attributes linked to a given skill type.
+     * Applies attribute-based modifiers to a target roll and calculates the total attribute score
+     * for a given skill.
      *
-     * <p>This method sums the raw values of the attributes linked to the skill, without applying any modifiers.</p>
+     * <p>This method retrieves the attributes linked to a specified {@link SkillType} and calculates
+     * their total contribution to both:</p>
+     * <ul>
+     *   <li>The target roll by applying modifiers (negative of the attribute values), and</li>
+     *   <li>The total attribute score, which it returns as an integer.</li>
+     * </ul>
+     * <p>Attributes that are set to {@link SkillAttribute#NONE} are ignored during this process.</p>
      *
-     * @param characterAttributes the {@link Attributes} of the person performing the skill check
-     * @param skillType           the {@link SkillType} being checked
+     * <p>For each relevant attribute:</p>
+     * <ul>
+     *   <li>The method adds the negative of the attribute value as a modifier to the {@link TargetRoll}
+     *       using {@link TargetRoll#addModifier(int, String)}, where the second parameter is the attribute's label.</li>
+     *   <li>The total attribute score is incremented by the raw attribute value.</li>
+     * </ul>
      *
-     * @return the total raw attribute score for the given skill type
+     * @param targetNumber         the {@link TargetRoll} representing the current target
+     *                             number, which will be adjusted based on the character's
+     *                             attribute values
+     * @param characterAttributes  the {@link Attributes} object representing the character's
+     *                             attributes that contribute to the skill check
+     * @param skillType            the {@link SkillType} being assessed, whose linked attributes
+     *                             determine the modifiers to be applied
+     *
+     * @return the total attribute score summed from all relevant attributes linked to the skill. If any of the
+     * parameters are {@code null}, the method will log an error and return {@code 0}.
      *
      * @author Illiani
-     * @since 0.50.5
+     * @since 0.50.05
      */
-    public static int getTotalAttributeScoreForSkill(final Attributes characterAttributes, final SkillType skillType) {
+    public static int getTotalAttributeScoreForSkill(TargetRoll targetNumber, final Attributes characterAttributes,
+          final SkillType skillType) {
+        // Validation
+        if (targetNumber == null || characterAttributes == null || skillType == null) {
+            logger.error("Null parameter passed into SkillCheckUtility.getTotalAttributeScoreForSkill." +
+                               " targetNumber: {}, characterAttributes: {}, skillType: {}", targetNumber, characterAttributes,
+                  skillType);
+            return 0;
+        }
+
+        int totalModifier = 0;
         List<SkillAttribute> linkedAttributes = List.of(skillType.getFirstAttribute(), skillType.getSecondAttribute());
 
-        int totalScore = 0;
         for (SkillAttribute attribute : linkedAttributes) {
             if (attribute == SkillAttribute.NONE) {
                 continue;
             }
 
-            totalScore += characterAttributes.getAttribute(attribute);
+            int attributeScore = characterAttributes.getAttribute(attribute);
+            totalModifier += attributeScore;
+            targetNumber.addModifier(-attributeScore, attribute.getLabel());
         }
-        return totalScore;
+
+        return totalModifier;
     }
 }
