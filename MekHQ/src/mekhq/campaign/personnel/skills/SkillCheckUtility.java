@@ -490,7 +490,7 @@ public class SkillCheckUtility {
      *   <li>The {@link TargetRoll}, where the attribute modifier is applied as a negative value.</li>
      * </ul>
      *
-     * <p></p>Attributes that are set to {@link SkillAttribute#NONE} are ignored during this process.</p>
+     * <p>Attributes that are set to {@link SkillAttribute#NONE} are ignored during this process.</p>
      *
      * <p>The calculated attribute modifiers are applied directly to the {@link TargetRoll} using
      * {@link TargetRoll#addModifier(int, String)}, where the negative modifier is associated with the
