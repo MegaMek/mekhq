@@ -81,7 +81,7 @@ import org.mockito.Mockito;
 class SkillCheckUtilityTest {
     @Test
     void testIsPersonNull_EdgeDisallowed() {
-        SkillCheckUtility checkUtility = new SkillCheckUtility(null, S_GUN_MEK, 0, false);
+        SkillCheckUtility checkUtility = new SkillCheckUtility(null, S_GUN_MEK, null, 0, false, false);
 
         int expectedMarginOfSuccess = getMarginValue(DISASTROUS);
         assertEquals(expectedMarginOfSuccess, checkUtility.getMarginOfSuccess());
@@ -99,7 +99,7 @@ class SkillCheckUtilityTest {
 
     @Test
     void testIsPersonNull_EdgeAllowed() {
-        SkillCheckUtility checkUtility = new SkillCheckUtility(null, S_GUN_MEK, 0, true);
+        SkillCheckUtility checkUtility = new SkillCheckUtility(null, S_GUN_MEK, null, 0, true, false);
 
         int expectedMarginOfSuccess = getMarginValue(DISASTROUS);
         assertEquals(expectedMarginOfSuccess, checkUtility.getMarginOfSuccess());
@@ -117,7 +117,7 @@ class SkillCheckUtilityTest {
 
     @Test
     void testIsPersonNull_PerformQuickSkillCheck() {
-        boolean results = performQuickSkillCheck(null, S_GUN_MEK, 0);
+        boolean results = performQuickSkillCheck(null, S_GUN_MEK, null, 0);
         assertFalse(results);
     }
 

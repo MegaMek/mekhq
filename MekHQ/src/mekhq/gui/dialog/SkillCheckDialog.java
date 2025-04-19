@@ -150,7 +150,7 @@ public class SkillCheckDialog {
     private String performSkillCheck(int selectedSkill, int selectedModifier, int choiceIndex) {
         String skillName = skillNames.get(selectedSkill);
         boolean useEdge = choiceIndex == DIALOG_USE_EDGE_INDEX;
-        SkillCheckUtility utility = new SkillCheckUtility(character, skillName, selectedModifier, useEdge);
+        SkillCheckUtility utility = new SkillCheckUtility(character, skillName, null, selectedModifier, useEdge, true);
         isSuccess = utility.isSuccess();
 
         return utility.getResultsText();
