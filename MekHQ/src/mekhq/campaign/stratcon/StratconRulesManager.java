@@ -39,6 +39,7 @@ import static megamek.common.UnitType.CONV_FIGHTER;
 import static megamek.common.UnitType.DROPSHIP;
 import static megamek.common.UnitType.JUMPSHIP;
 import static megamek.common.UnitType.MEK;
+import static megamek.common.enums.SkillLevel.REGULAR;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.icons.enums.OperationalStatus.determineLayeredForceIconOperationalStatus;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.finalizeScenario;
@@ -48,6 +49,7 @@ import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGround
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosphere;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
 import static mekhq.campaign.personnel.skills.SkillType.getSkillHash;
@@ -106,6 +108,7 @@ import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache;
 import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache.CacheType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
@@ -1687,23 +1690,13 @@ public class StratconRulesManager {
         int interceptionRoll = randomInt(100);
 
         // Check passed
-        if (interceptionRoll >= interceptionOdds) {
+        if (interceptionRoll >= interceptionOdds || contract.getMoraleLevel().isRouted()) {
             reportStatus.append(' ');
             reportStatus.append(String.format(resources.getString("reinforcementsCommandFailure.text"),
                   spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
                   CLOSING_SPAN_TAG));
             campaign.addReport(reportStatus.toString());
             return DELAYED;
-        }
-
-        // Check failed, but enemy is routed
-        if (contract.getMoraleLevel().isRouted()) {
-            reportStatus.append(' ');
-            reportStatus.append(String.format(resources.getString("reinforcementsSuccessRouted.text"),
-                  spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                  CLOSING_SPAN_TAG));
-            campaign.addReport(reportStatus.toString());
-            return SUCCESS;
         }
 
         // Check failed, enemy attempt interception
@@ -1738,31 +1731,23 @@ public class StratconRulesManager {
             return FAILED;
         }
 
+        campaign.addReport(reportStatus.toString());
+
 
         roll = d6(2);
         int targetNumber = 9;
         Skill tactics = commander.getSkill(S_TACTICS);
 
-        if (tactics != null) {
-            targetNumber -= tactics.getFinalSkillValue(commander.getOptions());
-        } else {
-            // Effectively a -1 penalty for being unskilled
-            targetNumber++;
-        }
+        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(commander, S_TACTICS, 0, true);
+        campaign.addReport(skillCheckUtility.getResultsText());
 
-        if (roll >= targetNumber) {
-            reportStatus.append(' ');
+        if (skillCheckUtility.isSuccess()) {
             String reportString = tactics != null ?
                                         resources.getString("reinforcementEvasionSuccessful.text") :
                                         resources.getString("reinforcementEvasionSuccessful.noSkill");
-            reportStatus.append(String.format(reportString,
+            campaign.addReport(String.format(reportString,
                   spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                  CLOSING_SPAN_TAG,
-                  roll,
-                  targetNumber));
-
-
-            campaign.addReport(reportStatus.toString());
+                  CLOSING_SPAN_TAG));
 
             if (campaign.getCampaignOptions().isUseFatigue()) {
                 increaseFatigue(force.getId(), campaign);
@@ -1771,13 +1756,11 @@ public class StratconRulesManager {
             return DELAYED;
         }
 
-        reportStatus.append(' ');
-        reportStatus.append(String.format(resources.getString("reinforcementEvasionUnsuccessful.text"),
+        campaign.addReport(String.format(resources.getString("reinforcementEvasionUnsuccessful.text"),
               spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
               CLOSING_SPAN_TAG,
               roll,
               targetNumber));
-        campaign.addReport(reportStatus.toString());
 
         ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(force, campaign.getHangar());
 
@@ -1869,35 +1852,26 @@ public class StratconRulesManager {
      */
     public static TargetRoll calculateReinforcementTargetNumber(@Nullable Person commandLiaison, AtBContract contract) {
         // Create Target Roll
-        TargetRoll reinforcementTargetNumber = new TargetRoll();
+        TargetRoll reinforcementTargetNumber = new TargetRoll(7, "Base Target Number");
 
         // Base Target Number
-        int skillTargetNumber = 12;
-        SkillType skillType = getSkillHash().get(S_ADMIN);
-        if (skillType != null) {
-            skillTargetNumber = getSkillHash().get(S_ADMIN).getTarget();
-        }
-
-        if (commandLiaison != null) {
-            Skill skill = commandLiaison.getSkill(S_ADMIN);
-
-            if (skill != null) {
-                skillTargetNumber = skill.getFinalSkillValue(commandLiaison.getOptions());
-            }
-
-            reinforcementTargetNumber.addModifier(skillTargetNumber,
-                  "Administration (" + commandLiaison.getFullTitle() + ')');
+        Skill skill = commandLiaison != null ? commandLiaison.getSkill(S_ADMIN) : null;
+        int skillModifier;
+        if (skill == null) {
+            skillModifier = -REGULAR.getExperienceLevel();
         } else {
-            reinforcementTargetNumber.addModifier(skillTargetNumber, "Administration (Unskilled)");
+            skillModifier = skill.getExperienceLevel() - REGULAR.getExperienceLevel();
         }
+
+        // Admin Skill Modifier
+        reinforcementTargetNumber.addModifier(skillModifier, "Administration Skill");
 
         // Enemy Morale Modifier
         reinforcementTargetNumber.addModifier(contract.getMoraleLevel().ordinal(), "Enemy Morale");
 
         // Skill Modifier
-        int skillModifier = contract.getEnemySkill().getAdjustedValue() - SkillLevel.REGULAR.getAdjustedValue();
-
-        reinforcementTargetNumber.addModifier(skillModifier, "Enemy Skill Modifier");
+        int enemySkillModifier = contract.getEnemySkill().getAdjustedValue() - REGULAR.getAdjustedValue();
+        reinforcementTargetNumber.addModifier(enemySkillModifier, "Enemy Skill Modifier");
 
         // Liaison Modifier
         ContractCommandRights commandRights = contract.getCommandRights();
