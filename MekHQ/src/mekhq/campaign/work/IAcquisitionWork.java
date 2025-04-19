@@ -51,7 +51,9 @@ public interface IAcquisitionWork extends IWork {
     public Unit getUnit();
 
     public int getDaysToWait();
+
     public void resetDaysToWait();
+
     public void decrementDaysToWait();
 
     public String find(int transitDays);
@@ -73,6 +75,10 @@ public interface IAcquisitionWork extends IWork {
     public void decrementQuantity();
 
     public Money getBuyCost();
+
+    public default Money getTotalBuyCost() {
+        return getBuyCost().multipliedBy(getQuantity());
+    }
 
     public boolean isIntroducedBy(int year, boolean clan, int techFaction);
 

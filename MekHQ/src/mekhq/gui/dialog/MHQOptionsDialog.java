@@ -205,6 +205,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionUnableToAffordExpensesNag;
     private JCheckBox optionUnableToAffordLoanPaymentNag;
     private JCheckBox optionUnableToAffordJumpNag;
+    private JCheckBox optionUnableToAffordShoppingListNag;
+
     // endregion Nag Tab
 
     // region Miscellaneous
@@ -415,7 +417,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionPersonnelFilterStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
-                                                          final boolean isSelected, final boolean cellHasFocus) {
+                  final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PersonnelFilterStyle) {
                     list.setToolTipText(((PersonnelFilterStyle) value).getToolTipText());
@@ -951,7 +953,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         comboNewDayForceIconOperationalStatusStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
-                                                          final boolean isSelected, final boolean cellHasFocus) {
+                  final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof ForceIconOperationalStatusStyle) {
                     list.setToolTipText(((ForceIconOperationalStatusStyle) value).getToolTipText());
@@ -1108,6 +1110,13 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionUnableToAffordJumpNag.setToolTipText(resources.getString("optionUnableToAffordJumpNag.toolTipText"));
         optionUnableToAffordJumpNag.setName("optionUnableToAffordJumpNag");
 
+        optionUnableToAffordShoppingListNag = new JCheckBox(resources.getString("optionUnableToAffordShoppingListNag" +
+                                                                                      ".text"));
+        optionUnableToAffordShoppingListNag.setToolTipText(resources.getString("optionUnableToAffordShoppingListNag" +
+                                                                                     ".toolTipText"));
+        optionUnableToAffordShoppingListNag.setName("optionUnableToAffordShoppingListNag");
+
+
         // Layout the UI
         final JPanel panel = new JPanel();
         panel.setName("nagPanel");
@@ -1133,7 +1142,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(optionInvalidFactionNag)
                                       .addComponent(optionUnableToAffordExpensesNag)
                                       .addComponent(optionUnableToAffordLoanPaymentNag)
-                                      .addComponent(optionUnableToAffordJumpNag));
+                                      .addComponent(optionUnableToAffordJumpNag)
+                                      .addComponent(optionUnableToAffordShoppingListNag));
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
                                         .addComponent(optionUnmaintainedUnitsNag)
@@ -1152,7 +1162,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(optionInvalidFactionNag)
                                         .addComponent(optionUnableToAffordExpensesNag)
                                         .addComponent(optionUnableToAffordLoanPaymentNag)
-                                        .addComponent(optionUnableToAffordJumpNag));
+                                        .addComponent(optionUnableToAffordJumpNag)
+                                        .addComponent(optionUnableToAffordShoppingListNag));
 
         return panel;
     }
@@ -1234,7 +1245,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         comboDefaultCompanyGenerationMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
-                                                          final boolean isSelected, final boolean cellHasFocus) {
+                  final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof CompanyGenerationMethod) {
                     list.setToolTipText(((CompanyGenerationMethod) value).getToolTipText());
@@ -1472,6 +1483,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                     optionUnableToAffordLoanPaymentNag.isSelected());
         MekHQ.getMHQOptions()
               .setNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP, optionUnableToAffordJumpNag.isSelected());
+        MekHQ.getMHQOptions()
+              .setNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_SHOPPING_LIST,
+                    optionUnableToAffordShoppingListNag.isSelected());
 
         PreferenceManager.getClientPreferences().setUserDir(txtUserDir.getText());
         PreferenceManager.getInstance().save();
@@ -1628,7 +1642,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                              .getNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT));
         optionUnableToAffordJumpNag.setSelected(MekHQ.getMHQOptions()
                                                       .getNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP));
-
+        optionUnableToAffordShoppingListNag.setSelected(MekHQ.getMHQOptions()
+                                                              .getNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_SHOPPING_LIST));
         txtUserDir.setText(PreferenceManager.getClientPreferences().getUserDir());
         spnStartGameDelay.setValue(MekHQ.getMHQOptions().getStartGameDelay());
         spnStartGameClientDelay.setValue(MekHQ.getMHQOptions().getStartGameClientDelay());

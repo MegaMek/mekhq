@@ -57,6 +57,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CampaignSummary;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.FinancialReport;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -119,6 +120,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
     // procurement table
     private JPanel panProcurement;
     private JTable procurementTable;
+    private JPanel panTotalCost;
+    private JLabel procurmantTotalCostLabel;
     private ProcurementTableModel procurementModel;
     private JButton btnGetUnit;
     private JButton btnGetParts;
@@ -474,6 +477,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panProcurementButtons.add(btnMRMSInstant);
 
         /* shopping table */
+        procurmantTotalCostLabel = new JLabel();
+        refreshProcurmentTotalCost();
         procurementModel = new ProcurementTableModel(getCampaign());
         procurementTable = new JTable(procurementModel);
         procurementTable.getAccessibleContext().setAccessibleName("Pending Procurements");
@@ -508,6 +513,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
                         procurementModel.incrementItem(procurementTable.convertRowIndexToModel(row));
                     }
                 }
+                refreshProcurmentTotalCost();
             }
         });
 
@@ -523,6 +529,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
                         procurementModel.decrementItem(row);
                     }
                 }
+                refreshProcurmentTotalCost();
             }
         });
 
@@ -545,6 +552,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         panProcurement.add(scrollProcurement, gridBagConstraints);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        panProcurement.add(procurmantTotalCostLabel, gridBagConstraints);
     }
 
     /**
@@ -737,6 +749,29 @@ public final class CommandCenterTab extends CampaignGuiTab {
      */
     private void refreshProcurementList() {
         procurementModel.setData(getCampaign().getShoppingList().getShoppingList());
+        refreshProcurmentTotalCost();
+    }
+
+    /**
+     * refresh the total cost of procurement
+     */
+    private void refreshProcurmentTotalCost() {
+
+        String formatString, totalCostString;
+        Money totalCost, funds;
+        formatString = resourceMap.getString("lblProcurementTotalCost.text");
+        totalCost = getCampaign().getShoppingList().getTotalBuyCost();
+        funds = getCampaign().getFunds();
+        if (funds.compareTo(totalCost) < 0) {
+            totalCostString = " <font color='" +
+                                    MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
+                                    "'>" +
+                                    totalCost.toAmountAndSymbolString() +
+                                    "</font>";
+        } else {
+            totalCostString = totalCost.toAmountAndSymbolString();
+        }
+        procurmantTotalCostLabel.setText(String.format(formatString, totalCostString));
     }
 
     /**

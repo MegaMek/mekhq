@@ -117,7 +117,7 @@ public class ProcurementTableModel extends DataTableModel {
             case COL_COST:
                 return shoppingItem.getBuyCost().toAmountAndSymbolString();
             case COL_TOTAL_COST:
-                return shoppingItem.getBuyCost().multipliedBy(shoppingItem.getQuantity()).toAmountAndSymbolString();
+                return shoppingItem.getTotalBuyCost().toAmountAndSymbolString();
             case COL_TARGET:
                 final TargetRoll target = getCampaign().getTargetForAcquisition(shoppingItem);
                 String value = target.getValueAsString();
