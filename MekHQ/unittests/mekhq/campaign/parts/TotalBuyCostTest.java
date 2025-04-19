@@ -125,15 +125,17 @@ public class TotalBuyCostTest {
         Money partValue = shoppinglistItem.getBuyCost();
         assertFalse(partValue.isZero());
         Money partTotalValue = shoppinglistItem.getTotalBuyCost();
-        assertTrue(partValue.multipliedBy(2).compareTo(partTotalValue) == 0);
+        assertTrue(partValue.multipliedBy(3).compareTo(partTotalValue) == 0);
         mockShoppingList.addShoppingItemWithoutChecking(shoppinglistItem);
+        assertTrue(mockShoppingList.getTotalBuyCost()
+                         .getAmount()
+                         .equals(partValue.getAmount().multiply(BigDecimal.valueOf(3))));
+        shoppinglistItem.decrementQuantity();
         assertTrue(mockShoppingList.getTotalBuyCost()
                          .getAmount()
                          .equals(partValue.getAmount().multiply(BigDecimal.valueOf(2))));
         shoppinglistItem.decrementQuantity();
         assertTrue(mockShoppingList.getTotalBuyCost().getAmount().equals(partValue.getAmount()));
-        shoppinglistItem.decrementQuantity();
-        assertTrue(mockShoppingList.getTotalBuyCost().isZero());
     }
 
     @Test
