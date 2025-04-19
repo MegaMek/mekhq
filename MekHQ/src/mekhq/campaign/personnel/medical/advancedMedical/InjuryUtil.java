@@ -25,7 +25,7 @@
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
  */
-package mekhq.campaign.mod.am;
+package mekhq.campaign.personnel.medical.advancedMedical;
 
 import java.util.ArrayList;
 import java.util.Collection;
