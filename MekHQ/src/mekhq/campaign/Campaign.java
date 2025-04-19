@@ -56,6 +56,7 @@ import static mekhq.campaign.personnel.lifeEvents.NewYearsDayAnnouncement.isNewY
 import static mekhq.campaign.personnel.lifeEvents.WinterHolidayAnnouncement.isWinterHolidayMajorDay;
 import static mekhq.campaign.personnel.skills.Aging.applyAgingSPA;
 import static mekhq.campaign.personnel.skills.Aging.updateAllSkillAgeModifiers;
+import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenUsage;
@@ -152,7 +153,6 @@ import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
-import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -165,6 +165,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.RandomDependents;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
@@ -3252,92 +3253,6 @@ public class Campaign implements ITechManager {
         return patients;
     }
 
-    public String healPerson(Person medWork, Person doctor) {
-        if (getCampaignOptions().isUseAdvancedMedical()) {
-            return "";
-        }
-        String report = "";
-        report += doctor.getHyperlinkedFullTitle() + " attempts to heal " + medWork.getFullName();
-        TargetRoll target = getTargetFor(medWork, doctor);
-        int roll = d6(2);
-        report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ':';
-        int xpGained = 0;
-        // If we get a natural 2 that isn't an automatic success, reroll if Edge is
-        // available and in use.
-        if (getCampaignOptions().isUseSupportEdge() &&
-                  doctor.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL)) {
-            if ((roll == 2) && (doctor.getCurrentEdge() > 0) && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
-                doctor.changeCurrentEdge(-1);
-                roll = d6(2);
-                report += medWork.fail() +
-                                '\n' +
-                                doctor.getHyperlinkedFullTitle() +
-                                " uses Edge to reroll:" +
-                                " rolls " +
-                                roll +
-                                ':';
-            }
-        }
-        if (roll >= target.getValue()) {
-            report = report + medWork.succeed();
-            Unit u = medWork.getUnit();
-            if (null != u) {
-                u.resetPilotAndEntity();
-            }
-            if (roll == 12 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
-                xpGained += getCampaignOptions().getSuccessXP();
-            }
-            if (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
-                doctor.setNTasks(doctor.getNTasks() + 1);
-            }
-            if (doctor.getNTasks() >= getCampaignOptions().getNTasksXP()) {
-                xpGained += getCampaignOptions().getTaskXP();
-                doctor.setNTasks(0);
-            }
-        } else {
-            report = report + medWork.fail();
-            if (roll == 2 && target.getValue() != TargetRoll.AUTOMATIC_FAIL) {
-                xpGained += getCampaignOptions().getMistakeXP();
-            }
-        }
-        if (xpGained > 0) {
-            doctor.awardXP(this, xpGained);
-            report += " (" + xpGained + "XP gained) ";
-        }
-        medWork.setDaysToWaitForHealing(getCampaignOptions().getHealingWaitingPeriod());
-        return report;
-    }
-
-    public TargetRoll getTargetFor(Person medWork, Person doctor) {
-        Skill skill = doctor.getSkill(SkillType.S_DOCTOR);
-        if (null == skill) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                  doctor.getFullName() + " isn't a doctor, he just plays one on TV.");
-        }
-        if (medWork.getDoctorId() != null && !medWork.getDoctorId().equals(doctor.getId())) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                  medWork.getFullName() + " is already being tended by another doctor");
-        }
-        if (!medWork.needsFixing() && !(getCampaignOptions().isUseAdvancedMedical() && medWork.needsAMFixing())) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, medWork.getFullName() + " does not require healing.");
-        }
-        if (getPatientsFor(doctor) > 25) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, doctor.getFullName() + " already has 25 patients.");
-        }
-        TargetRoll target = new TargetRoll(skill.getFinalSkillValue(doctor.getOptions()),
-              skill.getSkillLevel().toString());
-        if (target.getValue() == TargetRoll.IMPOSSIBLE) {
-            return target;
-        }
-        // understaffed mods
-        int helpMod = getShorthandedMod(getMedicsPerDoctor(), true);
-        if (helpMod > 0) {
-            target.addModifier(helpMod, "shorthanded");
-        }
-        target.append(medWork.getHealingMods(this));
-        return target;
-    }
-
     /**
      * Retrieves the best logistics person based on the acquisition skill, personnel category, and maximum acquisitions
      * allowed for the campaign.
@@ -4881,6 +4796,7 @@ public class Campaign implements ITechManager {
      */
     public void processNewDayPersonnel() {
         RecoverMIAPersonnel recovery = new RecoverMIAPersonnel(this, faction, getAtBUnitRatingMod());
+        MedicalController medicalController = new MedicalController(this);
 
         // This list ensures we don't hit a concurrent modification error
         List<Person> personnel = getPersonnelFilteringOutDeparted();
@@ -4930,7 +4846,7 @@ public class Campaign implements ITechManager {
             person.resetMinutesLeft(campaignOptions.isTechsUseAdministration());
             person.setAcquisition(0);
 
-            processAdvancedMedicalEvents(person);
+            medicalController.processMedicalEvents(person);
 
             processAnniversaries(person);
 
@@ -4995,37 +4911,6 @@ public class Campaign implements ITechManager {
         // Update the force icons based on the end-of-day unit status if desired
         if (MekHQ.getMHQOptions().getNewDayOptimizeMedicalAssignments()) {
             new OptimizeInfirmaryAssignments(this);
-        }
-    }
-
-    /**
-     * Processes advanced medical events for a person.
-     *
-     * @param person the {@link Person} to process advanced medical events for
-     */
-    private void processAdvancedMedicalEvents(Person person) {
-        if (person.needsFixing() && !getCampaignOptions().isUseAdvancedMedical()) {
-            person.decrementDaysToWaitForHealing();
-            Person doctor = getPerson(person.getDoctorId());
-            if ((doctor != null) && doctor.isDoctor()) {
-                if (person.getDaysToWaitForHealing() <= 0) {
-                    addReport(healPerson(person, doctor));
-                }
-            } else if (person.checkNaturalHealing(15)) {
-                addReport(person.getHyperlinkedFullTitle() + " heals naturally!");
-                Unit unit = person.getUnit();
-                if (unit != null) {
-                    unit.resetPilotAndEntity();
-                }
-            }
-        }
-        // TODO Advanced Medical needs to go away from here later on
-        if (getCampaignOptions().isUseAdvancedMedical()) {
-            InjuryUtil.resolveDailyHealing(this, person);
-            Unit unit = person.getUnit();
-            if (unit != null) {
-                unit.resetPilotAndEntity();
-            }
         }
     }
 
@@ -6605,7 +6490,7 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "kills");
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "skillTypes");
         for (final String skillName : SkillType.skillList) {
-            final SkillType type = SkillType.getType(skillName);
+            final SkillType type = getType(skillName);
             if (type != null) {
                 type.writeToXML(pw, indent);
             }
