@@ -994,7 +994,7 @@ public class SkillType {
             }
 
             // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
-            boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.05"));
+            boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.06"));
             if (preDatesSkillChanges) {
                 compatibilityHandler(skillType);
             }
@@ -1183,6 +1183,10 @@ public class SkillType {
               temporarySkillType.getSecondAttribute());
 
         skillType.countUp = temporarySkillType.isCountUp();
+
+        if (skillType.subType == SUPPORT_COMMAND) {
+            skillType.target = temporarySkillType.getTarget();
+        }
     }
 
 
@@ -1581,8 +1585,8 @@ public class SkillType {
 
     public static SkillType createTactics() {
         return new SkillType(S_TACTICS,
-              0,
-              true,
+              9,
+              false,
               SUPPORT_COMMAND,
               INTELLIGENCE,
               WILLPOWER,
@@ -1595,8 +1599,8 @@ public class SkillType {
 
     public static SkillType createStrategy() {
         return new SkillType(S_STRATEGY,
-              0,
-              true,
+              9,
+              false,
               SUPPORT_COMMAND,
               INTELLIGENCE,
               WILLPOWER,
@@ -1624,8 +1628,8 @@ public class SkillType {
 
     public static SkillType createLeadership() {
         return new SkillType(S_LEADER,
-              0,
-              true,
+              8,
+              false,
               SUPPORT_COMMAND,
               WILLPOWER,
               CHARISMA,
