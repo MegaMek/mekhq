@@ -106,6 +106,7 @@ public class SkillCheckDialog {
         String results = performSkillCheck(dialog.getComboBoxChoiceIndex(), dialog.getSpinnerValue(), choiceIndex);
 
         // Results Dialog
+        campaign.addReport(results.replaceAll("<p>", "<br><br>").replaceAll("</p>", ""));
         showResultsDialog(results);
     }
 
@@ -149,7 +150,7 @@ public class SkillCheckDialog {
     private String performSkillCheck(int selectedSkill, int selectedModifier, int choiceIndex) {
         String skillName = skillNames.get(selectedSkill);
         boolean useEdge = choiceIndex == DIALOG_USE_EDGE_INDEX;
-        SkillCheckUtility utility = new SkillCheckUtility(character, skillName, selectedModifier, useEdge);
+        SkillCheckUtility utility = new SkillCheckUtility(character, skillName, null, selectedModifier, useEdge, true);
         isSuccess = utility.isSuccess();
 
         return utility.getResultsText();
@@ -303,7 +304,7 @@ public class SkillCheckDialog {
 
         for (String skillName : SkillType.getSkillList()) {
             SkillType skillType = SkillType.getType(skillName);
-            int targetNumber = determineTargetNumber(character, skillType, 0);
+            int targetNumber = determineTargetNumber(character, skillType, 0).getValue();
             boolean isCountsUp = SkillType.getType(skillName).isCountUp();
 
             // Build the label with the target number
