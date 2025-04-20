@@ -283,7 +283,7 @@ public class SkillCheckUtility {
               genderedReferenced,
               skillName,
               roll,
-              targetNumber);
+              targetNumber.getValue());
 
         String edgeUseText = !usedEdge ? "" : getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.rerolled", firstName);
 
