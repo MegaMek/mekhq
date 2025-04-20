@@ -1,6 +1,6 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.05-SNAPSHOT
+0.50.05
 + PR #6284: Fixed Unique Interaction when Loading Player Campaigns with Custom Rank Systems
 + PR #6285: Added Mercenary Auction Events
 + Fix #910, #3644, #4762, #6179: Added Auto-Optimize Medical Assignments Feature
@@ -246,6 +246,8 @@ MEKHQ VERSION HISTORY:
 + PR #6699: Thunderbird Battle Armor (3145/NTNU RS Upgrade versions) had no space between (Upgrade) and [Wepaon Type] in MHQ, but it did in MM.
 + Fix #6700: Fixed Company Kill Awards not awarded
 + PR #6703: Added Null Protection to ReportHyperlinkListener
++ PR #6706: Refactored Centralized Skill Check Class to Use TargetRoll; Fixed Multiple Bugs 
++ PR #6705: Fixed SPA Grouping Logic in Campaign Options IIC
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times

@@ -193,13 +193,13 @@ public class Attributes {
      */
     public int getAttribute(SkillAttribute attribute) {
         return switch (attribute) {
-            case STRENGTH -> strength;
-            case BODY -> body;
-            case REFLEXES -> reflexes;
-            case DEXTERITY -> dexterity;
-            case INTELLIGENCE -> intelligence;
-            case WILLPOWER -> willpower;
-            case CHARISMA -> charisma;
+            case STRENGTH -> clamp(strength, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            case BODY -> clamp(body, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            case REFLEXES -> clamp(reflexes, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            case DEXTERITY -> clamp(dexterity, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            case INTELLIGENCE -> clamp(intelligence, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            case WILLPOWER -> clamp(willpower, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
+            case CHARISMA -> clamp(charisma, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
             default -> 0;
         };
     }
