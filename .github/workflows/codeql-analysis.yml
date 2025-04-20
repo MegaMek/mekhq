@@ -78,7 +78,10 @@ jobs:
           languages: java-kotlin
           build-mode: none
           queries: security-and-quality
-          source-root: mekhq
+          source-root: mekhq/mekhq
+          config: |
+            paths:
+              - mekhq
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
