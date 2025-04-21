@@ -5843,7 +5843,8 @@ public class Unit implements ITechnology {
         } else {
             // if it is self crewed AND is mothballed and has a mothball info, get the tech
             if (isSelfCrewed() && isMothballed() && (this.mothballInfo != null)) {
-                var previousTech = this.mothballInfo.getTech();
+                UUID previousTechId = this.mothballInfo.getTechId();
+                var previousTech = campaign.getPerson(previousTechId);
                 var previousTechExists = previousTech != null;
                 var previousTechIsActive = previousTechExists && previousTech.getStatus().isActive();
                 if (previousTechIsActive) {
@@ -7012,10 +7013,6 @@ public class Unit implements ITechnology {
             if (getTechOfficer() == null) {
                 logger.error("Unit {} ('{}') references missing tech officer {}", getId(), getName(), id);
             }
-        }
-
-        if (mothballInfo != null) {
-            mothballInfo.fixReferences(campaign);
         }
 
         if (hasTransportShipAssignment()) {
