@@ -73,7 +73,7 @@ public class ActivateUnitAction implements IUnitAction {
                 return;
             }
 
-            if (entity.isLargeCraft() && !unit.getCrew().contains(tech)) {
+            if (tech != null && entity.isLargeCraft() && !unit.getCrew().contains(tech)) {
                 if (!tech.isTechLargeVessel()) {
                     logger.error("{} is not a vessel tech", tech.getFullTitle());
                     return;
