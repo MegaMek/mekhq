@@ -994,7 +994,7 @@ public class SkillType {
             }
 
             // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
-            boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.05"));
+            boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.06"));
             if (preDatesSkillChanges) {
                 compatibilityHandler(skillType);
             }
@@ -1051,7 +1051,7 @@ public class SkillType {
             }
 
             // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
-            boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.05"));
+            boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.06"));
             if (preDatesSkillChanges) {
                 compatibilityHandler(skillType);
             }
