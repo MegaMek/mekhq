@@ -2312,7 +2312,7 @@
             <xpCost>-300</xpCost>
             <weight>1</weight>
             <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
+            <invalidAbilities>mutation_cat_girl_unofficial</invalidAbilities>
             <removeAbilities></removeAbilities>
             <choiceValues></choiceValues>
         </ability>
@@ -3021,7 +3021,7 @@
             <weight>1</weight>
             <prereqAbilities></prereqAbilities>
             <invalidAbilities></invalidAbilities>
-            <removeAbilities>flaw_animal_antipathy</removeAbilities>
+            <removeAbilities></removeAbilities>
             <choiceValues></choiceValues>
         </ability>
         <ability>
