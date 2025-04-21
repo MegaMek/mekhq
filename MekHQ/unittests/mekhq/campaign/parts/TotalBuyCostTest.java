@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -77,47 +77,47 @@ public class TotalBuyCostTest {
 
     @Test
     public void emptyShoppingList() {
-        ShoppingList mockShoppingList = new ShoppingList();
-        Money totalBuyValue = mockShoppingList.getTotalBuyCost();
-        assertTrue(mockShoppingList.getPartList().isEmpty());
+        ShoppingList testShoppingList = new ShoppingList();
+        Money totalBuyValue = testShoppingList.getTotalBuyCost();
+        assertTrue(testShoppingList.getPartList().isEmpty());
         assertTrue(totalBuyValue.isZero());
     }
 
     @Test
     public void onePartInShoppingList() {
-        ShoppingList mockShoppingList = new ShoppingList();
-        mockCampaign.setShoppingList(mockShoppingList);
+        ShoppingList testShoppingList = new ShoppingList();
+        mockCampaign.setShoppingList(testShoppingList);
         Part part = new MekSensor(1, mockCampaign);
         IAcquisitionWork shoppinglistItem = part.getAcquisitionWork();
         Money partValue = shoppinglistItem.getBuyCost();
         assertFalse(partValue.isZero());
-        mockShoppingList.addShoppingItemWithoutChecking(shoppinglistItem);
-        assertTrue(mockShoppingList.getTotalBuyCost().getAmount().equals(partValue.getAmount()));
+        testShoppingList.addShoppingItemWithoutChecking(shoppinglistItem);
+        assertTrue(testShoppingList.getTotalBuyCost().getAmount().equals(partValue.getAmount()));
     }
 
     @Test
     public void incrementPartInShoppingList() {
-        ShoppingList mockShoppingList = new ShoppingList();
-        mockCampaign.setShoppingList(mockShoppingList);
+        ShoppingList testShoppingList = new ShoppingList();
+        mockCampaign.setShoppingList(testShoppingList);
         Part part = new MekSensor(1, mockCampaign);
         IAcquisitionWork shoppinglistItem = part.getAcquisitionWork();
         Money partValue = shoppinglistItem.getBuyCost();
         assertFalse(partValue.isZero());
         shoppinglistItem.incrementQuantity();
-        mockShoppingList.addShoppingItemWithoutChecking(shoppinglistItem);
-        assertTrue(mockShoppingList.getTotalBuyCost()
+        testShoppingList.addShoppingItemWithoutChecking(shoppinglistItem);
+        assertTrue(testShoppingList.getTotalBuyCost()
                          .getAmount()
                          .equals(partValue.getAmount().multiply(BigDecimal.valueOf(2))));
         shoppinglistItem.incrementQuantity();
-        assertTrue(mockShoppingList.getTotalBuyCost()
+        assertTrue(testShoppingList.getTotalBuyCost()
                          .getAmount()
                          .equals(partValue.getAmount().multiply(BigDecimal.valueOf(3))));
     }
 
     @Test
     public void decrementPartInShoppingList() {
-        ShoppingList mockShoppingList = new ShoppingList();
-        mockCampaign.setShoppingList(mockShoppingList);
+        ShoppingList testShoppingList = new ShoppingList();
+        mockCampaign.setShoppingList(testShoppingList);
         Part part = new MekSensor(1, mockCampaign);
         IAcquisitionWork shoppinglistItem = part.getAcquisitionWork();
         shoppinglistItem.incrementQuantity();
@@ -126,22 +126,22 @@ public class TotalBuyCostTest {
         assertFalse(partValue.isZero());
         Money partTotalValue = shoppinglistItem.getTotalBuyCost();
         assertTrue(partValue.multipliedBy(3).compareTo(partTotalValue) == 0);
-        mockShoppingList.addShoppingItemWithoutChecking(shoppinglistItem);
-        assertTrue(mockShoppingList.getTotalBuyCost()
+        testShoppingList.addShoppingItemWithoutChecking(shoppinglistItem);
+        assertTrue(testShoppingList.getTotalBuyCost()
                          .getAmount()
                          .equals(partValue.getAmount().multiply(BigDecimal.valueOf(3))));
         shoppinglistItem.decrementQuantity();
-        assertTrue(mockShoppingList.getTotalBuyCost()
+        assertTrue(testShoppingList.getTotalBuyCost()
                          .getAmount()
                          .equals(partValue.getAmount().multiply(BigDecimal.valueOf(2))));
         shoppinglistItem.decrementQuantity();
-        assertTrue(mockShoppingList.getTotalBuyCost().getAmount().equals(partValue.getAmount()));
+        assertTrue(testShoppingList.getTotalBuyCost().getAmount().equals(partValue.getAmount()));
     }
 
     @Test
     public void addDifferentPartsInShoppingList() {
-        ShoppingList mockShoppingList = new ShoppingList();
-        mockCampaign.setShoppingList(mockShoppingList);
+        ShoppingList testShoppingList = new ShoppingList();
+        mockCampaign.setShoppingList(testShoppingList);
         Part partA = new MekSensor(1, mockCampaign);
         Part partB = new MekCockpit(2, Mek.COCKPIT_SMALL, false, mockCampaign);
         IAcquisitionWork shoppinglistItemA = partA.getAcquisitionWork();
@@ -149,9 +149,9 @@ public class TotalBuyCostTest {
         Money partValueA = shoppinglistItemA.getBuyCost();
         Money partValueB = shoppinglistItemB.getBuyCost();
         Money partTotalValue = partValueA.plus(partValueB);
-        mockShoppingList.addShoppingItem(shoppinglistItemA, 1, mockCampaign);
-        mockShoppingList.addShoppingItem(shoppinglistItemB, 1, mockCampaign);
-        assertTrue(mockShoppingList.getTotalBuyCost().getAmount().equals(partTotalValue.getAmount()));
+        testShoppingList.addShoppingItem(shoppinglistItemA, 1, mockCampaign);
+        testShoppingList.addShoppingItem(shoppinglistItemB, 1, mockCampaign);
+        assertTrue(testShoppingList.getTotalBuyCost().getAmount().equals(partTotalValue.getAmount()));
 
 
     }

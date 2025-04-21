@@ -121,7 +121,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JPanel panProcurement;
     private JTable procurementTable;
     private JPanel panTotalCost;
-    private JLabel procurmantTotalCostLabel;
+    private JLabel procurementTotalCostLabel;
     private ProcurementTableModel procurementModel;
     private JButton btnGetUnit;
     private JButton btnGetParts;
@@ -477,7 +477,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panProcurementButtons.add(btnMRMSInstant);
 
         /* shopping table */
-        procurmantTotalCostLabel = new JLabel();
+        procurementTotalCostLabel = new JLabel();
         refreshProcurmentTotalCost();
         procurementModel = new ProcurementTableModel(getCampaign());
         procurementTable = new JTable(procurementModel);
@@ -556,7 +556,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
-        panProcurement.add(procurmantTotalCostLabel, gridBagConstraints);
+        panProcurement.add(procurementTotalCostLabel, gridBagConstraints);
     }
 
     /**
@@ -771,7 +771,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         } else {
             totalCostString = totalCost.toAmountAndSymbolString();
         }
-        procurmantTotalCostLabel.setText(String.format(formatString, totalCostString));
+        procurementTotalCostLabel.setText(String.format(formatString, totalCostString));
     }
 
     /**
