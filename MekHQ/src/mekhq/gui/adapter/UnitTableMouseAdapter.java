@@ -631,6 +631,18 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
     private @Nullable Person pickTechForMothballOrActivation(Unit unit, String description) {
         Person tech = null;
+
+        if (unit.isConventionalInfantry()) {
+            return null;
+        }
+
+        if (unit.isSelfCrewed()) {
+            if (unit.engineerResponsible().isPresent()) {
+                tech = unit.engineerResponsible().get();
+                return tech;
+            }
+        }
+
         if (!unit.isSelfCrewed() || isSelfCrewedButHasNoTech(unit)) {
             UUID id = gui.selectTech(unit, description, true);
             if (null != id) {
@@ -649,6 +661,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         }
+
         return tech;
     }
 
