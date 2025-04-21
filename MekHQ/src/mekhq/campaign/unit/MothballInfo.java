@@ -27,6 +27,11 @@
  */
 package mekhq.campaign.unit;
 
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import megamek.Version;
 import megamek.common.force.Force;
 import megamek.logging.MMLogger;
@@ -35,11 +40,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * This class is used to store information about a particular unit that is
@@ -51,30 +51,28 @@ import java.util.UUID;
 public class MothballInfo {
     private static final MMLogger logger = MMLogger.create(MothballInfo.class);
 
-    private Person tech;
-    private int forceID;
-    private List<Person> drivers;
-    private List<Person> gunners;
-    private List<Person> vesselCrew;
-    private Person techOfficer;
-    private Person navigator;
+    private UUID techId;
+    private int forceId;
+    private List<UUID> driverIds = new ArrayList<>();
+    private List<UUID> gunnerIds = new ArrayList<>();
+    private List<UUID> vesselCrewIds = new ArrayList<>();
+    private UUID techOfficerId;
+    private UUID navigatorId;
 
     /**
      * Parameterless constructor, used for deserialization.
      */
     private MothballInfo() {
-        forceID = Force.NO_FORCE;
-        drivers = new ArrayList<>();
-        gunners = new ArrayList<>();
-        vesselCrew = new ArrayList<>();
+        forceId = Force.NO_FORCE;
     }
 
     /**
      * Who was the original tech of this vessel?
-     * @return The original tech
+     *
+     * @return The original tech's ID
      */
-    public Person getTech() {
-        return tech;
+    public UUID getTechId() {
+        return techId;
     }
 
     /**
@@ -83,13 +81,43 @@ public class MothballInfo {
      * @param unit The unit to work with
      */
     public MothballInfo(Unit unit) {
-        tech = unit.getTech();
-        forceID = unit.getForceId();
-        drivers = new ArrayList<>(unit.getDrivers());
-        gunners = new ArrayList<>(unit.getGunners());
-        vesselCrew = new ArrayList<>(unit.getVesselCrew());
-        techOfficer = unit.getTechOfficer();
-        navigator = unit.getNavigator();
+        Person tech = unit.getTech();
+        if (tech != null) {
+            techId = tech.getId();
+        }
+
+        forceId = unit.getForceId();
+
+        List<Person> drivers = new ArrayList<>(unit.getDrivers());
+        for (Person driver : drivers) {
+            if (driver != null) {
+                driverIds.add(driver.getId());
+            }
+        }
+
+        List<Person> gunners = new ArrayList<>(unit.getGunners());
+        for (Person gunner : gunners) {
+            if (gunner != null) {
+                gunnerIds.add(gunner.getId());
+            }
+        }
+
+        List<Person> vesselCrews = new ArrayList<>(unit.getVesselCrew());
+        for (Person vesselCrew : vesselCrews) {
+            if (vesselCrew != null) {
+                vesselCrewIds.add(vesselCrew.getId());
+            }
+        }
+
+        Person techOfficer = unit.getTechOfficer();
+        if (techOfficer != null) {
+            techOfficerId = techOfficer.getId();
+        }
+
+        Person navigator = unit.getNavigator();
+        if (navigator != null) {
+            navigatorId = navigator.getId();
+        }
     }
 
     /**
@@ -99,42 +127,49 @@ public class MothballInfo {
      * @param campaign The campaign in which this is happening
      */
     public void restorePreMothballInfo(Unit unit, Campaign campaign) {
+        Person tech = campaign.getPerson(techId);
         if (tech != null) {
             unit.setTech(tech);
         }
 
-        for (Person driver : drivers) {
-            if (driver.getStatus().isActive() && (driver.getUnit() == null)) {
+        for (UUID driverId : driverIds) {
+            Person driver = campaign.getPerson(driverId);
+            if (driver != null && driver.getStatus().isActive() && (driver.getUnit() == null)) {
                 unit.addDriver(driver);
             }
         }
 
-        for (Person gunner : gunners) {
+        for (UUID gunnerId : gunnerIds) {
             // add the gunner if they exist, aren't dead/retired/etc and aren't already
             // assigned to some
             // other unit. Caveat: single-person units have the same driver and gunner.
-            if (gunner.getStatus().isActive() &&
-                    ((gunner.getUnit() == null) || (gunner.getUnit() == unit))) {
+            Person gunner = campaign.getPerson(gunnerId);
+            if (gunner != null &&
+                      gunner.getStatus().isActive() &&
+                      ((gunner.getUnit() == null) || (gunner.getUnit() == unit))) {
                 unit.addGunner(gunner);
             }
         }
 
-        for (Person crew : vesselCrew) {
-            if (crew.getStatus().isActive() && (crew.getUnit() == null)) {
+        for (UUID crewId : vesselCrewIds) {
+            Person crew = campaign.getPerson(crewId);
+            if (crew != null && crew.getStatus().isActive() && (crew.getUnit() == null)) {
                 unit.addVesselCrew(crew);
             }
         }
 
+        Person techOfficer = campaign.getPerson(techOfficerId);
         if ((techOfficer != null) && (techOfficer.getStatus().isActive()) && (techOfficer.getUnit() == null)) {
             unit.setTechOfficer(techOfficer);
         }
 
+        Person navigator = campaign.getPerson(navigatorId);
         if ((navigator != null) && (navigator.getStatus().isActive()) && (navigator.getUnit() == null)) {
             unit.setNavigator(navigator);
         }
 
-        if (campaign.getForce(forceID) != null) {
-            campaign.addUnitToForce(unit, forceID);
+        if (campaign.getForce(forceId) != null) {
+            campaign.addUnitToForce(unit, forceId);
         }
 
         unit.resetEngineer();
@@ -142,30 +177,30 @@ public class MothballInfo {
 
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "mothballInfo");
-        if (tech != null) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techId", tech.getId());
+        if (techId != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techId", techId);
         }
 
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceID", forceID);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceID", forceId);
 
-        for (Person driver : drivers) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "driverId", driver.getId());
+        for (UUID driver : driverIds) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "driverId", driver);
         }
 
-        for (Person gunner : gunners) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gunnerId", gunner.getId());
+        for (UUID gunner : gunnerIds) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gunnerId", gunner);
         }
 
-        for (Person crew : vesselCrew) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "vesselCrewId", crew.getId());
+        for (UUID crew : vesselCrewIds) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "vesselCrewId", crew);
         }
 
-        if (navigator != null) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "navigatorId", navigator.getId());
+        if (navigatorId != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "navigatorId", navigatorId);
         }
 
-        if (techOfficer != null) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techOfficerId", techOfficer.getId());
+        if (techOfficerId != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techOfficerId", techOfficerId);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "mothballInfo");
     }
@@ -185,19 +220,19 @@ public class MothballInfo {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("techID")) {
-                    retVal.tech = new MothballInfoPersonRef(UUID.fromString(wn2.getTextContent()));
+                    retVal.techId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("forceID")) {
-                    retVal.forceID = Integer.parseInt(wn2.getTextContent());
+                    retVal.forceId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("driverID")) {
-                    retVal.drivers.add(new MothballInfoPersonRef(UUID.fromString(wn2.getTextContent())));
+                    retVal.driverIds.add(UUID.fromString(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("gunnerID")) {
-                    retVal.gunners.add(new MothballInfoPersonRef(UUID.fromString(wn2.getTextContent())));
+                    retVal.gunnerIds.add(UUID.fromString(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("vesselCrewID")) {
-                    retVal.vesselCrew.add(new MothballInfoPersonRef(UUID.fromString(wn2.getTextContent())));
+                    retVal.vesselCrewIds.add(UUID.fromString(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("techOfficerID")) {
-                    retVal.techOfficer = new MothballInfoPersonRef(UUID.fromString(wn2.getTextContent()));
+                    retVal.techOfficerId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("navigatorID")) {
-                    retVal.navigator = new MothballInfoPersonRef(UUID.fromString(wn2.getTextContent()));
+                    retVal.navigatorId = UUID.fromString(wn2.getTextContent());
                 }
             }
         } catch (Exception ex) {
@@ -205,69 +240,5 @@ public class MothballInfo {
         }
 
         return retVal;
-    }
-
-    /**
-     * Represents an unresolved reference to a Person from a MothballInfo instance.
-     */
-    public static class MothballInfoPersonRef extends Person {
-        public MothballInfoPersonRef(UUID id) {
-            super(id);
-        }
-    }
-
-    public void fixReferences(Campaign campaign) {
-        if (tech instanceof MothballInfoPersonRef) {
-            UUID id = tech.getId();
-            tech = campaign.getPerson(id);
-            if (tech == null) {
-                logger.error(
-                        String.format("Mothball info references missing tech %s", id));
-            }
-        }
-        for (int ii = drivers.size() - 1; ii >= 0; --ii) {
-            Person driver = drivers.get(ii);
-            if (driver instanceof MothballInfoPersonRef) {
-                drivers.set(ii, campaign.getPerson(driver.getId()));
-                if (drivers.get(ii) == null) {
-                    logger.error(
-                            String.format("Mothball info references missing driver %s",
-                                    driver.getId()));
-                    drivers.remove(ii);
-                }
-            }
-        }
-        for (int ii = gunners.size() - 1; ii >= 0; --ii) {
-            Person gunner = gunners.get(ii);
-            if (gunner instanceof MothballInfoPersonRef) {
-                gunners.set(ii, campaign.getPerson(gunner.getId()));
-                if (gunners.get(ii) == null) {
-                    logger.error(
-                            String.format("Mothball info references missing gunner %s",
-                                    gunner.getId()));
-                    gunners.remove(ii);
-                }
-            }
-        }
-        for (int ii = vesselCrew.size() - 1; ii >= 0; --ii) {
-            Person crew = vesselCrew.get(ii);
-            if (crew instanceof MothballInfoPersonRef) {
-                vesselCrew.set(ii, campaign.getPerson(crew.getId()));
-                if (vesselCrew.get(ii) == null) {
-                    logger.error(
-                            String.format("Mothball info references missing vessel crew %s",
-                                    crew.getId()));
-                    vesselCrew.remove(ii);
-                }
-            }
-        }
-        if (navigator instanceof MothballInfoPersonRef) {
-            UUID id = navigator.getId();
-            navigator = campaign.getPerson(id);
-            if (navigator == null) {
-                logger.error(
-                        String.format("Mothball info references missing navigator %s", id));
-            }
-        }
     }
 }
