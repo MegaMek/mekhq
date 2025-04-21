@@ -88,6 +88,7 @@ import mekhq.gui.sorter.TargetSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.service.enums.MRMSMode;
 import mekhq.service.mrms.MRMSService;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * Collates important information about the campaign and displays it, along with some actionable buttons
@@ -763,11 +764,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
         totalCost = getCampaign().getShoppingList().getTotalBuyCost();
         funds = getCampaign().getFunds();
         if (funds.compareTo(totalCost) < 0) {
-            totalCostString = " <font color='" +
-                                    MekHQ.getMHQOptions().getFontColorNegativeHexColor() +
-                                    "'>" +
-                                    totalCost.toAmountAndSymbolString() +
-                                    "</font>";
+            String warningColor = MekHQ.getMHQOptions().getFontColorWarningHexColor();
+            String formatedString = "<b>" + totalCost.toAmountAndSymbolString() + "</b>";
+            totalCostString = ReportingUtilities.messageSurroundedBySpanWithColor(warningColor, formatedString);
         } else {
             totalCostString = totalCost.toAmountAndSymbolString();
         }

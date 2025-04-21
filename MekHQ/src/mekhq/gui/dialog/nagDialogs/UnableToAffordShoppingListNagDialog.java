@@ -72,7 +72,7 @@ public class UnableToAffordShoppingListNagDialog extends ImmersiveDialogNag {
 
         Money totalBuyCost = campaign.getShoppingList().getTotalBuyCost();
         Money currentFunds = campaign.getFunds();
-        Money deficit = currentFunds.minus(totalBuyCost);
+        Money deficit = totalBuyCost.minus(currentFunds);
 
         return getFormattedTextAt(RESOURCE_BUNDLE,
               key + ".ic",
