@@ -251,6 +251,8 @@ MEKHQ VERSION HISTORY:
 + PR #6713: Fixed Two Invalid and Removable SPAs
 + PR #6714: Fixed Target Number Display in Skill Check Utility
 + PR #6715: Replaced Placeholder Art in Skill Check Dialog
++ PR #6716: Corrected Resupply Documentation; Archived Outdated Parts Procurement Documentation
++ Fix #6717: Fixed Skill Compatibility Version Check
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
