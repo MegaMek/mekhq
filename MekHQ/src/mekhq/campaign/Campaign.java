@@ -194,6 +194,7 @@ import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
