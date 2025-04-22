@@ -37,8 +37,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ResourceBundle;
 
-import org.junit.jupiter.api.Test;
-
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
@@ -46,6 +44,7 @@ import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.generators.companyGenerators.AtBCompanyGenerator;
 import mekhq.campaign.universe.generators.companyGenerators.WindchildCompanyGenerator;
+import org.junit.jupiter.api.Test;
 
 class CompanyGenerationMethodTest {
     // region Variable Declarations

@@ -39,10 +39,10 @@ import java.util.List;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
