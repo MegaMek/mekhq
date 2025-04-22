@@ -26,7 +26,7 @@
  * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
  * InMediaRes Productions, LLC.
  */
-package mekhq.campaign;
+package mekhq.campaign.personnel.skills;
 
 import static java.lang.Math.max;
 
@@ -38,6 +38,7 @@ import java.util.Map.Entry;
 
 import megamek.Version;
 import megamek.logging.MMLogger;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
