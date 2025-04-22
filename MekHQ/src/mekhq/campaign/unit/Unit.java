@@ -31,6 +31,7 @@ package mekhq.campaign.unit;
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static megamek.common.MiscType.F_CARGO;
+import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_B;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_C;
@@ -1641,6 +1642,7 @@ public class Unit implements ITechnology {
             double actualCapacity = max(0, bayCapacity - bayDamage);
 
             if (bay instanceof CargoBay) {
+                actualCapacity = getCapacityModifiedForTransportedUnits(actualCapacity);
                 capacity += actualCapacity;
                 continue;
             }
@@ -1708,6 +1710,41 @@ public class Unit implements ITechnology {
             }
         }
         return capacity;
+    }
+
+    /**
+     * Calculates the remaining cargo capacity of a unit after accounting for transported units.
+     *
+     * <p>This method:</p>
+     * <ul>
+     *   <li>Examines all units currently being transported by the specified unit</li>
+     *   <li>For each transported unit in a cargo bay, subtracts its weight from the available cargo capacity</li>
+     *   <li>Ensures the remaining capacity never goes below zero</li>
+     * </ul>
+     *
+     * @param individualCargo The initial cargo capacity before considering transported units
+     * @return The remaining cargo capacity, after subtracting the weight of all transported units, will never be
+     * negative
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public double getCapacityModifiedForTransportedUnits(double individualCargo) {
+        AbstractTransportedUnitsSummary transportSummary = getTransportedUnitsSummary(TACTICAL_TRANSPORT);
+
+        if (transportSummary != null) {
+            for (Unit transportedUnit : transportSummary.getTransportedUnits()) {
+                ITransportAssignment assignment = transportedUnit.getTransportAssignment(TACTICAL_TRANSPORT);
+                if (assignment != null) {
+                    if (assignment.getTransporterType() == CARGO_BAY) {
+                        double weight = transportedUnit.getEntity().getWeight();
+
+                        individualCargo = max(0, individualCargo - weight);
+                    }
+                }
+            }
+        }
+        return individualCargo;
     }
 
     /**
