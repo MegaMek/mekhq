@@ -202,9 +202,17 @@ public abstract class AbstractSkillGenerator {
         }
     }
 
-    public void generateRoleplaySkills(final Person person, final int experienceLevel) {
+    /**
+     * @deprecated use {@link #generateRoleplaySkills(Person)} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
+    public void generateRoleplaySkills(final Person person, int experienceLevel) {
+        generateRoleplaySkills(person);
+    }
+
+    public void generateRoleplaySkills(final Person person) {
         for (SkillType skillType : getRoleplaySkills()) {
-            int roleplaySkillLevel = Utilities.generateExpLevel(rskillPrefs.getRoleplaySkillsModifier(experienceLevel));
+            int roleplaySkillLevel = Utilities.generateExpLevel(rskillPrefs.getRoleplaySkillModifier());
             if (roleplaySkillLevel > SkillType.EXP_ULTRA_GREEN) {
                 addSkill(person, skillType.getName(), roleplaySkillLevel, rskillPrefs.randomizeSkill(), 0);
             }
