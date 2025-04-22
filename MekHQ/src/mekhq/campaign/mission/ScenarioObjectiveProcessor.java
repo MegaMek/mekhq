@@ -27,6 +27,17 @@
  */
 package mekhq.campaign.mission;
 
+import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 import megamek.common.Entity;
 import megamek.common.OffBoardDirection;
 import mekhq.MHQConstants;
@@ -39,11 +50,6 @@ import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import org.apache.logging.log4j.LogManager;
-
-import java.util.*;
-
-import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
 
 /**
  * Handles processing for objectives for a scenario that has them
@@ -418,7 +424,9 @@ public class ScenarioObjectiveProcessor {
                     Resupply resupply = new Resupply(campaign, contract, RESUPPLY_LOOT);
 
                     // This scaling means users will need to have at least 10 qualifying units before they get a Resupply.
-                    int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : (int) (scaleFactor * 0.1);
+                    int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ?
+                                                 1 :
+                                                 (int) (scaleFactor * 0.2);
                     int size = effect.howMuch * effectMultiplier;
 
                     if (dryRun) {
