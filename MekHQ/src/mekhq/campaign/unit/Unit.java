@@ -31,6 +31,7 @@ package mekhq.campaign.unit;
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static megamek.common.MiscType.F_CARGO;
+import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
 import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_B;
@@ -55,8 +56,8 @@ import javax.swing.UIManager;
 import megamek.Version;
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.CrewType;
 import megamek.common.*;
+import megamek.common.CrewType;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.ArmorType;
@@ -349,7 +350,7 @@ public class Unit implements ITechnology {
      */
     public void initializeShipTransportSpace() {
         // Initialize the bay capacity
-        initializeTransportSpace(CampaignTransportType.SHIP_TRANSPORT);
+        initializeTransportSpace(SHIP_TRANSPORT);
     }
 
     /**
@@ -379,7 +380,7 @@ public class Unit implements ITechnology {
     }
 
     private ShipTransportedUnitsSummary getShipTransportedUnitsSummary() {
-        return (ShipTransportedUnitsSummary) getTransportedUnitsSummary(CampaignTransportType.SHIP_TRANSPORT);
+        return (ShipTransportedUnitsSummary) getTransportedUnitsSummary(SHIP_TRANSPORT);
     }
 
     private TacticalTransportedUnitsSummary getTacticalTransportedUnitsSummary() {
@@ -650,14 +651,14 @@ public class Unit implements ITechnology {
      * Gets a value indicating whether this unit is transporting units.
      */
     public boolean hasShipTransportedUnits() {
-        return hasTransportedUnits(CampaignTransportType.SHIP_TRANSPORT);
+        return hasTransportedUnits(SHIP_TRANSPORT);
     }
 
     /**
      * @return the set of units being transported by this unit.
      */
     public Set<Unit> getShipTransportedUnits() {
-        return getTransportedUnits(CampaignTransportType.SHIP_TRANSPORT);
+        return getTransportedUnits(SHIP_TRANSPORT);
     }
 
     /**
@@ -666,7 +667,7 @@ public class Unit implements ITechnology {
      * @param unit The unit being transported by this instance.
      */
     public void addShipTransportedUnit(Unit unit) {
-        addTransportedUnit(CampaignTransportType.SHIP_TRANSPORT, unit);
+        addTransportedUnit(SHIP_TRANSPORT, unit);
     }
 
     /**
@@ -1633,6 +1634,8 @@ public class Unit implements ITechnology {
         }
 
         double capacity = 0.0;
+        double cargoBayCapacity = -getCapacityModifiedForTransportedUnits(TACTICAL_TRANSPORT);
+        cargoBayCapacity -= getCapacityModifiedForTransportedUnits(SHIP_TRANSPORT);
 
         // Add capacities from transport bays
         for (Bay bay : entity.getTransportBays()) {
@@ -1642,8 +1645,7 @@ public class Unit implements ITechnology {
             double actualCapacity = max(0, bayCapacity - bayDamage);
 
             if (bay instanceof CargoBay) {
-                actualCapacity = getCapacityModifiedForTransportedUnits(actualCapacity);
-                capacity += actualCapacity;
+                cargoBayCapacity += actualCapacity;
                 continue;
             }
 
@@ -1656,6 +1658,8 @@ public class Unit implements ITechnology {
                 capacity += actualCapacity;
             }
         }
+
+        capacity += max(0, cargoBayCapacity);
 
         // Add capacities from mounted equipment
         for (Mounted<?> mounted : entity.getMisc()) {
@@ -1713,38 +1717,38 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * Calculates the remaining cargo capacity of a unit after accounting for transported units.
+     * Calculates the total weight of all units assigned to be transported in the cargo bays of this unit for a given
+     * transport type.
      *
      * <p>This method:</p>
      * <ul>
-     *   <li>Examines all units currently being transported by the specified unit</li>
-     *   <li>For each transported unit in a cargo bay, subtracts its weight from the available cargo capacity</li>
-     *   <li>Ensures the remaining capacity never goes below zero</li>
+     *   <li>Retrieves all units currently assigned to be transported by this unit using the specified {@code transportType}.</li>
+     *   <li>For each transported unit assigned to a cargo bay, adds its full weight to the total.</li>
+     *   <li>Only units with a {@link TransporterType} of {@link TransporterType#CARGO_BAY} are included in the sum.</li>
      * </ul>
      *
-     * @param individualCargo The initial cargo capacity before considering transported units
-     * @return The remaining cargo capacity, after subtracting the weight of all transported units, will never be
-     * negative
+     * @param transportType The transport type to consider when determining transported units and their assignments.
+     * @return The combined weight of all units assigned to cargo bays under this unit for the specified transport type.
      *
      * @author Illiani
      * @since 0.50.05
      */
-    public double getCapacityModifiedForTransportedUnits(double individualCargo) {
-        AbstractTransportedUnitsSummary transportSummary = getTransportedUnitsSummary(TACTICAL_TRANSPORT);
+    public double getCapacityModifiedForTransportedUnits(CampaignTransportType transportType) {
+        AbstractTransportedUnitsSummary transportSummary = getTransportedUnitsSummary(transportType);
+        double cargoCapacityUsage = 0;
 
         if (transportSummary != null) {
             for (Unit transportedUnit : transportSummary.getTransportedUnits()) {
-                ITransportAssignment assignment = transportedUnit.getTransportAssignment(TACTICAL_TRANSPORT);
+                ITransportAssignment assignment = transportedUnit.getTransportAssignment(transportType);
                 if (assignment != null) {
                     if (assignment.getTransporterType() == CARGO_BAY) {
-                        double weight = transportedUnit.getEntity().getWeight();
-
-                        individualCargo = max(0, individualCargo - weight);
+                        cargoCapacityUsage += transportedUnit.getEntity().getWeight();
                     }
                 }
             }
         }
-        return individualCargo;
+
+        return cargoCapacityUsage;
     }
 
     /**
@@ -2720,7 +2724,7 @@ public class Unit implements ITechnology {
         for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
             // Some transports were set up before this and use a different saving & loading
             // pattern. Let's ignore them.
-            if (campaignTransportType.equals(CampaignTransportType.SHIP_TRANSPORT)) {
+            if (campaignTransportType.equals(SHIP_TRANSPORT)) {
                 continue;
             }
 
@@ -5907,8 +5911,8 @@ public class Unit implements ITechnology {
         // We don't want to clear transport assignments, but we do want to remove the
         // transport from the list of potential transports, if it's transport.
         if (campaign != null) {
-            if (!getTransportCapabilities(CampaignTransportType.SHIP_TRANSPORT).isEmpty()) {
-                getCampaign().removeCampaignTransporter(CampaignTransportType.SHIP_TRANSPORT, this);
+            if (!getTransportCapabilities(SHIP_TRANSPORT).isEmpty()) {
+                getCampaign().removeCampaignTransporter(SHIP_TRANSPORT, this);
             }
 
             if (!getTransportCapabilities(CampaignTransportType.TACTICAL_TRANSPORT).isEmpty()) {
@@ -5991,8 +5995,8 @@ public class Unit implements ITechnology {
         // If this unit is a transport, let's add it to the campaign's
         // transporter map.
         if (campaign != null) {
-            if (!getTransportCapabilities(CampaignTransportType.SHIP_TRANSPORT).isEmpty()) {
-                getCampaign().addCampaignTransport(CampaignTransportType.SHIP_TRANSPORT, this);
+            if (!getTransportCapabilities(SHIP_TRANSPORT).isEmpty()) {
+                getCampaign().addCampaignTransport(SHIP_TRANSPORT, this);
             }
 
             if (!getTransportCapabilities(CampaignTransportType.TACTICAL_TRANSPORT).isEmpty()) {
