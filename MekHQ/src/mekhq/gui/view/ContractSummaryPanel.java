@@ -55,8 +55,6 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.enums.MHQTabType;
 
@@ -613,7 +611,7 @@ public class ContractSummaryPanel extends JPanel {
      */
     @Deprecated(since = "0.50.05", forRemoval = true)
     private String generateRerollText(int rerolls) {
-        return generateRerollText("");
+        return generateRerollText("( " + rerolls + ')');
     }
 
     private String generateRerollText(String addendum) {
