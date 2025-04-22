@@ -29,6 +29,9 @@
 package mekhq.gui.view;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 
 import java.awt.Cursor;
 import java.awt.GridBagConstraints;
@@ -80,6 +83,10 @@ public class ContractSummaryPanel extends JPanel {
     private JLabel txtStraightSupport;
     private JLabel txtBattleLossComp;
 
+    private Person commandNegotiator;
+    private Person transportNegotiator;
+    private Person logisticsNegotiator;
+
     private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog",
             MekHQ.getMHQOptions().getLocale());
     private ContractPaymentBreakdown contractPaymentBreakdown;
@@ -102,12 +109,12 @@ public class ContractSummaryPanel extends JPanel {
                 logRerolls = 1;
                 tranRerolls = 1;
             } else {
-                Person admin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_COMMAND, SkillType.S_NEG, SkillType.S_ADMIN);
-                cmdRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null) ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
-                admin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_NEG, SkillType.S_ADMIN);
-                logRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null) ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
-                admin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_TRANSPORT, SkillType.S_NEG, SkillType.S_ADMIN);
-                tranRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null) ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
+                commandNegotiator = campaign.getSeniorAdminPerson(COMMAND);
+                cmdRerolls = (commandNegotiator == null || commandNegotiator.getSkill(SkillType.S_NEG) == null) ? 0 : 1;
+                logisticsNegotiator = campaign.getSeniorAdminPerson(LOGISTICS);
+                logRerolls = (logisticsNegotiator == null || logisticsNegotiator.getSkill(SkillType.S_NEG) == null) ? 0 : 1;
+                transportNegotiator = campaign.getSeniorAdminPerson(TRANSPORT);
+                tranRerolls = (transportNegotiator == null || transportNegotiator.getSkill(SkillType.S_NEG) == null) ? 0 : 1;
             }
         }
 
@@ -572,37 +579,45 @@ public class ContractSummaryPanel extends JPanel {
     }
 
     private void setCommandRerollButtonText(JButton rerollButton) {
-        int rerolls = (cmdRerolls - campaign.getContractMarket().getRerollsUsed(contract,
-                AbstractContractMarket.CLAUSE_COMMAND));
-        rerollButton.setText(generateRerollText(rerolls));
+        String addendum = "";
+        if (commandNegotiator != null) {
+            addendum = " (" + commandNegotiator.getFullTitle() + ')';
+        }
+        rerollButton.setText(generateRerollText(addendum));
     }
 
     private void setTransportRerollButtonText(JButton rerollButton) {
-        int rerolls = (tranRerolls - campaign.getContractMarket().getRerollsUsed(contract,
-                AbstractContractMarket.CLAUSE_TRANSPORT));
-        rerollButton.setText(generateRerollText(rerolls));
+        String addendum = "";
+        if (transportNegotiator != null) {
+            addendum = " (" + transportNegotiator.getFullTitle() + ')';
+        }
+
+        rerollButton.setText(generateRerollText(addendum));
     }
 
     private void setSalvageRerollButtonText(JButton rerollButton) {
-        int rerolls = (logRerolls - campaign.getContractMarket().getRerollsUsed(contract,
-            AbstractContractMarket.CLAUSE_SALVAGE));
-        rerollButton.setText(generateRerollText(rerolls));
+        String addendum = "";
+        if (logisticsNegotiator != null) {
+            addendum = " (" + logisticsNegotiator.getFullTitle() + ')';
+        }
+
+        rerollButton.setText(generateRerollText(addendum));
     }
 
     private void setSupportRerollButtonText(JButton rerollButton) {
-        int rerolls = (logRerolls - campaign.getContractMarket().getRerollsUsed(contract,
-                AbstractContractMarket.CLAUSE_SUPPORT));
-        rerollButton.setText(generateRerollText(rerolls));
+        setSalvageRerollButtonText(rerollButton);
     }
 
+    /**
+     * @deprecated use {@link #generateRerollText()} instead.}
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     private String generateRerollText(int rerolls) {
-        StringBuilder text = new StringBuilder(resourceMap.getString("lblRenegotiate.text"));
-        if (method != ContractMarketMethod.CAM_OPS) {
-            text.append(" (")
-                .append(rerolls)
-                .append(')');
-        }
-        return text.toString();
+        return generateRerollText("");
+    }
+
+    private String generateRerollText(String addendum) {
+        return resourceMap.getString("lblRenegotiate.text") + addendum;
     }
 
     public void refreshAmounts() {
