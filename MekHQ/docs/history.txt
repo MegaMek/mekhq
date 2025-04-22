@@ -254,6 +254,7 @@ MEKHQ VERSION HISTORY:
 + PR #6716: Corrected Resupply Documentation; Archived Outdated Parts Procurement Documentation
 + Fix #6717: Fixed Skill Compatibility Version Check
 + Fix #6720: Stopped Deleted Personnel Returning to the Campaign When Activating a Mothballed Unit
++ PR #6729: Moved RandomSkillPreferences to Skills Package
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
