@@ -63,7 +63,7 @@ import megamek.common.planetaryconditions.Light;
 import megamek.common.planetaryconditions.Weather;
 import megamek.common.planetaryconditions.Wind;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;

@@ -30,7 +30,7 @@ package mekhq.campaign.personnel.generator;
 import java.util.Objects;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 

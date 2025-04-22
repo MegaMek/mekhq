@@ -32,7 +32,6 @@ import static megamek.common.Compute.d6;
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.personnel.enums.PersonnelRole.*;
 import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
-import static mekhq.campaign.personnel.skills.SkillType.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,10 +42,10 @@ import java.util.Map;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.IOption;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 
 /**
