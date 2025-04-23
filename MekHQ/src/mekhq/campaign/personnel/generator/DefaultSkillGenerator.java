@@ -29,6 +29,7 @@ package mekhq.campaign.personnel.generator;
 
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.SUPPORT_COMMAND;
@@ -159,6 +160,19 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
     @Override
     public void generateAttributes(Person person) {
         RandomSkillPreferences skillPreferences = getSkillPreferences();
+
+        if (!skillPreferences.isUseAttributes()) {
+            for (SkillAttribute attribute : SkillAttribute.values()) {
+                if (attribute.isNone()) {
+                    continue;
+                }
+
+                person.setAttributeScore(attribute, DEFAULT_ATTRIBUTE_SCORE);
+            }
+
+            return;
+        }
+
         boolean extraRandomAttributes = skillPreferences.isRandomizeAttributes();
 
         PersonnelRole profession = person.getPrimaryRole();

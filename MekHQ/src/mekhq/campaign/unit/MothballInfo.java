@@ -128,7 +128,7 @@ public class MothballInfo {
      */
     public void restorePreMothballInfo(Unit unit, Campaign campaign) {
         Person tech = campaign.getPerson(techId);
-        if (tech != null) {
+        if (tech != null && tech.getStatus().isActive()) {
             unit.setTech(tech);
         }
 

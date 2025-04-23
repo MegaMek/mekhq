@@ -620,6 +620,7 @@
         <commandSkillsModifier>-12,-11,-10,-9,-8</commandSkillsModifier>
         <roleplaySkillModifier>-8</roleplaySkillModifier>
         <randomizeSkill>true</randomizeSkill>
+        <useAttributes>true</useAttributes>
         <randomizeAttributes>true</randomizeAttributes>
         <randomizeTraits>true</randomizeTraits>
         <useClanBonuses>true</useClanBonuses>

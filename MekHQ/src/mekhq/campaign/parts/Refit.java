@@ -2612,7 +2612,7 @@ public class Refit extends Part implements IAcquisitionWork {
     @Override
     public String failToFind() {
         return ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
-              " refit kit not found.");
+              " <b>refit kit not found</b>.");
     }
 
     /**

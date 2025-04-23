@@ -3308,7 +3308,11 @@ public class AtBDynamicScenarioFactory {
         for (int forceID : scenario.getForceIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
             if (forceTemplate != null && forceTemplate.getContributesToBV()) {
-                bvBudget += campaign.getForce(forceID).getTotalBV(campaign, forceStandardBattleValue);
+                Force force = campaign.getForce(forceID);
+                if (force != null) {
+                    bvBudget += campaign.getForce(forceID).getTotalBV(campaign, forceStandardBattleValue);
+                    logger.info("Forced BV contribution for {}: {}", force.getName(), bvBudget);
+                }
             }
         }
 

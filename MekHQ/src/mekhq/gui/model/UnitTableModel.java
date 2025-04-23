@@ -302,7 +302,7 @@ public class UnitTableModel extends DataTableModel {
                     ruggedMultiplier = 3;
                 }
 
-                yield daysSinceLastMaintenance + " / " + (cycleLength * ruggedMultiplier) + " days";
+                yield ((cycleLength * ruggedMultiplier) - daysSinceLastMaintenance) + " days";
             }
             case COL_BV -> entity.calculateBattleValue(true, unit.getEntity().getCrew() == null);
             case COL_REPAIR -> unit.getPartsNeedingFixing().size();
