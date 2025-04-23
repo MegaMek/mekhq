@@ -1168,20 +1168,8 @@ public class SkillType {
         }
 
         skillType.subType = temporarySkillType.getSubType();
-        logger.info("SkillType {} has been updated to sub type {}",
-              skillType.getName(),
-              temporarySkillType.getSubType());
-
         skillType.firstAttribute = temporarySkillType.getFirstAttribute();
-        logger.info("SkillType {} has been updated to first attribute {}",
-              skillType.getName(),
-              temporarySkillType.getFirstAttribute());
-
         skillType.secondAttribute = temporarySkillType.getSecondAttribute();
-        logger.info("SkillType {} has been updated to second attribute {}",
-              skillType.getName(),
-              temporarySkillType.getSecondAttribute());
-
         skillType.countUp = temporarySkillType.isCountUp();
     }
 

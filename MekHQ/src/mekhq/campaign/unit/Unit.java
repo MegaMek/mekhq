@@ -1716,9 +1716,10 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * Calculates the total weight of all units assigned to be transported in this unit's cargo space,
-     * for a specific transport type and transporter type.
-     * <p>This method:
+     * Calculates the total weight of all units assigned to be transported in this unit for a specific transport type
+     * and transporter type.
+     *
+     * <p>This method:</p>
      * <ul>
      *     <li>Finds all units currently assigned to be transported by this unit with the specified transport type.</li>
      *     <li>For each transported unit, checks if it is assigned to a transporter of the specified type.</li>
