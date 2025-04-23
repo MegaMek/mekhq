@@ -113,8 +113,6 @@ public class AdvancementTab {
 
     //start Skill Randomization Tab
     private JCheckBox chkExtraRandomness;
-    private JCheckBox chkRandomizeAttributes;
-    private JCheckBox chkRandomizeTraits;
     private JCheckBox chkComingOfAgeSPAs;
 
     private JPanel pnlPhenotype;
@@ -176,6 +174,11 @@ public class AdvancementTab {
     private JSpinner spnRoleplaySkillsVet;
     private JLabel lblRoleplaySkillsElite;
     private JSpinner spnRoleplaySkillsElite;
+
+    private JPanel pnlATOWAttributes;
+    private JCheckBox chkUseAttributes;
+    private JCheckBox chkRandomizeAttributes;
+    private JCheckBox chkRandomizeTraits;
     //end Skill Randomization Tab
 
     //start Recruitment Bonus Tab
@@ -522,7 +525,10 @@ public class AdvancementTab {
      */
     private void initializeSkillRandomizationTab() {
         chkExtraRandomness = new JCheckBox();
+        chkUseAttributes = new JCheckBox();
         chkRandomizeAttributes = new JCheckBox();
+
+        pnlATOWAttributes = new JPanel();
         chkRandomizeTraits = new JCheckBox();
         chkComingOfAgeSPAs = new JCheckBox();
 
@@ -609,8 +615,6 @@ public class AdvancementTab {
 
         // Contents
         chkExtraRandomness = new CampaignOptionsCheckBox("ExtraRandomness");
-        chkRandomizeAttributes = new CampaignOptionsCheckBox("RandomizeAttributes");
-        chkRandomizeTraits = new CampaignOptionsCheckBox("RandomizeTraits");
         chkComingOfAgeSPAs = new CampaignOptionsCheckBox("ComingOfAgeAbilities");
 
         pnlPhenotype = createPhenotypePanel();
@@ -630,12 +634,6 @@ public class AdvancementTab {
         panel.add(chkExtraRandomness, layout);
 
         layout.gridy++;
-        panel.add(chkRandomizeAttributes, layout);
-
-        layout.gridy++;
-        panel.add(chkRandomizeTraits, layout);
-
-        layout.gridy++;
         panel.add(chkComingOfAgeSPAs, layout);
 
         layout.gridx = 0;
@@ -651,6 +649,37 @@ public class AdvancementTab {
 
         // Create Parent Panel and return
         return createParentPanel(panel, "XpAwardsTab");
+    }
+
+    /**
+     * Creates and returns the ATOW panel, which allows users to configure settings for attribute and traits
+     * probabilities.
+     *
+     * @return A {@code JPanel} containing configuration options for phenotype probabilities.
+     */
+    private JPanel createATOWAttributesPanel() {
+        // Contents
+        chkUseAttributes = new CampaignOptionsCheckBox("UseAttributes");
+        chkRandomizeAttributes = new CampaignOptionsCheckBox("RandomizeAttributes");
+        chkRandomizeTraits = new CampaignOptionsCheckBox("RandomizeTraits");
+
+        final JPanel panel = new CampaignOptionsStandardPanel("ATOWAttributesPanel", true, "ATOWAttributesPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+
+        layout.gridy++;
+        panel.add(chkRandomizeAttributes, layout);
+
+        layout.gridx++;
+        panel.add(chkRandomizeTraits, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkUseAttributes, layout);
+
+        return panel;
     }
 
     /**
@@ -672,8 +701,8 @@ public class AdvancementTab {
         layout.gridy = 0;
 
         for (int i = 0; i < phenotypes.size(); i++) {
-            phenotypeLabels[i] = new CampaignOptionsLabel(phenotypes.get(i).getName());
-            phenotypeSpinners[i] = new CampaignOptionsSpinner(phenotypes.get(i).getName(), 0, 0, 100, 1);
+            phenotypeLabels[i] = new CampaignOptionsLabel(phenotypes.get(i).getLabel());
+            phenotypeSpinners[i] = new CampaignOptionsSpinner(phenotypes.get(i).getLabel(), 0, 0, 100, 1);
 
             layout.gridx++;
             panel.add(phenotypeLabels[i], layout);
@@ -748,6 +777,7 @@ public class AdvancementTab {
         pnlArtillery = createArtilleryPanel();
         pnlSmallArms = createSmallArmsPanel();
         pnlSecondarySkills = createSecondarySkillPanel();
+        pnlATOWAttributes = createATOWAttributesPanel();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SkillGroupsPanel");
@@ -768,6 +798,8 @@ public class AdvancementTab {
         layout.gridx = 0;
         layout.gridy++;
         panel.add(pnlSecondarySkills, layout);
+        layout.gridx++;
+        panel.add(pnlATOWAttributes, layout);
 
         return panel;
     }
@@ -1149,6 +1181,7 @@ public class AdvancementTab {
 
         //start Skill Randomization Tab
         chkExtraRandomness.setSelected(skillPreferences.randomizeSkill());
+        chkUseAttributes.setSelected(skillPreferences.isUseAttributes());
         chkRandomizeAttributes.setSelected(skillPreferences.isRandomizeAttributes());
         chkRandomizeTraits.setSelected(skillPreferences.isRandomizeTraits());
         chkComingOfAgeSPAs.setSelected(options.isRewardComingOfAgeAbilities());
@@ -1237,6 +1270,7 @@ public class AdvancementTab {
 
         //start Skill Randomization Tab
         skillPreferences.setRandomizeSkill(chkExtraRandomness.isSelected());
+        skillPreferences.setUseAttributes(chkUseAttributes.isSelected());
         skillPreferences.setRandomizeAttributes(chkRandomizeAttributes.isSelected());
         skillPreferences.setRandomizeTraits(chkRandomizeTraits.isSelected());
         for (int i = 0; i < phenotypeSpinners.length; i++) {
