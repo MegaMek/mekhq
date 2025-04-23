@@ -131,7 +131,7 @@ public class AdvancementTab {
 
     private JPanel pnlSkillGroups;
 
-    private JPanel pnlTactics;
+    private JPanel pnlCommandSkills;
     private JLabel lblCommandSkillsUltraGreen;
     private JSpinner spnCommandSkillsUltraGreen;
     private JLabel lblCommandSkillsGreen;
@@ -162,18 +162,8 @@ public class AdvancementTab {
     private JSpinner spnSecondProb;
     private JLabel lblSecondBonus;
     private JSpinner spnSecondBonus;
-
-    private JPanel pnlRoleplaySkills;
-    private JLabel lblRoleplaySkillsUltraGreen;
-    private JSpinner spnRoleplaySkillsUltraGreen;
-    private JLabel lblRoleplaySkillsGreen;
-    private JSpinner spnRoleplaySkillsGreen;
-    private JLabel lblRoleplaySkillsReg;
-    private JSpinner spnRoleplaySkillsReg;
-    private JLabel lblRoleplaySkillsVet;
-    private JSpinner spnRoleplaySkillsVet;
-    private JLabel lblRoleplaySkillsElite;
-    private JSpinner spnRoleplaySkillsElite;
+    private JLabel lblRoleplaySkillsModifier;
+    private JSpinner spnRoleplaySkillsModifier;
 
     private JPanel pnlATOWAttributes;
     private JCheckBox chkUseAttributes;
@@ -538,7 +528,7 @@ public class AdvancementTab {
 
         pnlSkillGroups = new JPanel();
 
-        pnlTactics = new JPanel();
+        pnlCommandSkills = new JPanel();
         lblCommandSkillsUltraGreen = new JLabel();
         spnCommandSkillsUltraGreen = new JSpinner();
         lblCommandSkillsGreen = new JLabel();
@@ -570,17 +560,8 @@ public class AdvancementTab {
         lblSecondBonus = new JLabel();
         spnSecondBonus = new JSpinner();
 
-        pnlRoleplaySkills = new JPanel();
-        lblRoleplaySkillsUltraGreen = new JLabel();
-        spnRoleplaySkillsUltraGreen = new JSpinner();
-        lblRoleplaySkillsGreen = new JLabel();
-        spnRoleplaySkillsGreen = new JSpinner();
-        lblRoleplaySkillsReg = new JLabel();
-        spnRoleplaySkillsReg = new JSpinner();
-        lblRoleplaySkillsVet = new JLabel();
-        spnRoleplaySkillsVet = new JSpinner();
-        lblRoleplaySkillsElite = new JLabel();
-        spnRoleplaySkillsElite = new JSpinner();
+        lblRoleplaySkillsModifier = new JLabel();
+        spnRoleplaySkillsModifier = new JSpinner();
 
         pnlRandomAbilities = new JPanel();
         lblAbilityGreen = new JLabel();
@@ -670,14 +651,14 @@ public class AdvancementTab {
         layout.gridy = 0;
 
         layout.gridy++;
-        panel.add(chkRandomizeAttributes, layout);
+        panel.add(chkUseAttributes, layout);
 
         layout.gridx++;
         panel.add(chkRandomizeTraits, layout);
 
         layout.gridx = 0;
         layout.gridy++;
-        panel.add(chkUseAttributes, layout);
+        panel.add(chkRandomizeAttributes, layout);
 
         return panel;
     }
@@ -772,8 +753,7 @@ public class AdvancementTab {
      */
     private JPanel createSkillGroupPanel() {
         // Contents
-        pnlTactics = createTacticsPanel();
-        pnlRoleplaySkills = createRoleplaySkillsPanel();
+        pnlCommandSkills = createCommandSkillsPanel();
         pnlArtillery = createArtilleryPanel();
         pnlSmallArms = createSmallArmsPanel();
         pnlSecondarySkills = createSecondarySkillPanel();
@@ -785,9 +765,9 @@ public class AdvancementTab {
         layout.gridwidth = 1;
         layout.gridx = 0;
         layout.gridy = 0;
-        panel.add(pnlTactics, layout);
+        panel.add(pnlCommandSkills, layout);
         layout.gridx++;
-        panel.add(pnlRoleplaySkills, layout);
+        panel.add(pnlSecondarySkills, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -797,20 +777,18 @@ public class AdvancementTab {
 
         layout.gridx = 0;
         layout.gridy++;
-        panel.add(pnlSecondarySkills, layout);
-        layout.gridx++;
         panel.add(pnlATOWAttributes, layout);
 
         return panel;
     }
 
     /**
-     * Creates and returns the Tactics panel, which allows users to configure settings for Tactics modifiers for
-     * different skill levels, such as green, regular, veteran, and elite.
+     * Creates and returns the Command Skills panel, which allows users to configure settings for Command Skill
+     * modifiers for different skill levels, such as green, regular, veteran, and elite.
      *
-     * @return A {@code JPanel} containing configuration options for Tactics modifiers.
+     * @return A {@code JPanel} containing configuration options for Command Skill modifiers.
      */
-    private JPanel createTacticsPanel() {
+    private JPanel createCommandSkillsPanel() {
         // Contents
         lblCommandSkillsUltraGreen = new CampaignOptionsLabel("CommandSkillsUltraGreen");
         spnCommandSkillsUltraGreen = new CampaignOptionsSpinner("CommandSkillsUltraGreen", 0, -12, 12, 1);
@@ -860,22 +838,14 @@ public class AdvancementTab {
         return panel;
     }
 
+    /**
+     * @deprecated unused.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     private JPanel createRoleplaySkillsPanel() {
         // Contents
-        lblRoleplaySkillsUltraGreen = new CampaignOptionsLabel("RoleplaySkillsUltraGreen");
-        spnRoleplaySkillsUltraGreen = new CampaignOptionsSpinner("RoleplaySkillsUltraGreen", 0, -12, 12, 1);
-
-        lblRoleplaySkillsGreen = new CampaignOptionsLabel("RoleplaySkillsGreen");
-        spnRoleplaySkillsGreen = new CampaignOptionsSpinner("RoleplaySkillsGreen", 0, -12, 12, 1);
-
-        lblRoleplaySkillsReg = new CampaignOptionsLabel("RoleplaySkillsRegular");
-        spnRoleplaySkillsReg = new CampaignOptionsSpinner("RoleplaySkillsRegular", 0, -12, 12, 1);
-
-        lblRoleplaySkillsVet = new CampaignOptionsLabel("RoleplaySkillsVeteran");
-        spnRoleplaySkillsVet = new CampaignOptionsSpinner("RoleplaySkillsVeteran", 0, -12, 12, 1);
-
-        lblRoleplaySkillsElite = new CampaignOptionsLabel("RoleplaySkillsElite");
-        spnRoleplaySkillsElite = new CampaignOptionsSpinner("RoleplaySkillsElite", 0, -12, 12, 1);
+        lblRoleplaySkillsModifier = new CampaignOptionsLabel("RoleplaySkillsModifier");
+        spnRoleplaySkillsModifier = new CampaignOptionsSpinner("RoleplaySkillsModifier", 0, -12, 12, 1);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("RoleplaySkillsPanel", true, "RoleplaySkillsPanel");
@@ -883,29 +853,9 @@ public class AdvancementTab {
         layout.gridwidth = 1;
         layout.gridx = 0;
         layout.gridy = 0;
-        panel.add(lblRoleplaySkillsUltraGreen, layout);
+        panel.add(lblRoleplaySkillsModifier, layout);
         layout.gridx++;
-        panel.add(spnRoleplaySkillsUltraGreen, layout);
-        layout.gridx++;
-        panel.add(lblRoleplaySkillsGreen, layout);
-        layout.gridx++;
-        panel.add(spnRoleplaySkillsGreen, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblRoleplaySkillsReg, layout);
-        layout.gridx++;
-        panel.add(spnRoleplaySkillsReg, layout);
-        layout.gridx++;
-        panel.add(lblRoleplaySkillsVet, layout);
-        layout.gridx++;
-        panel.add(spnRoleplaySkillsVet, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblRoleplaySkillsElite, layout);
-        layout.gridx++;
-        panel.add(spnRoleplaySkillsElite, layout);
+        panel.add(spnRoleplaySkillsModifier, layout);
 
         return panel;
     }
@@ -989,6 +939,9 @@ public class AdvancementTab {
         lblSecondBonus = new CampaignOptionsLabel("SecondarySkillBonus");
         spnSecondBonus = new CampaignOptionsSpinner("SecondarySkillBonus", 0, -12, 12, 1);
 
+        lblRoleplaySkillsModifier = new CampaignOptionsLabel("RoleplaySkillsModifier");
+        spnRoleplaySkillsModifier = new CampaignOptionsSpinner("RoleplaySkillsModifier", 0, -12, 12, 1);
+
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SecondarySkillPanel", true, "SecondarySkillPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -998,6 +951,10 @@ public class AdvancementTab {
         panel.add(lblAntiMekSkill, layout);
         layout.gridx++;
         panel.add(spnAntiMekSkill, layout);
+        layout.gridx++;
+        panel.add(lblRoleplaySkillsModifier, layout);
+        layout.gridx++;
+        panel.add(spnRoleplaySkillsModifier, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -1198,11 +1155,7 @@ public class AdvancementTab {
         spnCommandSkillsReg.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_REGULAR));
         spnCommandSkillsVet.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_VETERAN));
         spnCommandSkillsElite.setValue(skillPreferences.getCommandSkillsModifier(SkillType.EXP_ELITE));
-        spnRoleplaySkillsUltraGreen.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_ULTRA_GREEN));
-        spnRoleplaySkillsGreen.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_GREEN));
-        spnRoleplaySkillsReg.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_REGULAR));
-        spnRoleplaySkillsVet.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_VETERAN));
-        spnRoleplaySkillsElite.setValue(skillPreferences.getRoleplaySkillsModifier(SkillType.EXP_ELITE));
+        spnRoleplaySkillsModifier.setValue(skillPreferences.getRoleplaySkillModifier());
         spnCombatSA.setValue(skillPreferences.getCombatSmallArmsBonus());
         spnSupportSA.setValue(skillPreferences.getSupportSmallArmsBonus());
         spnArtyProb.setValue(skillPreferences.getArtilleryProb());
@@ -1287,12 +1240,7 @@ public class AdvancementTab {
         skillPreferences.setCommandSkillsMod(SkillType.EXP_REGULAR, (int) spnCommandSkillsReg.getValue());
         skillPreferences.setCommandSkillsMod(SkillType.EXP_VETERAN, (int) spnCommandSkillsVet.getValue());
         skillPreferences.setCommandSkillsMod(SkillType.EXP_ELITE, (int) spnCommandSkillsElite.getValue());
-        skillPreferences.setRoleplaySkillsModifier(SkillType.EXP_ULTRA_GREEN,
-              (int) spnRoleplaySkillsUltraGreen.getValue());
-        skillPreferences.setRoleplaySkillsModifier(SkillType.EXP_GREEN, (int) spnRoleplaySkillsGreen.getValue());
-        skillPreferences.setRoleplaySkillsModifier(SkillType.EXP_REGULAR, (int) spnRoleplaySkillsReg.getValue());
-        skillPreferences.setRoleplaySkillsModifier(SkillType.EXP_VETERAN, (int) spnRoleplaySkillsVet.getValue());
-        skillPreferences.setRoleplaySkillsModifier(SkillType.EXP_ELITE, (int) spnRoleplaySkillsElite.getValue());
+        skillPreferences.setRoleplaySkillModifier((int) spnRoleplaySkillsModifier.getValue());
         skillPreferences.setCombatSmallArmsBonus((int) spnCombatSA.getValue());
         skillPreferences.setSupportSmallArmsBonus((int) spnSupportSA.getValue());
         skillPreferences.setSpecialAbilityBonus(SkillType.EXP_GREEN, (int) spnAbilityGreen.getValue());

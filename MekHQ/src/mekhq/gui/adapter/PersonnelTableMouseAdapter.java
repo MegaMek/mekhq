@@ -88,7 +88,6 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Kill;
-import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.event.PersonStatusChangedEvent;
@@ -127,6 +126,7 @@ import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
@@ -1469,7 +1469,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 RandomSkillPreferences skillPreferences = getCampaign().getRandomSkillPreferences();
                 AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPreferences);
                 for (Person person : people) {
-                    skillGenerator.generateRoleplaySkills(person, person.getExperienceLevel(getCampaign(), false));
+                    skillGenerator.generateRoleplaySkills(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;

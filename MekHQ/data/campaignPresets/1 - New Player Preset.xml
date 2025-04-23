@@ -640,7 +640,7 @@
         </recruitmentBonuses>
         <specialAbilityBonus>-10,-10,-2,0,1</specialAbilityBonus>
         <commandSkillsModifier>-12,-11,-10,-9,-8</commandSkillsModifier>
-        <roleplaySkillsModifier>-12,-11,-10,-9,-8</roleplaySkillsModifier>
+        <roleplaySkillModifier>-8</roleplaySkillModifier>
         <randomizeSkill>true</randomizeSkill>
         <useAttributes>true</useAttributes>
         <randomizeAttributes>true</randomizeAttributes>
