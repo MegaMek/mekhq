@@ -54,8 +54,8 @@ import javax.swing.UIManager;
 import megamek.Version;
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.CrewType;
 import megamek.common.*;
+import megamek.common.CrewType;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.ArmorType;
@@ -2066,9 +2066,9 @@ public class Unit implements ITechnology {
 
     public double getInfantryCapacity() {
         double bays = 0;
-        for (Bay b : getEntity().getTransportBays()) {
-            if (b instanceof InfantryBay) {
-                bays += b.getCapacity();
+        for (Bay bay : getEntity().getTransportBays()) {
+            if (bay instanceof InfantryBay) {
+                bays += bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight();
             }
         }
         return bays;
