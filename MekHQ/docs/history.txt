@@ -255,6 +255,20 @@ MEKHQ VERSION HISTORY:
 + Fix #6717: Fixed Skill Compatibility Version Check
 + Fix #6720: Stopped Deleted Personnel Returning to the Campaign When Activating a Mothballed Unit
 + PR #6729: Moved RandomSkillPreferences to Skills Package
++ Fix #3000, #4097: Updated Comms Center Functionality to Match Description
++ PR #6733: Adjusted Resupply Scaling Factor in Convoy Raid and Facility Hostile Capture
++ Fix #6734: Fixed Prisoner Capacity of Injured Prisoners
++ PR #6735: Added Seed Force to Log During Scenario Generation
++ PR #6738: Remove Redundant Logging in SkillType Updates
++ Fix #3624, #4039: Fixed Transport Report Counting Mothballed Units as Occupying Bays
++ Fix #4014: Fixed OmniPod Handling in Repair Bay Acquisitions Dialog
++ Fix #4120: Updated Global Tooltip Behavior for Instant and Persistent Display
++ Fix #4086
++ Fix #6718: Ensured Only Active Techs are Reassigned When Activating Units from a Mothballed State
++ Fix #6701: Added Colorblind Assistance to Refit Not Found Text
++ Fix #1914: Refactored Contract Terms Negotiations to Be Closer to RAW
++ PR #6727: Fix sorting the units in the Unit Market by price
++ Fix #6711: Fixed Conventional Infantry & Large Vessel (DropShip) Mothballing and Activation
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
