@@ -469,7 +469,9 @@ public class Unit implements ITechnology {
             en.setDuplicateMarker(this.entity.getDuplicateMarker());
             en.generateShortName();
             en.generateDisplayName();
-            C3Util.copyC3Networks(this.entity, en);
+            if (en.getGame() != null) {
+                C3Util.copyC3Networks(this.entity, en);
+            }
         }
         this.entity = en;
     }
