@@ -162,8 +162,6 @@ public class AdvancementTab {
     private JSpinner spnSecondProb;
     private JLabel lblSecondBonus;
     private JSpinner spnSecondBonus;
-
-    private JPanel pnlRoleplaySkills;
     private JLabel lblRoleplaySkillsModifier;
     private JSpinner spnRoleplaySkillsModifier;
 
@@ -562,7 +560,6 @@ public class AdvancementTab {
         lblSecondBonus = new JLabel();
         spnSecondBonus = new JSpinner();
 
-        pnlRoleplaySkills = new JPanel();
         lblRoleplaySkillsModifier = new JLabel();
         spnRoleplaySkillsModifier = new JSpinner();
 
@@ -654,14 +651,14 @@ public class AdvancementTab {
         layout.gridy = 0;
 
         layout.gridy++;
-        panel.add(chkRandomizeAttributes, layout);
+        panel.add(chkUseAttributes, layout);
 
         layout.gridx++;
         panel.add(chkRandomizeTraits, layout);
 
         layout.gridx = 0;
         layout.gridy++;
-        panel.add(chkUseAttributes, layout);
+        panel.add(chkRandomizeAttributes, layout);
 
         return panel;
     }
@@ -756,7 +753,7 @@ public class AdvancementTab {
      */
     private JPanel createSkillGroupPanel() {
         // Contents
-        pnlCommandSkills = createTacticsPanel();
+        pnlCommandSkills = createCommandSkillsPanel();
         pnlArtillery = createArtilleryPanel();
         pnlSmallArms = createSmallArmsPanel();
         pnlSecondarySkills = createSecondarySkillPanel();
@@ -786,12 +783,12 @@ public class AdvancementTab {
     }
 
     /**
-     * Creates and returns the Tactics panel, which allows users to configure settings for Tactics modifiers for
-     * different skill levels, such as green, regular, veteran, and elite.
+     * Creates and returns the Command Skills panel, which allows users to configure settings for Command Skill
+     * modifiers for different skill levels, such as green, regular, veteran, and elite.
      *
-     * @return A {@code JPanel} containing configuration options for Tactics modifiers.
+     * @return A {@code JPanel} containing configuration options for Command Skill modifiers.
      */
-    private JPanel createTacticsPanel() {
+    private JPanel createCommandSkillsPanel() {
         // Contents
         lblCommandSkillsUltraGreen = new CampaignOptionsLabel("CommandSkillsUltraGreen");
         spnCommandSkillsUltraGreen = new CampaignOptionsSpinner("CommandSkillsUltraGreen", 0, -12, 12, 1);
