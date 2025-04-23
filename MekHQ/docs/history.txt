@@ -275,6 +275,7 @@ MEKHQ VERSION HISTORY:
 + PR #6730: Added Option to Disable ATOW Attribute Scores
 + PR #6736: Simplified Roleplay Skills Randomization
 + PR #6737: Adjusted Maintenance Cycle Hangar Display
++ PR #6745: Updated "The Learning Ropes" Campaign Save File
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
