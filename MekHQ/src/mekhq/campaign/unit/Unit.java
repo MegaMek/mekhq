@@ -1634,8 +1634,7 @@ public class Unit implements ITechnology {
         }
 
         double capacity = 0.0;
-        double cargoBayCapacity = -getCapacityModifiedForTransportedUnits(TACTICAL_TRANSPORT);
-        cargoBayCapacity -= getCapacityModifiedForTransportedUnits(SHIP_TRANSPORT);
+        double cargoBayCapacity = -getCapacityModifiedForTransportedUnits(TACTICAL_TRANSPORT, CARGO_BAY);
 
         // Add capacities from transport bays
         for (Bay bay : entity.getTransportBays()) {
@@ -1717,23 +1716,24 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * Calculates the total weight of all units assigned to be transported in the cargo bays of this unit for a given
-     * transport type.
-     *
-     * <p>This method:</p>
+     * Calculates the total weight of all units assigned to be transported in this unit's cargo space,
+     * for a specific transport type and transporter type.
+     * <p>This method:
      * <ul>
-     *   <li>Retrieves all units currently assigned to be transported by this unit using the specified {@code transportType}.</li>
-     *   <li>For each transported unit assigned to a cargo bay, adds its full weight to the total.</li>
-     *   <li>Only units with a {@link TransporterType} of {@link TransporterType#CARGO_BAY} are included in the sum.</li>
+     *     <li>Finds all units currently assigned to be transported by this unit with the specified transport type.</li>
+     *     <li>For each transported unit, checks if it is assigned to a transporter of the specified type.</li>
+     *     <li>Adds the full weight of each matching transported unit to the total.</li>
      * </ul>
      *
-     * @param transportType The transport type to consider when determining transported units and their assignments.
-     * @return The combined weight of all units assigned to cargo bays under this unit for the specified transport type.
+     * @param transportType   The transport type to match when retrieving transported units.
+     * @param transporterType The transporter type to filter assignments (only units assigned to this type are considered).
+     * @return The sum weight of all units assigned to this unit via the given transport and transporter type.
      *
      * @author Illiani
      * @since 0.50.05
      */
-    public double getCapacityModifiedForTransportedUnits(CampaignTransportType transportType) {
+    public double getCapacityModifiedForTransportedUnits(CampaignTransportType transportType,
+          TransporterType transporterType) {
         AbstractTransportedUnitsSummary transportSummary = getTransportedUnitsSummary(transportType);
         double cargoCapacityUsage = 0;
 
@@ -1741,7 +1741,7 @@ public class Unit implements ITechnology {
             for (Unit transportedUnit : transportSummary.getTransportedUnits()) {
                 ITransportAssignment assignment = transportedUnit.getTransportAssignment(transportType);
                 if (assignment != null) {
-                    if (assignment.getTransporterType() == CARGO_BAY) {
+                    if (assignment.getTransporterType() == transporterType) {
                         cargoCapacityUsage += transportedUnit.getEntity().getWeight();
                     }
                 }
