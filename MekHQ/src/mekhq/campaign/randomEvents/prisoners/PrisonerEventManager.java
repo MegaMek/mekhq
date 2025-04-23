@@ -527,7 +527,7 @@ public class PrisonerEventManager {
 
         for (Person prisoner : campaign.getCurrentPrisoners()) {
             if (prisoner.needsFixing() && isMekHQCaptureStyle) {
-                if (prisoner.getDoctorId() != null) {
+                if (prisoner.getDoctorId() == null) {
                     // Injured prisoners without doctors increase prisoner unhappiness, increasing
                     // capacity usage.
                     prisonerCapacityUsage++;
