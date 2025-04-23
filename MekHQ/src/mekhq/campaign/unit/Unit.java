@@ -1634,7 +1634,7 @@ public class Unit implements ITechnology {
         }
 
         double capacity = 0.0;
-        double cargoBayCapacity = -getCapacityModifiedForTransportedUnits(TACTICAL_TRANSPORT, CARGO_BAY);
+        double cargoBayCapacity = -getTotalWeightOfUnitsAssignedToBeTransported(TACTICAL_TRANSPORT, CARGO_BAY);
 
         // Add capacities from transport bays
         for (Bay bay : entity.getTransportBays()) {
@@ -1732,7 +1732,7 @@ public class Unit implements ITechnology {
      * @author Illiani
      * @since 0.50.05
      */
-    public double getCapacityModifiedForTransportedUnits(CampaignTransportType transportType,
+    public double getTotalWeightOfUnitsAssignedToBeTransported(CampaignTransportType transportType,
           TransporterType transporterType) {
         AbstractTransportedUnitsSummary transportSummary = getTransportedUnitsSummary(transportType);
         double cargoCapacityUsage = 0;
