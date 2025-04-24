@@ -2110,9 +2110,9 @@ public class Unit implements ITechnology {
 
     public double getInfantryCapacity() {
         double bays = 0;
-        for (Bay b : getEntity().getTransportBays()) {
-            if (b instanceof InfantryBay) {
-                bays += b.getCapacity();
+        for (Bay bay : getEntity().getTransportBays()) {
+            if (bay instanceof InfantryBay) {
+                bays += bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight();
             }
         }
         return bays;
