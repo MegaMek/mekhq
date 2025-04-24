@@ -226,7 +226,7 @@ public class MekHQ implements GameListener {
      */
     private static void setTooltipSettings() {
         ToolTipManager tooltipManager = ToolTipManager.sharedInstance();
-        tooltipManager.setInitialDelay(0);
+        tooltipManager.setInitialDelay(100);
         tooltipManager.setDismissDelay(Integer.MAX_VALUE);
         tooltipManager.setReshowDelay(0);
     }
