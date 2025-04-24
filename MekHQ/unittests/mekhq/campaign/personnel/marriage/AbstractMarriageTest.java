@@ -27,6 +27,18 @@
  */
 package mekhq.campaign.personnel.marriage;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -42,14 +54,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(value = MockitoExtension.class)
 public class AbstractMarriageTest {
@@ -503,7 +507,7 @@ public class AbstractMarriageTest {
         final List<Person> mockPersonnel = new ArrayList<>();
         mockPersonnel.add(mockMale);
         mockPersonnel.add(mockFemale);
-        when(mockCampaign.getActivePersonnel()).thenReturn(mockPersonnel);
+        when(mockCampaign.getActivePersonnel(false)).thenReturn(mockPersonnel);
 
         final Person mockPerson = mock(Person.class);
         when(mockPerson.getGender()).thenReturn(Gender.FEMALE);

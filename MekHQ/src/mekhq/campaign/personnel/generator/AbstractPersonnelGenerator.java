@@ -46,6 +46,7 @@ import mekhq.campaign.personnel.skills.SkillType;
  * Represents a class which can generate new {@link Person} objects for a {@link Campaign}.
  */
 public abstract class AbstractPersonnelGenerator {
+
     private RandomNameGenerator randomNameGenerator = RandomNameGenerator.getInstance();
 
     private RandomSkillPreferences rSkillPrefs = new RandomSkillPreferences();
@@ -140,10 +141,14 @@ public abstract class AbstractPersonnelGenerator {
     protected void generateNameAndGender(Campaign campaign, Person person, Gender gender) {
         int nonBinaryDiceSize = campaign.getCampaignOptions().getNonBinaryDiceSize();
 
-        if ((gender == Gender.RANDOMIZE) && (nonBinaryDiceSize > 0) && (Compute.randomInt(nonBinaryDiceSize) == 0)) {
-            person.setGender(RandomGenderGenerator.generateOther());
+        if (gender != Gender.RANDOMIZE) {
+            person.setGender(gender);
         } else {
-            person.setGender(RandomGenderGenerator.generate());
+            if (nonBinaryDiceSize > 0 && Compute.randomInt(nonBinaryDiceSize) == 0) {
+                person.setGender(RandomGenderGenerator.generateOther());
+            } else {
+                person.setGender(RandomGenderGenerator.generate());
+            }
         }
 
         String factionCode = campaign.getCampaignOptions().isUseOriginFactionForNames() ?
