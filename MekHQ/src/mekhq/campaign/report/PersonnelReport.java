@@ -51,6 +51,7 @@ public class PersonnelReport extends AbstractReport {
         int countMIA = 0;
         int countKIA = 0;
         int countDead = 0;
+        int countStudents = 0;
         int countRetired = 0;
         Money salary = Money.zero();
 
@@ -82,6 +83,8 @@ public class PersonnelReport extends AbstractReport {
                 countDead++;
             } else if (p.getStatus().isDead()) {
                 countDead++;
+            } else if (p.getStatus().isStudent()) {
+                countStudents++;
             }
 
         }
@@ -104,6 +107,7 @@ public class PersonnelReport extends AbstractReport {
               .append(String.format("%-30s        %4s\n", "KIA Combat Personnel", countKIA))
               .append(String.format("%-30s        %4s\n", "Retired Combat Personnel", countRetired))
               .append(String.format("%-30s        %4s\n", "Dead Combat Personnel", countDead))
+              .append(String.format("%-30s        %4s\n", "Student Combat Personnel", countStudents))
               .append("\nMonthly Salary For Combat Personnel: ")
               .append(salary.toAmountAndSymbolString());
 
@@ -118,6 +122,7 @@ public class PersonnelReport extends AbstractReport {
         int countMIA = 0;
         int countKIA = 0;
         int countDead = 0;
+        int countStudents = 0;
         int countRetired = 0;
         Money salary = Money.zero();
         int prisoners = 0;
@@ -151,6 +156,8 @@ public class PersonnelReport extends AbstractReport {
                 countDead++;
             } else if (primarySupport && p.getStatus().isDead()) {
                 countDead++;
+            } else if (primarySupport && p.getStatus().isStudent()) {
+                countStudents++;
             }
 
             if (p.getPrimaryRole().isDependent() && p.getStatus().isActive() && p.getPrisonerStatus().isFree()) {
@@ -190,6 +197,7 @@ public class PersonnelReport extends AbstractReport {
               .append(String.format("%-30s        %4s\n", "KIA Support Personnel", countKIA))
               .append(String.format("%-30s        %4s\n", "Retired Support Personnel", countRetired))
               .append(String.format("%-30s        %4s\n", "Dead Support Personnel", countDead))
+              .append(String.format("%-30s        %4s\n", "Student Support Personnel", countStudents))
               .append("\nMonthly Salary For Support Personnel: ")
               .append(salary.toAmountAndSymbolString())
               .append(String.format("\nYou have " + dependents + " %s", (dependents == 1) ? "dependent" : "dependents"))

@@ -53,6 +53,7 @@ import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
  */
 public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
+
     private final AbstractFactionSelector factionSelector;
     private final AbstractPlanetSelector planetSelector;
 

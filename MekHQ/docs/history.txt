@@ -269,6 +269,13 @@ MEKHQ VERSION HISTORY:
 + Fix #1914: Refactored Contract Terms Negotiations to Be Closer to RAW
 + PR #6727: Fix sorting the units in the Unit Market by price
 + Fix #6711: Fixed Conventional Infantry & Large Vessel (DropShip) Mothballing and Activation
++ Fix #3870: Allowed Extra Maintenance Time for Self-Crewed Units (Such as DropShips); Allowed Maintenance Time Changes for Mothballed Units
++ Fix #3963: Added the Ability to GM Increase the Number of Each Part in the Warehouse
++ Fix #4086: Added Parts In Use Button to Warehouse Tab
++ PR #6730: Added Option to Disable ATOW Attribute Scores
++ PR #6736: Simplified Roleplay Skills Randomization
++ PR #6737: Adjusted Maintenance Cycle Hangar Display
++ PR #6745: Updated "The Learning Ropes" Campaign Save File
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
