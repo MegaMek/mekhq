@@ -382,6 +382,7 @@ public class Campaign implements ITechManager {
     private BehaviorSettings autoResolveBehaviorSettings;
     private List<Unit> automatedMothballUnits;
     private int temporaryPrisonerCapacity;
+    private boolean processProcurement;
 
     // options relating to parts in use and restock
     private boolean ignoreMothballed;
@@ -481,6 +482,7 @@ public class Campaign implements ITechManager {
         autoResolveBehaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
         automatedMothballUnits = new ArrayList<>();
         temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
+        processProcurement = true;
         topUpWeekly = false;
         ignoreMothballed = true;
         ignoreSparesUnderQuality = QUALITY_A;
@@ -5532,7 +5534,9 @@ public class Campaign implements ITechManager {
 
         processNewDayForces();
 
-        setShoppingList(goShopping(getShoppingList()));
+        if (processProcurement) {
+            setShoppingList(goShopping(getShoppingList()));
+        }
 
         // check for anything in finances
         finances.newDay(this, yesterday, getLocalDate());
@@ -6747,6 +6751,7 @@ public class Campaign implements ITechManager {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "automatedMothballUnits");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "temporaryPrisonerCapacity", temporaryPrisonerCapacity);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "processProcurement", processProcurement);
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, ++indent, "partsInUse");
         writePartInUseToXML(pw, indent);
@@ -9656,6 +9661,14 @@ public class Campaign implements ITechManager {
         }
 
         return toBuy;
+    }
+
+    public boolean isProcessProcurement() {
+        return processProcurement;
+    }
+
+    public void setProcessProcurement(boolean processProcurement) {
+        this.processProcurement = processProcurement;
     }
 
     // Simple getters and setters for our stock map
