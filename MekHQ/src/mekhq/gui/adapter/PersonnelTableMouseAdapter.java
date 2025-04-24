@@ -869,10 +869,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADOPTION: {
-                Person orphan = getCampaign().getPerson(UUID.fromString(data[1]));
+                Person orphan = gui.getCampaign().getPerson(UUID.fromString(data[1]));
 
                 // clear the old parents
-                for (Person parent : orphan.getGenealogy().getParents()) {
+                List<Person> originalParents = orphan.getGenealogy().getParents();
+                for (Person parent : originalParents) {
                     orphan.getGenealogy().removeFamilyMember(FamilialRelationshipType.PARENT, parent);
                 }
 
