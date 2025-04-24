@@ -263,7 +263,7 @@ MEKHQ VERSION HISTORY:
 + Fix #3624, #4039: Fixed Transport Report Counting Mothballed Units as Occupying Bays
 + Fix #4014: Fixed OmniPod Handling in Repair Bay Acquisitions Dialog
 + Fix #4120: Updated Global Tooltip Behavior for Instant and Persistent Display
-+ Fix #4086
++ Fix #4086: Added GM ability to increase warehouse item counts
 + Fix #6718: Ensured Only Active Techs are Reassigned When Activating Units from a Mothballed State
 + Fix #6701: Added Colorblind Assistance to Refit Not Found Text
 + Fix #1914: Refactored Contract Terms Negotiations to Be Closer to RAW
@@ -276,6 +276,10 @@ MEKHQ VERSION HISTORY:
 + PR #6736: Simplified Roleplay Skills Randomization
 + PR #6737: Adjusted Maintenance Cycle Hangar Display
 + PR #6745: Updated "The Learning Ropes" Campaign Save File
++ PR #6757: Fixed Defection Logic for Prisoners
++ Fix #6758: Fixed Ransom Events Not Ransoming Prisoners
++ PR #6760: Added Missing 'Has Documentation' Icon to Unit Market Options in Campaign Options IIC
++ PR #6762: Slightly Adjusted Tooltip Initial Delay Setting
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
