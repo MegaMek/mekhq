@@ -236,7 +236,7 @@ public class CapturePrisoners {
         }
 
         // Attempt defection
-        if (prisoner.getPrisonerStatus().isPrisoner() && !campaignFaction.isClan()) {
+        if (!campaignFaction.isClan()) {
             int defectionChance = determineDefectionChance(prisoner, true);
 
             if (randomInt(defectionChance) == 0) {
