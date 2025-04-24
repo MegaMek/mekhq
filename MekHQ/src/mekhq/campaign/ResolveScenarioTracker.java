@@ -46,6 +46,7 @@ import megamek.common.event.PostGameResolution;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.PersonBattleFinishedEvent;
@@ -1759,7 +1760,7 @@ public class ResolveScenarioTracker {
             for (Unit salvageUnit : getLeftoverSalvage()) {
                 value = value.plus(salvageUnit.getSellValue());
             }
-            if (((Contract) mission).isSalvageExchange()) {
+            if (usesSalvageExchange()) {
                 value = value.multipliedBy(((Contract) mission).getSalvagePct()).dividedBy(100);
                 campaign.getFinances()
                       .credit(TransactionType.SALVAGE_EXCHANGE,
@@ -1895,8 +1896,33 @@ public class ResolveScenarioTracker {
         return toReturn;
     }
 
+    /**
+     * Determines whether a salvage exchange is used based on the current contract's conditions.
+     *
+     * <p>This method checks the type of the mission and evaluates specific conditions to determine if a salvage
+     * exchange approach applies. For AtB (Against the Bot) contracts, it evaluates if the enemy and employer's factions
+     * are Clan and if the date is before the Battle of Tukayyid. If these conditions are met, it returns true.</p>
+     *
+     * <p>Additionally, in general contracts, it checks if the salvage exchange is explicitly enabled.</p>
+     *
+     * @return {@code true} if the current mission uses a salvage exchange, {@code false} otherwise.
+     */
     public boolean usesSalvageExchange() {
-        return (getMission() instanceof Contract) && ((Contract) getMission()).isSalvageExchange();
+        if (getMission() instanceof AtBContract atbContract) {
+            boolean enemyIsClan = atbContract.getEnemy().isClan();
+            boolean employerIsClan = atbContract.getEmployerFaction().isClan();
+            boolean isBeforeTukayyid = campaign.getLocalDate().isBefore(MHQConstants.BATTLE_OF_TUKAYYID);
+
+            if (enemyIsClan && !employerIsClan && isBeforeTukayyid) {
+                return true;
+            }
+        }
+
+        if (getMission() instanceof Contract contract) {
+            return contract.isSalvageExchange();
+        } else {
+            return false;
+        }
     }
 
     /**
