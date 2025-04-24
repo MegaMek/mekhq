@@ -1908,21 +1908,23 @@ public class ResolveScenarioTracker {
      * @return {@code true} if the current mission uses a salvage exchange, {@code false} otherwise.
      */
     public boolean usesSalvageExchange() {
+        if (getMission() instanceof Contract contract) {
+            return contract.isSalvageExchange();
+        }
+
         if (getMission() instanceof AtBContract atbContract) {
             boolean enemyIsClan = atbContract.getEnemy().isClan();
             boolean employerIsClan = atbContract.getEmployerFaction().isClan();
             boolean isBeforeTukayyid = campaign.getLocalDate().isBefore(MHQConstants.BATTLE_OF_TUKAYYID);
 
             if (enemyIsClan && !employerIsClan && isBeforeTukayyid) {
+                campaign.addReport("Your employer has evoked a special clause and seized all salvage.");
+
                 return true;
             }
         }
 
-        if (getMission() instanceof Contract contract) {
-            return contract.isSalvageExchange();
-        } else {
-            return false;
-        }
+        return false;
     }
 
     /**
