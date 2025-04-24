@@ -28,8 +28,6 @@
  */
 package mekhq.campaign.personnel.skills;
 
-import static java.lang.Math.max;
-
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +51,7 @@ public class RandomSkillPreferences {
     private int overallRecruitBonus;
     Map<PersonnelRole, Integer> recruitmentBonuses;
     private boolean randomizeSkill;
+    private boolean useAttributes;
     private boolean randomizeAttributes;
     private boolean randomizeTraits;
     private boolean useClanBonuses;
@@ -61,7 +60,7 @@ public class RandomSkillPreferences {
     private int combatSmallArmsBonus;
     private int supportSmallArmsBonus;
     private int[] commandSkillsModifier;
-    private int[] roleplaySkillsModifier;
+    private int roleplaySkillModifier;
     private int artilleryProb;
     private int artilleryBonus;
     private int secondSkillProb;
@@ -71,6 +70,7 @@ public class RandomSkillPreferences {
         overallRecruitBonus = 0;
         recruitmentBonuses = new HashMap<>();
         randomizeSkill = true;
+        useAttributes = false;
         randomizeAttributes = false;
         randomizeTraits = false;
         useClanBonuses = true;
@@ -79,7 +79,7 @@ public class RandomSkillPreferences {
         supportSmallArmsBonus = -10;
         specialAbilityBonus = new int[] { -10, -10, -2, 0, 1 };
         commandSkillsModifier = new int[] { -10, -10, -7, -4, -1 };
-        roleplaySkillsModifier = new int[] { -12, -11, -10, -9, -8 };
+        roleplaySkillModifier = -12;
         artilleryProb = 10;
         artilleryBonus = -2;
         secondSkillProb = 0;
@@ -178,6 +178,14 @@ public class RandomSkillPreferences {
         this.randomizeSkill = b;
     }
 
+    public boolean isUseAttributes() {
+        return useAttributes;
+    }
+
+    public void setUseAttributes(boolean useAttributes) {
+        this.useAttributes = useAttributes;
+    }
+
     public boolean isRandomizeAttributes() {
         return randomizeAttributes;
     }
@@ -186,10 +194,6 @@ public class RandomSkillPreferences {
         this.randomizeAttributes = isRandomizeAttributes;
     }
 
-    /**
-     * @deprecated not in use.
-     */
-    @Deprecated(since = "0.50.05", forRemoval = true)
     public boolean isRandomizeTraits() {
         return randomizeTraits;
     }
@@ -198,6 +202,10 @@ public class RandomSkillPreferences {
         this.randomizeTraits = randomizeTraits;
     }
 
+    /**
+     * @deprecated not in use.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public void setUseClanBonuses(boolean b) {
         this.useClanBonuses = b;
     }
@@ -244,14 +252,28 @@ public class RandomSkillPreferences {
         }
     }
 
+    /**
+     * @deprecated Use {@link #getRoleplaySkillModifier()} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public int getRoleplaySkillsModifier(int experienceLevel) {
-        return roleplaySkillsModifier[max(0, experienceLevel)];
+        return roleplaySkillModifier;
     }
 
+    public int getRoleplaySkillModifier() {
+        return roleplaySkillModifier;
+    }
+
+    /**
+     * @deprecated Use {@link #setRoleplaySkillModifier(int)} instead.
+     */
+    @Deprecated(since = "0.50.05", forRemoval = true)
     public void setRoleplaySkillsModifier(int level, int bonus) {
-        if (level < roleplaySkillsModifier.length) {
-            roleplaySkillsModifier[level] = bonus;
-        }
+        setRoleplaySkillModifier(bonus);
+    }
+
+    public void setRoleplaySkillModifier(int roleplaySkillModifier) {
+        this.roleplaySkillModifier = roleplaySkillModifier;
     }
 
     public void setArtilleryProb(int b) {
@@ -296,8 +318,9 @@ public class RandomSkillPreferences {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "recruitmentBonuses");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "specialAbilityBonus", specialAbilityBonus);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandSkillsModifier", commandSkillsModifier);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "roleplaySkillsModifier", roleplaySkillsModifier);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "roleplaySkillModifier", roleplaySkillModifier);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeSkill", randomizeSkill);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAttributes", useAttributes);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeAttributes", randomizeAttributes);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeTraits", randomizeTraits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanBonuses", useClanBonuses);
@@ -327,13 +350,15 @@ public class RandomSkillPreferences {
                 continue;
             }
 
-            logger.debug("%s: %s", wn2.getNodeName(), wn2.getTextContent());
+            logger.debug("{}: {}", wn2.getNodeName(), wn2.getTextContent());
 
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("overallRecruitBonus")) {
                     retVal.overallRecruitBonus = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomizeSkill")) {
                     retVal.randomizeSkill = wn2.getTextContent().equalsIgnoreCase("true");
+                } else if (wn2.getNodeName().equalsIgnoreCase("useAttributes")) {
+                    retVal.useAttributes = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomizeAttributes")) {
                     retVal.randomizeAttributes = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomizeTraits")) {
@@ -363,11 +388,8 @@ public class RandomSkillPreferences {
                     for (int i = 0; i < values.length; i++) {
                         retVal.commandSkillsModifier[i] = Integer.parseInt(values[i]);
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("roleplaySkillsModifier")) {
-                    String[] values = wn2.getTextContent().split(",");
-                    for (int i = 0; i < values.length; i++) {
-                        retVal.roleplaySkillsModifier[i] = Integer.parseInt(values[i]);
-                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("roleplaySkillModifier")) {
+                    retVal.roleplaySkillModifier = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("specialAbilityBonus")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {

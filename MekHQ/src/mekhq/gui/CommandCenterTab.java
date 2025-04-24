@@ -124,6 +124,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JButton btnGetParts;
     private JButton btnNeededParts;
     private JButton btnPartsReport;
+    private JButton btnPauseProcurement;
+    private JButton btnResumeProcurement;
     private JButton btnMRMSDialog;
     private JButton btnMRMSInstant;
 
@@ -425,7 +427,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
      */
     private void initProcurementPanel() {
         /* shopping buttons */
-        JPanel panProcurementButtons = new JPanel(new GridLayout(6, 1));
+        JPanel panProcurementButtons = new JPanel(new GridLayout(8, 1));
         panProcurementButtons.getAccessibleContext().setAccessibleName("Procurement Actions");
 
         btnGetUnit = new JButton(resourceMap.getString("btnGetUnit.text"));
@@ -448,6 +450,24 @@ public final class CommandCenterTab extends CampaignGuiTab {
         btnPartsReport.setToolTipText(resourceMap.getString("btnPartsReport.toolTipText"));
         btnPartsReport.addActionListener(evt -> new PartsReportDialog(getCampaignGui(), true).setVisible(true));
         panProcurementButtons.add(btnPartsReport);
+
+        btnPauseProcurement = new JButton(resourceMap.getString("btnPauseProcurement.text"));
+        btnPauseProcurement.addActionListener(evt -> {
+            btnPauseProcurement.setEnabled(false);
+            btnResumeProcurement.setEnabled(true);
+            getCampaign().setProcessProcurement(false);
+        });
+        btnPauseProcurement.setEnabled(getCampaign().isProcessProcurement());
+        panProcurementButtons.add(btnPauseProcurement);
+
+        btnResumeProcurement = new JButton(resourceMap.getString("btnResumeProcurement.text"));
+        btnResumeProcurement.addActionListener(evt -> {
+            btnResumeProcurement.setEnabled(false);
+            btnPauseProcurement.setEnabled(true);
+            getCampaign().setProcessProcurement(true);
+        });
+        btnResumeProcurement.setEnabled(!getCampaign().isProcessProcurement());
+        panProcurementButtons.add(btnResumeProcurement);
 
         btnMRMSDialog = new JButton(resourceMap.getString("btnMRMSDialog.text"));
         btnMRMSDialog.setToolTipText(resourceMap.getString("btnMRMSDialog.toolTipText"));

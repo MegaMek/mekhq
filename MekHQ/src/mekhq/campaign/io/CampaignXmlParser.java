@@ -365,6 +365,8 @@ public class CampaignXmlParser {
                     processPartsInUse(campaign, wn);
                 } else if (xn.equalsIgnoreCase("temporaryPrisonerCapacity")) {
                     campaign.setTemporaryPrisonerCapacity(Integer.parseInt(wn.getTextContent().trim()));
+                } else if (xn.equalsIgnoreCase("processProcurement")) {
+                    campaign.setProcessProcurement(Boolean.parseBoolean(wn.getTextContent().trim()));
                 }
             } else {
                 // If it's a text node or attribute or whatever at this level,
