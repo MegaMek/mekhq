@@ -1586,9 +1586,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 int level = (Integer) skillLevels.get(type).getModel().getValue();
                 int bonus = (Integer) skillBonus.get(type).getModel().getValue();
                 SkillType skillType = SkillType.getType(type);
-                int ageModifier = getAgeModifier(milestone,
-                      skillType.getFirstAttribute(),
-                      skillType.getSecondAttribute());
+                int ageModifier = 0;
+                if (campaign.getCampaignOptions().isUseAgeEffects()) {
+                    ageModifier = getAgeModifier(milestone,
+                          skillType.getFirstAttribute(),
+                          skillType.getSecondAttribute());
+                }
                 person.addSkill(type, level, bonus, ageModifier);
             } else {
                 person.removeSkill(type);
@@ -1738,9 +1741,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         int level = (Integer) skillLevels.get(type).getModel().getValue();
         int bonus = (Integer) skillBonus.get(type).getModel().getValue();
-        int ageModifier = getAgeModifier(getMilestone(person.getAge(campaign.getLocalDate())),
-              skillType.getFirstAttribute(),
-              skillType.getSecondAttribute());
+        int ageModifier = 0;
+        if (campaign.getCampaignOptions().isUseAgeEffects()) {
+            ageModifier = getAgeModifier(getMilestone(person.getAge(campaign.getLocalDate())),
+                  skillType.getFirstAttribute(),
+                  skillType.getSecondAttribute());
+        }
 
         if (skillType.isCountUp()) {
             int target = min(getCountUpMaxValue(), skillType.getTarget() + level + bonus + ageModifier);
