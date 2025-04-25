@@ -27,12 +27,13 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import static megamek.common.Compute.randomInt;
+
 import java.time.LocalDate;
 import java.util.Objects;
 
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.common.Compute;
 import megamek.common.enums.Gender;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -144,7 +145,7 @@ public abstract class AbstractPersonnelGenerator {
         if (gender != Gender.RANDOMIZE) {
             person.setGender(gender);
         } else {
-            if (nonBinaryDiceSize > 0 && Compute.randomInt(nonBinaryDiceSize) == 0) {
+            if (nonBinaryDiceSize > 0 && randomInt(nonBinaryDiceSize) == 0) {
                 person.setGender(RandomGenderGenerator.generateOther());
             } else {
                 person.setGender(RandomGenderGenerator.generate());
@@ -241,32 +242,35 @@ public abstract class AbstractPersonnelGenerator {
     }
 
     /**
-     * Generates the birthday for a {@link Person} based on their experience level and affiliation.
-     * <p>
-     * The method calculates the person's age using {@link Utilities#getAgeByExpLevel(int, boolean)} and subtracts it
-     * from the current campaign date to determine their year of birth. A random day within that year is then selected,
-     * ensuring the generated birthday is always on or before the current campaign date, so the person's age is
-     * accurate.
-     * </p>
+     * Assigns a realistic date of birth to the specified {@link Person} using their experience level and affiliation.
      *
-     * @param campaign        The {@link Campaign} containing metadata such as the current local date.
-     * @param person          The {@link Person} whose birthday is being generated.
-     * @param expLvl          The experience level of the {@code person}, which determines their age.
-     * @param isClanPersonnel Indicates whether the {@code person} belongs to the Clans, which affects the calculated
-     *                        age.
+     * <p>This method determines the person's approximate age based on their experience, then calculates a date of birth
+     * ensuring the resulting age matches the campaign's timeline. The generated birthday always falls on or before
+     * the current campaign date, guaranteeing age accuracy.</p>
+     *
+     * @param campaign        The current campaign, used to obtain the reference date for calculation.
+     * @param person          The person whose birthday is being set.
+     * @param expLvl          Numeric experience level used to determine age.
+     * @param isClanPersonnel Whether the person is affiliated with a Clan, modifying age calculation rules.
      */
     protected void generateBirthday(Campaign campaign, Person person, int expLvl, boolean isClanPersonnel) {
         LocalDate currentDate = campaign.getLocalDate();
         int age = Utilities.getAgeByExpLevel(expLvl, isClanPersonnel);
 
+        // Generate an initial birthday
+        int year = campaign.getGameYear();
+        int daysInYear = 365; // We ignore leap years for simplicity's sake
+        int randomDay = randomInt(daysInYear) + 1; // random int from 1 to daysInYear
+        LocalDate birthday = LocalDate.ofYearDay(year, randomDay);
+
         // Subtract age to get the target year
-        LocalDate birthday = currentDate.minusYears(age);
+        birthday = birthday.minusYears(age);
 
         // Constrain the random day to ensure the birthday is on or before the current date
-        int daysInYear = birthday.isLeapYear() ? 366 : 365;
-        int maxDay = Math.min(currentDate.getDayOfYear(), daysInYear);
-        int randomDay = Compute.randomInt(maxDay) + 1;
+        if (birthday.isAfter(currentDate)) {
+            birthday = birthday.minusYears(1);
+        }
 
-        person.setDateOfBirth(birthday.withDayOfYear(randomDay));
+        person.setDateOfBirth(birthday);
     }
 }
