@@ -36,6 +36,7 @@ import static mekhq.campaign.personnel.skills.enums.AgingMilestone.CLAN_REPUTATI
 import static mekhq.campaign.personnel.skills.enums.AgingMilestone.NONE;
 import static mekhq.campaign.personnel.skills.enums.AgingMilestone.STAR_CAPTAIN_RANK_INDEX;
 import static mekhq.campaign.personnel.skills.enums.AgingMilestone.STAR_CAPTAIN_REPUTATION_MULTIPLIER;
+import static mekhq.campaign.personnel.skills.enums.AgingMilestone.STAR_COLONEL_RANK_INDEX;
 import static mekhq.campaign.personnel.skills.enums.AgingMilestone.STAR_COLONEL_REPUTATION_MULTIPLIER;
 import static mekhq.campaign.personnel.skills.enums.AgingMilestone.TWENTY_FIVE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NO_SKILL_ATTRIBUTE;
@@ -236,7 +237,7 @@ public class Aging {
             hasHitRankTarget = true;
         }
 
-        if (reputationMultiplier == STAR_COLONEL_REPUTATION_MULTIPLIER && rankIndex >= STAR_CAPTAIN_RANK_INDEX) {
+        if (reputationMultiplier == STAR_COLONEL_REPUTATION_MULTIPLIER && rankIndex >= STAR_COLONEL_RANK_INDEX) {
             hasHitRankTarget = true;
         }
 
