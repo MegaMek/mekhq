@@ -281,6 +281,8 @@ MEKHQ VERSION HISTORY:
 + PR #6760: Added Missing 'Has Documentation' Icon to Unit Market Options in Campaign Options IIC
 + PR #6762: Slightly Adjusted Tooltip Initial Delay Setting
 + PR #6756: Fixed Exception When Adopting Child with Existing Parents (Sentry)
++ Fix #6761: Fixed Birthday Generation Logic
++ PR #6763: Fixed Loophole That Allowed Players to Acquire Clantech Prior to Tukayyid.
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
