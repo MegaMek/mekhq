@@ -280,6 +280,7 @@ MEKHQ VERSION HISTORY:
 + Fix #6758: Fixed Ransom Events Not Ransoming Prisoners
 + PR #6760: Added Missing 'Has Documentation' Icon to Unit Market Options in Campaign Options IIC
 + PR #6762: Slightly Adjusted Tooltip Initial Delay Setting
++ PR #6756: Fixed Exception When Adopting Child with Existing Parents (Sentry)
 
 0.50.04 (2025-03-22 1600 UTC)
 + PR #5852: RAW CamOps Delivery Times
