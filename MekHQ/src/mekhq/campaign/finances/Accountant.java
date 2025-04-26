@@ -219,7 +219,7 @@ public record Accountant(Campaign campaign) {
           double jumpShipContractPercent, boolean useEquipmentSaleValue) {
         Money value = Money.zero();
 
-        for (UUID uuid : campaign().getForces().getAllUnits(true)) {
+        for (UUID uuid : campaign().getAllUnitsInTheTOE(true)) {
             Unit unit = getHangar().getUnit(uuid);
 
             if (unit == null) {

@@ -170,6 +170,32 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                 int quantity = dialog.getValue();
                 gui.getCampaign().getWarehouse().removePart(selectedPart, quantity);
             }
+        } else if (command.equalsIgnoreCase("ADD_N")) {
+            if (null != selectedPart) {
+                PopupValueChoiceDialog dialog = new PopupValueChoiceDialog(gui.getFrame(),
+                      true,
+                      "Add How Many " + selectedPart.getName() + "s?",
+                      0,
+                      0,
+                      9999999);
+                dialog.setVisible(true);
+                if (dialog.getValue() < 0) {
+                    return;
+                }
+
+                int quantity = dialog.getValue();
+                Part clonedPart = selectedPart.clone();
+
+                if (selectedPart instanceof AmmoStorage) {
+                    ((AmmoStorage) clonedPart).setShots(quantity);
+                } else if (selectedPart instanceof Armor) {
+                    ((Armor) clonedPart).setAmount(quantity);
+                } else {
+                    clonedPart.setQuantity(quantity);
+                }
+
+                gui.getCampaign().getWarehouse().addPart(clonedPart, true);
+            }
         } else if (command.contains("SET_QUALITY")) {
             boolean reverse = gui.getCampaign().getCampaignOptions().isReverseQualityNames();
             Object[] possibilities = { PartQuality.QUALITY_A.toName(reverse), PartQuality.QUALITY_B.toName(reverse),
@@ -470,6 +496,11 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
             }
+            // add parts
+            menuItem = new JMenuItem("Add Parts...");
+            menuItem.setActionCommand("ADD_N");
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
             // remove parts
             menuItem = new JMenuItem("Remove Part");
             menuItem.setActionCommand("REMOVE");

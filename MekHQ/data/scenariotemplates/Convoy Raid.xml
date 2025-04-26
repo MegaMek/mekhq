@@ -3,11 +3,11 @@
     <name>Convoy Raid</name>
     <stratConScenarioType>CONVOY</stratConScenarioType>
     <shortBriefing>Intercept and disrupt enemy convoy.</shortBriefing>
-    <detailedBriefing>An enemy supply convoy is on the move, and this is our chance to cripple their logistics. Your mission is to intercept and raid the convoy before it can escape the engagement zone. These supplies are vital to the enemy’s war effort, and every truck or transport we eliminate weakens their ability to fight. Speed and aggression will be key—hit them hard, hit them fast, and get out before their reinforcements arrive.
+    <detailedBriefing><![CDATA[An enemy supply convoy is on the move, and this is our chance to cripple their logistics. Your mission is to intercept and raid the convoy before it can escape the engagement zone. These supplies are vital to the enemy’s war effort, and every truck or transport we eliminate weakens their ability to fight. Speed and aggression will be key—hit them hard, hit them fast, and get out before their reinforcements arrive.
 
 Your primary objective is to prevent at least 50% of the convoy from reaching the far side of the engagement zone. Disrupt their formation, destroy their transports, and force them to abandon their mission. If their escort force proves too formidable, you have an alternative route to success—destroy at least 50% of the convoy’s escorts to force the remaining defenders to surrender. With their protection shattered, the convoy will have no choice but to stand down.
 
-The more convoy units that survive, the greater the spoils. Disabling transports instead of outright destruction may increase salvage potential, but that is a secondary concern to stopping the convoy itself. However, do not linger. The enemy will respond quickly, and we will not control the field once the battle ends. Execute the raid with precision, neutralize the targets, and withdraw before the enemy's full force arrives.</detailedBriefing>
+The more convoy units that survive, the greater the spoils. Disabling transports instead of outright destruction may increase salvage potential, but that is a secondary concern to stopping the convoy itself. However, do not linger. The enemy will respond quickly, and we will not control the field once the battle ends. Execute the raid with precision, neutralize the targets, and withdraw before the enemy's full force arrives.]]></detailedBriefing>
     <battlefieldControl>ENEMY</battlefieldControl>
     <mapParameters>
         <allowedTerrainTypes />
@@ -32,7 +32,9 @@ The more convoy units that survive, the greater the spoils. Disabling transports
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones />
+                <deploymentZones>
+                    <deploymentZone>10</deploymentZone>
+                </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
@@ -44,8 +46,7 @@ The more convoy units that survive, the greater the spoils. Disabling transports
                 <minWeightClass>0</minWeightClass>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>OppositeArc</syncDeploymentType>
-                <syncedForceName>Convoy</syncedForceName>
+                <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
             </value>
         </entry>
@@ -91,10 +92,7 @@ The more convoy units that survive, the greater the spoils. Disabling transports
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>2</deploymentZone>
-                    <deploymentZone>4</deploymentZone>
                     <deploymentZone>6</deploymentZone>
-                    <deploymentZone>8</deploymentZone>
                 </deploymentZones>
                 <destinationZone>6</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
@@ -105,7 +103,7 @@ The more convoy units that survive, the greater the spoils. Disabling transports
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>1</minWeightClass>
-                <retreatThreshold>50</retreatThreshold>
+                <retreatThreshold>0</retreatThreshold>
                 <subjectToRandomRemoval>false</subjectToRandomRemoval>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>

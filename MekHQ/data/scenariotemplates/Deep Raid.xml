@@ -2,11 +2,11 @@
 <ScenarioTemplate>
     <name>Deep Raid</name>
     <shortBriefing>Destroy or cripple DropShip.</shortBriefing>
-    <detailedBriefing>We have identified a vulnerable enemy DropShip deep behind enemy lines. This is a rare opportunity to eliminate a key enemy asset before it can escape. Your mission is to destroy the DropShip before it can lift off.
+    <detailedBriefing><![CDATA[We have identified a vulnerable enemy DropShip deep behind enemy lines. This is a rare opportunity to eliminate a key enemy asset before it can escape. Your mission is to destroy the DropShip before it can lift off.
 
 Expect rapid enemy response forces as the enemy scrambles to defend their asset. They will attempt to delay and stall you long enough for the DropShip to achieve liftoff. Speed is critical—push through their defenses, disable or destroy the DropShip, and exfiltrate before enemy reinforcements overwhelm your position.
 
-This engagement takes place in enemy territory, meaning we will not control the field at the end. There will be no opportunity for salvage or recovery, so focus solely on mission success. Strike fast, eliminate the target, and get out before the enemy locks down the area.</detailedBriefing>
+This engagement takes place in enemy territory, meaning we will not control the field at the end. There will be no opportunity for salvage or recovery, so focus solely on mission success. Strike fast, eliminate the target, and get out before the enemy locks down the area.]]></detailedBriefing>
     <battlefieldControl>ENEMY</battlefieldControl>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
@@ -42,7 +42,6 @@ This engagement takes place in enemy territory, meaning we will not control the 
                     <deploymentZone>6</deploymentZone>
                     <deploymentZone>7</deploymentZone>
                     <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
@@ -66,15 +65,13 @@ This engagement takes place in enemy territory, meaning we will not control the 
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
                 <allowedUnitType>-2</allowedUnitType>
-                <arrivalTurn>0</arrivalTurn>
+                <arrivalTurn>-3</arrivalTurn>
                 <canReinforceLinked>true</canReinforceLinked>
                 <contributesToBV>false</contributesToBV>
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones>
-                    <deploymentZone>10</deploymentZone>
-                </deploymentZones>
+                <deploymentZones />
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
@@ -87,7 +84,8 @@ This engagement takes place in enemy territory, meaning we will not control the 
                 <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>None</syncDeploymentType>
+                <syncDeploymentType>OppositeEdge</syncDeploymentType>
+                <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
             </value>
         </entry>

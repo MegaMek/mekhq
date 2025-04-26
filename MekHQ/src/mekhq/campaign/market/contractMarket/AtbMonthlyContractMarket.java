@@ -34,6 +34,9 @@ import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.VETERAN;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
@@ -627,24 +630,18 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
          * the highest admin skill, or higher negotiation if the admin
          * skills are equal.
          */
-        Person adminCommand = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_COMMAND,
-              SkillType.S_ADMIN,
-              SkillType.S_NEG);
-        Person adminTransport = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_TRANSPORT,
-              SkillType.S_ADMIN,
-              SkillType.S_NEG);
-        Person adminLogistics = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS,
-              SkillType.S_ADMIN,
-              SkillType.S_NEG);
+        Person adminCommand = campaign.getSeniorAdminPerson(COMMAND);
+        Person adminTransport = campaign.getSeniorAdminPerson(TRANSPORT);
+        Person adminLogistics = campaign.getSeniorAdminPerson(LOGISTICS);
         int adminCommandExp = (adminCommand == null) ?
-                                    SkillType.EXP_ULTRA_GREEN :
-                                    adminCommand.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+                                    SkillType.EXP_NONE :
+                                    adminCommand.getSkill(SkillType.S_NEG).getExperienceLevel();
         int adminTransportExp = (adminTransport == null) ?
-                                      SkillType.EXP_ULTRA_GREEN :
-                                      adminTransport.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+                                      SkillType.EXP_NONE :
+                                      adminTransport.getSkill(SkillType.S_NEG).getExperienceLevel();
         int adminLogisticsExp = (adminLogistics == null) ?
-                                      SkillType.EXP_ULTRA_GREEN :
-                                      adminLogistics.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+                                      SkillType.EXP_NONE :
+                                      adminLogistics.getSkill(SkillType.S_NEG).getExperienceLevel();
 
         /* Treat government units like merc units that have a retainer contract */
         if ((!campaign.getFaction().isMercenary() && !campaign.getFaction().isPirate()) ||

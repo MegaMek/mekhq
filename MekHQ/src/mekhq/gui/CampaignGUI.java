@@ -31,6 +31,7 @@ package mekhq.gui;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.force.Force.NO_ASSIGNED_SCENARIO;
+import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -1823,25 +1824,41 @@ public class CampaignGUI extends JPanel {
     /**
      * Shows a dialog that lets the user select a tech for a task on a particular unit
      *
-     * @param u                 The unit to be serviced, used to filter techs for skill on the unit.
+     * @param unit                 The unit to be serviced, used to filter techs for skill on the unit.
      * @param desc              The description of the task
      * @param ignoreMaintenance If true, ignores the time required for maintenance tasks when displaying the tech's time
      *                          available.
      *
      * @return The ID of the selected tech, or null if none is selected.
      */
-    public @Nullable UUID selectTech(Unit u, String desc, boolean ignoreMaintenance) {
+    public @Nullable UUID selectTech(Unit unit, String desc, boolean ignoreMaintenance) {
         String name;
         Map<String, Person> techHash = new LinkedHashMap<>();
         for (Person tech : getCampaign().getTechsExpanded()) {
-            if (!tech.isMothballing() && tech.canTech(u.getEntity())) {
+            if (tech.isTechLargeVessel()) {
+                Entity entity = unit.getEntity();
+                if (entity == null) {
+                    logger.error("(selectTech) Unit {} has no entity", unit);
+                    continue;
+                }
+
+                if (unit.getEntity().isLargeCraft()) {
+                    Unit techUnit = tech.getUnit();
+                    // This stops vessel crew from other vessels appearing in the list
+                    if (techUnit != null && !techUnit.equals(unit)) {
+                        continue;
+                    }
+                }
+            }
+
+            if (!tech.isMothballing() && tech.canTech(unit.getEntity())) {
                 int time = tech.getMinutesLeft();
                 if (!ignoreMaintenance) {
                     time -= Math.max(0, tech.getMaintenanceTimeUsing());
                 }
                 name = tech.getFullTitle() +
                              ", " +
-                             SkillType.getExperienceLevelName(tech.getSkillForWorkingOn(u).getExperienceLevel()) +
+                             getExperienceLevelName(tech.getSkillForWorkingOn(unit).getExperienceLevel()) +
                              " (" +
                              time +
                              "min)";
