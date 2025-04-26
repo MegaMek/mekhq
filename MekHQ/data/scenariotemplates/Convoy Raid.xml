@@ -94,7 +94,7 @@ The more convoy units that survive, the greater the spoils. Disabling transports
                 <deploymentZones>
                     <deploymentZone>6</deploymentZone>
                 </deploymentZones>
-                <destinationZone>2</destinationZone>
+                <destinationZone>6</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>0.5</forceMultiplier>

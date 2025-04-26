@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<campaignPreset version="0.50.05-SNAPSHOT">
+<campaignPreset version="0.50.05">
     <title>1 - New Player Preset</title>
     <description><![CDATA[This preset is a simplified version of the "Veteran Experience" preset, designed for newer players or those seeking an easier game.
 <br>
@@ -640,8 +640,9 @@
         </recruitmentBonuses>
         <specialAbilityBonus>-10,-10,-2,0,1</specialAbilityBonus>
         <commandSkillsModifier>-12,-11,-10,-9,-8</commandSkillsModifier>
-        <roleplaySkillsModifier>-12,-11,-10,-9,-8</roleplaySkillsModifier>
+        <roleplaySkillModifier>-8</roleplaySkillModifier>
         <randomizeSkill>true</randomizeSkill>
+        <useAttributes>true</useAttributes>
         <randomizeAttributes>true</randomizeAttributes>
         <randomizeTraits>true</randomizeTraits>
         <useClanBonuses>true</useClanBonuses>
@@ -2000,7 +2001,7 @@
             <xpCost>-300</xpCost>
             <weight>1</weight>
             <prereqAbilities></prereqAbilities>
-            <invalidAbilities></invalidAbilities>
+            <invalidAbilities>mutation_cat_girl_unofficial</invalidAbilities>
             <removeAbilities></removeAbilities>
             <choiceValues></choiceValues>
         </ability>
@@ -2238,7 +2239,7 @@
             <weight>1</weight>
             <prereqAbilities></prereqAbilities>
             <invalidAbilities></invalidAbilities>
-            <removeAbilities>flaw_animal_antipathy</removeAbilities>
+            <removeAbilities></removeAbilities>
             <choiceValues></choiceValues>
         </ability>
         <ability>

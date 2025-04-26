@@ -78,6 +78,7 @@ jobs:
           languages: java-kotlin
           build-mode: none
           queries: security-and-quality
+          source-root: mekhq
           config: |
             paths:
               - mekhq

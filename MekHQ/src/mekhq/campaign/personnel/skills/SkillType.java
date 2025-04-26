@@ -994,7 +994,7 @@ public class SkillType {
             }
 
             // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
-            boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.05"));
+            boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.06"));
             if (preDatesSkillChanges) {
                 compatibilityHandler(skillType);
             }
@@ -1051,7 +1051,7 @@ public class SkillType {
             }
 
             // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
-            boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.05"));
+            boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.06"));
             if (preDatesSkillChanges) {
                 compatibilityHandler(skillType);
             }
@@ -1168,20 +1168,8 @@ public class SkillType {
         }
 
         skillType.subType = temporarySkillType.getSubType();
-        logger.info("SkillType {} has been updated to sub type {}",
-              skillType.getName(),
-              temporarySkillType.getSubType());
-
         skillType.firstAttribute = temporarySkillType.getFirstAttribute();
-        logger.info("SkillType {} has been updated to first attribute {}",
-              skillType.getName(),
-              temporarySkillType.getFirstAttribute());
-
         skillType.secondAttribute = temporarySkillType.getSecondAttribute();
-        logger.info("SkillType {} has been updated to second attribute {}",
-              skillType.getName(),
-              temporarySkillType.getSecondAttribute());
-
         skillType.countUp = temporarySkillType.isCountUp();
     }
 

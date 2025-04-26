@@ -5,7 +5,7 @@
     <localModifiers>EnemyMekGarrison.xml</localModifiers>
     <owner>Opposing</owner>
     <sharedModifiers>EnemyMekReinforcements.xml</sharedModifiers>
-    <userDescription>Hostile Meks will participate in scenarios on this track and defend this facility.</userDescription>
+    <userDescription><![CDATA[Hostile Meks will participate in scenarios on this track and defend this facility.]]></userDescription>
     <visible>false</visible>
     <biomes>
         <biomeCategory>TerranFacility</biomeCategory>

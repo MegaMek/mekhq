@@ -67,10 +67,7 @@ public class PrisonerRansomEventDialog extends ImmersiveDialogCore {
               null,
               false,
               null,
-              null,
-              false);
-
-        setAlwaysOnTop(true);
+              null, true);
     }
 
     /**

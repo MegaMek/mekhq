@@ -31,6 +31,8 @@ package mekhq.campaign.unit;
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static megamek.common.MiscType.F_CARGO;
+import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
+import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_B;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_C;
@@ -54,8 +56,8 @@ import javax.swing.UIManager;
 import megamek.Version;
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.CrewType;
 import megamek.common.*;
+import megamek.common.CrewType;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.ArmorType;
@@ -348,7 +350,7 @@ public class Unit implements ITechnology {
      */
     public void initializeShipTransportSpace() {
         // Initialize the bay capacity
-        initializeTransportSpace(CampaignTransportType.SHIP_TRANSPORT);
+        initializeTransportSpace(SHIP_TRANSPORT);
     }
 
     /**
@@ -378,7 +380,7 @@ public class Unit implements ITechnology {
     }
 
     private ShipTransportedUnitsSummary getShipTransportedUnitsSummary() {
-        return (ShipTransportedUnitsSummary) getTransportedUnitsSummary(CampaignTransportType.SHIP_TRANSPORT);
+        return (ShipTransportedUnitsSummary) getTransportedUnitsSummary(SHIP_TRANSPORT);
     }
 
     private TacticalTransportedUnitsSummary getTacticalTransportedUnitsSummary() {
@@ -469,7 +471,9 @@ public class Unit implements ITechnology {
             en.setDuplicateMarker(this.entity.getDuplicateMarker());
             en.generateShortName();
             en.generateDisplayName();
-            C3Util.copyC3Networks(this.entity, en);
+            if (en.getGame() != null) {
+                C3Util.copyC3Networks(this.entity, en);
+            }
         }
         this.entity = en;
     }
@@ -649,14 +653,14 @@ public class Unit implements ITechnology {
      * Gets a value indicating whether this unit is transporting units.
      */
     public boolean hasShipTransportedUnits() {
-        return hasTransportedUnits(CampaignTransportType.SHIP_TRANSPORT);
+        return hasTransportedUnits(SHIP_TRANSPORT);
     }
 
     /**
      * @return the set of units being transported by this unit.
      */
     public Set<Unit> getShipTransportedUnits() {
-        return getTransportedUnits(CampaignTransportType.SHIP_TRANSPORT);
+        return getTransportedUnits(SHIP_TRANSPORT);
     }
 
     /**
@@ -665,7 +669,7 @@ public class Unit implements ITechnology {
      * @param unit The unit being transported by this instance.
      */
     public void addShipTransportedUnit(Unit unit) {
-        addTransportedUnit(CampaignTransportType.SHIP_TRANSPORT, unit);
+        addTransportedUnit(SHIP_TRANSPORT, unit);
     }
 
     /**
@@ -1632,6 +1636,7 @@ public class Unit implements ITechnology {
         }
 
         double capacity = 0.0;
+        double cargoBayCapacity = -getTotalWeightOfUnitsAssignedToBeTransported(TACTICAL_TRANSPORT, CARGO_BAY);
 
         // Add capacities from transport bays
         for (Bay bay : entity.getTransportBays()) {
@@ -1641,7 +1646,7 @@ public class Unit implements ITechnology {
             double actualCapacity = max(0, bayCapacity - bayDamage);
 
             if (bay instanceof CargoBay) {
-                capacity += actualCapacity;
+                cargoBayCapacity += actualCapacity;
                 continue;
             }
 
@@ -1654,6 +1659,8 @@ public class Unit implements ITechnology {
                 capacity += actualCapacity;
             }
         }
+
+        capacity += max(0, cargoBayCapacity);
 
         // Add capacities from mounted equipment
         for (Mounted<?> mounted : entity.getMisc()) {
@@ -1708,6 +1715,43 @@ public class Unit implements ITechnology {
             }
         }
         return capacity;
+    }
+
+    /**
+     * Calculates the total weight of all units assigned to be transported in this unit for a specific transport type
+     * and transporter type.
+     *
+     * <p>This method:</p>
+     * <ul>
+     *     <li>Finds all units currently assigned to be transported by this unit with the specified transport type.</li>
+     *     <li>For each transported unit, checks if it is assigned to a transporter of the specified type.</li>
+     *     <li>Adds the full weight of each matching transported unit to the total.</li>
+     * </ul>
+     *
+     * @param transportType   The transport type to match when retrieving transported units.
+     * @param transporterType The transporter type to filter assignments (only units assigned to this type are considered).
+     * @return The sum weight of all units assigned to this unit via the given transport and transporter type.
+     *
+     * @author Illiani
+     * @since 0.50.05
+     */
+    public double getTotalWeightOfUnitsAssignedToBeTransported(CampaignTransportType transportType,
+          TransporterType transporterType) {
+        AbstractTransportedUnitsSummary transportSummary = getTransportedUnitsSummary(transportType);
+        double cargoCapacityUsage = 0;
+
+        if (transportSummary != null) {
+            for (Unit transportedUnit : transportSummary.getTransportedUnits()) {
+                ITransportAssignment assignment = transportedUnit.getTransportAssignment(transportType);
+                if (assignment != null) {
+                    if (assignment.getTransporterType() == transporterType) {
+                        cargoCapacityUsage += transportedUnit.getEntity().getWeight();
+                    }
+                }
+            }
+        }
+
+        return cargoCapacityUsage;
     }
 
     /**
@@ -2066,9 +2110,9 @@ public class Unit implements ITechnology {
 
     public double getInfantryCapacity() {
         double bays = 0;
-        for (Bay b : getEntity().getTransportBays()) {
-            if (b instanceof InfantryBay) {
-                bays += b.getCapacity();
+        for (Bay bay : getEntity().getTransportBays()) {
+            if (bay instanceof InfantryBay) {
+                bays += bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight();
             }
         }
         return bays;
@@ -2683,7 +2727,7 @@ public class Unit implements ITechnology {
         for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
             // Some transports were set up before this and use a different saving & loading
             // pattern. Let's ignore them.
-            if (campaignTransportType.equals(CampaignTransportType.SHIP_TRANSPORT)) {
+            if (campaignTransportType.equals(SHIP_TRANSPORT)) {
                 continue;
             }
 
@@ -5843,7 +5887,8 @@ public class Unit implements ITechnology {
         } else {
             // if it is self crewed AND is mothballed and has a mothball info, get the tech
             if (isSelfCrewed() && isMothballed() && (this.mothballInfo != null)) {
-                var previousTech = this.mothballInfo.getTech();
+                UUID previousTechId = this.mothballInfo.getTechId();
+                var previousTech = campaign.getPerson(previousTechId);
                 var previousTechExists = previousTech != null;
                 var previousTechIsActive = previousTechExists && previousTech.getStatus().isActive();
                 if (previousTechIsActive) {
@@ -5869,8 +5914,8 @@ public class Unit implements ITechnology {
         // We don't want to clear transport assignments, but we do want to remove the
         // transport from the list of potential transports, if it's transport.
         if (campaign != null) {
-            if (!getTransportCapabilities(CampaignTransportType.SHIP_TRANSPORT).isEmpty()) {
-                getCampaign().removeCampaignTransporter(CampaignTransportType.SHIP_TRANSPORT, this);
+            if (!getTransportCapabilities(SHIP_TRANSPORT).isEmpty()) {
+                getCampaign().removeCampaignTransporter(SHIP_TRANSPORT, this);
             }
 
             if (!getTransportCapabilities(CampaignTransportType.TACTICAL_TRANSPORT).isEmpty()) {
@@ -5953,8 +5998,8 @@ public class Unit implements ITechnology {
         // If this unit is a transport, let's add it to the campaign's
         // transporter map.
         if (campaign != null) {
-            if (!getTransportCapabilities(CampaignTransportType.SHIP_TRANSPORT).isEmpty()) {
-                getCampaign().addCampaignTransport(CampaignTransportType.SHIP_TRANSPORT, this);
+            if (!getTransportCapabilities(SHIP_TRANSPORT).isEmpty()) {
+                getCampaign().addCampaignTransport(SHIP_TRANSPORT, this);
             }
 
             if (!getTransportCapabilities(CampaignTransportType.TACTICAL_TRANSPORT).isEmpty()) {
@@ -7012,10 +7057,6 @@ public class Unit implements ITechnology {
             if (getTechOfficer() == null) {
                 logger.error("Unit {} ('{}') references missing tech officer {}", getId(), getName(), id);
             }
-        }
-
-        if (mothballInfo != null) {
-            mothballInfo.fixReferences(campaign);
         }
 
         if (hasTransportShipAssignment()) {
