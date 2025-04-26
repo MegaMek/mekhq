@@ -3,6 +3,7 @@ MEKHQ VERSION HISTORY:
 0.50.06
 + PR #6767: Updated Rank System XML Version to 0.50.06
 + PR #6768: 0.50.06 Deprecation Removal and Clean up 
++ PR #6772: Restored Event Handlers for Campaign State Management
 
 0.50.05 (2025-04-25 1800 UTC)
 + PR #6284: Fixed Unique Interaction when Loading Player Campaigns with Custom Rank Systems
